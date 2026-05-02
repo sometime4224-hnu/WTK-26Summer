@@ -255,6 +255,10 @@
             color: #475467;
         }
 
+        .scenario-btn__num {
+            display: none;
+        }
+
         .scenario-btn strong {
             display: block;
             font-size: 0.92rem;
@@ -597,38 +601,283 @@
 
         @media (max-width: 640px) {
             .shell {
-                width: min(100% - 20px, 1180px);
-                padding-top: 12px;
+                width: min(100% - 12px, 1180px);
+                padding-top: 8px;
+                padding-bottom: 18px;
             }
 
             .topbar {
                 grid-template-columns: 1fr;
+                min-height: 42px;
+                padding: 6px;
+                overflow: hidden;
+            }
+
+            .topbar__links {
+                min-width: 0;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                scrollbar-width: none;
+            }
+
+            .topbar__links::-webkit-scrollbar {
+                display: none;
+            }
+
+            .topbar a {
+                flex: 0 0 auto;
+                min-height: 30px;
+                padding: 0 9px;
+                font-size: 0.78rem;
             }
 
             .topbar__title {
                 display: none;
             }
 
-            .scene {
+            .hero {
+                gap: 8px;
+                padding: 10px 0 8px;
+            }
+
+            .eyebrow {
+                margin-bottom: 4px;
+                font-size: 0.68rem;
+            }
+
+            h1 {
+                font-size: 1.55rem;
+                line-height: 1.12;
+            }
+
+            .hero__copy {
+                display: none;
+            }
+
+            .hero__legend {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 6px;
+            }
+
+            .legend-chip {
+                min-height: 32px;
+                gap: 4px;
+                padding: 0 6px;
+                font-size: 0.72rem;
+            }
+
+            .activity {
+                gap: 8px;
+            }
+
+            .panel__head {
+                padding: 10px;
+            }
+
+            .panel__head h2 {
+                font-size: 0.98rem;
+            }
+
+            .badge {
+                min-height: 24px;
+                padding: 0 8px;
+                font-size: 0.72rem;
+            }
+
+            .scenario-list {
+                display: grid;
+                grid-template-columns: repeat(8, minmax(0, 1fr));
+                gap: 5px;
+                padding: 0 10px 10px;
+            }
+
+            .scenario-btn {
+                min-height: 38px;
                 grid-template-columns: 1fr;
+                place-items: center;
+                padding: 0;
+            }
+
+            .scenario-btn__icon,
+            .scenario-btn > span:last-child {
+                display: none;
+            }
+
+            .scenario-btn__num {
+                display: grid;
+                width: 100%;
+                height: 100%;
+                place-items: center;
+                color: #475467;
+                font-size: 0.82rem;
+                font-weight: 900;
+            }
+
+            .scenario-btn.active .scenario-btn__num {
+                color: var(--meter-color);
+            }
+
+            .meter-panel {
+                gap: 8px;
+                padding: 10px;
+            }
+
+            .scene {
+                grid-template-columns: 76px minmax(0, 1fr);
+                gap: 9px;
+                min-height: 0;
+                padding: 9px;
             }
 
             .scene__image {
-                min-height: 140px;
+                min-height: 86px;
             }
 
             .scene__image img {
-                min-height: 140px;
+                min-height: 86px;
             }
 
-            .meter-labels,
+            .scenario-copy {
+                justify-content: flex-start;
+            }
+
+            .scenario-copy h3 {
+                font-size: 0.96rem;
+                line-height: 1.28;
+            }
+
+            .scenario-copy p {
+                margin-top: 4px;
+                font-size: 0.78rem;
+                line-height: 1.34;
+            }
+
+            .scenario-copy .vi-text {
+                margin-top: 3px;
+                font-size: 0.73rem;
+                line-height: 1.32;
+            }
+
+            .scenario-copy .vi-text::before {
+                min-height: 16px;
+                margin-right: 4px;
+                padding: 0 5px;
+                font-size: 0.58rem;
+            }
+
+            .meter {
+                padding: 10px;
+            }
+
+            .meter__readout {
+                gap: 8px;
+            }
+
+            .readout-word {
+                min-height: 30px;
+                padding: 0 9px;
+                font-size: 0.86rem;
+            }
+
+            .readout-score {
+                min-width: 44px;
+                font-size: 1.25rem;
+            }
+
+            .meter-track {
+                margin-top: 10px;
+                padding-top: 14px;
+            }
+
+            input[type="range"] {
+                height: 10px;
+            }
+
+            input[type="range"]::-webkit-slider-thumb {
+                width: 24px;
+                height: 24px;
+            }
+
+            input[type="range"]::-moz-range-thumb {
+                width: 18px;
+                height: 18px;
+            }
+
+            .meter-labels {
+                display: none;
+            }
+
             .choice-grid,
             .reference {
                 grid-template-columns: 1fr 1fr;
             }
 
             .choice-btn {
+                min-height: 46px;
+                gap: 2px;
+                padding: 6px 4px;
+                font-size: 0.74rem;
+            }
+
+            .choice-btn i {
+                font-size: 0.9rem;
+            }
+
+            .actions {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+
+            .action-btn {
+                min-height: 36px;
+                padding: 0 8px;
+                font-size: 0.8rem;
+            }
+
+            #reset-btn {
+                grid-column: 1 / -1;
+            }
+
+            .feedback {
                 min-height: 58px;
+                padding: 9px;
+            }
+
+            .feedback strong {
+                font-size: 0.88rem;
+            }
+
+            .feedback p {
+                font-size: 0.78rem;
+                line-height: 1.34;
+            }
+
+            .reference {
+                gap: 6px;
+                margin-top: 8px;
+            }
+
+            .reference-card {
+                min-height: 0;
+            }
+
+            .reference-card img {
+                display: none;
+            }
+
+            .reference-card__body {
+                padding: 8px;
+            }
+
+            .reference-card h3 {
+                font-size: 0.86rem;
+            }
+
+            .reference-card p {
+                margin-top: 4px;
+                font-size: 0.72rem;
+                line-height: 1.3;
             }
         }
     </style>
@@ -912,6 +1161,7 @@
                 return `
                     <button class="scenario-btn${active}" data-index="${index}" type="button">
                         <span class="scenario-btn__icon"><i class="fa-solid ${doneIcon}"></i></span>
+                        <span class="scenario-btn__num">${index + 1}</span>
                         <span>
                             <strong>${index + 1}. ${scenario.title}</strong>
                             <span>상황 판단</span>
