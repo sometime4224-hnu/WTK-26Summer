@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>17과 어휘 보조자료2 | 가능성 판단 미터</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <style>
+        :root {
+            --ink: #172033;
+            --muted: #667085;
+            --paper: #ffffff;
+            --page: #f5f8fa;
+            --line: #d8e1ea;
+            --no: #be123c;
+            --hard: #b45309;
+            --maybe: #0f766e;
+            --sure: #4f46e5;
+            --shadow: 0 18px 44px rgba(17, 24, 39, 0.08);
+            --topbar-height: 48px;
+            --meter-color: var(--no);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            background: var(--page);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            background:
+                linear-gradient(180deg, #fbfdff 0%, #f5f8fa 58%, #f6f8f3 100%);
+            font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+            letter-spacing: 0;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            min-height: var(--topbar-height);
+            display: grid;
+            grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+            align-items: center;
+            gap: 10px;
+            padding: 7px 12px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid rgba(216, 225, 234, 0.92);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar__links {
+            display: flex;
+            gap: 7px;
+            align-items: center;
+            min-width: 0;
+            overflow-x: auto;
+        }
+
+        .topbar a {
+            min-height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid rgba(23, 32, 51, 0.1);
+            border-radius: 8px;
+            background: rgba(23, 32, 51, 0.04);
+            color: var(--ink);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar__title {
+            min-width: 0;
+            overflow: hidden;
+            text-align: right;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: #475467;
+        }
+
+        .shell {
+            width: min(1180px, 100% - 28px);
+            margin: 0 auto;
+            padding: 18px 0 34px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: end;
+            gap: 18px;
+            padding: 18px 0 14px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--maybe);
+            font-size: 0.76rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.9rem, 4vw, 3.6rem);
+            line-height: 1.08;
+            letter-spacing: 0;
+        }
+
+        .hero__copy {
+            max-width: 760px;
+            margin: 12px 0 0;
+            color: var(--muted);
+            font-size: 1.02rem;
+            line-height: 1.65;
+            font-weight: 700;
+        }
+
+        .hero__legend {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(88px, 1fr));
+            gap: 8px;
+            min-width: 260px;
+        }
+
+        .legend-chip {
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            font-size: 0.84rem;
+            font-weight: 900;
+        }
+
+        .legend-chip i {
+            color: var(--tone);
+        }
+
+        .activity {
+            display: grid;
+            grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .panel {
+            border: 1px solid rgba(216, 225, 234, 0.95);
+            border-radius: 8px;
+            background: var(--paper);
+            box-shadow: 0 12px 30px rgba(17, 24, 39, 0.05);
+            overflow: hidden;
+        }
+
+        .panel__head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 14px 15px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .panel__head h2 {
+            margin: 0;
+            font-size: 1.06rem;
+            line-height: 1.25;
+        }
+
+        .badge {
+            min-height: 26px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 9px;
+            border-radius: 999px;
+            background: #eef4f6;
+            color: #475467;
+            font-size: 0.76rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .scenario-list {
+            display: grid;
+            gap: 8px;
+            padding: 12px;
+        }
+
+        .scenario-btn {
+            width: 100%;
+            min-height: 72px;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            align-items: center;
+            gap: 10px;
+            padding: 11px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: inherit;
+            text-align: left;
+        }
+
+        .scenario-btn.active {
+            border-color: var(--meter-color);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--meter-color) 16%, transparent);
+        }
+
+        .scenario-btn__icon {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: #f3f6f8;
+            color: #475467;
+        }
+
+        .scenario-btn strong {
+            display: block;
+            font-size: 0.92rem;
+            line-height: 1.35;
+        }
+
+        .scenario-btn span:last-child {
+            display: block;
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .meter-panel {
+            display: grid;
+            gap: 14px;
+            padding: 15px;
+        }
+
+        .scene {
+            display: grid;
+            grid-template-columns: 156px minmax(0, 1fr);
+            gap: 14px;
+            min-height: 220px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 249, 252, 0.9)),
+                radial-gradient(circle at 18% 24%, color-mix(in srgb, var(--meter-color) 14%, transparent), transparent 36%),
+                radial-gradient(circle at 86% 78%, rgba(79, 70, 229, 0.1), transparent 30%);
+        }
+
+        .scene__image {
+            position: relative;
+            min-height: 170px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #edf2f7;
+        }
+
+        .scene__image img {
+            width: 100%;
+            height: 100%;
+            min-height: 170px;
+            display: block;
+            object-fit: cover;
+        }
+
+        .scene__image::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 42%, rgba(17, 24, 39, 0.24));
+        }
+
+        .scenario-copy {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .scenario-copy h3 {
+            margin: 0;
+            font-size: clamp(1.18rem, 2.4vw, 1.8rem);
+            line-height: 1.28;
+            letter-spacing: 0;
+        }
+
+        .scenario-copy p {
+            margin: 10px 0 0;
+            color: var(--muted);
+            font-weight: 800;
+            line-height: 1.55;
+        }
+
+        .scenario-copy .vi-text {
+            margin-top: 6px;
+            color: #4b5563;
+            font-size: 0.92rem;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .scenario-copy .vi-text::before {
+            content: "VI";
+            display: inline-flex;
+            min-height: 20px;
+            align-items: center;
+            margin-right: 7px;
+            padding: 0 6px;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--meter-color) 10%, #fff);
+            color: var(--meter-color);
+            font-size: 0.68rem;
+            font-weight: 900;
+            vertical-align: 1px;
+        }
+
+        .meter {
+            padding: 15px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .meter__readout {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .readout-word {
+            display: inline-flex;
+            min-height: 38px;
+            align-items: center;
+            padding: 0 12px;
+            border-radius: 8px;
+            background: color-mix(in srgb, var(--meter-color) 13%, #fff);
+            color: var(--meter-color);
+            font-size: 1.05rem;
+            font-weight: 900;
+        }
+
+        .readout-score {
+            min-width: 72px;
+            text-align: right;
+            color: var(--meter-color);
+            font-size: 1.7rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .meter-track {
+            position: relative;
+            margin-top: 20px;
+            padding-top: 20px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 12px;
+            appearance: none;
+            border-radius: 999px;
+            background:
+                linear-gradient(90deg,
+                    var(--no) 0 22%,
+                    var(--hard) 22% 47%,
+                    var(--maybe) 47% 73%,
+                    var(--sure) 73% 100%);
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border: 4px solid #fff;
+            border-radius: 50%;
+            background: var(--meter-color);
+            box-shadow: 0 8px 18px rgba(17, 24, 39, 0.22);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border: 4px solid #fff;
+            border-radius: 50%;
+            background: var(--meter-color);
+            box-shadow: 0 8px 18px rgba(17, 24, 39, 0.22);
+        }
+
+        .meter-labels {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .meter-label {
+            min-height: 42px;
+            display: grid;
+            place-items: center;
+            padding: 7px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: #475467;
+            font-size: 0.8rem;
+            font-weight: 900;
+            text-align: center;
+            line-height: 1.25;
+        }
+
+        .meter-label.active {
+            border-color: var(--tone);
+            color: var(--tone);
+            background: color-mix(in srgb, var(--tone) 10%, #fff);
+        }
+
+        .choice-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 9px;
+        }
+
+        .choice-btn {
+            min-height: 70px;
+            display: grid;
+            place-items: center;
+            gap: 4px;
+            padding: 9px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--tone);
+            font-weight: 900;
+            text-align: center;
+            line-height: 1.22;
+        }
+
+        .choice-btn i {
+            font-size: 1.05rem;
+        }
+
+        .choice-btn.active {
+            border-color: var(--tone);
+            background: color-mix(in srgb, var(--tone) 10%, #fff);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--tone) 14%, transparent);
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            min-height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--ink);
+            padding: 0 13px;
+            font-weight: 900;
+        }
+
+        .action-btn.primary {
+            border-color: var(--meter-color);
+            background: var(--meter-color);
+            color: #fff;
+        }
+
+        .feedback {
+            min-height: 84px;
+            display: grid;
+            gap: 4px;
+            align-content: center;
+            padding: 13px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .feedback strong {
+            color: var(--meter-color);
+            font-size: 1rem;
+        }
+
+        .feedback p {
+            margin: 0;
+            color: var(--muted);
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .reference {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .reference-card {
+            min-height: 190px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            overflow: hidden;
+            box-shadow: 0 10px 24px rgba(17, 24, 39, 0.04);
+        }
+
+        .reference-card img {
+            width: 100%;
+            height: 98px;
+            display: block;
+            object-fit: cover;
+        }
+
+        .reference-card__body {
+            padding: 11px;
+        }
+
+        .reference-card h3 {
+            margin: 0;
+            color: var(--tone);
+            font-size: 1rem;
+            line-height: 1.25;
+        }
+
+        .reference-card p {
+            margin: 7px 0 0;
+            color: var(--muted);
+            font-size: 0.84rem;
+            line-height: 1.45;
+            font-weight: 800;
+        }
+
+        @media (max-width: 980px) {
+            .hero,
+            .activity {
+                grid-template-columns: 1fr;
+            }
+
+            .hero__legend {
+                min-width: 0;
+            }
+
+            .reference {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                width: min(100% - 20px, 1180px);
+                padding-top: 12px;
+            }
+
+            .topbar {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar__title {
+                display: none;
+            }
+
+            .scene {
+                grid-template-columns: 1fr;
+            }
+
+            .scene__image {
+                min-height: 140px;
+            }
+
+            .scene__image img {
+                min-height: 140px;
+            }
+
+            .meter-labels,
+            .choice-grid,
+            .reference {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .choice-btn {
+                min-height: 58px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar">
+        <div class="topbar__links">
+            <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+            <a href="index.html"><i class="fa-solid fa-folder-open"></i> 17과</a>
+            <a href="vocabulary.html"><i class="fa-solid fa-comments"></i> 어휘</a>
+            <a href="vocab-support-rumor-flow.html"><i class="fa-solid fa-share-nodes"></i> 보조1</a>
+            <a href="vocab-support-misunderstanding-sequence.html"><i class="fa-solid fa-timeline"></i> 보조3</a>
+            <a href="vocab-support-adverb-tone.html"><i class="fa-solid fa-sliders"></i> 보조4</a>
+        </div>
+        <div class="topbar__title">어휘 보조자료2: 가능성 판단 미터</div>
+    </nav>
+
+    <main class="shell">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">Vocabulary Support 2</p>
+                <h1>가능성 판단 미터</h1>
+                <p class="hero__copy">소문이나 상황을 들은 뒤, 가능성이 낮은지 높은지에 따라 반응 표현을 고릅니다.</p>
+            </div>
+            <div class="hero__legend" aria-label="표현 범위">
+                <span class="legend-chip" style="--tone: var(--no);"><i class="fa-solid fa-ban"></i> 불가능</span>
+                <span class="legend-chip" style="--tone: var(--hard);"><i class="fa-solid fa-face-surprise"></i> 불신</span>
+                <span class="legend-chip" style="--tone: var(--maybe);"><i class="fa-solid fa-check"></i> 가능</span>
+                <span class="legend-chip" style="--tone: var(--sure);"><i class="fa-solid fa-certificate"></i> 확실</span>
+            </div>
+        </header>
+
+        <section class="activity" aria-label="가능성 판단 활동">
+            <aside class="panel">
+                <div class="panel__head">
+                    <h2>상황 카드</h2>
+                    <span class="badge"><i class="fa-solid fa-layer-group"></i> 8문항</span>
+                </div>
+                <div id="scenario-list" class="scenario-list"></div>
+            </aside>
+
+            <section class="panel">
+                <div class="panel__head">
+                    <h2>판단하기</h2>
+                    <span id="progress-badge" class="badge">1 / 8</span>
+                </div>
+                <div class="meter-panel">
+                    <div class="scene">
+                        <div class="scene__image">
+                            <img id="scenario-image" src="../assets/c17/vocabulary/images/cards/possibility-possible.webp" alt="">
+                        </div>
+                        <div class="scenario-copy">
+                            <h3 id="scenario-title"></h3>
+                            <p id="scenario-title-vi" class="vi-text"></p>
+                            <p id="scenario-clue"></p>
+                            <p id="scenario-clue-vi" class="vi-text"></p>
+                        </div>
+                    </div>
+
+                    <div class="meter" aria-label="확신 정도">
+                        <div class="meter__readout">
+                            <span id="readout-word" class="readout-word">그럴 수 있다</span>
+                            <span id="readout-score" class="readout-score">55</span>
+                        </div>
+                        <div class="meter-track">
+                            <input id="confidence-range" type="range" min="0" max="100" value="55" aria-label="확신 정도">
+                        </div>
+                        <div id="meter-labels" class="meter-labels"></div>
+                    </div>
+
+                    <div id="choice-grid" class="choice-grid" aria-label="표현 선택"></div>
+
+                    <div class="actions">
+                        <button id="check-btn" class="action-btn primary" type="button"><i class="fa-solid fa-check"></i> 정답 확인</button>
+                        <button id="next-btn" class="action-btn" type="button"><i class="fa-solid fa-arrow-right"></i> 다음 상황</button>
+                        <button id="reset-btn" class="action-btn" type="button"><i class="fa-solid fa-rotate-right"></i> 다시 시작</button>
+                    </div>
+
+                    <div id="feedback" class="feedback" aria-live="polite">
+                        <strong>표현을 선택하세요.</strong>
+                        <p>미터 위치와 표현 버튼이 함께 움직입니다.</p>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section class="reference" aria-label="가능성 표현 정리">
+            <article class="reference-card" style="--tone: var(--no);">
+                <img src="../assets/c17/vocabulary/images/cards/possibility-no-reason.webp" alt="">
+                <div class="reference-card__body">
+                    <h3>그럴 리가 없다</h3>
+                    <p>가능성이 거의 없다고 판단할 때 씁니다.</p>
+                </div>
+            </article>
+            <article class="reference-card" style="--tone: var(--hard);">
+                <img src="../assets/c17/vocabulary/images/cards/possibility-hard-to-believe.webp" alt="">
+                <div class="reference-card__body">
+                    <h3>믿어지지 않다</h3>
+                    <p>사실일 수 있지만 마음으로 받아들이기 어려울 때 씁니다.</p>
+                </div>
+            </article>
+            <article class="reference-card" style="--tone: var(--maybe);">
+                <img src="../assets/c17/vocabulary/images/cards/possibility-possible.webp" alt="">
+                <div class="reference-card__body">
+                    <h3>그럴 수 있다</h3>
+                    <p>그런 일이 가능하다고 인정할 때 씁니다.</p>
+                </div>
+            </article>
+            <article class="reference-card" style="--tone: var(--sure);">
+                <img src="../assets/c17/vocabulary/images/cards/possibility-certain.webp" alt="">
+                <div class="reference-card__body">
+                    <h3>틀림없다</h3>
+                    <p>근거가 충분해서 확실하다고 판단할 때 씁니다.</p>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <script>
+        const expressionData = [
+            {
+                id: "no-reason",
+                label: "그럴 리가 없다",
+                short: "불가능",
+                score: 10,
+                min: 0,
+                max: 24,
+                color: "#be123c",
+                icon: "fa-ban"
+            },
+            {
+                id: "hard-to-believe",
+                label: "믿어지지 않다",
+                short: "불신",
+                score: 38,
+                min: 25,
+                max: 49,
+                color: "#b45309",
+                icon: "fa-face-surprise"
+            },
+            {
+                id: "possible",
+                label: "그럴 수 있다",
+                short: "가능",
+                score: 62,
+                min: 50,
+                max: 74,
+                color: "#0f766e",
+                icon: "fa-check"
+            },
+            {
+                id: "certain",
+                label: "틀림없다",
+                short: "확실",
+                score: 90,
+                min: 75,
+                max: 100,
+                color: "#4f46e5",
+                icon: "fa-certificate"
+            }
+        ];
+
+        const imageBasePath = "../assets/c17/vocabulary/images/cards";
+        const scenarios = [
+            {
+                title: "항상 일찍 오던 친구가 오늘 연락 없이 결석했어요.",
+                clue: "어제 밤에 열이 난다고 말했어요.",
+                viTitle: "Người bạn luôn đến sớm hôm nay nghỉ học mà không báo.",
+                viClue: "Tối qua bạn ấy nói là bị sốt.",
+                answer: "possible",
+                image: `${imageBasePath}/possibility-possible.webp`,
+                reason: "아팠다는 단서가 있으므로 결석은 충분히 가능한 상황입니다."
+            },
+            {
+                title: "한국어를 전혀 모르는 사람이 통역 없이 긴 인터뷰를 했대요.",
+                clue: "그 사람은 아직 한글도 배우지 않았어요.",
+                viTitle: "Có người không biết tiếng Hàn mà nói là đã phỏng vấn dài không cần phiên dịch.",
+                viClue: "Người đó còn chưa học bảng chữ Hàn.",
+                answer: "no-reason",
+                image: `${imageBasePath}/possibility-no-reason.webp`,
+                reason: "현재 능력과 소문이 맞지 않아 가능성이 매우 낮습니다."
+            },
+            {
+                title: "두 사람이 매일 같이 점심을 먹고 같은 팔찌를 하고 있어요.",
+                clue: "친구들이 지난주에도 둘이 데이트하는 것을 봤대요.",
+                viTitle: "Hai người ngày nào cũng ăn trưa cùng nhau và đeo vòng tay giống nhau.",
+                viClue: "Tuần trước bạn bè cũng thấy họ đi hẹn hò.",
+                answer: "certain",
+                image: `${imageBasePath}/possibility-certain.webp`,
+                reason: "반복된 행동과 목격담이 있어 확신에 가까운 판단을 할 수 있습니다."
+            },
+            {
+                title: "오랫동안 준비한 유학 합격 소식을 들었어요.",
+                clue: "기쁘지만 너무 갑작스러워 아직 실감이 나지 않아요.",
+                viTitle: "Bạn nghe tin mình đã đậu du học sau thời gian chuẩn bị lâu.",
+                viClue: "Bạn vui, nhưng tin đến quá bất ngờ nên vẫn chưa thấy thật.",
+                answer: "hard-to-believe",
+                image: `${imageBasePath}/possibility-hard-to-believe.webp`,
+                reason: "사실을 부정한다기보다 마음으로 받아들이기 어려운 느낌입니다."
+            },
+            {
+                title: "내일 시험이 있다는 소문이 갑자기 돌았어요.",
+                clue: "선생님은 오늘 수업 끝에 시험이 없다고 세 번 말했어요.",
+                viTitle: "Bỗng có tin đồn rằng ngày mai có bài kiểm tra.",
+                viClue: "Cuối giờ hôm nay, thầy cô nói ba lần là không có kiểm tra.",
+                answer: "no-reason",
+                image: `${imageBasePath}/possibility-no-reason.webp`,
+                reason: "권위 있는 정보가 반대 방향이므로 소문을 믿기 어렵습니다."
+            },
+            {
+                title: "친구가 약속 시간을 잊어버렸어요.",
+                clue: "요즘 시험 기간이라 며칠째 거의 못 잤대요.",
+                viTitle: "Bạn của bạn quên giờ hẹn.",
+                viClue: "Dạo này đang mùa thi nên bạn ấy gần như không ngủ mấy ngày.",
+                answer: "possible",
+                image: `${imageBasePath}/possibility-possible.webp`,
+                reason: "피곤한 상황에서는 약속을 잊을 수도 있다고 인정할 수 있습니다."
+            },
+            {
+                title: "회의실에 불이 켜져 있고 발표 자료가 화면에 떠 있어요.",
+                clue: "방금 안에서 발표 연습하는 소리도 들렸어요.",
+                viTitle: "Phòng họp đang bật đèn và tài liệu thuyết trình hiện trên màn hình.",
+                viClue: "Vừa rồi bạn cũng nghe tiếng luyện thuyết trình bên trong.",
+                answer: "certain",
+                image: `${imageBasePath}/possibility-certain.webp`,
+                reason: "여러 단서가 같은 방향을 가리키므로 거의 확실한 상황입니다."
+            },
+            {
+                title: "오랜만에 만난 친구가 다음 달에 결혼한다고 했어요.",
+                clue: "너무 뜻밖이라 처음에는 농담처럼 들렸어요.",
+                viTitle: "Một người bạn lâu ngày gặp lại nói rằng tháng sau sẽ kết hôn.",
+                viClue: "Tin quá bất ngờ nên lúc đầu nghe như đùa.",
+                answer: "hard-to-believe",
+                image: `${imageBasePath}/possibility-hard-to-believe.webp`,
+                reason: "뜻밖의 사실을 듣고 놀라서 믿기 어려운 반응입니다."
+            }
+        ];
+
+        const scenarioListEl = document.getElementById("scenario-list");
+        const scenarioImageEl = document.getElementById("scenario-image");
+        const scenarioTitleEl = document.getElementById("scenario-title");
+        const scenarioTitleViEl = document.getElementById("scenario-title-vi");
+        const scenarioClueEl = document.getElementById("scenario-clue");
+        const scenarioClueViEl = document.getElementById("scenario-clue-vi");
+        const progressBadgeEl = document.getElementById("progress-badge");
+        const rangeEl = document.getElementById("confidence-range");
+        const readoutWordEl = document.getElementById("readout-word");
+        const readoutScoreEl = document.getElementById("readout-score");
+        const meterLabelsEl = document.getElementById("meter-labels");
+        const choiceGridEl = document.getElementById("choice-grid");
+        const feedbackEl = document.getElementById("feedback");
+        const checkBtn = document.getElementById("check-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const resetBtn = document.getElementById("reset-btn");
+
+        let currentIndex = 0;
+        let selectedExpressionId = "possible";
+        let checkedScenarios = new Set();
+
+        function getExpressionById(id) {
+            return expressionData.find((item) => item.id === id);
+        }
+
+        function getExpressionByScore(score) {
+            return expressionData.find((item) => score >= item.min && score <= item.max) || expressionData[0];
+        }
+
+        function setTone(expression) {
+            document.documentElement.style.setProperty("--meter-color", expression.color);
+        }
+
+        function renderScenarioList() {
+            scenarioListEl.innerHTML = scenarios.map((scenario, index) => {
+                const active = index === currentIndex ? " active" : "";
+                const doneIcon = checkedScenarios.has(index) ? "fa-circle-check" : "fa-circle";
+                return `
+                    <button class="scenario-btn${active}" data-index="${index}" type="button">
+                        <span class="scenario-btn__icon"><i class="fa-solid ${doneIcon}"></i></span>
+                        <span>
+                            <strong>${index + 1}. ${scenario.title}</strong>
+                            <span>상황 판단</span>
+                        </span>
+                    </button>
+                `;
+            }).join("");
+        }
+
+        function renderMeterLabels() {
+            meterLabelsEl.innerHTML = expressionData.map((item) => `
+                <span class="meter-label${item.id === selectedExpressionId ? " active" : ""}" style="--tone: ${item.color};">${item.short}<br>${item.label}</span>
+            `).join("");
+        }
+
+        function renderChoices() {
+            choiceGridEl.innerHTML = expressionData.map((item) => `
+                <button class="choice-btn${item.id === selectedExpressionId ? " active" : ""}" data-expression="${item.id}" style="--tone: ${item.color};" type="button">
+                    <i class="fa-solid ${item.icon}"></i>
+                    <span>${item.label}</span>
+                </button>
+            `).join("");
+        }
+
+        function updateMeterFromExpression(id, syncRange = true) {
+            selectedExpressionId = id;
+            const expression = getExpressionById(id);
+            setTone(expression);
+            if (syncRange) {
+                rangeEl.value = expression.score;
+            }
+            readoutWordEl.textContent = expression.label;
+            readoutScoreEl.textContent = rangeEl.value;
+            renderMeterLabels();
+            renderChoices();
+        }
+
+        function showScenario(index) {
+            currentIndex = index;
+            const scenario = scenarios[currentIndex];
+            scenarioImageEl.src = scenario.image;
+            scenarioTitleEl.textContent = scenario.title;
+            scenarioTitleViEl.textContent = scenario.viTitle;
+            scenarioClueEl.textContent = scenario.clue;
+            scenarioClueViEl.textContent = scenario.viClue;
+            progressBadgeEl.textContent = `${currentIndex + 1} / ${scenarios.length}`;
+            feedbackEl.innerHTML = `
+                <strong>표현을 선택하세요.</strong>
+                <p>상황과 단서를 보고 가장 자연스러운 반응을 고릅니다.</p>
+            `;
+            updateMeterFromExpression("possible", true);
+            renderScenarioList();
+        }
+
+        function checkAnswer() {
+            const scenario = scenarios[currentIndex];
+            const answer = getExpressionById(scenario.answer);
+            const selected = getExpressionById(selectedExpressionId);
+            const isCorrect = selected.id === answer.id;
+            checkedScenarios.add(currentIndex);
+            feedbackEl.innerHTML = isCorrect
+                ? `<strong>맞아요. ${answer.label}</strong><p>${scenario.reason}</p>`
+                : `<strong>다시 볼 표현: ${answer.label}</strong><p>${scenario.reason}</p>`;
+            updateMeterFromExpression(answer.id, true);
+            renderScenarioList();
+        }
+
+        function moveNext() {
+            showScenario((currentIndex + 1) % scenarios.length);
+        }
+
+        scenarioListEl.addEventListener("click", (event) => {
+            const button = event.target.closest(".scenario-btn");
+            if (!button) return;
+            showScenario(Number(button.dataset.index));
+        });
+
+        rangeEl.addEventListener("input", () => {
+            const expression = getExpressionByScore(Number(rangeEl.value));
+            updateMeterFromExpression(expression.id, false);
+            readoutScoreEl.textContent = rangeEl.value;
+        });
+
+        choiceGridEl.addEventListener("click", (event) => {
+            const button = event.target.closest(".choice-btn");
+            if (!button) return;
+            updateMeterFromExpression(button.dataset.expression, true);
+        });
+
+        checkBtn.addEventListener("click", checkAnswer);
+        nextBtn.addEventListener("click", moveNext);
+        resetBtn.addEventListener("click", () => {
+            checkedScenarios = new Set();
+            showScenario(0);
+        });
+
+        showScenario(0);
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

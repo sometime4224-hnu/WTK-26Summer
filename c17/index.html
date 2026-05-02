@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17과 챕터 허브 | 두 사람이 연인 사이래요?</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-start: #fffaf0;
+            --bg-end: #eff6ff;
+            --ink: #1f2937;
+            --muted: #64748b;
+            --line: rgba(148, 163, 184, 0.28);
+            --panel: rgba(255, 255, 255, 0.9);
+            --shadow: 0 14px 30px rgba(15, 23, 42, 0.07);
+            --vocab: #fb923c;
+            --grammar: #4f46e5;
+            --listening: #0f766e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans KR", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 8% 12%, rgba(251, 191, 36, 0.16), transparent 26%),
+                radial-gradient(circle at 88% 16%, rgba(59, 130, 246, 0.16), transparent 28%),
+                linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 100%);
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            border-radius: 999px;
+            filter: blur(22px);
+            opacity: 0.56;
+            pointer-events: none;
+        }
+
+        body::before {
+            inset: 88px auto auto -34px;
+            width: 170px;
+            height: 170px;
+            background: rgba(249, 115, 22, 0.22);
+        }
+
+        body::after {
+            inset: auto -34px 54px auto;
+            width: 210px;
+            height: 210px;
+            background: rgba(56, 189, 248, 0.18);
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 10px 18px;
+            backdrop-filter: blur(14px);
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.78);
+        }
+
+        .topbar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #ea580c;
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .topbar span {
+            color: #475569;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .shell {
+            width: min(1200px, calc(100% - 32px));
+            margin: 14px auto 34px;
+        }
+
+        .hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            gap: 14px 18px;
+            overflow: hidden;
+            padding: 18px 22px;
+            border-radius: 24px;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.97) 0%, rgba(255, 237, 213, 0.92) 38%, rgba(219, 234, 254, 0.92) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.78);
+            box-shadow: var(--shadow);
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: auto -38px -78px auto;
+            width: 250px;
+            height: 250px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, rgba(59, 130, 246, 0) 70%);
+        }
+
+        .hero__badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: max-content;
+            padding: 8px 13px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(254, 215, 170, 0.84), rgba(219, 234, 254, 0.86));
+            color: #9a3412;
+            font-weight: 800;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(1.8rem, 3.1vw, 2.9rem);
+            line-height: 1.1;
+        }
+
+        .hero__chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            grid-column: 1 / -1;
+            margin-top: 0;
+        }
+
+        .hero__chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.82);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            color: #334155;
+            font-weight: 700;
+            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.4);
+        }
+
+        .section {
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 24px;
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.74);
+            box-shadow: var(--shadow);
+        }
+
+        .section__head {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .section__eyebrow {
+            margin: 0 0 8px;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 900;
+            color: #0f766e;
+        }
+
+        .section h2 {
+            margin: 0;
+            font-size: clamp(1.4rem, 2vw, 1.95rem);
+        }
+
+        .path-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(236px, 1fr));
+            gap: 14px;
+        }
+
+        .path-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            column-gap: 12px;
+            row-gap: 10px;
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.82);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.045);
+        }
+
+        .path-card[data-tone="vocab"] {
+            background: linear-gradient(180deg, rgba(255, 247, 237, 0.95) 0%, rgba(255, 255, 255, 0.88) 100%);
+        }
+
+        .path-card[data-tone="grammar"] {
+            background: linear-gradient(180deg, rgba(238, 242, 255, 0.96) 0%, rgba(255, 255, 255, 0.88) 100%);
+        }
+
+        .path-card[data-tone="listening"] {
+            background: linear-gradient(180deg, rgba(240, 253, 250, 0.96) 0%, rgba(255, 255, 255, 0.88) 100%);
+        }
+
+        .path-card__badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: max-content;
+            padding: 7px 11px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.82rem;
+        }
+
+        .path-card[data-tone="vocab"] .path-card__badge {
+            color: #9a3412;
+            background: rgba(254, 215, 170, 0.9);
+        }
+
+        .path-card[data-tone="grammar"] .path-card__badge {
+            color: #3730a3;
+            background: rgba(199, 210, 254, 0.9);
+        }
+
+        .path-card[data-tone="listening"] .path-card__badge {
+            color: #0f766e;
+            background: rgba(153, 246, 228, 0.86);
+        }
+
+        .path-card h3 {
+            margin: 0;
+            min-width: 0;
+            font-size: 1.08rem;
+            line-height: 1.35;
+        }
+
+        .lesson-list {
+            display: grid;
+            grid-column: 1 / -1;
+            gap: 8px;
+            margin-top: 0;
+        }
+
+        .lesson-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            text-decoration: none;
+            color: inherit;
+            background: rgba(255, 255, 255, 0.84);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            box-shadow: 0 12px 22px rgba(15, 23, 42, 0.04);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+
+        .lesson-link:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.28);
+            box-shadow: 0 18px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .lesson-link--main {
+            border-width: 2px;
+        }
+
+        .lesson-link--main .lesson-kind {
+            background: rgba(59, 130, 246, 0.12);
+            color: #1d4ed8;
+        }
+
+        .lesson-link--coming {
+            cursor: default;
+            opacity: 0.76;
+            border-style: dashed;
+        }
+
+        .lesson-link--coming:hover {
+            transform: none;
+            border-color: rgba(148, 163, 184, 0.18);
+            box-shadow: 0 12px 22px rgba(15, 23, 42, 0.04);
+        }
+
+        .lesson-link--coming .lesson-kind {
+            background: rgba(148, 163, 184, 0.16);
+            color: #475569;
+        }
+
+        .lesson-link > div {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 0;
+        }
+
+        .lesson-kind {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            background: rgba(226, 232, 240, 0.84);
+            color: #475569;
+        }
+
+        .lesson-title {
+            display: block;
+            margin-top: 0;
+            font-weight: 800;
+            font-size: 0.95rem;
+            line-height: 1.35;
+        }
+
+        .lesson-arrow {
+            flex: 0 0 auto;
+            color: #94a3b8;
+        }
+
+        .staff-note {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+        }
+
+        .staff-note summary {
+            cursor: pointer;
+            font-weight: 800;
+            color: #475569;
+        }
+
+        .staff-note p {
+            margin: 12px 0 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        body .le-index-summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 14px;
+        }
+
+        body .le-index-summary strong {
+            flex: 0 0 auto;
+            margin: 0;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        body .le-progress-track {
+            flex: 1 1 auto;
+            height: 6px;
+        }
+
+        body .le-progress-text {
+            flex: 0 0 auto;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 720px) {
+            .topbar {
+                padding: 13px 14px;
+            }
+
+            .shell {
+                width: min(100% - 20px, 1120px);
+                margin: 12px auto 28px;
+            }
+
+            .hero,
+            .section {
+                padding: 18px;
+                border-radius: 22px;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .section__head {
+                align-items: start;
+                flex-direction: column;
+            }
+
+            .lesson-link > div {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            body .le-index-summary {
+                gap: 8px;
+            }
+
+            body .le-index-summary strong {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <header class="topbar">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인으로</a>
+        <span>17과 챕터 허브</span>
+    </header>
+
+    <main class="shell">
+        <section class="hero">
+            <span class="hero__badge"><i class="fa-solid fa-bolt"></i> 17과</span>
+            <h1>두 사람이 연인 사이래요?</h1>
+            <div class="hero__chips">
+                <span class="hero__chip"><i class="fa-solid fa-layer-group"></i> 어휘 자료 5개</span>
+                <span class="hero__chip"><i class="fa-solid fa-book-open"></i> 문법 2개</span>
+                <span class="hero__chip"><i class="fa-solid fa-headphones"></i> 듣고 말하기</span>
+                <span class="hero__chip"><i class="fa-solid fa-comments"></i> 말하기</span>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section__head">
+                <div>
+                    <p class="section__eyebrow">Vocabulary</p>
+                    <h2>어휘</h2>
+                </div>
+            </div>
+            <div class="path-grid">
+                <article class="path-card" data-tone="vocab">
+                    <span class="path-card__badge"><i class="fa-solid fa-layer-group"></i> 어휘 메인 + 보조 활동</span>
+                    <h3>소문 · 가능성 · 말하는 태도 · 오해와 화해 어휘</h3>
+                    <div class="lesson-list">
+                        <a class="lesson-link lesson-link--main" href="vocabulary.html">
+                            <div>
+                                <span class="lesson-kind">핵심</span>
+                                <span class="lesson-title">어휘 카드</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                        </a>
+                        <a class="lesson-link" href="vocab-support-rumor-flow.html">
+                            <div>
+                                <span class="lesson-kind">보조 자료 1</span>
+                                <span class="lesson-title">소문 흐름 도식</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                        </a>
+                        <a class="lesson-link" href="vocab-support-possibility-meter.html">
+                            <div>
+                                <span class="lesson-kind">보조 자료 2</span>
+                                <span class="lesson-title">가능성 판단 미터</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                        </a>
+                        <a class="lesson-link" href="vocab-support-misunderstanding-sequence.html">
+                            <div>
+                                <span class="lesson-kind">보조 자료 3</span>
+                                <span class="lesson-title">오해 사건 순서 배열</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                        </a>
+                        <a class="lesson-link" href="vocab-support-adverb-tone.html">
+                            <div>
+                                <span class="lesson-kind">보조 자료 4</span>
+                                <span class="lesson-title">말하는 태도 렌즈</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section__head">
+                <div>
+                    <p class="section__eyebrow">Grammar</p>
+                    <h2>문법</h2>
+                </div>
+            </div>
+            <div class="path-grid">
+                <article class="path-card" data-tone="grammar">
+                    <span class="path-card__badge"><i class="fa-solid fa-1"></i> 문법 1</span>
+                    <h3>V-고 보니</h3>
+                    <div class="lesson-list">
+                        <div class="lesson-link lesson-link--coming">
+                            <div>
+                                <span class="lesson-kind">준비 중</span>
+                                <span class="lesson-title">문법 1 메인 페이지</span>
+                            </div>
+                            <i class="fa-solid fa-hourglass-half lesson-arrow"></i>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="path-card" data-tone="grammar">
+                    <span class="path-card__badge"><i class="fa-solid fa-2"></i> 문법 2</span>
+                    <h3>A-(으)ㄴ 척하다 · V-는 척하다</h3>
+                    <div class="lesson-list">
+                        <div class="lesson-link lesson-link--coming">
+                            <div>
+                                <span class="lesson-kind">준비 중</span>
+                                <span class="lesson-title">문법 2 메인 페이지</span>
+                            </div>
+                            <i class="fa-solid fa-hourglass-half lesson-arrow"></i>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section__head">
+                <div>
+                    <p class="section__eyebrow">Listening & Speaking</p>
+                    <h2>듣고 말하기 · 말하기</h2>
+                </div>
+            </div>
+            <div class="path-grid">
+                <article class="path-card" data-tone="listening">
+                    <span class="path-card__badge"><i class="fa-solid fa-headphones"></i> 듣고 말하기</span>
+                    <h3>소문을 듣고 사실 관계 확인하기</h3>
+                    <div class="lesson-list">
+                        <div class="lesson-link lesson-link--coming">
+                            <div>
+                                <span class="lesson-kind">듣기</span>
+                                <span class="lesson-title">소문과 오해 듣기 활동</span>
+                            </div>
+                            <i class="fa-solid fa-hourglass-half lesson-arrow"></i>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="path-card" data-tone="listening">
+                    <span class="path-card__badge"><i class="fa-solid fa-comments"></i> 말하기</span>
+                    <h3>들은 이야기를 전하고 오해를 정정하기</h3>
+                    <div class="lesson-list">
+                        <div class="lesson-link lesson-link--coming">
+                            <div>
+                                <span class="lesson-kind">말하기 1</span>
+                                <span class="lesson-title">소문 전달하기</span>
+                            </div>
+                            <i class="fa-solid fa-hourglass-half lesson-arrow"></i>
+                        </div>
+                        <div class="lesson-link lesson-link--coming">
+                            <div>
+                                <span class="lesson-kind">말하기 2</span>
+                                <span class="lesson-title">오해 정정하기</span>
+                            </div>
+                            <i class="fa-solid fa-hourglass-half lesson-arrow"></i>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section__head">
+                <div>
+                    <p class="section__eyebrow">Review</p>
+                    <h2>복습 · 시험</h2>
+                </div>
+            </div>
+            <div class="path-grid">
+                <article class="path-card" data-tone="grammar">
+                    <span class="path-card__badge"><i class="fa-solid fa-clipboard-check"></i> 실전 세트</span>
+                    <h3>17과 어휘·문법 모의고사</h3>
+                    <div class="lesson-list">
+                        <div class="lesson-link lesson-link--coming">
+                            <div>
+                                <span class="lesson-kind">준비 중</span>
+                                <span class="lesson-title">자동저장 모의고사</span>
+                            </div>
+                            <i class="fa-solid fa-hourglass-half lesson-arrow"></i>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <details class="staff-note">
+            <summary>강사용 안내</summary>
+            <p>17과는 현재 어휘 메인 페이지와 어휘 보조자료 1-4를 먼저 연결했습니다. 보조자료는 <code>소문이 나다/소문을 내다</code>, <code>소문이 퍼지다/소문을 퍼뜨리다</code>, 가능성 판단 표현, 오해와 화해 흐름, 말하는 태도 부사를 중심으로 구성했습니다.</p>
+            <p>문법, 듣고 말하기, 말하기, 복습 시험은 15·16과의 표준 인덱스 구조에 맞춰 준비 중 항목으로 배치했습니다. 개별 페이지가 제작되면 같은 <code>lesson-link</code> 형식으로 실제 링크만 교체하면 됩니다.</p>
+        </details>
+    </main>
+
+    <script src="../shared/learning-enhancements.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>
