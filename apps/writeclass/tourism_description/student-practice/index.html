@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기말 말하기 수행평가 준비 학습지 | 내 나라 관광지 소개</title>
+<meta name="description" content="내 나라 관광지를 한국어로 소개하는 기말 말하기 수행평가 발표문을 준비하는 학생용 학습지입니다.">
+<style>
+:root {
+  --ink: #172033;
+  --muted: #64748b;
+  --line: #d6dde8;
+  --paper: #ffffff;
+  --bg: #f3f7fb;
+  --navy: #1a3d6e;
+  --orange: #d97706;
+  --teal: #0d9488;
+  --green: #3f7a48;
+  --rose: #b4535a;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  color: var(--ink);
+  background:
+    linear-gradient(90deg, rgba(26, 61, 110, 0.05) 1px, transparent 1px),
+    linear-gradient(180deg, #eef5fb 0%, var(--bg) 100%);
+  background-size: 28px 28px, auto;
+}
+
+button, input, textarea { font: inherit; color: inherit; }
+
+.shell {
+  width: min(100% - 28px, 1100px);
+  margin: 14px auto 44px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  position: sticky;
+  top: 10px;
+  z-index: 20;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+}
+
+.topbar__links,
+.topbar__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+a, .link-btn {
+  color: var(--navy);
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.link-btn,
+.action-btn {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 8px;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+.action-btn {
+  color: #fff;
+  background: var(--navy);
+  border-color: var(--navy);
+  font-weight: 800;
+}
+
+.action-btn.secondary {
+  background: #fff;
+  color: var(--navy);
+  border-color: var(--line);
+}
+
+.action-btn.warning {
+  background: #fff;
+  color: var(--rose);
+  border-color: rgba(180, 83, 90, 0.35);
+}
+
+.hero {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: stretch;
+  padding: 24px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+}
+
+.hero__tag {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(13, 148, 136, 0.1);
+  color: var(--teal);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+h1 {
+  margin: 12px 0 8px;
+  font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+
+.hero p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+  font-size: 1rem;
+}
+
+.source-box {
+  border-left: 5px solid var(--orange);
+  background: #fff8ed;
+  border-radius: 8px;
+  padding: 14px;
+  line-height: 1.55;
+}
+
+.source-box strong {
+  display: block;
+  color: #9a5a00;
+  margin-bottom: 6px;
+}
+
+.source-box code {
+  display: block;
+  margin-top: 8px;
+  color: var(--navy);
+  word-break: break-all;
+  font-size: 0.86rem;
+}
+
+.navline {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+
+.navline a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--navy);
+  font-size: 0.9rem;
+}
+
+.worksheet {
+  display: grid;
+  gap: 14px;
+}
+
+.section {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.section__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+  border-bottom: 2px solid #eef2f7;
+  padding-bottom: 10px;
+}
+
+.section__num {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--navy);
+  color: #fff;
+  font-weight: 900;
+}
+
+.section h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.section__lead {
+  margin: -4px 0 14px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.grid-2,
+.grid-3 {
+  display: grid;
+  gap: 10px;
+}
+
+.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label,
+.check-label {
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: #26344f;
+}
+
+.field small {
+  display: block;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+input[type="text"],
+textarea {
+  width: 100%;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdff;
+  padding: 10px 11px;
+  outline: none;
+}
+
+textarea {
+  min-height: 82px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+  background: #fff;
+}
+
+.spot-row,
+.phrase-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 7px 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.flow {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.flow-step {
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--teal);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdff;
+  min-height: 118px;
+}
+
+.flow-step:nth-child(2) { border-top-color: var(--orange); }
+.flow-step:nth-child(3) { border-top-color: var(--green); }
+.flow-step:nth-child(4) { border-top-color: var(--navy); }
+.flow-step:nth-child(5) { border-top-color: var(--rose); }
+
+.flow-step strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.96rem;
+}
+
+.flow-step span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.script-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.script-tools p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.script-area {
+  min-height: 360px;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.meter {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.phrase-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.phrase-table th,
+.phrase-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 9px 10px;
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.phrase-table th {
+  background: #f1f6fb;
+  color: var(--navy);
+}
+
+.phrase-table tr:last-child td { border-bottom: 0; }
+
+.checks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdff;
+  line-height: 1.45;
+}
+
+.check-item input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--teal);
+}
+
+.footer-note {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%) translateY(14px);
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: rgba(23, 32, 51, 0.94);
+  color: #fff;
+  font-weight: 800;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s ease;
+  z-index: 50;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 840px) {
+  .hero,
+  .grid-2,
+  .grid-3,
+  .flow,
+  .checks {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    position: static;
+    align-items: flex-start;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .topbar,
+  .navline,
+  .script-tools,
+  .spot-row,
+  .phrase-row,
+  .toast {
+    display: none !important;
+  }
+
+  .shell {
+    width: 100%;
+    margin: 0;
+  }
+
+  .hero,
+  .section {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  textarea,
+  input[type="text"] {
+    border-color: #9aa6b8;
+    background: #fff;
+  }
+
+  .script-area {
+    min-height: 460px;
+  }
+}
+</style>
+</head>
+<body>
+<main class="shell">
+  <div class="topbar">
+    <div class="topbar__links">
+      <a class="link-btn" href="../../../index.html">허브로</a>
+      <a class="link-btn" href="../index.html">관광지 글쓰기</a>
+    </div>
+    <div class="topbar__actions">
+      <button class="action-btn secondary" type="button" id="saveStatus">자동 저장됨</button>
+      <button class="action-btn" type="button" onclick="window.print()">인쇄</button>
+      <button class="action-btn warning" type="button" onclick="resetWorksheet()">초기화</button>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div>
+      <span class="hero__tag">기말 말하기 수행평가 준비</span>
+      <h1>내 나라 관광지 소개<br>발표문 준비 학습지</h1>
+      <p>관광지를 한 곳 고르고, 필요한 정보를 정리한 뒤, 한국어 발표문을 완성합니다. 발표할 때는 내용을 많이 넣는 것보다 청중이 이해하기 쉬운 순서와 분명한 문장이 더 중요합니다.</p>
+    </div>
+    <aside class="source-box">
+      <strong>확인한 연계 자료</strong>
+      쓰기 12과 활동의 “우리 나라 관광지를 한국인에게 소개해요” 부분을 말하기 수행평가용 발표문 준비 단계로 바꾸었습니다.
+      <code>apps/writeclass/tourism_description/index.html</code>
+    </aside>
+  </section>
+
+  <nav class="navline" aria-label="학습지 바로가기">
+    <a href="#task">1. 발표 조건</a>
+    <a href="#info">2. 정보 정리</a>
+    <a href="#order">3. 발표 순서</a>
+    <a href="#script">4. 발표문</a>
+    <a href="#phrases">5. 표현</a>
+    <a href="#check">6. 점검</a>
+  </nav>
+
+  <div class="worksheet">
+    <section class="section" id="task">
+      <div class="section__head">
+        <span class="section__num">1</span>
+        <h2>발표 조건을 확인해요</h2>
+      </div>
+      <p class="section__lead">수업에서 안내받은 조건을 먼저 적어 두세요. 모르는 부분은 비워 두었다가 선생님께 확인합니다.</p>
+      <div class="grid-3">
+        <div class="field">
+          <label for="studentName">이름</label>
+          <input id="studentName" data-save="studentName" type="text" placeholder="예) 응우옌 민아">
+        </div>
+        <div class="field">
+          <label for="targetTime">목표 발표 시간</label>
+          <input id="targetTime" data-save="targetTime" type="text" placeholder="예) 1분 30초">
+        </div>
+        <div class="field">
+          <label for="visualAid">준비 자료</label>
+          <input id="visualAid" data-save="visualAid" type="text" placeholder="예) 사진 2장, 지도 1장">
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="info">
+      <div class="section__head">
+        <span class="section__num">2</span>
+        <h2>소개할 관광지 정보를 모아요</h2>
+      </div>
+      <p class="section__lead">짧은 단어로 적어도 괜찮습니다. 발표문을 쓸 때 문장으로 바꾸면 됩니다.</p>
+      <div class="grid-2">
+        <div class="field">
+          <label for="spotName">관광지 이름</label>
+          <input id="spotName" data-save="spotName" type="text" placeholder="예) 하롱베이">
+          <div class="spot-row" aria-label="관광지 예시">
+            <button class="chip" type="button" data-spot="하롱베이">하롱베이</button>
+            <button class="chip" type="button" data-spot="호이안">호이안</button>
+            <button class="chip" type="button" data-spot="다낭">다낭</button>
+            <button class="chip" type="button" data-spot="사파">사파</button>
+            <button class="chip" type="button" data-spot="후에">후에</button>
+            <button class="chip" type="button" data-spot="푸꾸옥">푸꾸옥</button>
+            <button class="chip" type="button" data-spot="달랏">달랏</button>
+            <button class="chip" type="button" data-spot="닌빈">닌빈</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="location">위치</label>
+          <input id="location" data-save="location" type="text" placeholder="예) 베트남 북쪽 / 하노이 근처">
+        </div>
+        <div class="field">
+          <label for="transport">가는 방법과 시간</label>
+          <input id="transport" data-save="transport" type="text" placeholder="예) 하노이에서 버스로 3시간 30분 정도">
+        </div>
+        <div class="field">
+          <label for="weather">날씨나 여행하기 좋은 때</label>
+          <input id="weather" data-save="weather" type="text" placeholder="예) 봄과 가을에 날씨가 좋아요">
+        </div>
+        <div class="field">
+          <label for="feature">특징</label>
+          <textarea id="feature" data-save="feature" placeholder="예) 바다와 섬이 아름다운 세계적으로 유명한 관광지"></textarea>
+        </div>
+        <div class="field">
+          <label for="things">볼거리, 먹을거리, 즐길 거리</label>
+          <textarea id="things" data-save="things" placeholder="예) 석회암 섬, 동굴, 크루즈, 해산물"></textarea>
+        </div>
+        <div class="field">
+          <label for="reason">추천하는 이유</label>
+          <textarea id="reason" data-save="reason" placeholder="예) 경치가 아름답고 사진을 찍기 좋기 때문"></textarea>
+        </div>
+        <div class="field">
+          <label for="caution">주의할 점 또는 여행 팁</label>
+          <textarea id="caution" data-save="caution" placeholder="예) 성수기에는 사람이 많으니까 미리 예약하는 것이 좋아요"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="order">
+      <div class="section__head">
+        <span class="section__num">3</span>
+        <h2>발표 순서를 정해요</h2>
+      </div>
+      <div class="flow">
+        <div class="flow-step"><strong>도입</strong><span>인사, 이름, 발표 주제를 말합니다.</span></div>
+        <div class="flow-step"><strong>위치</strong><span>관광지가 어디에 있고 어떻게 가는지 말합니다.</span></div>
+        <div class="flow-step"><strong>특징</strong><span>날씨, 풍경, 유명한 이유를 설명합니다.</span></div>
+        <div class="flow-step"><strong>활동</strong><span>볼 수 있는 것, 먹을 수 있는 것, 할 수 있는 것을 말합니다.</span></div>
+        <div class="flow-step"><strong>마무리</strong><span>추천 이유를 말하고 감사 인사로 끝냅니다.</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="script">
+      <div class="section__head">
+        <span class="section__num">4</span>
+        <h2>발표문을 완성해요</h2>
+      </div>
+      <div class="script-tools">
+        <p>아래 버튼으로 초안을 만든 뒤, 자신의 말로 자연스럽게 고쳐 쓰세요.</p>
+        <div class="topbar__actions">
+          <button class="action-btn" type="button" onclick="makeDraft()">초안 만들기</button>
+          <button class="action-btn secondary" type="button" onclick="copyScript()">발표문 복사</button>
+          <button class="action-btn secondary" type="button" onclick="downloadScript()">텍스트 저장</button>
+        </div>
+      </div>
+      <textarea id="scriptText" class="script-area" data-save="scriptText" placeholder="안녕하십니까. 저는 ○○입니다. 오늘은 제 나라의 관광지 ○○에 대해 발표하겠습니다."></textarea>
+      <div class="meter">
+        <span id="countText">0자 · 0문장</span>
+        <span>목표: 도입, 본론 3부분, 마무리가 모두 보이게 말하기</span>
+      </div>
+    </section>
+
+    <section class="section" id="phrases">
+      <div class="section__head">
+        <span class="section__num">5</span>
+        <h2>발표에 쓸 수 있는 표현</h2>
+      </div>
+      <table class="phrase-table">
+        <thead>
+          <tr>
+            <th>기능</th>
+            <th>표현</th>
+            <th>예문</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>발표 시작</td>
+            <td>오늘은 …에 대해 발표하겠습니다.</td>
+            <td>오늘은 하롱베이에 대해 발표하겠습니다.</td>
+          </tr>
+          <tr>
+            <td>위치 설명</td>
+            <td>…은/는 …에 있는 관광지입니다.</td>
+            <td>하롱베이는 베트남 북쪽에 있는 관광지입니다.</td>
+          </tr>
+          <tr>
+            <td>가는 방법</td>
+            <td>…에서 …까지 …(으)로 …쯤 걸립니다.</td>
+            <td>하노이에서 하롱베이까지 버스로 세 시간쯤 걸립니다.</td>
+          </tr>
+          <tr>
+            <td>특징 설명</td>
+            <td>… 때문에 유명합니다.</td>
+            <td>아름다운 바다와 섬 때문에 유명합니다.</td>
+          </tr>
+          <tr>
+            <td>활동 설명</td>
+            <td>…을/를 볼 수 있습니다. …을/를 즐길 수 있습니다.</td>
+            <td>동굴을 볼 수 있고 크루즈를 즐길 수 있습니다.</td>
+          </tr>
+          <tr>
+            <td>추천</td>
+            <td>…기 때문에 꼭 추천하고 싶습니다.</td>
+            <td>경치가 아름답기 때문에 꼭 추천하고 싶습니다.</td>
+          </tr>
+          <tr>
+            <td>마무리</td>
+            <td>이상으로 발표를 마치겠습니다. 감사합니다.</td>
+            <td>이상으로 발표를 마치겠습니다. 감사합니다.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="phrase-row">
+        <button class="chip" type="button" data-insert="먼저, ">먼저</button>
+        <button class="chip" type="button" data-insert="다음으로, ">다음으로</button>
+        <button class="chip" type="button" data-insert="또한 ">또한</button>
+        <button class="chip" type="button" data-insert="하지만 ">하지만</button>
+        <button class="chip" type="button" data-insert="그래서 ">그래서</button>
+        <button class="chip" type="button" data-insert="마지막으로, ">마지막으로</button>
+      </div>
+    </section>
+
+    <section class="section" id="check">
+      <div class="section__head">
+        <span class="section__num">6</span>
+        <h2>발표 전에 스스로 점검해요</h2>
+      </div>
+      <div class="checks">
+        <label class="check-item"><input type="checkbox" data-check="c1"><span><span class="check-label">주제</span><br>관광지 이름과 나라/지역을 분명히 말했습니다.</span></label>
+        <label class="check-item"><input type="checkbox" data-check="c2"><span><span class="check-label">내용</span><br>위치, 특징, 유명한 것, 추천 이유가 들어 있습니다.</span></label>
+        <label class="check-item"><input type="checkbox" data-check="c3"><span><span class="check-label">구조</span><br>도입, 본론, 마무리 순서가 잘 보입니다.</span></label>
+        <label class="check-item"><input type="checkbox" data-check="c4"><span><span class="check-label">문법</span><br>배운 표현을 두 가지 이상 사용했습니다.</span></label>
+        <label class="check-item"><input type="checkbox" data-check="c5"><span><span class="check-label">말하기</span><br>너무 빠르지 않게, 문장 끝을 분명히 말할 수 있습니다.</span></label>
+        <label class="check-item"><input type="checkbox" data-check="c6"><span><span class="check-label">연습</span><br>발표문을 보지 않고 한 번 이상 말해 보았습니다.</span></label>
+      </div>
+      <p class="footer-note">연습할 때는 어려운 단어를 줄이고, 자신이 확실히 말할 수 있는 문장으로 바꾸세요. 자연스럽게 말할 수 있는 발표문이 좋은 발표문입니다.</p>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = "speaking.tourism.presentation.worksheet.v1";
+const fields = [...document.querySelectorAll("[data-save]")];
+const checks = [...document.querySelectorAll("[data-check]")];
+const scriptText = document.getElementById("scriptText");
+const saveStatus = document.getElementById("saveStatus");
+let saveTimer;
+
+function restore() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    fields.forEach((field) => {
+      if (typeof saved[field.dataset.save] === "string") field.value = saved[field.dataset.save];
+    });
+    checks.forEach((check) => {
+      check.checked = Boolean(saved[check.dataset.check]);
+    });
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+  updateCount();
+}
+
+function collect() {
+  const data = {};
+  fields.forEach((field) => { data[field.dataset.save] = field.value; });
+  checks.forEach((check) => { data[check.dataset.check] = check.checked; });
+  return data;
+}
+
+function save() {
+  clearTimeout(saveTimer);
+  saveStatus.textContent = "저장 중";
+  saveTimer = setTimeout(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(collect()));
+    saveStatus.textContent = "자동 저장됨";
+  }, 160);
+}
+
+function getValue(id, fallback) {
+  const value = document.getElementById(id).value.trim();
+  return value || fallback;
+}
+
+function makeDraft() {
+  const name = getValue("studentName", "○○");
+  const spot = getValue("spotName", "○○");
+  const location = getValue("location", "제 나라의 유명한 지역");
+  const transport = getValue("transport", "시내에서 버스나 차로 갈 수 있습니다");
+  const weather = getValue("weather", "날씨가 좋은 때에 가면 좋습니다");
+  const feature = getValue("feature", "아름다운 경치");
+  const things = getValue("things", "사진 찍기와 산책");
+  const reason = getValue("reason", "한국 친구들도 재미있게 여행할 수 있기");
+  const caution = getValue("caution", "가기 전에 날씨와 시간을 확인하는 것이 좋습니다");
+
+  scriptText.value = [
+    `안녕하십니까. 저는 ${name}입니다. 오늘은 제 나라의 관광지 ${spot}에 대해 발표하겠습니다.`,
+    `먼저, ${spot}은/는 ${location}에 있는 관광지입니다. ${transport}.`,
+    `다음으로, ${spot}은/는 ${feature} 때문에 유명합니다. ${weather}.`,
+    `또한 이곳에서는 ${things} 등을 즐길 수 있습니다.`,
+    `마지막으로, ${caution}. 저는 ${reason} 때문에 이곳을 꼭 추천하고 싶습니다.`,
+    "이상으로 발표를 마치겠습니다. 감사합니다."
+  ].join("\n\n");
+  updateCount();
+  save();
+  toast("초안을 만들었어요. 어색한 부분은 직접 고쳐 보세요.");
+}
+
+function copyScript() {
+  const text = scriptText.value.trim();
+  if (!text) {
+    toast("먼저 발표문을 써 주세요.");
+    return;
+  }
+  navigator.clipboard.writeText(text).then(() => toast("발표문을 복사했어요."));
+}
+
+function downloadScript() {
+  const spot = getValue("spotName", "관광지");
+  const text = scriptText.value.trim();
+  if (!text) {
+    toast("저장할 발표문이 없어요.");
+    return;
+  }
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${spot}_관광지_발표문.txt`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function insertAtCursor(text) {
+  const start = scriptText.selectionStart;
+  const end = scriptText.selectionEnd;
+  const before = scriptText.value.slice(0, start);
+  const after = scriptText.value.slice(end);
+  scriptText.value = before + text + after;
+  scriptText.focus();
+  scriptText.selectionStart = scriptText.selectionEnd = start + text.length;
+  updateCount();
+  save();
+}
+
+function updateCount() {
+  const text = scriptText.value.trim();
+  const chars = text.replace(/\s/g, "").length;
+  const sentences = text ? text.split(/[.!?。！？\n]+/).filter((part) => part.trim()).length : 0;
+  document.getElementById("countText").textContent = `${chars}자 · ${sentences}문장`;
+}
+
+function resetWorksheet() {
+  if (!window.confirm("입력한 내용을 모두 지울까요?")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  fields.forEach((field) => { field.value = ""; });
+  checks.forEach((check) => { check.checked = false; });
+  updateCount();
+  toast("학습지를 초기화했어요.");
+}
+
+function toast(message) {
+  const el = document.getElementById("toast");
+  el.textContent = message;
+  el.classList.add("show");
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove("show"), 1800);
+}
+
+document.querySelectorAll("[data-spot]").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.getElementById("spotName").value = button.dataset.spot;
+    save();
+  });
+});
+
+document.querySelectorAll("[data-insert]").forEach((button) => {
+  button.addEventListener("click", () => insertAtCursor(button.dataset.insert));
+});
+
+fields.forEach((field) => {
+  field.addEventListener("input", () => {
+    if (field === scriptText) updateCount();
+    save();
+  });
+});
+
+checks.forEach((check) => check.addEventListener("change", save));
+restore();
+</script>
+</body>
+</html>
