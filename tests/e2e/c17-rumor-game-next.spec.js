@@ -40,6 +40,23 @@ async function movePlayerTo(page, x, y) {
   );
 }
 
+test("c17 rumor game NEXT is linked from main and vocabulary entry points", async ({ page }) => {
+  await page.goto("/");
+  const rootGameLink = page.locator('a[href="c17/rumor-game-next/index.html"]');
+  await expect(rootGameLink).toHaveCount(1);
+  await expect(rootGameLink).toContainText("소문 무마 게임 NEXT");
+
+  await page.goto("/c17/index.html");
+  const chapterGameLink = page.locator('a[href="rumor-game-next/index.html"]');
+  await expect(chapterGameLink).toHaveCount(1);
+  await expect(chapterGameLink).toContainText("보조 놀이");
+
+  await page.goto("/c17/vocabulary.html");
+  const vocabGameLink = page.locator('.topbar a[href="rumor-game-next/index.html"]');
+  await expect(vocabGameLink).toHaveCount(1);
+  await expect(vocabGameLink).toContainText("보조놀이");
+});
+
 test("c17 rumor game NEXT renders and exposes vocabulary systems", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
