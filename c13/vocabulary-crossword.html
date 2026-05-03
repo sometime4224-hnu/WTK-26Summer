@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>13과 어휘 | 가로세로 낱말퍼즐</title>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
     <style>
         :root {
             --bg: #f4f6fa;
@@ -33,6 +34,33 @@
 
         body.is-sheet-open {
             overflow: hidden;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(216, 224, 234, 0.92);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+        }
+
+        .topbar a,
+        .topbar span {
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1.1;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar span {
+            color: var(--muted);
         }
 
         .shell {
@@ -775,6 +803,14 @@
     </style>
 </head>
 <body>
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html">메인</a>
+        <span>|</span>
+        <a href="index.html">13과</a>
+        <span>|</span>
+        <a href="vocabulary.html">어휘</a>
+    </nav>
+
     <main class="shell">
         <section class="controls">
             <div id="set-tabs" class="set-tabs" aria-label="퍼즐 세트 선택"></div>
@@ -834,5 +870,6 @@
     </div>
 
     <script src="vocabulary-crossword.js"></script>
+    <script src="../shared/site-copyright.js"></script>
 </body>
 </html>

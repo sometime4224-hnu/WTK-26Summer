@@ -14,12 +14,50 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
     <style>
         body {
             font-family: 'Inter', 'Noto Sans KR', sans-serif;
             background-color: #f8fafc;
             color: #334155;
             -webkit-font-smoothing: antialiased;
+        }
+
+        .reason-return-nav {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-bottom: 1px solid #dbeafe;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+        }
+
+        .reason-return-nav a,
+        .reason-return-nav span {
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.1;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .reason-return-nav span {
+            color: #94a3b8;
+        }
+
+        .reason-header {
+            top: 44px;
+        }
+
+        @media (max-width: 640px) {
+            .reason-header {
+                top: 40px;
+            }
         }
         
         /* 스크롤바 커스텀 */
@@ -89,9 +127,17 @@
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="reason-return-nav" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html">12과</a>
+        <span>|</span>
+        <a href="grammar1.html">문법 1</a>
+    </nav>
     
     <!-- Header Area -->
-    <div class="bg-white shadow-sm sticky top-0 z-10">
+    <div class="reason-header bg-white shadow-sm sticky z-10">
         <div class="container mx-auto px-4 py-3 max-w-5xl">
             <div class="flex justify-between items-center mb-2">
                 <h1 class="text-xl md:text-2xl font-bold text-blue-600 tracking-tight">
