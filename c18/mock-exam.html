@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18과 모의고사 | 어휘·문법</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <link rel="stylesheet" href="chapter.css">
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html">18과 목록</a>
+        <span>|</span>
+        <strong>모의고사</strong>
+    </nav>
+
+    <main class="shell">
+        <section class="hero">
+            <div class="hero-grid">
+                <div>
+                    <p class="eyebrow">Review Test</p>
+                    <h1>18과 어휘·문법 모의고사</h1>
+                    <p class="lead">확인된 18과 범위 안에서 만든 16문항 자동 채점 시험입니다. 어휘 10문항, 문법 6문항으로 구성했습니다.</p>
+                    <div class="chips">
+                        <span class="chip"><i class="fa-solid fa-layer-group"></i> 어휘 10</span>
+                        <span class="chip"><i class="fa-solid fa-book-open"></i> 문법 6</span>
+                        <span class="chip"><i class="fa-solid fa-check"></i> 자동 채점</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="button-row" style="justify-content: flex-end; margin-bottom: 14px;">
+                <button class="btn" type="button" data-action="reset"><i class="fa-solid fa-rotate-left"></i> 다시 풀기</button>
+                <button class="btn primary" type="button" data-action="grade"><i class="fa-solid fa-check"></i> 채점하기</button>
+            </div>
+            <div id="examGrid" class="exam-grid"></div>
+            <div id="examResult" class="result-card"></div>
+        </section>
+
+        <nav class="footer-nav" aria-label="페이지 이동">
+            <a class="btn" href="reading.html"><i class="fa-solid fa-arrow-left"></i> 읽고 말하기</a>
+            <a class="btn primary" href="index.html">18과 목록 <i class="fa-solid fa-list"></i></a>
+        </nav>
+    </main>
+
+    <script>
+        window.C18_MOCK_EXAM = {
+            summary: "틀린 문항은 바로 아래 해설을 보고 어휘 카드와 문법 페이지로 돌아가 복습하세요.",
+            questions: [
+                {
+                    number: 1,
+                    type: "어휘",
+                    prompt: "공연을 보는 사람들을 무엇이라고 합니까?",
+                    options: [
+                        { letter: "A", text: "대본" },
+                        { letter: "B", text: "관객" },
+                        { letter: "C", text: "대사" },
+                        { letter: "D", text: "무대" }
+                    ],
+                    answer: "B",
+                    explanation: "공연을 보는 사람들은 <code>관객</code>입니다."
+                },
+                {
+                    number: 2,
+                    type: "어휘",
+                    prompt: "배우들이 조명 아래에서 연기하는 공간을 무엇이라고 합니까?",
+                    options: [
+                        { letter: "A", text: "무대" },
+                        { letter: "B", text: "관객" },
+                        { letter: "C", text: "대본" },
+                        { letter: "D", text: "대사" }
+                    ],
+                    answer: "A",
+                    explanation: "배우가 공연하는 공간은 <code>무대</code>입니다."
+                },
+                {
+                    number: 3,
+                    type: "어휘",
+                    prompt: "연극에서 배우가 무대 위에서 말하는 문장을 무엇이라고 합니까?",
+                    options: [
+                        { letter: "A", text: "관객" },
+                        { letter: "B", text: "대사" },
+                        { letter: "C", text: "대본" },
+                        { letter: "D", text: "연기" }
+                    ],
+                    answer: "B",
+                    explanation: "배우가 말하는 문장은 <code>대사</code>입니다."
+                },
+                {
+                    number: 4,
+                    type: "어휘",
+                    prompt: "배우가 장면과 대사를 확인하며 읽는 글은 무엇입니까?",
+                    options: [
+                        { letter: "A", text: "무대" },
+                        { letter: "B", text: "관객" },
+                        { letter: "C", text: "대본" },
+                        { letter: "D", text: "소품" }
+                    ],
+                    answer: "C",
+                    explanation: "연극 전체의 말과 행동이 적힌 글은 <code>대본</code>입니다."
+                },
+                {
+                    number: 5,
+                    type: "어휘",
+                    prompt: "거울을 떨어뜨려 조각나게 했어요. 거울을 ______.",
+                    options: [
+                        { letter: "A", text: "숨겼어요" },
+                        { letter: "B", text: "깨뜨렸어요" },
+                        { letter: "C", text: "들여다봤어요" },
+                        { letter: "D", text: "끄덕였어요" }
+                    ],
+                    answer: "B",
+                    explanation: "단단한 물건을 부서지게 하는 것은 <code>깨뜨리다</code>입니다."
+                },
+                {
+                    number: 6,
+                    type: "어휘",
+                    prompt: "남이 보지 못하게 옷장 안에 넣어 두었어요. 선물을 ______.",
+                    options: [
+                        { letter: "A", text: "숨겼어요" },
+                        { letter: "B", text: "빼앗았어요" },
+                        { letter: "C", text: "깨뜨렸어요" },
+                        { letter: "D", text: "가로저었어요" }
+                    ],
+                    answer: "A",
+                    explanation: "다른 사람이 보거나 알지 못하게 하는 것은 <code>숨기다</code>입니다."
+                },
+                {
+                    number: 7,
+                    type: "어휘",
+                    prompt: "아니라는 뜻으로 머리를 좌우로 흔들었어요. 고개를 ______.",
+                    options: [
+                        { letter: "A", text: "끄덕였어요" },
+                        { letter: "B", text: "가로저었어요" },
+                        { letter: "C", text: "들여다봤어요" },
+                        { letter: "D", text: "빼앗았어요" }
+                    ],
+                    answer: "B",
+                    explanation: "부정의 몸짓은 <code>고개를 가로젓다</code>입니다."
+                },
+                {
+                    number: 8,
+                    type: "어휘",
+                    prompt: "갑자기 큰 소리가 나서 매우 놀랐어요. ______.",
+                    options: [
+                        { letter: "A", text: "깜짝 놀랐어요" },
+                        { letter: "B", text: "대본을 읽었어요" },
+                        { letter: "C", text: "관객을 보냈어요" },
+                        { letter: "D", text: "무대를 썼어요" }
+                    ],
+                    answer: "A",
+                    explanation: "예상하지 못해 매우 놀라는 것은 <code>깜짝 놀라다</code>입니다."
+                },
+                {
+                    number: 9,
+                    type: "어휘",
+                    prompt: "갑자기 몸을 돌려 뒤쪽을 보았어요. 뒤를 ______.",
+                    options: [
+                        { letter: "A", text: "획 돌아봤어요" },
+                        { letter: "B", text: "고개를 끄덕였어요" },
+                        { letter: "C", text: "소리를 읽었어요" },
+                        { letter: "D", text: "연기를 숨겼어요" }
+                    ],
+                    answer: "A",
+                    explanation: "<code>뒤를 획 돌아보다</code>는 갑자기 뒤쪽을 보는 행동입니다."
+                },
+                {
+                    number: 10,
+                    type: "어휘",
+                    prompt: "그렇다는 뜻으로 머리를 위아래로 움직였어요. 고개를 ______.",
+                    options: [
+                        { letter: "A", text: "가로저었어요" },
+                        { letter: "B", text: "끄덕였어요" },
+                        { letter: "C", text: "깨뜨렸어요" },
+                        { letter: "D", text: "빼앗았어요" }
+                    ],
+                    answer: "B",
+                    explanation: "동의의 몸짓은 <code>고개를 끄덕이다</code>입니다."
+                },
+                {
+                    number: 11,
+                    type: "문법",
+                    prompt: "빈칸에 알맞은 것을 고르세요. 무대가 좁______ 천천히 움직이세요.",
+                    options: [
+                        { letter: "A", text: "다니까" },
+                        { letter: "B", text: "고 말다" },
+                        { letter: "C", text: "대본" },
+                        { letter: "D", text: "관객" }
+                    ],
+                    answer: "A",
+                    explanation: "형용사 <code>좁다</code>를 강조하며 이유로 말하므로 <code>좁다니까</code>가 맞습니다."
+                },
+                {
+                    number: 12,
+                    type: "문법",
+                    prompt: "친구에게 “이 연극이 정말 재미있다”를 다시 강조할 때 자연스러운 말은 무엇입니까?",
+                    options: [
+                        { letter: "A", text: "재미있다니까요." },
+                        { letter: "B", text: "재미있고 말았어요." },
+                        { letter: "C", text: "재미있는 관객이에요." },
+                        { letter: "D", text: "재미있게 대본이에요." }
+                    ],
+                    answer: "A",
+                    explanation: "형용사 내용을 다시 강조할 때 <code>재미있다니까요</code>라고 합니다."
+                },
+                {
+                    number: 13,
+                    type: "문법",
+                    prompt: "빈칸에 알맞은 것을 고르세요. 긴장해서 중요한 대사를 잊______.",
+                    options: [
+                        { letter: "A", text: "다니까요" },
+                        { letter: "B", text: "고 말았어요" },
+                        { letter: "C", text: "는 관객이에요" },
+                        { letter: "D", text: "의 무대예요" }
+                    ],
+                    answer: "B",
+                    explanation: "결국 잊어버린 아쉬운 결과이므로 <code>잊고 말았어요</code>가 맞습니다."
+                },
+                {
+                    number: 14,
+                    type: "문법",
+                    prompt: "원하지 않은 결과를 나타내는 문장은 무엇입니까?",
+                    options: [
+                        { letter: "A", text: "거울을 깨뜨리고 말았어요." },
+                        { letter: "B", text: "거울이 좁다니까요." },
+                        { letter: "C", text: "거울은 관객이에요." },
+                        { letter: "D", text: "거울을 대본이에요." }
+                    ],
+                    answer: "A",
+                    explanation: "<code>V-고 말다</code>는 결국 일어난 결과와 아쉬움을 나타냅니다."
+                },
+                {
+                    number: 15,
+                    type: "문법",
+                    prompt: "“우리는 그냥 친구 사이라니까요.”의 의미로 알맞은 것은?",
+                    options: [
+                        { letter: "A", text: "연인이라는 뜻" },
+                        { letter: "B", text: "친구 사이라는 사실을 다시 강조하는 뜻" },
+                        { letter: "C", text: "이미 잊었다는 뜻" },
+                        { letter: "D", text: "공연을 보러 온 사람이라는 뜻" }
+                    ],
+                    answer: "B",
+                    explanation: "<code>N(이)라니까요</code>는 명사 내용을 다시 강조하거나 오해를 정정합니다."
+                },
+                {
+                    number: 16,
+                    type: "문법",
+                    prompt: "다음 중 결합이 바른 것은?",
+                    options: [
+                        { letter: "A", text: "소리를 지르고 말았어요." },
+                        { letter: "B", text: "소리를 지르다니까 말았어요." },
+                        { letter: "C", text: "소리를 관객했어요." },
+                        { letter: "D", text: "소리를 대본이에요." }
+                    ],
+                    answer: "A",
+                    explanation: "동사 어간 뒤에 <code>-고 말다</code>를 붙여 <code>지르고 말았어요</code>라고 합니다."
+                }
+            ]
+        };
+    </script>
+    <script src="chapter.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

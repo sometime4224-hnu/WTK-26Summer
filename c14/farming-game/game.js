@@ -318,7 +318,7 @@ function getPortraitProfileOverrides(id, isTouch, isPortrait) {
         miniMapSize: 132,
         touchButtonSize: 44,
         touchActionWidth: 92,
-        touchActionHeight: 48
+        touchActionHeight: 54
       };
     case "phone-low":
       return {
@@ -329,7 +329,7 @@ function getPortraitProfileOverrides(id, isTouch, isPortrait) {
         miniMapSize: 118,
         touchButtonSize: 46,
         touchActionWidth: 96,
-        touchActionHeight: 50
+        touchActionHeight: 54
       };
     default:
       return {};
@@ -2074,9 +2074,6 @@ function resetQuizSelection(reshuffle = false) {
     state.quizAssembly.choices = shuffleArray(state.quizAssembly.choices);
   }
   syncQuizBoard();
-  return;
-  ui.quizType.textContent = state.solvedQuizSigns.has(quiz.id) ? "팻말 다시 읽기" : "팻말 퀴즈";
-  ui.quizPrompt.textContent = "팻말 아래 글자 조각을 눌러 생활 표현을 완성해 보세요.";
 }
 
 function appendQuizChoice(choiceId) {
@@ -2187,14 +2184,8 @@ function submitQuizAnswer() {
     showQuizFeedback("글자를 모두 눌러서 빈칸을 먼저 완성해 보세요.");
     playSfx("uiClick", { volume: 0.16, playbackRate: 0.88 });
     return false;
-    showQuizFeedback("빈칸에 들어갈 동사를 먼저 써 보세요.");
-    playSfx("uiClick", { volume: 0.16, playbackRate: 0.88 });
-    return false;
   }
   if (typed !== quiz.answer) {
-    showQuizFeedback(`아직 아니에요. '${quiz.prefix}'에 어울리는 동사를 다시 떠올려 보세요.`);
-    playSfx("uiClick", { volume: 0.16, playbackRate: 0.84 });
-    return false;
     showQuizFeedback(`아직 아니에요. '${quiz.prefix}'에 어울리는 동사를 다시 떠올려 보세요.`);
     playSfx("uiClick", { volume: 0.16, playbackRate: 0.84 });
     return false;

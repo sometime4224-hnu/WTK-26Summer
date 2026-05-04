@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18과 어휘 | 거울이 깨지고 말았어요</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <link rel="stylesheet" href="chapter.css">
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html">18과 목록</a>
+        <span>|</span>
+        <strong>어휘</strong>
+    </nav>
+
+    <main class="shell">
+        <section class="hero">
+            <div class="hero-grid">
+                <div>
+                    <p class="eyebrow">Vocabulary</p>
+                    <h1>18과 어휘 카드</h1>
+                    <p class="lead">원본 18과의 연극 대본과 그림 활동에 나온 어휘를 장면별 이미지 카드로 묶었습니다. 그림으로 먼저 장면을 떠올리고, 뜻과 예문을 함께 확인하세요.</p>
+                    <div class="chips">
+                        <span class="chip"><i class="fa-solid fa-masks-theater"></i> 공연 명사</span>
+                        <span class="chip"><i class="fa-solid fa-hand"></i> 행동 동사</span>
+                        <span class="chip"><i class="fa-solid fa-person-running"></i> 몸짓 표현</span>
+                    </div>
+                </div>
+                <button class="translation-toggle js-vi-toggle" type="button" aria-pressed="false">
+                    <i class="fa-solid fa-language"></i> Tiếng Việt OFF
+                </button>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="stats-grid">
+                <div class="stat-card"><strong>16</strong><span>이미지 카드</span></div>
+                <div class="stat-card"><strong id="vocabVisibleCount">16</strong><span>현재 표시</span></div>
+                <div class="stat-card"><strong>3</strong><span>분류</span></div>
+                <div class="stat-card"><strong>8</strong><span>즉석 퀴즈</span></div>
+            </div>
+
+            <div class="toolbar">
+                <div class="filter-row" aria-label="어휘 분류">
+                    <button class="filter-btn active" type="button" data-vocab-filter="all">전체</button>
+                    <button class="filter-btn" type="button" data-vocab-filter="stage">공연</button>
+                    <button class="filter-btn" type="button" data-vocab-filter="object">사건</button>
+                    <button class="filter-btn" type="button" data-vocab-filter="gesture">몸짓</button>
+                </div>
+                <label class="search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input id="vocabSearch" type="search" placeholder="단어, 뜻, 예문 검색">
+                </label>
+            </div>
+
+            <div id="vocabGrid" class="vocab-grid" aria-live="polite"></div>
+        </section>
+
+        <section id="vocabQuiz" class="section">
+            <div class="quiz-card">
+                <div class="quiz-head">
+                    <div>
+                        <p class="eyebrow">Quick Quiz</p>
+                        <h2>어휘 빠른 확인</h2>
+                    </div>
+                    <span id="vocabQuizCount" class="quiz-count">1 / 8</span>
+                </div>
+                <div class="progress"><div id="vocabQuizProgress" class="progress-bar"></div></div>
+                <p id="vocabQuizPrompt" class="prompt"></p>
+                <div id="vocabQuizChoices" class="choices"></div>
+                <div id="vocabQuizFeedback" class="feedback"></div>
+                <div class="button-row" style="justify-content: space-between; margin-top: 14px;">
+                    <button id="vocabQuizRestart" class="btn" type="button"><i class="fa-solid fa-rotate-left"></i> 다시 풀기</button>
+                    <button id="vocabQuizNext" class="btn primary" type="button" disabled>다음 <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <nav class="footer-nav" aria-label="페이지 이동">
+            <a class="btn" href="index.html"><i class="fa-solid fa-list"></i> 18과 목록</a>
+            <a class="btn primary" href="grammar1.html">문법 1로 이동 <i class="fa-solid fa-arrow-right"></i></a>
+        </nav>
+    </main>
+
+    <script>
+        const c18VocabImageBase = "../assets/c18/vocabulary/images/cards/";
+        window.C18_VOCABULARY = [
+            { term: "연극", category: "stage", categoryLabel: "공연", meaning: "배우가 무대에서 이야기를 보여 주는 공연", vi: "vở kịch, kịch nói", example: "우리 반은 축제에서 짧은 연극을 하기로 했어요.", tags: ["공연", "무대"], image: c18VocabImageBase + "theater-play.webp", imageAlt: "무대 위 배우들이 이야기를 보여 주는 연극 장면" },
+            { term: "연기", category: "stage", categoryLabel: "공연", meaning: "배우가 맡은 역할처럼 말하고 행동하는 것", vi: "diễn xuất", example: "처음에는 어색했지만 연습할수록 연기가 자연스러워졌어요.", tags: ["배우", "역할"], image: c18VocabImageBase + "acting.webp", imageAlt: "배우가 무대에서 감정을 담아 연기하는 장면" },
+            { term: "무대", category: "stage", categoryLabel: "공연", meaning: "배우들이 관객 앞에서 연기하는 공간", vi: "sân khấu", example: "조명이 켜지자 배우들이 무대 위로 나왔어요.", tags: ["공연장", "공간"], image: c18VocabImageBase + "stage.webp", imageAlt: "막이 열린 공연 무대와 조명" },
+            { term: "관객", category: "stage", categoryLabel: "공연", meaning: "공연을 보는 사람들", vi: "khán giả", example: "관객들은 마지막 장면에서 큰 박수를 보냈어요.", tags: ["보는 사람", "공연"], image: c18VocabImageBase + "audience.webp", imageAlt: "무대 앞에 앉아 공연을 보는 관객들" },
+            { term: "대본", category: "stage", categoryLabel: "공연", meaning: "연극에서 배우가 말할 내용과 행동이 적힌 글", vi: "kịch bản", example: "배우들은 대본을 읽고 자기 대사를 표시했어요.", tags: ["글", "연습"], image: c18VocabImageBase + "script.webp", imageAlt: "펼쳐진 대본과 연습 표시 도구" },
+            { term: "대사", category: "stage", categoryLabel: "공연", meaning: "연극에서 배우가 맡은 역할로 말하는 문장", vi: "lời thoại", example: "민지는 중요한 대사를 잊지 않으려고 여러 번 외웠어요.", tags: ["말", "문장"], image: c18VocabImageBase + "line-dialogue.webp", imageAlt: "무대 위 배우들이 말풍선으로 대사를 주고받는 장면" },
+            { term: "들여다보다", category: "object", categoryLabel: "사건", meaning: "안쪽이나 가까운 곳을 자세히 보다", vi: "nhìn kỹ vào bên trong", example: "주인공은 오래된 거울을 가만히 들여다보았어요.", tags: ["거울", "보다"], image: c18VocabImageBase + "look-into.webp", imageAlt: "사람이 상자 안을 자세히 들여다보는 장면" },
+            { term: "숨기다", category: "object", categoryLabel: "사건", meaning: "다른 사람이 보거나 알지 못하게 하다", vi: "giấu, che giấu", example: "농부는 거울을 장롱 속에 숨겨 두었어요.", tags: ["감추다", "비밀"], image: c18VocabImageBase + "hide.webp", imageAlt: "사람이 물건을 등 뒤로 숨기는 장면" },
+            { term: "빼앗다", category: "object", categoryLabel: "사건", meaning: "남의 것을 억지로 가져가다", vi: "cướp, lấy mất", example: "동생이 장난으로 형의 대본을 빼앗았어요.", tags: ["가져가다", "갈등"], image: c18VocabImageBase + "take-away.webp", imageAlt: "두 사람이 물건을 서로 잡아당기는 장면" },
+            { term: "깨뜨리다", category: "object", categoryLabel: "사건", meaning: "단단한 물건을 부서지게 하다", vi: "làm vỡ", example: "연습 중에 거울을 떨어뜨려 깨뜨리고 말았어요.", tags: ["거울", "부서지다"], image: c18VocabImageBase + "break.webp", imageAlt: "탁자 위 물건이 깨져 조각난 장면" },
+            { term: "벌떡 일어나다", category: "gesture", categoryLabel: "몸짓", meaning: "갑자기 힘 있게 일어나다", vi: "bật dậy", example: "소리를 듣자 배우가 벌떡 일어났어요.", tags: ["갑자기", "동작"], image: c18VocabImageBase + "stand-up.webp", imageAlt: "침대에서 갑자기 힘 있게 일어나는 사람" },
+            { term: "깜짝 놀라다", category: "gesture", categoryLabel: "몸짓", meaning: "예상하지 못한 일 때문에 매우 놀라다", vi: "giật mình", example: "불이 갑자기 꺼져서 관객들이 깜짝 놀랐어요.", tags: ["놀람", "감정"], image: c18VocabImageBase + "surprised.webp", imageAlt: "눈을 크게 뜨고 깜짝 놀란 얼굴" },
+            { term: "고개를 가로젓다", category: "gesture", categoryLabel: "몸짓", meaning: "아니라는 뜻으로 머리를 좌우로 흔들다", vi: "lắc đầu", example: "감독은 이 장면이 어색하다며 고개를 가로저었어요.", tags: ["아니요", "반대"], image: c18VocabImageBase + "shake-head.webp", imageAlt: "머리를 좌우로 흔드는 얼굴과 방향 화살표" },
+            { term: "소리를 지르다", category: "gesture", categoryLabel: "몸짓", meaning: "큰 목소리로 외치다", vi: "hét lên", example: "주인공은 거울이 깨지자 소리를 질렀어요.", tags: ["큰소리", "외치다"], image: c18VocabImageBase + "shout.webp", imageAlt: "배우가 크게 외치고 소리 선이 퍼지는 장면" },
+            { term: "뒤를 획 돌아보다", category: "gesture", categoryLabel: "몸짓", meaning: "갑자기 몸을 돌려 뒤쪽을 보다", vi: "ngoảnh phắt lại", example: "발소리가 들리자 배우가 뒤를 획 돌아보았어요.", tags: ["뒤", "돌아보다"], image: c18VocabImageBase + "turn-back.webp", imageAlt: "몸을 갑자기 돌려 뒤를 보는 사람" },
+            { term: "고개를 끄덕이다", category: "gesture", categoryLabel: "몸짓", meaning: "그렇다는 뜻으로 머리를 위아래로 움직이다", vi: "gật đầu", example: "관객의 질문을 듣고 배우가 고개를 끄덕였어요.", tags: ["네", "동의"], image: c18VocabImageBase + "nod.webp", imageAlt: "위아래 화살표와 함께 고개를 끄덕이는 얼굴" }
+        ];
+    </script>
+    <script src="chapter.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>
