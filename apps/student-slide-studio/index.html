@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>학생 슬라이드 제작기</title>
+    <meta
+      name="description"
+      content="브라우저에서 발표 슬라이드를 만들고 단일 HTML 파일로 내보내는 학생용 슬라이드 제작기"
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="back-link" href="../index.html" aria-label="공용 프로그램 허브로 돌아가기">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+        </span>
+        <span>허브</span>
+      </a>
+
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">S</span>
+        <div>
+          <h1>학생 슬라이드 제작기</h1>
+          <p>HTML 발표 자료 만들기</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="button secondary" id="importButton" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="M7 8l5-5 5 5"></path><path d="M5 21h14"></path></svg>
+          </span>
+          <span>불러오기</span>
+        </button>
+        <button class="button secondary" id="saveProjectButton" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><path d="M7 3v7h8"></path><path d="M7 21v-7h10v7"></path></svg>
+          </span>
+          <span>프로젝트</span>
+        </button>
+        <button class="button secondary" id="presentButton" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+          </span>
+          <span>발표</span>
+        </button>
+        <button class="button primary" id="exportButton" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+          </span>
+          <span>HTML</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="builder" aria-label="슬라이드 제작 화면">
+      <aside class="slide-rail" aria-label="슬라이드 목록">
+        <div class="panel-heading">
+          <div>
+            <h2>슬라이드</h2>
+            <p id="slideCount">0장</p>
+          </div>
+          <button class="icon-button" id="addSlideButton" type="button" aria-label="슬라이드 추가">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+            </span>
+          </button>
+        </div>
+        <ol class="slide-list" id="slideList"></ol>
+      </aside>
+
+      <section class="stage-panel" aria-label="슬라이드 미리보기">
+        <div class="project-strip">
+          <label class="field compact">
+            <span>발표 제목</span>
+            <input id="projectTitleInput" type="text" autocomplete="off">
+          </label>
+          <label class="field compact">
+            <span>테마</span>
+            <select id="themeInput">
+              <option value="paper">Paper</option>
+              <option value="mint">Mint</option>
+              <option value="coral">Coral</option>
+              <option value="night">Night</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="preview-shell">
+          <div class="slide-preview" id="slidePreview" aria-live="polite"></div>
+        </div>
+
+        <div class="stage-actions">
+          <button class="button ghost" id="moveUpButton" type="button">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 19V5"></path><path d="M5 12l7-7 7 7"></path></svg>
+            </span>
+            <span>앞으로</span>
+          </button>
+          <button class="button ghost" id="moveDownButton" type="button">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M19 12l-7 7-7-7"></path></svg>
+            </span>
+            <span>뒤로</span>
+          </button>
+          <button class="button ghost" id="duplicateSlideButton" type="button">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M5 16H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </span>
+            <span>복제</span>
+          </button>
+          <button class="button danger" id="deleteSlideButton" type="button">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>
+            </span>
+            <span>삭제</span>
+          </button>
+        </div>
+      </section>
+
+      <aside class="inspector" aria-label="선택한 슬라이드 편집">
+        <div class="panel-heading">
+          <div>
+            <h2>편집</h2>
+            <p id="selectedSlideLabel">1번 슬라이드</p>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>레이아웃</span>
+          <select id="layoutInput">
+            <option value="title">제목</option>
+            <option value="text">본문</option>
+            <option value="split">글 + 이미지</option>
+            <option value="image">이미지 중심</option>
+            <option value="quote">인용</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>작은 제목</span>
+          <input id="kickerInput" type="text" autocomplete="off">
+        </label>
+
+        <label class="field">
+          <span>큰 제목</span>
+          <input id="titleInput" type="text" autocomplete="off">
+        </label>
+
+        <label class="field">
+          <span>본문</span>
+          <textarea id="bodyInput" rows="9"></textarea>
+        </label>
+
+        <label class="field">
+          <span>이미지</span>
+          <input id="imageInput" type="file" accept="image/*">
+        </label>
+
+        <label class="field">
+          <span>이미지 설명</span>
+          <input id="imageAltInput" type="text" autocomplete="off">
+        </label>
+
+        <button class="button ghost full-width" id="removeImageButton" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg>
+          </span>
+          <span>이미지 제거</span>
+        </button>
+
+        <label class="field">
+          <span>발표 메모</span>
+          <textarea id="notesInput" rows="5"></textarea>
+        </label>
+
+        <p class="status" id="status" aria-live="polite"></p>
+      </aside>
+    </main>
+
+    <div class="presenter" id="presenter" hidden>
+      <div class="presenter-top">
+        <strong id="presenterCounter">1 / 1</strong>
+        <button class="icon-button light" id="closePresenterButton" type="button" aria-label="발표 닫기">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg>
+          </span>
+        </button>
+      </div>
+      <div class="presenter-stage" id="presenterStage"></div>
+      <div class="presenter-bottom">
+        <button class="button light" id="presentPrevButton" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+          </span>
+          <span>이전</span>
+        </button>
+        <button class="button light" id="presentNextButton" type="button">
+          <span>다음</span>
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <input id="importProjectInput" type="file" accept="application/json" hidden>
+    <script src="app.js"></script>
+  </body>
+</html>
