@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+  <!-- End Google Tag Manager -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>17과 어휘 보조 퀴즈 | 그림 보고 어휘 고르기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #667085;
+      --paper: #ffffff;
+      --page: #f5f8fa;
+      --line: #d8e1ea;
+      --soft: #eef4f6;
+      --brand: #0f766e;
+      --brand-dark: #115e59;
+      --amber: #d97706;
+      --rose: #be123c;
+      --indigo: #4f46e5;
+      --mask: #fff4dc;
+      --mask-line: rgba(193, 145, 74, 0.24);
+      --shadow: 0 18px 42px rgba(17, 24, 39, 0.08);
+      --topbar-height: 48px;
+      --category-color: var(--brand);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--page);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, #fbfdff 0%, #f5f8fa 58%, #f6f2e8 100%);
+      font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      min-height: var(--topbar-height);
+      display: grid;
+      grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 12px;
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid rgba(216, 225, 234, 0.9);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar__links {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      overflow-x: auto;
+    }
+
+    .topbar a,
+    .topbar button {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 1px solid rgba(23, 32, 51, 0.1);
+      border-radius: 8px;
+      background: rgba(23, 32, 51, 0.04);
+      color: var(--ink);
+      padding: 0 10px;
+      font-size: 0.8rem;
+      font-weight: 900;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .topbar__title {
+      min-width: 0;
+      overflow: hidden;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #475467;
+      font-size: 0.9rem;
+      font-weight: 900;
+    }
+
+    .shell {
+      width: min(1180px, 100% - 28px);
+      margin: 0 auto;
+      padding: 16px 0 34px;
+    }
+
+    .quiz-panel {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      min-height: calc(100vh - var(--topbar-height) - 48px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .quiz-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 12px;
+      padding: 18px;
+      border-bottom: 1px solid rgba(216, 225, 234, 0.9);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .eyebrow {
+      margin: 0 0 5px;
+      color: var(--brand-dark);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      line-height: 1.12;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .scorebox {
+      min-width: 150px;
+      display: grid;
+      gap: 5px;
+      text-align: right;
+    }
+
+    .scorebox strong {
+      font-size: 1.7rem;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .scorebox span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .progress {
+      grid-column: 1 / -1;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(23, 32, 51, 0.08);
+      overflow: hidden;
+    }
+
+    .progress__fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--brand), var(--amber), var(--indigo));
+      transition: width 0.24s ease;
+    }
+
+    .quiz-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+      min-height: 0;
+    }
+
+    .prompt-pane {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 14px;
+      padding: 18px;
+      border-right: 1px solid rgba(216, 225, 234, 0.9);
+      background: linear-gradient(180deg, rgba(238, 244, 246, 0.34), rgba(255, 255, 255, 0.55));
+    }
+
+    .round-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .category-pill,
+    .count-label {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      padding: 0 11px;
+      font-size: 0.82rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .category-pill {
+      background: var(--category-bg, #e8f3f1);
+      color: var(--category-color);
+    }
+
+    .count-label {
+      color: var(--muted);
+      background: rgba(23, 32, 51, 0.05);
+    }
+
+    .visual-frame {
+      position: relative;
+      align-self: start;
+      width: 100%;
+      aspect-ratio: 1;
+      overflow: hidden;
+      border: 1px solid rgba(216, 225, 234, 0.9);
+      border-radius: 8px;
+      background: #fff7e6;
+    }
+
+    .visual-frame img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .visual-mask {
+      position: absolute;
+      z-index: 2;
+      pointer-events: none;
+      background: #fff4dc;
+      border: 1px solid var(--mask-line);
+      box-shadow: 0 8px 20px rgba(193, 145, 74, 0.08);
+    }
+
+    .visual-mask--top {
+      left: -1px;
+      top: -1px;
+      width: calc(100% + 2px);
+      height: var(--mask-top, 19%);
+      border-radius: 8px 8px 6px 6px;
+    }
+
+    .visual-mask--patch {
+      border-radius: 7px;
+    }
+
+    .question-pane {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .question-title {
+      margin: 0;
+      font-size: 1.35rem;
+      line-height: 1.36;
+      font-weight: 900;
+      word-break: keep-all;
+    }
+
+    .options {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+    }
+
+    .option-btn {
+      min-height: 58px;
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      border: 1px solid rgba(23, 32, 51, 0.14);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      padding: 10px 13px;
+      text-align: left;
+      font-weight: 900;
+      transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
+    }
+
+    .option-btn:hover,
+    .option-btn:focus-visible {
+      border-color: var(--category-color);
+      transform: translateY(-1px);
+      outline: 0;
+    }
+
+    .option-btn[disabled] {
+      cursor: default;
+      transform: none;
+    }
+
+    .option-btn.is-correct {
+      border-color: #16a34a;
+      background: #edf9f1;
+      color: #166534;
+    }
+
+    .option-btn.is-wrong {
+      border-color: #e11d48;
+      background: #fff1f2;
+      color: #9f1239;
+    }
+
+    .option-index {
+      width: 34px;
+      height: 34px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 8px;
+      background: rgba(23, 32, 51, 0.06);
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 900;
+    }
+
+    .option-btn.is-correct .option-index {
+      color: #fff;
+      background: #16a34a;
+    }
+
+    .option-btn.is-wrong .option-index {
+      color: #fff;
+      background: #e11d48;
+    }
+
+    .feedback {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-top: 1px solid rgba(216, 225, 234, 0.9);
+      padding-top: 13px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 900;
+    }
+
+    .feedback.good {
+      color: #15803d;
+    }
+
+    .feedback.bad {
+      color: #be123c;
+    }
+
+    .next-btn,
+    .restart-btn {
+      min-height: 42px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--ink);
+      color: #fff;
+      padding: 0 16px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .restart-btn {
+      background: var(--category-color);
+    }
+
+    .next-btn:disabled {
+      opacity: 0.42;
+      cursor: default;
+    }
+
+    .result-view {
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 16px;
+      min-height: 100%;
+      padding: 28px;
+      text-align: center;
+    }
+
+    .result-view[hidden] {
+      display: none;
+    }
+
+    .result-score {
+      font-size: 4rem;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .result-breakdown {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .breakdown-pill {
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 8px;
+      background: rgba(23, 32, 51, 0.06);
+      color: #475467;
+      padding: 0 11px;
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .missed-list {
+      display: grid;
+      gap: 8px;
+      width: min(520px, 100%);
+    }
+
+    .missed-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 42px;
+      border: 1px solid rgba(216, 225, 234, 0.9);
+      border-radius: 8px;
+      background: #fff;
+      padding: 9px 11px;
+      color: #475467;
+      font-size: 0.9rem;
+      font-weight: 900;
+    }
+
+    .missed-item strong {
+      color: var(--ink);
+    }
+
+    @media (max-width: 880px) {
+      .quiz-body {
+        grid-template-columns: 1fr;
+      }
+
+      .prompt-pane {
+        border-right: 0;
+        border-bottom: 1px solid rgba(216, 225, 234, 0.9);
+      }
+
+      .visual-frame {
+        max-width: 560px;
+        justify-self: center;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .topbar {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .topbar__title {
+        display: none;
+      }
+
+      .shell {
+        width: min(100% - 18px, 1180px);
+        padding-top: 10px;
+      }
+
+      .quiz-head {
+        grid-template-columns: 1fr;
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .scorebox {
+        min-width: 0;
+        text-align: left;
+      }
+
+      .prompt-pane,
+      .question-pane {
+        padding: 14px;
+      }
+
+      .question-title {
+        font-size: 1.12rem;
+      }
+
+      .option-btn {
+        min-height: 56px;
+        grid-template-columns: 32px minmax(0, 1fr);
+      }
+
+      .option-index {
+        width: 32px;
+        height: 32px;
+      }
+
+      .feedback {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .next-btn,
+      .restart-btn {
+        width: 100%;
+      }
+
+      .result-score {
+        font-size: 3rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <nav class="topbar">
+    <div class="topbar__links">
+      <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+      <a href="index.html"><i class="fa-solid fa-folder-open"></i> 17과</a>
+      <a href="vocabulary.html"><i class="fa-solid fa-layer-group"></i> 어휘</a>
+      <a href="vocab-support-rumor-flow.html"><i class="fa-solid fa-share-nodes"></i> 보조1</a>
+      <a href="vocab-support-possibility-meter.html"><i class="fa-solid fa-gauge-high"></i> 보조2</a>
+      <a href="vocab-support-misunderstanding-sequence.html"><i class="fa-solid fa-timeline"></i> 보조3</a>
+      <a href="vocab-support-adverb-tone.html"><i class="fa-solid fa-sliders"></i> 보조4</a>
+    </div>
+    <div class="topbar__title">17과 그림 어휘 퀴즈</div>
+    <button type="button" id="shuffleBtn"><i class="fa-solid fa-shuffle"></i> 섞기</button>
+  </nav>
+
+  <main class="shell">
+    <section class="quiz-panel" id="quizPanel" aria-live="polite">
+      <div class="quiz-head">
+        <div>
+          <p class="eyebrow">17과 어휘 보조 퀴즈</p>
+          <h1>그림 보고 어휘 고르기</h1>
+        </div>
+        <div class="scorebox">
+          <strong id="scoreText">0</strong>
+          <span id="scoreDetail">0 / 16</span>
+        </div>
+        <div class="progress" aria-hidden="true"><div class="progress__fill" id="progressFill"></div></div>
+      </div>
+
+      <div class="quiz-body" id="quizBody">
+        <section class="prompt-pane">
+          <div class="round-meta">
+            <span class="category-pill" id="categoryPill">소문</span>
+            <span class="count-label" id="countLabel">1 / 16</span>
+          </div>
+          <div class="visual-frame" id="visualFrame">
+            <img id="visualImage" src="" alt="어휘 장면 그림">
+            <div id="visualMasks" aria-hidden="true"></div>
+          </div>
+        </section>
+
+        <section class="question-pane">
+          <h2 class="question-title" id="questionTitle">그림에 맞는 어휘를 고르세요.</h2>
+          <div class="options" id="options"></div>
+          <div class="feedback" id="feedback">
+            <span id="feedbackText">보기 순서는 매번 바뀝니다.</span>
+            <button class="next-btn" type="button" id="nextBtn" disabled><i class="fa-solid fa-arrow-right"></i> 다음</button>
+          </div>
+        </section>
+      </div>
+
+      <section class="result-view" id="resultView" hidden>
+        <p class="eyebrow">완료</p>
+        <div class="result-score" id="resultScore">0 / 16</div>
+        <div class="result-breakdown" id="resultBreakdown"></div>
+        <div class="missed-list" id="missedList"></div>
+        <button class="restart-btn" type="button" id="restartBtn"><i class="fa-solid fa-rotate-right"></i> 다시 풀기</button>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const imageBase = "../assets/c17/vocabulary/images/cards/";
+
+      const categoryMeta = {
+        rumor: { label: "소문", color: "#0f766e", bg: "#e8f3f1" },
+        possibility: { label: "가능성", color: "#4f46e5", bg: "#eef2ff" },
+        attitude: { label: "말하는 태도", color: "#d97706", bg: "#fff7ed" },
+        repair: { label: "오해와 화해", color: "#be123c", bg: "#fff1f2" }
+      };
+
+      const questionBank = [
+        { id: "rumor-appear", category: "rumor", answer: "소문이 나다", image: "rumor-appear.webp" },
+        { id: "rumor-start", category: "rumor", answer: "소문을 내다", image: "rumor-start.webp" },
+        { id: "rumor-spread", category: "rumor", answer: "소문이 퍼지다", image: "rumor-spread.webp" },
+        { id: "rumor-scatter", category: "rumor", answer: "소문을 퍼뜨리다", image: "rumor-scatter.webp" },
+        { id: "no-reason", category: "possibility", answer: "그럴 리가 없다", image: "possibility-no-reason.webp" },
+        { id: "hard-to-believe", category: "possibility", answer: "믿어지지 않다", image: "possibility-hard-to-believe.webp" },
+        { id: "possible", category: "possibility", answer: "그럴 수 있다", image: "possibility-possible.webp" },
+        {
+          id: "certain",
+          category: "possibility",
+          answer: "틀림없다",
+          image: "possibility-certain.webp",
+          patches: [
+            { left: 30, top: 22.5, width: 34, height: 10 },
+            { left: 27, top: 59, width: 34, height: 13 },
+            { left: 4, top: 20, width: 18, height: 13 },
+            { left: 47, top: 75, width: 24, height: 12 }
+          ]
+        },
+        { id: "by-chance", category: "attitude", answer: "우연히", image: "attitude-by-chance.webp" },
+        { id: "in-detail", category: "attitude", answer: "자세히", image: "attitude-in-detail.webp" },
+        { id: "clearly", category: "attitude", answer: "분명히", image: "attitude-clearly.webp" },
+        { id: "honestly", category: "attitude", answer: "솔직히", image: "attitude-honestly.webp" },
+        { id: "disappointed", category: "repair", answer: "실망하다", image: "repair-disappointed.webp" },
+        { id: "argue", category: "repair", answer: "다투다", image: "repair-argue.webp" },
+        { id: "misunderstand", category: "repair", answer: "오해하다", image: "repair-misunderstand.webp" },
+        { id: "reconcile", category: "repair", answer: "오해를 풀다 · 화해하다", image: "repair-solve-reconcile.webp", maskTop: 20 }
+      ];
+
+      const elements = {
+        quizBody: document.getElementById("quizBody"),
+        resultView: document.getElementById("resultView"),
+        categoryPill: document.getElementById("categoryPill"),
+        countLabel: document.getElementById("countLabel"),
+        visualFrame: document.getElementById("visualFrame"),
+        visualImage: document.getElementById("visualImage"),
+        visualMasks: document.getElementById("visualMasks"),
+        questionTitle: document.getElementById("questionTitle"),
+        options: document.getElementById("options"),
+        feedback: document.getElementById("feedback"),
+        feedbackText: document.getElementById("feedbackText"),
+        nextBtn: document.getElementById("nextBtn"),
+        scoreText: document.getElementById("scoreText"),
+        scoreDetail: document.getElementById("scoreDetail"),
+        progressFill: document.getElementById("progressFill"),
+        resultScore: document.getElementById("resultScore"),
+        resultBreakdown: document.getElementById("resultBreakdown"),
+        missedList: document.getElementById("missedList"),
+        restartBtn: document.getElementById("restartBtn"),
+        shuffleBtn: document.getElementById("shuffleBtn")
+      };
+
+      const state = {
+        questions: [],
+        index: 0,
+        score: 0,
+        answered: false,
+        wrongAnswers: [],
+        categoryScores: {}
+      };
+
+      function shuffle(items) {
+        const next = [...items];
+        for (let i = next.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [next[i], next[j]] = [next[j], next[i]];
+        }
+        return next;
+      }
+
+      function uniqueByAnswer(items) {
+        const seen = new Set();
+        return items.filter((item) => {
+          if (seen.has(item.answer)) return false;
+          seen.add(item.answer);
+          return true;
+        });
+      }
+
+      function makeOptions(question) {
+        const pool = questionBank.filter((item) => item.answer !== question.answer);
+        const sameCategory = shuffle(pool.filter((item) => item.category === question.category)).slice(0, 2);
+        const sameAnswers = new Set(sameCategory.map((item) => item.answer));
+        const others = shuffle(pool.filter((item) => !sameAnswers.has(item.answer))).slice(0, 3 - sameCategory.length);
+        return shuffle(uniqueByAnswer([question, ...sameCategory, ...others]).map((item) => item.answer));
+      }
+
+      function buildQuestions() {
+        return shuffle(questionBank).map((question) => ({
+          ...question,
+          options: makeOptions(question)
+        }));
+      }
+
+      function setCategoryTheme(category) {
+        const meta = categoryMeta[category];
+        document.documentElement.style.setProperty("--category-color", meta.color);
+        document.documentElement.style.setProperty("--category-bg", meta.bg);
+        elements.categoryPill.textContent = meta.label;
+      }
+
+      function renderMasks(question) {
+        elements.visualMasks.innerHTML = "";
+        const topMask = document.createElement("span");
+        topMask.className = "visual-mask visual-mask--top";
+        topMask.style.setProperty("--mask-top", `${question.maskTop || 19}%`);
+        elements.visualMasks.append(topMask);
+
+        (question.patches || []).forEach((patch) => {
+          const mask = document.createElement("span");
+          mask.className = "visual-mask visual-mask--patch";
+          mask.style.left = `${patch.left}%`;
+          mask.style.top = `${patch.top}%`;
+          mask.style.width = `${patch.width}%`;
+          mask.style.height = `${patch.height}%`;
+          elements.visualMasks.append(mask);
+        });
+      }
+
+      function renderOptions(question) {
+        elements.options.innerHTML = "";
+        question.options.forEach((option, index) => {
+          const button = document.createElement("button");
+          button.className = "option-btn";
+          button.type = "button";
+          button.dataset.index = String(index);
+          button.innerHTML = `<span class="option-index">${index + 1}</span><span>${option}</span>`;
+          button.addEventListener("click", () => checkAnswer(button, option, question));
+          elements.options.append(button);
+        });
+      }
+
+      function updateScore() {
+        const answeredCount = state.index + (state.answered ? 1 : 0);
+        elements.scoreText.textContent = String(state.score);
+        elements.scoreDetail.textContent = `${answeredCount} / ${state.questions.length}`;
+        elements.progressFill.style.width = `${(answeredCount / state.questions.length) * 100}%`;
+      }
+
+      function renderQuestion() {
+        const question = state.questions[state.index];
+        setCategoryTheme(question.category);
+        elements.countLabel.textContent = `${state.index + 1} / ${state.questions.length}`;
+        elements.questionTitle.textContent = "그림에 맞는 어휘를 고르세요.";
+        elements.visualImage.src = `${imageBase}${question.image}`;
+        elements.visualImage.alt = "어휘 장면 그림";
+        elements.feedbackText.textContent = "보기 순서는 매번 바뀝니다.";
+        elements.feedback.className = "feedback";
+        elements.nextBtn.disabled = true;
+        state.answered = false;
+        renderMasks(question);
+        renderOptions(question);
+        updateScore();
+      }
+
+      function checkAnswer(button, selected, question) {
+        if (state.answered) return;
+        state.answered = true;
+        const correct = selected === question.answer;
+        if (correct) {
+          state.score += 1;
+          state.categoryScores[question.category] += 1;
+          elements.feedbackText.textContent = "정답입니다.";
+          elements.feedback.className = "feedback good";
+        } else {
+          state.wrongAnswers.push({ selected, answer: question.answer });
+          elements.feedbackText.textContent = `정답: ${question.answer}`;
+          elements.feedback.className = "feedback bad";
+        }
+
+        Array.from(elements.options.children).forEach((item) => {
+          item.disabled = true;
+          const value = question.options[Number(item.dataset.index)];
+          if (value === question.answer) item.classList.add("is-correct");
+        });
+
+        if (!correct) button.classList.add("is-wrong");
+        elements.nextBtn.disabled = false;
+        updateScore();
+      }
+
+      function showResult() {
+        elements.quizBody.style.display = "none";
+        elements.resultView.hidden = false;
+        elements.progressFill.style.width = "100%";
+        elements.scoreText.textContent = String(state.score);
+        elements.scoreDetail.textContent = `${state.questions.length} / ${state.questions.length}`;
+        elements.resultScore.textContent = `${state.score} / ${state.questions.length}`;
+        elements.resultBreakdown.innerHTML = "";
+        Object.entries(categoryMeta).forEach(([key, meta]) => {
+          const total = state.questions.filter((question) => question.category === key).length;
+          const item = document.createElement("span");
+          item.className = "breakdown-pill";
+          item.textContent = `${meta.label} ${state.categoryScores[key]} / ${total}`;
+          elements.resultBreakdown.append(item);
+        });
+        elements.missedList.innerHTML = "";
+        state.wrongAnswers.slice(0, 6).forEach((item) => {
+          const row = document.createElement("div");
+          row.className = "missed-item";
+          row.innerHTML = `<span>선택 ${item.selected}</span><strong>${item.answer}</strong>`;
+          elements.missedList.append(row);
+        });
+      }
+
+      function nextQuestion() {
+        if (!state.answered) return;
+        state.index += 1;
+        if (state.index >= state.questions.length) {
+          showResult();
+        } else {
+          renderQuestion();
+        }
+      }
+
+      function restart() {
+        state.questions = buildQuestions();
+        state.index = 0;
+        state.score = 0;
+        state.answered = false;
+        state.wrongAnswers = [];
+        state.categoryScores = { rumor: 0, possibility: 0, attitude: 0, repair: 0 };
+        elements.quizBody.style.display = "";
+        elements.resultView.hidden = true;
+        renderQuestion();
+      }
+
+      elements.nextBtn.addEventListener("click", nextQuestion);
+      elements.restartBtn.addEventListener("click", restart);
+      elements.shuffleBtn.addEventListener("click", restart);
+
+      window.C17_PICTURE_QUIZ = {
+        questionBank,
+        state,
+        actions: { restart, nextQuestion }
+      };
+
+      restart();
+    })();
+  </script>
+  <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

@@ -22,6 +22,22 @@
       <section class="game-stage" aria-label="소문 마을 NEXT 프로토타입">
         <canvas id="gameCanvas" width="960" height="640" aria-label="소문을 무마하는 마을 게임 화면"></canvas>
 
+        <section id="titleScreen" class="title-screen" aria-label="소문 마을 NEXT 시작 화면">
+          <div class="title-screen__scene" aria-hidden="true">
+            <span class="title-screen__hero"></span>
+            <span class="title-screen__villain"></span>
+            <span class="title-screen__mote title-screen__mote--one">소문</span>
+            <span class="title-screen__mote title-screen__mote--two">?</span>
+            <span class="title-screen__mote title-screen__mote--three">!</span>
+          </div>
+          <div class="title-screen__content">
+            <span class="title-screen__tag">17과 어휘 보조놀이</span>
+            <h1>소문 무마 게임 NEXT</h1>
+            <p>빌런이 작은 오해를 들고 마을에 들어왔습니다. 주인공은 소문을 확인하고, 가능성을 판단하고, 흔들리는 마음을 다독여 우군을 만들어야 합니다.</p>
+            <button id="startButton" class="title-screen__start" type="button">시작하기</button>
+          </div>
+        </section>
+
         <div class="hud">
           <div class="hud__cluster hud__cluster--mission">
             <span class="hud__label">현재 상황</span>
@@ -39,6 +55,22 @@
           <canvas id="miniMap" width="168" height="126" aria-label="소문 확산 미니맵"></canvas>
         </div>
 
+        <section class="victory-card" aria-label="승리 조건">
+          <span class="panel-label">Clear Goals</span>
+          <ul id="victoryList" class="victory-list"></ul>
+        </section>
+
+        <button id="expressionToggle" class="expression-toggle" type="button" aria-expanded="false" aria-controls="expressionOverlay">표현집</button>
+
+        <section id="expressionOverlay" class="expression-overlay hidden" aria-label="인게임 표현집">
+          <div class="expression-overlay__header">
+            <span class="panel-label">Vocabulary</span>
+            <button id="expressionClose" type="button">닫기</button>
+          </div>
+          <h2>지금 쓰는 표현</h2>
+          <ul id="expressionOverlayList" class="expression-overlay__list"></ul>
+        </section>
+
         <div id="prompt" class="prompt hidden"></div>
         <div id="toast" class="toast hidden" aria-live="polite"></div>
 
@@ -49,6 +81,7 @@
           </div>
           <p id="dialogueText"></p>
           <p id="dialogueClue" class="dialogue__clue"></p>
+          <p id="dialogueFeedback" class="dialogue__feedback hidden"></p>
           <div id="dialogueOptions" class="dialogue__options"></div>
         </section>
 
@@ -60,12 +93,11 @@
           <button id="restartButton" type="button">다시 시작</button>
         </section>
 
-        <div class="toolbelt" aria-label="조작">
-          <button type="button" data-action="move" data-dir="up">위</button>
-          <button type="button" data-action="move" data-dir="left">왼쪽</button>
-          <button type="button" data-action="interact">확인</button>
-          <button type="button" data-action="move" data-dir="right">오른쪽</button>
-          <button type="button" data-action="move" data-dir="down">아래</button>
+        <div class="mobile-controls" aria-label="모바일 조작">
+          <div id="joystick" class="joystick" aria-label="이동 조이스틱">
+            <span id="joystickKnob" class="joystick__knob"></span>
+          </div>
+          <button class="mobile-action" type="button" data-action="interact">확인</button>
         </div>
       </section>
 

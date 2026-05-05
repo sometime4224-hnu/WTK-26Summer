@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>17과 어휘 보조자료5 | 소문 장면 도식</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <style>
+        :root {
+            --ink: #172033;
+            --muted: #667085;
+            --paper: #ffffff;
+            --page: #f5f8fa;
+            --line: #d8e1ea;
+            --rumor: #0f766e;
+            --rumor-dark: #115e59;
+            --rumor-soft: #dcf5ef;
+            --spread: #4f46e5;
+            --spread-soft: #eef2ff;
+            --danger: #be123c;
+            --danger-soft: #fff1f2;
+            --amber: #d97706;
+            --amber-soft: #fff7ed;
+            --topbar-height: 48px;
+        }
+        * { box-sizing: border-box; }
+        html { min-height: 100%; background: var(--page); }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            background: linear-gradient(180deg, #fbfdff 0%, #f5f8fa 54%, #f3f7f2 100%);
+            font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+        }
+        button { font: inherit; cursor: pointer; }
+
+        /* TOPBAR */
+        .topbar {
+            position: sticky; top: 0; z-index: 20;
+            min-height: var(--topbar-height);
+            display: grid;
+            grid-template-columns: auto minmax(0,1fr) auto;
+            align-items: center; gap: 10px;
+            padding: 7px 12px;
+            background: rgba(255,255,255,0.94);
+            border-bottom: 1px solid rgba(216,225,234,0.92);
+            backdrop-filter: blur(14px);
+        }
+        .topbar__links {
+            display: flex; gap: 6px; align-items: center;
+            overflow-x: auto; min-width: 0;
+        }
+        .topbar a, .topbar button {
+            min-height: 34px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            border: 1px solid rgba(23,32,51,0.1);
+            border-radius: 8px;
+            background: rgba(23,32,51,0.04);
+            color: var(--ink); padding: 0 10px;
+            font-size: 0.8rem; font-weight: 900;
+            text-decoration: none; white-space: nowrap;
+        }
+        .topbar__title {
+            text-align: center; font-size: 0.9rem; font-weight: 900;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
+        /* SHELL */
+        .shell {
+            width: min(1180px, 100% - 28px);
+            margin: 0 auto; padding: 18px 0 40px;
+        }
+
+        /* HERO */
+        .hero {
+            padding: 16px 0 14px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 20px;
+        }
+        .eyebrow {
+            margin: 0 0 6px; color: var(--rumor);
+            font-size: 0.76rem; font-weight: 900;
+            letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        h1 { margin: 0; font-size: clamp(1.6rem,3.5vw,2.6rem); font-weight: 900; line-height: 1.1; }
+        .hero__sub {
+            margin: 8px 0 0; color: #475467;
+            font-size: clamp(0.92rem,1.5vw,1.05rem); line-height: 1.65; font-weight: 700;
+        }
+
+        /* MAIN LAYOUT */
+        .diagram-layout {
+            display: grid;
+            grid-template-columns: 220px minmax(0,1fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        /* VOCAB BUTTON PANEL */
+        .vocab-panel {
+            position: sticky;
+            top: calc(var(--topbar-height) + 12px);
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .panel-label {
+            font-size: 0.72rem; font-weight: 900;
+            color: var(--muted); letter-spacing: 0.07em;
+            text-transform: uppercase; padding: 0 4px; margin-bottom: 2px;
+        }
+        .vocab-btn {
+            display: flex; align-items: center; gap: 10px;
+            min-height: 50px; padding: 0 14px;
+            border: 2px solid var(--line);
+            border-radius: 10px;
+            background: var(--paper);
+            color: var(--ink);
+            font-size: 0.95rem; font-weight: 900;
+            text-align: left;
+            transition: border-color 0.18s, background 0.18s, transform 0.15s, box-shadow 0.18s;
+        }
+        .vocab-btn:hover {
+            transform: translateX(3px);
+            border-color: #98a2b3;
+        }
+        .vocab-btn.active {
+            border-color: var(--active-color, var(--rumor));
+            background: var(--active-bg, var(--rumor-soft));
+            color: var(--active-color, var(--rumor-dark));
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+        .vocab-btn .dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--dot-color, var(--rumor));
+            flex-shrink: 0;
+        }
+        .vocab-btn .korean { font-size: 0.97rem; font-weight: 900; }
+        .vocab-btn .english { font-size: 0.75rem; font-weight: 700; color: var(--muted); margin-top: 1px; }
+        .vocab-btn-inner { display: flex; flex-direction: column; }
+
+        .reset-btn {
+            margin-top: 4px;
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+            min-height: 38px; padding: 0 12px;
+            border: 1px solid var(--line); border-radius: 8px;
+            background: #f8fafc; color: var(--muted);
+            font-size: 0.82rem; font-weight: 900;
+            transition: background 0.15s;
+        }
+        .reset-btn:hover { background: #eef4f6; }
+
+        /* DIAGRAM AREA */
+        .diagram-wrap {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: var(--paper);
+            box-shadow: 0 12px 32px rgba(17,24,39,0.06);
+            overflow: hidden;
+        }
+        .diagram-svg-wrap {
+            width: 100%;
+            aspect-ratio: 16/10;
+            position: relative;
+        }
+        .diagram-svg-wrap svg {
+            width: 100%; height: 100%;
+            display: block;
+        }
+
+        /* INFO BOX */
+        .info-box {
+            min-height: 68px;
+            padding: 14px 18px;
+            border-top: 1px solid var(--line);
+            background: #f8fbfc;
+            transition: background 0.2s;
+        }
+        .info-box .vocab-word {
+            font-size: 1.15rem; font-weight: 900; color: var(--ink);
+        }
+        .info-box .vocab-meaning {
+            font-size: 0.92rem; font-weight: 700; color: #344054; margin-top: 2px; line-height: 1.55;
+        }
+        .info-box .vocab-example {
+            font-size: 0.88rem; font-weight: 700; color: var(--muted); margin-top: 4px;
+            font-style: italic;
+        }
+        .info-box .vocab-prompt {
+            font-size: 0.88rem; font-weight: 800; color: #98a2b3;
+        }
+
+        /* SVG highlight zones */
+        .zone { transition: opacity 0.25s; }
+        .zone-highlight {
+            stroke-width: 3;
+            fill: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .zone-fill-highlight {
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .zone-highlight.show { opacity: 1; }
+        .zone-fill-highlight.show { opacity: 0.18; }
+
+        /* Arrow animations */
+        @keyframes dash {
+            to { stroke-dashoffset: -24; }
+        }
+        .flow-arrow {
+            stroke-dasharray: 8 6;
+            stroke-dashoffset: 0;
+        }
+        .flow-arrow.animated {
+            animation: dash 0.6s linear infinite;
+        }
+
+        /* Pulse animation for highlighted characters */
+        @keyframes pulse-ring {
+            0% { r: 28; opacity: 0.7; }
+            100% { r: 38; opacity: 0; }
+        }
+        .pulse-circle {
+            opacity: 0;
+            fill: none;
+        }
+        .pulse-circle.show {
+            animation: pulse-ring 1.2s ease-out infinite;
+        }
+
+        @media (max-width: 800px) {
+            .diagram-layout {
+                grid-template-columns: 1fr;
+            }
+            .vocab-panel {
+                position: static;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .panel-label, .reset-btn { grid-column: 1 / -1; }
+        }
+        @media (max-width: 500px) {
+            .vocab-panel { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav class="topbar">
+    <div class="topbar__links">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <a href="index.html"><i class="fa-solid fa-folder-open"></i> 17과</a>
+        <a href="vocabulary.html"><i class="fa-solid fa-comments"></i> 어휘</a>
+        <a href="vocab-support-rumor-flow.html"><i class="fa-solid fa-share-nodes"></i> 보조1</a>
+        <a href="vocab-support-possibility-meter.html"><i class="fa-solid fa-gauge-high"></i> 보조2</a>
+        <a href="vocab-support-misunderstanding-sequence.html"><i class="fa-solid fa-timeline"></i> 보조3</a>
+        <a href="vocab-support-adverb-tone.html"><i class="fa-solid fa-sliders"></i> 보조4</a>
+        <a href="rumor-game-next/index.html"><i class="fa-solid fa-gamepad"></i> 보조놀이</a>
+    </div>
+    <div class="topbar__title">어휘 보조자료5: 소문 장면 도식</div>
+    <div></div>
+</nav>
+
+<main class="shell">
+    <header class="hero">
+        <p class="eyebrow">Chapter 17 · Vocab Aid 5</p>
+        <h1>소문 장면 도식</h1>
+        <p class="hero__sub">어휘 버튼을 클릭하면 그 표현이 가리키는 장면 요소가 강조됩니다.</p>
+    </header>
+
+    <div class="diagram-layout">
+        <!-- LEFT: VOCAB BUTTONS -->
+        <aside class="vocab-panel" aria-label="어휘 선택">
+            <div class="panel-label">소문 어휘</div>
+
+            <button class="vocab-btn" data-vocab="rumor-appear"
+                style="--active-color:#0f766e;--active-bg:#dcf5ef;--dot-color:#0f766e;">
+                <span class="dot"></span>
+                <span class="vocab-btn-inner">
+                    <span class="korean">소문이 나다</span>
+                    <span class="english">a rumor comes out</span>
+                </span>
+            </button>
+
+            <button class="vocab-btn" data-vocab="rumor-start"
+                style="--active-color:#b45309;--active-bg:#fff2d8;--dot-color:#b45309;">
+                <span class="dot"></span>
+                <span class="vocab-btn-inner">
+                    <span class="korean">소문을 내다</span>
+                    <span class="english">to start a rumor</span>
+                </span>
+            </button>
+
+            <button class="vocab-btn" data-vocab="rumor-spread-i"
+                style="--active-color:#4f46e5;--active-bg:#eef2ff;--dot-color:#4f46e5;">
+                <span class="dot"></span>
+                <span class="vocab-btn-inner">
+                    <span class="korean">소문이 퍼지다</span>
+                    <span class="english">a rumor spreads</span>
+                </span>
+            </button>
+
+            <button class="vocab-btn" data-vocab="rumor-spread-t"
+                style="--active-color:#6d28d9;--active-bg:#f5f3ff;--dot-color:#6d28d9;">
+                <span class="dot"></span>
+                <span class="vocab-btn-inner">
+                    <span class="korean">소문을 퍼뜨리다</span>
+                    <span class="english">to spread a rumor</span>
+                </span>
+            </button>
+
+            <div class="panel-label" style="margin-top:6px;">반응 어휘</div>
+
+            <button class="vocab-btn" data-vocab="misunderstand"
+                style="--active-color:#be123c;--active-bg:#fff1f2;--dot-color:#be123c;">
+                <span class="dot"></span>
+                <span class="vocab-btn-inner">
+                    <span class="korean">오해하다</span>
+                    <span class="english">to misunderstand</span>
+                </span>
+            </button>
+
+            <button class="vocab-btn" data-vocab="argue"
+                style="--active-color:#c2410c;--active-bg:#fff7ed;--dot-color:#c2410c;">
+                <span class="dot"></span>
+                <span class="vocab-btn-inner">
+                    <span class="korean">다투다</span>
+                    <span class="english">to argue</span>
+                </span>
+            </button>
+
+            <button class="vocab-btn" data-vocab="solve"
+                style="--active-color:#0369a1;--active-bg:#e0f2fe;--dot-color:#0369a1;">
+                <span class="dot"></span>
+                <span class="vocab-btn-inner">
+                    <span class="korean">오해를 풀다</span>
+                    <span class="english">to resolve a misunderstanding</span>
+                </span>
+            </button>
+
+            <button class="vocab-btn" data-vocab="reconcile"
+                style="--active-color:#15803d;--active-bg:#dcfce7;--dot-color:#15803d;">
+                <span class="dot"></span>
+                <span class="vocab-btn-inner">
+                    <span class="korean">화해하다</span>
+                    <span class="english">to reconcile</span>
+                </span>
+            </button>
+
+            <button class="reset-btn" id="reset-btn" type="button">
+                <i class="fa-solid fa-xmark"></i> 강조 해제
+            </button>
+        </aside>
+
+        <!-- RIGHT: DIAGRAM -->
+        <div class="diagram-wrap">
+            <div class="diagram-svg-wrap">
+                <svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg" aria-label="소문 장면 도식">
+                    <defs>
+                        <!-- Background gradient -->
+                        <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#f0f9ff"/>
+                            <stop offset="100%" stop-color="#f0fdf4"/>
+                        </linearGradient>
+                        <!-- Arrow marker - teal -->
+                        <marker id="arrowTeal" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                            <path d="M0,0 L0,6 L8,3 z" fill="#0f766e"/>
+                        </marker>
+                        <!-- Arrow marker - indigo -->
+                        <marker id="arrowIndigo" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                            <path d="M0,0 L0,6 L8,3 z" fill="#4f46e5"/>
+                        </marker>
+                        <!-- Arrow marker - violet -->
+                        <marker id="arrowViolet" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                            <path d="M0,0 L0,6 L8,3 z" fill="#6d28d9"/>
+                        </marker>
+                        <!-- Arrow marker - amber -->
+                        <marker id="arrowAmber" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                            <path d="M0,0 L0,6 L8,3 z" fill="#b45309"/>
+                        </marker>
+                        <!-- Clip path for scene sections -->
+                        <clipPath id="bgClip">
+                            <rect width="900" height="560"/>
+                        </clipPath>
+                    </defs>
+
+                    <!-- ─── BACKGROUND ─── -->
+                    <rect width="900" height="560" fill="url(#bgGrad)"/>
+
+                    <!-- Ground line -->
+                    <rect x="0" y="480" width="900" height="80" fill="#e8f5e9" opacity="0.6"/>
+                    <line x1="0" y1="480" x2="900" y2="480" stroke="#c8e6c9" stroke-width="1.5"/>
+
+                    <!-- Section dividers (subtle) -->
+                    <line x1="300" y1="30" x2="300" y2="460" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
+                    <line x1="600" y1="30" x2="600" y2="460" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
+
+                    <!-- Section labels -->
+                    <text x="150" y="28" text-anchor="middle" font-family="Noto Sans KR, sans-serif" font-size="11" font-weight="900" fill="#94a3b8" letter-spacing="1">소문 발생</text>
+                    <text x="450" y="28" text-anchor="middle" font-family="Noto Sans KR, sans-serif" font-size="11" font-weight="900" fill="#94a3b8" letter-spacing="1">소문 확산</text>
+                    <text x="750" y="28" text-anchor="middle" font-family="Noto Sans KR, sans-serif" font-size="11" font-weight="900" fill="#94a3b8" letter-spacing="1">오해 → 해결</text>
+
+                    <!-- ══════════════════════════════════════ -->
+                    <!-- SECTION 1: COUPLE (소문의 주인공) - x:40-280 -->
+                    <!-- ══════════════════════════════════════ -->
+
+                    <!-- Zone fill for "소문이 나다" -->
+                    <rect id="fill-rumor-appear" class="zone-fill-highlight" x="38" y="38" width="248" height="280" rx="12" fill="#0f766e"/>
+
+                    <!-- Couple background circle -->
+                    <circle cx="150" cy="195" r="90" fill="#dcf5ef" opacity="0.5"/>
+
+                    <!-- Heart icon between couple -->
+                    <text x="150" y="118" text-anchor="middle" font-size="22" fill="#f43f5e">♥</text>
+
+                    <!-- Person A (아키라) -->
+                    <!-- Body -->
+                    <circle cx="112" cy="155" r="18" fill="#fbbf24" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="112" y="160" text-anchor="middle" font-family="Noto Sans KR" font-size="11" font-weight="900" fill="#78350f">아</text>
+                    <!-- Torso -->
+                    <rect x="96" y="174" width="32" height="40" rx="8" fill="#fb923c" stroke="#ea580c" stroke-width="1.5"/>
+                    <!-- Arms -->
+                    <line x1="96" y1="184" x2="80" y2="202" stroke="#fb923c" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="128" y1="184" x2="138" y2="202" stroke="#fb923c" stroke-width="5" stroke-linecap="round"/>
+                    <!-- Legs -->
+                    <line x1="106" y1="214" x2="100" y2="240" stroke="#f97316" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="118" y1="214" x2="124" y2="240" stroke="#f97316" stroke-width="5" stroke-linecap="round"/>
+
+                    <!-- Person B -->
+                    <circle cx="188" cy="155" r="18" fill="#a78bfa" stroke="#8b5cf6" stroke-width="1.5"/>
+                    <text x="188" y="160" text-anchor="middle" font-family="Noto Sans KR" font-size="11" font-weight="900" fill="#3b0764">바</text>
+                    <!-- Torso -->
+                    <rect x="172" y="174" width="32" height="40" rx="8" fill="#818cf8" stroke="#6366f1" stroke-width="1.5"/>
+                    <!-- Arms -->
+                    <line x1="172" y1="184" x2="162" y2="202" stroke="#818cf8" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="204" y1="184" x2="220" y2="202" stroke="#818cf8" stroke-width="5" stroke-linecap="round"/>
+                    <!-- Legs -->
+                    <line x1="182" y1="214" x2="176" y2="240" stroke="#6366f1" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="194" y1="214" x2="200" y2="240" stroke="#6366f1" stroke-width="5" stroke-linecap="round"/>
+
+                    <!-- Couple label -->
+                    <rect x="108" y="252" width="84" height="24" rx="6" fill="#fff" opacity="0.9"/>
+                    <text x="150" y="268" text-anchor="middle" font-family="Noto Sans KR" font-size="11" font-weight="900" fill="#374151">아키라 &amp; 바라</text>
+
+                    <!-- "소문이 나다" speech bubble emerging -->
+                    <ellipse cx="150" cy="310" rx="72" ry="28" fill="#fff" stroke="#0f766e" stroke-width="2" opacity="0.95"/>
+                    <path d="M140,282 L146,296 L134,296 Z" fill="#fff" stroke="#0f766e" stroke-width="1.5"/>
+                    <text x="150" y="306" text-anchor="middle" font-family="Noto Sans KR" font-size="11.5" font-weight="900" fill="#0f766e">소문이 났어요!</text>
+                    <text x="150" y="321" text-anchor="middle" font-family="Noto Sans KR" font-size="9.5" font-weight="700" fill="#0f766e" opacity="0.8">두 사람이 연인 사이래요?</text>
+
+                    <!-- Zone outline for "소문이 나다" -->
+                    <rect id="zone-rumor-appear" class="zone-highlight" x="38" y="38" width="248" height="300" rx="12" stroke="#0f766e"/>
+                    <!-- Pulse on couple -->
+                    <circle id="pulse-rumor-appear" class="pulse-circle" cx="150" cy="175" r="28" stroke="#0f766e" stroke-width="3"/>
+
+                    <!-- ══════════════════════════════════════ -->
+                    <!-- GOSSIPER (소문을 내다 / 퍼뜨리다) - x:50-240, y:350-460 -->
+                    <!-- ══════════════════════════════════════ -->
+
+                    <!-- Zone fill for gossiper -->
+                    <rect id="fill-rumor-start" class="zone-fill-highlight" x="38" y="350" width="248" height="120" rx="12" fill="#b45309"/>
+                    <rect id="fill-rumor-spread-t" class="zone-fill-highlight" x="38" y="350" width="248" height="120" rx="12" fill="#6d28d9"/>
+
+                    <!-- Gossiper person (수진) -->
+                    <circle cx="80" cy="390" r="18" fill="#34d399" stroke="#059669" stroke-width="1.5"/>
+                    <text x="80" y="395" text-anchor="middle" font-family="Noto Sans KR" font-size="10" font-weight="900" fill="#064e3b">수진</text>
+                    <!-- Torso -->
+                    <rect x="64" y="409" width="32" height="36" rx="8" fill="#10b981" stroke="#059669" stroke-width="1.5"/>
+                    <!-- Arms - one pointing -->
+                    <line x1="64" y1="419" x2="42" y2="408" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="96" y1="419" x2="115" y2="408" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+                    <!-- Legs -->
+                    <line x1="74" y1="445" x2="68" y2="465" stroke="#059669" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="86" y1="445" x2="92" y2="465" stroke="#059669" stroke-width="5" stroke-linecap="round"/>
+
+                    <!-- Gossiper speech bubble -->
+                    <ellipse cx="178" cy="382" rx="78" ry="26" fill="#fffbeb" stroke="#b45309" stroke-width="2" opacity="0.97"/>
+                    <path d="M118,390 L125,397 L118,404 Z" fill="#fffbeb" stroke="#b45309" stroke-width="1.5"/>
+                    <text x="178" y="377" text-anchor="middle" font-family="Noto Sans KR" font-size="11" font-weight="900" fill="#92400e">들었어요? 아키라 씨랑</text>
+                    <text x="178" y="392" text-anchor="middle" font-family="Noto Sans KR" font-size="11" font-weight="900" fill="#92400e">바라 씨가 사귀대요!</text>
+
+                    <!-- Zone outline for gossiper -->
+                    <rect id="zone-rumor-start" class="zone-highlight" x="38" y="355" width="248" height="115" rx="12" stroke="#b45309"/>
+                    <rect id="zone-rumor-spread-t" class="zone-highlight" x="38" y="355" width="248" height="115" rx="12" stroke="#6d28d9"/>
+                    <circle id="pulse-rumor-start" class="pulse-circle" cx="80" cy="415" r="28" stroke="#b45309" stroke-width="3"/>
+                    <circle id="pulse-rumor-spread-t" class="pulse-circle" cx="80" cy="415" r="28" stroke="#6d28d9" stroke-width="3"/>
+
+                    <!-- ══════════════════════════════════════ -->
+                    <!-- FLOW ARROWS (소문이 퍼지다) - Section 2: x:300-600 -->
+                    <!-- ══════════════════════════════════════ -->
+
+                    <!-- Main flow arrow 1 (gossiper → listener group) -->
+                    <path id="arrow-flow1" class="flow-arrow" d="M240,400 C268,400 285,300 305,255" stroke="#4f46e5" stroke-width="2.5" fill="none" marker-end="url(#arrowIndigo)" opacity="0"/>
+                    <!-- Main flow arrow 2 -->
+                    <path id="arrow-flow2" class="flow-arrow" d="M242,385 C268,370 285,350 308,340" stroke="#4f46e5" stroke-width="2.5" fill="none" marker-end="url(#arrowIndigo)" opacity="0"/>
+                    <!-- Main flow arrow 3 -->
+                    <path id="arrow-flow3" class="flow-arrow" d="M240,415 C268,420 285,430 308,440" stroke="#4f46e5" stroke-width="2.5" fill="none" marker-end="url(#arrowIndigo)" opacity="0"/>
+                    <!-- Further spread arrows -->
+                    <path id="arrow-flow4" class="flow-arrow" d="M410,245 C440,235 465,238 488,248" stroke="#4f46e5" stroke-width="2" fill="none" marker-end="url(#arrowIndigo)" opacity="0"/>
+                    <path id="arrow-flow5" class="flow-arrow" d="M410,335 C440,330 465,325 488,330" stroke="#4f46e5" stroke-width="2" fill="none" marker-end="url(#arrowIndigo)" opacity="0"/>
+                    <path id="arrow-flow6" class="flow-arrow" d="M410,435 C440,440 465,440 488,438" stroke="#4f46e5" stroke-width="2" fill="none" marker-end="url(#arrowIndigo)" opacity="0"/>
+
+                    <!-- Zone fill for 소문이 퍼지다 -->
+                    <rect id="fill-rumor-spread-i" class="zone-fill-highlight" x="240" y="38" width="360" height="450" rx="12" fill="#4f46e5"/>
+
+                    <!-- Listener 1 (top) -->
+                    <circle cx="360" cy="238" r="16" fill="#fdba74" stroke="#fb923c" stroke-width="1.5"/>
+                    <text x="360" y="243" text-anchor="middle" font-family="Noto Sans KR" font-size="9" font-weight="900" fill="#78350f">사람1</text>
+                    <rect x="346" y="255" width="28" height="32" rx="7" fill="#fb923c"/>
+                    <!-- speech bubble small -->
+                    <ellipse cx="395" cy="228" rx="32" ry="16" fill="#fff" stroke="#4f46e5" stroke-width="1.5" opacity="0.92"/>
+                    <text x="395" y="232" text-anchor="middle" font-family="Noto Sans KR" font-size="9.5" font-weight="900" fill="#3730a3">정말요?!</text>
+
+                    <!-- Listener 2 (middle) -->
+                    <circle cx="360" cy="328" r="16" fill="#86efac" stroke="#22c55e" stroke-width="1.5"/>
+                    <text x="360" y="333" text-anchor="middle" font-family="Noto Sans KR" font-size="9" font-weight="900" fill="#14532d">사람2</text>
+                    <rect x="346" y="345" width="28" height="32" rx="7" fill="#22c55e"/>
+                    <ellipse cx="395" cy="318" rx="32" ry="16" fill="#fff" stroke="#4f46e5" stroke-width="1.5" opacity="0.92"/>
+                    <text x="395" y="322" text-anchor="middle" font-family="Noto Sans KR" font-size="9.5" font-weight="900" fill="#3730a3">어머!</text>
+
+                    <!-- Listener 3 (bottom) -->
+                    <circle cx="360" cy="418" r="16" fill="#c4b5fd" stroke="#8b5cf6" stroke-width="1.5"/>
+                    <text x="360" y="423" text-anchor="middle" font-family="Noto Sans KR" font-size="9" font-weight="900" fill="#3b0764">사람3</text>
+                    <rect x="346" y="435" width="28" height="32" rx="7" fill="#8b5cf6"/>
+                    <ellipse cx="395" cy="408" rx="32" ry="16" fill="#fff" stroke="#4f46e5" stroke-width="1.5" opacity="0.92"/>
+                    <text x="395" y="412" text-anchor="middle" font-family="Noto Sans KR" font-size="9.5" font-weight="900" fill="#3730a3">헐, 진짜요?</text>
+
+                    <!-- Zone outline 소문이 퍼지다 -->
+                    <rect id="zone-rumor-spread-i" class="zone-highlight" x="240" y="38" width="360" height="450" rx="12" stroke="#4f46e5"/>
+
+                    <!-- ══════════════════════════════════════ -->
+                    <!-- SECTION 3: 오해 / 다투다 - x:610-760 -->
+                    <!-- ══════════════════════════════════════ -->
+
+                    <!-- Zone fills -->
+                    <rect id="fill-misunderstand" class="zone-fill-highlight" x="605" y="38" width="170" height="260" rx="12" fill="#be123c"/>
+                    <rect id="fill-argue" class="zone-fill-highlight" x="605" y="38" width="170" height="260" rx="12" fill="#c2410c"/>
+
+                    <!-- Arguing person C (아키라) -->
+                    <circle cx="645" cy="115" r="16" fill="#fbbf24" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="645" y="120" text-anchor="middle" font-family="Noto Sans KR" font-size="9" font-weight="900" fill="#78350f">아키라</text>
+                    <rect x="631" y="132" width="28" height="32" rx="7" fill="#fb923c"/>
+                    <!-- Arm pointing accusingly -->
+                    <line x1="659" y1="140" x2="682" y2="132" stroke="#fb923c" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="631" y1="142" x2="614" y2="145" stroke="#fb923c" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="641" y1="164" x2="635" y2="186" stroke="#f97316" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="653" y1="164" x2="659" y2="186" stroke="#f97316" stroke-width="5" stroke-linecap="round"/>
+
+                    <!-- Arguing person D (바라) -->
+                    <circle cx="730" cy="115" r="16" fill="#a78bfa" stroke="#8b5cf6" stroke-width="1.5"/>
+                    <text x="730" y="120" text-anchor="middle" font-family="Noto Sans KR" font-size="9" font-weight="900" fill="#3b0764">바라</text>
+                    <rect x="716" y="132" width="28" height="32" rx="7" fill="#818cf8"/>
+                    <!-- Arm pointing back -->
+                    <line x1="716" y1="140" x2="693" y2="132" stroke="#818cf8" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="744" y1="142" x2="761" y2="145" stroke="#818cf8" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="726" y1="164" x2="720" y2="186" stroke="#6366f1" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="738" y1="164" x2="744" y2="186" stroke="#6366f1" stroke-width="5" stroke-linecap="round"/>
+
+                    <!-- Conflict sparks -->
+                    <text x="687" y="128" text-anchor="middle" font-size="20" fill="#ef4444">⚡</text>
+
+                    <!-- Misunderstanding thought bubble for 아키라 -->
+                    <ellipse cx="645" cy="64" rx="38" ry="22" fill="#fff1f2" stroke="#be123c" stroke-width="1.8" opacity="0.95"/>
+                    <path d="M645,87 L640,98 L652,94 Z" fill="#fff1f2" stroke="#be123c" stroke-width="1.5"/>
+                    <text x="645" y="59" text-anchor="middle" font-family="Noto Sans KR" font-size="9" font-weight="900" fill="#be123c">바라 씨가</text>
+                    <text x="645" y="72" text-anchor="middle" font-family="Noto Sans KR" font-size="9" font-weight="900" fill="#be123c">소문 냈나?</text>
+
+                    <!-- 오해하다 label -->
+                    <rect x="648" y="195" width="78" height="26" rx="6" fill="#fff1f2" stroke="#be123c" stroke-width="1.5"/>
+                    <text x="687" y="212" text-anchor="middle" font-family="Noto Sans KR" font-size="11" font-weight="900" fill="#be123c">오해하다</text>
+
+                    <!-- 다투다 label -->
+                    <rect x="620" y="225" width="134" height="26" rx="6" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+                    <text x="687" y="242" text-anchor="middle" font-family="Noto Sans KR" font-size="11" font-weight="900" fill="#c2410c">다투다 😤</text>
+
+                    <!-- Zone outlines -->
+                    <rect id="zone-misunderstand" class="zone-highlight" x="605" y="38" width="170" height="260" rx="12" stroke="#be123c"/>
+                    <rect id="zone-argue" class="zone-highlight" x="605" y="38" width="170" height="260" rx="12" stroke="#c2410c"/>
+                    <circle id="pulse-misunderstand" class="pulse-circle" cx="687" cy="128" r="38" stroke="#be123c" stroke-width="3"/>
+                    <circle id="pulse-argue" class="pulse-circle" cx="687" cy="128" r="38" stroke="#c2410c" stroke-width="3"/>
+
+                    <!-- ══════════════════════════════════════ -->
+                    <!-- SECTION 4: 오해를 풀다 / 화해하다 - x:610-780, y:310-460 -->
+                    <!-- ══════════════════════════════════════ -->
+
+                    <!-- Zone fills -->
+                    <rect id="fill-solve" class="zone-fill-highlight" x="605" y="300" width="170" height="170" rx="12" fill="#0369a1"/>
+                    <rect id="fill-reconcile" class="zone-fill-highlight" x="605" y="300" width="170" height="170" rx="12" fill="#15803d"/>
+
+                    <!-- Making up: Person E & F -->
+                    <!-- Person E -->
+                    <circle cx="645" cy="345" r="16" fill="#fbbf24" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="645" y="350" text-anchor="middle" font-family="Noto Sans KR" font-size="9" font-weight="900" fill="#78350f">아키라</text>
+                    <rect x="631" y="362" width="28" height="32" rx="7" fill="#fb923c"/>
+                    <!-- Arm extended (handshake) -->
+                    <line x1="659" y1="370" x2="672" y2="370" stroke="#fb923c" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="631" y1="372" x2="616" y2="374" stroke="#fb923c" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="641" y1="394" x2="635" y2="414" stroke="#f97316" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="653" y1="394" x2="659" y2="414" stroke="#f97316" stroke-width="5" stroke-linecap="round"/>
+
+                    <!-- Person F -->
+                    <circle cx="730" cy="345" r="16" fill="#a78bfa" stroke="#8b5cf6" stroke-width="1.5"/>
+                    <text x="730" y="350" text-anchor="middle" font-family="Noto Sans KR" font-size="9" font-weight="900" fill="#3b0764">바라</text>
+                    <rect x="716" y="362" width="28" height="32" rx="7" fill="#818cf8"/>
+                    <!-- Arm extended (handshake) -->
+                    <line x1="716" y1="370" x2="703" y2="370" stroke="#818cf8" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="744" y1="372" x2="759" y2="374" stroke="#818cf8" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="726" y1="394" x2="720" y2="414" stroke="#6366f1" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="738" y1="394" x2="744" y2="414" stroke="#6366f1" stroke-width="5" stroke-linecap="round"/>
+
+                    <!-- Handshake / heart -->
+                    <text x="687" y="378" text-anchor="middle" font-size="18" fill="#22c55e">🤝</text>
+
+                    <!-- Speech bubble: 오해를 풀다 -->
+                    <ellipse cx="687" cy="432" rx="68" ry="20" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.8" opacity="0.97"/>
+                    <text x="687" y="428" text-anchor="middle" font-family="Noto Sans KR" font-size="10.5" font-weight="900" fill="#0369a1">미안해요, 오해였어요.</text>
+
+                    <!-- Reconcile label -->
+                    <rect x="620" y="455" width="134" height="26" rx="6" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+                    <text x="687" y="472" text-anchor="middle" font-family="Noto Sans KR" font-size="11" font-weight="900" fill="#15803d">화해하다 😊</text>
+
+                    <!-- Zone outlines -->
+                    <rect id="zone-solve" class="zone-highlight" x="605" y="300" width="170" height="170" rx="12" stroke="#0369a1"/>
+                    <rect id="zone-reconcile" class="zone-highlight" x="605" y="300" width="170" height="170" rx="12" stroke="#15803d"/>
+                    <circle id="pulse-solve" class="pulse-circle" cx="687" cy="368" r="38" stroke="#0369a1" stroke-width="3"/>
+                    <circle id="pulse-reconcile" class="pulse-circle" cx="687" cy="368" r="38" stroke="#15803d" stroke-width="3"/>
+
+                    <!-- ══════════════════════════════════════ -->
+                    <!-- VERTICAL NARRATIVE ARROW (소문이 퍼지다) -->
+                    <!-- ══════════════════════════════════════ -->
+                    <path id="arrow-main" class="flow-arrow"
+                        d="M240,400 C265,390 282,280 300,240"
+                        stroke="#4f46e5" stroke-width="2.2" fill="none"
+                        marker-end="url(#arrowIndigo)" opacity="0.35"/>
+
+                    <!-- From gossiper to listeners arrows (always visible, subtle) -->
+                    <path d="M175,385 C220,340 270,270 342,250" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#arrowIndigo)" opacity="0.3"/>
+                    <path d="M175,390 C220,375 270,355 342,340" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#arrowIndigo)" opacity="0.3"/>
+                    <path d="M175,408 C220,420 270,435 342,430" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#arrowIndigo)" opacity="0.3"/>
+
+                    <!-- From listeners to section 3 arrows -->
+                    <path d="M412,245 C450,200 530,155 610,130" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#arrowIndigo)" opacity="0.3"/>
+                    <path d="M412,340 C460,340 530,310 610,280" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#arrowIndigo)" opacity="0.25"/>
+
+                    <!-- Down arrow: 오해 → 화해 -->
+                    <path d="M687,268 L687,298" stroke="#6b7280" stroke-width="2" fill="none" stroke-dasharray="4 3" marker-end="url(#arrowTeal)" opacity="0.5"/>
+
+                    <!-- ══════════════════════════════════════ -->
+                    <!-- STAGE LABELS (right column) -->
+                    <!-- ══════════════════════════════════════ -->
+                    <rect x="790" y="60" width="100" height="200" rx="10" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+                    <text x="840" y="82" text-anchor="middle" font-family="Noto Sans KR" font-size="10" font-weight="900" fill="#475467">흐름</text>
+
+                    <!-- Stage items -->
+                    <circle cx="808" cy="108" r="8" fill="#0f766e"/>
+                    <text x="808" y="112" text-anchor="middle" font-family="Noto Sans KR" font-size="8" font-weight="900" fill="#fff">1</text>
+                    <text x="820" y="112" font-family="Noto Sans KR" font-size="9.5" font-weight="900" fill="#0f766e">소문이 나다</text>
+
+                    <line x1="808" y1="116" x2="808" y2="132" stroke="#d1d5db" stroke-width="1.5"/>
+
+                    <circle cx="808" cy="140" r="8" fill="#b45309"/>
+                    <text x="808" y="144" text-anchor="middle" font-family="Noto Sans KR" font-size="8" font-weight="900" fill="#fff">2</text>
+                    <text x="820" y="144" font-family="Noto Sans KR" font-size="9.5" font-weight="900" fill="#b45309">소문을 내다</text>
+
+                    <line x1="808" y1="148" x2="808" y2="164" stroke="#d1d5db" stroke-width="1.5"/>
+
+                    <circle cx="808" cy="172" r="8" fill="#4f46e5"/>
+                    <text x="808" y="176" text-anchor="middle" font-family="Noto Sans KR" font-size="8" font-weight="900" fill="#fff">3</text>
+                    <text x="820" y="176" font-family="Noto Sans KR" font-size="9.5" font-weight="900" fill="#4f46e5">소문이 퍼지다</text>
+
+                    <line x1="808" y1="180" x2="808" y2="196" stroke="#d1d5db" stroke-width="1.5"/>
+
+                    <circle cx="808" cy="204" r="8" fill="#be123c"/>
+                    <text x="808" y="208" text-anchor="middle" font-family="Noto Sans KR" font-size="8" font-weight="900" fill="#fff">4</text>
+                    <text x="820" y="208" font-family="Noto Sans KR" font-size="9.5" font-weight="900" fill="#be123c">오해하다</text>
+
+                    <line x1="808" y1="212" x2="808" y2="228" stroke="#d1d5db" stroke-width="1.5"/>
+
+                    <circle cx="808" cy="236" r="8" fill="#15803d"/>
+                    <text x="808" y="240" text-anchor="middle" font-family="Noto Sans KR" font-size="8" font-weight="900" fill="#fff">5</text>
+                    <text x="820" y="240" font-family="Noto Sans KR" font-size="9.5" font-weight="900" fill="#15803d">화해하다</text>
+
+                    <!-- Stage box bottom area: 소문을 퍼뜨리다 note -->
+                    <rect x="790" y="278" width="100" height="72" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>
+                    <circle cx="808" cy="298" r="8" fill="#6d28d9"/>
+                    <text x="808" y="302" text-anchor="middle" font-family="Noto Sans KR" font-size="8" font-weight="900" fill="#fff">★</text>
+                    <text x="820" y="298" font-family="Noto Sans KR" font-size="9" font-weight="900" fill="#6d28d9">소문을</text>
+                    <text x="820" y="311" font-family="Noto Sans KR" font-size="9" font-weight="900" fill="#6d28d9">퍼뜨리다</text>
+                    <text x="800" y="330" font-family="Noto Sans KR" font-size="8.5" font-weight="700" fill="#7c3aed">능동 전파</text>
+                    <text x="800" y="342" font-family="Noto Sans KR" font-size="8.5" font-weight="700" fill="#7c3aed">(타동사)</text>
+
+                    <!-- Stage: 오해를 풀다 -->
+                    <rect x="790" y="368" width="100" height="52" rx="10" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="1"/>
+                    <circle cx="808" cy="388" r="8" fill="#0369a1"/>
+                    <text x="808" y="392" text-anchor="middle" font-family="Noto Sans KR" font-size="7" font-weight="900" fill="#fff">★</text>
+                    <text x="820" y="388" font-family="Noto Sans KR" font-size="9" font-weight="900" fill="#0369a1">오해를 풀다</text>
+                    <text x="800" y="408" font-family="Noto Sans KR" font-size="8.5" font-weight="700" fill="#0369a1">갈등 해소</text>
+
+                </svg>
+            </div>
+
+            <!-- INFO BOX -->
+            <div class="info-box" id="info-box">
+                <p class="vocab-prompt">← 왼쪽 어휘 버튼을 클릭하면 해당 장면이 강조됩니다.</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+const vocabData = {
+    "rumor-appear": {
+        korean: "소문이 나다",
+        english: "a rumor comes out",
+        meaning: "어떤 이야기가 사람들 사이에 알려지기 시작하다",
+        example: "아키라 씨가 바라 씨와 사귄다는 소문이 났어요.",
+        zones: ["zone-rumor-appear"],
+        fills: ["fill-rumor-appear"],
+        pulses: ["pulse-rumor-appear"],
+        arrows: [],
+        color: "#0f766e"
+    },
+    "rumor-start": {
+        korean: "소문을 내다",
+        english: "to start a rumor",
+        meaning: "어떤 이야기를 다른 사람들에게 말해서 알려지게 하다",
+        example: "누가 그런 소문을 냈을까요?",
+        zones: ["zone-rumor-start"],
+        fills: ["fill-rumor-start"],
+        pulses: ["pulse-rumor-start"],
+        arrows: [],
+        color: "#b45309"
+    },
+    "rumor-spread-i": {
+        korean: "소문이 퍼지다",
+        english: "a rumor spreads (by itself)",
+        meaning: "이야기가 여러 사람에게 자연스럽게 널리 알려지다 (자동사)",
+        example: "잘못된 소문이 금방 퍼졌어요.",
+        zones: ["zone-rumor-spread-i"],
+        fills: ["fill-rumor-spread-i"],
+        pulses: [],
+        arrows: ["arrow-flow1","arrow-flow2","arrow-flow3","arrow-flow4","arrow-flow5","arrow-flow6"],
+        color: "#4f46e5"
+    },
+    "rumor-spread-t": {
+        korean: "소문을 퍼뜨리다",
+        english: "to spread a rumor (actively)",
+        meaning: "이야기를 여기저기에 의도적으로 전하다 (타동사) → 주어가 적극 행동",
+        example: "확인하지 않은 소문을 퍼뜨리면 안 돼요.",
+        zones: ["zone-rumor-spread-t"],
+        fills: ["fill-rumor-spread-t"],
+        pulses: ["pulse-rumor-spread-t"],
+        arrows: ["arrow-flow1","arrow-flow2","arrow-flow3"],
+        color: "#6d28d9"
+    },
+    "misunderstand": {
+        korean: "오해하다",
+        english: "to misunderstand",
+        meaning: "잘못 이해하다 — 소문 때문에 사실이 아닌 것을 사실로 믿다",
+        example: "제 말을 오해하지 마세요.",
+        zones: ["zone-misunderstand"],
+        fills: ["fill-misunderstand"],
+        pulses: ["pulse-misunderstand"],
+        arrows: [],
+        color: "#be123c"
+    },
+    "argue": {
+        korean: "다투다",
+        english: "to argue",
+        meaning: "서로 말이나 행동으로 싸우다",
+        example: "오해 때문에 두 사람이 다퉜어요.",
+        zones: ["zone-argue"],
+        fills: ["fill-argue"],
+        pulses: ["pulse-argue"],
+        arrows: [],
+        color: "#c2410c"
+    },
+    "solve": {
+        korean: "오해를 풀다",
+        english: "to resolve a misunderstanding",
+        meaning: "잘못 이해한 것을 바로잡다 — 서로 이야기해서 사실을 확인하다",
+        example: "서로 이야기해서 오해를 풀었어요.",
+        zones: ["zone-solve"],
+        fills: ["fill-solve"],
+        pulses: ["pulse-solve"],
+        arrows: [],
+        color: "#0369a1"
+    },
+    "reconcile": {
+        korean: "화해하다",
+        english: "to reconcile",
+        meaning: "다툰 뒤 관계를 다시 좋게 하다",
+        example: "두 사람은 다시 화해했어요.",
+        zones: ["zone-reconcile"],
+        fills: ["fill-reconcile"],
+        pulses: ["pulse-reconcile"],
+        arrows: [],
+        color: "#15803d"
+    }
+};
+
+let activeVocab = null;
+
+function clearAll() {
+    // zones
+    document.querySelectorAll('.zone-highlight').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.zone-fill-highlight').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.pulse-circle').forEach(el => el.classList.remove('show'));
+    // arrows
+    document.querySelectorAll('.flow-arrow').forEach(el => {
+        el.style.opacity = '';
+        el.classList.remove('animated');
+    });
+    // buttons
+    document.querySelectorAll('.vocab-btn').forEach(el => el.classList.remove('active'));
+    // info box
+    document.getElementById('info-box').innerHTML = '<p class="vocab-prompt">← 왼쪽 어휘 버튼을 클릭하면 해당 장면이 강조됩니다.</p>';
+    activeVocab = null;
+}
+
+function activate(vocabId) {
+    clearAll();
+    if (!vocabData[vocabId]) return;
+
+    activeVocab = vocabId;
+    const data = vocabData[vocabId];
+
+    // Highlight zones
+    data.zones.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('show');
+    });
+    data.fills.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('show');
+    });
+    data.pulses.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('show');
+    });
+    // Animate arrows
+    data.arrows.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.opacity = '1';
+            el.classList.add('animated');
+        }
+    });
+
+    // Highlight button
+    const btn = document.querySelector(`[data-vocab="${vocabId}"]`);
+    if (btn) btn.classList.add('active');
+
+    // Info box
+    const infoBox = document.getElementById('info-box');
+    infoBox.style.background = data.color + '0d'; // very light tint
+    infoBox.innerHTML = `
+        <div class="vocab-word" style="color:${data.color}">${data.korean} <span style="color:#94a3b8;font-size:0.85rem;font-weight:700;">${data.english}</span></div>
+        <div class="vocab-meaning">${data.meaning}</div>
+        <div class="vocab-example">예) ${data.example}</div>
+    `;
+}
+
+// Event listeners
+document.querySelectorAll('.vocab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const vocabId = btn.dataset.vocab;
+        if (activeVocab === vocabId) {
+            clearAll();
+        } else {
+            activate(vocabId);
+        }
+    });
+});
+
+document.getElementById('reset-btn').addEventListener('click', clearAll);
+</script>
+<script src="../shared/site-copyright.js"></script>
+</body>
+</html>

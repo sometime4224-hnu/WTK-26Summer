@@ -1,0 +1,1 @@
+window.REVIEW5_FEEDBACK_I18N = {};
