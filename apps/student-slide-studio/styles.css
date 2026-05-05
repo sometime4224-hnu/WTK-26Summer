@@ -373,6 +373,43 @@ button:disabled {
   margin: -2px 0 12px;
 }
 
+.bubble-toolbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: stretch;
+  margin: 0 0 12px;
+}
+
+.bubble-toolbar .button {
+  width: 100%;
+}
+
+.bubble-size-control {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 34px;
+  gap: 8px;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.bubble-size-control span,
+.bubble-size-control output {
+  color: #3f444d;
+  font-size: 0.84rem;
+  font-weight: 850;
+}
+
+.bubble-size-control input {
+  min-height: 0;
+  padding: 0;
+}
+
 .slide-photo-chip {
   position: relative;
   min-height: 58px;
@@ -432,6 +469,39 @@ button:disabled {
 
 .photo-chip-actions button:disabled {
   opacity: 0.38;
+}
+
+.bubble-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.bubble-size-control {
+  display: grid;
+  grid-template-columns: auto minmax(86px, 1fr) 30px;
+  align-items: center;
+  gap: 8px;
+  min-width: 210px;
+  color: #3f444d;
+  font-size: 0.84rem;
+  font-weight: 850;
+}
+
+.bubble-size-control input {
+  min-width: 0;
+}
+
+.bubble-size-control output {
+  color: var(--accent-dark);
+  text-align: right;
+  font-weight: 900;
 }
 
 .project-row {
@@ -552,13 +622,16 @@ textarea:focus {
   content: "";
   position: absolute;
   inset: auto 0 0 auto;
+  z-index: 1;
   width: 42%;
   height: 9px;
   background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.92), rgba(var(--accent-rgb), 0));
+  pointer-events: none;
 }
 
 .photo-stage {
   position: relative;
+  z-index: 1;
   min-height: 0;
   align-self: stretch;
   margin: 0;
@@ -589,6 +662,83 @@ textarea:focus {
   width: 100%;
   height: 100%;
   padding: 14px;
+}
+
+.bubble-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.bubble-layer.is-editable {
+  pointer-events: auto;
+}
+
+.speech-bubble {
+  position: absolute;
+  min-width: 120px;
+  padding: 0.7em 0.9em;
+  border: 2px solid rgba(31, 35, 40, 0.78);
+  border-radius: 8px;
+  color: #17201f;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 26px rgba(31, 35, 40, 0.18);
+  line-height: 1.28;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  left: 24px;
+  bottom: -15px;
+  width: 22px;
+  height: 22px;
+  border-right: 2px solid rgba(31, 35, 40, 0.78);
+  border-bottom: 2px solid rgba(31, 35, 40, 0.78);
+  background: rgba(255, 255, 255, 0.92);
+  transform: rotate(45deg);
+}
+
+.speech-bubble.is-selected {
+  outline: 3px solid rgba(15, 118, 110, 0.38);
+}
+
+.bubble-content {
+  position: relative;
+  z-index: 1;
+  min-height: 1.25em;
+  overflow-wrap: anywhere;
+}
+
+.bubble-content:focus {
+  outline: none;
+}
+
+.bubble-content:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(31, 35, 40, 0.46);
+}
+
+.bubble-handle,
+.bubble-resize {
+  position: absolute;
+  z-index: 2;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+.bubble-handle {
+  left: -6px;
+  top: -6px;
+}
+
+.bubble-resize {
+  right: -6px;
+  bottom: -6px;
 }
 
 .photo-card {
@@ -673,7 +823,7 @@ textarea:focus {
 
 .slide-text {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 18px;
@@ -785,6 +935,92 @@ textarea:focus {
 .arrange-row .photo-card:first-child,
 .arrange-column .photo-card:first-child {
   grid-row: auto;
+}
+
+.bubble-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.bubble-layer.is-editable {
+  pointer-events: auto;
+}
+
+.speech-bubble {
+  position: absolute;
+  display: grid;
+  align-content: center;
+  min-width: 96px;
+  padding: 16px 18px;
+  border: 2px solid rgba(31, 35, 40, 0.84);
+  border-radius: 8px;
+  color: #16191d;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 28px rgba(31, 35, 40, 0.2);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  pointer-events: auto;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  bottom: -15px;
+  width: 22px;
+  height: 22px;
+  border-right: 2px solid rgba(31, 35, 40, 0.84);
+  border-bottom: 2px solid rgba(31, 35, 40, 0.84);
+  background: rgba(255, 255, 255, 0.92);
+  transform: rotate(45deg);
+}
+
+.speech-bubble.is-selected {
+  outline: 3px solid rgba(var(--accent-rgb), 0.62);
+  outline-offset: 3px;
+}
+
+.bubble-content {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  white-space: pre-wrap;
+}
+
+.bubble-content[contenteditable="true"] {
+  cursor: text;
+  outline: none;
+}
+
+.bubble-content[contenteditable="true"]:empty::before {
+  content: attr(data-placeholder);
+  color: #787f8a;
+}
+
+.bubble-handle {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 5px;
+  z-index: 2;
+  height: 9px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(90deg, rgba(31, 35, 40, 0.4) 0 4px, transparent 4px 8px);
+  cursor: move;
+}
+
+.bubble-resize {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  z-index: 2;
+  width: 16px;
+  height: 16px;
+  border-right: 3px solid rgba(31, 35, 40, 0.58);
+  border-bottom: 3px solid rgba(31, 35, 40, 0.58);
+  cursor: nwse-resize;
 }
 
 .empty-slide {

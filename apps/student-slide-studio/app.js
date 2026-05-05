@@ -33,6 +33,12 @@ const TRANSLATIONS = {
     autosaveSaving: "자동저장 중...",
     autosaveWhenImages: "이미지를 넣으면 자동저장됩니다.",
     backAria: "공용 프로그램 허브로 돌아가기",
+    addBubble: "말상자 추가",
+    bubbleAdded: "말상자를 추가했습니다.",
+    bubbleDeleted: "말상자를 삭제했습니다.",
+    bubbleFontSize: "글자 크기",
+    bubbleTextDefault: "여기에 입력",
+    bubbleToolbarAria: "말상자 편집",
     caption: "짧은 설명",
     clearAria: "전체 비우기",
     clearConfirm: "모든 이미지 슬라이드를 비울까요?",
@@ -42,6 +48,7 @@ const TRANSLATIONS = {
     deckAria: "발표 조작",
     deckTitleFallback: "학생 발표",
     delete: "삭제",
+    deleteBubble: "말상자 삭제",
     deleted: "선택한 슬라이드를 삭제했습니다.",
     descriptionExists: "설명 있음",
     documentDescription: "여러 이미지를 첨부하면 발표용 HTML 슬라이드로 자동 정리하는 학생용 제작기",
@@ -127,6 +134,12 @@ const TRANSLATIONS = {
     autosaveSaving: "Đang tự lưu...",
     autosaveWhenImages: "Thêm ảnh để bắt đầu tự lưu.",
     backAria: "Quay lại trang công cụ chung",
+    addBubble: "Thêm ô thoại",
+    bubbleAdded: "Đã thêm ô thoại.",
+    bubbleDeleted: "Đã xóa ô thoại.",
+    bubbleFontSize: "Cỡ chữ",
+    bubbleTextDefault: "Nhập chữ ở đây",
+    bubbleToolbarAria: "Chỉnh sửa ô thoại",
     caption: "Mô tả ngắn",
     clearAria: "Xóa tất cả",
     clearConfirm: "Xóa tất cả slide ảnh?",
@@ -136,6 +149,7 @@ const TRANSLATIONS = {
     deckAria: "Điều khiển trình chiếu",
     deckTitleFallback: "Bài thuyết trình của học sinh",
     delete: "Xóa",
+    deleteBubble: "Xóa ô thoại",
     deleted: "Đã xóa slide đã chọn.",
     descriptionExists: "có mô tả",
     documentDescription: "Công cụ cho học sinh: thêm nhiều ảnh và tự sắp xếp thành slide HTML để thuyết trình",
@@ -204,11 +218,15 @@ const TRANSLATIONS = {
 };
 
 const elements = {
+  addBubbleButton: document.getElementById("addBubbleButton"),
   autosaveIndicator: document.getElementById("autosaveIndicator"),
+  bubbleFontSizeInput: document.getElementById("bubbleFontSizeInput"),
+  bubbleFontSizeValue: document.getElementById("bubbleFontSizeValue"),
   captionInput: document.getElementById("captionInput"),
   clearButton: document.getElementById("clearButton"),
   closePresenterButton: document.getElementById("closePresenterButton"),
   deleteSlideButton: document.getElementById("deleteSlideButton"),
+  deleteBubbleButton: document.getElementById("deleteBubbleButton"),
   dropzone: document.getElementById("dropzone"),
   exportButton: document.getElementById("exportButton"),
   imageFilesInput: document.getElementById("imageFilesInput"),
@@ -245,6 +263,7 @@ const elements = {
 
 let state = normalizeProject({});
 let selectedId = null;
+let selectedBubbleId = null;
 let presenterIndex = 0;
 let presentationSession = 0;
 let autosaveReady = false;
@@ -273,7 +292,9 @@ async function init() {
 }
 
 function bindEvents() {
+  elements.addBubbleButton.addEventListener("click", addBubbleToSelectedSlide);
   elements.clearButton.addEventListener("click", clearSlides);
+  elements.deleteBubbleButton.addEventListener("click", deleteSelectedBubble);
   elements.deleteSlideButton.addEventListener("click", deleteSelectedSlide);
   elements.exportButton.addEventListener("click", exportDeck);
   elements.importButton.addEventListener("click", () => elements.importProjectInput.click());
@@ -318,6 +339,7 @@ function bindEvents() {
   elements.photoFitInput.addEventListener("change", () => updateSelectedSlide({ fit: safeFit(elements.photoFitInput.value) }));
   elements.captionInput.addEventListener("input", () => updateSelectedSlide({ caption: elements.captionInput.value }));
   elements.notesInput.addEventListener("input", () => updateSelectedSlide({ notes: elements.notesInput.value }));
+  elements.bubbleFontSizeInput.addEventListener("input", () => updateSelectedBubbleFontSize(elements.bubbleFontSizeInput.value));
 
   ["dragenter", "dragover"].forEach((eventName) => {
     elements.dropzone.addEventListener(eventName, (event) => {
@@ -450,6 +472,7 @@ function normalizeSlide(slide, language = "ko") {
     caption: typeof slide?.caption === "string" ? slide.caption : typeof slide?.body === "string" ? slide.body : "",
     notes: typeof slide?.notes === "string" ? slide.notes : "",
     accent: normalizeAccent(slide?.accent || blendImageAccents(images)),
+    bubbles: normalizeBubbles(slide, language),
     images
   };
 }
@@ -473,6 +496,26 @@ function normalizeImage(image) {
   };
 }
 
+function normalizeBubbles(slide, language = "ko") {
+  return Array.isArray(slide?.bubbles)
+    ? slide.bubbles.map((bubble) => normalizeBubble(bubble, language))
+    : [];
+}
+
+function normalizeBubble(bubble = {}, language = "ko") {
+  const width = clampNumber(bubble.width, 16, 78, 28);
+  const height = clampNumber(bubble.height, 8, 44, 15);
+  return {
+    id: typeof bubble.id === "string" && bubble.id ? bubble.id : createId(),
+    text: typeof bubble.text === "string" ? bubble.text : translate("bubbleTextDefault", language),
+    x: clampNumber(bubble.x, 2, 98 - width, 56),
+    y: clampNumber(bubble.y, 2, 92 - height, 12),
+    width,
+    height,
+    fontSize: clampNumber(bubble.fontSize, 18, 72, 30)
+  };
+}
+
 function normalizeAccent(accent) {
   if (
     accent &&
@@ -492,6 +535,12 @@ function normalizeAccent(accent) {
 
 function clampColor(value) {
   return Math.max(0, Math.min(255, Math.round(value)));
+}
+
+function clampNumber(value, min, max, fallback) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.max(min, Math.min(max, number));
 }
 
 function safeLayout(layout) {
@@ -709,6 +758,13 @@ function getSelectedSlide() {
   return state.slides[index];
 }
 
+function getSelectedBubble(slide = getSelectedSlide()) {
+  if (!slide || !selectedBubbleId) return null;
+  const bubble = slide.bubbles.find((item) => item.id === selectedBubbleId) || null;
+  if (!bubble) selectedBubbleId = null;
+  return bubble;
+}
+
 async function addImageFiles(fileList) {
   const files = Array.from(fileList || []).filter((file) => file.type.startsWith("image/"));
   if (!files.length) {
@@ -733,6 +789,7 @@ async function addImageFiles(fileList) {
         caption: "",
         notes: "",
         accent: processed.accent,
+        bubbles: [],
         images: [{
           src: processed.src,
           alt: titleFromFileName(file.name, slideNumber),
@@ -754,6 +811,7 @@ async function addImageFiles(fileList) {
 
   state.slides.push(...newSlides);
   selectedId = newSlides[0].id;
+  selectedBubbleId = null;
   await saveState({ immediate: true });
   renderAll();
   setStatus(t("slideMade", newSlides.length));
@@ -930,6 +988,7 @@ function renderSlideList() {
     `;
     button.addEventListener("click", () => {
       selectedId = slide.id;
+      selectedBubbleId = null;
       renderAll();
     });
     item.append(button);
@@ -955,6 +1014,7 @@ function renderForm() {
   elements.captionInput.disabled = !hasSlide;
   elements.notesInput.disabled = !hasSlide;
   renderSlidePhotoList(slide);
+  updateBubbleControls();
 }
 
 function renderSlidePhotoList(slide) {
@@ -989,6 +1049,7 @@ function renderSlidePhotoList(slide) {
 function renderPreview() {
   const slide = getSelectedSlide();
   if (!slide) {
+    selectedBubbleId = null;
     elements.slidePreview.innerHTML = `
       <div class="empty-slide">
         <div>
@@ -1000,7 +1061,119 @@ function renderPreview() {
     return;
   }
 
-  elements.slidePreview.innerHTML = renderSlideMarkup(slide, getSelectedIndex(), state.slides.length, state);
+  elements.slidePreview.innerHTML = renderSlideMarkup(slide, getSelectedIndex(), state.slides.length, state, {
+    editable: true
+  });
+  bindBubbleLayerEvents();
+  renderBubbleSelection();
+}
+
+function bindBubbleLayerEvents() {
+  const layer = elements.slidePreview.querySelector(".bubble-layer.is-editable");
+  if (!layer) return;
+
+  layer.addEventListener("pointerdown", (event) => {
+    if (event.target === layer) selectBubble(null);
+  });
+
+  layer.querySelectorAll(".speech-bubble").forEach((element) => {
+    element.addEventListener("pointerdown", () => {
+      selectBubble(element.dataset.bubbleId);
+    });
+
+    const content = element.querySelector(".bubble-content");
+    content.addEventListener("input", () => {
+      updateBubbleText(element.dataset.bubbleId, readEditableText(content));
+    });
+    content.addEventListener("focus", () => {
+      selectBubble(element.dataset.bubbleId);
+    });
+
+    element.querySelector(".bubble-handle").addEventListener("pointerdown", (event) => {
+      startBubbleTransform(event, element, "move");
+    });
+    element.querySelector(".bubble-resize").addEventListener("pointerdown", (event) => {
+      startBubbleTransform(event, element, "resize");
+    });
+  });
+}
+
+function selectBubble(bubbleId) {
+  const slide = getSelectedSlide();
+  selectedBubbleId = slide?.bubbles.some((bubble) => bubble.id === bubbleId) ? bubbleId : null;
+  renderBubbleSelection();
+  updateBubbleControls();
+}
+
+function renderBubbleSelection() {
+  elements.slidePreview.querySelectorAll(".speech-bubble").forEach((element) => {
+    element.classList.toggle("is-selected", element.dataset.bubbleId === selectedBubbleId);
+  });
+}
+
+function readEditableText(element) {
+  return element.innerText.replace(/\u00a0/g, " ").replace(/\r/g, "").trimEnd();
+}
+
+function updateBubbleText(bubbleId, text) {
+  const slide = getSelectedSlide();
+  const bubble = slide?.bubbles.find((item) => item.id === bubbleId);
+  if (!bubble) return;
+  bubble.text = text;
+  saveState();
+}
+
+function startBubbleTransform(event, element, mode) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const slide = getSelectedSlide();
+  const bubble = slide?.bubbles.find((item) => item.id === element.dataset.bubbleId);
+  const slideElement = elements.slidePreview.querySelector(".slide");
+  if (!bubble || !slideElement) return;
+
+  selectBubble(bubble.id);
+  const rect = slideElement.getBoundingClientRect();
+  const start = {
+    clientX: event.clientX,
+    clientY: event.clientY,
+    x: bubble.x,
+    y: bubble.y,
+    width: bubble.width,
+    height: bubble.height
+  };
+
+  function moveBubble(moveEvent) {
+    moveEvent.preventDefault();
+    const dx = ((moveEvent.clientX - start.clientX) / rect.width) * 100;
+    const dy = ((moveEvent.clientY - start.clientY) / rect.height) * 100;
+
+    if (mode === "move") {
+      bubble.x = clampNumber(start.x + dx, 1, 99 - bubble.width, start.x);
+      bubble.y = clampNumber(start.y + dy, 1, 94 - bubble.height, start.y);
+    } else {
+      bubble.width = clampNumber(start.width + dx, 14, 96 - bubble.x, start.width);
+      bubble.height = clampNumber(start.height + dy, 8, 70 - bubble.y, start.height);
+    }
+
+    applyBubblePosition(element, bubble);
+  }
+
+  function stopBubbleMove() {
+    window.removeEventListener("pointermove", moveBubble);
+    window.removeEventListener("pointerup", stopBubbleMove);
+    saveState({ immediate: true });
+  }
+
+  window.addEventListener("pointermove", moveBubble);
+  window.addEventListener("pointerup", stopBubbleMove, { once: true });
+}
+
+function applyBubblePosition(element, bubble) {
+  element.style.left = `${bubble.x}%`;
+  element.style.top = `${bubble.y}%`;
+  element.style.width = `${bubble.width}%`;
+  element.style.minHeight = `${bubble.height}%`;
 }
 
 function updateControls() {
@@ -1011,10 +1184,23 @@ function updateControls() {
   elements.exportButton.disabled = !hasSlides;
   elements.presentButton.disabled = !hasSlides;
   elements.slideImagesInput.disabled = !hasSlides;
+  elements.addBubbleButton.disabled = !hasSlides;
+  elements.deleteBubbleButton.disabled = !hasSlides || !getSelectedBubble();
   elements.photoArrangeInput.disabled = !hasSlides;
   elements.photoFitInput.disabled = !hasSlides;
+  elements.bubbleFontSizeInput.disabled = !hasSlides || !getSelectedBubble();
   elements.moveUpButton.disabled = selectedIndex <= 0;
   elements.moveDownButton.disabled = selectedIndex === -1 || selectedIndex >= state.slides.length - 1;
+}
+
+function updateBubbleControls() {
+  const bubble = getSelectedBubble();
+  const fontSize = Math.round(bubble?.fontSize || 30);
+  elements.deleteBubbleButton.disabled = !bubble;
+  elements.bubbleFontSizeInput.disabled = !bubble;
+  elements.bubbleFontSizeInput.value = String(fontSize);
+  elements.bubbleFontSizeValue.value = String(fontSize);
+  elements.bubbleFontSizeValue.textContent = String(fontSize);
 }
 
 function updateSelectedSlide(patch) {
@@ -1024,6 +1210,80 @@ function updateSelectedSlide(patch) {
   saveState();
   renderSlideList();
   renderPreview();
+}
+
+function addBubbleToSelectedSlide() {
+  const slide = getSelectedSlide();
+  if (!slide) {
+    setStatus(t("addFirst"));
+    return;
+  }
+
+  const offset = (slide.bubbles.length % 4) * 5;
+  const bubble = normalizeBubble(
+    {
+      text: t("bubbleTextDefault"),
+      x: 55 - offset,
+      y: 12 + offset,
+      width: 30,
+      height: 14,
+      fontSize: 30
+    },
+    getLanguage()
+  );
+  slide.bubbles.push(bubble);
+  selectedBubbleId = bubble.id;
+  saveState({ immediate: true });
+  renderPreview();
+  updateBubbleControls();
+  setStatus(t("bubbleAdded"));
+
+  window.setTimeout(() => {
+    const content = elements.slidePreview.querySelector(`[data-bubble-id="${selectorEscape(bubble.id)}"] .bubble-content`);
+    if (!content) return;
+    content.focus();
+    selectEditableText(content);
+  }, 0);
+}
+
+function deleteSelectedBubble() {
+  const slide = getSelectedSlide();
+  if (!slide || !selectedBubbleId) return;
+  const nextBubbles = slide.bubbles.filter((bubble) => bubble.id !== selectedBubbleId);
+  if (nextBubbles.length === slide.bubbles.length) return;
+  slide.bubbles = nextBubbles;
+  selectedBubbleId = null;
+  saveState({ immediate: true });
+  renderPreview();
+  updateBubbleControls();
+  setStatus(t("bubbleDeleted"));
+}
+
+function updateSelectedBubbleFontSize(value) {
+  const bubble = getSelectedBubble();
+  if (!bubble) return;
+  bubble.fontSize = clampNumber(value, 18, 72, bubble.fontSize || 30);
+  const element = getSelectedBubbleElement();
+  if (element) element.style.fontSize = `${bubble.fontSize}px`;
+  updateBubbleControls();
+  saveState();
+}
+
+function getSelectedBubbleElement() {
+  if (!selectedBubbleId) return null;
+  return elements.slidePreview.querySelector(`[data-bubble-id="${selectorEscape(selectedBubbleId)}"]`);
+}
+
+function selectorEscape(value) {
+  return window.CSS?.escape ? CSS.escape(value) : String(value).replace(/"/g, '\\"');
+}
+
+function selectEditableText(element) {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
 }
 
 function moveSelectedSlide(direction) {
@@ -1043,6 +1303,7 @@ function deleteSelectedSlide() {
   if (index === -1) return;
   state.slides.splice(index, 1);
   selectedId = state.slides[Math.min(index, state.slides.length - 1)]?.id || null;
+  selectedBubbleId = null;
   saveState({ immediate: true });
   renderAll();
   setStatus(t("deleted"));
@@ -1085,6 +1346,7 @@ function clearSlides() {
   if (!shouldClear) return;
   state.slides = [];
   selectedId = null;
+  selectedBubbleId = null;
   saveState({ immediate: true });
   renderAll();
   setStatus(t("cleared"));
@@ -1105,6 +1367,7 @@ function importProjectFile(event) {
     try {
       state = normalizeProject(JSON.parse(String(reader.result)));
       selectedId = state.slides[0]?.id || null;
+      selectedBubbleId = null;
       saveState({ immediate: true });
       renderAll();
       setStatus(t("imported"));
@@ -1195,20 +1458,22 @@ function safeFileName(name) {
     .slice(0, 60) || "presentation";
 }
 
-function renderSlideMarkup(slide, index, total, project) {
+function renderSlideMarkup(slide, index, total, project, options = {}) {
   const style = buildSlideStyle(slide);
   const layout = safeLayout(slide.layout);
+  const language = safeLanguage(project.language);
+  const localT = (key, ...args) => translate(key, language, ...args);
   const caption = slide.caption ? `<p class="slide-caption">${bodyToHtml(slide.caption)}</p>` : "";
   const presenter = project.presenter ? escapeHtml(project.presenter) : "";
   const textMarkup = layout === "focus" ? "" : `
       <div class="slide-text">
         <span class="slide-number">${index + 1} / ${total}</span>
         <div class="slide-copy">
-          <h2 class="slide-title">${escapeHtml(slide.title || `${t("photo")} ${index + 1}`)}</h2>
+          <h2 class="slide-title">${escapeHtml(slide.title || `${localT("photo")} ${index + 1}`)}</h2>
           ${caption}
         </div>
         <footer class="slide-footer">
-          <span>${escapeHtml(project.title || t("present"))}</span>
+          <span>${escapeHtml(project.title || localT("present"))}</span>
           <span>${presenter}</span>
         </footer>
       </div>`;
@@ -1219,7 +1484,44 @@ function renderSlideMarkup(slide, index, total, project) {
         ${renderPhotoSet(slide)}
       </div>
       ${textMarkup}
+      ${renderBubbleLayer(slide, { editable: Boolean(options.editable), language })}
     </article>
+  `;
+}
+
+function renderBubbleLayer(slide, options = {}) {
+  const bubbles = Array.isArray(slide.bubbles) ? slide.bubbles : [];
+  if (!bubbles.length && !options.editable) return "";
+  const editableClass = options.editable ? " is-editable" : "";
+  const markup = bubbles.map((bubble) => renderBubbleMarkup(bubble, options)).join("");
+  return `<div class="bubble-layer${editableClass}">${markup}</div>`;
+}
+
+function renderBubbleMarkup(bubble, options = {}) {
+  const language = safeLanguage(options.language);
+  const editable = Boolean(options.editable);
+  const selectedClass = editable && bubble.id === selectedBubbleId ? " is-selected" : "";
+  const style = [
+    `left: ${bubble.x}%`,
+    `top: ${bubble.y}%`,
+    `width: ${bubble.width}%`,
+    `min-height: ${bubble.height}%`,
+    `font-size: ${bubble.fontSize}px`
+  ].join("; ");
+  const editAttributes = editable
+    ? `contenteditable="true" spellcheck="false" role="textbox" aria-label="${escapeAttribute(translate("bubbleTextDefault", language))}"`
+    : "";
+  const controls = editable
+    ? `
+      <div class="bubble-handle" aria-hidden="true"></div>
+      <div class="bubble-resize" aria-hidden="true"></div>
+    `
+    : "";
+  return `
+    <div class="speech-bubble${selectedClass}" data-bubble-id="${escapeAttribute(bubble.id)}" style="${style}">
+      ${controls}
+      <div class="bubble-content" ${editAttributes} data-placeholder="${escapeAttribute(translate("bubbleTextDefault", language))}">${bodyToHtml(bubble.text)}</div>
+    </div>
   `;
 }
 
@@ -1417,13 +1719,16 @@ button:disabled {
   content: "";
   position: absolute;
   inset: auto 0 0 auto;
+  z-index: 1;
   width: 42%;
   height: 9px;
   background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.92), rgba(var(--accent-rgb), 0));
+  pointer-events: none;
 }
 
 .photo-stage {
   position: relative;
+  z-index: 1;
   min-height: 0;
   align-self: stretch;
   margin: 0;
@@ -1538,7 +1843,7 @@ button:disabled {
 
 .slide-text {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 18px;
@@ -1650,6 +1955,49 @@ button:disabled {
 .arrange-row .photo-card:first-child,
 .arrange-column .photo-card:first-child {
   grid-row: auto;
+}
+
+.bubble-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.speech-bubble {
+  position: absolute;
+  display: grid;
+  align-content: center;
+  min-width: 96px;
+  padding: 16px 18px;
+  border: 2px solid rgba(31, 35, 40, 0.84);
+  border-radius: 8px;
+  color: #16191d;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 28px rgba(31, 35, 40, 0.2);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  pointer-events: auto;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  bottom: -15px;
+  width: 22px;
+  height: 22px;
+  border-right: 2px solid rgba(31, 35, 40, 0.84);
+  border-bottom: 2px solid rgba(31, 35, 40, 0.84);
+  background: rgba(255, 255, 255, 0.92);
+  transform: rotate(45deg);
+}
+
+.bubble-content {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  white-space: pre-wrap;
 }
 
 @media (max-width: 760px) {
