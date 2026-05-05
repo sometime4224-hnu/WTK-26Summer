@@ -12,39 +12,43 @@
   </head>
   <body>
     <header class="app-header">
-      <a class="back-link" href="../index.html" aria-label="공용 프로그램 허브로 돌아가기">
+      <a class="back-link" href="../index.html" aria-label="공용 프로그램 허브로 돌아가기" data-i18n-aria-label="backAria">
         <span class="icon" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
         </span>
-        <span>허브</span>
+        <span data-i18n="hub">허브</span>
       </a>
 
       <div class="brand">
         <span class="brand-mark" aria-hidden="true">S</span>
         <div>
-          <h1>학생 슬라이드 제작기</h1>
-          <p>사진을 넣으면 발표 슬라이드로 자동 정리 · <span id="autosaveIndicator">자동저장 준비</span></p>
+          <h1 data-i18n="appTitle">학생 슬라이드 제작기</h1>
+          <p><span data-i18n="appSubtitle">사진을 넣으면 발표 슬라이드로 자동 정리</span> · <span id="autosaveIndicator">자동저장 준비</span></p>
         </div>
       </div>
 
       <div class="header-actions">
+        <div class="language-toggle" role="group" aria-label="언어 선택" data-i18n-aria-label="languageAria">
+          <button type="button" data-language="ko" aria-pressed="true">한국어</button>
+          <button type="button" data-language="vi" aria-pressed="false">Tiếng Việt</button>
+        </div>
         <button class="button secondary" id="importButton" type="button">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="M7 8l5-5 5 5"></path><path d="M5 21h14"></path></svg>
           </span>
-          <span>불러오기</span>
+          <span data-i18n="import">불러오기</span>
         </button>
         <button class="button secondary" id="saveProjectButton" type="button">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><path d="M7 3v7h8"></path><path d="M7 21v-7h10v7"></path></svg>
           </span>
-          <span>저장</span>
+          <span data-i18n="save">저장</span>
         </button>
         <button class="button secondary" id="presentButton" type="button">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
           </span>
-          <span>발표</span>
+          <span data-i18n="present">발표</span>
         </button>
         <button class="button primary" id="exportButton" type="button">
           <span class="icon" aria-hidden="true">
@@ -55,14 +59,14 @@
       </div>
     </header>
 
-    <main class="studio" aria-label="이미지 슬라이드 제작 화면">
+    <main class="studio" aria-label="이미지 슬라이드 제작 화면" data-i18n-aria-label="mainAria">
       <section class="upload-panel">
         <div class="panel-heading">
           <div>
-            <h2>이미지 넣기</h2>
+            <h2 data-i18n="uploadTitle">이미지 넣기</h2>
             <p id="slideCount">0장</p>
           </div>
-          <button class="icon-button" id="clearButton" type="button" aria-label="전체 비우기">
+          <button class="icon-button" id="clearButton" type="button" aria-label="전체 비우기" data-i18n-aria-label="clearAria">
             <span class="icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>
             </span>
@@ -74,21 +78,21 @@
           <span class="drop-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
           </span>
-          <strong>이미지를 여러 장 선택하세요</strong>
-          <span>사진 중심 슬라이드가 자동 생성됩니다.</span>
+          <strong data-i18n="dropTitle">이미지를 여러 장 선택하세요</strong>
+          <span data-i18n="dropSubtitle">사진 중심 슬라이드가 자동 생성됩니다.</span>
         </label>
 
-        <ol class="image-list" id="slideList" aria-label="이미지 슬라이드 순서"></ol>
+        <ol class="image-list" id="slideList" aria-label="이미지 슬라이드 순서" data-i18n-aria-label="slideListAria"></ol>
       </section>
 
-      <section class="preview-panel" aria-label="슬라이드 미리보기">
+      <section class="preview-panel" aria-label="슬라이드 미리보기" data-i18n-aria-label="previewAria">
         <div class="project-row">
           <label class="field">
-            <span>발표 제목</span>
+            <span data-i18n="projectTitle">발표 제목</span>
             <input id="projectTitleInput" type="text" autocomplete="off">
           </label>
           <label class="field">
-            <span>발표자</span>
+            <span data-i18n="presenterName">발표자</span>
             <input id="presenterNameInput" type="text" autocomplete="off">
           </label>
         </div>
@@ -102,86 +106,86 @@
             <span class="icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M12 19V5"></path><path d="M5 12l7-7 7 7"></path></svg>
             </span>
-            <span>앞으로</span>
+            <span data-i18n="moveUp">앞으로</span>
           </button>
           <button class="button ghost" id="moveDownButton" type="button">
             <span class="icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M19 12l-7 7-7-7"></path></svg>
             </span>
-            <span>뒤로</span>
+            <span data-i18n="moveDown">뒤로</span>
           </button>
           <button class="button danger" id="deleteSlideButton" type="button">
             <span class="icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>
             </span>
-            <span>삭제</span>
+            <span data-i18n="delete">삭제</span>
           </button>
         </div>
       </section>
 
-      <aside class="edit-panel" aria-label="선택한 이미지 슬라이드 편집">
+      <aside class="edit-panel" aria-label="선택한 이미지 슬라이드 편집" data-i18n-aria-label="editAria">
         <div class="panel-heading">
           <div>
-            <h2>간단 편집</h2>
+            <h2 data-i18n="editTitle">간단 편집</h2>
             <p id="selectedSlideLabel">이미지를 넣어 주세요</p>
           </div>
         </div>
 
         <label class="field">
-          <span>슬라이드 제목</span>
+          <span data-i18n="slideTitle">슬라이드 제목</span>
           <input id="slideTitleInput" type="text" autocomplete="off">
         </label>
 
         <label class="field">
-          <span>레이아웃</span>
+          <span data-i18n="layout">레이아웃</span>
           <select id="layoutInput">
-            <option value="focus">사진만</option>
-            <option value="grid">사진 격자</option>
-            <option value="split">사진 + 설명</option>
-            <option value="caption">큰 사진 + 하단 제목</option>
-            <option value="strip">사진 묶음</option>
+            <option value="focus" data-i18n="layoutFocus">사진만</option>
+            <option value="grid" data-i18n="layoutGrid">사진 격자</option>
+            <option value="split" data-i18n="layoutSplit">사진 + 설명</option>
+            <option value="caption" data-i18n="layoutCaption">큰 사진 + 하단 제목</option>
+            <option value="strip" data-i18n="layoutStrip">사진 묶음</option>
           </select>
         </label>
 
         <div class="field-grid">
           <label class="field">
-            <span>사진 배치</span>
+            <span data-i18n="photoArrange">사진 배치</span>
             <select id="photoArrangeInput">
-              <option value="auto">자동</option>
-              <option value="hero">첫 사진 크게</option>
-              <option value="grid">격자</option>
-              <option value="row">가로</option>
-              <option value="column">세로</option>
+              <option value="auto" data-i18n="arrangeAuto">자동</option>
+              <option value="hero" data-i18n="arrangeHero">첫 사진 크게</option>
+              <option value="grid" data-i18n="arrangeGrid">격자</option>
+              <option value="row" data-i18n="arrangeRow">가로</option>
+              <option value="column" data-i18n="arrangeColumn">세로</option>
             </select>
           </label>
 
           <label class="field">
-            <span>사진 맞춤</span>
+            <span data-i18n="photoFit">사진 맞춤</span>
             <select id="photoFitInput">
-              <option value="contain">전체 보이기</option>
-              <option value="cover">가득 채우기</option>
+              <option value="contain" data-i18n="fitContain">전체 보이기</option>
+              <option value="cover" data-i18n="fitCover">가득 채우기</option>
             </select>
           </label>
         </div>
 
         <label class="field">
-          <span>이 슬라이드에 사진 추가</span>
+          <span data-i18n="addToSlide">이 슬라이드에 사진 추가</span>
           <input id="slideImagesInput" type="file" accept="image/*" multiple>
         </label>
 
-        <div class="slide-photo-list" id="slidePhotoList" aria-label="현재 슬라이드 사진 목록"></div>
+        <div class="slide-photo-list" id="slidePhotoList" aria-label="현재 슬라이드 사진 목록" data-i18n-aria-label="currentPhotosAria"></div>
 
         <label class="field">
-          <span>짧은 설명</span>
+          <span data-i18n="caption">짧은 설명</span>
           <textarea id="captionInput" rows="5"></textarea>
         </label>
 
         <label class="field">
-          <span>발표 메모</span>
+          <span data-i18n="notes">발표 메모</span>
           <textarea id="notesInput" rows="4"></textarea>
         </label>
 
-        <p class="helper">이미지는 자동으로 크기를 줄이고, 사진 색을 바탕으로 슬라이드 분위기를 맞춥니다.</p>
+        <p class="helper" data-i18n="helper">이미지는 자동으로 크기를 줄이고, 사진 색을 바탕으로 슬라이드 분위기를 맞춥니다.</p>
         <p class="status" id="status" aria-live="polite"></p>
       </aside>
     </main>
@@ -189,7 +193,7 @@
     <div class="presenter" id="presenter" hidden>
       <div class="presenter-top">
         <strong id="presenterCounter">1 / 1</strong>
-        <button class="icon-button light" id="closePresenterButton" type="button" aria-label="발표 닫기">
+        <button class="icon-button light" id="closePresenterButton" type="button" aria-label="발표 닫기" data-i18n-aria-label="closePresenterAria">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg>
           </span>
@@ -201,10 +205,10 @@
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
           </span>
-          <span>이전</span>
+          <span data-i18n="prev">이전</span>
         </button>
         <button class="button light" id="presentNextButton" type="button">
-          <span>다음</span>
+          <span data-i18n="next">다음</span>
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
           </span>

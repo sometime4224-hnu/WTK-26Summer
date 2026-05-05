@@ -1,5 +1,6 @@
 const STORAGE_KEY = "student-image-slide-studio-v2";
 const STORAGE_META_KEY = "student-image-slide-studio-meta-v2";
+const LANGUAGE_STORAGE_KEY = "student-image-slide-studio-language-v1";
 const LEGACY_STORAGE_KEY = "student-slide-studio-project-v1";
 const AUTOSAVE_DB_NAME = "student-slide-studio-autosave";
 const AUTOSAVE_STORE_NAME = "projects";
@@ -10,6 +11,197 @@ const IMAGE_QUALITY = 0.86;
 const LAYOUTS = new Set(["focus", "grid", "split", "caption", "strip"]);
 const PHOTO_ARRANGEMENTS = new Set(["auto", "hero", "grid", "row", "column"]);
 const PHOTO_FITS = new Set(["contain", "cover"]);
+const LANGUAGES = new Set(["ko", "vi"]);
+const TRANSLATIONS = {
+  ko: {
+    addFirst: "먼저 왼쪽에서 이미지를 넣어 슬라이드를 만들어 주세요.",
+    addToSlide: "이 슬라이드에 사진 추가",
+    appSubtitle: "사진을 넣으면 발표 슬라이드로 자동 정리",
+    appTitle: "학생 슬라이드 제작기",
+    arrangeAuto: "자동",
+    arrangeColumn: "세로",
+    arrangeGrid: "격자",
+    arrangeHero: "첫 사진 크게",
+    arrangeRow: "가로",
+    autosaveFailed: "자동저장 실패",
+    autosaveFailedDetail: "자동저장 실패: 저장 버튼으로 프로젝트 파일을 받아 두세요.",
+    autosaveLoaded: "자동저장된 작업을 불러왔습니다.",
+    autosaveLoading: "자동저장 불러오는 중",
+    autosaveLoadingDetail: "자동저장된 작업을 불러오는 중입니다...",
+    autosaveReady: "자동저장 준비",
+    autosaveSaved: "자동저장됨",
+    autosaveSaving: "자동저장 중...",
+    autosaveWhenImages: "이미지를 넣으면 자동저장됩니다.",
+    backAria: "공용 프로그램 허브로 돌아가기",
+    caption: "짧은 설명",
+    clearAria: "전체 비우기",
+    clearConfirm: "모든 이미지 슬라이드를 비울까요?",
+    cleared: "슬라이드를 모두 비웠습니다.",
+    closePresenterAria: "발표 닫기",
+    currentPhotosAria: "현재 슬라이드 사진 목록",
+    deckAria: "발표 조작",
+    deckTitleFallback: "학생 발표",
+    delete: "삭제",
+    deleted: "선택한 슬라이드를 삭제했습니다.",
+    descriptionExists: "설명 있음",
+    documentDescription: "여러 이미지를 첨부하면 발표용 HTML 슬라이드로 자동 정리하는 학생용 제작기",
+    documentTitle: "학생 슬라이드 제작기",
+    dropSubtitle: "사진 중심 슬라이드가 자동 생성됩니다.",
+    dropTitle: "이미지를 여러 장 선택하세요",
+    editAria: "선택한 이미지 슬라이드 편집",
+    editTitle: "간단 편집",
+    emptySubtitle: "왼쪽에서 여러 이미지를 넣으면 자동으로 발표용 슬라이드가 만들어집니다.",
+    emptyTitle: "이미지로 시작하세요",
+    exportDone: "발표용 HTML 파일을 만들었습니다.",
+    fitContain: "전체 보이기",
+    fitCover: "가득 채우기",
+    helper: "이미지는 자동으로 크기를 줄이고, 사진 색을 바탕으로 슬라이드 분위기를 맞춥니다.",
+    hub: "허브",
+    imageFileNeeded: "이미지 파일을 선택해 주세요.",
+    import: "불러오기",
+    importFailed: "프로젝트 파일을 읽지 못했습니다.",
+    imported: "프로젝트를 불러왔습니다.",
+    languageAria: "언어 선택",
+    languageChanged: "언어를 한국어로 바꿨습니다.",
+    layout: "레이아웃",
+    layoutCaption: "큰 사진 + 하단 제목",
+    layoutFocus: "사진만",
+    layoutGrid: "사진 격자",
+    layoutSplit: "사진 + 설명",
+    layoutStrip: "사진 묶음",
+    mainAria: "이미지 슬라이드 제작 화면",
+    makingSlides: (count) => `${count}장의 이미지를 슬라이드로 만드는 중입니다...`,
+    moveDown: "뒤로",
+    movePhotoLeft: (number) => `${number}번 사진 앞으로 이동`,
+    movePhotoRight: (number) => `${number}번 사진 뒤로 이동`,
+    moveUp: "앞으로",
+    next: "다음",
+    notes: "발표 메모",
+    photo: "사진",
+    photoAdded: (count) => `현재 슬라이드에 사진 ${count}장을 추가했습니다.`,
+    photoAddFailed: "사진을 추가하지 못했습니다. 다른 이미지 파일로 다시 시도해 주세요.",
+    photoAdding: (count) => `${count}장의 사진을 현재 슬라이드에 추가하는 중입니다...`,
+    photoArrange: "사진 배치",
+    photoFit: "사진 맞춤",
+    photoRemoved: "현재 슬라이드에서 사진을 제거했습니다.",
+    photoReordered: "사진 순서를 바꿨습니다.",
+    present: "발표",
+    presenterName: "발표자",
+    previewAria: "슬라이드 미리보기",
+    prev: "이전",
+    projectFileMade: "프로젝트 파일을 만들었습니다.",
+    projectTitle: "발표 제목",
+    projectTitleFallback: "나의 발표",
+    removePhoto: (number) => `${number}번 사진 제거`,
+    save: "저장",
+    selectAdditionalImage: "추가할 이미지 파일을 선택해 주세요.",
+    selectedLabel: (number) => `${number}번 이미지`,
+    selectedNone: "이미지를 넣어 주세요",
+    slide: "슬라이드",
+    slideCardAria: (number) => `${number}번 이미지 슬라이드 선택`,
+    slideCardMeta: (number, count, hasCaption) => `${number}번 · 사진 ${count}장${hasCaption ? " · 설명 있음" : ""}`,
+    slideCount: (count) => `${count}장`,
+    slideListAria: "이미지 슬라이드 순서",
+    slideMade: (count) => `${count}장의 슬라이드를 만들었습니다.`,
+    slideProcessingFailed: "이미지를 처리하지 못했습니다. 다른 이미지 파일로 다시 시도해 주세요.",
+    slideTitle: "슬라이드 제목",
+    uploadTitle: "이미지 넣기"
+  },
+  vi: {
+    addFirst: "Trước tiên hãy thêm ảnh ở bên trái để tạo slide.",
+    addToSlide: "Thêm ảnh vào slide này",
+    appSubtitle: "Thêm ảnh, công cụ tự sắp xếp thành slide thuyết trình",
+    appTitle: "Trình tạo slide cho học sinh",
+    arrangeAuto: "Tự động",
+    arrangeColumn: "Dọc",
+    arrangeGrid: "Lưới",
+    arrangeHero: "Ảnh đầu lớn",
+    arrangeRow: "Ngang",
+    autosaveFailed: "Tự lưu thất bại",
+    autosaveFailedDetail: "Tự lưu thất bại: hãy dùng nút Lưu để tải tệp dự án.",
+    autosaveLoaded: "Đã mở bản tự lưu.",
+    autosaveLoading: "Đang mở bản tự lưu",
+    autosaveLoadingDetail: "Đang mở bài làm đã tự lưu...",
+    autosaveReady: "Sẵn sàng tự lưu",
+    autosaveSaved: "Đã tự lưu",
+    autosaveSaving: "Đang tự lưu...",
+    autosaveWhenImages: "Thêm ảnh để bắt đầu tự lưu.",
+    backAria: "Quay lại trang công cụ chung",
+    caption: "Mô tả ngắn",
+    clearAria: "Xóa tất cả",
+    clearConfirm: "Xóa tất cả slide ảnh?",
+    cleared: "Đã xóa tất cả slide.",
+    closePresenterAria: "Đóng trình chiếu",
+    currentPhotosAria: "Danh sách ảnh trong slide hiện tại",
+    deckAria: "Điều khiển trình chiếu",
+    deckTitleFallback: "Bài thuyết trình của học sinh",
+    delete: "Xóa",
+    deleted: "Đã xóa slide đã chọn.",
+    descriptionExists: "có mô tả",
+    documentDescription: "Công cụ cho học sinh: thêm nhiều ảnh và tự sắp xếp thành slide HTML để thuyết trình",
+    documentTitle: "Trình tạo slide cho học sinh",
+    dropSubtitle: "Slide tập trung vào ảnh sẽ được tạo tự động.",
+    dropTitle: "Chọn nhiều ảnh",
+    editAria: "Chỉnh sửa slide ảnh đã chọn",
+    editTitle: "Chỉnh sửa nhanh",
+    emptySubtitle: "Thêm nhiều ảnh ở bên trái, công cụ sẽ tự tạo slide thuyết trình.",
+    emptyTitle: "Bắt đầu bằng ảnh",
+    exportDone: "Đã tạo tệp HTML để thuyết trình.",
+    fitContain: "Hiện toàn bộ",
+    fitCover: "Lấp đầy khung",
+    helper: "Ảnh sẽ được tự giảm kích thước và màu ảnh sẽ tạo sắc thái cho slide.",
+    hub: "Trang chính",
+    imageFileNeeded: "Hãy chọn tệp ảnh.",
+    import: "Mở",
+    importFailed: "Không đọc được tệp dự án.",
+    imported: "Đã mở dự án.",
+    languageAria: "Chọn ngôn ngữ",
+    languageChanged: "Đã chuyển sang tiếng Việt.",
+    layout: "Bố cục",
+    layoutCaption: "Ảnh lớn + tiêu đề dưới",
+    layoutFocus: "Chỉ ảnh",
+    layoutGrid: "Lưới ảnh",
+    layoutSplit: "Ảnh + mô tả",
+    layoutStrip: "Dải ảnh",
+    mainAria: "Màn hình tạo slide ảnh",
+    makingSlides: (count) => `Đang tạo ${count} ảnh thành slide...`,
+    moveDown: "Lùi xuống",
+    movePhotoLeft: (number) => `Chuyển ảnh ${number} lên trước`,
+    movePhotoRight: (number) => `Chuyển ảnh ${number} ra sau`,
+    moveUp: "Đưa lên",
+    next: "Tiếp",
+    notes: "Ghi chú thuyết trình",
+    photo: "Ảnh",
+    photoAdded: (count) => `Đã thêm ${count} ảnh vào slide hiện tại.`,
+    photoAddFailed: "Không thêm được ảnh. Hãy thử tệp ảnh khác.",
+    photoAdding: (count) => `Đang thêm ${count} ảnh vào slide hiện tại...`,
+    photoArrange: "Sắp xếp ảnh",
+    photoFit: "Cách vừa ảnh",
+    photoRemoved: "Đã xóa ảnh khỏi slide hiện tại.",
+    photoReordered: "Đã đổi thứ tự ảnh.",
+    present: "Trình chiếu",
+    presenterName: "Người trình bày",
+    previewAria: "Xem trước slide",
+    prev: "Trước",
+    projectFileMade: "Đã tạo tệp dự án.",
+    projectTitle: "Tiêu đề bài trình bày",
+    projectTitleFallback: "Bài thuyết trình của em",
+    removePhoto: (number) => `Xóa ảnh ${number}`,
+    save: "Lưu",
+    selectAdditionalImage: "Hãy chọn tệp ảnh để thêm.",
+    selectedLabel: (number) => `Ảnh số ${number}`,
+    selectedNone: "Hãy thêm ảnh",
+    slide: "slide",
+    slideCardAria: (number) => `Chọn slide ảnh số ${number}`,
+    slideCardMeta: (number, count, hasCaption) => `Slide ${number} · ${count} ảnh${hasCaption ? " · có mô tả" : ""}`,
+    slideCount: (count) => `${count} slide`,
+    slideListAria: "Thứ tự slide ảnh",
+    slideMade: (count) => `Đã tạo ${count} slide.`,
+    slideProcessingFailed: "Không xử lý được ảnh. Hãy thử tệp ảnh khác.",
+    slideTitle: "Tiêu đề slide",
+    uploadTitle: "Thêm ảnh"
+  }
+};
 
 const elements = {
   autosaveIndicator: document.getElementById("autosaveIndicator"),
@@ -22,7 +214,11 @@ const elements = {
   imageFilesInput: document.getElementById("imageFilesInput"),
   importButton: document.getElementById("importButton"),
   importProjectInput: document.getElementById("importProjectInput"),
+  i18nAriaNodes: Array.from(document.querySelectorAll("[data-i18n-aria-label]")),
+  i18nNodes: Array.from(document.querySelectorAll("[data-i18n]")),
+  languageButtons: Array.from(document.querySelectorAll("[data-language]")),
   layoutInput: document.getElementById("layoutInput"),
+  metaDescription: document.querySelector('meta[name="description"]'),
   moveDownButton: document.getElementById("moveDownButton"),
   moveUpButton: document.getElementById("moveUpButton"),
   notesInput: document.getElementById("notesInput"),
@@ -62,15 +258,17 @@ bindEvents();
 init();
 
 async function init() {
-  setAutosaveIndicator("자동저장 불러오는 중");
-  setStatus("자동저장된 작업을 불러오는 중입니다...");
+  applyLanguage();
+  setAutosaveIndicator(t("autosaveLoading"));
+  setStatus(t("autosaveLoadingDetail"));
   state = await loadProject();
   selectedId = state.slides[0]?.id || null;
   lastSavedJson = JSON.stringify(state);
   autosaveReady = true;
+  applyLanguage();
   renderAll();
-  const message = state.slides.length ? "자동저장된 작업을 불러왔습니다." : "이미지를 넣으면 자동저장됩니다.";
-  setAutosaveIndicator(state.slides.length ? "자동저장됨" : "자동저장 준비");
+  const message = state.slides.length ? t("autosaveLoaded") : t("autosaveWhenImages");
+  setAutosaveIndicator(state.slides.length ? t("autosaveSaved") : t("autosaveReady"));
   setStatus(message);
 }
 
@@ -86,6 +284,9 @@ function bindEvents() {
   elements.presentPrevButton.addEventListener("click", () => movePresenter(-1));
   elements.closePresenterButton.addEventListener("click", closePresentation);
   elements.saveProjectButton.addEventListener("click", saveProjectFile);
+  elements.languageButtons.forEach((button) => {
+    button.addEventListener("click", () => changeLanguage(button.dataset.language));
+  });
 
   elements.imageFilesInput.addEventListener("change", async (event) => {
     await addImageFiles(event.target.files);
@@ -224,23 +425,25 @@ function readAutosaveRecord(db) {
 }
 
 function normalizeProject(project) {
+  const language = safeLanguage(project?.language || readPreferredLanguage());
   const slides = Array.isArray(project?.slides)
-    ? project.slides.map(normalizeSlide).filter((slide) => slide.images.length)
+    ? project.slides.map((slide) => normalizeSlide(slide, language)).filter((slide) => slide.images.length)
     : [];
 
   return {
-    title: typeof project?.title === "string" ? project.title : "나의 발표",
+    language,
+    title: typeof project?.title === "string" ? project.title : translate("projectTitleFallback", language),
     presenter: typeof project?.presenter === "string" ? project.presenter : "",
     slides
   };
 }
 
-function normalizeSlide(slide) {
+function normalizeSlide(slide, language = "ko") {
   const images = normalizeImages(slide);
 
   return {
     id: typeof slide?.id === "string" && slide.id ? slide.id : createId(),
-    title: typeof slide?.title === "string" ? slide.title : "사진",
+    title: typeof slide?.title === "string" ? slide.title : translate("photo", language),
     layout: safeLayout(slide?.layout),
     arrangement: safeArrangement(slide?.arrangement),
     fit: safeFit(slide?.fit),
@@ -303,6 +506,74 @@ function safeFit(fit) {
   return PHOTO_FITS.has(fit) ? fit : "contain";
 }
 
+function safeLanguage(language) {
+  return LANGUAGES.has(language) ? language : "ko";
+}
+
+function readPreferredLanguage() {
+  try {
+    return safeLanguage(localStorage.getItem(LANGUAGE_STORAGE_KEY));
+  } catch (error) {
+    return "ko";
+  }
+}
+
+function getLanguage() {
+  return safeLanguage(state?.language || readPreferredLanguage());
+}
+
+function translate(key, language = "ko", ...args) {
+  const dictionary = TRANSLATIONS[safeLanguage(language)] || TRANSLATIONS.ko;
+  const value = dictionary[key] ?? TRANSLATIONS.ko[key] ?? key;
+  return typeof value === "function" ? value(...args) : value;
+}
+
+function t(key, ...args) {
+  return translate(key, getLanguage(), ...args);
+}
+
+function applyLanguage() {
+  const language = getLanguage();
+  document.documentElement.lang = language;
+  document.title = t("documentTitle");
+  if (elements.metaDescription) elements.metaDescription.content = t("documentDescription");
+
+  elements.i18nNodes.forEach((node) => {
+    node.textContent = t(node.dataset.i18n);
+  });
+  elements.i18nAriaNodes.forEach((node) => {
+    node.setAttribute("aria-label", t(node.dataset.i18nAriaLabel));
+  });
+  elements.languageButtons.forEach((button) => {
+    const isActive = button.dataset.language === language;
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
+function changeLanguage(language) {
+  const previousLanguage = getLanguage();
+  const nextLanguage = safeLanguage(language);
+  if (previousLanguage === nextLanguage) return;
+
+  const previousDefaultTitle = translate("projectTitleFallback", previousLanguage);
+  state.language = nextLanguage;
+  if (state.title === previousDefaultTitle) {
+    state.title = translate("projectTitleFallback", nextLanguage);
+  }
+
+  try {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage);
+  } catch (error) {
+    console.warn("Could not save language preference.", error);
+  }
+
+  applyLanguage();
+  renderAll();
+  if (!elements.presenter.hidden) renderPresenter();
+  saveState();
+  setStatus(t("languageChanged"));
+}
+
 function blendImageAccents(images) {
   if (!images.length) return { r: 15, g: 118, b: 110 };
   const sum = images.reduce(
@@ -336,7 +607,7 @@ function saveState(options = {}) {
 
 function scheduleAutosave() {
   autosavePending = true;
-  setAutosaveIndicator("자동저장 중...");
+  setAutosaveIndicator(t("autosaveSaving"));
   window.clearTimeout(autosaveTimer);
   autosaveTimer = window.setTimeout(flushAutosave, AUTOSAVE_DELAY);
 }
@@ -358,18 +629,18 @@ async function flushAutosave() {
 
   autosaveInFlight = true;
   autosavePending = false;
-  setAutosaveIndicator("자동저장 중...");
+  setAutosaveIndicator(t("autosaveSaving"));
 
   try {
     await persistProject(snapshot, serialized);
     lastSavedJson = serialized;
     const time = formatTime(new Date());
-    setAutosaveIndicator(`자동저장됨 ${time}`);
-    setStatus(`자동저장됨 ${time}`, { temporary: true });
+    setAutosaveIndicator(`${t("autosaveSaved")} ${time}`);
+    setStatus(`${t("autosaveSaved")} ${time}`, { temporary: true });
   } catch (error) {
     console.warn("Could not autosave project.", error);
-    setAutosaveIndicator("자동저장 실패");
-    setStatus("자동저장 실패: 저장 버튼으로 프로젝트 파일을 받아 두세요.");
+    setAutosaveIndicator(t("autosaveFailed"));
+    setStatus(t("autosaveFailedDetail"));
   } finally {
     autosaveInFlight = false;
     if (autosavePending) scheduleAutosave();
@@ -384,10 +655,12 @@ async function persistProject(project, serialized) {
       JSON.stringify({
         title: project.title,
         presenter: project.presenter,
+        language: project.language,
         slideCount: project.slides.length,
         savedAt: Date.now()
       })
     );
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, project.language);
     localStorage.removeItem(STORAGE_KEY);
   } catch (error) {
     console.warn("IndexedDB autosave failed; trying localStorage fallback.", error);
@@ -439,17 +712,17 @@ function getSelectedSlide() {
 async function addImageFiles(fileList) {
   const files = Array.from(fileList || []).filter((file) => file.type.startsWith("image/"));
   if (!files.length) {
-    setStatus("이미지 파일을 선택해 주세요.");
+    setStatus(t("imageFileNeeded"));
     return;
   }
 
-  setStatus(`${files.length}장의 이미지를 슬라이드로 만드는 중입니다...`);
+  setStatus(t("makingSlides", files.length));
   const newSlides = [];
 
   for (const file of files) {
     try {
       const slideNumber = state.slides.length + newSlides.length + 1;
-      const fallbackTitle = `사진 ${slideNumber}`;
+      const fallbackTitle = `${t("photo")} ${slideNumber}`;
       const processed = await processImageFile(file);
       newSlides.push({
         id: createId(),
@@ -475,7 +748,7 @@ async function addImageFiles(fileList) {
   }
 
   if (!newSlides.length) {
-    setStatus("이미지를 처리하지 못했습니다. 다른 이미지 파일로 다시 시도해 주세요.");
+    setStatus(t("slideProcessingFailed"));
     return;
   }
 
@@ -483,23 +756,23 @@ async function addImageFiles(fileList) {
   selectedId = newSlides[0].id;
   await saveState({ immediate: true });
   renderAll();
-  setStatus(`${newSlides.length}장의 슬라이드를 만들었습니다.`);
+  setStatus(t("slideMade", newSlides.length));
 }
 
 async function addImagesToSelectedSlide(fileList) {
   const slide = getSelectedSlide();
   if (!slide) {
-    setStatus("먼저 왼쪽에서 이미지를 넣어 슬라이드를 만들어 주세요.");
+    setStatus(t("addFirst"));
     return;
   }
 
   const files = Array.from(fileList || []).filter((file) => file.type.startsWith("image/"));
   if (!files.length) {
-    setStatus("추가할 이미지 파일을 선택해 주세요.");
+    setStatus(t("selectAdditionalImage"));
     return;
   }
 
-  setStatus(`${files.length}장의 사진을 현재 슬라이드에 추가하는 중입니다...`);
+  setStatus(t("photoAdding", files.length));
   const additions = [];
 
   for (const file of files) {
@@ -519,7 +792,7 @@ async function addImagesToSelectedSlide(fileList) {
   }
 
   if (!additions.length) {
-    setStatus("사진을 추가하지 못했습니다. 다른 이미지 파일로 다시 시도해 주세요.");
+    setStatus(t("photoAddFailed"));
     return;
   }
 
@@ -527,7 +800,7 @@ async function addImagesToSelectedSlide(fileList) {
   slide.accent = blendImageAccents(slide.images);
   await saveState({ immediate: true });
   renderAll();
-  setStatus(`현재 슬라이드에 사진 ${additions.length}장을 추가했습니다.`);
+  setStatus(t("photoAdded", additions.length));
 }
 
 function titleFromFileName(fileName, fallbackNumber) {
@@ -536,7 +809,7 @@ function titleFromFileName(fileName, fallbackNumber) {
     .replace(/[_-]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  return raw || `사진 ${fallbackNumber}`;
+  return raw || `${t("photo")} ${fallbackNumber}`;
 }
 
 async function processImageFile(file) {
@@ -627,6 +900,7 @@ function strengthenColor(color) {
 }
 
 function renderAll() {
+  applyLanguage();
   elements.projectTitleInput.value = state.title;
   elements.presenterNameInput.value = state.presenter;
   renderSlideList();
@@ -636,7 +910,7 @@ function renderAll() {
 }
 
 function renderSlideList() {
-  elements.slideCount.textContent = `${state.slides.length}장`;
+  elements.slideCount.textContent = t("slideCount", state.slides.length);
   elements.slideList.innerHTML = "";
   const selectedIndex = getSelectedIndex();
 
@@ -645,13 +919,13 @@ function renderSlideList() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = `image-card${index === selectedIndex ? " is-active" : ""}`;
-    button.setAttribute("aria-label", `${index + 1}번 이미지 슬라이드 선택`);
+    button.setAttribute("aria-label", t("slideCardAria", index + 1));
     const firstImage = slide.images[0];
     button.innerHTML = `
       <img src="${escapeAttribute(firstImage.src)}" alt="">
       <span>
-        <strong>${escapeHtml(slide.title || `사진 ${index + 1}`)}</strong>
-        <span>${index + 1}번 · 사진 ${slide.images.length}장${slide.caption ? " · 설명 있음" : ""}</span>
+        <strong>${escapeHtml(slide.title || `${t("photo")} ${index + 1}`)}</strong>
+        <span>${escapeHtml(t("slideCardMeta", index + 1, slide.images.length, Boolean(slide.caption)))}</span>
       </span>
     `;
     button.addEventListener("click", () => {
@@ -666,7 +940,7 @@ function renderSlideList() {
 function renderForm() {
   const slide = getSelectedSlide();
   const hasSlide = Boolean(slide);
-  elements.selectedSlideLabel.textContent = hasSlide ? `${getSelectedIndex() + 1}번 이미지` : "이미지를 넣어 주세요";
+  elements.selectedSlideLabel.textContent = hasSlide ? t("selectedLabel", getSelectedIndex() + 1) : t("selectedNone");
   elements.slideTitleInput.value = slide?.title || "";
   elements.layoutInput.value = slide?.layout || "focus";
   elements.photoArrangeInput.value = slide?.arrangement || "auto";
@@ -698,9 +972,9 @@ function renderSlidePhotoList(slide) {
       <img src="${escapeAttribute(image.src)}" alt="">
       <span>${index + 1}</span>
       <div class="photo-chip-actions">
-        <button type="button" data-action="left" aria-label="${index + 1}번 사진 앞으로 이동">‹</button>
-        <button type="button" data-action="right" aria-label="${index + 1}번 사진 뒤로 이동">›</button>
-        <button type="button" data-action="remove" aria-label="${index + 1}번 사진 제거">×</button>
+        <button type="button" data-action="left" aria-label="${escapeAttribute(t("movePhotoLeft", index + 1))}">‹</button>
+        <button type="button" data-action="right" aria-label="${escapeAttribute(t("movePhotoRight", index + 1))}">›</button>
+        <button type="button" data-action="remove" aria-label="${escapeAttribute(t("removePhoto", index + 1))}">×</button>
       </div>
     `;
     item.querySelector('[data-action="left"]').disabled = index === 0;
@@ -718,8 +992,8 @@ function renderPreview() {
     elements.slidePreview.innerHTML = `
       <div class="empty-slide">
         <div>
-          <strong>이미지로 시작하세요</strong>
-          <span>왼쪽에서 여러 이미지를 넣으면 자동으로 발표용 슬라이드가 만들어집니다.</span>
+          <strong>${escapeHtml(t("emptyTitle"))}</strong>
+          <span>${escapeHtml(t("emptySubtitle"))}</span>
         </div>
       </div>
     `;
@@ -771,7 +1045,7 @@ function deleteSelectedSlide() {
   selectedId = state.slides[Math.min(index, state.slides.length - 1)]?.id || null;
   saveState({ immediate: true });
   renderAll();
-  setStatus("선택한 슬라이드를 삭제했습니다.");
+  setStatus(t("deleted"));
 }
 
 function removePhotoFromSelectedSlide(photoIndex) {
@@ -787,7 +1061,7 @@ function removePhotoFromSelectedSlide(photoIndex) {
   slide.accent = blendImageAccents(slide.images);
   saveState({ immediate: true });
   renderAll();
-  setStatus("현재 슬라이드에서 사진을 제거했습니다.");
+  setStatus(t("photoRemoved"));
 }
 
 function movePhotoInSelectedSlide(photoIndex, direction) {
@@ -802,24 +1076,24 @@ function movePhotoInSelectedSlide(photoIndex, direction) {
   slide.accent = blendImageAccents(slide.images);
   saveState({ immediate: true });
   renderAll();
-  setStatus("사진 순서를 바꿨습니다.");
+  setStatus(t("photoReordered"));
 }
 
 function clearSlides() {
   if (!state.slides.length) return;
-  const shouldClear = window.confirm("모든 이미지 슬라이드를 비울까요?");
+  const shouldClear = window.confirm(t("clearConfirm"));
   if (!shouldClear) return;
   state.slides = [];
   selectedId = null;
   saveState({ immediate: true });
   renderAll();
-  setStatus("슬라이드를 모두 비웠습니다.");
+  setStatus(t("cleared"));
 }
 
 function saveProjectFile() {
   const json = JSON.stringify(state, null, 2);
   downloadFile(`${safeFileName(state.title || "image-slide-project")}.json`, json, "application/json;charset=utf-8");
-  setStatus("프로젝트 파일을 만들었습니다.");
+  setStatus(t("projectFileMade"));
 }
 
 function importProjectFile(event) {
@@ -833,10 +1107,10 @@ function importProjectFile(event) {
       selectedId = state.slides[0]?.id || null;
       saveState({ immediate: true });
       renderAll();
-      setStatus("프로젝트를 불러왔습니다.");
+      setStatus(t("imported"));
     } catch (error) {
       console.error(error);
-      setStatus("프로젝트 파일을 읽지 못했습니다.");
+      setStatus(t("importFailed"));
     } finally {
       elements.importProjectInput.value = "";
     }
@@ -898,7 +1172,7 @@ function exportDeck() {
   if (!state.slides.length) return;
   const html = buildDeckHtml(state);
   downloadFile(`${safeFileName(state.title || "presentation")}.html`, html, "text/html;charset=utf-8");
-  setStatus("발표용 HTML 파일을 만들었습니다.");
+  setStatus(t("exportDone"));
 }
 
 function downloadFile(fileName, content, type) {
@@ -930,11 +1204,11 @@ function renderSlideMarkup(slide, index, total, project) {
       <div class="slide-text">
         <span class="slide-number">${index + 1} / ${total}</span>
         <div class="slide-copy">
-          <h2 class="slide-title">${escapeHtml(slide.title || `사진 ${index + 1}`)}</h2>
+          <h2 class="slide-title">${escapeHtml(slide.title || `${t("photo")} ${index + 1}`)}</h2>
           ${caption}
         </div>
         <footer class="slide-footer">
-          <span>${escapeHtml(project.title || "발표")}</span>
+          <span>${escapeHtml(project.title || t("present"))}</span>
           <span>${presenter}</span>
         </footer>
       </div>`;
@@ -1011,7 +1285,8 @@ function setStatus(message, options = {}) {
 }
 
 function buildDeckHtml(project) {
-  const title = escapeHtml(project.title || "학생 발표");
+  const language = safeLanguage(project.language);
+  const title = escapeHtml(project.title || translate("deckTitleFallback", language));
   const slides = project.slides
     .map((slide, index) => {
       const markup = renderSlideMarkup(slide, index, project.slides.length, project);
@@ -1020,7 +1295,7 @@ function buildDeckHtml(project) {
     .join("\n");
 
   return `<!doctype html>
-<html lang="ko">
+<html lang="${language}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1031,12 +1306,12 @@ function buildDeckHtml(project) {
   <main class="deck-viewport" aria-live="polite">
     ${slides}
   </main>
-  <nav class="deck-bar" aria-label="발표 조작">
+  <nav class="deck-bar" aria-label="${escapeAttribute(translate("deckAria", language))}">
     <strong id="deckCounter">1 / ${project.slides.length}</strong>
     <div class="deck-actions">
       <button id="printDeck" type="button">PDF</button>
-      <button id="prevDeck" type="button">이전</button>
-      <button id="nextDeck" type="button">다음</button>
+      <button id="prevDeck" type="button">${escapeHtml(translate("prev", language))}</button>
+      <button id="nextDeck" type="button">${escapeHtml(translate("next", language))}</button>
     </div>
   </nav>
   <script>${getDeckScript()}</script>
