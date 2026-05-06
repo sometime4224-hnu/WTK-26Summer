@@ -946,6 +946,7 @@ textarea:focus {
 
 .bubble-layer.is-editable {
   pointer-events: auto;
+  touch-action: none;
 }
 
 .speech-bubble {
@@ -960,8 +961,10 @@ textarea:focus {
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 14px 28px rgba(31, 35, 40, 0.2);
   line-height: 1.25;
+  overflow: visible;
   overflow-wrap: anywhere;
   pointer-events: auto;
+  touch-action: none;
 }
 
 .speech-bubble::after {
@@ -982,6 +985,10 @@ textarea:focus {
   outline-offset: 3px;
 }
 
+.speech-bubble.is-transforming {
+  user-select: none;
+}
+
 .bubble-content {
   position: relative;
   z-index: 1;
@@ -992,6 +999,9 @@ textarea:focus {
 .bubble-content[contenteditable="true"] {
   cursor: text;
   outline: none;
+  touch-action: manipulation;
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 .bubble-content[contenteditable="true"]:empty::before {
@@ -1001,26 +1011,55 @@ textarea:focus {
 
 .bubble-handle {
   position: absolute;
-  left: 8px;
-  right: 8px;
-  top: 5px;
+  left: 6px;
+  right: 6px;
+  top: 6px;
   z-index: 2;
-  height: 9px;
+  width: auto;
+  height: 28px;
   border-radius: 999px;
-  background: repeating-linear-gradient(90deg, rgba(31, 35, 40, 0.4) 0 4px, transparent 4px 8px);
+  background: rgba(255, 255, 255, 0.01);
   cursor: move;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.bubble-handle::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 10px;
+  height: 8px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(90deg, rgba(31, 35, 40, 0.48) 0 4px, transparent 4px 8px);
 }
 
 .bubble-resize {
   position: absolute;
-  right: 5px;
-  bottom: 5px;
+  right: 0;
+  bottom: 0;
   z-index: 2;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: transparent;
+  cursor: nwse-resize;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.bubble-resize::before {
+  content: "";
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
   width: 16px;
   height: 16px;
-  border-right: 3px solid rgba(31, 35, 40, 0.58);
-  border-bottom: 3px solid rgba(31, 35, 40, 0.58);
-  cursor: nwse-resize;
+  border-right: 3px solid rgba(31, 35, 40, 0.62);
+  border-bottom: 3px solid rgba(31, 35, 40, 0.62);
 }
 
 .empty-slide {

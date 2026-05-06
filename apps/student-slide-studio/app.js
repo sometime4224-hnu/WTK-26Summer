@@ -112,6 +112,8 @@ const TRANSLATIONS = {
     slideMade: (count) => `${count}장의 슬라이드를 만들었습니다.`,
     slideProcessingFailed: "이미지를 처리하지 못했습니다. 다른 이미지 파일로 다시 시도해 주세요.",
     slideTitle: "슬라이드 제목",
+    studentNamePrompt: "HTML 파일 이름으로 사용할 학생 이름을 입력하세요.",
+    studentNameRequired: "학생 이름을 입력하면 HTML 파일을 저장합니다.",
     uploadTitle: "이미지 넣기"
   },
   vi: {
@@ -213,6 +215,8 @@ const TRANSLATIONS = {
     slideMade: (count) => `Đã tạo ${count} slide.`,
     slideProcessingFailed: "Không xử lý được ảnh. Hãy thử tệp ảnh khác.",
     slideTitle: "Tiêu đề slide",
+    studentNamePrompt: "Nhập tên học sinh để đặt tên tệp HTML.",
+    studentNameRequired: "Hãy nhập tên học sinh để lưu tệp HTML.",
     uploadTitle: "Thêm ảnh"
   }
 };
@@ -1133,7 +1137,19 @@ function startBubbleTransform(event, element, mode) {
   if (!bubble || !slideElement) return;
 
   selectBubble(bubble.id);
+  element.classList.add("is-transforming");
+  const pointerId = event.pointerId;
+  const captureTarget = event.currentTarget instanceof Element ? event.currentTarget : element;
+  if (captureTarget.setPointerCapture && Number.isFinite(pointerId)) {
+    try {
+      captureTarget.setPointerCapture(pointerId);
+    } catch (error) {
+      console.warn("Could not capture bubble pointer.", error);
+    }
+  }
   const rect = slideElement.getBoundingClientRect();
+  const width = Math.max(1, rect.width);
+  const height = Math.max(1, rect.height);
   const start = {
     clientX: event.clientX,
     clientY: event.clientY,
@@ -1144,9 +1160,16 @@ function startBubbleTransform(event, element, mode) {
   };
 
   function moveBubble(moveEvent) {
+    if (
+      Number.isFinite(pointerId) &&
+      Number.isFinite(moveEvent.pointerId) &&
+      moveEvent.pointerId !== pointerId
+    ) {
+      return;
+    }
     moveEvent.preventDefault();
-    const dx = ((moveEvent.clientX - start.clientX) / rect.width) * 100;
-    const dy = ((moveEvent.clientY - start.clientY) / rect.height) * 100;
+    const dx = ((moveEvent.clientX - start.clientX) / width) * 100;
+    const dy = ((moveEvent.clientY - start.clientY) / height) * 100;
 
     if (mode === "move") {
       bubble.x = clampNumber(start.x + dx, 1, 99 - bubble.width, start.x);
@@ -1159,21 +1182,38 @@ function startBubbleTransform(event, element, mode) {
     applyBubblePosition(element, bubble);
   }
 
-  function stopBubbleMove() {
+  function stopBubbleMove(stopEvent) {
+    if (
+      Number.isFinite(pointerId) &&
+      Number.isFinite(stopEvent?.pointerId) &&
+      stopEvent.pointerId !== pointerId
+    ) {
+      return;
+    }
     window.removeEventListener("pointermove", moveBubble);
     window.removeEventListener("pointerup", stopBubbleMove);
+    window.removeEventListener("pointercancel", stopBubbleMove);
+    element.classList.remove("is-transforming");
+    if (captureTarget.releasePointerCapture && Number.isFinite(pointerId)) {
+      try {
+        captureTarget.releasePointerCapture(pointerId);
+      } catch (error) {
+        console.warn("Could not release bubble pointer.", error);
+      }
+    }
     saveState({ immediate: true });
   }
 
   window.addEventListener("pointermove", moveBubble);
-  window.addEventListener("pointerup", stopBubbleMove, { once: true });
+  window.addEventListener("pointerup", stopBubbleMove);
+  window.addEventListener("pointercancel", stopBubbleMove);
 }
 
 function applyBubblePosition(element, bubble) {
   element.style.left = `${bubble.x}%`;
   element.style.top = `${bubble.y}%`;
   element.style.width = `${bubble.width}%`;
-  element.style.minHeight = `${bubble.height}%`;
+  element.style.height = `${bubble.height}%`;
 }
 
 function updateControls() {
@@ -1433,9 +1473,25 @@ function renderPresenter() {
 
 function exportDeck() {
   if (!state.slides.length) return;
+  const studentName = requestStudentNameForExport();
+  if (!studentName) return;
   const html = buildDeckHtml(state);
-  downloadFile(`${safeFileName(state.title || "presentation")}.html`, html, "text/html;charset=utf-8");
+  downloadFile(`${safeFileName(studentName, "student")}.html`, html, "text/html;charset=utf-8");
   setStatus(t("exportDone"));
+}
+
+function requestStudentNameForExport() {
+  const defaultName = state.presenter.trim();
+  const name = window.prompt(t("studentNamePrompt"), defaultName);
+  if (name === null) return "";
+
+  const trimmedName = name.trim();
+  if (!trimmedName) {
+    setStatus(t("studentNameRequired"));
+    return "";
+  }
+
+  return trimmedName;
 }
 
 function downloadFile(fileName, content, type) {
@@ -1450,12 +1506,12 @@ function downloadFile(fileName, content, type) {
   window.setTimeout(() => URL.revokeObjectURL(url), 1200);
 }
 
-function safeFileName(name) {
+function safeFileName(name, fallback = "presentation") {
   return String(name)
     .trim()
     .replace(/[\\/:*?"<>|]+/g, "-")
     .replace(/\s+/g, "-")
-    .slice(0, 60) || "presentation";
+    .slice(0, 60) || fallback;
 }
 
 function renderSlideMarkup(slide, index, total, project, options = {}) {
@@ -1505,7 +1561,7 @@ function renderBubbleMarkup(bubble, options = {}) {
     `left: ${bubble.x}%`,
     `top: ${bubble.y}%`,
     `width: ${bubble.width}%`,
-    `min-height: ${bubble.height}%`,
+    `height: ${bubble.height}%`,
     `font-size: ${bubble.fontSize}px`
   ].join("; ");
   const editAttributes = editable
