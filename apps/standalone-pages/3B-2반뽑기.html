@@ -193,8 +193,12 @@
 
         const result = document.getElementById("result");
         const drawButton = document.getElementById("drawButton");
+        const STORAGE_KEY = "korean3b:3b-2-draw-state";
+        const rosterKey = students.join("|");
 
-        let remainingStudents = [];
+        const savedState = loadDrawState();
+        let remainingStudents = savedState.remainingStudents;
+        let lastPickedStudent = savedState.lastPickedStudent;
 
         function shuffle(list) {
             const copy = [...list];
@@ -207,12 +211,61 @@
             return copy;
         }
 
+        function loadDrawState() {
+            try {
+                const rawState = localStorage.getItem(STORAGE_KEY);
+                if (!rawState) {
+                    return { remainingStudents: [], lastPickedStudent: "" };
+                }
+
+                const parsedState = JSON.parse(rawState);
+                const validStudents = new Set(students);
+
+                if (parsedState.rosterKey !== rosterKey || !Array.isArray(parsedState.remainingStudents)) {
+                    return { remainingStudents: [], lastPickedStudent: "" };
+                }
+
+                return {
+                    remainingStudents: parsedState.remainingStudents.filter((student, index, list) => (
+                        validStudents.has(student) && list.indexOf(student) === index
+                    )),
+                    lastPickedStudent: validStudents.has(parsedState.lastPickedStudent) ? parsedState.lastPickedStudent : ""
+                };
+            } catch {
+                return { remainingStudents: [], lastPickedStudent: "" };
+            }
+        }
+
+        function saveDrawState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    rosterKey,
+                    remainingStudents,
+                    lastPickedStudent
+                }));
+            } catch {
+                // Drawing should keep working even if browser storage is unavailable.
+            }
+        }
+
+        function createDrawPool() {
+            const pool = shuffle(students);
+
+            if (pool.length > 1 && pool[pool.length - 1] === lastPickedStudent) {
+                pool.unshift(pool.pop());
+            }
+
+            return pool;
+        }
+
         function drawStudent() {
             if (remainingStudents.length === 0) {
-                remainingStudents = shuffle(students);
+                remainingStudents = createDrawPool();
             }
 
             const pickedStudent = remainingStudents.pop();
+            lastPickedStudent = pickedStudent;
+            saveDrawState();
 
             result.textContent = pickedStudent;
             result.classList.remove("is-empty", "pop");

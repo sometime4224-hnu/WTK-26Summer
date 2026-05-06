@@ -107,10 +107,81 @@
 
       const button = document.getElementById('draw-button');
       const output = document.getElementById('student-name');
+      const storageKey = 'korean3b:single-student-draw-state';
+      const rosterKey = students.join('|');
+
+      const savedState = loadDrawState();
+      let remainingStudents = savedState.remainingStudents;
+      let lastPickedStudent = savedState.lastPickedStudent;
+
+      function shuffle(list) {
+        const copy = [...list];
+
+        for (let index = copy.length - 1; index > 0; index -= 1) {
+          const swapIndex = Math.floor(Math.random() * (index + 1));
+          [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+        }
+
+        return copy;
+      }
+
+      function loadDrawState() {
+        try {
+          const rawState = localStorage.getItem(storageKey);
+          if (!rawState) {
+            return { remainingStudents: [], lastPickedStudent: '' };
+          }
+
+          const parsedState = JSON.parse(rawState);
+          const validStudents = new Set(students);
+
+          if (parsedState.rosterKey !== rosterKey || !Array.isArray(parsedState.remainingStudents)) {
+            return { remainingStudents: [], lastPickedStudent: '' };
+          }
+
+          return {
+            remainingStudents: parsedState.remainingStudents.filter((student, index, list) => (
+              validStudents.has(student) && list.indexOf(student) === index
+            )),
+            lastPickedStudent: validStudents.has(parsedState.lastPickedStudent) ? parsedState.lastPickedStudent : ''
+          };
+        } catch {
+          return { remainingStudents: [], lastPickedStudent: '' };
+        }
+      }
+
+      function saveDrawState() {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify({
+            rosterKey,
+            remainingStudents,
+            lastPickedStudent
+          }));
+        } catch {
+          // Keep the draw usable even when browser storage is blocked.
+        }
+      }
+
+      function createDrawPool() {
+        const pool = shuffle(students);
+
+        if (pool.length > 1 && pool[pool.length - 1] === lastPickedStudent) {
+          pool.unshift(pool.pop());
+        }
+
+        return pool;
+      }
 
       button.addEventListener('click', () => {
-        const index = Math.floor(Math.random() * students.length);
-        output.textContent = students[index];
+        if (remainingStudents.length === 0) {
+          remainingStudents = createDrawPool();
+        }
+
+        const pickedStudent = remainingStudents.pop();
+        lastPickedStudent = pickedStudent;
+        saveDrawState();
+
+        output.textContent = pickedStudent;
       });
     })();
   </script>

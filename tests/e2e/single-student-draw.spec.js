@@ -32,6 +32,11 @@ const studentNames = [
   '다오 티 투 짱'
 ];
 
+async function drawOne(page) {
+  await page.locator('#draw-button').click();
+  return page.locator('#student-name').innerText();
+}
+
 test('draws exactly one student from the presentation roster', async ({ page }) => {
   await page.goto('/apps/standalone-pages/single-student-draw.html', { waitUntil: 'domcontentloaded' });
 
@@ -39,9 +44,39 @@ test('draws exactly one student from the presentation roster', async ({ page }) 
   await expect(page.locator('#draw-button')).toHaveText('뽑기');
   await expect(page.locator('#student-name')).toHaveText('');
 
-  await page.locator('#draw-button').click();
-
-  const pickedName = await page.locator('#student-name').innerText();
+  const pickedName = await drawOne(page);
   expect(studentNames).toContain(pickedName);
   expect(pickedName.split(/\s+/).filter(Boolean).length).toBeGreaterThanOrEqual(3);
+});
+
+test('draws every presentation student once before the pool resets', async ({ page }) => {
+  await page.goto('/apps/standalone-pages/single-student-draw.html', { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => localStorage.clear());
+  await page.reload({ waitUntil: 'domcontentloaded' });
+
+  const drawnNames = [];
+
+  for (let index = 0; index < 10; index += 1) {
+    const pickedName = await drawOne(page);
+    expect(studentNames).toContain(pickedName);
+    expect(drawnNames).not.toContain(pickedName);
+    drawnNames.push(pickedName);
+  }
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+
+  while (drawnNames.length < studentNames.length) {
+    const pickedName = await drawOne(page);
+    expect(studentNames).toContain(pickedName);
+    expect(drawnNames).not.toContain(pickedName);
+    drawnNames.push(pickedName);
+  }
+
+  expect(new Set(drawnNames).size).toBe(studentNames.length);
+
+  const lastNameFromFinishedPool = drawnNames[drawnNames.length - 1];
+  const firstNameFromResetPool = await drawOne(page);
+
+  expect(studentNames).toContain(firstNameFromResetPool);
+  expect(firstNameFromResetPool).not.toBe(lastNameFromFinishedPool);
 });
