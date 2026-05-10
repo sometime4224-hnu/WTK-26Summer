@@ -40,6 +40,75 @@ function resolvePath(urlPath) {
   return candidatePath;
 }
 
+function sendFile(request, response, filePath, contentType, stat) {
+  const headers = {
+    'Content-Type': contentType,
+    'Cache-Control': 'no-store',
+    'Accept-Ranges': 'bytes'
+  };
+
+  const range = request.headers.range;
+  if (range) {
+    const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+    if (!match) {
+      response.writeHead(416, {
+        ...headers,
+        'Content-Range': `bytes */${stat.size}`
+      });
+      response.end();
+      return;
+    }
+
+    let start = match[1] ? Number(match[1]) : 0;
+    let end = match[2] ? Number(match[2]) : stat.size - 1;
+
+    if (!match[1] && match[2]) {
+      const suffixLength = Math.min(Number(match[2]), stat.size);
+      start = stat.size - suffixLength;
+      end = stat.size - 1;
+    }
+
+    if (
+      !Number.isInteger(start)
+      || !Number.isInteger(end)
+      || start < 0
+      || end < start
+      || start >= stat.size
+    ) {
+      response.writeHead(416, {
+        ...headers,
+        'Content-Range': `bytes */${stat.size}`
+      });
+      response.end();
+      return;
+    }
+
+    end = Math.min(end, stat.size - 1);
+    const contentLength = end - start + 1;
+    response.writeHead(206, {
+      ...headers,
+      'Content-Length': contentLength,
+      'Content-Range': `bytes ${start}-${end}/${stat.size}`
+    });
+    if (request.method === 'HEAD') {
+      response.end();
+      return;
+    }
+    fs.createReadStream(filePath, { start, end }).pipe(response);
+    return;
+  }
+
+  response.writeHead(200, {
+    ...headers,
+    'Content-Length': stat.size
+  });
+  if (request.method === 'HEAD') {
+    response.end();
+    return;
+  }
+  fs.createReadStream(filePath).pipe(response);
+}
+
 const server = http.createServer((request, response) => {
   const requestPath = request.url === '/' ? '/index.html' : request.url;
   const filePath = resolvePath(requestPath);
@@ -54,28 +123,23 @@ const server = http.createServer((request, response) => {
     finalPath = path.join(finalPath, 'index.html');
   }
 
-  if (!fs.existsSync(finalPath) || !fs.statSync(finalPath).isFile()) {
+  const stat = fs.existsSync(finalPath) ? fs.statSync(finalPath) : null;
+  if (!stat || !stat.isFile()) {
     send(response, 404, 'Not found');
     return;
   }
 
   const extension = path.extname(finalPath).toLowerCase();
   const contentType = contentTypes[extension] || 'application/octet-stream';
-  fs.createReadStream(finalPath)
-    .on('open', () => {
-      response.writeHead(200, {
-        'Content-Type': contentType,
-        'Cache-Control': 'no-store'
-      });
-    })
-    .on('error', () => {
-      if (!response.headersSent) {
-        send(response, 500, 'Internal server error');
-      } else {
-        response.destroy();
-      }
-    })
-    .pipe(response);
+  try {
+    sendFile(request, response, finalPath, contentType, stat);
+  } catch (error) {
+    if (!response.headersSent) {
+      send(response, 500, 'Internal server error');
+    } else {
+      response.destroy();
+    }
+  }
 });
 
 server.listen(port, host, () => {
