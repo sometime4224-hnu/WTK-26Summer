@@ -22,27 +22,27 @@
                 description: "듣기 지문에 나온 '여성 운전자가 주차를 힘들어 한다고 해서 사고를 많이 내는 것은 아닙니다'처럼 일반화된 생각을 조심스럽게 반박하는 표현을 복습합니다.",
                 descriptionVi: "On lai cach phan bac viec ket luan chung nhu 'khong phai cu nhu vay thi deu...'."
             },
-            audioSrc: "../assets/c17/listening/audio/lesson17-track85-original.mp3",
+            audioSrc: null,
             audioSourceType: "original",
             activityImage: {
-                src: "../assets/c17/listening/images/lesson17-listening1-cuts.webp",
-                alt: "운전 습관과 교통사고 뉴스 흐름을 정리한 14컷 컷툰",
-                altVi: "Khung 14 tranh tom tat dong ban tin ve thoi quen lai xe va tai nan giao thong",
+                src: "../assets/c17/listening/images/lesson17-listening1-cuts.webp?v=20260510-track85-new-source",
+                alt: "운전 습관과 교통사고 뉴스 흐름을 정리한 10컷 컷툰",
+                altVi: "Khung 10 tranh tom tat dong ban tin ve thoi quen lai xe va tai nan giao thong",
                 pendingLabel: "듣기 1 컷툰 이미지를 불러오는 중입니다.",
                 pendingLabelVi: "Dang tai tranh cattoon cho bai nghe 1.",
                 pendingHint: "뉴스 흐름에 맞춰 정렬한 교재 소스 컷툰입니다.",
                 pendingHintVi: "Tranh cattoon duoc sap xep theo mach ban tin.",
-                caption: "교재 이미지의 상·하 컷을 각각 분할해 14컷을 한 컷씩 보도록 구성했습니다.",
-                captionVi: "Moi khung tren/duoi cua anh sach giao khoa duoc tach rieng thanh 14 tranh."
+                caption: "새 이미지 소스를 10컷으로 분할해 본문 진행에 맞춰 구성했습니다.",
+                captionVi: "Anh moi duoc tach thanh 10 tranh theo mach bai nghe."
             },
             syncVisual: {
-                imageSrc: "../assets/c17/listening/images/lesson17-listening1-cuts.webp",
+                imageSrc: "../assets/c17/listening/images/lesson17-listening1-cuts.webp?v=20260510-track85-new-source",
                 title: "컷툰으로 듣기 흐름 보기",
                 titleVi: "Xem mach bai nghe bang cattoon",
                 copy: "Track 85를 재생하면 뉴스 흐름에 맞춰 컷이 한 장씩 넘어갑니다.",
                 copyVi: "Khi phat Track 85, tung tranh se chuyen theo mach ban tin.",
-                aspectRatio: "2 / 1",
-                transitionMs: 420,
+                aspectRatio: "3.2 / 1",
+                transitionMs: 0,
                 frames: [
                     { start: 0, end: 6.34, x: 0, y: 0, width: 1254, height: 627, label: "1", title: "뉴스 도입", titleVi: "Mo dau ban tin", caption: "여성이 남성보다 운전을 못하고 사고를 자주 내는지 질문을 던집니다.", captionVi: "Dat cau hoi ve dinh kien phu nu lai xe kem va hay gay tai nan." },
                     { start: 6.34, end: 13.19, x: 1254, y: 0, width: 1254, height: 627, label: "2", title: "오해 제기", titleVi: "Neu hieu lam", caption: "뉴스를 보는 사람들의 고정관념이 오해였다고 이어 말합니다.", captionVi: "Noi rang dinh kien cua nguoi xem co ve la hieu lam." },
@@ -276,7 +276,7 @@
                 description: "듣기 지문에 나온 '물을 많이 마신다고 해서 누구나 다 건강해지는 것은 아닙니다'처럼 건강 상식을 일반화하지 않는 표현을 복습합니다.",
                 descriptionVi: "On lai cach noi khong nen khai quat hoa cac kien thuc suc khoe."
             },
-            audioSrc: "../assets/c17/listening/audio/lesson17-track86-original.mp3",
+            audioSrc: null,
             audioSourceType: "original",
             activityImage: {
                 src: "../assets/c17/listening/images/lesson17-listening2-cuts.webp",
@@ -296,7 +296,7 @@
                 copy: "Track 86을 재생하면 건강 상식 문답 흐름에 맞춰 컷이 한 장씩 넘어갑니다.",
                 copyVi: "Khi phat Track 86, tung tranh se chuyen theo thu tu hoi dap suc khoe.",
                 aspectRatio: "2 / 1",
-                transitionMs: 420,
+                transitionMs: 0,
                 frames: [
                     { start: 0, end: 6.21, x: 0, y: 0, width: 1254, height: 627, label: "1", title: "물 질문", titleVi: "Hoi ve nuoc", caption: "남자가 물을 많이 마시는 것이 건강에 좋은지 묻습니다.", captionVi: "Nguoi nam hoi uong nhieu nuoc co tot cho suc khoe khong." },
                     { start: 6.21, end: 12.91, x: 1254, y: 0, width: 1254, height: 627, label: "2", title: "더 마셔야 할까", titleVi: "Co nen uong hon khong", caption: "건강을 위해 물을 더 많이 마셔야 하는지 다시 묻습니다.", captionVi: "Anh hoi co nen uong nhieu hon vi suc khoe khong." },
@@ -521,6 +521,118 @@
         return JSON.parse(JSON.stringify(lesson));
     }
 
+    const track85PreciseCutFrames = [
+        { start: 0, end: 13.06, x: 0, y: 0, width: 1254, height: 392, label: "1", title: "뉴스 도입", titleVi: "Mo dau ban tin", caption: "안내 멘트가 끝난 뒤 앵커가 여성 운전자에 대한 고정관념과 사고 여부를 질문합니다.", captionVi: "Sau loi huong dan, nguoi dan chu dat cau hoi ve dinh kien phu nu lai xe kem va hay gay tai nan." },
+        { start: 13.06, end: 22.48, x: 1254, y: 0, width: 1254, height: 392, label: "2", title: "오해 바로잡기", titleVi: "Sua hieu lam", caption: "뉴스를 보는 사람들의 생각을 짚고 모두 오해였던 것 같다고 말합니다.", captionVi: "Noi ve suy nghi cua nguoi xem va sua lai rang do la hieu lam." },
+        { start: 22.48, end: 30.94, x: 0, y: 392, width: 1254, height: 392, label: "3", title: "사고 통계", titleVi: "Thong ke tai nan", caption: "남성 운전자가 여성 운전자보다 다섯 배 이상 사고를 많이 냈다는 통계를 제시합니다.", captionVi: "Thong ke cho thay tai xe nam gay tai nan nhieu hon phu nu hon nam lan." },
+        { start: 30.94, end: 33.78, x: 1254, y: 392, width: 1254, height: 392, label: "4", title: "기자 연결", titleVi: "Noi voi phong vien", caption: "김지연 기자가 마트 현장에서 보도를 이어 갑니다.", captionVi: "Phong vien Kim Jiyeon tiep tuc ban tin tai sieu thi." },
+        { start: 33.78, end: 40.70, x: 0, y: 784, width: 1254, height: 392, label: "5", title: "마트 주차 장면", titleVi: "Canh do xe o sieu thi", caption: "마트에서 힘들게 주차하는 여성 운전자를 남성이 답답해하며 바라봅니다.", captionVi: "Mot nguoi nam nhin nguoi phu nu dang kho khan khi do xe o sieu thi." },
+        { start: 40.70, end: 44.52, x: 1254, y: 784, width: 1254, height: 392, label: "6", title: "경적을 누르는 남성", titleVi: "Bam coi", caption: "기다리지 못한 남성이 경적을 누르는 장면으로 이어집니다.", captionVi: "Nguoi nam khong doi duoc va bam coi." },
+        { start: 44.52, end: 65.44, x: 0, y: 1176, width: 1254, height: 392, label: "7", title: "안전 운전", titleVi: "Lai xe an toan", caption: "주차가 힘들다고 사고를 많이 내는 것은 아니며 여성 운전자는 안전 운전을 중요하게 생각한다고 설명합니다.", captionVi: "Kho do xe khong co nghia la hay gay tai nan; tai xe nu coi trong lai xe an toan." },
+        { start: 65.44, end: 75.30, x: 1254, y: 1176, width: 1254, height: 392, label: "8", title: "위험한 운전 습관", titleVi: "Thoi quen nguy hiem", caption: "속도를 높이거나 신호를 지키지 않는 운전 습관이 사고를 더 자주 낸다고 말합니다.", captionVi: "Thoi quen tang toc va khong theo tin hieu co the gay tai nan thuong xuyen hon." },
+        { start: 75.30, end: 81.12, x: 0, y: 1568, width: 1254, height: 392, label: "9", title: "원인은 운전 습관", titleVi: "Nguyen nhan la thoi quen", caption: "교통사고의 원인은 성별 차이가 아니라 운전 습관이라고 정리합니다.", captionVi: "Ket luan nguyen nhan tai nan la thoi quen lai xe, khong phai gioi tinh." },
+        { start: 81.12, end: 89.55, x: 1254, y: 1568, width: 1254, height: 392, label: "10", title: "안전 운전 결론", titleVi: "Ket luan ve lai xe an toan", caption: "안전하게 운전하는 것이 운전을 제일 잘하는 것이라고 마무리합니다.", captionVi: "Ket thuc bang y rang lai xe an toan moi la lai xe gioi nhat." }
+    ];
+
+    const track85PreciseTranscript = [
+        { speaker: "앵커", text: "정말 여자는 남자보다 운전을 못하고 사고를 자주 낼까요?", vi: "Co that phu nu lai xe kem hon nam gioi va hay gay tai nan hon khong?", start: 6.84, end: 11.80, keywords: ["여자", "남자보다", "사고"] },
+        { speaker: "앵커", text: "지금 뉴스를 보고 계신 분들 중에도 여자는 운전이 서툴다고 생각하는 분들이 있을 텐데요.", vi: "Trong so nguoi dang xem tin tuc, co le co nguoi nghi phu nu lai xe chua gioi.", start: 13.06, end: 19.28, keywords: ["여자는", "운전이 서툴다"] },
+        { speaker: "앵커", text: "모두 오해였던 것 같습니다.", vi: "Tat ca co le la hieu lam.", start: 19.78, end: 21.48, keywords: ["오해"] },
+        { speaker: "앵커", text: "지난해 일어난 교통사고를 보니 남성 운전자가 여성 운전자보다 5배 이상 사고를 많이 냈습니다.", vi: "Theo cac vu tai nan giao thong nam ngoai, tai xe nam gay tai nan nhieu hon tai xe nu hon nam lan.", start: 22.48, end: 30.14, keywords: ["교통사고", "남성 운전자", "5배 이상"] },
+        { speaker: "앵커", text: "김지연 기자가 전해 드립니다.", vi: "Phong vien Kim Jiyeon se dua tin.", start: 30.94, end: 32.82, keywords: ["기자"] },
+        { speaker: "기자", text: "마트에서 힘들게 주차하고 있는 여성 운전자를 한 남성이 답답해하며 바라보고 있습니다.", vi: "O sieu thi, mot nguoi nam nhin nguoi phu nu dang kho khan khi do xe.", start: 33.78, end: 39.54, keywords: ["마트", "주차", "답답해하며"] },
+        { speaker: "기자", text: "기다리지 못하고 경적을 누르는 남성도 있습니다.", vi: "Cung co nguoi nam khong doi duoc va bam coi.", start: 40.70, end: 43.34, keywords: ["경적"] },
+        { speaker: "기자", text: "하지만 여성 운전자가 주차를 힘들어 한다고 해서 사고를 많이 내는 것은 아닙니다.", vi: "Nhung khong phai phu nu do xe kho thi hay gay tai nan.", start: 44.52, end: 50.00, keywords: ["주차", "사고", "것은 아닙니다"] },
+        { speaker: "기자", text: "남자라고 해서 누구나 주차를 잘하는 것도 아닙니다.", vi: "Khong phai cu la nam gioi thi ai cung do xe gioi.", start: 51.00, end: 54.24, keywords: ["남자라고 해서", "누구나", "아닙니다"] },
+        { speaker: "기자", text: "실제로 여성 운전자는 조금 느리게 가도 안전하게 운전하는 것을 중요하게 생각한다고 합니다.", vi: "Thuc te, tai xe nu coi trong viec lai xe an toan du di cham mot chut.", start: 54.58, end: 61.28, keywords: ["여성 운전자", "안전하게 운전"] },
+        { speaker: "기자", text: "그래서 사고를 많이 내지 않습니다.", vi: "Vi vay ho khong gay nhieu tai nan.", start: 62.28, end: 64.30, keywords: ["사고", "많이 내지 않습니다"] },
+        { speaker: "기자", text: "자신이 운전을 잘한다고 생각해서 속도를 높이거나 빨리 가기 위해 신호를 지키지 않는 남성 운전자들이 사고를 더 자주 낸다고 합니다.", vi: "Tai xe nam nghi minh lai gioi, tang toc hoac khong theo tin hieu de di nhanh, gay tai nan thuong xuyen hon.", start: 65.44, end: 74.30, keywords: ["속도", "신호", "사고"] },
+        { speaker: "기자", text: "교통사고의 원인은 남성과 여성의 차이 때문이 아니라 운전 습관 때문입니다.", vi: "Nguyen nhan tai nan giao thong khong phai khac biet nam nu ma la thoi quen lai xe.", start: 75.30, end: 80.74, keywords: ["원인", "차이", "운전 습관"] },
+        { speaker: "기자", text: "안전하게 운전하는 것이 운전을 제일 잘하는 것입니다.", vi: "Lai xe an toan moi la lai xe gioi nhat.", start: 81.12, end: 84.82, keywords: ["안전하게 운전", "제일 잘하는 것"] },
+        { speaker: "기자", text: "지금까지 김지연이었습니다.", vi: "Vua roi la Kim Jiyeon.", start: 85.60, end: 87.36, keywords: ["김지연"] }
+    ];
+
+    const track85PrecisePublicCues = [
+        { speaker: "앵커", start: 6.84, end: 21.48, keywords: ["여자는 운전이 서툴다", "오해"], extraKeywords: ["도입", "고정관념"] },
+        { speaker: "앵커", start: 22.48, end: 32.82, keywords: ["교통사고", "5배 이상", "김지연 기자"], extraKeywords: ["통계"] },
+        { speaker: "기자", start: 33.78, end: 43.34, keywords: ["마트", "주차", "경적"], extraKeywords: ["현장"] },
+        { speaker: "기자", start: 44.52, end: 64.30, keywords: ["사고를 많이 내는 것은 아닙니다", "안전하게 운전"], extraKeywords: ["반박"] },
+        { speaker: "기자", start: 65.44, end: 80.74, keywords: ["속도", "신호", "운전 습관"], extraKeywords: ["원인"] },
+        { speaker: "기자", start: 81.12, end: 87.36, keywords: ["안전하게 운전", "제일 잘하는 것"], extraKeywords: ["결론"] }
+    ];
+
+    const track86PreciseCutFrames = [
+        { start: 0, end: 13.78, x: 0, y: 0, width: 1254, height: 627, label: "1", title: "물 질문 시작", titleVi: "Bat dau hoi ve nuoc", caption: "안내 멘트가 끝난 뒤 남자가 물을 많이 마시는 것이 건강에 좋은지 묻습니다.", captionVi: "Sau loi huong dan, nguoi nam hoi uong nhieu nuoc co tot cho suc khoe khong." },
+        { start: 13.78, end: 19.99, x: 1254, y: 0, width: 1254, height: 627, label: "2", title: "더 마셔야 할까", titleVi: "Co nen uong hon khong", caption: "물을 별로 안 마시는데 건강을 위해 더 많이 마셔야 하는지 다시 묻습니다.", captionVi: "Anh hoi co can uong nhieu nuoc hon vi suc khoe khong." },
+        { start: 19.99, end: 23.34, x: 2508, y: 0, width: 1254, height: 627, label: "3", title: "물은 몸에 좋다", titleVi: "Nuoc tot cho co the", caption: "박사가 물이 우리 몸에 좋은 것은 맞다고 답합니다.", captionVi: "Chuyen gia noi nuoc dung la tot cho co the." },
+        { start: 23.34, end: 26.89, x: 0, y: 627, width: 1254, height: 627, label: "4", title: "몸의 70%", titleVi: "70 phan tram co the", caption: "우리 몸의 70%가 물로 되어 있다고 설명합니다.", captionVi: "Giai thich 70 phan tram co the la nuoc." },
+        { start: 26.89, end: 32.18, x: 1254, y: 627, width: 1254, height: 627, label: "5", title: "많다고 다 좋은 건 아님", titleVi: "Nhieu khong phai luon tot", caption: "물을 많이 마신다고 해서 누구나 건강해지는 것은 아니라고 바로잡습니다.", captionVi: "Sua hieu lam rang khong phai ai uong nhieu nuoc cung khoe hon." },
+        { start: 32.18, end: 42.92, x: 2508, y: 627, width: 1254, height: 627, label: "6", title: "8잔 이상 주의", titleVi: "Can than tren 8 ly", caption: "음식에도 물이 들어 있으므로 하루 8잔 이상 마시면 소화가 안 되거나 배탈이 날 수 있다고 말합니다.", captionVi: "Do do an cung co nuoc, tren 8 ly moi ngay co the kho tieu hoac dau bung." },
+        { start: 42.92, end: 48.24, x: 0, y: 1254, width: 1254, height: 627, label: "7", title: "눈 질문", titleVi: "Hoi ve mat", caption: "남자가 질문을 하나 더 하며 요즘 눈이 많이 나빠졌다고 말합니다.", captionVi: "Nguoi nam hoi them va noi gan day mat kem di." },
+        { start: 48.24, end: 54.2, x: 1254, y: 1254, width: 1254, height: 627, label: "8", title: "어두운 곳에서 책", titleVi: "Doc sach noi toi", caption: "친구들이 어두운 곳에서 책을 읽어서 눈이 나빠졌다고 했다는 말을 전합니다.", captionVi: "Anh ke ban be noi mat kem vi doc sach noi toi." },
+        { start: 54.2, end: 56.26, x: 2508, y: 1254, width: 1254, height: 627, label: "9", title: "정말 그런가요", titleVi: "Co dung vay khong", caption: "남자가 정말 어두운 곳에서 책을 읽어서 눈이 나빠진 것인지 확인합니다.", captionVi: "Anh hoi dieu do co dung khong." },
+        { start: 56.26, end: 61.62, x: 0, y: 1881, width: 1254, height: 627, label: "10", title: "언제나 그런 건 아님", titleVi: "Khong phai luon nhu vay", caption: "박사가 어두운 곳에서 책을 읽는다고 해서 언제나 눈이 나빠지는 것은 아니라고 답합니다.", captionVi: "Chuyen gia noi khong phai cu doc sach noi toi thi mat luon kem." },
+        { start: 61.62, end: 67.13, x: 1254, y: 1881, width: 1254, height: 627, label: "11", title: "좋은 습관은 아님", titleVi: "Khong phai thoi quen tot", caption: "그래도 눈 건강에 좋은 습관은 아니므로 고치는 게 좋다고 덧붙입니다.", captionVi: "Tuy vay do khong phai thoi quen tot cho mat nen nen sua." },
+        { start: 67.13, end: 76.85, x: 2508, y: 1881, width: 1254, height: 627, label: "12", title: "스마트폰과 컴퓨터", titleVi: "Dien thoai va may tinh", caption: "어두운 곳에서 책을 읽어서가 아니라 스마트폰이나 컴퓨터를 오래 사용해서 눈이 나빠졌을 거라고 설명합니다.", captionVi: "Co the mat kem do dung dien thoai hoac may tinh lau, khong phai do doc sach noi toi." },
+        { start: 76.85, end: 81.34, x: 0, y: 2508, width: 1254, height: 627, label: "13", title: "병원 검사", titleVi: "Kham o benh vien", caption: "병원에 가서 검사를 받아 보는 게 좋겠다고 권합니다.", captionVi: "Khuyen anh nen den benh vien kiem tra." },
+        { start: 81.34, end: 87.32, x: 1254, y: 2508, width: 1254, height: 627, label: "14", title: "커피를 좋아함", titleVi: "Thich ca phe", caption: "남자가 커피를 아주 좋아하지만 몸에 안 좋다고 들었다고 말합니다.", captionVi: "Nguoi nam noi minh rat thich ca phe nhung nghe noi ca phe khong tot." },
+        { start: 87.32, end: 89.07, x: 2508, y: 2508, width: 1254, height: 627, label: "15", title: "커피가 나쁜가요", titleVi: "Ca phe co xau khong", caption: "커피가 정말 몸에 안 좋은지 묻는 질문으로 이어집니다.", captionVi: "Cau hoi tiep tuc: ca phe co that su khong tot khong." },
+        { start: 89.07, end: 91.72, x: 0, y: 3135, width: 1254, height: 627, label: "16", title: "나쁘다니요", titleVi: "Khong tot sao", caption: "박사가 커피가 건강에 나쁘다는 말을 되묻습니다.", captionVi: "Chuyen gia hoi lai y rang ca phe khong tot cho suc khoe." },
+        { start: 91.72, end: 98.84, x: 1254, y: 3135, width: 1254, height: 627, label: "17", title: "하루 2~3잔", titleVi: "Moi ngay 2-3 ly", caption: "설탕이나 크림이 들어가지 않은 커피를 하루 2~3잔 마시면 오히려 건강에 좋다고 말합니다.", captionVi: "Ca phe khong duong hoac kem, moi ngay 2-3 ly, co the tot hon cho suc khoe." },
+        { start: 98.84, end: 105.45, x: 2508, y: 3135, width: 1254, height: 627, label: "18", title: "예방과 다이어트", titleVi: "Phong ngua va giam can", caption: "암 예방과 다이어트에도 도움이 되므로 걱정하지 않아도 된다고 마무리합니다.", captionVi: "Noi ca phe co the giup phong ngua ung thu va giam can nen khong can lo." }
+    ];
+
+    const track86PreciseTranscript = [
+        { speaker: "남", text: "박사님, 물을 많이 마시는 게 건강에 좋다고 하는데", vi: "Thua bac si, nghe noi uong nhieu nuoc tot cho suc khoe.", start: 7.32, end: 11.51, keywords: ["물을 많이 마시는 게", "건강"] },
+        { speaker: "남", text: "그게 사실인가요?", vi: "Dieu do co dung khong?", start: 11.79, end: 12.91, keywords: ["사실"] },
+        { speaker: "남", text: "전 물을 별로 안 마시는데 건강을 위해서 더 많이 마셔야 할까요?", vi: "Toi khong uong nhieu nuoc, vay co nen uong nhieu hon vi suc khoe khong?", start: 13.78, end: 18.91, keywords: ["물을 별로 안 마시는데", "더 많이"] },
+        { speaker: "여", text: "물이 우리 몸에 좋은 것은 맞습니다.", vi: "Nuoc tot cho co the la dung.", start: 19.99, end: 22.66, keywords: ["물", "좋은 것은"] },
+        { speaker: "여", text: "우리 몸의 70%가 물로 되어 있고요.", vi: "Khoang 70% co the chung ta la nuoc.", start: 23.34, end: 26.03, keywords: ["70%", "물"] },
+        { speaker: "여", text: "그런데 물을 많이 마신다고 해서 누구나 다 건강해지는 것은 아닙니다.", vi: "Nhung khong phai ai uong nhieu nuoc cung khoe hon.", start: 26.89, end: 31.53, keywords: ["많이 마신다고 해서", "누구나", "것은 아닙니다"] },
+        { speaker: "여", text: "우리가 평소에 먹는 음식에도 물이 들어 있기 때문에", vi: "Vi thuc an hang ngay cung co nuoc,", start: 32.18, end: 36.26, keywords: ["음식", "물"] },
+        { speaker: "여", text: "하루에 8잔 이상 마시면 소화가 잘 안되거나 배탈이 날 수도 있습니다.", vi: "neu uong hon 8 ly mot ngay, co the kho tieu hoac dau bung.", start: 36.48, end: 41.89, keywords: ["8잔 이상", "소화", "배탈"] },
+        { speaker: "남", text: "질문이 하나 더 있는데요.", vi: "Toi con mot cau hoi nua.", start: 42.92, end: 44.47, keywords: ["질문"] },
+        { speaker: "남", text: "제가 요즘 눈이 많이 나빠졌어요.", vi: "Gan day mat toi kem di.", start: 45.05, end: 47.52, keywords: ["눈", "나빠졌어요"] },
+        { speaker: "남", text: "그런데 친구들이 제가 어두운 곳에서 책을 읽어서 나빠진 거래요.", vi: "Ban be noi do toi doc sach o noi toi.", start: 48.24, end: 53.51, keywords: ["어두운 곳", "책", "나빠진"] },
+        { speaker: "남", text: "정말 그런가요?", vi: "Co that khong?", start: 54.2, end: 55.08, keywords: ["정말"] },
+        { speaker: "여", text: "어두운 곳에서 책을 읽는다고 해서 언제나 눈이 나빠지는 건 아닙니다.", vi: "Khong phai cu doc sach o noi toi thi luc nao cung mat kem.", start: 56.26, end: 60.98, keywords: ["읽는다고 해서", "언제나", "아닙니다"] },
+        { speaker: "여", text: "물론 눈 건강에 좋은 습관은 아니니까 고치시는 게 좋겠지요?", vi: "Tat nhien do khong phai thoi quen tot cho mat, nen sua thi tot hon.", start: 61.62, end: 66.39, keywords: ["눈 건강", "습관", "고치시는"] },
+        { speaker: "여", text: "검사를 해 봐야 알겠지만 어두운 곳에서 책을 읽어서가 아니라", vi: "Can kiem tra moi biet, nhung khong phai vi doc sach o noi toi,", start: 67.13, end: 71.51, keywords: ["검사", "읽어서가 아니라"] },
+        { speaker: "여", text: "스마트폰이나 컴퓨터를 오랜 시간 사용해서 나빠졌을 겁니다.", vi: "ma co le vi dung dien thoai hoac may tinh lau.", start: 71.84, end: 76.19, keywords: ["스마트폰", "컴퓨터", "오랜 시간"] },
+        { speaker: "여", text: "병원에 가셔서 검사를 한번 받아 보시는 게 좋겠습니다.", vi: "Nen den benh vien kiem tra mot lan.", start: 76.85, end: 80.28, keywords: ["병원", "검사"] },
+        { speaker: "남", text: "그리고 저는 커피를 아주 좋아하는데 커피가 몸에 안 좋다고 들었어요.", vi: "Toi rat thich ca phe, nhung nghe noi ca phe khong tot cho co the.", start: 81.34, end: 86.71, keywords: ["커피", "몸에 안 좋다"] },
+        { speaker: "남", text: "정말이에요?", vi: "Co that khong?", start: 87.32, end: 87.98, keywords: ["정말"] },
+        { speaker: "여", text: "커피가 건강에 나쁘다니요.", vi: "Ca phe co hai cho suc khoe sao?", start: 89.07, end: 91.16, keywords: ["나쁘다니요"] },
+        { speaker: "여", text: "설탕이나 크림이 들어가지 않은 커피를 하루에 2~3잔 정도 마시면 오히려 건강에 좋습니다.", vi: "Ca phe khong duong va kem, uong 2-3 ly moi ngay thi con tot cho suc khoe.", start: 91.72, end: 98.22, keywords: ["설탕", "크림", "2~3잔", "건강에 좋습니다"] },
+        { speaker: "여", text: "암을 예방할 수 있고 다이어트에도 도움을 주니까", vi: "No co the giup phong tranh ung thu va ho tro giam can,", start: 98.84, end: 101.94, keywords: ["암", "예방", "다이어트"] },
+        { speaker: "여", text: "걱정하지 않으셔도 됩니다.", vi: "nen khong can lo lang.", start: 102.15, end: 103.65, keywords: ["걱정하지 않다"] }
+    ];
+
+    const track86PrecisePublicCues = [
+        { speaker: "남", start: 7.32, end: 18.91, keywords: ["물을 많이 마시는 게", "건강", "더 많이 마셔야"], extraKeywords: ["첫 번째 질문"] },
+        { speaker: "여", start: 19.99, end: 41.89, keywords: ["누구나 다 건강해지는 것은 아닙니다", "8잔 이상", "배탈"], extraKeywords: ["물에 대한 답"] },
+        { speaker: "남", start: 42.92, end: 55.08, keywords: ["눈이 많이 나빠졌어요", "어두운 곳에서 책", "정말 그런가요"], extraKeywords: ["두 번째 질문"] },
+        { speaker: "여", start: 56.26, end: 80.28, keywords: ["언제나 눈이 나빠지는 건 아닙니다", "스마트폰", "컴퓨터", "병원"], extraKeywords: ["눈 건강"] },
+        { speaker: "남", start: 81.34, end: 87.98, keywords: ["커피", "몸에 안 좋다고", "정말이에요"], extraKeywords: ["세 번째 질문"] },
+        { speaker: "여", start: 89.07, end: 103.65, keywords: ["나쁘다니요", "2~3잔", "건강에 좋습니다", "걱정하지"], extraKeywords: ["커피"] }
+    ];
+
+    function applyPreciseCutFrames(lesson) {
+        if (!lesson || !lesson.syncVisual) return;
+        if (lesson.id === "track85") {
+            lesson.syncVisual.frames = track85PreciseCutFrames.map((frame) => ({ ...frame }));
+            lesson.transcript = track85PreciseTranscript.map((line) => ({ ...line, keywords: [...(line.keywords || [])] }));
+            lesson.publicCues = track85PrecisePublicCues.map((cue) => ({ ...cue, keywords: [...(cue.keywords || [])], extraKeywords: [...(cue.extraKeywords || [])] }));
+        }
+        if (lesson.id === "track86") {
+            lesson.syncVisual.frames = track86PreciseCutFrames.map((frame) => ({ ...frame }));
+            lesson.transcript = track86PreciseTranscript.map((line) => ({ ...line, keywords: [...(line.keywords || [])] }));
+            lesson.publicCues = track86PrecisePublicCues.map((cue) => ({ ...cue, keywords: [...(cue.keywords || [])], extraKeywords: [...(cue.extraKeywords || [])] }));
+        }
+    }
+
+    lessons.forEach(applyPreciseCutFrames);
+
     window.C17_LISTENING_LESSONS = lessons;
     window.createC17ListeningWorkbookConfig = function createC17ListeningWorkbookConfig(options) {
         const settings = options || {};
@@ -529,6 +641,7 @@
             .map((id) => lessons.find((lesson) => lesson.id === id))
             .filter(Boolean)
             .map(cloneLesson);
+        selectedLessons.forEach(applyPreciseCutFrames);
 
         return {
             kicker: "Chapter 17 Listening Lab",

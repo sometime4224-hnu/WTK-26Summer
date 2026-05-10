@@ -44,10 +44,14 @@
     function getFrameIndex(visual, time) {
         const safeTime = Number.isFinite(time) ? time : 0;
         const frames = visual.frames;
+        let lastStartedIndex = 0;
         for (let index = 0; index < frames.length; index += 1) {
             const frame = frames[index];
+            const start = Number(frame.start);
             const end = Number.isFinite(Number(frame.end)) ? Number(frame.end) : Infinity;
-            if (safeTime >= Number(frame.start) && safeTime < end) return index;
+            if (safeTime < start) return Math.max(lastStartedIndex, 0);
+            lastStartedIndex = index;
+            if (safeTime >= start && safeTime < end) return index;
         }
         if (safeTime < Number(frames[0].start)) return 0;
         return frames.length - 1;
@@ -88,7 +92,8 @@
         figure.dataset.cuttoonLessonId = lesson.id;
         figure.dataset.imageStatus = "ready";
         figure.style.setProperty("--lw-film-ratio", visual.aspectRatio || "1.12 / 1");
-        figure.style.setProperty("--lw-film-transition", `${Number(visual.transitionMs) || 640}ms`);
+        const transitionMs = Number(visual.transitionMs);
+        figure.style.setProperty("--lw-film-transition", `${Number.isFinite(transitionMs) ? Math.max(transitionMs, 0) : 640}ms`);
 
         const rail = visual.frames.map((frame, index) => `
             <li>
