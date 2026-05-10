@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17과 컷 쓰기 | 서동요</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <style>
+        :root {
+            --bg: #f7fafc;
+            --paper: #ffffff;
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #d8e2ed;
+            --teal: #0f766e;
+            --teal-dark: #115e59;
+            --rose: #be123c;
+            --amber: #d97706;
+            --indigo: #4f46e5;
+            --good: #047857;
+            --bad: #b91c1c;
+            --shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans KR", system-ui, sans-serif;
+            color: var(--ink);
+            background:
+                linear-gradient(135deg, rgba(219, 234, 254, 0.72), transparent 38%),
+                linear-gradient(315deg, rgba(255, 241, 242, 0.86), transparent 44%),
+                var(--bg);
+        }
+
+        button,
+        input,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 8px 16px;
+            border-bottom: 1px solid rgba(216, 226, 237, 0.9);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar a,
+        .topbar strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--teal-dark);
+            font-size: 0.92rem;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar span {
+            color: #cbd5e1;
+            font-weight: 900;
+        }
+
+        .topbar strong {
+            min-width: 0;
+            overflow: hidden;
+            color: #334155;
+            text-overflow: ellipsis;
+        }
+
+        .shell {
+            width: min(1180px, calc(100% - 32px));
+            margin: 18px auto 44px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 16px;
+            align-items: end;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .eyebrow {
+            margin: 0 0 7px;
+            color: var(--teal);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            word-break: keep-all;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4.2vw, 3.8rem);
+            line-height: 1.07;
+        }
+
+        .lead {
+            max-width: 760px;
+            margin: 9px 0 0;
+            color: #475569;
+            font-size: clamp(1rem, 1.45vw, 1.12rem);
+            line-height: 1.7;
+        }
+
+        .actions,
+        .mode-row,
+        .button-row,
+        .choice-grid,
+        .token-row,
+        .progress-dots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn,
+        .mode-row button,
+        .choice,
+        .token,
+        .ghost-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            padding: 0 13px;
+            background: #fff;
+            color: var(--teal-dark);
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .btn.primary,
+        .mode-row button.active,
+        .choice.selected,
+        .token.selected {
+            border-color: var(--teal);
+            background: var(--teal);
+            color: #fff;
+        }
+
+        .btn.rose {
+            border-color: var(--rose);
+            background: var(--rose);
+            color: #fff;
+        }
+
+        .practice {
+            display: grid;
+            grid-template-columns: 220px minmax(0, 1fr);
+            gap: 14px;
+            align-items: start;
+            margin-top: 16px;
+        }
+
+        .rail,
+        .workbench,
+        .answer-card {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow);
+        }
+
+        .rail {
+            position: sticky;
+            top: 66px;
+            padding: 12px;
+        }
+
+        .rail h2,
+        .workbench h2 {
+            margin: 0;
+            font-size: 1.22rem;
+        }
+
+        .rail p {
+            margin: 6px 0 10px;
+            color: var(--muted);
+            line-height: 1.6;
+            font-size: 0.92rem;
+        }
+
+        .cut-pick {
+            display: grid;
+            grid-template-columns: 36px 1fr;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+            min-height: 50px;
+            margin-top: 7px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 6px;
+            background: #fff;
+            color: #334155;
+            text-align: left;
+            font-weight: 900;
+        }
+
+        .cut-pick span:first-child {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #e0e7ff;
+            color: var(--indigo);
+        }
+
+        .cut-pick.active {
+            border-color: var(--indigo);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .workbench {
+            min-width: 0;
+            padding: 14px;
+        }
+
+        .stage-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .stage-title h2 {
+            margin-top: 4px;
+        }
+
+        .progress-dots {
+            justify-content: flex-end;
+        }
+
+        .dot {
+            min-width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid #d8e2ed;
+            background: #fff;
+            color: #64748b;
+            font-size: 0.88rem;
+            font-weight: 900;
+        }
+
+        .dot.done {
+            border-color: var(--teal);
+            background: #ccfbf1;
+            color: var(--teal-dark);
+        }
+
+        .dot.active {
+            border-color: var(--rose);
+            background: #ffe4e6;
+            color: var(--rose);
+        }
+
+        .work-grid {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.92fr) minmax(0, 1.08fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .image-panel {
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .image-panel img {
+            width: 100%;
+            object-fit: contain;
+        }
+
+        .caption {
+            padding: 10px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 0.92rem;
+            font-weight: 800;
+            line-height: 1.55;
+        }
+
+        .task-panel {
+            display: grid;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .answer-card {
+            display: grid;
+            gap: 12px;
+            padding: 12px;
+            box-shadow: none;
+        }
+
+        .answer-card h3 {
+            margin: 0;
+            font-size: 1.08rem;
+        }
+
+        .answer-card p {
+            margin: 0;
+            color: #475569;
+            line-height: 1.7;
+        }
+
+        .target-sentence {
+            border-left: 4px solid var(--teal);
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #f0fdfa;
+            color: #134e4a;
+            font-weight: 900;
+            line-height: 1.7;
+        }
+
+        .choice-grid {
+            align-items: stretch;
+        }
+
+        .choice {
+            flex: 1 1 220px;
+            min-height: auto;
+            justify-content: flex-start;
+            padding: 11px 12px;
+            color: #334155;
+            text-align: left;
+            line-height: 1.55;
+        }
+
+        .choice.correct {
+            border-color: var(--good);
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .choice.wrong {
+            border-color: var(--bad);
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .sentence-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            min-height: 52px;
+            border: 1px solid #d8e2ed;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f8fafc;
+            line-height: 1.7;
+            font-weight: 800;
+        }
+
+        .blank-slot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: min(190px, 100%);
+            min-height: 38px;
+            border: 2px dashed #94a3b8;
+            border-radius: 8px;
+            padding: 4px 10px;
+            color: #64748b;
+            background: #fff;
+        }
+
+        .blank-slot.filled {
+            border-style: solid;
+            border-color: var(--teal);
+            color: var(--teal-dark);
+            font-weight: 900;
+        }
+
+        .token-row {
+            min-height: 48px;
+        }
+
+        .token {
+            min-height: 38px;
+            color: #334155;
+        }
+
+        .token:disabled,
+        .choice:disabled,
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.62;
+        }
+
+        .input-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .input-grid label {
+            display: grid;
+            gap: 6px;
+            color: #334155;
+            font-weight: 900;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 11px 12px;
+            background: #fff;
+            color: var(--ink);
+            line-height: 1.65;
+        }
+
+        textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .feedback {
+            min-height: 28px;
+            color: #475569;
+            font-weight: 900;
+            line-height: 1.55;
+        }
+
+        .feedback.good {
+            color: var(--good);
+        }
+
+        .feedback.bad {
+            color: var(--bad);
+        }
+
+        .answer-text {
+            display: none;
+            border-radius: 8px;
+            padding: 10px 12px;
+            background: #fffbeb;
+            color: #78350f;
+            line-height: 1.7;
+            font-weight: 900;
+        }
+
+        .answer-text.open {
+            display: block;
+        }
+
+        .footer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 22px;
+        }
+
+        @media (max-width: 960px) {
+            .hero,
+            .practice,
+            .work-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .rail {
+                position: static;
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 8px;
+            }
+
+            .rail h2,
+            .rail p {
+                grid-column: 1 / -1;
+            }
+
+            .cut-pick {
+                margin: 0;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .shell {
+                width: min(100% - 20px, 1180px);
+            }
+
+            .topbar {
+                overflow-x: auto;
+            }
+
+            .stage-head {
+                align-items: start;
+                flex-direction: column;
+            }
+
+            .rail {
+                grid-template-columns: 1fr;
+            }
+
+            .choice,
+            .btn,
+            .ghost-link {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html">17과 목록</a>
+        <span>|</span>
+        <a href="reading-cuttoon.html">컷툰</a>
+        <span>|</span>
+        <strong>컷 쓰기 | 서동요</strong>
+    </nav>
+
+    <main class="shell">
+        <section class="hero">
+            <div>
+                <p class="eyebrow">Cut Writing</p>
+                <h1>서동요 컷 쓰기</h1>
+                <p class="lead">컷을 하나씩 보며 문장 선택, 핵심어 넣기, 어순 맞추기, 빈칸 쓰기, 전체 문장 쓰기까지 연습합니다.</p>
+            </div>
+            <div class="actions">
+                <a class="btn" href="reading.html"><i class="fa-solid fa-book-open"></i> 지문 읽기</a>
+                <a class="btn primary" href="reading-cuttoon.html"><i class="fa-solid fa-images"></i> 컷툰 보기</a>
+            </div>
+        </section>
+
+        <section class="practice" aria-label="컷 쓰기 연습">
+            <aside class="rail" aria-label="컷 선택">
+                <h2>컷 선택</h2>
+                <p>연습할 컷을 고르세요. 진행 기록은 이 브라우저에 자동 저장됩니다.</p>
+                <div id="cutRail"></div>
+            </aside>
+
+            <section class="workbench" aria-live="polite">
+                <div class="stage-head">
+                    <div class="stage-title">
+                        <p class="eyebrow" id="stageEyebrow">Step</p>
+                        <h2 id="stageTitle">연습 준비</h2>
+                    </div>
+                    <div class="progress-dots" id="progressDots" aria-label="단계 진행"></div>
+                </div>
+
+                <div class="mode-row" id="modeRow" aria-label="연습 단계"></div>
+
+                <div class="work-grid">
+                    <figure class="image-panel">
+                        <img id="cutImage" src="../assets/c17/reading-writing/images/writing-cut/c17-writing-cut-01.webp" alt="서동요 컷 1" loading="eager" decoding="async">
+                        <figcaption class="caption" id="cutCaption">1컷</figcaption>
+                    </figure>
+
+                    <div class="task-panel">
+                        <article class="answer-card">
+                            <h3 id="taskHeading">문장을 확인하세요.</h3>
+                            <p id="taskGuide">컷에 맞는 활동이 여기에 표시됩니다.</p>
+                            <div id="taskBody"></div>
+                            <div class="feedback" id="feedback"></div>
+                            <div class="answer-text" id="answerText"></div>
+                            <div class="button-row">
+                                <button class="btn" type="button" id="prevBtn"><i class="fa-solid fa-arrow-left"></i> 이전</button>
+                                <button class="btn" type="button" id="checkBtn"><i class="fa-solid fa-check"></i> 확인</button>
+                                <button class="btn" type="button" id="showAnswerBtn"><i class="fa-solid fa-eye"></i> 정답 보기</button>
+                                <button class="btn rose" type="button" id="nextBtn">다음 <i class="fa-solid fa-arrow-right"></i></button>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <nav class="footer-nav" aria-label="페이지 이동">
+            <a class="btn" href="reading-cuttoon.html"><i class="fa-solid fa-arrow-left"></i> 컷툰 보기</a>
+            <a class="btn primary" href="index.html">17과 목록 <i class="fa-solid fa-list"></i></a>
+        </nav>
+    </main>
+
+    <script src="writing-cut.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

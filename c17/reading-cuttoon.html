@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17과 읽기 컷툰 | 서동요</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <style>
+        :root {
+            --bg: #f7fafc;
+            --paper: #ffffff;
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #d8e2ed;
+            --teal: #0f766e;
+            --teal-dark: #115e59;
+            --rose: #be123c;
+            --amber: #d97706;
+            --shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans KR", system-ui, sans-serif;
+            color: var(--ink);
+            background:
+                linear-gradient(130deg, rgba(204, 251, 241, 0.72), transparent 36%),
+                linear-gradient(315deg, rgba(255, 247, 237, 0.9), transparent 42%),
+                var(--bg);
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 8px 16px;
+            border-bottom: 1px solid rgba(216, 226, 237, 0.9);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar a,
+        .topbar strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--teal-dark);
+            font-size: 0.92rem;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar span {
+            color: #cbd5e1;
+            font-weight: 900;
+        }
+
+        .topbar strong {
+            min-width: 0;
+            overflow: hidden;
+            color: #334155;
+            text-overflow: ellipsis;
+        }
+
+        .shell {
+            width: min(1180px, calc(100% - 32px));
+            margin: 18px auto 44px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 16px;
+            align-items: end;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .eyebrow {
+            margin: 0 0 7px;
+            color: var(--teal);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            word-break: keep-all;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4.2vw, 3.8rem);
+            line-height: 1.07;
+        }
+
+        .lead {
+            max-width: 760px;
+            margin: 9px 0 0;
+            color: #475569;
+            font-size: clamp(1rem, 1.45vw, 1.12rem);
+            line-height: 1.7;
+        }
+
+        .actions,
+        .sheet-tabs,
+        .cut-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn,
+        .sheet-tabs button,
+        .cut-controls a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            padding: 0 13px;
+            background: #fff;
+            color: var(--teal-dark);
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .btn.primary,
+        .sheet-tabs button[aria-pressed="true"] {
+            border-color: var(--teal);
+            background: var(--teal);
+            color: #fff;
+        }
+
+        .viewer {
+            display: grid;
+            grid-template-columns: 220px minmax(0, 1fr);
+            gap: 14px;
+            margin-top: 16px;
+            align-items: start;
+        }
+
+        .panel,
+        .cut-card {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: var(--shadow);
+        }
+
+        .cut-nav {
+            position: sticky;
+            top: 66px;
+            padding: 12px;
+        }
+
+        .cut-nav h2,
+        .sheet-stage h2,
+        .cut-section h2 {
+            margin: 0;
+            font-size: 1.22rem;
+        }
+
+        .cut-nav p,
+        .sheet-stage p,
+        .cut-card p {
+            color: var(--muted);
+            line-height: 1.62;
+        }
+
+        .cut-nav p {
+            margin: 6px 0 10px;
+            font-size: 0.92rem;
+        }
+
+        .cut-nav a {
+            display: grid;
+            grid-template-columns: 34px 1fr;
+            gap: 8px;
+            align-items: center;
+            min-height: 48px;
+            margin-top: 7px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 6px;
+            background: #fff;
+            color: #334155;
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .cut-nav a span:first-child {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: #ccfbf1;
+            color: var(--teal-dark);
+        }
+
+        .cut-nav a.active {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+        }
+
+        .sheet-stage {
+            min-width: 0;
+            padding: 14px;
+        }
+
+        .sheet-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .sheet-panel {
+            display: none;
+        }
+
+        .sheet-panel.active {
+            display: block;
+        }
+
+        .sheet-panel img {
+            width: min(100%, 760px);
+            margin: 0 auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .cut-section {
+            margin-top: 18px;
+        }
+
+        .cut-section-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .cut-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .cut-card {
+            display: grid;
+            align-content: start;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .cut-card img {
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            object-fit: contain;
+        }
+
+        .cut-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .cut-card h3 span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: #fee2e2;
+            color: var(--rose);
+            font-size: 0.88rem;
+        }
+
+        .cut-card p {
+            margin: 0;
+            color: #334155;
+            font-weight: 700;
+        }
+
+        .cut-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .cut-meta span {
+            display: inline-flex;
+            align-items: center;
+            min-height: 30px;
+            border-radius: 8px;
+            padding: 0 9px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.82rem;
+            font-weight: 900;
+        }
+
+        .footer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 22px;
+        }
+
+        @media (max-width: 900px) {
+            .hero,
+            .viewer {
+                grid-template-columns: 1fr;
+            }
+
+            .cut-nav {
+                position: static;
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 8px;
+            }
+
+            .cut-nav h2,
+            .cut-nav p {
+                grid-column: 1 / -1;
+            }
+
+            .cut-nav a {
+                margin: 0;
+            }
+
+            .cut-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 620px) {
+            .shell {
+                width: min(100% - 20px, 1180px);
+            }
+
+            .topbar {
+                overflow-x: auto;
+            }
+
+            .hero {
+                align-items: start;
+            }
+
+            .sheet-head,
+            .cut-section-head {
+                align-items: start;
+                flex-direction: column;
+            }
+
+            .cut-nav,
+            .cut-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html">17과 목록</a>
+        <span>|</span>
+        <a href="reading.html">읽기</a>
+        <span>|</span>
+        <strong>컷툰 | 서동요</strong>
+    </nav>
+
+    <main class="shell">
+        <section class="hero">
+            <div>
+                <p class="eyebrow">Reading Cuttoon</p>
+                <h1>서동요 컷툰</h1>
+                <p class="lead">교재 원본 읽기 흐름을 9개의 컷으로 확인합니다. 그림을 보며 사건 순서와 문장을 함께 다시 읽어 보세요.</p>
+            </div>
+            <div class="actions">
+                <a class="btn" href="reading.html"><i class="fa-solid fa-book-open"></i> 지문 읽기</a>
+                <a class="btn primary" href="writing-cut.html"><i class="fa-solid fa-pen-nib"></i> 컷 쓰기</a>
+            </div>
+        </section>
+
+        <section class="viewer" aria-label="컷툰 보기">
+            <aside class="panel cut-nav" aria-label="컷 바로가기">
+                <h2>컷 목록</h2>
+                <p>컷 번호를 누르면 아래 개별 컷으로 이동합니다.</p>
+                <a class="active" href="#cut-01" data-cut-link="1"><span>1</span><span>서동 소개</span></a>
+                <a href="#cut-02" data-cut-link="2"><span>2</span><span>신라로 향함</span></a>
+                <a href="#cut-03" data-cut-link="3"><span>3</span><span>노래를 퍼뜨림</span></a>
+                <a href="#cut-04" data-cut-link="4"><span>4</span><span>궁궐까지 전해짐</span></a>
+                <a href="#cut-05" data-cut-link="5"><span>5</span><span>궁 밖으로 나감</span></a>
+                <a href="#cut-06" data-cut-link="6"><span>6</span><span>시골에서 만남</span></a>
+                <a href="#cut-07" data-cut-link="7"><span>7</span><span>사랑과 결혼</span></a>
+                <a href="#cut-08" data-cut-link="8"><span>8</span><span>사실을 알게 됨</span></a>
+                <a href="#cut-09" data-cut-link="9"><span>9</span><span>백제의 왕</span></a>
+            </aside>
+
+            <section class="panel sheet-stage" aria-label="원본 컷툰 시트">
+                <div class="sheet-head">
+                    <div>
+                        <p class="eyebrow">Original Sheets</p>
+                        <h2>원본 컷툰 시트</h2>
+                    </div>
+                    <div class="sheet-tabs" role="group" aria-label="시트 선택">
+                        <button type="button" data-sheet-button="1" aria-pressed="true">1-3컷</button>
+                        <button type="button" data-sheet-button="2" aria-pressed="false">4-6컷</button>
+                        <button type="button" data-sheet-button="3" aria-pressed="false">7-9컷</button>
+                    </div>
+                </div>
+                <figure class="sheet-panel active" data-sheet-panel="1">
+                    <img src="../assets/c17/reading-writing/images/cuttoon/c17-reading-cuttoon-sheet-01.webp" alt="서동요 컷툰 1쪽, 1컷부터 3컷" loading="eager" decoding="async">
+                </figure>
+                <figure class="sheet-panel" data-sheet-panel="2">
+                    <img src="../assets/c17/reading-writing/images/cuttoon/c17-reading-cuttoon-sheet-02.webp" alt="서동요 컷툰 2쪽, 4컷부터 6컷" loading="lazy" decoding="async">
+                </figure>
+                <figure class="sheet-panel" data-sheet-panel="3">
+                    <img src="../assets/c17/reading-writing/images/cuttoon/c17-reading-cuttoon-sheet-03.webp" alt="서동요 컷툰 3쪽, 7컷부터 9컷" loading="lazy" decoding="async">
+                </figure>
+            </section>
+        </section>
+
+        <section class="cut-section" aria-label="개별 컷 읽기">
+            <div class="cut-section-head">
+                <div>
+                    <p class="eyebrow">Cut Reading</p>
+                    <h2>컷별 문장</h2>
+                </div>
+                <div class="cut-controls">
+                    <a href="writing-cut.html"><i class="fa-solid fa-pen-to-square"></i> 이 문장으로 쓰기</a>
+                </div>
+            </div>
+
+            <div class="cut-grid">
+                <article id="cut-01" class="cut-card" data-cut-card="1">
+                    <img src="../assets/c17/reading-writing/images/cuts/c17-reading-cut-01.webp" alt="1컷, 서동은 가난했지만 영리한 청년이었다" loading="lazy" decoding="async">
+                    <h3><span>1</span> 서동 소개</h3>
+                    <p>백제에 살던 서동은 가난했지만 영리한 청년이었습니다.</p>
+                    <div class="cut-meta"><span>백제</span><span>가난하다</span><span>영리하다</span></div>
+                </article>
+                <article id="cut-02" class="cut-card" data-cut-card="2">
+                    <img src="../assets/c17/reading-writing/images/cuts/c17-reading-cut-02.webp" alt="2컷, 서동이 선화 공주 이야기를 듣고 신라로 향한다" loading="lazy" decoding="async">
+                    <h3><span>2</span> 신라로 향함</h3>
+                    <p>그는 신라의 선화 공주가 아름답다는 이야기를 듣고 신라로 향했습니다.</p>
+                    <div class="cut-meta"><span>선화 공주</span><span>이야기를 듣다</span><span>향하다</span></div>
+                </article>
+                <article id="cut-03" class="cut-card" data-cut-card="3">
+                    <img src="../assets/c17/reading-writing/images/cuts/c17-reading-cut-03.webp" alt="3컷, 서동이 노래를 만들어 사람들 사이에 퍼뜨린다" loading="lazy" decoding="async">
+                    <h3><span>3</span> 노래를 퍼뜨림</h3>
+                    <p>그곳에서 공주와 자신의 이름이 들어간 노래를 만들어 사람들 사이에 퍼뜨렸습니다.</p>
+                    <div class="cut-meta"><span>노래</span><span>이름</span><span>퍼뜨리다</span></div>
+                </article>
+                <article id="cut-04" class="cut-card" data-cut-card="4">
+                    <img src="../assets/c17/reading-writing/images/cuts/c17-reading-cut-04.webp" alt="4컷, 아이들이 노래를 계속 불러 이야기가 궁궐까지 전해진다" loading="lazy" decoding="async">
+                    <h3><span>4</span> 궁궐까지 전해짐</h3>
+                    <p>뜻을 모르는 아이들이 그 노래를 계속 부르자, 이야기는 궁궐 안까지 전해졌습니다.</p>
+                    <div class="cut-meta"><span>뜻을 모르다</span><span>계속 부르다</span><span>전해지다</span></div>
+                </article>
+                <article id="cut-05" class="cut-card" data-cut-card="5">
+                    <img src="../assets/c17/reading-writing/images/cuts/c17-reading-cut-05.webp" alt="5컷, 왕이 공주를 궁 밖으로 내보낸다" loading="lazy" decoding="async">
+                    <h3><span>5</span> 궁 밖으로 나감</h3>
+                    <p>왕은 공주에게 나쁜 소문이 생겼다고 생각했고, 결국 공주를 궁 밖으로 내보냈습니다.</p>
+                    <div class="cut-meta"><span>나쁜 소문</span><span>결국</span><span>내보내다</span></div>
+                </article>
+                <article id="cut-06" class="cut-card" data-cut-card="6">
+                    <img src="../assets/c17/reading-writing/images/cuts/c17-reading-cut-06.webp" alt="6컷, 공주가 시골에서 한 남자를 만난다" loading="lazy" decoding="async">
+                    <h3><span>6</span> 시골에서 만남</h3>
+                    <p>공주는 시골에서 한 남자를 만났습니다.</p>
+                    <div class="cut-meta"><span>공주</span><span>시골</span><span>만나다</span></div>
+                </article>
+                <article id="cut-07" class="cut-card" data-cut-card="7">
+                    <img src="../assets/c17/reading-writing/images/cuts/c17-reading-cut-07.webp" alt="7컷, 남자가 공주를 도와주고 두 사람이 결혼한다" loading="lazy" decoding="async">
+                    <h3><span>7</span> 사랑과 결혼</h3>
+                    <p>그 남자는 공주가 지낼 수 있도록 도와주었고, 두 사람은 서로 사랑하게 되어 결혼했습니다.</p>
+                    <div class="cut-meta"><span>도와주다</span><span>서로</span><span>결혼하다</span></div>
+                </article>
+                <article id="cut-08" class="cut-card" data-cut-card="8">
+                    <img src="../assets/c17/reading-writing/images/cuts/c17-reading-cut-08.webp" alt="8컷, 공주가 소문을 퍼뜨린 사람이 서동이라는 사실을 알게 된다" loading="lazy" decoding="async">
+                    <h3><span>8</span> 사실을 알게 됨</h3>
+                    <p>시간이 지나 공주는 소문을 퍼뜨린 사람이 남편 서동이었다는 사실을 알게 되었지만, 서동을 향한 마음은 달라지지 않았습니다.</p>
+                    <div class="cut-meta"><span>시간이 지나</span><span>사실</span><span>달라지지 않다</span></div>
+                </article>
+                <article id="cut-09" class="cut-card" data-cut-card="9">
+                    <img src="../assets/c17/reading-writing/images/cuts/c17-reading-cut-09.webp" alt="9컷, 서동이 백제의 왕이 된다" loading="lazy" decoding="async">
+                    <h3><span>9</span> 백제의 왕</h3>
+                    <p>훗날 서동은 공부하고 재산을 모아 백제의 왕이 되었습니다.</p>
+                    <div class="cut-meta"><span>훗날</span><span>재산</span><span>왕이 되다</span></div>
+                </article>
+            </div>
+        </section>
+
+        <nav class="footer-nav" aria-label="페이지 이동">
+            <a class="btn" href="reading.html"><i class="fa-solid fa-arrow-left"></i> 지문 읽기</a>
+            <a class="btn primary" href="writing-cut.html">컷 쓰기 <i class="fa-solid fa-arrow-right"></i></a>
+            <a class="btn" href="index.html">17과 목록 <i class="fa-solid fa-list"></i></a>
+        </nav>
+    </main>
+
+    <script>
+        (function () {
+            "use strict";
+
+            const sheetButtons = document.querySelectorAll("[data-sheet-button]");
+            const sheetPanels = document.querySelectorAll("[data-sheet-panel]");
+            const cutLinks = document.querySelectorAll("[data-cut-link]");
+            const cutCards = document.querySelectorAll("[data-cut-card]");
+
+            function showSheet(sheet) {
+                sheetButtons.forEach((button) => {
+                    const active = button.dataset.sheetButton === sheet;
+                    button.setAttribute("aria-pressed", String(active));
+                });
+                sheetPanels.forEach((panel) => {
+                    panel.classList.toggle("active", panel.dataset.sheetPanel === sheet);
+                });
+            }
+
+            function activateCut(cut) {
+                cutLinks.forEach((link) => {
+                    link.classList.toggle("active", link.dataset.cutLink === cut);
+                });
+            }
+
+            sheetButtons.forEach((button) => {
+                button.addEventListener("click", () => showSheet(button.dataset.sheetButton));
+            });
+
+            cutLinks.forEach((link) => {
+                link.addEventListener("click", () => activateCut(link.dataset.cutLink));
+            });
+
+            if ("IntersectionObserver" in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    const visible = entries
+                        .filter((entry) => entry.isIntersecting)
+                        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+                    if (visible) {
+                        activateCut(visible.target.dataset.cutCard);
+                    }
+                }, { rootMargin: "-20% 0px -55% 0px", threshold: [0.25, 0.5, 0.75] });
+
+                cutCards.forEach((card) => observer.observe(card));
+            }
+        })();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

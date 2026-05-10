@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17과 읽기 | 서동요와 소문의 힘</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --paper: #ffffff;
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #d8e2ed;
+            --teal: #0f766e;
+            --teal-dark: #115e59;
+            --amber: #d97706;
+            --rose: #be123c;
+            --indigo: #4f46e5;
+            --soft-teal: #ccfbf1;
+            --soft-amber: #fff7ed;
+            --soft-rose: #fff1f2;
+            --shadow: 0 18px 42px rgba(15, 23, 42, 0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans KR", system-ui, sans-serif;
+            color: var(--ink);
+            background:
+                linear-gradient(120deg, rgba(204, 251, 241, 0.72), transparent 38%),
+                linear-gradient(300deg, rgba(255, 247, 237, 0.92), transparent 44%),
+                var(--bg);
+        }
+
+        button,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 8px 16px;
+            border-bottom: 1px solid rgba(216, 226, 237, 0.9);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar a,
+        .topbar strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--teal-dark);
+            font-size: 0.92rem;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar span {
+            color: #cbd5e1;
+            font-weight: 900;
+        }
+
+        .topbar strong {
+            min-width: 0;
+            overflow: hidden;
+            color: #334155;
+            text-overflow: ellipsis;
+        }
+
+        .shell {
+            width: min(1180px, calc(100% - 32px));
+            margin: 18px auto 44px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 260px;
+            gap: 18px;
+            align-items: stretch;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .hero-main {
+            display: grid;
+            align-content: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .eyebrow {
+            margin: 0;
+            color: var(--teal);
+            font-size: 0.8rem;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            word-break: keep-all;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4.4vw, 4rem);
+            line-height: 1.06;
+        }
+
+        .lead {
+            max-width: 760px;
+            margin: 0;
+            color: #475569;
+            font-size: clamp(1rem, 1.5vw, 1.13rem);
+            line-height: 1.7;
+        }
+
+        .hero-actions,
+        .chips,
+        .choice-row,
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn,
+        .chip,
+        .badge,
+        .choice-row button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            border-radius: 8px;
+            font-weight: 900;
+        }
+
+        .btn {
+            border: 1px solid var(--teal);
+            padding: 0 13px;
+            background: var(--teal);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .btn.secondary {
+            border-color: var(--line);
+            background: #fff;
+            color: var(--teal-dark);
+        }
+
+        .chip {
+            min-height: 34px;
+            padding: 0 10px;
+            border: 1px solid var(--line);
+            background: #fff;
+            color: #334155;
+            font-size: 0.86rem;
+        }
+
+        .lesson-visual {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin: 0;
+            padding: 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.78);
+            box-shadow: var(--shadow);
+        }
+
+        .lesson-visual img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fffaf0;
+            object-fit: contain;
+        }
+
+        .section {
+            margin-top: 16px;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .section-head h2 {
+            margin: 4px 0 0;
+            font-size: clamp(1.35rem, 2.2vw, 2rem);
+        }
+
+        .grid-2,
+        .grid-3,
+        .story-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .story-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .card,
+        .story-card,
+        .reading-panel,
+        .question-card,
+        .writing-panel {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: var(--shadow);
+        }
+
+        .card,
+        .question-card,
+        .writing-panel {
+            padding: 16px;
+        }
+
+        .reading-panel {
+            padding: 18px;
+        }
+
+        .reading-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .reading-title h2 {
+            margin: 0;
+            color: var(--rose);
+            font-size: clamp(1.45rem, 2.4vw, 2.25rem);
+        }
+
+        .badge {
+            min-height: 32px;
+            width: max-content;
+            padding: 0 10px;
+            background: var(--soft-teal);
+            color: var(--teal-dark);
+            font-size: 0.82rem;
+        }
+
+        .badge.amber {
+            background: var(--soft-amber);
+            color: #9a3412;
+        }
+
+        .badge.rose {
+            background: var(--soft-rose);
+            color: var(--rose);
+        }
+
+        .adapted-text {
+            margin: 0;
+            color: #26364b;
+            font-size: 1.08rem;
+            line-height: 1.92;
+        }
+
+        .adapted-text + .adapted-text {
+            margin-top: 14px;
+        }
+
+        .story-card {
+            overflow: hidden;
+        }
+
+        .story-card img {
+            width: 100%;
+            height: 150px;
+            border-bottom: 1px solid var(--line);
+            background: #fffaf0;
+            object-fit: contain;
+        }
+
+        .story-card div {
+            padding: 12px;
+        }
+
+        .story-card strong,
+        .card strong,
+        .question-card strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            line-height: 1.45;
+        }
+
+        .story-card p,
+        .card p,
+        .question-card p {
+            margin: 0;
+            color: #475569;
+            line-height: 1.65;
+        }
+
+        .keyword-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .keyword {
+            min-height: 44px;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .keyword b {
+            display: block;
+            color: var(--teal-dark);
+            font-size: 0.95rem;
+        }
+
+        .keyword span {
+            display: block;
+            margin-top: 4px;
+            color: #64748b;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .choice-row {
+            margin-top: 12px;
+        }
+
+        .choice-row button {
+            flex: 1 1 170px;
+            min-height: 48px;
+            border: 1px solid var(--line);
+            padding: 8px 10px;
+            background: #fff;
+            color: #334155;
+            text-align: left;
+            transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+        }
+
+        .choice-row button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            border-color: var(--teal);
+        }
+
+        .choice-row button.correct {
+            border-color: #16a34a;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .choice-row button.wrong {
+            border-color: var(--rose);
+            background: #ffe4e6;
+            color: #9f1239;
+        }
+
+        .feedback {
+            min-height: 28px;
+            margin-top: 10px;
+            color: #64748b;
+            font-weight: 900;
+            line-height: 1.5;
+        }
+
+        .feedback.good {
+            color: #15803d;
+        }
+
+        .feedback.bad {
+            color: var(--rose);
+        }
+
+        .sequence-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .sequence-list button {
+            display: grid;
+            grid-template-columns: 34px 1fr;
+            gap: 10px;
+            align-items: center;
+            min-height: 48px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: #334155;
+            text-align: left;
+            font-weight: 800;
+        }
+
+        .sequence-list b {
+            display: inline-grid;
+            place-items: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: var(--soft-amber);
+            color: #9a3412;
+        }
+
+        .sequence-list button.revealed {
+            border-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .writing-panel textarea {
+            width: 100%;
+            min-height: 152px;
+            margin-top: 10px;
+            padding: 12px;
+            resize: vertical;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            outline: none;
+            color: var(--ink);
+            line-height: 1.7;
+        }
+
+        .writing-panel textarea:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+        }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .word-bank span {
+            display: inline-flex;
+            align-items: center;
+            min-height: 32px;
+            padding: 0 10px;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.86rem;
+            font-weight: 900;
+        }
+
+        .vi-text {
+            display: none;
+        }
+
+        .show-vi .vi-text {
+            display: block;
+        }
+
+        .vi-box {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #eef2ff;
+            color: #3730a3;
+            line-height: 1.65;
+            font-weight: 700;
+        }
+
+        .translation-toggle {
+            border: 1px solid var(--line);
+            padding: 0 12px;
+            background: #fff;
+            color: var(--indigo);
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        @media (max-width: 940px) {
+            .hero,
+            .grid-2,
+            .grid-3,
+            .story-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .lesson-visual {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                width: min(100% - 20px, 1180px);
+                margin-top: 12px;
+            }
+
+            .topbar {
+                overflow-x: auto;
+                padding: 8px 12px;
+            }
+
+            .lesson-visual {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .section-head,
+            .reading-title,
+            .footer-nav {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .keyword-list {
+                grid-template-columns: 1fr;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html">17과 목록</a>
+        <span>|</span>
+        <strong>읽기 | 서동요</strong>
+    </nav>
+
+    <main id="page" class="shell">
+        <section class="hero">
+            <div class="hero-main">
+                <p class="eyebrow">Reading & Writing</p>
+                <h1>서동요와 소문의 힘</h1>
+                <p class="lead">서동요 이야기의 흐름을 따라가며, 소문이 사람의 삶을 어떻게 바꾸는지 확인합니다.</p>
+                <div class="chips">
+                    <span class="chip"><i class="fa-solid fa-scroll"></i> 옛이야기</span>
+                    <span class="chip"><i class="fa-solid fa-comments"></i> 소문</span>
+                    <span class="chip"><i class="fa-solid fa-list-ol"></i> 사건 순서</span>
+                    <span class="chip"><i class="fa-solid fa-pen"></i> 들은 소문 쓰기</span>
+                </div>
+                <div class="hero-actions">
+                    <a class="btn" href="#reading"><i class="fa-solid fa-book-open"></i> 읽기</a>
+                    <a class="btn secondary" href="reading-cuttoon.html"><i class="fa-solid fa-images"></i> 컷툰</a>
+                    <a class="btn secondary" href="writing-cut.html"><i class="fa-solid fa-pen-nib"></i> 컷 쓰기</a>
+                    <a class="btn secondary" href="#check"><i class="fa-solid fa-list-check"></i> 문제</a>
+                    <button id="viToggle" class="btn secondary translation-toggle" type="button" aria-pressed="false">
+                        <i class="fa-solid fa-language"></i> Tiếng Việt OFF
+                    </button>
+                </div>
+            </div>
+            <figure class="lesson-visual" aria-label="소문과 오해 흐름 이미지">
+                <img src="../assets/c17/vocabulary/images/cards/rumor-start.webp" alt="소문이 시작되는 장면" loading="lazy" decoding="async">
+                <img src="../assets/c17/vocabulary/images/cards/rumor-spread.webp" alt="소문이 퍼지는 장면" loading="lazy" decoding="async">
+                <img src="../assets/c17/vocabulary/images/cards/repair-misunderstand.webp" alt="오해가 생긴 장면" loading="lazy" decoding="async">
+                <img src="../assets/c17/vocabulary/images/cards/repair-solve-reconcile.webp" alt="오해를 풀고 화해하는 장면" loading="lazy" decoding="async">
+            </figure>
+        </section>
+
+        <section class="section grid-2" aria-label="읽기 전 준비">
+            <article class="card">
+                <span class="badge">준비</span>
+                <strong>여러분은 소문을 쉽게 믿는 편입니까?</strong>
+                <p>어떤 이야기를 들었을 때 바로 믿는지, 누구에게 확인하는지 먼저 생각해 보세요.</p>
+                <div class="vi-text vi-box">Bạn có dễ tin lời đồn không? Khi nghe một chuyện, bạn kiểm tra với ai?</div>
+            </article>
+            <article class="card">
+                <span class="badge amber">읽기 목표</span>
+                <strong>누가, 왜, 어떤 소문을 퍼뜨렸는지 찾기</strong>
+                <p>인물의 행동보다 소문이 어떤 결과를 만들었는지에 초점을 두고 읽습니다.</p>
+                <div class="vi-text vi-box">Hãy chú ý ai lan truyền lời đồn, vì sao làm vậy, và lời đồn dẫn đến kết quả gì.</div>
+            </article>
+        </section>
+
+        <section id="reading" class="section">
+            <article class="reading-panel">
+                <div class="reading-title">
+                    <div>
+                        <p class="eyebrow">Reading</p>
+                        <h2>서동요(서동의 노래)</h2>
+                    </div>
+                    <span class="badge rose">요약 읽기</span>
+                </div>
+                <p class="adapted-text">백제에 살던 서동은 가난했지만 영리한 청년이었습니다. 그는 신라의 선화 공주가 아름답다는 이야기를 듣고 신라로 향했습니다. 그곳에서 공주와 자신의 이름이 들어간 노래를 만들어 사람들 사이에 퍼뜨렸습니다.</p>
+                <p class="adapted-text">뜻을 모르는 아이들이 그 노래를 계속 부르자, 이야기는 궁궐 안까지 전해졌습니다. 왕은 공주에게 나쁜 소문이 생겼다고 생각했고, 결국 공주를 궁 밖으로 내보냈습니다.</p>
+                <p class="adapted-text">공주는 시골에서 한 남자를 만났습니다. 그 남자는 공주가 지낼 수 있도록 도와주었고, 두 사람은 서로 사랑하게 되어 결혼했습니다. 시간이 지나 공주는 소문을 퍼뜨린 사람이 남편 서동이었다는 사실을 알게 되었지만, 서동을 향한 마음은 달라지지 않았습니다. 훗날 서동은 공부하고 재산을 모아 백제의 왕이 되었습니다.</p>
+                <div class="vi-text vi-box">Bản đọc này được viết lại ngắn gọn theo nội dung bài đọc gốc: Seodong nghe lời đồn về công chúa, lan truyền một bài hát, lời đồn khiến công chúa rời cung, rồi hai người gặp nhau và kết hôn.</div>
+            </article>
+        </section>
+
+        <section class="section">
+            <div class="section-head">
+                <div>
+                    <p class="eyebrow">Story Flow</p>
+                    <h2>사건 흐름</h2>
+                </div>
+            </div>
+            <div class="story-grid">
+                <article class="story-card">
+                    <img src="../assets/c17/vocabulary/images/cards/rumor-appear.webp" alt="소문을 듣는 장면" loading="lazy" decoding="async">
+                    <div>
+                        <strong>1. 소문을 듣다</strong>
+                        <p>서동이 선화 공주에 대한 이야기를 듣습니다.</p>
+                    </div>
+                </article>
+                <article class="story-card">
+                    <img src="../assets/c17/vocabulary/images/cards/rumor-scatter.webp" alt="노래가 퍼지는 장면" loading="lazy" decoding="async">
+                    <div>
+                        <strong>2. 노래를 퍼뜨리다</strong>
+                        <p>아이들이 뜻도 모르고 노래를 부르며 다닙니다.</p>
+                    </div>
+                </article>
+                <article class="story-card">
+                    <img src="../assets/c17/vocabulary/images/cards/repair-disappointed.webp" alt="공주가 궁을 떠나는 장면을 떠올리는 이미지" loading="lazy" decoding="async">
+                    <div>
+                        <strong>3. 궁에서 쫓겨나다</strong>
+                        <p>왕은 소문 때문에 공주를 궁 밖으로 보냅니다.</p>
+                    </div>
+                </article>
+                <article class="story-card">
+                    <img src="../assets/c17/vocabulary/images/cards/repair-solve-reconcile.webp" alt="오해를 넘어 관계가 이어지는 장면" loading="lazy" decoding="async">
+                    <div>
+                        <strong>4. 사실을 알게 되다</strong>
+                        <p>공주는 사실을 알고 놀라지만 마음은 변하지 않습니다.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section grid-2" aria-label="핵심 어휘와 순서">
+            <article class="card">
+                <span class="badge">핵심 어휘</span>
+                <div class="keyword-list">
+                    <div class="keyword"><b>소문을 듣다</b><span>다른 사람에게서 이야기를 듣다</span></div>
+                    <div class="keyword"><b>소문을 퍼뜨리다</b><span>이야기를 여러 사람에게 전하다</span></div>
+                    <div class="keyword"><b>궁에서 내쫓다</b><span>궁 밖으로 나가게 하다</span></div>
+                    <div class="keyword"><b>알고 보니</b><span>나중에 사실을 알게 되었을 때</span></div>
+                </div>
+            </article>
+            <article class="card">
+                <span class="badge amber">순서 확인</span>
+                <strong>버튼을 눌러 정답 순서를 확인하세요.</strong>
+                <div class="sequence-list" id="sequenceList">
+                    <button type="button" data-order="2"><b>?</b><span>아이들이 노래를 부르며 돌아다녔다.</span></button>
+                    <button type="button" data-order="4"><b>?</b><span>공주는 서동이 소문을 퍼뜨린 사람이라는 것을 알았다.</span></button>
+                    <button type="button" data-order="1"><b>?</b><span>서동은 선화 공주에 대한 소문을 듣고 신라로 갔다.</span></button>
+                    <button type="button" data-order="3"><b>?</b><span>왕은 공주를 궁에서 내보냈다.</span></button>
+                </div>
+            </article>
+        </section>
+
+        <section id="check" class="section">
+            <div class="section-head">
+                <div>
+                    <p class="eyebrow">Reading Check</p>
+                    <h2>내용 확인</h2>
+                </div>
+            </div>
+            <div class="grid-3">
+                <article class="question-card" data-question data-answer="2">
+                    <span class="badge">1</span>
+                    <strong>이 글의 내용과 같은 것은 무엇입니까?</strong>
+                    <div class="choice-row">
+                        <button type="button" data-choice="0">서동은 왕이 되기 위해 공주와 결혼했다.</button>
+                        <button type="button" data-choice="1">서동은 공주와의 사랑을 알리기 위해 노래를 만들었다.</button>
+                        <button type="button" data-choice="2">선화 공주는 서동이 만든 노래 때문에 궁에서 쫓겨났다.</button>
+                    </div>
+                    <div class="feedback" data-feedback></div>
+                </article>
+                <article class="question-card" data-question data-answer="0">
+                    <span class="badge">2</span>
+                    <strong>이 글을 읽고 알 수 있는 것은 무엇입니까?</strong>
+                    <div class="choice-row">
+                        <button type="button" data-choice="0">소문의 힘</button>
+                        <button type="button" data-choice="1">공주와 결혼하는 법</button>
+                        <button type="button" data-choice="2">사람의 마음을 얻는 법</button>
+                    </div>
+                    <div class="feedback" data-feedback></div>
+                </article>
+                <article class="question-card" data-question data-answer="1">
+                    <span class="badge">3</span>
+                    <strong>서동의 행동을 현대 사회에서 했다면 어떻게 되었을까요?</strong>
+                    <div class="choice-row">
+                        <button type="button" data-choice="0">항상 좋은 결과만 생겼을 것이다.</button>
+                        <button type="button" data-choice="1">확인하지 않은 소문을 퍼뜨려 문제가 되었을 것이다.</button>
+                        <button type="button" data-choice="2">아무도 신경 쓰지 않았을 것이다.</button>
+                    </div>
+                    <div class="feedback" data-feedback></div>
+                </article>
+            </div>
+        </section>
+
+        <section id="writing" class="section grid-2">
+            <article class="writing-panel">
+                <span class="badge rose">쓰기 준비</span>
+                <strong>여러분을 놀라게 한 소문을 정리해 보세요.</strong>
+                <div class="word-bank">
+                    <span>얼마 전</span>
+                    <span>소문을 들었다</span>
+                    <span>믿었다 / 믿지 않았다</span>
+                    <span>그 이유는</span>
+                    <span>결국</span>
+                </div>
+                <textarea id="rumorNote" placeholder="예: 얼마 전 고향 친구가 ...다는 소문을 들었다. 처음에는 ...라고 생각했다. 왜냐하면 ...기 때문이다. 하지만/그런데 ..."></textarea>
+                <div class="action-row">
+                    <button id="saveNoteBtn" class="btn" type="button"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
+                    <button id="clearNoteBtn" class="btn secondary" type="button"><i class="fa-solid fa-eraser"></i> 지우기</button>
+                </div>
+                <div id="noteStatus" class="feedback"></div>
+            </article>
+            <article class="card">
+                <span class="badge">말하기 연결</span>
+                <strong>확인 질문으로 소문을 멈추기</strong>
+                <p>들은 이야기를 바로 전하기 전에 다음 질문을 붙여 보세요.</p>
+                <div class="word-bank">
+                    <span>어디서 들었어요?</span>
+                    <span>분명히 맞아요?</span>
+                    <span>자세히 말해 주세요.</span>
+                    <span>그럴 리가 없어요.</span>
+                    <span>그럴 수도 있겠네요.</span>
+                </div>
+                <div class="vi-text vi-box">Trước khi truyền lời đồn, hãy hỏi nguồn tin và mức độ chắc chắn.</div>
+            </article>
+        </section>
+
+        <nav class="footer-nav" aria-label="페이지 이동">
+            <a class="btn secondary" href="listening.html"><i class="fa-solid fa-arrow-left"></i> 듣기 전체</a>
+            <a class="btn secondary" href="reading-cuttoon.html"><i class="fa-solid fa-images"></i> 컷툰 보기</a>
+            <a class="btn" href="writing-cut.html">컷 쓰기 <i class="fa-solid fa-pen-nib"></i></a>
+            <a class="btn" href="index.html">17과 목록 <i class="fa-solid fa-list"></i></a>
+        </nav>
+    </main>
+
+    <script>
+        (function () {
+            "use strict";
+
+            const page = document.getElementById("page");
+            const viToggle = document.getElementById("viToggle");
+            const sequenceList = document.getElementById("sequenceList");
+            const rumorNote = document.getElementById("rumorNote");
+            const noteStatus = document.getElementById("noteStatus");
+            const saveNoteBtn = document.getElementById("saveNoteBtn");
+            const clearNoteBtn = document.getElementById("clearNoteBtn");
+            const noteKey = "korean3b.c17.reading.rumor-note";
+
+            function setViState(show) {
+                page.classList.toggle("show-vi", show);
+                viToggle.setAttribute("aria-pressed", String(show));
+                viToggle.innerHTML = show
+                    ? '<i class="fa-solid fa-language"></i> Tiếng Việt ON'
+                    : '<i class="fa-solid fa-language"></i> Tiếng Việt OFF';
+            }
+
+            function answerQuestion(question, choice) {
+                const answer = question.dataset.answer;
+                const buttons = question.querySelectorAll("[data-choice]");
+                const feedback = question.querySelector("[data-feedback]");
+                const isCorrect = choice.dataset.choice === answer;
+
+                buttons.forEach((button) => {
+                    button.disabled = true;
+                    button.classList.toggle("correct", button.dataset.choice === answer);
+                    button.classList.toggle("wrong", button === choice && !isCorrect);
+                });
+
+                feedback.textContent = isCorrect ? "정답입니다." : "정답을 다시 확인해 보세요.";
+                feedback.className = isCorrect ? "feedback good" : "feedback bad";
+            }
+
+            function bindQuestions() {
+                document.querySelectorAll("[data-question]").forEach((question) => {
+                    question.addEventListener("click", (event) => {
+                        const choice = event.target.closest("[data-choice]");
+                        if (!choice) return;
+                        answerQuestion(question, choice);
+                    });
+                });
+            }
+
+            function bindSequence() {
+                sequenceList.addEventListener("click", (event) => {
+                    const button = event.target.closest("button[data-order]");
+                    if (!button) return;
+                    button.classList.add("revealed");
+                    button.querySelector("b").textContent = button.dataset.order;
+                });
+            }
+
+            function loadNote() {
+                try {
+                    rumorNote.value = window.localStorage.getItem(noteKey) || "";
+                } catch (error) {}
+            }
+
+            function saveNote() {
+                try {
+                    window.localStorage.setItem(noteKey, rumorNote.value);
+                    noteStatus.textContent = "저장했습니다.";
+                    noteStatus.className = "feedback good";
+                } catch (error) {
+                    noteStatus.textContent = "이 브라우저에서는 저장이 제한될 수 있습니다.";
+                    noteStatus.className = "feedback bad";
+                }
+            }
+
+            function clearNote() {
+                rumorNote.value = "";
+                try {
+                    window.localStorage.removeItem(noteKey);
+                } catch (error) {}
+                noteStatus.textContent = "지웠습니다.";
+                noteStatus.className = "feedback";
+            }
+
+            viToggle.addEventListener("click", () => {
+                setViState(!page.classList.contains("show-vi"));
+            });
+            saveNoteBtn.addEventListener("click", saveNote);
+            clearNoteBtn.addEventListener("click", clearNote);
+
+            bindQuestions();
+            bindSequence();
+            loadNote();
+        })();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>
