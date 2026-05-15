@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+        <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기말고사 어휘·문법 복습</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --ink: #172033;
+            --muted: #64748b;
+            --panel: #ffffff;
+            --line: #d9e2ec;
+            --teal: #0f766e;
+            --teal-soft: #e7f6f2;
+            --amber: #b45309;
+            --amber-soft: #fff7ed;
+            --rose: #be123c;
+            --rose-soft: #fff1f2;
+            --shadow: 0 22px 46px rgba(15, 23, 42, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans KR", sans-serif;
+            color: var(--ink);
+            background:
+                linear-gradient(180deg, #fffaf2 0%, var(--bg) 42%, #f1f8f6 100%);
+        }
+
+        .shell {
+            width: min(1040px, calc(100% - 32px));
+            margin: 28px auto 56px;
+        }
+
+        .topbar,
+        .hero,
+        .panel {
+            background: rgba(255,255,255,0.92);
+            border: 1px solid rgba(217,226,236,0.85);
+            box-shadow: var(--shadow);
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 16px 18px;
+            border-radius: 20px;
+        }
+
+        .topbar__links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .topbar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .topbar strong {
+            font-size: 0.96rem;
+            text-align: right;
+        }
+
+        .hero,
+        .panel {
+            margin-top: 20px;
+            padding: 28px;
+            border-radius: 22px;
+        }
+
+        .hero {
+            display: grid;
+            gap: 12px;
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(231,246,242,0.92) 56%, rgba(255,247,237,0.94) 100%);
+        }
+
+        .hero__badge {
+            display: inline-flex;
+            width: fit-content;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: var(--teal-soft);
+            color: var(--teal);
+            font-weight: 900;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 3.25rem);
+            line-height: 1.1;
+            letter-spacing: 0;
+        }
+
+        .hero p,
+        .panel p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .panel h2 {
+            margin: 0 0 10px;
+            font-size: 1.45rem;
+        }
+
+        .review-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .review-card {
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            min-height: 240px;
+            gap: 10px;
+            padding: 18px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+            color: inherit;
+            text-decoration: none;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 32px rgba(15, 23, 42, 0.11);
+        }
+
+        .review-card:nth-child(1):hover { border-color: var(--amber); }
+        .review-card:nth-child(2):hover { border-color: var(--teal); }
+        .review-card:nth-child(3):hover { border-color: var(--rose); }
+
+        .review-card__pill {
+            display: inline-flex;
+            width: fit-content;
+            align-items: center;
+            gap: 8px;
+            min-height: 32px;
+            padding: 0 11px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .review-card:nth-child(1) .review-card__pill {
+            background: var(--amber-soft);
+            color: var(--amber);
+        }
+
+        .review-card:nth-child(2) .review-card__pill {
+            background: var(--teal-soft);
+            color: var(--teal);
+        }
+
+        .review-card:nth-child(3) .review-card__pill {
+            background: var(--rose-soft);
+            color: var(--rose);
+        }
+
+        .review-card__title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+
+        .review-card__note {
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.65;
+        }
+
+        .review-card__foot {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--ink);
+            font-weight: 900;
+        }
+
+        @media (max-width: 820px) {
+            .review-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .review-card {
+                min-height: 0;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .shell {
+                width: min(100% - 24px, 1040px);
+                margin-top: 18px;
+            }
+
+            .topbar,
+            .hero,
+            .panel {
+                border-radius: 16px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .topbar strong {
+                text-align: left;
+            }
+
+            .hero,
+            .panel {
+                padding: 22px;
+            }
+        }
+    </style>
+        <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+</head>
+<body>
+        <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <main class="shell">
+        <div class="topbar">
+            <div class="topbar__links">
+                <a href="index.html">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>복습 허브로</span>
+                </a>
+                <a href="../index.html">
+                    <i class="fa-solid fa-house"></i>
+                    <span>메인으로</span>
+                </a>
+            </div>
+            <strong>기말고사 어휘·문법 복습</strong>
+        </div>
+
+        <section class="hero">
+            <div class="hero__badge">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Final Review</span>
+            </div>
+            <h1>기말고사 어휘·문법 복습</h1>
+            <p>복습 5, 복습 6, 기말 모의고사를 한곳에 모아 둔 기말 대비 전용 페이지입니다.</p>
+        </section>
+
+        <section class="panel">
+            <h2>기말 대비 세트</h2>
+            <p>13~18과 복습 흐름과 실전형 모의고사를 이어서 확인할 수 있습니다.</p>
+            <div class="review-grid">
+                <a href="review5-html/index.html" class="review-card">
+                    <span class="review-card__pill"><i class="fa-solid fa-layer-group"></i> Review 5</span>
+                    <span class="review-card__title">복습 5 단계별 퀴즈</span>
+                    <span class="review-card__note">13~15과 복습 5의 확인하기, 평가하기, 듣기, 읽기·쓰기를 모아 둔 복습 세트입니다.</span>
+                    <span class="review-card__foot">복습 5 시작 <i class="fa-solid fa-arrow-right"></i></span>
+                </a>
+                <a href="review6-html/index.html" class="review-card">
+                    <span class="review-card__pill"><i class="fa-solid fa-layer-group"></i> Review 6</span>
+                    <span class="review-card__title">복습 6 단계별 퀴즈</span>
+                    <span class="review-card__note">16~18과 복습 6의 확인하기, 평가하기, 읽기 활동을 한곳에서 진행하는 복습 세트입니다.</span>
+                    <span class="review-card__foot">복습 6 시작 <i class="fa-solid fa-arrow-right"></i></span>
+                </a>
+                <a href="../apps/final-vocab-grammar-mock/index.html" class="review-card">
+                    <span class="review-card__pill"><i class="fa-solid fa-clipboard-check"></i> Mock</span>
+                    <span class="review-card__title">3B 기말 어휘·문법·읽기 모의고사</span>
+                    <span class="review-card__note">14~17과 전체와 18과 어휘를 범위로 하는 1~4회차 실전형 모의고사입니다.</span>
+                    <span class="review-card__foot">모의고사 선택 <i class="fa-solid fa-arrow-right"></i></span>
+                </a>
+            </div>
+        </section>
+    </main>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>
