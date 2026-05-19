@@ -34,6 +34,11 @@ LISTENING_TYPE5_BOXES = [
     (95, 1035, 900, 1305),
 ]
 
+WRITING_TYPE2_BOXES = [
+    (120, 245, 900, 720),
+    (120, 730, 900, 1240),
+]
+
 
 def page_path(pages_dir, page):
     direct = pages_dir / f"book-{page}.jpg"
@@ -83,6 +88,11 @@ def build_jobs():
         page = 52 + ((number - 1) // 4)
         box = LISTENING_TYPE5_BOXES[(number - 1) % 4]
         jobs.append((f"listening-type5-q{number:02d}", page, box))
+
+    for number in range(1, 11):
+        page = 65 + ((number - 1) // 2)
+        box = WRITING_TYPE2_BOXES[(number - 1) % 2]
+        jobs.append((f"writing-type2-q{number:02d}", page, box))
 
     return jobs
 

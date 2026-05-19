@@ -1,6 +1,6 @@
 # 한국어 연습(토픽) 기말 모의고사
 
-한국어연습2 자료를 바탕으로 만든 별도 모의고사/복습 앱입니다. 3B 읽기(한국어연습) 수업진도표 기준으로 중간고사 이후 기말고사 범위인 읽기 유형 3~4, 듣기 유형 4~5만 포함합니다.
+한국어연습2 자료를 바탕으로 만든 별도 모의고사/복습 앱입니다. 3B 읽기(한국어연습) 수업진도표 기준으로 중간고사 이후 기말고사 범위인 읽기 유형 3~4, 듣기 유형 4~5를 앱에 포함합니다. 쓰기는 10주차 진도표의 유형 1 표기를 유형 2 오타로 보고, 기말 범위인 쓰기 유형 2 [52번] 문제 이미지만 별도 추출해 둡니다.
 
 ## 원본 자료 관리
 
@@ -27,9 +27,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\prepare-private-as
 
 생성되는 로컬 파일:
 
-- `assets/questions/*.jpg`
+- `assets/questions/reading-*.jpg`
+- `assets/questions/listening-*.jpg`
+- `assets/questions/writing-type2-q*.jpg`
 - `assets/audio/type-4/q-*.mp3`
 - `assets/audio/type-5/q-*.mp3`
+
+## 인쇄용 시험지
+
+쓰기 유형 2 [52번]은 A4 인쇄용 DOCX 시험지로도 정리했습니다.
+
+- `printables/writing-type2-final-paper.docx`
+- `printables/writing-type2-answer-key.docx`
 
 ## 실행
 

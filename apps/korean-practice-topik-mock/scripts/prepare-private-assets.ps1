@@ -52,7 +52,8 @@ if (-not $SkipPages) {
 
   $pageRanges = @(
     @{ First = 17; Last = 28 },
-    @{ First = 48; Last = 54 }
+    @{ First = 48; Last = 54 },
+    @{ First = 65; Last = 69 }
   )
 
   foreach ($range in $pageRanges) {
