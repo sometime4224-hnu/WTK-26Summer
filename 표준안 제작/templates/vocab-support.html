@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<!--
+  TEMPLATE: vocab-support.html  (T-06)
+  파일명: vocab-support-[주제].html
+  역할: 어휘 보조 활동 (활동 유형별로 콘텐츠 섹션 선택)
+  활동 유형:
+    A) 흐름 도식 (관계·순서 시각화)
+    B) 강도/가능성 게이지
+    C) 순서 배열
+    D) 그림 퀴즈
+    E) 장면 재현 (이미지+어휘 매핑)
+  필요한 유형 섹션만 남기고 나머지 주석 처리
+-->
+<head>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>★[N]과 어휘 보조 | ★[활동명]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="../shared/multilang-toggle.css" />
+    <style>
+        body { background:var(--bg); }
+        .shell { width:var(--shell-width); margin:var(--shell-margin); display:grid; gap:14px; }
+
+        .topbar { position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;
+            min-height:48px;padding:0 14px;background:rgba(255,255,255,.94);
+            border-bottom:1px solid var(--line);backdrop-filter:blur(12px); }
+        .topbar a { color:var(--accent-dark);font-size:13px;font-weight:900;text-decoration:none; }
+        .topbar span { color:#cbd5e1; }
+
+        .hero { border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--surface);
+            box-shadow:var(--shadow);padding:20px 22px; }
+        .eyebrow { color:var(--vocab);font-size:11px;font-weight:900;
+            letter-spacing:.08em;text-transform:uppercase;margin:0 0 6px; }
+        .hero h1 { margin:0 0 8px;font-size:clamp(20px,3.5vw,28px); }
+        .lead { color:var(--muted);font-size:14px;font-weight:700;margin:0 0 14px; }
+
+        .panel { border:1px solid var(--line);border-radius:var(--radius-lg);
+            background:var(--surface);box-shadow:var(--shadow-sm);padding:20px 22px; }
+
+        /* A. 흐름 도식 */
+        .flow-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;align-items:center; }
+        .flow-node { border:2px solid var(--vocab);border-radius:var(--radius);padding:14px;
+            background:#fff7ed;text-align:center; }
+        .flow-node .word { font-size:17px;font-weight:900;color:var(--ink); }
+        .flow-node .desc { font-size:12px;color:var(--muted);margin-top:4px; }
+        .flow-arrow { text-align:center;color:var(--muted);font-size:18px; }
+
+        /* B. 게이지 */
+        .gauge-list { display:grid;gap:14px; }
+        .gauge-item { display:grid;gap:6px; }
+        .gauge-label { font-size:14px;font-weight:900; }
+        .gauge-bar { height:14px;background:#e2e8f0;border-radius:var(--radius-pill);overflow:hidden; }
+        .gauge-fill { height:100%;background:linear-gradient(90deg,var(--vocab),#fbbf24);
+            border-radius:inherit;transition:width .4s ease; }
+        .gauge-desc { font-size:12px;color:var(--muted);font-weight:700; }
+
+        /* C. 순서 배열 */
+        .seq-list { display:grid;gap:8px; }
+        .seq-item { display:flex;align-items:center;gap:12px;border:1px solid var(--line);
+            border-radius:var(--radius);padding:12px 14px;background:#fff;cursor:grab; }
+        .seq-num { width:28px;height:28px;border-radius:50%;background:var(--vocab);
+            color:#fff;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;flex:0 0 auto; }
+        .seq-text { font-size:14px;font-weight:700; }
+
+        /* D. 그림 퀴즈 */
+        .pic-quiz { display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px; }
+        .pic-card { border:2px solid var(--line);border-radius:var(--radius);overflow:hidden;
+            background:#fff;cursor:pointer;transition:border-color .14s; }
+        .pic-card img { width:100%;aspect-ratio:1/1;object-fit:cover;display:block; }
+        .pic-card .pic-label { padding:8px;text-align:center;font-size:13px;font-weight:900; }
+        .pic-card.selected { border-color:var(--vocab); }
+        .pic-card.correct  { border-color:var(--ok); background:var(--ok-bg); }
+        .pic-card.wrong    { border-color:var(--bad); background:var(--bad-bg); }
+
+        /* E. 장면 재현 */
+        .scene-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+        .scene-img { border-radius:var(--radius);overflow:hidden; }
+        .scene-img img { width:100%;height:auto;display:block; }
+        .scene-words { display:flex;flex-wrap:wrap;gap:8px;align-content:start; }
+        .scene-word { border:1px solid var(--vocab);border-radius:var(--radius-pill);
+            padding:6px 14px;background:#fff7ed;color:var(--vocab);font-size:14px;font-weight:900; }
+
+        code { border-radius:6px;padding:1px 6px;background:var(--accent-soft);color:var(--accent-dark);font-family:inherit;font-weight:900; }
+
+        .footer-nav { display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between; }
+        .btn { display:inline-flex;align-items:center;gap:6px;min-height:40px;
+            border:1px solid var(--accent-line);border-radius:var(--radius-pill);
+            padding:0 15px;background:#fff;color:var(--accent-dark);font-size:13px;font-weight:900;text-decoration:none; }
+        .btn.primary { border-color:var(--accent-dark);background:var(--accent);color:#fff; }
+
+        @media(max-width:600px){ .scene-grid { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html">★[N]과 목록</a>
+        <span>|</span>
+        <a href="vocabulary.html">어휘 메인</a>
+        <span>|</span>
+        <strong style="font-size:13px;font-weight:900">★[활동명]</strong>
+    </nav>
+
+    <main class="shell">
+
+        <section class="hero">
+            <p class="eyebrow">Chapter ★[N] · Vocab Support</p>
+            <h1>★[활동명]</h1>
+            <p class="lead">★[활동 안내 한 줄]</p>
+            <!-- 번역 블록이 있는 경우에만 삽입 -->
+            <div data-multilang-bar></div>
+        </section>
+
+        <!--
+          ── A. 흐름 도식 ───────────────────────────────
+          어휘 간 관계·순서를 시각적으로 제시할 때 사용
+        -->
+        <section class="panel" aria-label="★[도식 제목]">
+            <h2>★[도식 제목]</h2>
+            <div class="flow-grid">
+                <div class="flow-node">
+                    <div class="word">★어휘1</div>
+                    <div class="desc">★설명</div>
+                    <div data-lang="vi" style="font-size:11px;margin-top:4px;color:#7c2d12">★vi</div>
+                </div>
+                <div class="flow-arrow" aria-hidden="true">→</div>
+                <div class="flow-node">
+                    <div class="word">★어휘2</div>
+                    <div class="desc">★설명</div>
+                    <div data-lang="vi" style="font-size:11px;margin-top:4px;color:#7c2d12">★vi</div>
+                </div>
+                <!-- 노드·화살표 반복 -->
+            </div>
+        </section>
+
+        <!--
+          ── B. 게이지 (가능성·강도 측정) ─────────────
+          슬라이더나 게이지로 어휘 뉘앙스를 체험할 때 사용
+        -->
+        <!--
+        <section class="panel" aria-label="가능성 게이지">
+            <h2>★[게이지 제목]</h2>
+            <div class="gauge-list">
+                <div class="gauge-item">
+                    <div class="gauge-label">★어휘</div>
+                    <div class="gauge-bar"><div class="gauge-fill" style="width:★%"></div></div>
+                    <div class="gauge-desc">★설명 <span data-lang="vi" class="lang-box" style="display:inline">★vi</span></div>
+                </div>
+            </div>
+        </section>
+        -->
+
+        <!--
+          ── C. 순서 배열 ───────────────────────────────
+          사건·이야기 순서 맞추기
+        -->
+        <!--
+        <section class="panel" aria-label="순서 배열">
+            <h2>★[순서 제목]</h2>
+            <div class="seq-list" id="seqList">
+                <div class="seq-item" data-order="★정답순서">
+                    <div class="seq-num">?</div>
+                    <div class="seq-text">★사건 설명 <span data-lang="vi" class="lang-box" style="display:inline">★vi</span></div>
+                </div>
+            </div>
+        </section>
+        -->
+
+        <!--
+          ── D. 그림 퀴즈 ───────────────────────────────
+          이미지 보고 어휘 선택
+        -->
+        <!--
+        <section class="panel" aria-label="그림 퀴즈">
+            <h2>★[그림 퀴즈 제목]</h2>
+            <p id="pic-question" style="font-size:18px;font-weight:900;margin:0 0 14px">★문제</p>
+            <div class="pic-quiz" id="picQuiz">
+                <div class="pic-card" data-answer="★정답어휘" tabindex="0" role="button" aria-label="★어휘">
+                    <img src="../assets/c[N]/vocabulary/images/★파일명.webp" alt="★어휘" loading="lazy">
+                    <div class="pic-label">★어휘</div>
+                </div>
+            </div>
+        </section>
+        -->
+
+        <!--
+          ── E. 장면 재현 ───────────────────────────────
+          상황 이미지와 어휘 매핑
+        -->
+        <!--
+        <section class="panel" aria-label="장면 재현">
+            <h2>★[장면 제목]</h2>
+            <div class="scene-grid">
+                <div class="scene-img">
+                    <img src="../assets/c[N]/vocabulary/images/★장면이미지.webp" alt="★장면 설명" loading="lazy">
+                </div>
+                <div class="scene-words">
+                    <span class="scene-word">★어휘1</span>
+                    <span class="scene-word">★어휘2</span>
+                </div>
+            </div>
+        </section>
+        -->
+
+        <nav class="footer-nav" aria-label="페이지 이동">
+            <a class="btn" href="vocabulary.html"><i class="fa-solid fa-arrow-left"></i> 어휘 메인</a>
+            <a class="btn" href="index.html">★[N]과 목록</a>
+            <a class="btn primary" href="★vocab-support-다음.html">다음 보조 활동 <i class="fa-solid fa-arrow-right"></i></a>
+        </nav>
+    </main>
+
+    <script src="../shared/multilang-toggle.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

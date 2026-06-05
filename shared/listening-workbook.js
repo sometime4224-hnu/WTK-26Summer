@@ -952,6 +952,51 @@
         return chooseLocalizedText(source[key], source[`${key}Vi`], fallback);
     }
 
+    function getTranslationScaffoldConfig(config = pageConfig) {
+        return (config && config.translationScaffold) || {};
+    }
+
+    function usesMinimalTranslationScaffold(config = pageConfig) {
+        const scaffold = getTranslationScaffoldConfig(config);
+        return scaffold.mode === "minimal" || scaffold.minimal === true;
+    }
+
+    function shouldLocalizeLearnerContent(config = pageConfig) {
+        const scaffold = getTranslationScaffoldConfig(config);
+        if (typeof scaffold.localizeLearnerContent === "boolean") {
+            return scaffold.localizeLearnerContent;
+        }
+        return !usesMinimalTranslationScaffold(config);
+    }
+
+    function getLearnerContentField(source, key, fallback = "") {
+        if (!source) return fallback;
+        if (!shouldLocalizeLearnerContent()) {
+            return source[key] == null ? fallback : source[key];
+        }
+        return getLocalizedField(source, key, fallback);
+    }
+
+    function getSubtitleHelpText() {
+        if (!usesMinimalTranslationScaffold()) {
+            return getInstructionText().subtitleHelp;
+        }
+        return chooseLocalizedText(
+            "자막은 1회 청취 후 핵심어, 2회 후 전체 대본이 열립니다. 번역은 활동 지시와 핵심 도움말에만 사용합니다.",
+            "Sau 1 lan nghe se mo tu khoa, sau 2 lan se mo toan van. Ban dich chi dung cho chi dan va goi y chinh."
+        );
+    }
+
+    function getCurrentStageText(label, unlocked) {
+        if (!usesMinimalTranslationScaffold()) {
+            return getInstructionText().currentStage(label, unlocked);
+        }
+        return chooseLocalizedText(
+            `현재 단계: ${label} · 현재 ${unlocked}단계까지 열림 · 1회 후 핵심어, 2회 후 전체 대본을 확인하세요.`,
+            `Buoc hien tai: ${label} · hien mo den buoc ${unlocked} · sau 1 lan nghe xem tu khoa, sau 2 lan xem toan van.`
+        );
+    }
+
     function getPageCompactConfig(config = pageConfig) {
         if (!config) return null;
         const compactConfig = config.compactLayout || config.sampleCompact;
@@ -1052,6 +1097,9 @@
     }
 
     function getQuizLanguage(state) {
+        if (usesMinimalTranslationScaffold()) {
+            return getInstructionLanguage();
+        }
         return state.quizLanguage === "vi" ? "vi" : "ko";
     }
 
@@ -1081,16 +1129,19 @@
     }
 
     function getQuestionPrompt(question, language) {
+        if (!shouldLocalizeLearnerContent()) return question.prompt || "";
         if (language === "vi" && question.promptVi) return question.promptVi;
         return question.prompt || "";
     }
 
     function getQuestionExplanation(question, language) {
+        if (!shouldLocalizeLearnerContent()) return question.explanation || "";
         if (language === "vi" && question.explanationVi) return question.explanationVi;
         return question.explanation || "";
     }
 
     function getOptionLabel(option, language) {
+        if (!shouldLocalizeLearnerContent()) return option.label || "";
         if (language === "vi" && option.labelVi) return option.labelVi;
         return option.label || "";
     }
@@ -1122,10 +1173,12 @@
     }
 
     function getTfStatement(question) {
+        if (!shouldLocalizeLearnerContent()) return question.statement || "";
         return chooseLocalizedText(question.statement, question.statementVi, "");
     }
 
     function getTfExplanation(question) {
+        if (!shouldLocalizeLearnerContent()) return question.explanation || "";
         return chooseLocalizedText(question.explanation, question.explanationVi, "");
     }
 
@@ -1296,6 +1349,7 @@
     }
 
     function getSequenceItemLabel(item) {
+        if (!shouldLocalizeLearnerContent()) return item.label || "";
         return chooseLocalizedText(item.label, item.labelVi, item.label || "");
     }
 
@@ -1375,10 +1429,12 @@
     }
 
     function getClozeSentence(item) {
+        if (!shouldLocalizeLearnerContent()) return item.sentence || "";
         return chooseLocalizedText(item.sentence, item.sentenceVi, "");
     }
 
     function getClozeHint(item) {
+        if (!shouldLocalizeLearnerContent()) return item.hint || "";
         return chooseLocalizedText(item.hint, item.hintVi, "");
     }
 
@@ -1392,7 +1448,9 @@
     function getClozeFeedback(item) {
         const answerLabel = chooseLocalizedText("정답", "Dap an");
         const hintLabel = chooseLocalizedText("힌트", "Goi y");
-        const explanation = chooseLocalizedText(item.explanation, item.explanationVi, "");
+        const explanation = shouldLocalizeLearnerContent()
+            ? chooseLocalizedText(item.explanation, item.explanationVi, "")
+            : (item.explanation || "");
         const parts = [`${answerLabel}: ${getClozeAnswers(item)[0] || ""}`];
         if (getClozeHint(item)) parts.push(`${hintLabel}: ${getClozeHint(item)}`);
         if (explanation) parts.push(explanation);
@@ -1469,8 +1527,13 @@
 
     function syncState(lessonId) {
         const state = getState(lessonId);
-        const unlocked = getUnlockedStage(state.listens);
+        const lesson = lessonMap.get(lessonId);
+        const stages = lesson ? getLessonStages(lesson) : STAGES;
+        const unlocked = lesson ? getLessonUnlockedStage(lesson, state.listens) : getUnlockedStage(state.listens);
         if (state.stage > unlocked) state.stage = unlocked;
+        if (!stages.some((stage) => stage.id === state.stage)) {
+            state.stage = stages[Math.min(unlocked, stages.length - 1)]?.id || 0;
+        }
         writeStorage(storageKey(lessonId, "listens"), state.listens);
         writeStorage(storageKey(lessonId, "stage"), state.stage);
         writeStorage(storageKey(lessonId, "speed"), state.speed);
@@ -2020,7 +2083,7 @@
                         </div>
                         <div id="listen-status-${escapeHtml(lesson.id)}" class="lw-status lw-status--compact" data-tone="info">${escapeHtml(uiText.listenCount(state.listens))}</div>
                     </div>
-                    <div class="lw-help-box lw-help-box--compact">${escapeHtml(uiText.subtitleHelp)}</div>
+                    <div class="lw-help-box lw-help-box--compact">${escapeHtml(getSubtitleHelpText())}</div>
                 </div>
             </section>
         `;
@@ -2040,7 +2103,7 @@
                         <button type="button" class="lw-speed-button${state.speed === speed ? " is-active" : ""}" data-action="set-speed" data-lesson-id="${escapeHtml(lesson.id)}" data-speed="${speed.toFixed(1)}">${speed.toFixed(1)}배</button>
                     `).join("")}
                 </div>
-                <div class="lw-help-box">${escapeHtml(uiText.subtitleHelp)}</div>
+                <div class="lw-help-box">${escapeHtml(getSubtitleHelpText())}</div>
                 <div id="listen-status-${escapeHtml(lesson.id)}" class="lw-status" data-tone="info">${escapeHtml(uiText.listenCount(state.listens))}</div>
             </section>
         `;
@@ -2251,17 +2314,19 @@
                 <h3>${escapeHtml(uiText.clarificationTitle)}</h3>
                 <p class="lw-section-copy">${escapeHtml(getLocalizedField(lesson, "clarificationPrompt", "못 들은 부분을 다시 묻거나, 핵심을 확인하는 표현을 버튼으로 골라 연습해 보세요."))}</p>
                 <div class="lw-grid">
-                    ${expressions.map((item) => `
+                    ${expressions.map((item) => {
+                        const expressionTranslation = shouldLocalizeLearnerContent() ? item.vi : "";
+                        return `
                         <div class="lw-expression-card">
                             <strong>${escapeHtml(item.ko)}</strong>
-                            <small>${escapeHtml(item.vi)}</small>
+                            ${expressionTranslation ? `<small>${escapeHtml(expressionTranslation)}</small>` : ""}
                             <div>${escapeHtml(chooseLocalizedText(item.use, item.useVi, item.use || ""))}</div>
                             <div class="lw-chip-row">
                                 <button type="button" class="lw-chip-button" data-action="append-expression" data-lesson-id="${escapeHtml(lesson.id)}" data-expression="${escapeHtml(item.ko)}">${escapeHtml(uiText.clarificationAdd)}</button>
                                 <button type="button" class="lw-chip-button" data-action="speak-expression" data-lesson-id="${escapeHtml(lesson.id)}" data-expression="${escapeHtml(item.ko)}">${escapeHtml(uiText.clarificationSpeak)}</button>
                             </div>
                         </div>
-                    `).join("")}
+                    `; }).join("")}
                 </div>
                 <div class="lw-summary-block" style="margin-top: 12px;">
                     <strong>${escapeHtml(uiText.clarificationBox)}</strong>
@@ -2297,6 +2362,7 @@
         const state = getState(lesson.id);
         const language = getQuizLanguage(state);
         const uiText = getQuizText(language);
+        const showQuizLanguageBar = !usesMinimalTranslationScaffold();
         const foldable = isQuizFoldEnabled(lesson);
         const isOpen = foldable ? readQuizFoldState(lesson) : true;
         const foldBodyId = `quiz-fold-body-${lesson.id}`;
@@ -2331,12 +2397,14 @@
                 <strong id="quiz-guide-title-${escapeHtml(lesson.id)}">${escapeHtml(uiText.guideTitle)}</strong>
                 <div id="quiz-guide-${escapeHtml(lesson.id)}" style="font-size: 14px; line-height: 1.8; color: #475569;">${escapeHtml(getLessonQuizGuide(lesson, language))}</div>
             </div>
-            <div class="lw-quiz-language-bar">
-                <strong>${escapeHtml(uiText.languageLabel)}</strong>
-                <button type="button" class="lw-note-tab${language === "ko" ? " is-active" : ""}" data-action="set-quiz-language" data-lesson-id="${escapeHtml(lesson.id)}" data-quiz-language="ko">${escapeHtml(uiText.languageKo)}</button>
-                <button type="button" class="lw-note-tab${language === "vi" ? " is-active" : ""}" data-action="set-quiz-language" data-lesson-id="${escapeHtml(lesson.id)}" data-quiz-language="vi">${escapeHtml(uiText.languageVi)}</button>
-                <div class="lw-quiz-language-help" id="quiz-language-help-${escapeHtml(lesson.id)}">${escapeHtml(uiText.languageHelp)}</div>
-            </div>
+            ${showQuizLanguageBar ? `
+                <div class="lw-quiz-language-bar">
+                    <strong>${escapeHtml(uiText.languageLabel)}</strong>
+                    <button type="button" class="lw-note-tab${language === "ko" ? " is-active" : ""}" data-action="set-quiz-language" data-lesson-id="${escapeHtml(lesson.id)}" data-quiz-language="ko">${escapeHtml(uiText.languageKo)}</button>
+                    <button type="button" class="lw-note-tab${language === "vi" ? " is-active" : ""}" data-action="set-quiz-language" data-lesson-id="${escapeHtml(lesson.id)}" data-quiz-language="vi">${escapeHtml(uiText.languageVi)}</button>
+                    <div class="lw-quiz-language-help" id="quiz-language-help-${escapeHtml(lesson.id)}">${escapeHtml(uiText.languageHelp)}</div>
+                </div>
+            ` : ""}
             <div class="lw-grid">
                 ${(lesson.questions || []).map((question, index) => `
                     <article class="lw-quiz-card" id="quiz-card-${escapeHtml(lesson.id)}-${index}">
@@ -2759,7 +2827,7 @@
                 <article class="lw-transcript-line" id="transcript-line-${escapeHtml(lesson.id)}-${index}" data-line-index="${index}">
                     <div class="lw-line-speaker">${escapeHtml(line.speaker)}</div>
                     <div class="lw-line-text">${renderChunkedLineText(lesson.id, index, line, "transcript-chunk")}</div>
-                    ${stage === 3 ? `<div class="lw-line-translation">${escapeHtml(line.vi || "")}</div>` : ""}
+                    ${stage === 3 && shouldLocalizeLearnerContent() ? `<div class="lw-line-translation">${escapeHtml(line.vi || "")}</div>` : ""}
                 </article>
             `;
         }).join("");
@@ -2786,16 +2854,17 @@
 
         return `
             <div class="lw-line-text">${renderChunkedLineText(lessonId, lineIndex, line, "preview-chunk")}</div>
-            ${stage === 3 ? `<div class="lw-line-translation">${escapeHtml(line.vi || "")}</div>` : ""}
+            ${stage === 3 && shouldLocalizeLearnerContent() ? `<div class="lw-line-translation">${escapeHtml(line.vi || "")}</div>` : ""}
         `;
     }
 
     function renderStageMeta(lessonId) {
-        const uiText = getInstructionText();
         const state = getState(lessonId);
-        const unlocked = getUnlockedStage(state.listens);
-        const current = STAGES.find((stage) => stage.id === state.stage) || STAGES[0];
-        return uiText.currentStage(getStageLabel(current), unlocked);
+        const lesson = lessonMap.get(lessonId);
+        const stages = lesson ? getLessonStages(lesson) : STAGES;
+        const unlocked = lesson ? getLessonUnlockedStage(lesson, state.listens) : getUnlockedStage(state.listens);
+        const current = stages.find((stage) => stage.id === state.stage) || stages[0] || STAGES[0];
+        return getCurrentStageText(getStageLabel(current), unlocked);
     }
 
     function getGeneratedTranscriptTimingEntry(line, lesson = null, lineIndex = null) {
@@ -4972,7 +5041,13 @@
     }
 
     function getLessonStages(lesson) {
-        if (lessonHasTranscript(lesson)) return STAGES;
+        if (lessonHasTranscript(lesson)) {
+            const scaffold = getTranslationScaffoldConfig();
+            const maxStage = Number.isFinite(Number(scaffold.maxSubtitleStage))
+                ? Number(scaffold.maxSubtitleStage)
+                : (usesMinimalTranslationScaffold() ? 2 : 3);
+            return STAGES.filter((stage) => stage.id <= maxStage);
+        }
         const stages = [
             { id: 0, label: "듣기만", labelVi: "Chi nghe", unlock: 0 },
             { id: 1, label: "핵심어", labelVi: "Tu khoa", unlock: 1 },
@@ -4995,11 +5070,17 @@
         if (!lesson) return [];
 
         const cards = [];
-        const summary = getLocalizedField(lesson, "summary", lesson.summary || "");
-        const keywordPrompt = getLocalizedNotePrompt(lesson, "keywords", "");
-        const cue = getLocalizedNotePrompt(lesson, "cue", "");
-        const details = getLocalizedNotePrompt(lesson, "details", "");
-        const predictionNote = getLocalizedField(lesson.preListening || {}, "predictionNote", (lesson.preListening && lesson.preListening.predictionNote) || "");
+        const summary = getLearnerContentField(lesson, "summary", lesson.summary || "");
+        const keywordPrompt = shouldLocalizeLearnerContent()
+            ? getLocalizedNotePrompt(lesson, "keywords", "")
+            : ((lesson.notePrompts && lesson.notePrompts.keywords) || "");
+        const cue = shouldLocalizeLearnerContent()
+            ? getLocalizedNotePrompt(lesson, "cue", "")
+            : ((lesson.notePrompts && lesson.notePrompts.cue) || "");
+        const details = shouldLocalizeLearnerContent()
+            ? getLocalizedNotePrompt(lesson, "details", "")
+            : ((lesson.notePrompts && lesson.notePrompts.details) || "");
+        const predictionNote = getLearnerContentField(lesson.preListening || {}, "predictionNote", (lesson.preListening && lesson.preListening.predictionNote) || "");
 
         if (summary) cards.push({ title: chooseLocalizedText("내용 포인트", "Noi dung chinh"), body: summary });
         if (keywordPrompt) cards.push({ title: chooseLocalizedText("키워드 확장", "Mo rong tu khoa"), body: keywordPrompt });
@@ -5481,7 +5562,7 @@
                 <article class="lw-transcript-line" id="transcript-line-${escapeHtml(lesson.id)}-${index}" data-line-index="${index}">
                     <div class="lw-line-speaker">${escapeHtml(line.speaker)}</div>
                     <div class="lw-line-text">${renderChunkedLineText(lesson.id, index, line, "transcript-chunk")}</div>
-                    ${stage === 3 ? `<div class="lw-line-translation">${escapeHtml(line.vi || "")}</div>` : ""}
+                    ${stage === 3 && shouldLocalizeLearnerContent() ? `<div class="lw-line-translation">${escapeHtml(line.vi || "")}</div>` : ""}
                 </article>
             `;
         }).join("");
@@ -5493,7 +5574,7 @@
         const stages = getLessonStages(lesson);
         const unlocked = getLessonUnlockedStage(lesson, state.listens);
         const current = stages.find((stage) => stage.id === state.stage) || stages[0];
-        return getInstructionText().currentStage(getStageLabel(current), unlocked);
+        return getCurrentStageText(getStageLabel(current), unlocked);
     }
 
     function updateLessonUI(lessonId) {

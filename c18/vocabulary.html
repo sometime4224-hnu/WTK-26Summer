@@ -1,5 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
+<!--
+  TEMPLATE: vocabulary.html (T-05, c10-verified standard)
+
+  사용법:
+    1. window.VOCABULARY_CONFIG 안의 과 데이터를 실제 과 데이터로 교체한다.
+    2. 데이터가 많으면 vocabulary-data.js 로 분리하고 이 템플릿보다 먼저 로드한다.
+    3. image 값은 null이어도 된다. 이미지가 있으면 카드/퀴즈에서 자동 사용된다.
+    4. 그림 퀴즈에서 글자 없는 별도 이미지가 필요하면 quizImage를 지정한다.
+    5. 그림 퀴즈는 image 또는 quizImage가 1개 이상 있을 때만 버튼을 표시한다.
+-->
 <head>
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -8,121 +18,1491 @@
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>18과 어휘 | 거울이 깨지고 말았어요</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
-    <link rel="stylesheet" href="chapter.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="../shared/multilang-toggle.css" />
+    <style>
+        :root {
+            --vocab-shell-width: min(1180px, calc(100vw - 32px));
+            --vocab-shell-margin: 18px auto 42px;
+            --vocab-surface: rgba(255, 255, 255, 0.94);
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #f8fbfd 0%, #eef6ff 48%, #fff7ed 100%);
+            color: var(--ink, #172033);
+            font-family: 'Noto Sans KR', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button, input { font: inherit; }
+        button { -webkit-appearance: none; appearance: none; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 0 14px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line, #dbe4f0);
+            backdrop-filter: blur(12px);
+        }
+        .topbar a {
+            color: var(--accent-dark, #1d4ed8);
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+        .topbar__divider { color: #cbd5e1; font-weight: 900; }
+
+        .shell { width: var(--vocab-shell-width); margin: var(--vocab-shell-margin); }
+        .hero {
+            border: 1px solid var(--line-soft, #edf2f7);
+            border-radius: var(--radius-lg, 16px);
+            background: var(--vocab-surface);
+            box-shadow: var(--shadow, 0 18px 48px rgba(30, 41, 59, 0.11));
+            padding: 20px 22px;
+            margin-bottom: 14px;
+        }
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--vocab, #e4582e);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+        .hero h1 {
+            margin: 0 0 6px;
+            font-size: clamp(22px, 4vw, 32px);
+            line-height: 1.15;
+        }
+        .hero__subtitle { margin: 0; color: var(--muted, #64748b); font-size: 14px; font-weight: 700; }
+        .hero__row {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .hero__stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 11px;
+            background: #fff;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        [data-multilang-bar] { margin-top: 12px; }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .segmented {
+            display: flex;
+            gap: 4px;
+            border-radius: var(--radius, 8px);
+            padding: 3px;
+            background: #eaf0f7;
+        }
+        .segmented button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 44px;
+            border: 0;
+            border-radius: 8px;
+            padding: 0 14px;
+            background: transparent;
+            color: var(--muted, #64748b);
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .segmented button.active {
+            background: #fff;
+            color: var(--ink, #172033);
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+        }
+        .search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: min(280px, 100%);
+            flex: 1;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 13px;
+            min-height: 44px;
+            background: #fff;
+        }
+        .search i { color: var(--muted, #64748b); }
+        .search input {
+            width: 100%;
+            min-width: 0;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--ink, #172033);
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .control-btn,
+        .front-headword-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 12px;
+            background: #fff;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: background 0.14s, border-color 0.14s, color 0.14s, box-shadow 0.14s;
+        }
+        .control-btn:hover,
+        .front-headword-toggle:hover { border-color: #bfdbfe; color: var(--accent-dark, #1d4ed8); }
+        .front-headword-toggle[aria-checked="true"] {
+            border-color: var(--vocab, #e4582e);
+            background: #fff4ed;
+            color: var(--vocab, #e4582e);
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+        }
+        .front-headword-toggle__switch {
+            position: relative;
+            width: 34px;
+            height: 20px;
+            border-radius: var(--radius-pill, 999px);
+            background: #cbd5e1;
+            transition: background 0.14s;
+        }
+        .front-headword-toggle__switch::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.22);
+            transition: transform 0.14s;
+        }
+        .front-headword-toggle[aria-checked="true"] .front-headword-toggle__switch { background: var(--vocab, #e4582e); }
+        .front-headword-toggle[aria-checked="true"] .front-headword-toggle__switch::after { transform: translateX(14px); }
+
+        .category-filter { display: flex; flex-wrap: wrap; gap: 6px; }
+        .category-btn {
+            min-height: 40px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 12px;
+            background: #fff;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .category-btn.active { border-color: var(--vocab, #e4582e); background: #fff4ed; color: var(--vocab, #e4582e); }
+
+        .view { display: none; }
+        .view.active { display: block; }
+        .empty-state {
+            padding: 42px 16px;
+            text-align: center;
+            color: var(--muted, #64748b);
+            font-weight: 800;
+        }
+
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 14px;
+        }
+        .word-card {
+            min-width: 0;
+            border: 0;
+            padding: 0;
+            background: transparent;
+            color: inherit;
+            text-align: initial;
+            cursor: pointer;
+            perspective: 1000px;
+        }
+        .word-card:focus-visible { outline: none; }
+        .word-card:focus-visible .word-card__face {
+            outline: 3px solid #bfdbfe;
+            outline-offset: 3px;
+        }
+        .word-card__inner {
+            position: relative;
+            display: block;
+            width: 100%;
+            aspect-ratio: 1;
+            min-height: 190px;
+            transform-style: preserve-3d;
+            transition: transform 0.42s ease;
+        }
+        .word-card.is-flipped .word-card__inner { transform: rotateY(180deg); }
+        .word-card__face {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+            backface-visibility: hidden;
+            transition: border-color 0.16s, box-shadow 0.16s;
+        }
+        .word-card:hover .word-card__face { border-color: var(--card-line); box-shadow: var(--shadow, 0 18px 48px rgba(30, 41, 59, 0.11)); }
+        .word-card__front { padding: 10px; background: linear-gradient(135deg, var(--card-bg), #fff 78%); }
+        .word-card__image,
+        .word-card__placeholder {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+        .word-card__image { object-fit: cover; }
+        .word-card__placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            color: var(--card-ink);
+            font-size: 26px;
+            font-weight: 900;
+            line-height: 1.25;
+            text-align: center;
+            word-break: keep-all;
+        }
+        .word-card__front-headword {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 44px;
+            z-index: 2;
+            display: block;
+            border: 1px solid rgba(255, 255, 255, 0.78);
+            border-radius: 8px;
+            padding: 7px 9px;
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--ink, #172033);
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.13);
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1.25;
+            text-align: center;
+            overflow-wrap: anywhere;
+            backdrop-filter: blur(8px);
+        }
+        .card-action {
+            position: absolute;
+            z-index: 3;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border: 1px solid rgba(255, 255, 255, 0.74);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.88);
+            color: #475569;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+            cursor: pointer;
+        }
+        .card-action:hover { color: var(--accent-dark, #1d4ed8); }
+        .card-action--speak { top: 10px; right: 10px; }
+        .card-action--flip { right: 10px; bottom: 10px; }
+        .word-card__back {
+            transform: rotateY(180deg);
+            gap: 10px;
+            padding: 16px;
+            text-align: center;
+            background: linear-gradient(160deg, #fff, var(--card-bg));
+        }
+        .word-card__back::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--card-ink);
+        }
+        .word-card__back-main {
+            color: var(--ink, #172033);
+            font-size: clamp(20px, 3vw, 26px);
+            font-weight: 900;
+            line-height: 1.2;
+            word-break: keep-all;
+        }
+        .word-card__translation {
+            display: grid;
+            gap: 4px;
+            width: min(100%, 260px);
+            border: 1px solid var(--card-line);
+            border-radius: 8px;
+            padding: 9px 10px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .word-card__lang {
+            color: var(--card-ink);
+            font-size: 11px;
+            font-weight: 900;
+        }
+        .word-card__translation-text {
+            color: var(--ink, #172033);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.4;
+            word-break: keep-all;
+        }
+        .word-card__category {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 28px;
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 10px;
+            background: var(--card-bg);
+            color: var(--card-ink);
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .list-panel { display: flex; flex-direction: column; gap: 10px; }
+        .list-item {
+            display: grid;
+            grid-template-columns: 88px minmax(160px, 1fr) minmax(260px, 1.7fr);
+            gap: 14px;
+            align-items: center;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+        }
+        .list-item__thumb {
+            width: 72px;
+            height: 72px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--line, #dbe4f0);
+            background: #f8fafc;
+        }
+        .list-item__thumb-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px;
+            height: 72px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            background: #f8fafc;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .list-item__ko {
+            display: grid;
+            gap: 8px;
+            font-size: 17px;
+            font-weight: 900;
+            word-break: keep-all;
+        }
+        .meta-pill {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            min-height: 24px;
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 8px;
+            background: #f1f5f9;
+            color: var(--muted, #64748b);
+            font-size: 10px;
+            font-weight: 900;
+        }
+        .list-item__info {
+            display: grid;
+            gap: 9px;
+            color: var(--ink, #172033);
+            font-size: 13px;
+            line-height: 1.55;
+        }
+        .translation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 6px;
+        }
+        .translation-cell {
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            padding: 8px;
+            background: #f8fafc;
+            color: var(--ink, #172033);
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .translation-cell strong {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--muted, #64748b);
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .quiz-layout {
+            max-width: 640px;
+            margin: 0 auto;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: var(--radius-lg, 16px);
+            background: #fff;
+            box-shadow: var(--shadow, 0 18px 48px rgba(30, 41, 59, 0.11));
+            padding: 18px;
+        }
+        .quiz-mode-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 4px;
+            margin-bottom: 14px;
+            border-radius: 8px;
+            padding: 4px;
+            background: #f1f5f9;
+        }
+        .quiz-mode-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 38px;
+            border: 0;
+            border-radius: 8px;
+            padding: 0 10px;
+            background: transparent;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .quiz-mode-btn.active {
+            background: #fff;
+            color: var(--ink, #172033);
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+        }
+        .quiz-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .quiz-question {
+            display: grid;
+            gap: 12px;
+            min-height: 90px;
+            margin-bottom: 14px;
+        }
+        .quiz-visual {
+            position: relative;
+            width: min(100%, 260px);
+            aspect-ratio: 1;
+            margin: 0 auto;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+        .quiz-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .quiz-visual__fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 14px;
+            color: var(--muted, #64748b);
+            font-size: 14px;
+            font-weight: 900;
+            text-align: center;
+            word-break: keep-all;
+        }
+        .quiz-choseong-overlay {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            z-index: 2;
+            display: block;
+            border: 1px solid rgba(255, 255, 255, 0.78);
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--ink, #172033);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.16);
+            font-size: clamp(20px, 5vw, 30px);
+            font-weight: 900;
+            line-height: 1.15;
+            text-align: center;
+            overflow-wrap: anywhere;
+            backdrop-filter: blur(8px);
+        }
+        .quiz-prompt {
+            margin: 0;
+            text-align: center;
+            color: var(--ink, #172033);
+            font-size: 21px;
+            font-weight: 900;
+            line-height: 1.35;
+            word-break: keep-all;
+        }
+        .quiz-options { display: grid; gap: 8px; }
+        .quiz-option {
+            width: 100%;
+            min-height: 46px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            padding: 10px 14px;
+            background: #fff;
+            color: var(--ink, #172033);
+            font-size: 14px;
+            font-weight: 800;
+            text-align: left;
+            cursor: pointer;
+        }
+        .quiz-option:hover { border-color: #bfdbfe; background: var(--accent-soft, #eff6ff); }
+        .quiz-option.correct { border-color: var(--ok-line, #86efac); background: var(--ok-bg, #dcfce7); color: var(--ok, #15803d); }
+        .quiz-option.wrong { border-color: var(--bad-line, #fca5a5); background: var(--bad-bg, #fee2e2); color: var(--bad, #b91c1c); }
+        .feedback {
+            min-height: 28px;
+            color: var(--muted, #64748b);
+            font-size: 14px;
+            font-weight: 900;
+            text-align: center;
+        }
+        .quiz-actions { display: flex; justify-content: center; margin-top: 12px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 44px;
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 15px;
+            background: #fff;
+            color: var(--accent-dark, #1d4ed8);
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn.primary { border-color: var(--accent-dark, #1d4ed8); background: var(--accent, #2563eb); color: #fff; }
+        .footer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 22px;
+        }
+
+        @media (max-width: 760px) {
+            :root { --vocab-shell-width: min(100vw - 18px, 1180px); }
+            .shell { margin-top: 10px; }
+            .hero { padding: 16px; }
+            .hero__row { align-items: stretch; }
+            .toolbar { gap: 8px; }
+            .segmented { width: 100%; }
+            .segmented button { flex: 1; padding: 0 8px; }
+            .control-btn,
+            .front-headword-toggle { flex: 1 1 auto; }
+            .word-grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 10px; }
+            .word-card__inner { min-height: 160px; }
+            .word-card__front { padding: 8px; }
+            .word-card__front-headword { top: 8px; left: 8px; right: 40px; padding: 6px 8px; font-size: 12px; }
+            .card-action { width: 32px; height: 32px; }
+            .card-action--speak { top: 8px; right: 8px; }
+            .card-action--flip { right: 8px; bottom: 8px; }
+            .word-card__back { padding: 12px; }
+            .word-card__back-main { font-size: 18px; }
+            .word-card__translation-text { font-size: 12px; }
+            .list-item { grid-template-columns: 58px 1fr; gap: 10px; }
+            .list-item__thumb,
+            .list-item__thumb-placeholder { width: 54px; height: 54px; }
+            .list-item__info { grid-column: 1 / -1; }
+            .translation-grid { grid-template-columns: 1fr; }
+            .quiz-layout { padding: 14px; }
+            .quiz-prompt { font-size: 18px; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
 
     <nav class="topbar" aria-label="상단 이동">
         <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
-        <span>|</span>
+        <span class="topbar__divider">|</span>
         <a href="index.html">18과 목록</a>
-        <span>|</span>
-        <strong>어휘</strong>
     </nav>
 
     <main class="shell">
-        <section class="hero">
-            <div class="hero-grid">
+        <header class="hero">
+            <div class="hero__row">
                 <div>
-                    <p class="eyebrow">Vocabulary</p>
-                    <h1>18과 어휘 카드</h1>
-                    <p class="lead">원본 18과의 연극 대본과 그림 활동에 나온 어휘를 장면별 이미지 카드로 묶었습니다. 그림으로 먼저 장면을 떠올리고, 뜻과 예문을 함께 확인하세요.</p>
-                    <div class="chips">
-                        <span class="chip"><i class="fa-solid fa-masks-theater"></i> 공연 명사</span>
-                        <span class="chip"><i class="fa-solid fa-hand"></i> 행동 동사</span>
-                        <span class="chip"><i class="fa-solid fa-person-running"></i> 몸짓 표현</span>
+                    <p class="eyebrow">Chapter 18 Vocabulary</p>
+                    <h1>18과 어휘 학습</h1>
+                    <p class="hero__subtitle">연극과 사건, 몸짓 표현을 익힙니다.</p>
+                    <div class="hero__stats" aria-label="어휘 요약">
+                        <span class="stat-chip"><i class="fa-solid fa-layer-group"></i> <span id="vocab-count">어휘 0개</span></span>
+                        <span class="stat-chip"><i class="fa-solid fa-image"></i> <span id="image-count">이미지 0개</span></span>
+                        <span class="stat-chip"><i class="fa-solid fa-circle-question"></i> 뜻·초성·그림 퀴즈</span>
                     </div>
                 </div>
-                <button class="translation-toggle js-vi-toggle" type="button" aria-pressed="false">
-                    <i class="fa-solid fa-language"></i> Tiếng Việt OFF
-                </button>
             </div>
+            <div data-multilang-bar></div>
+        </header>
+
+        <section class="toolbar" aria-label="학습 보기 선택">
+            <div class="segmented" role="tablist" aria-label="보기">
+                <button class="active" data-view="cards" type="button" role="tab"><i class="fa-solid fa-table-cells-large"></i> 카드</button>
+                <button data-view="list" type="button" role="tab"><i class="fa-solid fa-list"></i> 정리</button>
+                <button data-view="quiz" type="button" role="tab"><i class="fa-solid fa-circle-question"></i> 퀴즈</button>
+            </div>
+            <label class="search" for="search-input">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input id="search-input" type="search" autocomplete="off" placeholder="어휘 검색" />
+            </label>
+            <button id="front-headword-toggle" class="front-headword-toggle" type="button" role="switch" aria-checked="false">
+                <span class="front-headword-toggle__switch" aria-hidden="true"></span>
+                <i class="fa-solid fa-tag" aria-hidden="true"></i> 표제어 표시
+            </button>
+            <button id="shuffle-btn" class="control-btn" type="button"><i class="fa-solid fa-shuffle"></i> 섞기</button>
         </section>
 
-        <section class="section">
-            <div class="stats-grid">
-                <div class="stat-card"><strong>16</strong><span>이미지 카드</span></div>
-                <div class="stat-card"><strong id="vocabVisibleCount">16</strong><span>현재 표시</span></div>
-                <div class="stat-card"><strong>3</strong><span>분류</span></div>
-                <div class="stat-card"><strong>8</strong><span>즉석 퀴즈</span></div>
-            </div>
-
-            <div class="toolbar">
-                <div class="filter-row" aria-label="어휘 분류">
-                    <button class="filter-btn active" type="button" data-vocab-filter="all">전체</button>
-                    <button class="filter-btn" type="button" data-vocab-filter="stage">공연</button>
-                    <button class="filter-btn" type="button" data-vocab-filter="object">사건</button>
-                    <button class="filter-btn" type="button" data-vocab-filter="gesture">몸짓</button>
-                </div>
-                <label class="search">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input id="vocabSearch" type="search" placeholder="단어, 뜻, 예문 검색">
-                </label>
-            </div>
-
-            <div id="vocabGrid" class="vocab-grid" aria-live="polite"></div>
+        <section class="toolbar" aria-label="어휘 범주 선택">
+            <div id="category-filter" class="category-filter"></div>
         </section>
 
-        <section id="vocabQuiz" class="section">
-            <div class="quiz-card">
-                <div class="quiz-head">
-                    <div>
-                        <p class="eyebrow">Quick Quiz</p>
-                        <h2>어휘 빠른 확인</h2>
-                    </div>
-                    <span id="vocabQuizCount" class="quiz-count">1 / 8</span>
+        <section id="cards-view" class="view active" aria-label="어휘 카드">
+            <div id="word-grid" class="word-grid"></div>
+            <div id="cards-empty" class="empty-state" hidden>검색 결과가 없습니다.</div>
+        </section>
+
+        <section id="list-view" class="view" aria-label="어휘 정리">
+            <div id="list-panel" class="list-panel"></div>
+            <div id="list-empty" class="empty-state" hidden>검색 결과가 없습니다.</div>
+        </section>
+
+        <section id="quiz-view" class="view" aria-label="어휘 퀴즈">
+            <div class="quiz-layout">
+                <div id="quiz-mode-selector" class="quiz-mode-selector" role="tablist" aria-label="퀴즈 유형"></div>
+                <div class="quiz-meta">
+                    <span id="quiz-progress">문제 1 / ?</span>
+                    <span id="quiz-type">뜻 맞히기</span>
                 </div>
-                <div class="progress"><div id="vocabQuizProgress" class="progress-bar"></div></div>
-                <p id="vocabQuizPrompt" class="prompt"></p>
-                <div id="vocabQuizChoices" class="choices"></div>
-                <div id="vocabQuizFeedback" class="feedback"></div>
-                <div class="button-row" style="justify-content: space-between; margin-top: 14px;">
-                    <button id="vocabQuizRestart" class="btn" type="button"><i class="fa-solid fa-rotate-left"></i> 다시 풀기</button>
-                    <button id="vocabQuizNext" class="btn primary" type="button" disabled>다음 <i class="fa-solid fa-arrow-right"></i></button>
+                <div id="quiz-question" class="quiz-question"></div>
+                <div id="quiz-options" class="quiz-options"></div>
+                <div id="quiz-feedback" class="feedback" aria-live="polite"></div>
+                <div class="quiz-actions">
+                    <button id="next-question-btn" class="btn primary" type="button" hidden>
+                        <i class="fa-solid fa-arrow-right"></i> 다음
+                    </button>
                 </div>
             </div>
         </section>
 
         <nav class="footer-nav" aria-label="페이지 이동">
-            <a class="btn" href="index.html"><i class="fa-solid fa-list"></i> 18과 목록</a>
-            <a class="btn primary" href="grammar1.html">문법 1로 이동 <i class="fa-solid fa-arrow-right"></i></a>
+            <a class="btn" href="index.html"><i class="fa-solid fa-house"></i> 18과 목록</a>
+            <a class="btn" href="../index.html"><i class="fa-solid fa-layer-group"></i> 전체 목록</a>
         </nav>
     </main>
 
+    <!-- 어휘 데이터: 필요 시 이 블록을 vocabulary-data.js 로 분리 -->
     <script>
-        const c18VocabImageBase = "../assets/c18/vocabulary/images/cards/";
-        window.C18_VOCABULARY = [
-            { term: "연극", category: "stage", categoryLabel: "공연", meaning: "배우가 무대에서 이야기를 보여 주는 공연", vi: "vở kịch, kịch nói", example: "우리 반은 축제에서 짧은 연극을 하기로 했어요.", tags: ["공연", "무대"], image: c18VocabImageBase + "theater-play.webp", imageAlt: "무대 위 배우들이 이야기를 보여 주는 연극 장면" },
-            { term: "연기", category: "stage", categoryLabel: "공연", meaning: "배우가 맡은 역할처럼 말하고 행동하는 것", vi: "diễn xuất", example: "처음에는 어색했지만 연습할수록 연기가 자연스러워졌어요.", tags: ["배우", "역할"], image: c18VocabImageBase + "acting.webp", imageAlt: "배우가 무대에서 감정을 담아 연기하는 장면" },
-            { term: "무대", category: "stage", categoryLabel: "공연", meaning: "배우들이 관객 앞에서 연기하는 공간", vi: "sân khấu", example: "조명이 켜지자 배우들이 무대 위로 나왔어요.", tags: ["공연장", "공간"], image: c18VocabImageBase + "stage.webp", imageAlt: "막이 열린 공연 무대와 조명" },
-            { term: "관객", category: "stage", categoryLabel: "공연", meaning: "공연을 보는 사람들", vi: "khán giả", example: "관객들은 마지막 장면에서 큰 박수를 보냈어요.", tags: ["보는 사람", "공연"], image: c18VocabImageBase + "audience.webp", imageAlt: "무대 앞에 앉아 공연을 보는 관객들" },
-            { term: "대본", category: "stage", categoryLabel: "공연", meaning: "연극에서 배우가 말할 내용과 행동이 적힌 글", vi: "kịch bản", example: "배우들은 대본을 읽고 자기 대사를 표시했어요.", tags: ["글", "연습"], image: c18VocabImageBase + "script.webp", imageAlt: "펼쳐진 대본과 연습 표시 도구" },
-            { term: "대사", category: "stage", categoryLabel: "공연", meaning: "연극에서 배우가 맡은 역할로 말하는 문장", vi: "lời thoại", example: "민지는 중요한 대사를 잊지 않으려고 여러 번 외웠어요.", tags: ["말", "문장"], image: c18VocabImageBase + "line-dialogue.webp", imageAlt: "무대 위 배우들이 말풍선으로 대사를 주고받는 장면" },
-            { term: "들여다보다", category: "object", categoryLabel: "사건", meaning: "안쪽이나 가까운 곳을 자세히 보다", vi: "nhìn kỹ vào bên trong", example: "주인공은 오래된 거울을 가만히 들여다보았어요.", tags: ["거울", "보다"], image: c18VocabImageBase + "look-into.webp", imageAlt: "사람이 상자 안을 자세히 들여다보는 장면" },
-            { term: "숨기다", category: "object", categoryLabel: "사건", meaning: "다른 사람이 보거나 알지 못하게 하다", vi: "giấu, che giấu", example: "농부는 거울을 장롱 속에 숨겨 두었어요.", tags: ["감추다", "비밀"], image: c18VocabImageBase + "hide.webp", imageAlt: "사람이 물건을 등 뒤로 숨기는 장면" },
-            { term: "빼앗다", category: "object", categoryLabel: "사건", meaning: "남의 것을 억지로 가져가다", vi: "cướp, lấy mất", example: "동생이 장난으로 형의 대본을 빼앗았어요.", tags: ["가져가다", "갈등"], image: c18VocabImageBase + "take-away.webp", imageAlt: "두 사람이 물건을 서로 잡아당기는 장면" },
-            { term: "깨뜨리다", category: "object", categoryLabel: "사건", meaning: "단단한 물건을 부서지게 하다", vi: "làm vỡ", example: "연습 중에 거울을 떨어뜨려 깨뜨리고 말았어요.", tags: ["거울", "부서지다"], image: c18VocabImageBase + "break.webp", imageAlt: "탁자 위 물건이 깨져 조각난 장면" },
-            { term: "벌떡 일어나다", category: "gesture", categoryLabel: "몸짓", meaning: "갑자기 힘 있게 일어나다", vi: "bật dậy", example: "소리를 듣자 배우가 벌떡 일어났어요.", tags: ["갑자기", "동작"], image: c18VocabImageBase + "stand-up.webp", imageAlt: "침대에서 갑자기 힘 있게 일어나는 사람" },
-            { term: "깜짝 놀라다", category: "gesture", categoryLabel: "몸짓", meaning: "예상하지 못한 일 때문에 매우 놀라다", vi: "giật mình", example: "불이 갑자기 꺼져서 관객들이 깜짝 놀랐어요.", tags: ["놀람", "감정"], image: c18VocabImageBase + "surprised.webp", imageAlt: "눈을 크게 뜨고 깜짝 놀란 얼굴" },
-            { term: "고개를 가로젓다", category: "gesture", categoryLabel: "몸짓", meaning: "아니라는 뜻으로 머리를 좌우로 흔들다", vi: "lắc đầu", example: "감독은 이 장면이 어색하다며 고개를 가로저었어요.", tags: ["아니요", "반대"], image: c18VocabImageBase + "shake-head.webp", imageAlt: "머리를 좌우로 흔드는 얼굴과 방향 화살표" },
-            { term: "소리를 지르다", category: "gesture", categoryLabel: "몸짓", meaning: "큰 목소리로 외치다", vi: "hét lên", example: "주인공은 거울이 깨지자 소리를 질렀어요.", tags: ["큰소리", "외치다"], image: c18VocabImageBase + "shout.webp", imageAlt: "배우가 크게 외치고 소리 선이 퍼지는 장면" },
-            { term: "뒤를 획 돌아보다", category: "gesture", categoryLabel: "몸짓", meaning: "갑자기 몸을 돌려 뒤쪽을 보다", vi: "ngoảnh phắt lại", example: "발소리가 들리자 배우가 뒤를 획 돌아보았어요.", tags: ["뒤", "돌아보다"], image: c18VocabImageBase + "turn-back.webp", imageAlt: "몸을 갑자기 돌려 뒤를 보는 사람" },
-            { term: "고개를 끄덕이다", category: "gesture", categoryLabel: "몸짓", meaning: "그렇다는 뜻으로 머리를 위아래로 움직이다", vi: "gật đầu", example: "관객의 질문을 듣고 배우가 고개를 끄덕였어요.", tags: ["네", "동의"], image: c18VocabImageBase + "nod.webp", imageAlt: "위아래 화살표와 함께 고개를 끄덕이는 얼굴" }
-        ];
+    window.VOCABULARY_CONFIG = {
+        chapter: "18",
+        title: "18과 어휘 학습",
+        subtitle: "연극과 사건, 몸짓 표현을 익힙니다.",
+        languages: [
+                "en",
+                "vi",
+                "mn",
+                "ar",
+                "kk",
+                "th"
+        ],
+        defaultLang: "none",
+        quizModes: [
+                "meaning",
+                "choseong",
+                "image"
+        ],
+        storageKey: "c18-vocabulary-standard",
+        categories: [
+                {
+                        id: "all",
+                        label: "전체"
+                },
+                {
+                        id: "stage",
+                        label: "공연"
+                },
+                {
+                        id: "object",
+                        label: "사건"
+                },
+                {
+                        id: "gesture",
+                        label: "몸짓"
+                }
+        ],
+        words: [
+                {
+                        id: "c18-vocab-01",
+                        ko: "연극",
+                        meaning: "배우가 무대에서 이야기를 보여 주는 공연",
+                        pos: "명사",
+                        category: "stage",
+                        example: "우리 반은 축제에서 짧은 연극을 하기로 했어요.",
+                        vi: "vở kịch, kịch nói",
+                        image: "../assets/c18/vocabulary/images/cards/theater-play.webp",
+                        imageAlt: "무대 위 배우들이 이야기를 보여 주는 연극 장면",
+                        quizImage: null,
+                        quizImageAlt: "무대 위 배우들이 이야기를 보여 주는 연극 장면"
+                },
+                {
+                        id: "c18-vocab-02",
+                        ko: "연기",
+                        meaning: "배우가 맡은 역할처럼 말하고 행동하는 것",
+                        pos: "명사",
+                        category: "stage",
+                        example: "처음에는 어색했지만 연습할수록 연기가 자연스러워졌어요.",
+                        vi: "diễn xuất",
+                        image: "../assets/c18/vocabulary/images/cards/acting.webp",
+                        imageAlt: "배우가 무대에서 감정을 담아 연기하는 장면",
+                        quizImage: null,
+                        quizImageAlt: "배우가 무대에서 감정을 담아 연기하는 장면"
+                },
+                {
+                        id: "c18-vocab-03",
+                        ko: "무대",
+                        meaning: "배우들이 관객 앞에서 연기하는 공간",
+                        pos: "명사",
+                        category: "stage",
+                        example: "조명이 켜지자 배우들이 무대 위로 나왔어요.",
+                        vi: "sân khấu",
+                        image: "../assets/c18/vocabulary/images/cards/stage.webp",
+                        imageAlt: "막이 열린 공연 무대와 조명",
+                        quizImage: null,
+                        quizImageAlt: "막이 열린 공연 무대와 조명"
+                },
+                {
+                        id: "c18-vocab-04",
+                        ko: "관객",
+                        meaning: "공연을 보는 사람들",
+                        pos: "명사",
+                        category: "stage",
+                        example: "관객들은 마지막 장면에서 큰 박수를 보냈어요.",
+                        vi: "khán giả",
+                        image: "../assets/c18/vocabulary/images/cards/audience.webp",
+                        imageAlt: "무대 앞에 앉아 공연을 보는 관객들",
+                        quizImage: null,
+                        quizImageAlt: "무대 앞에 앉아 공연을 보는 관객들"
+                },
+                {
+                        id: "c18-vocab-05",
+                        ko: "대본",
+                        meaning: "연극에서 배우가 말할 내용과 행동이 적힌 글",
+                        pos: "명사",
+                        category: "stage",
+                        example: "배우들은 대본을 읽고 자기 대사를 표시했어요.",
+                        vi: "kịch bản",
+                        image: "../assets/c18/vocabulary/images/cards/script.webp",
+                        imageAlt: "펼쳐진 대본과 연습 표시 도구",
+                        quizImage: null,
+                        quizImageAlt: "펼쳐진 대본과 연습 표시 도구"
+                },
+                {
+                        id: "c18-vocab-06",
+                        ko: "대사",
+                        meaning: "연극에서 배우가 맡은 역할로 말하는 문장",
+                        pos: "명사",
+                        category: "stage",
+                        example: "민지는 중요한 대사를 잊지 않으려고 여러 번 외웠어요.",
+                        vi: "lời thoại",
+                        image: "../assets/c18/vocabulary/images/cards/line-dialogue.webp",
+                        imageAlt: "무대 위 배우들이 말풍선으로 대사를 주고받는 장면",
+                        quizImage: null,
+                        quizImageAlt: "무대 위 배우들이 말풍선으로 대사를 주고받는 장면"
+                },
+                {
+                        id: "c18-vocab-07",
+                        ko: "들여다보다",
+                        meaning: "안쪽이나 가까운 곳을 자세히 보다",
+                        pos: "표현",
+                        category: "object",
+                        example: "주인공은 오래된 거울을 가만히 들여다보았어요.",
+                        vi: "nhìn kỹ vào bên trong",
+                        image: "../assets/c18/vocabulary/images/cards/look-into.webp",
+                        imageAlt: "사람이 상자 안을 자세히 들여다보는 장면",
+                        quizImage: null,
+                        quizImageAlt: "사람이 상자 안을 자세히 들여다보는 장면"
+                },
+                {
+                        id: "c18-vocab-08",
+                        ko: "숨기다",
+                        meaning: "다른 사람이 보거나 알지 못하게 하다",
+                        pos: "표현",
+                        category: "object",
+                        example: "농부는 거울을 장롱 속에 숨겨 두었어요.",
+                        vi: "giấu, che giấu",
+                        image: "../assets/c18/vocabulary/images/cards/hide.webp",
+                        imageAlt: "사람이 물건을 등 뒤로 숨기는 장면",
+                        quizImage: null,
+                        quizImageAlt: "사람이 물건을 등 뒤로 숨기는 장면"
+                },
+                {
+                        id: "c18-vocab-09",
+                        ko: "빼앗다",
+                        meaning: "남의 것을 억지로 가져가다",
+                        pos: "표현",
+                        category: "object",
+                        example: "동생이 장난으로 형의 대본을 빼앗았어요.",
+                        vi: "cướp, lấy mất",
+                        image: "../assets/c18/vocabulary/images/cards/take-away.webp",
+                        imageAlt: "두 사람이 물건을 서로 잡아당기는 장면",
+                        quizImage: null,
+                        quizImageAlt: "두 사람이 물건을 서로 잡아당기는 장면"
+                },
+                {
+                        id: "c18-vocab-10",
+                        ko: "깨뜨리다",
+                        meaning: "단단한 물건을 부서지게 하다",
+                        pos: "표현",
+                        category: "object",
+                        example: "연습 중에 거울을 떨어뜨려 깨뜨리고 말았어요.",
+                        vi: "làm vỡ",
+                        image: "../assets/c18/vocabulary/images/cards/break.webp",
+                        imageAlt: "탁자 위 물건이 깨져 조각난 장면",
+                        quizImage: null,
+                        quizImageAlt: "탁자 위 물건이 깨져 조각난 장면"
+                },
+                {
+                        id: "c18-vocab-11",
+                        ko: "벌떡 일어나다",
+                        meaning: "갑자기 힘 있게 일어나다",
+                        pos: "표현",
+                        category: "gesture",
+                        example: "소리를 듣자 배우가 벌떡 일어났어요.",
+                        vi: "bật dậy",
+                        image: "../assets/c18/vocabulary/images/cards/stand-up.webp",
+                        imageAlt: "침대에서 갑자기 힘 있게 일어나는 사람",
+                        quizImage: null,
+                        quizImageAlt: "침대에서 갑자기 힘 있게 일어나는 사람"
+                },
+                {
+                        id: "c18-vocab-12",
+                        ko: "깜짝 놀라다",
+                        meaning: "예상하지 못한 일 때문에 매우 놀라다",
+                        pos: "표현",
+                        category: "gesture",
+                        example: "불이 갑자기 꺼져서 관객들이 깜짝 놀랐어요.",
+                        vi: "giật mình",
+                        image: "../assets/c18/vocabulary/images/cards/surprised.webp",
+                        imageAlt: "눈을 크게 뜨고 깜짝 놀란 얼굴",
+                        quizImage: null,
+                        quizImageAlt: "눈을 크게 뜨고 깜짝 놀란 얼굴"
+                },
+                {
+                        id: "c18-vocab-13",
+                        ko: "고개를 가로젓다",
+                        meaning: "아니라는 뜻으로 머리를 좌우로 흔들다",
+                        pos: "표현",
+                        category: "gesture",
+                        example: "감독은 이 장면이 어색하다며 고개를 가로저었어요.",
+                        vi: "lắc đầu",
+                        image: "../assets/c18/vocabulary/images/cards/shake-head.webp",
+                        imageAlt: "머리를 좌우로 흔드는 얼굴과 방향 화살표",
+                        quizImage: null,
+                        quizImageAlt: "머리를 좌우로 흔드는 얼굴과 방향 화살표"
+                },
+                {
+                        id: "c18-vocab-14",
+                        ko: "소리를 지르다",
+                        meaning: "큰 목소리로 외치다",
+                        pos: "표현",
+                        category: "gesture",
+                        example: "주인공은 거울이 깨지자 소리를 질렀어요.",
+                        vi: "hét lên",
+                        image: "../assets/c18/vocabulary/images/cards/shout.webp",
+                        imageAlt: "배우가 크게 외치고 소리 선이 퍼지는 장면",
+                        quizImage: null,
+                        quizImageAlt: "배우가 크게 외치고 소리 선이 퍼지는 장면"
+                },
+                {
+                        id: "c18-vocab-15",
+                        ko: "뒤를 획 돌아보다",
+                        meaning: "갑자기 몸을 돌려 뒤쪽을 보다",
+                        pos: "표현",
+                        category: "gesture",
+                        example: "발소리가 들리자 배우가 뒤를 획 돌아보았어요.",
+                        vi: "ngoảnh phắt lại",
+                        image: "../assets/c18/vocabulary/images/cards/turn-back.webp",
+                        imageAlt: "몸을 갑자기 돌려 뒤를 보는 사람",
+                        quizImage: null,
+                        quizImageAlt: "몸을 갑자기 돌려 뒤를 보는 사람"
+                },
+                {
+                        id: "c18-vocab-16",
+                        ko: "고개를 끄덕이다",
+                        meaning: "그렇다는 뜻으로 머리를 위아래로 움직이다",
+                        pos: "표현",
+                        category: "gesture",
+                        example: "관객의 질문을 듣고 배우가 고개를 끄덕였어요.",
+                        vi: "gật đầu",
+                        image: "../assets/c18/vocabulary/images/cards/nod.webp",
+                        imageAlt: "위아래 화살표와 함께 고개를 끄덕이는 얼굴",
+                        quizImage: null,
+                        quizImageAlt: "위아래 화살표와 함께 고개를 끄덕이는 얼굴"
+                }
+        ]
+};
+    window.MULTILANG_CONFIG = {
+        langs: window.VOCABULARY_CONFIG.languages || ["en", "vi", "mn", "ar", "kk", "th"],
+        defaultLang: window.VOCABULARY_CONFIG.defaultLang || "none"
+    };
     </script>
-    <script src="chapter.js"></script>
+
+    <script src="../shared/vocabulary-multilang-data.js"></script>
+    <script>
+    (function () {
+        "use strict";
+
+        const cfg = window.VOCABULARY_CONFIG;
+        if (!cfg) return;
+
+        const LANGS = {
+            none: { label: "한국어 뜻", answerLabel: "한국어 뜻", speech: "ko-KR" },
+            en: { label: "영어", answerLabel: "English", speech: "en-US" },
+            vi: { label: "베트남어", answerLabel: "Tiếng Việt", speech: "vi-VN" },
+            mn: { label: "몽골어", answerLabel: "Монгол", speech: "mn-MN" },
+            ar: { label: "아랍어", answerLabel: "العربية", speech: "ar-SA" },
+            kk: { label: "카자흐어", answerLabel: "Қазақша", speech: "kk-KZ" },
+            th: { label: "태국어", answerLabel: "ไทย", speech: "th-TH" },
+            ja: { label: "일본어", answerLabel: "日本語", speech: "ja-JP" },
+            zh: { label: "중국어", answerLabel: "中文", speech: "zh-CN" }
+        };
+        const QUIZ_MODE_META = {
+            meaning: { label: "뜻", icon: "fa-language" },
+            choseong: { label: "초성", icon: "fa-spell-check" },
+            image: { label: "그림", icon: "fa-image" }
+        };
+        const PALETTES = [
+            { bg: "#fff7ed", ink: "#c2410c", line: "#fed7aa" },
+            { bg: "#eff6ff", ink: "#1d4ed8", line: "#bfdbfe" },
+            { bg: "#f0fdf4", ink: "#15803d", line: "#bbf7d0" },
+            { bg: "#fdf2f8", ink: "#be185d", line: "#fbcfe8" },
+            { bg: "#f5f3ff", ink: "#6d28d9", line: "#ddd6fe" }
+        ];
+        const CHOSEONG = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+
+        const storagePrefix = cfg.storageKey || `vocabulary-${cfg.chapter || "standard"}`;
+        const categories = normalizeCategories(cfg.categories || []);
+        const words = normalizeWords(cfg.words || []);
+        const imageCount = words.filter((word) => Boolean(word.image)).length;
+        const quizImageCount = words.filter((word) => Boolean(word.quizImage || word.image)).length;
+        const availableQuizModes = normalizeQuizModes(cfg.quizModes || ["meaning", "choseong", "image"]);
+
+        let currentView = "cards";
+        let activeLang = readStored("preferred-lang", cfg.defaultLang || "none");
+        if (!LANGS[activeLang] || (activeLang !== "none" && !cfg.languages?.includes(activeLang))) activeLang = "none";
+        let currentCategory = "all";
+        let searchQuery = "";
+        let showFrontHeadword = readStored(`${storagePrefix}-front-headword`, "false") === "true";
+        let quizMode = readStored(`${storagePrefix}-quiz-mode`, availableQuizModes[0] || "meaning");
+        if (!availableQuizModes.includes(quizMode)) quizMode = availableQuizModes[0] || "meaning";
+        let cardOrder = words.map((_, index) => index);
+        let quizQueue = [];
+        let quizIndex = 0;
+
+        const els = {
+            vocabCount: document.getElementById("vocab-count"),
+            imageCount: document.getElementById("image-count"),
+            viewButtons: document.querySelectorAll("[data-view]"),
+            categoryFilter: document.getElementById("category-filter"),
+            searchInput: document.getElementById("search-input"),
+            frontToggle: document.getElementById("front-headword-toggle"),
+            shuffleBtn: document.getElementById("shuffle-btn"),
+            wordGrid: document.getElementById("word-grid"),
+            cardsEmpty: document.getElementById("cards-empty"),
+            listPanel: document.getElementById("list-panel"),
+            listEmpty: document.getElementById("list-empty"),
+            quizModeSelector: document.getElementById("quiz-mode-selector"),
+            quizProgress: document.getElementById("quiz-progress"),
+            quizType: document.getElementById("quiz-type"),
+            quizQuestion: document.getElementById("quiz-question"),
+            quizOptions: document.getElementById("quiz-options"),
+            quizFeedback: document.getElementById("quiz-feedback"),
+            nextQuestionBtn: document.getElementById("next-question-btn")
+        };
+
+        function readStored(key, fallback) {
+            try { return localStorage.getItem(key) || fallback; }
+            catch (error) { return fallback; }
+        }
+
+        function writeStored(key, value) {
+            try { localStorage.setItem(key, value); }
+            catch (error) { /* ignore */ }
+        }
+
+        function normalizeCategories(source) {
+            const list = source.length ? source.slice() : [{ id: "all", label: "전체" }];
+            if (!list.some((category) => category.id === "all")) {
+                list.unshift({ id: "all", label: "전체" });
+            }
+            return list;
+        }
+
+        function normalizeWords(source) {
+            return source.map((word, index) => ({
+                ...word,
+                id: word.id || `word-${index + 1}`,
+                ko: word.ko || word.term || word.korean || "",
+                meaning: word.meaning || word.definition || word.foreign || "",
+                category: word.category || "all",
+                image: word.image || null,
+                imageAlt: word.imageAlt || word.alt || "",
+                quizImage: word.quizImage || word.maskedImage || null,
+                quizImageAlt: word.quizImageAlt || word.imageAlt || word.alt || ""
+            })).filter((word) => word.ko);
+        }
+
+        function normalizeQuizModes(source) {
+            const modes = source.filter((mode) => mode !== "image" || quizImageCount > 0);
+            return modes.length ? modes : ["meaning", "choseong"];
+        }
+
+        function categoryFor(id) {
+            return categories.find((category) => category.id === id) || categories[0];
+        }
+
+        function paletteFor(id) {
+            const categoryIds = categories.filter((category) => category.id !== "all").map((category) => category.id);
+            const index = Math.max(0, categoryIds.indexOf(id));
+            return PALETTES[index % PALETTES.length];
+        }
+
+        function answerFor(word, lang = activeLang) {
+            if (lang === "none") return word.meaning || word.example || word.ko;
+            return word[lang] || word.meaning || word.example || word.ko;
+        }
+
+        function answerLabel() {
+            return LANGS[activeLang]?.answerLabel || "한국어 뜻";
+        }
+
+        function quizTypeLabel() {
+            if (quizMode === "choseong") return "초성 퀴즈";
+            if (quizMode === "image") return "그림 퀴즈";
+            return `${answerLabel()} 맞히기`;
+        }
+
+        function quizAnswerFor(word) {
+            if (quizMode === "meaning") return answerFor(word);
+            return word.ko;
+        }
+
+        function quizPromptFor(word) {
+            if (quizMode === "choseong") return "초성을 보고 어휘를 고르세요.";
+            if (quizMode === "image") return "그림에 맞는 어휘를 고르세요.";
+            return word.ko;
+        }
+
+        function choseongFor(value) {
+            return String(value || "").split("").map((char) => {
+                const code = char.charCodeAt(0) - 0xac00;
+                if (code >= 0 && code <= 11171) return CHOSEONG[Math.floor(code / 588)];
+                return char;
+            }).join("").replace(/\s+/g, " ").trim();
+        }
+
+        function escapeHtml(value) {
+            return String(value || "").replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[char]);
+        }
+
+        function translationAttrs(lang) {
+            const code = lang && lang !== "none" ? lang : "ko";
+            const dir = code === "ar" ? "rtl" : "ltr";
+            return `lang="${escapeHtml(code)}" dir="${dir}"`;
+        }
+
+        function speak(text, langCode = "ko-KR") {
+            if (!window.speechSynthesis || !text) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = langCode;
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function searchableText(word) {
+            return [
+                word.ko,
+                word.meaning,
+                word.example,
+                categoryFor(word.category).label,
+                ...(cfg.languages || []).map((lang) => word[lang] || "")
+            ].join(" ").toLowerCase();
+        }
+
+        function filteredWords() {
+            const query = searchQuery.toLowerCase();
+            return cardOrder
+                .map((index) => words[index])
+                .filter((word) => {
+                    const categoryMatch = currentCategory === "all" || word.category === currentCategory;
+                    const searchMatch = !query || searchableText(word).includes(query);
+                    return categoryMatch && searchMatch;
+                });
+        }
+
+        function imageMarkup(word, className, fallbackText) {
+            if (word.image) {
+                return `<img class="${className}" src="${escapeHtml(word.image)}" alt="${escapeHtml(word.imageAlt || `${word.ko} 그림 카드`)}" loading="lazy" decoding="async" />`;
+            }
+            return `<span class="${className === "word-card__image" ? "word-card__placeholder" : "quiz-visual__fallback"}">${escapeHtml(fallbackText || word.ko)}</span>`;
+        }
+
+        function quizVisualFor(word, overlay = "") {
+            const quizImage = word.quizImage || word.image;
+            const quizImageAlt = word.quizImageAlt || word.imageAlt || "어휘 그림";
+            const visual = quizImage
+                ? `<img class="quiz-image" src="${escapeHtml(quizImage)}" alt="${escapeHtml(quizImageAlt)}" loading="lazy" decoding="async" />`
+                : `<span class="quiz-visual__fallback">${escapeHtml(word.ko)}</span>`;
+            return `<div class="quiz-visual">${visual}${overlay}</div>`;
+        }
+
+        function buildCategoryFilter() {
+            els.categoryFilter.innerHTML = "";
+            categories.forEach((category) => {
+                const button = document.createElement("button");
+                button.className = "category-btn" + (category.id === currentCategory ? " active" : "");
+                button.type = "button";
+                button.textContent = category.label;
+                button.dataset.categoryId = category.id;
+                button.addEventListener("click", () => {
+                    currentCategory = category.id;
+                    document.querySelectorAll(".category-btn").forEach((btn) => btn.classList.remove("active"));
+                    button.classList.add("active");
+                    render();
+                });
+                els.categoryFilter.appendChild(button);
+            });
+        }
+
+        function buildQuizModeSelector() {
+            els.quizModeSelector.innerHTML = "";
+            availableQuizModes.forEach((mode) => {
+                const meta = QUIZ_MODE_META[mode] || QUIZ_MODE_META.meaning;
+                const button = document.createElement("button");
+                button.className = "quiz-mode-btn";
+                button.type = "button";
+                button.dataset.quizMode = mode;
+                button.setAttribute("role", "tab");
+                button.innerHTML = `<i class="fa-solid ${meta.icon}"></i> ${escapeHtml(meta.label)}`;
+                button.addEventListener("click", () => {
+                    quizMode = mode;
+                    writeStored(`${storagePrefix}-quiz-mode`, quizMode);
+                    updateQuizModeButtons();
+                    if (currentView === "quiz") startQuiz();
+                });
+                els.quizModeSelector.appendChild(button);
+            });
+        }
+
+        function updateFrontHeadwordToggle() {
+            els.frontToggle.setAttribute("aria-checked", String(showFrontHeadword));
+        }
+
+        function updateQuizModeButtons() {
+            document.querySelectorAll("[data-quiz-mode]").forEach((button) => {
+                const active = button.dataset.quizMode === quizMode;
+                button.classList.toggle("active", active);
+                button.setAttribute("aria-selected", String(active));
+            });
+        }
+
+        function renderCards() {
+            const list = filteredWords();
+            els.wordGrid.innerHTML = "";
+            els.cardsEmpty.hidden = list.length > 0;
+            list.forEach((word) => {
+                const category = categoryFor(word.category);
+                const palette = paletteFor(word.category);
+                const card = document.createElement("article");
+                card.className = "word-card";
+                card.tabIndex = 0;
+                card.setAttribute("role", "button");
+                card.setAttribute("aria-pressed", "false");
+                card.setAttribute("aria-label", `${word.ko} 카드 뒤집기`);
+                card.style.setProperty("--card-bg", palette.bg);
+                card.style.setProperty("--card-ink", palette.ink);
+                card.style.setProperty("--card-line", palette.line);
+                card.innerHTML = `
+                    <span class="word-card__inner">
+                        <span class="word-card__face word-card__front">
+                            ${showFrontHeadword ? `<span class="word-card__front-headword">${escapeHtml(word.ko)}</span>` : ""}
+                            ${imageMarkup(word, "word-card__image", word.ko)}
+                            <span class="card-action card-action--flip" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span>
+                        </span>
+                        <span class="word-card__face word-card__back">
+                            <button class="card-action card-action--speak" type="button" data-speak="${escapeHtml(word.ko)}" data-lang-code="ko-KR" aria-label="${escapeHtml(word.ko)} 듣기"><i class="fa-solid fa-volume-high"></i></button>
+                            <span class="word-card__back-main">${escapeHtml(word.ko)}</span>
+                            <span class="word-card__translation">
+                                <span class="word-card__lang">${escapeHtml(answerLabel())}</span>
+                                <span class="word-card__translation-text" ${translationAttrs(activeLang)}>${escapeHtml(answerFor(word))}</span>
+                            </span>
+                            <span class="word-card__category">${escapeHtml(category.label)}</span>
+                        </span>
+                    </span>
+                `;
+                card.addEventListener("click", (event) => {
+                    const speaker = event.target.closest("[data-speak]");
+                    if (speaker) {
+                        event.stopPropagation();
+                        speak(speaker.dataset.speak, speaker.dataset.langCode);
+                        return;
+                    }
+                    const flipped = !card.classList.contains("is-flipped");
+                    card.classList.toggle("is-flipped", flipped);
+                    card.setAttribute("aria-pressed", String(flipped));
+                    if (navigator.vibrate) navigator.vibrate(10);
+                });
+                card.addEventListener("keydown", (event) => {
+                    if (event.key !== "Enter" && event.key !== " ") return;
+                    event.preventDefault();
+                    const flipped = !card.classList.contains("is-flipped");
+                    card.classList.toggle("is-flipped", flipped);
+                    card.setAttribute("aria-pressed", String(flipped));
+                });
+                els.wordGrid.appendChild(card);
+            });
+        }
+
+        function renderList() {
+            const list = filteredWords();
+            els.listPanel.innerHTML = "";
+            els.listEmpty.hidden = list.length > 0;
+            list.forEach((word, index) => {
+                const category = categoryFor(word.category);
+                const item = document.createElement("article");
+                item.className = "list-item";
+                const thumb = word.image
+                    ? `<img class="list-item__thumb" src="${escapeHtml(word.image)}" alt="${escapeHtml(word.imageAlt || `${word.ko} 그림`)}" loading="lazy" decoding="async" />`
+                    : '<span class="list-item__thumb-placeholder"><i class="fa-solid fa-image"></i></span>';
+                item.innerHTML = `
+                    ${thumb}
+                    <div class="list-item__ko">
+                        <span>${index + 1}. ${escapeHtml(word.ko)}</span>
+                        <span class="meta-pill">${escapeHtml(category.label)}${word.pos ? ` · ${escapeHtml(word.pos)}` : ""}</span>
+                    </div>
+                    <div class="list-item__info">
+                        <div><strong>뜻</strong> ${escapeHtml(word.meaning || word.example || "")}</div>
+                        ${word.example ? `<div><strong>예문</strong> ${escapeHtml(word.example)}</div>` : ""}
+                        <div class="translation-grid">
+                            ${(cfg.languages || []).filter((lang) => word[lang] && LANGS[lang]).map((lang) => `
+                                <div class="translation-cell" ${translationAttrs(lang)}><strong dir="ltr">${escapeHtml(LANGS[lang].label)}</strong>${escapeHtml(word[lang])}</div>
+                            `).join("")}
+                        </div>
+                    </div>
+                `;
+                els.listPanel.appendChild(item);
+            });
+        }
+
+        function shuffleCards() {
+            for (let i = cardOrder.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cardOrder[i], cardOrder[j]] = [cardOrder[j], cardOrder[i]];
+            }
+            const icon = els.shuffleBtn.querySelector("i");
+            icon.classList.add("fa-spin");
+            setTimeout(() => icon.classList.remove("fa-spin"), 450);
+            render();
+        }
+
+        function quizSourceWords() {
+            const filtered = filteredWords();
+            if (quizMode === "image") return filtered.filter((word) => Boolean(word.quizImage || word.image));
+            return filtered;
+        }
+
+        function startQuiz() {
+            quizQueue = quizSourceWords().sort(() => Math.random() - 0.5);
+            quizIndex = 0;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            const current = quizQueue[quizIndex];
+            els.quizOptions.innerHTML = "";
+            els.quizFeedback.textContent = "";
+            els.nextQuestionBtn.hidden = true;
+            if (!current) {
+                els.quizProgress.textContent = "문제 0 / 0";
+                els.quizType.textContent = quizTypeLabel();
+                els.quizQuestion.innerHTML = `<p class="quiz-prompt">${quizMode === "image" ? "이미지가 있는 검색 결과가 없습니다." : "검색 결과가 없습니다."}</p>`;
+                return;
+            }
+            els.quizProgress.textContent = `문제 ${quizIndex + 1} / ${quizQueue.length}`;
+            els.quizType.textContent = quizTypeLabel();
+            const choseongOverlay = quizMode === "choseong"
+                ? `<span class="quiz-choseong-overlay">${escapeHtml(choseongFor(current.ko))}</span>`
+                : "";
+            els.quizQuestion.innerHTML = `
+                ${quizVisualFor(current, choseongOverlay)}
+                <p class="quiz-prompt">${escapeHtml(quizPromptFor(current))}</p>
+            `;
+            const pool = words.filter((word) => word !== current);
+            const wrong = pool.sort(() => Math.random() - 0.5).slice(0, 3);
+            const choices = [current, ...wrong].sort(() => Math.random() - 0.5);
+            const correctAnswer = quizAnswerFor(current);
+            choices.forEach((choice) => {
+                const option = document.createElement("button");
+                option.className = "quiz-option";
+                option.type = "button";
+                option.textContent = quizAnswerFor(choice);
+                option.dataset.correct = String(choice === current);
+                option.addEventListener("click", () => {
+                    const ok = choice === current;
+                    document.querySelectorAll(".quiz-option").forEach((button) => {
+                        button.disabled = true;
+                        if (button === option) button.classList.add(ok ? "correct" : "wrong");
+                        if (!ok && button.dataset.correct === "true") button.classList.add("correct");
+                    });
+                    els.quizFeedback.textContent = ok ? "정답!" : `오답 - 정답: ${correctAnswer}`;
+                    els.nextQuestionBtn.hidden = false;
+                });
+                els.quizOptions.appendChild(option);
+            });
+        }
+
+        function nextQuizQuestion() {
+            quizIndex += 1;
+            if (quizIndex < quizQueue.length) {
+                renderQuizQuestion();
+                return;
+            }
+            els.quizProgress.textContent = `완료 / ${quizQueue.length}`;
+            els.quizType.textContent = "퀴즈 완료";
+            els.quizQuestion.innerHTML = '<p class="quiz-prompt">퀴즈 완료!</p>';
+            els.quizOptions.innerHTML = "";
+            els.quizFeedback.textContent = "완료되었습니다.";
+            els.nextQuestionBtn.hidden = true;
+        }
+
+        function switchView(view) {
+            currentView = view;
+            els.viewButtons.forEach((button) => button.classList.toggle("active", button.dataset.view === view));
+            document.querySelectorAll(".view").forEach((panel) => panel.classList.remove("active"));
+            document.getElementById(`${view}-view`).classList.add("active");
+            els.shuffleBtn.hidden = view !== "cards";
+            els.frontToggle.hidden = view !== "cards";
+            render();
+        }
+
+        function render() {
+            activeLang = window.MultilangToggle?.getLang?.() || readStored("preferred-lang", cfg.defaultLang || "none");
+            if (!LANGS[activeLang] || (activeLang !== "none" && !cfg.languages?.includes(activeLang))) activeLang = "none";
+            updateFrontHeadwordToggle();
+            updateQuizModeButtons();
+            if (currentView === "cards") renderCards();
+            else if (currentView === "list") renderList();
+            else startQuiz();
+        }
+
+        els.vocabCount.textContent = `어휘 ${words.length}개`;
+        els.imageCount.textContent = `이미지 ${imageCount}개`;
+        els.viewButtons.forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
+        els.searchInput.addEventListener("input", (event) => {
+            searchQuery = event.target.value.trim();
+            render();
+        });
+        els.frontToggle.addEventListener("click", () => {
+            showFrontHeadword = !showFrontHeadword;
+            writeStored(`${storagePrefix}-front-headword`, String(showFrontHeadword));
+            renderCards();
+            updateFrontHeadwordToggle();
+        });
+        els.shuffleBtn.addEventListener("click", shuffleCards);
+        els.nextQuestionBtn.addEventListener("click", nextQuizQuestion);
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest("[data-multilang-btn]")) return;
+            setTimeout(render, 50);
+        });
+
+        buildCategoryFilter();
+        buildQuizModeSelector();
+        switchView("cards");
+    })();
+    </script>
+    <script src="../shared/multilang-toggle.js"></script>
     <script src="../shared/site-copyright.js"></script>
 </body>
 </html>

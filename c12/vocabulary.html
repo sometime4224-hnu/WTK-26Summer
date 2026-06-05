@@ -1,783 +1,1600 @@
 <!DOCTYPE html>
 <html lang="ko">
+<!--
+  TEMPLATE: vocabulary.html (T-05, c10-verified standard)
+
+  사용법:
+    1. window.VOCABULARY_CONFIG 안의 과 데이터를 실제 과 데이터로 교체한다.
+    2. 데이터가 많으면 vocabulary-data.js 로 분리하고 이 템플릿보다 먼저 로드한다.
+    3. image 값은 null이어도 된다. 이미지가 있으면 카드/퀴즈에서 자동 사용된다.
+    4. 그림 퀴즈에서 글자 없는 별도 이미지가 필요하면 quizImage를 지정한다.
+    5. 그림 퀴즈는 image 또는 quizImage가 1개 이상 있을 때만 버튼을 표시한다.
+-->
 <head>
-        <!-- Google Tag Manager -->
+    <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>12과 어휘 카드 & 퀴즈</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>12과 어휘 | 몸 상태와 운동</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="../shared/multilang-toggle.css" />
     <style>
+        :root {
+            --vocab-shell-width: min(1180px, calc(100vw - 32px));
+            --vocab-shell-margin: 18px auto 42px;
+            --vocab-surface: rgba(255, 255, 255, 0.94);
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
         body {
-            font-family: 'Noto Sans KR', 'Noto Sans', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #f8fbfd 0%, #eef6ff 48%, #fff7ed 100%);
+            color: var(--ink, #172033);
+            font-family: 'Noto Sans KR', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans', sans-serif;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: transparent;
         }
-        .card-container {
-            perspective: 1000px;
-            -webkit-perspective: 1000px;
-            cursor: pointer;
-        }
-        .vocab-image-card {
-            width: 100%;
-            aspect-ratio: 1220 / 864;
-        }
-        .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            -webkit-transform-style: preserve-3d;
-        }
-        .card-container.flipped .card-inner {
-            transform: rotateY(180deg);
-            -webkit-transform: rotateY(180deg);
-        }
-        .card-front, .card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-        .card-back {
-            transform: rotateY(180deg);
-            -webkit-transform: rotateY(180deg);
-        }
-        .image-card-front {
-            padding: 0;
-            overflow: hidden;
-            background: #dbeafe;
-        }
-        .image-card-front img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-        .lang-btn.active {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-        }
-        .correct-answer {
-            background-color: #dcfce7; /* green-100 */
-        }
-        .wrong-answer {
-            background-color: #fee2e2; /* red-100 */
-        }
-        .answer-feedback {
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 1rem;
-            height: 30px;
-        }
-        .correct {
-            color: #15803d; /* green-700 */
-        }
-        .wrong {
-            color: #b91c1c; /* red-700 */
-        }
-        .quiz-image-box {
-            width: 100%;
-            max-width: 520px;
-            margin: 0 auto 1rem;
-            border-radius: 0.75rem;
-            overflow: hidden;
-            border: 1px solid #dbeafe;
-            background: #eff6ff;
-        }
-        .quiz-image-box img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: contain;
-        }
-        .quiz-mode-label {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #2563eb;
-            margin-bottom: 0.35rem;
-        }
-    </style>
-    <style id="c12-global-nav-style">
-        body { margin: 0; }
-        .c12-global-nav {
+        button, input { font: inherit; }
+        button { -webkit-appearance: none; appearance: none; }
+
+        .topbar {
             position: sticky;
             top: 0;
-            z-index: 1000;
-            width: 100%;
-            height: 58px;
+            z-index: 40;
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 0 16px;
-            box-sizing: border-box;
+            gap: 10px;
+            min-height: 48px;
+            padding: 0 14px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line, #dbe4f0);
+            backdrop-filter: blur(12px);
+        }
+        .topbar a {
+            color: var(--accent-dark, #1d4ed8);
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+        .topbar__divider { color: #cbd5e1; font-weight: 900; }
+
+        .shell { width: var(--vocab-shell-width); margin: var(--vocab-shell-margin); }
+        .hero {
+            border: 1px solid var(--line-soft, #edf2f7);
+            border-radius: var(--radius-lg, 16px);
+            background: var(--vocab-surface);
+            box-shadow: var(--shadow, 0 18px 48px rgba(30, 41, 59, 0.11));
+            padding: 20px 22px;
+            margin-bottom: 14px;
+        }
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--vocab, #e4582e);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+        .hero h1 {
+            margin: 0 0 6px;
+            font-size: clamp(22px, 4vw, 32px);
+            line-height: 1.15;
+        }
+        .hero__subtitle { margin: 0; color: var(--muted, #64748b); font-size: 14px; font-weight: 700; }
+        .hero__row {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .hero__stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 11px;
+            background: #fff;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        [data-multilang-bar] { margin-top: 12px; }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .segmented {
+            display: flex;
+            gap: 4px;
+            border-radius: var(--radius, 8px);
+            padding: 3px;
+            background: #eaf0f7;
+        }
+        .segmented button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 44px;
+            border: 0;
+            border-radius: 8px;
+            padding: 0 14px;
+            background: transparent;
+            color: var(--muted, #64748b);
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .segmented button.active {
+            background: #fff;
+            color: var(--ink, #172033);
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+        }
+        .search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: min(280px, 100%);
+            flex: 1;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 13px;
+            min-height: 44px;
+            background: #fff;
+        }
+        .search i { color: var(--muted, #64748b); }
+        .search input {
+            width: 100%;
+            min-width: 0;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--ink, #172033);
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .control-btn,
+        .front-headword-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 12px;
+            background: #fff;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: background 0.14s, border-color 0.14s, color 0.14s, box-shadow 0.14s;
+        }
+        .control-btn:hover,
+        .front-headword-toggle:hover { border-color: #bfdbfe; color: var(--accent-dark, #1d4ed8); }
+        .front-headword-toggle[aria-checked="true"] {
+            border-color: var(--vocab, #e4582e);
+            background: #fff4ed;
+            color: var(--vocab, #e4582e);
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+        }
+        .front-headword-toggle__switch {
+            position: relative;
+            width: 34px;
+            height: 20px;
+            border-radius: var(--radius-pill, 999px);
+            background: #cbd5e1;
+            transition: background 0.14s;
+        }
+        .front-headword-toggle__switch::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.22);
+            transition: transform 0.14s;
+        }
+        .front-headword-toggle[aria-checked="true"] .front-headword-toggle__switch { background: var(--vocab, #e4582e); }
+        .front-headword-toggle[aria-checked="true"] .front-headword-toggle__switch::after { transform: translateX(14px); }
+
+        .category-filter { display: flex; flex-wrap: wrap; gap: 6px; }
+        .category-btn {
+            min-height: 40px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 12px;
+            background: #fff;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .category-btn.active { border-color: var(--vocab, #e4582e); background: #fff4ed; color: var(--vocab, #e4582e); }
+
+        .view { display: none; }
+        .view.active { display: block; }
+        .empty-state {
+            padding: 42px 16px;
+            text-align: center;
+            color: var(--muted, #64748b);
+            font-weight: 800;
+        }
+
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 14px;
+        }
+        .word-card {
+            min-width: 0;
+            border: 0;
+            padding: 0;
+            background: transparent;
+            color: inherit;
+            text-align: initial;
+            cursor: pointer;
+            perspective: 1000px;
+        }
+        .word-card:focus-visible { outline: none; }
+        .word-card:focus-visible .word-card__face {
+            outline: 3px solid #bfdbfe;
+            outline-offset: 3px;
+        }
+        .word-card__inner {
+            position: relative;
+            display: block;
+            width: 100%;
+            aspect-ratio: 1;
+            min-height: 190px;
+            transform-style: preserve-3d;
+            transition: transform 0.42s ease;
+        }
+        .word-card.is-flipped .word-card__inner { transform: rotateY(180deg); }
+        .word-card__face {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+            backface-visibility: hidden;
+            transition: border-color 0.16s, box-shadow 0.16s;
+        }
+        .word-card:hover .word-card__face { border-color: var(--card-line); box-shadow: var(--shadow, 0 18px 48px rgba(30, 41, 59, 0.11)); }
+        .word-card__front { padding: 10px; background: linear-gradient(135deg, var(--card-bg), #fff 78%); }
+        .word-card__image,
+        .word-card__placeholder {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+        .word-card__image { object-fit: cover; }
+        .word-card__placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            color: var(--card-ink);
+            font-size: 26px;
+            font-weight: 900;
+            line-height: 1.25;
+            text-align: center;
+            word-break: keep-all;
+        }
+        .word-card__front-headword {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 44px;
+            z-index: 2;
+            display: block;
+            border: 1px solid rgba(255, 255, 255, 0.78);
+            border-radius: 8px;
+            padding: 7px 9px;
             background: rgba(255, 255, 255, 0.92);
-            border-bottom: 1px solid #bfdbfe;
+            color: var(--ink, #172033);
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.13);
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1.25;
+            text-align: center;
+            overflow-wrap: anywhere;
             backdrop-filter: blur(8px);
         }
-        .c12-global-nav a {
-            color: #2563eb;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 14px;
-            line-height: 1;
+        .card-action {
+            position: absolute;
+            z-index: 3;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border: 1px solid rgba(255, 255, 255, 0.74);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.88);
+            color: #475569;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+            cursor: pointer;
         }
-        .c12-divider {
-            color: #cbd5e1;
-            font-weight: 700;
-            line-height: 1;
+        .card-action:hover { color: var(--accent-dark, #1d4ed8); }
+        .card-action--speak { top: 10px; right: 10px; }
+        .card-action--flip { right: 10px; bottom: 10px; }
+        .word-card__back {
+            transform: rotateY(180deg);
+            gap: 10px;
+            padding: 16px;
+            text-align: center;
+            background: linear-gradient(160deg, #fff, var(--card-bg));
+        }
+        .word-card__back::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--card-ink);
+        }
+        .word-card__back-main {
+            color: var(--ink, #172033);
+            font-size: clamp(20px, 3vw, 26px);
+            font-weight: 900;
+            line-height: 1.2;
+            word-break: keep-all;
+        }
+        .word-card__translation {
+            display: grid;
+            gap: 4px;
+            width: min(100%, 260px);
+            border: 1px solid var(--card-line);
+            border-radius: 8px;
+            padding: 9px 10px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .word-card__lang {
+            color: var(--card-ink);
+            font-size: 11px;
+            font-weight: 900;
+        }
+        .word-card__translation-text {
+            color: var(--ink, #172033);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.4;
+            word-break: keep-all;
+        }
+        .word-card__category {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 28px;
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 10px;
+            background: var(--card-bg);
+            color: var(--card-ink);
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .list-panel { display: flex; flex-direction: column; gap: 10px; }
+        .list-item {
+            display: grid;
+            grid-template-columns: 88px minmax(160px, 1fr) minmax(260px, 1.7fr);
+            gap: 14px;
+            align-items: center;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+        }
+        .list-item__thumb {
+            width: 72px;
+            height: 72px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--line, #dbe4f0);
+            background: #f8fafc;
+        }
+        .list-item__thumb-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px;
+            height: 72px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            background: #f8fafc;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .list-item__ko {
+            display: grid;
+            gap: 8px;
+            font-size: 17px;
+            font-weight: 900;
+            word-break: keep-all;
+        }
+        .meta-pill {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            min-height: 24px;
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 8px;
+            background: #f1f5f9;
+            color: var(--muted, #64748b);
+            font-size: 10px;
+            font-weight: 900;
+        }
+        .list-item__info {
+            display: grid;
+            gap: 9px;
+            color: var(--ink, #172033);
+            font-size: 13px;
+            line-height: 1.55;
+        }
+        .translation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 6px;
+        }
+        .translation-cell {
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            padding: 8px;
+            background: #f8fafc;
+            color: var(--ink, #172033);
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .translation-cell strong {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--muted, #64748b);
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .quiz-layout {
+            max-width: 640px;
+            margin: 0 auto;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: var(--radius-lg, 16px);
+            background: #fff;
+            box-shadow: var(--shadow, 0 18px 48px rgba(30, 41, 59, 0.11));
+            padding: 18px;
+        }
+        .quiz-mode-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 4px;
+            margin-bottom: 14px;
+            border-radius: 8px;
+            padding: 4px;
+            background: #f1f5f9;
+        }
+        .quiz-mode-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 38px;
+            border: 0;
+            border-radius: 8px;
+            padding: 0 10px;
+            background: transparent;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .quiz-mode-btn.active {
+            background: #fff;
+            color: var(--ink, #172033);
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+        }
+        .quiz-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .quiz-question {
+            display: grid;
+            gap: 12px;
+            min-height: 90px;
+            margin-bottom: 14px;
+        }
+        .quiz-visual {
+            position: relative;
+            width: min(100%, 260px);
+            aspect-ratio: 1;
+            margin: 0 auto;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+        .quiz-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .quiz-visual__fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 14px;
+            color: var(--muted, #64748b);
+            font-size: 14px;
+            font-weight: 900;
+            text-align: center;
+            word-break: keep-all;
+        }
+        .quiz-choseong-overlay {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            z-index: 2;
+            display: block;
+            border: 1px solid rgba(255, 255, 255, 0.78);
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--ink, #172033);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.16);
+            font-size: clamp(20px, 5vw, 30px);
+            font-weight: 900;
+            line-height: 1.15;
+            text-align: center;
+            overflow-wrap: anywhere;
+            backdrop-filter: blur(8px);
+        }
+        .quiz-prompt {
+            margin: 0;
+            text-align: center;
+            color: var(--ink, #172033);
+            font-size: 21px;
+            font-weight: 900;
+            line-height: 1.35;
+            word-break: keep-all;
+        }
+        .quiz-options { display: grid; gap: 8px; }
+        .quiz-option {
+            width: 100%;
+            min-height: 46px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            padding: 10px 14px;
+            background: #fff;
+            color: var(--ink, #172033);
+            font-size: 14px;
+            font-weight: 800;
+            text-align: left;
+            cursor: pointer;
+        }
+        .quiz-option:hover { border-color: #bfdbfe; background: var(--accent-soft, #eff6ff); }
+        .quiz-option.correct { border-color: var(--ok-line, #86efac); background: var(--ok-bg, #dcfce7); color: var(--ok, #15803d); }
+        .quiz-option.wrong { border-color: var(--bad-line, #fca5a5); background: var(--bad-bg, #fee2e2); color: var(--bad, #b91c1c); }
+        .feedback {
+            min-height: 28px;
+            color: var(--muted, #64748b);
+            font-size: 14px;
+            font-weight: 900;
+            text-align: center;
+        }
+        .quiz-actions { display: flex; justify-content: center; margin-top: 12px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 44px;
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 15px;
+            background: #fff;
+            color: var(--accent-dark, #1d4ed8);
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn.primary { border-color: var(--accent-dark, #1d4ed8); background: var(--accent, #2563eb); color: #fff; }
+        .footer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 22px;
+        }
+
+        @media (max-width: 760px) {
+            :root { --vocab-shell-width: min(100vw - 18px, 1180px); }
+            .shell { margin-top: 10px; }
+            .hero { padding: 16px; }
+            .hero__row { align-items: stretch; }
+            .toolbar { gap: 8px; }
+            .segmented { width: 100%; }
+            .segmented button { flex: 1; padding: 0 8px; }
+            .control-btn,
+            .front-headword-toggle { flex: 1 1 auto; }
+            .word-grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 10px; }
+            .word-card__inner { min-height: 160px; }
+            .word-card__front { padding: 8px; }
+            .word-card__front-headword { top: 8px; left: 8px; right: 40px; padding: 6px 8px; font-size: 12px; }
+            .card-action { width: 32px; height: 32px; }
+            .card-action--speak { top: 8px; right: 8px; }
+            .card-action--flip { right: 8px; bottom: 8px; }
+            .word-card__back { padding: 12px; }
+            .word-card__back-main { font-size: 18px; }
+            .word-card__translation-text { font-size: 12px; }
+            .list-item { grid-template-columns: 58px 1fr; gap: 10px; }
+            .list-item__thumb,
+            .list-item__thumb-placeholder { width: 54px; height: 54px; }
+            .list-item__info { grid-column: 1 / -1; }
+            .translation-grid { grid-template-columns: 1fr; }
+            .quiz-layout { padding: 14px; }
+            .quiz-prompt { font-size: 18px; }
         }
     </style>
-        <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
-<body class="bg-blue-50 min-h-screen p-4 transition-colors duration-500">
-    <nav class="c12-global-nav" aria-label="상단 이동">
-        <a href="../index.html">메인</a>
-        <span class="c12-divider">|</span>
+<body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span class="topbar__divider">|</span>
         <a href="index.html">12과 목록</a>
     </nav>
-    
-    <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
 
-    <div class="text-center mb-4">
-        <h1 class="text-2xl sm:text-3xl font-bold text-blue-600 mb-1">12과 어휘</h1>
-        <div id="last-score-display" class="mt-1 text-sm text-gray-500 font-medium hidden"></div>
-    </div>
-
-    <div id="language-selector" class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-6 bg-white p-2 rounded-xl shadow-md">
-        <button data-lang="korean" class="lang-btn px-4 py-2 text-sm sm:text-base font-semibold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-300">한국어 설명</button>
-        <button data-lang="vietnamese" class="lang-btn px-4 py-2 text-sm sm:text-base font-semibold text-white bg-green-500 rounded-lg shadow-md hover:bg-green-600 transition-all duration-300">베트남어</button>
-        <button data-lang="japanese" class="lang-btn px-4 py-2 text-sm sm:text-base font-semibold text-white bg-purple-500 rounded-lg shadow-md hover:bg-purple-600 transition-all duration-300">일본어</button>
-        <button data-lang="chinese" class="lang-btn px-4 py-2 text-sm sm:text-base font-semibold text-white bg-red-500 rounded-lg shadow-md hover:bg-red-600 transition-all duration-300">중국어</button>
-    </div>
-
-    <!-- Main Card View -->
-    <div id="card-view" class="w-full max-w-6xl">
-        <div class="flex flex-wrap justify-center gap-3 mb-6">
-            <button id="start-quiz-btn" class="px-6 py-3 font-bold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-300">퀴즈 시작하기</button>
-            <button id="start-choseong-quiz-btn" class="px-6 py-3 font-bold text-white bg-purple-500 rounded-lg shadow-md hover:bg-purple-600 transition-all duration-300">초성퀴즈 시작하기</button>
-            <button id="start-image-quiz-btn" class="px-6 py-3 font-bold text-white bg-amber-500 rounded-lg shadow-md hover:bg-amber-600 transition-all duration-300">그림퀴즈 시작하기</button>
-        </div>
-        <div id="game-board" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
-    </div>
-
-    <!-- Quiz View -->
-    <div id="quiz-view" class="w-full max-w-2xl hidden">
-        <div class="bg-white rounded-xl shadow-md p-6 sm:p-8 flex flex-col items-center text-center">
-            <div id="quiz-header" class="w-full mb-4">
-                <p id="quiz-mode-label" class="quiz-mode-label hidden"></p>
-                <div id="quiz-image-box" class="quiz-image-box hidden">
-                    <img id="quiz-image" alt="퀴즈 그림">
+    <main class="shell">
+        <header class="hero">
+            <div class="hero__row">
+                <div>
+                    <p class="eyebrow">Chapter 12 Vocabulary</p>
+                    <h1>12과 어휘 학습</h1>
+                    <p class="hero__subtitle">몸 상태와 운동 동작 표현을 익힙니다.</p>
+                    <div class="hero__stats" aria-label="어휘 요약">
+                        <span class="stat-chip"><i class="fa-solid fa-layer-group"></i> <span id="vocab-count">어휘 0개</span></span>
+                        <span class="stat-chip"><i class="fa-solid fa-image"></i> <span id="image-count">이미지 0개</span></span>
+                        <span class="stat-chip"><i class="fa-solid fa-circle-question"></i> 뜻·초성·그림 퀴즈</span>
+                    </div>
                 </div>
-                <p id="quiz-question-number" class="text-gray-500 text-sm mb-2"></p>
-                <h3 id="quiz-question" class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6"></h3>
             </div>
-            <div id="quiz-options" class="w-full grid gap-4"></div>
-            <div id="quiz-feedback" class="answer-feedback"></div>
-            <div id="quiz-combo" class="mt-4 text-gray-500 text-lg font-semibold"></div>
-        </div>
-    </div>
+            <div data-multilang-bar></div>
+        </header>
 
-    <!-- Result View -->
-    <div id="result-view" class="w-full max-w-2xl hidden">
-        <div id="result-content-to-capture" class="bg-white rounded-xl shadow-md p-6 sm:p-8 flex flex-col items-center text-center">
-            <h3 id="result-title" class="text-3xl font-bold text-blue-600 mb-4"></h3>
-            <p id="result-score" class="text-xl text-gray-700 mb-6"></p>
-            <table class="w-full text-left table-auto border-collapse">
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th class="p-3 border-b-2">문제</th>
-                        <th class="p-3 border-b-2">정답</th>
-                        <th class="p-3 border-b-2">결과</th>
-                        <th class="p-3 border-b-2 text-right">점수</th>
-                    </tr>
-                </thead>
-                <tbody id="result-table-body">
-                </tbody>
-            </table>
-        </div>
-        <div class="flex flex-wrap justify-center gap-4 mt-6">
-            <button id="capture-btn" class="px-6 py-3 font-bold text-white bg-teal-500 rounded-lg shadow-md hover:bg-teal-600 transition-all duration-300">
-                <span id="capture-text">결과 캡처하기</span> 📸
+        <section class="toolbar" aria-label="학습 보기 선택">
+            <div class="segmented" role="tablist" aria-label="보기">
+                <button class="active" data-view="cards" type="button" role="tab"><i class="fa-solid fa-table-cells-large"></i> 카드</button>
+                <button data-view="list" type="button" role="tab"><i class="fa-solid fa-list"></i> 정리</button>
+                <button data-view="quiz" type="button" role="tab"><i class="fa-solid fa-circle-question"></i> 퀴즈</button>
+            </div>
+            <label class="search" for="search-input">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input id="search-input" type="search" autocomplete="off" placeholder="어휘 검색" />
+            </label>
+            <button id="front-headword-toggle" class="front-headword-toggle" type="button" role="switch" aria-checked="false">
+                <span class="front-headword-toggle__switch" aria-hidden="true"></span>
+                <i class="fa-solid fa-tag" aria-hidden="true"></i> 표제어 표시
             </button>
-            <button id="restart-quiz-btn" class="px-6 py-3 font-bold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-300">퀴즈 다시 풀기</button>
-            <button id="back-to-cards-btn" class="px-6 py-3 font-bold text-gray-700 bg-gray-200 rounded-lg shadow-md hover:bg-gray-300 transition-all duration-300">어휘 카드 보기</button>
-        </div>
-    </div>
-    <details class="w-full max-w-6xl mx-auto mt-8 bg-white/90 border border-blue-100 rounded-2xl shadow-sm">
-        <summary class="cursor-pointer px-5 py-4 text-sm font-bold text-blue-700">강사용 안내</summary>
-        <div class="px-5 pb-5 text-sm text-gray-600 leading-7">
-            몸과 건강 상태 주제 어휘 카드입니다. 카드 학습 뒤에 필요할 때만 퀴즈로 넘어가도록 상단 정보를 최소화했습니다.
-        </div>
-    </details>
+            <button id="shuffle-btn" class="control-btn" type="button"><i class="fa-solid fa-shuffle"></i> 섞기</button>
+        </section>
 
+        <section class="toolbar" aria-label="어휘 범주 선택">
+            <div id="category-filter" class="category-filter"></div>
+        </section>
+
+        <section id="cards-view" class="view active" aria-label="어휘 카드">
+            <div id="word-grid" class="word-grid"></div>
+            <div id="cards-empty" class="empty-state" hidden>검색 결과가 없습니다.</div>
+        </section>
+
+        <section id="list-view" class="view" aria-label="어휘 정리">
+            <div id="list-panel" class="list-panel"></div>
+            <div id="list-empty" class="empty-state" hidden>검색 결과가 없습니다.</div>
+        </section>
+
+        <section id="quiz-view" class="view" aria-label="어휘 퀴즈">
+            <div class="quiz-layout">
+                <div id="quiz-mode-selector" class="quiz-mode-selector" role="tablist" aria-label="퀴즈 유형"></div>
+                <div class="quiz-meta">
+                    <span id="quiz-progress">문제 1 / ?</span>
+                    <span id="quiz-type">뜻 맞히기</span>
+                </div>
+                <div id="quiz-question" class="quiz-question"></div>
+                <div id="quiz-options" class="quiz-options"></div>
+                <div id="quiz-feedback" class="feedback" aria-live="polite"></div>
+                <div class="quiz-actions">
+                    <button id="next-question-btn" class="btn primary" type="button" hidden>
+                        <i class="fa-solid fa-arrow-right"></i> 다음
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <nav class="footer-nav" aria-label="페이지 이동">
+            <a class="btn" href="index.html"><i class="fa-solid fa-house"></i> 12과 목록</a>
+            <a class="btn" href="../index.html"><i class="fa-solid fa-layer-group"></i> 전체 목록</a>
+        </nav>
+    </main>
+
+    <!-- 어휘 데이터: 필요 시 이 블록을 vocabulary-data.js 로 분리 -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const allVocabulary = {
-                korean: {
-                    themeColor: 'blue',
-                    data: [
-                        { korean: "살이 찌다/빠지다", foreign: "체중이 늘다/줄다." },
-                        { korean: "힘이 세다/약하다", foreign: "신체적인 능력이 강하다/약하다." },
-                        { korean: "자세가 좋다/나쁘다", foreign: "몸의 균형이나 태도가 바르다/바르지 않다." },
-                        { korean: "몸이 무겁다/가볍다", foreign: "몸이 둔하고 피곤하다/상쾌하고 활기차다." },
-                        { korean: "숨이 차다", foreign: "호흡이 가쁘고 힘들다." },
-                        { korean: "땀이 나다", foreign: "체온 조절을 위해 피부에서 물이 나오다." },
-                        { korean: "쥐가 나다", foreign: "근육이 갑자기 수축하여 아프다." },
-                        { korean: "지치다", foreign: "힘이 다 빠져서 피곤하다." },
-                        { korean: "기분이 상쾌하다", foreign: "느낌이 시원하고 깨끗하다." },
-                        { korean: "기운이 나다", foreign: "몸에 힘이 생기다." },
-                        { korean: "몸이 좋아지다", foreign: "건강 상태가 회복되다." },
-                        { korean: "근육이 생기다", foreign: "운동으로 근육이 발달하다." },
-                        { korean: "(목을) 돌리다", foreign: "목을 원을 그리며 움직이다." },
-                        { korean: "(옆구리를) 굽히다", foreign: "몸의 옆부분을 구부리다." },
-                        { korean: "(가슴을) 펴다", foreign: "가슴을 넓게 벌리다." },
-                        { korean: "(몸을) 젖히다", foreign: "몸을 뒤로 기울이다." },
-                        { korean: "(손을 허리에) 대다", foreign: "손을 허리 부분에 올려놓다." },
-                        { korean: "(팔을) 뻗다", foreign: "팔을 길게 늘이다." },
-                        { korean: "(다리를) 벌리다", foreign: "두 다리 사이를 넓히다." },
-                        { korean: "(발뒤꿈치를) 들다", foreign: "발의 뒷부분을 위로 올리다." }
-                    ]
+    window.VOCABULARY_CONFIG = {
+        chapter: "12",
+        title: "12과 어휘 학습",
+        subtitle: "몸 상태와 운동 동작 표현을 익힙니다.",
+        languages: [
+                "en",
+                "vi",
+                "mn",
+                "ar",
+                "kk",
+                "th"
+        ],
+        defaultLang: "none",
+        quizModes: [
+                "meaning",
+                "choseong",
+                "image"
+        ],
+        storageKey: "c12-vocabulary-standard",
+        categories: [
+                {
+                        id: "all",
+                        label: "전체"
                 },
-                vietnamese: {
-                    themeColor: 'green',
-                    data: [
-                        { korean: "살이 찌다/빠지다", foreign: "tăng cân / giảm cân" },
-                        { korean: "힘이 세다/약하다", foreign: "mạnh / yếu" },
-                        { korean: "자세가 좋다/나쁘다", foreign: "tư thế tốt / xấu" },
-                        { korean: "몸이 무겁다/가볍다", foreign: "cơ thể nặng nề / nhẹ nhõm" },
-                        { korean: "숨이 차다", foreign: "hụt hơi, khó thở" },
-                        { korean: "땀이 나다", foreign: "ra mồ hôi" },
-                        { korean: "쥐가 나다", foreign: "bị chuột rút" },
-                        { korean: "지치다", foreign: "mệt mỏi, kiệt sức" },
-                        { korean: "기분이 상쾌하다", foreign: "tâm trạng sảng khoái" },
-                        { korean: "기운이 나다", foreign: "lấy lại sức, thấy khỏe hơn" },
-                        { korean: "몸이 좋아지다", foreign: "sức khỏe tốt lên" },
-                        { korean: "근육이 생기다", foreign: "có cơ bắp, lên cơ" },
-                        { korean: "(목을) 돌리다", foreign: "xoay cổ" },
-                        { korean: "(옆구리를) 굽히다", foreign: "gập người sang bên" },
-                        { korean: "(가슴을) 펴다", foreign: "ưỡn ngực" },
-                        { korean: "(몸을) 젖히다", foreign: "ngả người ra sau" },
-                        { korean: "(손을 허리에) 대다", foreign: "chống tay lên hông" },
-                        { korean: "(팔을) 뻗다", foreign: "duỗi tay" },
-                        { korean: "(다리를) 벌리다", foreign: "dạng chân" },
-                        { korean: "(발뒤꿈치를) 들다", foreign: "nhấc gót chân lên" }
-                    ]
+                {
+                        id: "body",
+                        label: "몸 변화"
                 },
-                japanese: {
-                    themeColor: 'purple',
-                    data: [
-                        { korean: "살이 찌다/빠지다", foreign: "太る/痩せる" },
-                        { korean: "힘이 세다/약하다", foreign: "力が強い/弱い" },
-                        { korean: "자세가 좋다/나쁘다", foreign: "姿勢が良い/悪い" },
-                        { korean: "몸이 무겁다/가볍다", foreign: "体が重い/軽い" },
-                        { korean: "숨이 차다", foreign: "息が切れる" },
-                        { korean: "땀이 나다", foreign: "汗が出る" },
-                        { korean: "쥐가 나다", foreign: "足がつる" },
-                        { korean: "지치다", foreign: "疲れる" },
-                        { korean: "기분이 상쾌하다", foreign: "気分が爽快だ" },
-                        { korean: "기운이 나다", foreign: "元気が出る" },
-                        { korean: "몸이 좋아지다", foreign: "体調が良くなる" },
-                        { korean: "근육이 생기다", foreign: "筋肉がつく" },
-                        { korean: "(목을) 돌리다", foreign: "首を回す" },
-                        { korean: "(옆구리를) 굽히다", foreign: "脇腹を曲げる" },
-                        { korean: "(가슴을) 펴다", foreign: "胸を張る" },
-                        { korean: "(몸을) 젖히다", foreign: "体を反らす" },
-                        { korean: "(손을 허리에) 대다", foreign: "腰に手を当てる" },
-                        { korean: "(팔을) 뻗다", foreign: "腕を伸ばす" },
-                        { korean: "(다리를) 벌리다", foreign: "足を開く" },
-                        { korean: "(발뒤꿈치를) 들다", foreign: "かかとを上げる" }
-                    ]
+                {
+                        id: "condition",
+                        label: "피로·회복"
                 },
-                chinese: {
-                    themeColor: 'red',
-                    data: [
-                        { korean: "살이 찌다/빠지다", foreign: "长胖 / 变瘦" },
-                        { korean: "힘이 세다/약하다", foreign: "力气大 / 力气小" },
-                        { korean: "자세가 좋다/나쁘다", foreign: "姿势好 / 不好" },
-                        { korean: "몸이 무겁다/가볍다", foreign: "身体沉重 / 轻快" },
-                        { korean: "숨이 차다", foreign: "喘气" },
-                        { korean: "땀이 나다", foreign: "出汗" },
-                        { korean: "쥐가 나다", foreign: "抽筋" },
-                        { korean: "지치다", foreign: "累" },
-                        { korean: "기분이 상쾌하다", foreign: "心情舒畅" },
-                        { korean: "기운이 나다", foreign: "有精神" },
-                        { korean: "몸이 좋아지다", foreign: "身体变好" },
-                        { korean: "근육이 생기다", foreign: "长肌肉" },
-                        { korean: "(목을) 돌리다", foreign: "转动(脖子)" },
-                        { korean: "(옆구리를) 굽히다", foreign: "弯(腰侧)" },
-                        { korean: "(가슴을) 펴다", foreign: "挺(胸)" },
-                        { korean: "(몸을) 젖히다", foreign: "后仰(身体)" },
-                        { korean: "(손을 허리에) 대다", foreign: "手放在腰上" },
-                        { korean: "(팔을) 뻗다", foreign: "伸(胳膊)" },
-                        { korean: "(다리를) 벌리다", foreign: "岔开(腿)" },
-                        { korean: "(발뒤꿈치를) 들다", foreign: "踮起脚跟" }
-                    ]
+                {
+                        id: "movement",
+                        label: "스트레칭 동작"
                 }
-            };
-
-            const gameBoard = document.getElementById('game-board');
-            const langButtons = document.querySelectorAll('.lang-btn');
-            const body = document.body;
-            const cardView = document.getElementById('card-view');
-            const quizView = document.getElementById('quiz-view');
-            const resultView = document.getElementById('result-view');
-            const startQuizBtn = document.getElementById('start-quiz-btn');
-            const startChoseongQuizBtn = document.getElementById('start-choseong-quiz-btn');
-            const startImageQuizBtn = document.getElementById('start-image-quiz-btn');
-            const restartQuizBtn = document.getElementById('restart-quiz-btn');
-            const backToCardsBtn = document.getElementById('back-to-cards-btn');
-            const captureBtn = document.getElementById('capture-btn');
-            const captureText = document.getElementById('capture-text');
-            const resultContentToCapture = document.getElementById('result-content-to-capture');
-            const quizModeLabelEl = document.getElementById('quiz-mode-label');
-            const quizImageBoxEl = document.getElementById('quiz-image-box');
-            const quizImageEl = document.getElementById('quiz-image');
-            const quizQuestionEl = document.getElementById('quiz-question');
-            const quizQuestionNumberEl = document.getElementById('quiz-question-number');
-            const quizOptionsEl = document.getElementById('quiz-options');
-            const quizFeedbackEl = document.getElementById('quiz-feedback');
-            const quizComboEl = document.getElementById('quiz-combo');
-            const resultTitleEl = document.getElementById('result-title');
-            const resultScoreEl = document.getElementById('result-score');
-            const resultTableBodyEl = document.getElementById('result-table-body');
-            const lastScoreDisplayEl = document.getElementById('last-score-display');
-            
-            let currentLang = 'korean';
-            let currentQuizData = [];
-            let currentQuestionIndex = 0;
-            let totalScore = 0;
-            let combo = 0;
-            let quizResults = [];
-            let currentQuizMode = 'normal';
-
-            const colorMap = {
-                blue: { bg: 'bg-blue-50', text: 'text-blue-800', cardBack: 'bg-blue-500', button: 'bg-blue-500' },
-                green: { bg: 'bg-green-50', text: 'text-green-800', cardBack: 'bg-green-500', button: 'bg-green-500' },
-                purple: { bg: 'bg-purple-50', text: 'text-purple-800', cardBack: 'bg-purple-500', button: 'bg-purple-500' },
-                red: { bg: 'bg-red-50', text: 'text-red-800', cardBack: 'bg-red-500', button: 'bg-red-500' }
-            };
-
-            const c12ImageBasePath = "../assets/c12/misc/images/split-variants";
-            const koreanCardImageMap = {
-                "살이 찌다/빠지다": `${c12ImageBasePath}/full/s06_tl_n01.webp`,
-                "힘이 세다/약하다": `${c12ImageBasePath}/full/s06_tr_n02.webp`,
-                "자세가 좋다/나쁘다": `${c12ImageBasePath}/full/s06_bl_n03.webp`,
-                "몸이 무겁다/가볍다": `${c12ImageBasePath}/full/s06_br_n04.webp`,
-                "숨이 차다": `${c12ImageBasePath}/full/s05_tl_n05.webp`,
-                "땀이 나다": `${c12ImageBasePath}/full/s05_tr_n06.webp`,
-                "쥐가 나다": `${c12ImageBasePath}/full/s05_bl_n07.webp`,
-                "지치다": `${c12ImageBasePath}/full/s05_br_n08.webp`,
-                "기분이 상쾌하다": `${c12ImageBasePath}/full/s04_tl_n09.webp`,
-                "기운이 나다": `${c12ImageBasePath}/full/s04_tr_n10.webp`,
-                "몸이 좋아지다": `${c12ImageBasePath}/full/s04_bl_n11.webp`,
-                "근육이 생기다": `${c12ImageBasePath}/full/s04_br_n12.webp`,
-                "(목을) 돌리다": `${c12ImageBasePath}/full/s03_tl_n13.webp`,
-                "(옆구리를) 굽히다": `${c12ImageBasePath}/full/s03_tr_n14.webp`,
-                "(가슴을) 펴다": `${c12ImageBasePath}/full/s03_bl_n15.webp`,
-                "(몸을) 젖히다": `${c12ImageBasePath}/full/s03_br_n16.webp`,
-                "(손을 허리에) 대다": `${c12ImageBasePath}/full/s01_tl_n17.webp`,
-                "(팔을) 뻗다": `${c12ImageBasePath}/full/s01_tr_n18.webp`,
-                "(다리를) 벌리다": `${c12ImageBasePath}/full/s01_bl_n19.webp`,
-                "(발뒤꿈치를) 들다": `${c12ImageBasePath}/full/s01_br_n20.webp`
-            };
-
-            const koreanChoseongImageMap = Object.fromEntries(
-                Object.entries(koreanCardImageMap).map(([word, imagePath]) => [
-                    word,
-                    imagePath.replace('/full/', '/initials/')
-                ])
-            );
-            const koreanMaskedImageMap = Object.fromEntries(
-                Object.entries(koreanCardImageMap).map(([word, imagePath]) => [
-                    word,
-                    imagePath.replace('/full/', '/masked/')
-                ])
-            );
-
-            // Fisher-Yates shuffle algorithm
-            function shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
+        ],
+        words: [
+                {
+                        id: "c12-vocab-01",
+                        ko: "살이 찌다/빠지다",
+                        meaning: "체중이 늘다/줄다.",
+                        pos: "표현",
+                        category: "body",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s06_tl_n01.webp",
+                        imageAlt: "살이 찌다/빠지다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s06_tl_n01.webp",
+                        quizImageAlt: "살이 찌다/빠지다 그림 카드",
+                        vi: "tăng cân / giảm cân",
+                        ja: "太る/痩せる",
+                        zh: "长胖 / 变瘦"
+                },
+                {
+                        id: "c12-vocab-02",
+                        ko: "힘이 세다/약하다",
+                        meaning: "신체적인 능력이 강하다/약하다.",
+                        pos: "표현",
+                        category: "body",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s06_tr_n02.webp",
+                        imageAlt: "힘이 세다/약하다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s06_tr_n02.webp",
+                        quizImageAlt: "힘이 세다/약하다 그림 카드",
+                        vi: "mạnh / yếu",
+                        ja: "力が強い/弱い",
+                        zh: "力气大 / 力气小"
+                },
+                {
+                        id: "c12-vocab-03",
+                        ko: "자세가 좋다/나쁘다",
+                        meaning: "몸의 균형이나 태도가 바르다/바르지 않다.",
+                        pos: "표현",
+                        category: "body",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s06_bl_n03.webp",
+                        imageAlt: "자세가 좋다/나쁘다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s06_bl_n03.webp",
+                        quizImageAlt: "자세가 좋다/나쁘다 그림 카드",
+                        vi: "tư thế tốt / xấu",
+                        ja: "姿勢が良い/悪い",
+                        zh: "姿势好 / 不好"
+                },
+                {
+                        id: "c12-vocab-04",
+                        ko: "몸이 무겁다/가볍다",
+                        meaning: "몸이 둔하고 피곤하다/상쾌하고 활기차다.",
+                        pos: "표현",
+                        category: "body",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s06_br_n04.webp",
+                        imageAlt: "몸이 무겁다/가볍다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s06_br_n04.webp",
+                        quizImageAlt: "몸이 무겁다/가볍다 그림 카드",
+                        vi: "cơ thể nặng nề / nhẹ nhõm",
+                        ja: "体が重い/軽い",
+                        zh: "身体沉重 / 轻快"
+                },
+                {
+                        id: "c12-vocab-05",
+                        ko: "숨이 차다",
+                        meaning: "호흡이 가쁘고 힘들다.",
+                        pos: "표현",
+                        category: "condition",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s05_tl_n05.webp",
+                        imageAlt: "숨이 차다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s05_tl_n05.webp",
+                        quizImageAlt: "숨이 차다 그림 카드",
+                        vi: "hụt hơi, khó thở",
+                        ja: "息が切れる",
+                        zh: "喘气"
+                },
+                {
+                        id: "c12-vocab-06",
+                        ko: "땀이 나다",
+                        meaning: "체온 조절을 위해 피부에서 물이 나오다.",
+                        pos: "표현",
+                        category: "condition",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s05_tr_n06.webp",
+                        imageAlt: "땀이 나다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s05_tr_n06.webp",
+                        quizImageAlt: "땀이 나다 그림 카드",
+                        vi: "ra mồ hôi",
+                        ja: "汗が出る",
+                        zh: "出汗"
+                },
+                {
+                        id: "c12-vocab-07",
+                        ko: "쥐가 나다",
+                        meaning: "근육이 갑자기 수축하여 아프다.",
+                        pos: "표현",
+                        category: "condition",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s05_bl_n07.webp",
+                        imageAlt: "쥐가 나다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s05_bl_n07.webp",
+                        quizImageAlt: "쥐가 나다 그림 카드",
+                        vi: "bị chuột rút",
+                        ja: "足がつる",
+                        zh: "抽筋"
+                },
+                {
+                        id: "c12-vocab-08",
+                        ko: "지치다",
+                        meaning: "힘이 다 빠져서 피곤하다.",
+                        pos: "표현",
+                        category: "condition",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s05_br_n08.webp",
+                        imageAlt: "지치다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s05_br_n08.webp",
+                        quizImageAlt: "지치다 그림 카드",
+                        vi: "mệt mỏi, kiệt sức",
+                        ja: "疲れる",
+                        zh: "累"
+                },
+                {
+                        id: "c12-vocab-09",
+                        ko: "기분이 상쾌하다",
+                        meaning: "느낌이 시원하고 깨끗하다.",
+                        pos: "표현",
+                        category: "condition",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s04_tl_n09.webp",
+                        imageAlt: "기분이 상쾌하다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s04_tl_n09.webp",
+                        quizImageAlt: "기분이 상쾌하다 그림 카드",
+                        vi: "tâm trạng sảng khoái",
+                        ja: "気分が爽快だ",
+                        zh: "心情舒畅"
+                },
+                {
+                        id: "c12-vocab-10",
+                        ko: "기운이 나다",
+                        meaning: "몸에 힘이 생기다.",
+                        pos: "표현",
+                        category: "condition",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s04_tr_n10.webp",
+                        imageAlt: "기운이 나다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s04_tr_n10.webp",
+                        quizImageAlt: "기운이 나다 그림 카드",
+                        vi: "lấy lại sức, thấy khỏe hơn",
+                        ja: "元気が出る",
+                        zh: "有精神"
+                },
+                {
+                        id: "c12-vocab-11",
+                        ko: "몸이 좋아지다",
+                        meaning: "건강 상태가 회복되다.",
+                        pos: "표현",
+                        category: "condition",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s04_bl_n11.webp",
+                        imageAlt: "몸이 좋아지다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s04_bl_n11.webp",
+                        quizImageAlt: "몸이 좋아지다 그림 카드",
+                        vi: "sức khỏe tốt lên",
+                        ja: "体調が良くなる",
+                        zh: "身体变好"
+                },
+                {
+                        id: "c12-vocab-12",
+                        ko: "근육이 생기다",
+                        meaning: "운동으로 근육이 발달하다.",
+                        pos: "표현",
+                        category: "condition",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s04_br_n12.webp",
+                        imageAlt: "근육이 생기다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s04_br_n12.webp",
+                        quizImageAlt: "근육이 생기다 그림 카드",
+                        vi: "có cơ bắp, lên cơ",
+                        ja: "筋肉がつく",
+                        zh: "长肌肉"
+                },
+                {
+                        id: "c12-vocab-13",
+                        ko: "(목을) 돌리다",
+                        meaning: "목을 원을 그리며 움직이다.",
+                        pos: "표현",
+                        category: "movement",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s03_tl_n13.webp",
+                        imageAlt: "(목을) 돌리다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s03_tl_n13.webp",
+                        quizImageAlt: "(목을) 돌리다 그림 카드",
+                        vi: "xoay cổ",
+                        ja: "首を回す",
+                        zh: "转动(脖子)"
+                },
+                {
+                        id: "c12-vocab-14",
+                        ko: "(옆구리를) 굽히다",
+                        meaning: "몸의 옆부분을 구부리다.",
+                        pos: "표현",
+                        category: "movement",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s03_tr_n14.webp",
+                        imageAlt: "(옆구리를) 굽히다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s03_tr_n14.webp",
+                        quizImageAlt: "(옆구리를) 굽히다 그림 카드",
+                        vi: "gập người sang bên",
+                        ja: "脇腹を曲げる",
+                        zh: "弯(腰侧)"
+                },
+                {
+                        id: "c12-vocab-15",
+                        ko: "(가슴을) 펴다",
+                        meaning: "가슴을 넓게 벌리다.",
+                        pos: "표현",
+                        category: "movement",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s03_bl_n15.webp",
+                        imageAlt: "(가슴을) 펴다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s03_bl_n15.webp",
+                        quizImageAlt: "(가슴을) 펴다 그림 카드",
+                        vi: "ưỡn ngực",
+                        ja: "胸を張る",
+                        zh: "挺(胸)"
+                },
+                {
+                        id: "c12-vocab-16",
+                        ko: "(몸을) 젖히다",
+                        meaning: "몸을 뒤로 기울이다.",
+                        pos: "표현",
+                        category: "movement",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s03_br_n16.webp",
+                        imageAlt: "(몸을) 젖히다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s03_br_n16.webp",
+                        quizImageAlt: "(몸을) 젖히다 그림 카드",
+                        vi: "ngả người ra sau",
+                        ja: "体を反らす",
+                        zh: "后仰(身体)"
+                },
+                {
+                        id: "c12-vocab-17",
+                        ko: "(손을 허리에) 대다",
+                        meaning: "손을 허리 부분에 올려놓다.",
+                        pos: "표현",
+                        category: "movement",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s01_tl_n17.webp",
+                        imageAlt: "(손을 허리에) 대다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s01_tl_n17.webp",
+                        quizImageAlt: "(손을 허리에) 대다 그림 카드",
+                        vi: "chống tay lên hông",
+                        ja: "腰に手を当てる",
+                        zh: "手放在腰上"
+                },
+                {
+                        id: "c12-vocab-18",
+                        ko: "(팔을) 뻗다",
+                        meaning: "팔을 길게 늘이다.",
+                        pos: "표현",
+                        category: "movement",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s01_tr_n18.webp",
+                        imageAlt: "(팔을) 뻗다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s01_tr_n18.webp",
+                        quizImageAlt: "(팔을) 뻗다 그림 카드",
+                        vi: "duỗi tay",
+                        ja: "腕を伸ばす",
+                        zh: "伸(胳膊)"
+                },
+                {
+                        id: "c12-vocab-19",
+                        ko: "(다리를) 벌리다",
+                        meaning: "두 다리 사이를 넓히다.",
+                        pos: "표현",
+                        category: "movement",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s01_bl_n19.webp",
+                        imageAlt: "(다리를) 벌리다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s01_bl_n19.webp",
+                        quizImageAlt: "(다리를) 벌리다 그림 카드",
+                        vi: "dạng chân",
+                        ja: "足を開く",
+                        zh: "岔开(腿)"
+                },
+                {
+                        id: "c12-vocab-20",
+                        ko: "(발뒤꿈치를) 들다",
+                        meaning: "발의 뒷부분을 위로 올리다.",
+                        pos: "표현",
+                        category: "movement",
+                        example: "",
+                        image: "../assets/c12/vocabulary/images/split-variants/full/s01_br_n20.webp",
+                        imageAlt: "(발뒤꿈치를) 들다 그림 카드",
+                        quizImage: "../assets/c12/vocabulary/images/split-variants/masked/s01_br_n20.webp",
+                        quizImageAlt: "(발뒤꿈치를) 들다 그림 카드",
+                        vi: "nhấc gót chân lên",
+                        ja: "かかとを上げる",
+                        zh: "踮起脚跟"
                 }
-            }
-
-            // Function to save quiz result to local storage
-            function saveQuizResult() {
-                try {
-                    const resultData = {
-                        score: totalScore,
-                        totalQuestions: allVocabulary[currentLang].data.length,
-                        date: new Date().toLocaleDateString('ko-KR'),
-                        mode: currentQuizMode
-                    };
-                    localStorage.setItem(`quizResult_12_${currentLang}`, JSON.stringify(resultData));
-                    displayLastScore();
-                } catch (e) {
-                    console.error("Local storage save failed:", e);
-                }
-            }
-
-            // Function to load and display the last score
-            function displayLastScore() {
-                try {
-                    const savedData = localStorage.getItem(`quizResult_12_${currentLang}`);
-                    if (savedData) {
-                        const result = JSON.parse(savedData);
-                        const modeLabelMap = { normal: '일반퀴즈', choseong: '초성퀴즈', image: '그림퀴즈' };
-                        const modeLabel = modeLabelMap[result.mode] || '일반퀴즈';
-                        lastScoreDisplayEl.textContent = `최근 점수(${modeLabel}): ${result.score}점 (총 ${result.totalQuestions}문제)`;
-                        lastScoreDisplayEl.classList.remove('hidden');
-                    } else {
-                        lastScoreDisplayEl.classList.add('hidden');
-                    }
-                } catch (e) {
-                    console.error("Local storage load failed:", e);
-                }
-            }
-            
-            // Function to switch views
-            function showView(view) {
-                cardView.classList.add('hidden');
-                quizView.classList.add('hidden');
-                resultView.classList.add('hidden');
-                document.getElementById(view).classList.remove('hidden');
-            }
-
-            function activateLanguageButton(language) {
-                langButtons.forEach(btn => {
-                    if (btn.dataset.lang === language) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                });
-            }
-
-            function startQuiz(mode) {
-                currentQuizMode = mode;
-
-                if ((mode === 'choseong' || mode === 'image') && currentLang !== 'korean') {
-                    currentLang = 'korean';
-                    activateLanguageButton('korean');
-                    createCardBoard(currentLang);
-                }
-
-                const sourceData = mode === 'normal'
-                    ? allVocabulary[currentLang].data
-                    : allVocabulary.korean.data;
-
-                currentQuizData = [...sourceData];
-                shuffleArray(currentQuizData);
-                currentQuestionIndex = 0;
-                totalScore = 0;
-                combo = 0;
-                quizResults = [];
-                showView('quiz-view');
-                showQuizQuestion();
-            }
-
-            // Renders the vocabulary cards
-            function createCardBoard(language) {
-                gameBoard.innerHTML = '';
-                const langData = allVocabulary[language];
-                const vocabulary = langData.data;
-                const colors = colorMap[langData.themeColor];
-                const isKoreanMode = language === 'korean';
-                
-                body.className = `min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-500 ${colors.bg}`;
-                
-                vocabulary.forEach(item => {
-                    const cardContainer = document.createElement('div');
-                    cardContainer.className = isKoreanMode ? 'card-container vocab-image-card' : 'card-container h-48';
-                    const cardInner = document.createElement('div');
-                    cardInner.className = 'card-inner';
-
-                    const cardFront = document.createElement('div');
-                    if (isKoreanMode) {
-                        cardFront.className = 'card-front image-card-front';
-                        const imagePath = koreanCardImageMap[item.korean];
-                        if (imagePath) {
-                            const imageEl = document.createElement('img');
-                            imageEl.src = imagePath;
-                            imageEl.alt = `${item.korean} 그림 카드`;
-                            imageEl.loading = 'lazy';
-                            imageEl.decoding = 'async';
-                            cardFront.appendChild(imageEl);
-                        } else {
-                            const fallbackText = document.createElement('h2');
-                            fallbackText.className = `text-2xl font-bold ${colors.text}`;
-                            fallbackText.textContent = item.korean;
-                            cardFront.appendChild(fallbackText);
-                        }
-                    } else {
-                        cardFront.className = `card-front bg-white ${colors.text}`;
-                        const koreanText = document.createElement('h2');
-                        koreanText.className = 'text-2xl font-bold';
-                        koreanText.textContent = item.korean;
-                        cardFront.appendChild(koreanText);
-                    }
-
-                    const cardBack = document.createElement('div');
-                    cardBack.className = `card-back text-white ${colors.cardBack}`;
-                    if (isKoreanMode) {
-                        const koreanAnswer = document.createElement('h2');
-                        koreanAnswer.className = 'text-2xl font-bold';
-                        koreanAnswer.textContent = item.korean;
-                        cardBack.appendChild(koreanAnswer);
-                    } else {
-                        const foreignText = document.createElement('p');
-                        foreignText.className = 'text-lg font-semibold';
-                        foreignText.textContent = item.foreign;
-                        cardBack.appendChild(foreignText);
-                    }
-                    
-                    cardInner.appendChild(cardFront);
-                    cardInner.appendChild(cardBack);
-                    cardContainer.appendChild(cardInner);
-                    gameBoard.appendChild(cardContainer);
-
-                    cardContainer.addEventListener('click', () => cardContainer.classList.toggle('flipped'));
-                });
-            }
-
-            // Generates and displays a single quiz question
-            function showQuizQuestion() {
-                const totalQuestions = currentQuizData.length;
-                if (currentQuestionIndex >= totalQuestions) {
-                    showQuizResult();
-                    return;
-                }
-
-                const currentItem = currentQuizData[currentQuestionIndex];
-                let correctAnswer = '';
-                let options = [];
-
-                if (currentQuizMode === 'choseong' || currentQuizMode === 'image') {
-                    const allItems = allVocabulary.korean.data;
-                    const distractors = [];
-                    while (distractors.length < 2) {
-                        const randomIndex = Math.floor(Math.random() * allItems.length);
-                        const randomItem = allItems[randomIndex];
-                        if (randomItem.korean !== currentItem.korean && !distractors.includes(randomItem.korean)) {
-                            distractors.push(randomItem.korean);
-                        }
-                    }
-
-                    correctAnswer = currentItem.korean;
-                    options = [correctAnswer, ...distractors];
-
-                    const isChoseongMode = currentQuizMode === 'choseong';
-                    quizModeLabelEl.textContent = isChoseongMode ? '초성퀴즈' : '그림퀴즈';
-                    quizModeLabelEl.classList.remove('hidden');
-                    quizImageBoxEl.classList.remove('hidden');
-                    const imageMap = isChoseongMode ? koreanChoseongImageMap : koreanMaskedImageMap;
-                    quizImageEl.src = imageMap[currentItem.korean] || koreanCardImageMap[currentItem.korean] || '';
-                    quizImageEl.alt = `${currentItem.korean} ${isChoseongMode ? '초성' : '마스킹'} 그림`;
-                    quizQuestionEl.textContent = isChoseongMode
-                        ? '초성 그림의 어휘는 무엇일까요?'
-                        : '그림만 보고 어휘를 맞혀 보세요.';
-                } else {
-                    const allItems = allVocabulary[currentLang].data;
-                    const distractors = [];
-                    while (distractors.length < 2) {
-                        const randomIndex = Math.floor(Math.random() * allItems.length);
-                        const randomItem = allItems[randomIndex];
-                        if (randomItem.foreign !== currentItem.foreign && !distractors.includes(randomItem.foreign)) {
-                            distractors.push(randomItem.foreign);
-                        }
-                    }
-
-                    correctAnswer = currentItem.foreign;
-                    options = [correctAnswer, ...distractors];
-
-                    quizModeLabelEl.textContent = '일반퀴즈';
-                    quizModeLabelEl.classList.remove('hidden');
-                    quizImageBoxEl.classList.add('hidden');
-                    quizImageEl.removeAttribute('src');
-                    quizQuestionEl.textContent = currentItem.korean;
-                }
-
-                shuffleArray(options);
-
-                // Update UI
-                quizQuestionNumberEl.textContent = `${currentQuestionIndex + 1} / ${totalQuestions}`;
-                quizOptionsEl.innerHTML = '';
-                quizFeedbackEl.textContent = ''; // Clear feedback
-                quizComboEl.textContent = (combo > 0) ? `✨ ${combo} 콤보! ✨` : '';
-
-                options.forEach(option => {
-                    const optionBtn = document.createElement('button');
-                    optionBtn.className = `w-full px-4 py-4 text-lg font-semibold rounded-lg shadow-md transition-all duration-300 text-gray-800 bg-gray-100 hover:bg-gray-200`;
-                    optionBtn.textContent = option;
-                    optionBtn.addEventListener('click', () => handleAnswer(option, correctAnswer, optionBtn));
-                    quizOptionsEl.appendChild(optionBtn);
-                });
-            }
-
-            // Handles user's answer
-            function handleAnswer(selectedAnswer, correctAnswer, selectedBtn) {
-                const isCorrect = selectedAnswer === correctAnswer;
-                
-                // Disable all buttons after selection
-                Array.from(quizOptionsEl.children).forEach(btn => btn.disabled = true);
-
-                let pointsGained = 0;
-                if (isCorrect) {
-                    combo++;
-                    pointsGained = 10 + combo; // Basic point + combo bonus
-                    totalScore += pointsGained;
-                    selectedBtn.classList.add('bg-green-300', 'text-white');
-                    quizFeedbackEl.textContent = '정답입니다! 🎉';
-                    quizFeedbackEl.classList.add('correct');
-                } else {
-                    combo = 0;
-                    pointsGained = 0;
-                    selectedBtn.classList.add('bg-red-300', 'text-white');
-                    quizFeedbackEl.textContent = `아쉽네요. 정답은 '${correctAnswer}' 입니다.`;
-                    quizFeedbackEl.classList.add('wrong');
-                    
-                    // Highlight the correct answer
-                    Array.from(quizOptionsEl.children).forEach(btn => {
-                        if (btn.textContent === correctAnswer) {
-                            btn.classList.add('bg-green-300', 'text-white');
-                        }
-                    });
-                }
-                
-                // Track result
-                quizResults.push({
-                    question: currentQuizMode === 'choseong'
-                        ? `초성 그림 ${currentQuestionIndex + 1}`
-                        : currentQuizMode === 'image'
-                            ? `그림 퀴즈 ${currentQuestionIndex + 1}`
-                            : currentQuizData[currentQuestionIndex].korean,
-                    userAnswer: selectedAnswer,
-                    correctAnswer: correctAnswer,
-                    isCorrect: isCorrect,
-                    points: pointsGained
-                });
-                
-                // Move to the next question after a short delay
-                setTimeout(() => {
-                    currentQuestionIndex++;
-                    quizFeedbackEl.classList.remove('correct', 'wrong');
-                    showQuizQuestion();
-                }, 1500);
-            }
-
-            // Shows the quiz results page
-            function showQuizResult() {
-                showView('result-view');
-                resultTitleEl.textContent = currentQuizMode === 'choseong'
-                    ? '초성퀴즈 완료!'
-                    : currentQuizMode === 'image'
-                        ? '그림퀴즈 완료!'
-                        : '퀴즈 완료!';
-                resultScoreEl.textContent = `총 점수: ${totalScore}점`;
-                resultTableBodyEl.innerHTML = '';
-                
-                quizResults.forEach(result => {
-                    const row = document.createElement('tr');
-                    const correctClass = result.isCorrect ? 'correct-answer' : 'wrong-answer';
-                    row.className = correctClass;
-                    
-                    row.innerHTML = `
-                        <td class="p-3 border-b-2 font-medium">${result.question}</td>
-                        <td class="p-3 border-b-2 text-gray-700">${result.correctAnswer}</td>
-                        <td class="p-3 border-b-2 font-bold">${result.isCorrect ? 'O' : 'X'}</td>
-                        <td class="p-3 border-b-2 text-right">${result.points}점</td>
-                    `;
-                    resultTableBodyEl.appendChild(row);
-                });
-
-                saveQuizResult();
-            }
-
-            // Event Listeners
-            langButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    activateLanguageButton(button.dataset.lang);
-                    currentLang = button.dataset.lang;
-                    createCardBoard(currentLang);
-                    displayLastScore();
-                    showView('card-view');
-                });
-            });
-
-            startQuizBtn.addEventListener('click', () => {
-                startQuiz('normal');
-            });
-            startChoseongQuizBtn.addEventListener('click', () => {
-                startQuiz('choseong');
-            });
-            startImageQuizBtn.addEventListener('click', () => {
-                startQuiz('image');
-            });
-
-            restartQuizBtn.addEventListener('click', () => {
-                startQuiz(currentQuizMode);
-            });
-
-            backToCardsBtn.addEventListener('click', () => {
-                createCardBoard(currentLang);
-                showView('card-view');
-            });
-
-            captureBtn.addEventListener('click', () => {
-                // Hide buttons before capture
-                const buttons = document.querySelectorAll('#result-view button');
-                buttons.forEach(btn => btn.style.display = 'none');
-                
-                captureText.textContent = '캡처 중...';
-                
-                html2canvas(resultContentToCapture, {
-                    scale: 2, // Capture at a higher resolution
-                    useCORS: true
-                }).then(canvas => {
-                    const a = document.createElement('a');
-                    a.href = canvas.toDataURL('image/png');
-                    a.download = `quiz_result_${new Date().toLocaleDateString('ko-KR')}.png`;
-                    a.click();
-                    
-                    // Show buttons again after capture
-                    buttons.forEach(btn => btn.style.display = '');
-                    captureText.textContent = '결과 캡처하기';
-                });
-            });
-
-            // Initial setup
-            activateLanguageButton('korean');
-            createCardBoard('korean');
-            displayLastScore();
-        });
+        ]
+};
+    window.MULTILANG_CONFIG = {
+        langs: window.VOCABULARY_CONFIG.languages || ["en", "vi", "mn", "ar", "kk", "th"],
+        defaultLang: window.VOCABULARY_CONFIG.defaultLang || "none"
+    };
     </script>
-    <script src="../shared/pc-mode.js"></script>
+
+    <script src="../shared/vocabulary-multilang-data.js"></script>
+    <script>
+    (function () {
+        "use strict";
+
+        const cfg = window.VOCABULARY_CONFIG;
+        if (!cfg) return;
+
+        const LANGS = {
+            none: { label: "한국어 뜻", answerLabel: "한국어 뜻", speech: "ko-KR" },
+            en: { label: "영어", answerLabel: "English", speech: "en-US" },
+            vi: { label: "베트남어", answerLabel: "Tiếng Việt", speech: "vi-VN" },
+            mn: { label: "몽골어", answerLabel: "Монгол", speech: "mn-MN" },
+            ar: { label: "아랍어", answerLabel: "العربية", speech: "ar-SA" },
+            kk: { label: "카자흐어", answerLabel: "Қазақша", speech: "kk-KZ" },
+            th: { label: "태국어", answerLabel: "ไทย", speech: "th-TH" },
+            ja: { label: "일본어", answerLabel: "日本語", speech: "ja-JP" },
+            zh: { label: "중국어", answerLabel: "中文", speech: "zh-CN" }
+        };
+        const QUIZ_MODE_META = {
+            meaning: { label: "뜻", icon: "fa-language" },
+            choseong: { label: "초성", icon: "fa-spell-check" },
+            image: { label: "그림", icon: "fa-image" }
+        };
+        const PALETTES = [
+            { bg: "#fff7ed", ink: "#c2410c", line: "#fed7aa" },
+            { bg: "#eff6ff", ink: "#1d4ed8", line: "#bfdbfe" },
+            { bg: "#f0fdf4", ink: "#15803d", line: "#bbf7d0" },
+            { bg: "#fdf2f8", ink: "#be185d", line: "#fbcfe8" },
+            { bg: "#f5f3ff", ink: "#6d28d9", line: "#ddd6fe" }
+        ];
+        const CHOSEONG = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+
+        const storagePrefix = cfg.storageKey || `vocabulary-${cfg.chapter || "standard"}`;
+        const categories = normalizeCategories(cfg.categories || []);
+        const words = normalizeWords(cfg.words || []);
+        const imageCount = words.filter((word) => Boolean(word.image)).length;
+        const quizImageCount = words.filter((word) => Boolean(word.quizImage || word.image)).length;
+        const availableQuizModes = normalizeQuizModes(cfg.quizModes || ["meaning", "choseong", "image"]);
+
+        let currentView = "cards";
+        let activeLang = readStored("preferred-lang", cfg.defaultLang || "none");
+        if (!LANGS[activeLang] || (activeLang !== "none" && !cfg.languages?.includes(activeLang))) activeLang = "none";
+        let currentCategory = "all";
+        let searchQuery = "";
+        let showFrontHeadword = readStored(`${storagePrefix}-front-headword`, "false") === "true";
+        let quizMode = readStored(`${storagePrefix}-quiz-mode`, availableQuizModes[0] || "meaning");
+        if (!availableQuizModes.includes(quizMode)) quizMode = availableQuizModes[0] || "meaning";
+        let cardOrder = words.map((_, index) => index);
+        let quizQueue = [];
+        let quizIndex = 0;
+
+        const els = {
+            vocabCount: document.getElementById("vocab-count"),
+            imageCount: document.getElementById("image-count"),
+            viewButtons: document.querySelectorAll("[data-view]"),
+            categoryFilter: document.getElementById("category-filter"),
+            searchInput: document.getElementById("search-input"),
+            frontToggle: document.getElementById("front-headword-toggle"),
+            shuffleBtn: document.getElementById("shuffle-btn"),
+            wordGrid: document.getElementById("word-grid"),
+            cardsEmpty: document.getElementById("cards-empty"),
+            listPanel: document.getElementById("list-panel"),
+            listEmpty: document.getElementById("list-empty"),
+            quizModeSelector: document.getElementById("quiz-mode-selector"),
+            quizProgress: document.getElementById("quiz-progress"),
+            quizType: document.getElementById("quiz-type"),
+            quizQuestion: document.getElementById("quiz-question"),
+            quizOptions: document.getElementById("quiz-options"),
+            quizFeedback: document.getElementById("quiz-feedback"),
+            nextQuestionBtn: document.getElementById("next-question-btn")
+        };
+
+        function readStored(key, fallback) {
+            try { return localStorage.getItem(key) || fallback; }
+            catch (error) { return fallback; }
+        }
+
+        function writeStored(key, value) {
+            try { localStorage.setItem(key, value); }
+            catch (error) { /* ignore */ }
+        }
+
+        function normalizeCategories(source) {
+            const list = source.length ? source.slice() : [{ id: "all", label: "전체" }];
+            if (!list.some((category) => category.id === "all")) {
+                list.unshift({ id: "all", label: "전체" });
+            }
+            return list;
+        }
+
+        function normalizeWords(source) {
+            return source.map((word, index) => ({
+                ...word,
+                id: word.id || `word-${index + 1}`,
+                ko: word.ko || word.term || word.korean || "",
+                meaning: word.meaning || word.definition || word.foreign || "",
+                category: word.category || "all",
+                image: word.image || null,
+                imageAlt: word.imageAlt || word.alt || "",
+                quizImage: word.quizImage || word.maskedImage || null,
+                quizImageAlt: word.quizImageAlt || word.imageAlt || word.alt || ""
+            })).filter((word) => word.ko);
+        }
+
+        function normalizeQuizModes(source) {
+            const modes = source.filter((mode) => mode !== "image" || quizImageCount > 0);
+            return modes.length ? modes : ["meaning", "choseong"];
+        }
+
+        function categoryFor(id) {
+            return categories.find((category) => category.id === id) || categories[0];
+        }
+
+        function paletteFor(id) {
+            const categoryIds = categories.filter((category) => category.id !== "all").map((category) => category.id);
+            const index = Math.max(0, categoryIds.indexOf(id));
+            return PALETTES[index % PALETTES.length];
+        }
+
+        function answerFor(word, lang = activeLang) {
+            if (lang === "none") return word.meaning || word.example || word.ko;
+            return word[lang] || word.meaning || word.example || word.ko;
+        }
+
+        function answerLabel() {
+            return LANGS[activeLang]?.answerLabel || "한국어 뜻";
+        }
+
+        function quizTypeLabel() {
+            if (quizMode === "choseong") return "초성 퀴즈";
+            if (quizMode === "image") return "그림 퀴즈";
+            return `${answerLabel()} 맞히기`;
+        }
+
+        function quizAnswerFor(word) {
+            if (quizMode === "meaning") return answerFor(word);
+            return word.ko;
+        }
+
+        function quizPromptFor(word) {
+            if (quizMode === "choseong") return "초성을 보고 어휘를 고르세요.";
+            if (quizMode === "image") return "그림에 맞는 어휘를 고르세요.";
+            return word.ko;
+        }
+
+        function choseongFor(value) {
+            return String(value || "").split("").map((char) => {
+                const code = char.charCodeAt(0) - 0xac00;
+                if (code >= 0 && code <= 11171) return CHOSEONG[Math.floor(code / 588)];
+                return char;
+            }).join("").replace(/\s+/g, " ").trim();
+        }
+
+        function escapeHtml(value) {
+            return String(value || "").replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[char]);
+        }
+
+        function translationAttrs(lang) {
+            const code = lang && lang !== "none" ? lang : "ko";
+            const dir = code === "ar" ? "rtl" : "ltr";
+            return `lang="${escapeHtml(code)}" dir="${dir}"`;
+        }
+
+        function speak(text, langCode = "ko-KR") {
+            if (!window.speechSynthesis || !text) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = langCode;
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function searchableText(word) {
+            return [
+                word.ko,
+                word.meaning,
+                word.example,
+                categoryFor(word.category).label,
+                ...(cfg.languages || []).map((lang) => word[lang] || "")
+            ].join(" ").toLowerCase();
+        }
+
+        function filteredWords() {
+            const query = searchQuery.toLowerCase();
+            return cardOrder
+                .map((index) => words[index])
+                .filter((word) => {
+                    const categoryMatch = currentCategory === "all" || word.category === currentCategory;
+                    const searchMatch = !query || searchableText(word).includes(query);
+                    return categoryMatch && searchMatch;
+                });
+        }
+
+        function imageMarkup(word, className, fallbackText) {
+            if (word.image) {
+                return `<img class="${className}" src="${escapeHtml(word.image)}" alt="${escapeHtml(word.imageAlt || `${word.ko} 그림 카드`)}" loading="lazy" decoding="async" />`;
+            }
+            return `<span class="${className === "word-card__image" ? "word-card__placeholder" : "quiz-visual__fallback"}">${escapeHtml(fallbackText || word.ko)}</span>`;
+        }
+
+        function quizVisualFor(word, overlay = "") {
+            const quizImage = word.quizImage || word.image;
+            const quizImageAlt = word.quizImageAlt || word.imageAlt || "어휘 그림";
+            const visual = quizImage
+                ? `<img class="quiz-image" src="${escapeHtml(quizImage)}" alt="${escapeHtml(quizImageAlt)}" loading="lazy" decoding="async" />`
+                : `<span class="quiz-visual__fallback">${escapeHtml(word.ko)}</span>`;
+            return `<div class="quiz-visual">${visual}${overlay}</div>`;
+        }
+
+        function buildCategoryFilter() {
+            els.categoryFilter.innerHTML = "";
+            categories.forEach((category) => {
+                const button = document.createElement("button");
+                button.className = "category-btn" + (category.id === currentCategory ? " active" : "");
+                button.type = "button";
+                button.textContent = category.label;
+                button.dataset.categoryId = category.id;
+                button.addEventListener("click", () => {
+                    currentCategory = category.id;
+                    document.querySelectorAll(".category-btn").forEach((btn) => btn.classList.remove("active"));
+                    button.classList.add("active");
+                    render();
+                });
+                els.categoryFilter.appendChild(button);
+            });
+        }
+
+        function buildQuizModeSelector() {
+            els.quizModeSelector.innerHTML = "";
+            availableQuizModes.forEach((mode) => {
+                const meta = QUIZ_MODE_META[mode] || QUIZ_MODE_META.meaning;
+                const button = document.createElement("button");
+                button.className = "quiz-mode-btn";
+                button.type = "button";
+                button.dataset.quizMode = mode;
+                button.setAttribute("role", "tab");
+                button.innerHTML = `<i class="fa-solid ${meta.icon}"></i> ${escapeHtml(meta.label)}`;
+                button.addEventListener("click", () => {
+                    quizMode = mode;
+                    writeStored(`${storagePrefix}-quiz-mode`, quizMode);
+                    updateQuizModeButtons();
+                    if (currentView === "quiz") startQuiz();
+                });
+                els.quizModeSelector.appendChild(button);
+            });
+        }
+
+        function updateFrontHeadwordToggle() {
+            els.frontToggle.setAttribute("aria-checked", String(showFrontHeadword));
+        }
+
+        function updateQuizModeButtons() {
+            document.querySelectorAll("[data-quiz-mode]").forEach((button) => {
+                const active = button.dataset.quizMode === quizMode;
+                button.classList.toggle("active", active);
+                button.setAttribute("aria-selected", String(active));
+            });
+        }
+
+        function renderCards() {
+            const list = filteredWords();
+            els.wordGrid.innerHTML = "";
+            els.cardsEmpty.hidden = list.length > 0;
+            list.forEach((word) => {
+                const category = categoryFor(word.category);
+                const palette = paletteFor(word.category);
+                const card = document.createElement("article");
+                card.className = "word-card";
+                card.tabIndex = 0;
+                card.setAttribute("role", "button");
+                card.setAttribute("aria-pressed", "false");
+                card.setAttribute("aria-label", `${word.ko} 카드 뒤집기`);
+                card.style.setProperty("--card-bg", palette.bg);
+                card.style.setProperty("--card-ink", palette.ink);
+                card.style.setProperty("--card-line", palette.line);
+                card.innerHTML = `
+                    <span class="word-card__inner">
+                        <span class="word-card__face word-card__front">
+                            ${showFrontHeadword ? `<span class="word-card__front-headword">${escapeHtml(word.ko)}</span>` : ""}
+                            ${imageMarkup(word, "word-card__image", word.ko)}
+                            <span class="card-action card-action--flip" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span>
+                        </span>
+                        <span class="word-card__face word-card__back">
+                            <button class="card-action card-action--speak" type="button" data-speak="${escapeHtml(word.ko)}" data-lang-code="ko-KR" aria-label="${escapeHtml(word.ko)} 듣기"><i class="fa-solid fa-volume-high"></i></button>
+                            <span class="word-card__back-main">${escapeHtml(word.ko)}</span>
+                            <span class="word-card__translation">
+                                <span class="word-card__lang">${escapeHtml(answerLabel())}</span>
+                                <span class="word-card__translation-text" ${translationAttrs(activeLang)}>${escapeHtml(answerFor(word))}</span>
+                            </span>
+                            <span class="word-card__category">${escapeHtml(category.label)}</span>
+                        </span>
+                    </span>
+                `;
+                card.addEventListener("click", (event) => {
+                    const speaker = event.target.closest("[data-speak]");
+                    if (speaker) {
+                        event.stopPropagation();
+                        speak(speaker.dataset.speak, speaker.dataset.langCode);
+                        return;
+                    }
+                    const flipped = !card.classList.contains("is-flipped");
+                    card.classList.toggle("is-flipped", flipped);
+                    card.setAttribute("aria-pressed", String(flipped));
+                    if (navigator.vibrate) navigator.vibrate(10);
+                });
+                card.addEventListener("keydown", (event) => {
+                    if (event.key !== "Enter" && event.key !== " ") return;
+                    event.preventDefault();
+                    const flipped = !card.classList.contains("is-flipped");
+                    card.classList.toggle("is-flipped", flipped);
+                    card.setAttribute("aria-pressed", String(flipped));
+                });
+                els.wordGrid.appendChild(card);
+            });
+        }
+
+        function renderList() {
+            const list = filteredWords();
+            els.listPanel.innerHTML = "";
+            els.listEmpty.hidden = list.length > 0;
+            list.forEach((word, index) => {
+                const category = categoryFor(word.category);
+                const item = document.createElement("article");
+                item.className = "list-item";
+                const thumb = word.image
+                    ? `<img class="list-item__thumb" src="${escapeHtml(word.image)}" alt="${escapeHtml(word.imageAlt || `${word.ko} 그림`)}" loading="lazy" decoding="async" />`
+                    : '<span class="list-item__thumb-placeholder"><i class="fa-solid fa-image"></i></span>';
+                item.innerHTML = `
+                    ${thumb}
+                    <div class="list-item__ko">
+                        <span>${index + 1}. ${escapeHtml(word.ko)}</span>
+                        <span class="meta-pill">${escapeHtml(category.label)}${word.pos ? ` · ${escapeHtml(word.pos)}` : ""}</span>
+                    </div>
+                    <div class="list-item__info">
+                        <div><strong>뜻</strong> ${escapeHtml(word.meaning || word.example || "")}</div>
+                        ${word.example ? `<div><strong>예문</strong> ${escapeHtml(word.example)}</div>` : ""}
+                        <div class="translation-grid">
+                            ${(cfg.languages || []).filter((lang) => word[lang] && LANGS[lang]).map((lang) => `
+                                <div class="translation-cell" ${translationAttrs(lang)}><strong dir="ltr">${escapeHtml(LANGS[lang].label)}</strong>${escapeHtml(word[lang])}</div>
+                            `).join("")}
+                        </div>
+                    </div>
+                `;
+                els.listPanel.appendChild(item);
+            });
+        }
+
+        function shuffleCards() {
+            for (let i = cardOrder.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cardOrder[i], cardOrder[j]] = [cardOrder[j], cardOrder[i]];
+            }
+            const icon = els.shuffleBtn.querySelector("i");
+            icon.classList.add("fa-spin");
+            setTimeout(() => icon.classList.remove("fa-spin"), 450);
+            render();
+        }
+
+        function quizSourceWords() {
+            const filtered = filteredWords();
+            if (quizMode === "image") return filtered.filter((word) => Boolean(word.quizImage || word.image));
+            return filtered;
+        }
+
+        function startQuiz() {
+            quizQueue = quizSourceWords().sort(() => Math.random() - 0.5);
+            quizIndex = 0;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            const current = quizQueue[quizIndex];
+            els.quizOptions.innerHTML = "";
+            els.quizFeedback.textContent = "";
+            els.nextQuestionBtn.hidden = true;
+            if (!current) {
+                els.quizProgress.textContent = "문제 0 / 0";
+                els.quizType.textContent = quizTypeLabel();
+                els.quizQuestion.innerHTML = `<p class="quiz-prompt">${quizMode === "image" ? "이미지가 있는 검색 결과가 없습니다." : "검색 결과가 없습니다."}</p>`;
+                return;
+            }
+            els.quizProgress.textContent = `문제 ${quizIndex + 1} / ${quizQueue.length}`;
+            els.quizType.textContent = quizTypeLabel();
+            const choseongOverlay = quizMode === "choseong"
+                ? `<span class="quiz-choseong-overlay">${escapeHtml(choseongFor(current.ko))}</span>`
+                : "";
+            els.quizQuestion.innerHTML = `
+                ${quizVisualFor(current, choseongOverlay)}
+                <p class="quiz-prompt">${escapeHtml(quizPromptFor(current))}</p>
+            `;
+            const pool = words.filter((word) => word !== current);
+            const wrong = pool.sort(() => Math.random() - 0.5).slice(0, 3);
+            const choices = [current, ...wrong].sort(() => Math.random() - 0.5);
+            const correctAnswer = quizAnswerFor(current);
+            choices.forEach((choice) => {
+                const option = document.createElement("button");
+                option.className = "quiz-option";
+                option.type = "button";
+                option.textContent = quizAnswerFor(choice);
+                option.dataset.correct = String(choice === current);
+                option.addEventListener("click", () => {
+                    const ok = choice === current;
+                    document.querySelectorAll(".quiz-option").forEach((button) => {
+                        button.disabled = true;
+                        if (button === option) button.classList.add(ok ? "correct" : "wrong");
+                        if (!ok && button.dataset.correct === "true") button.classList.add("correct");
+                    });
+                    els.quizFeedback.textContent = ok ? "정답!" : `오답 - 정답: ${correctAnswer}`;
+                    els.nextQuestionBtn.hidden = false;
+                });
+                els.quizOptions.appendChild(option);
+            });
+        }
+
+        function nextQuizQuestion() {
+            quizIndex += 1;
+            if (quizIndex < quizQueue.length) {
+                renderQuizQuestion();
+                return;
+            }
+            els.quizProgress.textContent = `완료 / ${quizQueue.length}`;
+            els.quizType.textContent = "퀴즈 완료";
+            els.quizQuestion.innerHTML = '<p class="quiz-prompt">퀴즈 완료!</p>';
+            els.quizOptions.innerHTML = "";
+            els.quizFeedback.textContent = "완료되었습니다.";
+            els.nextQuestionBtn.hidden = true;
+        }
+
+        function switchView(view) {
+            currentView = view;
+            els.viewButtons.forEach((button) => button.classList.toggle("active", button.dataset.view === view));
+            document.querySelectorAll(".view").forEach((panel) => panel.classList.remove("active"));
+            document.getElementById(`${view}-view`).classList.add("active");
+            els.shuffleBtn.hidden = view !== "cards";
+            els.frontToggle.hidden = view !== "cards";
+            render();
+        }
+
+        function render() {
+            activeLang = window.MultilangToggle?.getLang?.() || readStored("preferred-lang", cfg.defaultLang || "none");
+            if (!LANGS[activeLang] || (activeLang !== "none" && !cfg.languages?.includes(activeLang))) activeLang = "none";
+            updateFrontHeadwordToggle();
+            updateQuizModeButtons();
+            if (currentView === "cards") renderCards();
+            else if (currentView === "list") renderList();
+            else startQuiz();
+        }
+
+        els.vocabCount.textContent = `어휘 ${words.length}개`;
+        els.imageCount.textContent = `이미지 ${imageCount}개`;
+        els.viewButtons.forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
+        els.searchInput.addEventListener("input", (event) => {
+            searchQuery = event.target.value.trim();
+            render();
+        });
+        els.frontToggle.addEventListener("click", () => {
+            showFrontHeadword = !showFrontHeadword;
+            writeStored(`${storagePrefix}-front-headword`, String(showFrontHeadword));
+            renderCards();
+            updateFrontHeadwordToggle();
+        });
+        els.shuffleBtn.addEventListener("click", shuffleCards);
+        els.nextQuestionBtn.addEventListener("click", nextQuizQuestion);
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest("[data-multilang-btn]")) return;
+            setTimeout(render, 50);
+        });
+
+        buildCategoryFilter();
+        buildQuizModeSelector();
+        switchView("cards");
+    })();
+    </script>
+    <script src="../shared/multilang-toggle.js"></script>
     <script src="../shared/site-copyright.js"></script>
 </body>
 </html>

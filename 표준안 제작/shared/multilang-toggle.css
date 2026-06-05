@@ -1,0 +1,164 @@
+/**
+ * multilang-toggle.css
+ * 한국어 학습 웹페이지 표준 다국어 토글 스타일
+ *
+ * design-tokens.css 의 --lang-* 변수를 사용한다.
+ * multilang-toggle.js 와 함께 로드해야 한다.
+ */
+
+/* ─────────────────────────────────────────────
+   1. 번역 블록 기본 상태
+   [data-lang] 이 붙은 요소는 기본 숨김.
+   JS가 .lang-visible 를 추가하면 표시.
+───────────────────────────────────────────── */
+[data-lang] {
+    display: none;
+}
+
+[data-lang].lang-visible {
+    display: revert;   /* 원래 display 속성으로 복원 */
+}
+
+/* 블록 레벨 번역 박스 공통 스타일 */
+.lang-box {
+    margin-top: 10px;
+    border-radius: 14px;
+    padding: 11px 14px;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.65;
+}
+
+/* 언어별 박스 색상 */
+.lang-box[data-lang="vi"],
+[data-lang="vi"].lang-box {
+    border: 1px solid #fdba74;
+    background: var(--amber-soft, #fff7ed);
+    color: #7c2d12;
+}
+
+.lang-box[data-lang="en"],
+[data-lang="en"].lang-box {
+    border: 1px solid #7dd3fc;
+    background: #f0f9ff;
+    color: #0c4a6e;
+}
+
+.lang-box[data-lang="ja"],
+[data-lang="ja"].lang-box {
+    border: 1px solid #c4b5fd;
+    background: #f5f3ff;
+    color: #4c1d95;
+}
+
+.lang-box[data-lang="zh"],
+[data-lang="zh"].lang-box {
+    border: 1px solid #fca5a5;
+    background: #fef2f2;
+    color: #7f1d1d;
+}
+
+
+/* ─────────────────────────────────────────────
+   2. 토글 버튼 바 (.multilang-bar)
+───────────────────────────────────────────── */
+.multilang-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+}
+
+.multilang-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 34px;
+    border-radius: var(--radius-pill, 999px);
+    padding: 0 12px;
+    border: 1.5px solid;
+    background: #ffffff;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+    transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+    cursor: pointer;
+}
+
+.multilang-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.multilang-btn:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+/* "번역 끄기" 버튼 */
+.multilang-btn--none {
+    border-color: var(--line, #d7e0ea);
+    color: var(--muted, #64748b);
+}
+.multilang-btn--none.active {
+    border-color: var(--line, #d7e0ea);
+    background: #f1f5f9;
+    color: var(--ink, #172033);
+}
+
+/* 베트남어 버튼 */
+.multilang-btn--vi {
+    border-color: #6ee7b7;
+    color: var(--lang-vi, #059669);
+}
+.multilang-btn--vi.active {
+    border-color: var(--lang-vi, #059669);
+    background: #ecfdf5;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+}
+
+/* 영어 버튼 */
+.multilang-btn--en {
+    border-color: #7dd3fc;
+    color: var(--lang-en, #0369a1);
+}
+.multilang-btn--en.active {
+    border-color: var(--lang-en, #0369a1);
+    background: #f0f9ff;
+    box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.12);
+}
+
+/* 일본어 버튼 */
+.multilang-btn--ja {
+    border-color: #c4b5fd;
+    color: var(--lang-ja, #7c3aed);
+}
+.multilang-btn--ja.active {
+    border-color: var(--lang-ja, #7c3aed);
+    background: #f5f3ff;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+/* 중국어 버튼 */
+.multilang-btn--zh {
+    border-color: #fca5a5;
+    color: var(--lang-zh, #b91c1c);
+}
+.multilang-btn--zh.active {
+    border-color: var(--lang-zh, #b91c1c);
+    background: #fef2f2;
+    box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12);
+}
+
+
+/* ─────────────────────────────────────────────
+   3. 반응형
+───────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .multilang-btn {
+        min-height: 30px;
+        padding: 0 10px;
+        font-size: 11px;
+    }
+}

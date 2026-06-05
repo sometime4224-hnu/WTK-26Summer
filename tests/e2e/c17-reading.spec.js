@@ -105,3 +105,39 @@ test('c17 cut writing page checks a sentence choice', async ({ page }) => {
   await page.locator('#nextBtn').click();
   await expect(page.locator('#stageTitle')).toContainText('핵심어');
 });
+
+test('c17 cut writing mobile view focuses on image and task', async ({ page }) => {
+  await blockExternalRequests(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  await page.goto('/c17/writing-cut.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.hero')).toBeHidden();
+  await expect(page.locator('.rail')).toBeHidden();
+  await expect(page.locator('#progressDots')).toBeHidden();
+  await expect(page.locator('#modeRow button')).toHaveCount(4);
+
+  await page.waitForFunction(() => {
+    const image = document.querySelector('#cutImage');
+    return image && image.complete && image.naturalWidth > 0;
+  });
+
+  const layout = await page.evaluate(() => {
+    const image = document.querySelector('.image-panel').getBoundingClientRect();
+    const task = document.querySelector('.answer-card').getBoundingClientRect();
+    const workbench = document.querySelector('.workbench').getBoundingClientRect();
+    return {
+      imageTop: image.top,
+      imageBottom: image.bottom,
+      taskTop: task.top,
+      taskBottom: task.bottom,
+      workbenchTop: workbench.top,
+      viewportHeight: window.innerHeight
+    };
+  });
+
+  expect(layout.workbenchTop).toBeLessThan(72);
+  expect(layout.imageTop).toBeGreaterThanOrEqual(0);
+  expect(layout.imageBottom).toBeLessThan(layout.viewportHeight);
+  expect(layout.taskTop).toBeLessThan(layout.viewportHeight);
+  expect(layout.taskBottom).toBeLessThanOrEqual(layout.viewportHeight);
+});

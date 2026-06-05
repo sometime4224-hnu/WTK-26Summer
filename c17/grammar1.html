@@ -16,6 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="../shared/multilang-toggle.css" />
     <link rel="stylesheet" href="grammar-main.css" />
 </head>
 <body>
@@ -45,10 +46,8 @@
                         <span class="chip"><i class="fa-solid fa-arrow-right-arrow-left"></i> 알고 보니</span>
                     </div>
                 </div>
-                <button id="viToggle" class="translation-toggle" type="button" aria-pressed="false">
-                    <i class="fa-solid fa-language"></i> Tiếng Việt OFF
-                </button>
             </div>
+            <div data-multilang-bar></div>
             <div class="tabs">
                 <button id="tabLearn" class="tab-btn active" type="button">학습</button>
                 <button id="tabPractice" class="tab-btn" type="button">연습</button>
@@ -61,7 +60,12 @@
                     <p class="eyebrow">Meaning</p>
                     <h2>하고 난 뒤에 새로 알게 됨</h2>
                     <p><code>V-고 보니</code>는 앞의 행동을 한 다음에 뒤의 사실을 깨닫거나 확인했다는 뜻입니다. 처음 생각과 실제가 달랐다는 느낌도 자주 들어갑니다.</p>
-                    <div class="vi-text vi-box">Dùng khi sau khi làm một việc, người nói mới nhận ra hoặc xác nhận một sự thật. Thường có cảm giác “hóa ra là...”.</div>
+                    <div data-lang="en" class="lang-box">Use <code>V-고 보니</code> when the speaker realizes or confirms a new fact after doing an action. It often feels like “after doing it, I found out...” or “it turned out that...”.</div>
+                    <div data-lang="vi" class="lang-box">Dùng khi sau khi làm một việc, người nói mới nhận ra hoặc xác nhận một sự thật. Thường có cảm giác “hóa ra là...”.</div>
+                    <div data-lang="mn" class="lang-box">Ямар нэг зүйлийг хийсний дараа л шинэ зүйл ойлгож, үнэн байдлыг мэдсэн үед хэрэглэнэ. Ихэвчлэн “тэгсэн чинь...” гэсэн мэдрэмжтэй.</div>
+                    <div data-lang="ar" class="lang-box">يُستعمل عندما يدرك المتكلم حقيقة جديدة أو يتأكد منها بعد القيام بفعل ما. وغالبا يحمل معنى «اتضح أن...».</div>
+                    <div data-lang="kk" class="lang-box">Бір істі орындағаннан кейін ғана жаңа фактіні түсінгенде немесе растағанда қолданылады. Көбіне «сөйтсе...» деген реңк береді.</div>
+                    <div data-lang="th" class="lang-box">ใช้เมื่อหลังจากทำบางอย่างแล้ว ผู้พูดจึงเพิ่งรู้หรือยืนยันข้อเท็จจริงใหม่ มักมีความรู้สึกว่า “ที่แท้ก็...”</div>
                 </article>
                 <article class="card">
                     <p class="eyebrow">Form</p>
@@ -72,14 +76,24 @@
                         <li>알다 → 알고 보니</li>
                     </ul>
                     <p>형용사보다 동작 동사와 잘 어울립니다. 이미 한 행동 뒤에 깨달은 내용을 이어 말합니다.</p>
-                    <div class="vi-text vi-box">Gắn <code>-고 보니</code> vào thân động từ. Phía sau là điều mới nhận ra sau hành động đó.</div>
+                    <div data-lang="en" class="lang-box">Attach <code>V-고 보니</code> to a verb stem. The following clause tells what the speaker newly realized after that action.</div>
+                    <div data-lang="vi" class="lang-box">Gắn <code>-고 보니</code> vào thân động từ. Phía sau là điều mới nhận ra sau hành động đó.</div>
+                    <div data-lang="mn" class="lang-box">Үйл үгийн үндсэнд <code>-고 보니</code>-г залгана. Дараах хэсэгт тухайн үйлдлийн дараа шинээр ойлгосон зүйлийг хэлнэ.</div>
+                    <div data-lang="ar" class="lang-box">تُضاف <code class="ko-term" lang="ko" dir="ltr">-고 보니</code> إلى جذر الفعل. وبعدها يأتي الأمر الذي أدركته بعد ذلك الفعل.</div>
+                    <div data-lang="kk" class="lang-box">Етістіктің түбіріне <code>-고 보니</code> жалғанады. Одан кейін сол әрекеттен кейін жаңадан түсінген нәрсе айтылады.</div>
+                    <div data-lang="th" class="lang-box">เติม <code>-고 보니</code> หลังรากคำกริยา ส่วนข้างหลังคือสิ่งที่เพิ่งรู้หลังจากทำการกระทำนั้นแล้ว</div>
                 </article>
                 <article class="card">
                     <p class="eyebrow">Compare</p>
                     <h2>V-아/어 보니(까)와의 차이</h2>
                     <p><code>V-아/어 보니(까)</code>는 “직접 해 봤더니”의 느낌이 강하고, <code>V-고 보니</code>는 “그 일이 끝나고 나서야” 알게 된 느낌이 강합니다.</p>
                     <p>소문을 듣고 확인한 뒤에는 <strong>직접 만나고 보니</strong>, <strong>이야기를 듣고 보니</strong>처럼 쓰면 자연스럽습니다.</p>
-                    <div class="vi-text vi-box"><code>-아/어 보니(까)</code> nhấn mạnh thử/trải nghiệm trực tiếp. <code>-고 보니</code> nhấn mạnh sau khi việc đã xảy ra thì mới nhận ra.</div>
+                    <div data-lang="en" class="lang-box"><code>V-아/어 보니(까)</code> emphasizes trying or experiencing something directly. <code>V-고 보니</code> emphasizes realizing something only after the action or event has happened.</div>
+                    <div data-lang="vi" class="lang-box"><code>-아/어 보니(까)</code> nhấn mạnh thử/trải nghiệm trực tiếp. <code>-고 보니</code> nhấn mạnh sau khi việc đã xảy ra thì mới nhận ra.</div>
+                    <div data-lang="mn" class="lang-box"><code>-아/어 보니(까)</code> нь шууд туршиж үзсэн эсвэл хийж үзсэн мэдрэмжийг илүү онцолдог. <code>-고 보니</code> нь тухайн үйл явдал дууссаны дараа л ойлгосон мэдрэмжийг илүү онцолдог.</div>
+                    <div data-lang="ar" class="lang-box"><code class="ko-term" lang="ko" dir="ltr">-아/어 보니(까)</code> يركّز أكثر على معنى التجربة المباشرة أو المحاولة. أما <code class="ko-term" lang="ko" dir="ltr">-고 보니</code> فيركّز على أنك أدركت الأمر بعد أن حدث الفعل أو انتهى.</div>
+                    <div data-lang="kk" class="lang-box"><code>-아/어 보니(까)</code> тікелей жасап көру немесе тәжірибе ету мағынасын көбірек баса айтады. Ал <code>-고 보니</code> іс болып өткеннен кейін ғана түсінген реңкті баса көрсетеді.</div>
+                    <div data-lang="th" class="lang-box"><code>-아/어 보니(까)</code> เน้นความรู้สึกว่าได้ลองทำหรือมีประสบการณ์โดยตรง ส่วน <code>-고 보니</code> เน้นว่าเพิ่งรู้หลังจากเรื่องนั้นเกิดขึ้นหรือจบลงแล้ว</div>
                 </article>
                 <article class="card">
                     <p class="eyebrow">Examples</p>
@@ -89,7 +103,12 @@
                         <div class="example">자세히 듣고 보니 두 사람은 연인 사이가 아니었어요.</div>
                         <div class="example">알고 보니 그 소문은 오래전에 끝난 이야기였어요.</div>
                     </div>
-                    <div class="vi-text vi-box">Ví dụ: Sau khi gặp trực tiếp, nghe kỹ, hoặc biết thêm thông tin thì nhận ra sự thật khác với lời đồn.</div>
+                    <div data-lang="en" class="lang-box">For example, use this after meeting someone directly, listening carefully, or learning more information and realizing that the truth is different from the rumor.</div>
+                    <div data-lang="vi" class="lang-box">Ví dụ: Sau khi gặp trực tiếp, nghe kỹ, hoặc biết thêm thông tin thì nhận ra sự thật khác với lời đồn.</div>
+                    <div data-lang="mn" class="lang-box">Жишээ нь шууд уулзаж, сайн сонсож, эсвэл нэмэлт мэдээлэл авсны дараа цуу ярианаас өөр үнэн байдлыг ойлгох үед хэрэглэнэ.</div>
+                    <div data-lang="ar" class="lang-box">مثال: بعد أن تقابل الشخص مباشرة، أو تستمع بتفصيل، أو تعرف معلومات إضافية، تدرك أن الحقيقة مختلفة عن الشائعة.</div>
+                    <div data-lang="kk" class="lang-box">Мысалы, тікелей кездескеннен, мұқият тыңдағаннан немесе қосымша мәлімет білгеннен кейін шындықтың өсектен басқа екенін түсінгенде қолданылады.</div>
+                    <div data-lang="th" class="lang-box">ตัวอย่าง: หลังจากได้พบโดยตรง ฟังอย่างละเอียด หรือรู้ข้อมูลเพิ่มเติมแล้ว จึงเข้าใจว่าความจริงต่างจากข่าวลือ</div>
                 </article>
             </div>
         </section>
@@ -160,6 +179,13 @@
             ]
         };
     </script>
+    <script>
+        window.MULTILANG_CONFIG = {
+            langs: ["en", "vi", "ar", "mn", "kk", "th"],
+            defaultLang: "none"
+        };
+    </script>
+    <script src="../shared/multilang-toggle.js"></script>
     <script src="grammar-main.js"></script>
     <script src="../shared/site-copyright.js"></script>
 </body>

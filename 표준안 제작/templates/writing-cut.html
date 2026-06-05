@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<!--
+  TEMPLATE: writing-cut.html  (T-10)
+  역할: 컷 이미지를 보며 4단계(선택→핵심어→어순→빈칸) 쓰기 연습
+  사용법:
+    1. writing-cut.js 를 같은 폴더에 복사 (데이터 포함)
+    2. writing-cut.js 상단 ASSET_BASE, STORAGE_KEY 교체
+    3. writing-cut.js 에 IS_TEACHER 플래그 추가 (교사용 지원을 위해)
+    4. ★ 부분 교체
+-->
+<head>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>★[N]과 컷 쓰기 | ★[쓰기 제목]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="../shared/multilang-toggle.css" />
+    <style>
+        body { background:linear-gradient(180deg,#f8fafc 0%,#f1f5f9 100%); }
+        .shell { width:var(--shell-width); margin:var(--shell-margin); display:grid; gap:14px; }
+
+        .topbar { position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;
+            min-height:48px;padding:0 14px;background:rgba(255,255,255,.94);
+            border-bottom:1px solid var(--line);backdrop-filter:blur(12px); }
+        .topbar a { color:var(--accent-dark);font-size:13px;font-weight:900;text-decoration:none; }
+        .topbar span { color:#cbd5e1; }
+
+        /* hero */
+        .hero { border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--surface);
+            box-shadow:var(--shadow);padding:20px 22px; }
+        .eyebrow { color:var(--writing,#7c3aed);font-size:11px;font-weight:900;
+            letter-spacing:.08em;text-transform:uppercase;margin:0 0 6px; }
+        .hero h1 { margin:0 0 8px;font-size:clamp(20px,3.5vw,28px); }
+        .lead { color:var(--muted);font-size:14px;font-weight:700;margin:0 0 14px; }
+        .actions { display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px; }
+        .btn { display:inline-flex;align-items:center;gap:6px;min-height:40px;
+            border:1px solid var(--accent-line);border-radius:var(--radius-pill);
+            padding:0 15px;background:#fff;color:var(--accent-dark);font-size:13px;font-weight:900;text-decoration:none; }
+        .btn.primary { border-color:var(--accent-dark);background:var(--accent);color:#fff; }
+        .btn.rose    { border-color:#fda4af;background:#fff1f2;color:var(--bad); }
+
+        /* 연습 레이아웃 */
+        .practice { display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start; }
+        @media(max-width:700px){ .practice { grid-template-columns:1fr; } }
+
+        /* 컷 선택 레일 */
+        .rail { border:1px solid var(--line);border-radius:var(--radius-lg);
+            background:var(--surface);box-shadow:var(--shadow-sm);padding:14px; }
+        .rail h2 { margin:0 0 6px;font-size:15px; }
+        .rail p  { margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:700; }
+        #cutRail { display:flex;flex-direction:column;gap:6px; }
+
+        /* 작업대 */
+        .workbench { border:1px solid var(--line);border-radius:var(--radius-lg);
+            background:var(--surface);box-shadow:var(--shadow-sm);padding:18px; }
+        .stage-head { display:flex;align-items:center;justify-content:space-between;
+            gap:12px;margin-bottom:14px; }
+        .stage-title { min-width:0; }
+        .stage-title .eyebrow { margin-bottom:3px; }
+        .stage-title h2 { margin:0;font-size:18px; }
+        .progress-dots { display:flex;gap:6px; }
+
+        .mode-row { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px; }
+
+        /* 이미지+태스크 2열 */
+        .work-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+        @media(max-width:600px){ .work-grid { grid-template-columns:1fr; } }
+
+        .image-panel figure { margin:0;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden; }
+        .image-panel figure img { width:100%;height:auto;display:block; }
+        .image-panel figcaption { padding:8px 10px;font-size:12px;font-weight:700;color:var(--muted); }
+
+        .answer-card { border:1px solid var(--line);border-radius:var(--radius);padding:16px; }
+        .answer-card h3 { margin:0 0 6px;font-size:16px; }
+        .answer-card p  { margin:0 0 12px;font-size:13px;color:var(--muted);font-weight:700; }
+
+        .feedback    { display:none;margin-top:10px;border-radius:var(--radius);
+            padding:10px 12px;font-size:14px;font-weight:800; }
+        .feedback.show.ok  { display:block;border:1px solid var(--ok-line);background:var(--ok-bg);color:var(--ok); }
+        .feedback.show.bad { display:block;border:1px solid var(--bad-line);background:var(--bad-bg);color:var(--bad); }
+        .answer-text { display:none;margin-top:10px;padding:10px 12px;
+            border:1px solid var(--accent-line);border-radius:var(--radius);
+            background:var(--accent-soft);font-size:14px;font-weight:700; }
+        .answer-text.open { display:block; }
+
+        .button-row { display:flex;flex-wrap:wrap;gap:6px;margin-top:12px; }
+
+        .footer-nav { display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between; }
+    </style>
+</head>
+<body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html">★[N]과 목록</a>
+        <span>|</span>
+        <a href="reading-cuttoon.html">컷툰</a>
+        <span>|</span>
+        <strong style="font-size:13px;font-weight:900">컷 쓰기 | ★[쓰기 제목]</strong>
+    </nav>
+
+    <main class="shell">
+
+        <section class="hero">
+            <p class="eyebrow">Cut Writing</p>
+            <h1>★[쓰기 제목] 컷 쓰기</h1>
+            <p class="lead">★[안내 — 컷 수, 단계 구성]</p>
+            <div class="actions">
+                <a class="btn" href="reading.html"><i class="fa-solid fa-book-open"></i> 지문 읽기</a>
+                <a class="btn primary" href="reading-cuttoon.html"><i class="fa-solid fa-images"></i> 컷툰 보기</a>
+            </div>
+            <!-- 번역 블록이 있는 경우에만 삽입 -->
+            <!-- <div data-multilang-bar></div> -->
+        </section>
+
+        <section class="practice" aria-label="컷 쓰기 연습">
+            <aside class="rail" aria-label="컷 선택">
+                <h2>컷 선택</h2>
+                <p>연습할 컷을 고르세요.</p>
+                <div id="cutRail"></div>
+            </aside>
+
+            <section class="workbench" aria-live="polite">
+                <div class="stage-head">
+                    <div class="stage-title">
+                        <p class="eyebrow" id="stageEyebrow">Step</p>
+                        <h2 id="stageTitle">연습 준비</h2>
+                    </div>
+                    <div class="progress-dots" id="progressDots" aria-label="단계 진행"></div>
+                </div>
+
+                <div class="mode-row" id="modeRow" aria-label="연습 단계"></div>
+
+                <div class="work-grid">
+                    <figure class="image-panel">
+                        <!-- writing-cut.js 가 src, alt 를 동적으로 설정 -->
+                        <img id="cutImage"
+                             src="../assets/c★[N]/reading-writing/images/writing-cut/★파일명-01.webp"
+                             alt="★첫 번째 컷 장면 설명"
+                             loading="eager"
+                             decoding="async">
+                        <figcaption class="caption" id="cutCaption">1컷</figcaption>
+                    </figure>
+
+                    <div class="task-panel">
+                        <article class="answer-card">
+                            <h3 id="taskHeading">문장을 확인하세요.</h3>
+                            <p id="taskGuide">컷에 맞는 활동이 여기에 표시됩니다.</p>
+                            <div id="taskBody"></div>
+                            <div class="feedback" id="feedback" aria-live="polite"></div>
+                            <div class="answer-text" id="answerText"></div>
+                            <div class="button-row">
+                                <button class="btn" type="button" id="prevBtn"><i class="fa-solid fa-arrow-left"></i> 이전</button>
+                                <button class="btn" type="button" id="checkBtn"><i class="fa-solid fa-check"></i> 확인</button>
+                                <button class="btn" type="button" id="showAnswerBtn"><i class="fa-solid fa-eye"></i> 정답 보기</button>
+                                <button class="btn rose" type="button" id="nextBtn">다음 <i class="fa-solid fa-arrow-right"></i></button>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <nav class="footer-nav" aria-label="페이지 이동">
+            <a class="btn" href="reading-cuttoon.html"><i class="fa-solid fa-arrow-left"></i> 컷툰 보기</a>
+            <a class="btn primary" href="index.html">★[N]과 목록 <i class="fa-solid fa-list"></i></a>
+        </nav>
+    </main>
+
+    <!--
+      writing-cut.js 는 같은 폴더에서 복사.
+      c17/writing-cut.js 를 기반으로:
+        - ASSET_BASE 경로 교체
+        - STORAGE_KEY 교체 (예: "korean3b.c[N].writing-cut.v1")
+        - IS_TEACHER 플래그 추가 (교사용 지원)
+        - cuts 배열 데이터 교체
+    -->
+    <script src="writing-cut.js"></script>
+    <script src="../shared/multilang-toggle.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

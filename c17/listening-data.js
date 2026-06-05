@@ -664,8 +664,13 @@
                 }
             },
             instructionLanguage: {
-                enabled: true,
+                enabled: false,
                 default: "ko"
+            },
+            translationScaffold: {
+                mode: "minimal",
+                maxSubtitleStage: 2,
+                localizeLearnerContent: false
             },
             theme: {
                 accent: "#0f766e",

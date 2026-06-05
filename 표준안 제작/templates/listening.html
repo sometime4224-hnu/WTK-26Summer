@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<!--
+  TEMPLATE: listening.html  (T-07)
+  파일명: listening[N].html
+  역할: 듣기 워크북 페이지. listening-workbook.js 가 #listening-workbook-app 에 전체 UI 렌더링.
+  사용법:
+    1. listening-data.js 에 window.LISTENING_DATA 정의 후 함께 로드
+    2. listening-workbook.js 버전 쿼리스트링 업데이트
+    3. ★ 부분 교체
+-->
+<head>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>★[N]과 듣기 [M] | ★[듣기 제목]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <!-- listening-workbook 전용 스타일 -->
+    <link rel="stylesheet" href="../shared/listening-workbook.css?v=★[버전]" />
+    <style>
+        body { background:linear-gradient(180deg,#f0fdfa 0%,#f8fafc 100%); }
+        /* injected-global-nav 는 project-topbar-compact.css 가 처리 */
+        #listening-workbook-app { min-height:100vh; }
+    </style>
+</head>
+<body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <!--
+      topbar: listening-workbook.js 가 #injected-global-nav 에 주입하거나
+      아래처럼 수동으로 작성.
+      수동 작성 시 project-topbar-compact.css 클래스 사용.
+    -->
+    <nav id="injected-global-nav" class="injected-global-nav" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인으로</a>
+        <span class="divider">|</span>
+        <a href="index.html"><i class="fa-solid fa-folder-open"></i> ★[N]과 목록</a>
+        <span class="divider">|</span>
+        <!-- 듣기 1이면 → 듣기 2 링크, 듣기 2이면 → 듣기 1 링크 -->
+        <a href="listening★[상대번호].html"><i class="fa-solid fa-headphones"></i> 듣기 ★[상대번호]</a>
+    </nav>
+
+    <!-- listening-workbook.js 가 여기에 UI 전체를 렌더링 -->
+    <div id="listening-workbook-app"></div>
+
+    <!-- ★ 데이터 파일 먼저 로드 후 워크북 JS 로드 -->
+    <script src="listening-data.js"></script>
+    <script src="../shared/listening-workbook.js?v=★[버전]"></script>
+    <script src="../shared/multilang-toggle.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>
+
+<!--
+  ══════════════════════════════════════════════════════════════════
+  LISTENING-DATA.JS 스키마 (listening-data.js 파일 내용 예시)
+  ══════════════════════════════════════════════════════════════════
+
+  window.LISTENING_DATA = {
+      chapter: "★N",
+      trackIndex: ★M - 1,          // 0-based (듣기 1이면 0, 듣기 2이면 1)
+      tracks: [
+          {
+              id:       "track1",
+              title:    "★[듣기 1 제목]",
+              audioSrc: "../assets/c★N/listening/audio/★파일명.mp3",
+
+              // 컷툰 이미지 타임라인
+              cuts: [
+                  {
+                      src:       "../assets/c★N/listening/images/★파일명.webp",
+                      caption:   "★장면 설명",
+                      timeStart: 0,
+                      timeEnd:   12.5
+                  }
+              ],
+
+              // 듣기 전 활동
+              preTasks: [
+                  { type: "discussion", prompt: "★질문" }
+              ],
+
+              // 듣기 중 문항
+              duringTasks: [
+                  {
+                      type:     "multiple-choice",
+                      prompt:   "★문항",
+                      choices:  ["★a", "★b", "★c", "★d"],
+                      answer:   0,
+                      feedback: "★해설"
+                  }
+              ],
+
+              // 듣기 후 활동
+              postTasks: [
+                  { type: "discussion", prompt: "★질문" }
+              ],
+
+              // 대본 (시간 기준)
+              transcript: [
+                  { speaker: "남", text: "★대사", start: 0, end: 8 }
+              ],
+
+              // 다국어 번역 (선택)
+              translations: {
+                  vi: ["★트랙별 베트남어 번역"],
+                  en: ["★English"]
+              }
+          },
+          {
+              id: "track2",
+              title: "★[듣기 2 제목]",
+              // ... 동일 구조
+          }
+      ]
+  };
+-->

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>17과 컷 쓰기 교사용 | 서동요와 소문의 힘</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        /* ── 교사 배너 ─────────────────────────── */
+        .teacher-banner {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            background: #1e3a5f;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 900;
+        }
+        .teacher-banner i { font-size: 15px; opacity: 0.85; }
+        .teacher-banner span {
+            font-size: 12px;
+            font-weight: 500;
+            opacity: 0.75;
+        }
+
+        /* ── topbar (학생용 재활용) ───────────────────── */
+        .global-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(12px);
+        }
+        .global-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+        }
+        .global-nav-links a {
+            color: var(--accent-dark, #1d4ed8);
+            font-size: 12px;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .global-nav-links a[aria-current="page"] {
+            color: var(--ink, #172033);
+        }
+        .global-nav-links span {
+            color: #cbd5e1;
+            font-size: 11px;
+        }
+        .global-nav-passage-btn {
+            flex: 0 0 auto;
+            min-height: 30px;
+            border: 1px solid var(--accent-line, #93c5fd);
+            border-radius: 999px;
+            padding: 0 10px;
+            background: var(--accent-soft, #dbeafe);
+            color: var(--accent-dark, #1d4ed8);
+            font-size: 11px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        /* ── 학생용 페이지 CSS 그대로 상속 ─────── */
+        /* writing-cut.html의 인라인 CSS를 여기서 최소 복제 */
+        /* (실제 배포 시 공유 CSS로 추출 권장) */
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: var(--font-sans, "Noto Sans KR", sans-serif);
+            color: var(--ink, #172033);
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+        }
+        .page-shell { min-height: 100vh; }
+        #app { width: min(1040px, calc(100% - 24px)); margin: 14px auto 48px; }
+
+        /* 교사 모드 강조 */
+        .teacher-mode .step-pill.active,
+        .teacher-mode .cut-pill.active {
+            background: #1e3a5f !important;
+            color: #ffffff !important;
+            border-color: #1e3a5f !important;
+        }
+    </style>
+</head>
+<body class="teacher-mode">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <div class="teacher-banner">
+        <i class="fa-solid fa-chalkboard-user"></i>
+        교사용 버전
+        <span>진행 제한 없이 모든 단계·컷을 자유롭게 열 수 있습니다.</span>
+    </div>
+
+    <nav class="global-nav" aria-label="페이지 이동">
+        <div class="global-nav-links">
+            <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+            <span>|</span>
+            <a href="index.html">17과 목록</a>
+            <span>|</span>
+            <a href="reading-cuttoon.html">읽기 컷툰</a>
+            <span>|</span>
+            <a href="writing-cut.html">학생용</a>
+            <span>|</span>
+            <a href="writing-cut-teacher.html" aria-current="page">교사용</a>
+        </div>
+        <button
+            type="button"
+            class="global-nav-passage-btn"
+            id="passageBtn"
+            aria-label="지문 보기"
+        >
+            <i class="fa-solid fa-book-open"></i> 지문
+        </button>
+    </nav>
+
+    <main class="page-shell">
+        <div id="app" class="app-root"></div>
+    </main>
+
+    <script>
+        window.C17_WRITING_CUT_TEACHER = true;
+
+        // 지문 보기 버튼 — reading.html로 이동
+        document.getElementById("passageBtn").addEventListener("click", function () {
+            window.open("reading.html", "_blank");
+        });
+    </script>
+    <script src="writing-cut.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

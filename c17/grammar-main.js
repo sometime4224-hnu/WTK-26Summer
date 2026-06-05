@@ -32,6 +32,9 @@
     };
 
     function setTranslationVisible(isVisible) {
+        if (!viToggle) {
+            return;
+        }
         page.classList.toggle("vi-on", isVisible);
         viToggle.setAttribute("aria-pressed", String(isVisible));
         viToggle.innerHTML = '<i class="fa-solid fa-language"></i> ' + (isVisible ? "Tiếng Việt ON" : "Tiếng Việt OFF");
@@ -137,9 +140,11 @@
             + "<p>정답률 " + percent + "%입니다. " + (config.summary || "") + "</p>";
     }
 
-    viToggle.addEventListener("click", function () {
-        setTranslationVisible(viToggle.getAttribute("aria-pressed") !== "true");
-    });
+    if (viToggle) {
+        viToggle.addEventListener("click", function () {
+            setTranslationVisible(viToggle.getAttribute("aria-pressed") !== "true");
+        });
+    }
 
     tabLearn.addEventListener("click", function () {
         showTab("learn");

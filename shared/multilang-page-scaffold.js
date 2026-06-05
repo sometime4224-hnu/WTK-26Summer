@@ -1,0 +1,168 @@
+/**
+ * Page-level multilingual scaffold panel for chapter grammar pages.
+ *
+ * The page data file provides short scaffold notes keyed by paths such as
+ * "c10/grammar1.html". This script inserts one common translation panel and
+ * lets multilang-toggle.js handle the language buttons.
+ */
+(function () {
+    "use strict";
+
+    const DATA = window.MULTILANG_PAGE_DATA || {};
+    const LANG_ORDER = ["en", "vi", "ar", "mn", "kk", "th"];
+    const LANG_LABELS = {
+        en: "English",
+        vi: "Tiếng Việt",
+        ar: "العربية",
+        mn: "Монгол",
+        kk: "Қазақша",
+        th: "ไทย"
+    };
+
+    function getPageKey() {
+        const parts = window.location.pathname
+            .split("/")
+            .filter(Boolean)
+            .map((part) => {
+                try {
+                    return decodeURIComponent(part).toLowerCase();
+                } catch {
+                    return part.toLowerCase();
+                }
+            });
+        if (parts.length < 2) return "";
+        return `${parts[parts.length - 2]}/${parts[parts.length - 1]}`;
+    }
+
+    function escapeHtml(value) {
+        return String(value == null ? "" : value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function ensureStylesheet() {
+        const href = "../shared/multilang-toggle.css";
+        const existing = Array.from(document.querySelectorAll("link[rel='stylesheet']"))
+            .some((link) => link.getAttribute("href") === href);
+        if (existing) return;
+
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = href;
+        document.head.appendChild(link);
+    }
+
+    function getLanguages(entry) {
+        const translations = entry && entry.translations ? entry.translations : {};
+        return LANG_ORDER.filter((lang) => translations[lang]);
+    }
+
+    function renderTerm(term) {
+        if (!term) return "";
+        return `<code class="ko-term" lang="ko" dir="ltr">${escapeHtml(term)}</code>`;
+    }
+
+    function renderTranslation(lang, entry, translation) {
+        const title = translation.title || LANG_LABELS[lang] || lang;
+        const summary = translation.summary || "";
+        const points = Array.isArray(translation.points) ? translation.points : [];
+        const grammar = translation.grammar || entry.grammar || "";
+
+        return `
+            <div class="multilang-scaffold__language">${escapeHtml(title)}</div>
+            ${grammar ? `<div class="multilang-scaffold__term">${renderTerm(grammar)}</div>` : ""}
+            ${summary ? `<p>${escapeHtml(summary)}</p>` : ""}
+            ${points.length ? `
+                <ul>
+                    ${points.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}
+                </ul>
+            ` : ""}
+        `;
+    }
+
+    function buildPanel(entry, languages) {
+        const section = document.createElement("section");
+        section.className = "multilang-scaffold";
+        section.dataset.multilangScaffold = "auto";
+        section.setAttribute("aria-label", "다국어 문법 도움말");
+
+        const title = entry.title || "다국어 문법 도움말";
+        const subtitle = entry.subtitle || "필요한 언어를 골라 문법 의미와 사용 맥락만 짧게 확인하세요.";
+
+        section.innerHTML = `
+            <div class="multilang-scaffold__head">
+                <div>
+                    <strong>${escapeHtml(title)}</strong>
+                    <p>${escapeHtml(subtitle)}</p>
+                </div>
+                <div data-multilang-bar></div>
+            </div>
+            <div class="multilang-scaffold__body"></div>
+        `;
+
+        const body = section.querySelector(".multilang-scaffold__body");
+        languages.forEach((lang) => {
+            const box = document.createElement("div");
+            box.className = "lang-box multilang-scaffold__box";
+            box.dataset.lang = lang;
+            box.lang = lang;
+            if (lang === "ar") box.dir = "rtl";
+            box.innerHTML = renderTranslation(lang, entry, entry.translations[lang]);
+            body.appendChild(box);
+        });
+
+        return section;
+    }
+
+    function insertPanel(panel) {
+        const header = document.querySelector("header");
+        if (header && header.parentNode) {
+            header.insertAdjacentElement("afterend", panel);
+            return;
+        }
+        const main = document.querySelector("main");
+        if (main && main.parentNode) {
+            main.insertAdjacentElement("beforebegin", panel);
+            return;
+        }
+        document.body.insertAdjacentElement("afterbegin", panel);
+    }
+
+    function hideLegacyVietnameseControls() {
+        ["viToggle", "viToggleBtn", "translation-btn"].forEach((id) => {
+            const control = document.getElementById(id);
+            if (!control) return;
+            control.hidden = true;
+            control.setAttribute("aria-hidden", "true");
+            control.style.display = "none";
+        });
+    }
+
+    function init() {
+        const entry = DATA[getPageKey()];
+        if (!entry || document.querySelector("[data-multilang-scaffold='auto']")) return;
+
+        const languages = getLanguages(entry);
+        if (!languages.length) return;
+
+        ensureStylesheet();
+        window.MULTILANG_CONFIG = Object.assign({}, window.MULTILANG_CONFIG || {}, {
+            langs: languages,
+            defaultLang: "none"
+        });
+
+        insertPanel(buildPanel(entry, languages));
+        hideLegacyVietnameseControls();
+    }
+
+    if (document.body) {
+        init();
+    } else if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();

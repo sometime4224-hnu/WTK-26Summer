@@ -21,11 +21,24 @@
         return config.instructionLanguage && config.instructionLanguage.default === "vi" ? "vi" : "ko";
     }
 
+    function usesMinimalTranslationScaffold() {
+        const scaffold = config.translationScaffold || {};
+        return scaffold.mode === "minimal" || scaffold.minimal === true;
+    }
+
     function getLocalized(source, field, fallback = "") {
         if (!source) return fallback;
         const language = getLanguage();
         const localizedField = language === "vi" ? `${field}Vi` : field;
         return source[localizedField] || source[field] || fallback;
+    }
+
+    function getFrameContent(frame, field, fallback = "") {
+        if (!frame) return fallback;
+        if (usesMinimalTranslationScaffold()) {
+            return frame[field] || fallback;
+        }
+        return getLocalized(frame, field, fallback);
     }
 
     function getVisualConfig(lesson) {
@@ -97,7 +110,7 @@
 
         const rail = visual.frames.map((frame, index) => `
             <li>
-                <button type="button" class="lw-film__frame-button" data-film-frame="${index}" title="${escapeHtml(getLocalized(frame, "title", `Frame ${index + 1}`))}">
+                <button type="button" class="lw-film__frame-button" data-film-frame="${index}" title="${escapeHtml(getFrameContent(frame, "title", `Frame ${index + 1}`))}">
                     ${escapeHtml(frame.label || String(index + 1))}
                 </button>
             </li>
@@ -191,8 +204,8 @@
         focus.style.transform = `translate(${focusX}px, ${focusY}px)`;
 
         caption.innerHTML = `
-            <strong>${escapeHtml(getLocalized(frame, "title", `Frame ${frameIndex + 1}`))}</strong>
-            <span>${escapeHtml(getLocalized(frame, "caption", ""))}</span>
+            <strong>${escapeHtml(getFrameContent(frame, "title", `Frame ${frameIndex + 1}`))}</strong>
+            <span>${escapeHtml(getFrameContent(frame, "caption", ""))}</span>
         `;
 
         const counter = figure.querySelector(".lw-film__counter");

@@ -2,7 +2,10 @@
     "use strict";
 
     const ASSET_BASE = "../assets/c17/reading-writing/images/writing-cut/";
-    const STORAGE_KEY = "korean3b.c17.writing-cut.v1";
+    const IS_TEACHER = Boolean(window.C17_WRITING_CUT_TEACHER);
+    const STORAGE_KEY = IS_TEACHER
+        ? "korean3b.c17.writing-cut.teacher.v1"
+        : "korean3b.c17.writing-cut.v1";
 
     const stages = [
         {
