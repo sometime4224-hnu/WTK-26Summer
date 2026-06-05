@@ -6,9 +6,15 @@ const root = process.cwd();
 const templatePath = path.join(root, "표준안 제작", "templates", "vocabulary.html");
 const template = fs.readFileSync(templatePath, "utf8");
 
+const STANDARD_LANGUAGES = ["en", "vi", "mn", "ar", "kk", "th"];
+
 const languageMap = {
   english: "en",
   vietnamese: "vi",
+  mongolian: "mn",
+  arabic: "ar",
+  kazakh: "kk",
+  thai: "th",
   japanese: "ja",
   chinese: "zh"
 };
@@ -277,6 +283,10 @@ function buildConfig(lesson, categories, words, languages) {
   };
 }
 
+function normalizeConfigLanguages(config) {
+  return { ...config, languages: STANDARD_LANGUAGES.slice() };
+}
+
 function extractImageMap(lesson, source) {
   const baseName = `c${lesson}ImageBasePath`;
   const base = extractStringConst(source, baseName);
@@ -449,7 +459,7 @@ function main() {
   const results = [];
   for (let lesson = 10; lesson <= 18; lesson += 1) {
     console.log(`upgrading c${lesson}...`);
-    const config = configForLesson(lesson);
+    const config = normalizeConfigLanguages(configForLesson(lesson));
     const html = renderPage(lesson, config);
     writeLesson(lesson, html);
     results.push({ lesson: `c${lesson}`, ...summarize(config) });

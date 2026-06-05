@@ -302,9 +302,9 @@
             width: 100%;
             height: 100%;
             border-radius: 8px;
-            background: #f8fafc;
+            background: #fff;
         }
-        .word-card__image { object-fit: cover; }
+        .word-card__image { object-fit: contain; }
         .word-card__placeholder {
             display: flex;
             align-items: center;
@@ -428,9 +428,9 @@
             width: 72px;
             height: 72px;
             border-radius: 8px;
-            object-fit: cover;
+            object-fit: contain;
             border: 1px solid var(--line, #dbe4f0);
-            background: #f8fafc;
+            background: #fff;
         }
         .list-item__thumb-placeholder {
             display: flex;
@@ -554,13 +554,14 @@
             border: 1px solid var(--line, #dbe4f0);
             border-radius: 8px;
             overflow: hidden;
-            background: #f8fafc;
+            background: #fff;
         }
         .quiz-image {
             display: block;
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
+            background: #fff;
         }
         .quiz-visual__fallback {
             display: flex;
@@ -1115,6 +1116,7 @@
     </script>
 
     <script src="../shared/vocabulary-multilang-data.js"></script>
+
     <script>
     (function () {
         "use strict";
@@ -1127,11 +1129,9 @@
             en: { label: "영어", answerLabel: "English", speech: "en-US" },
             vi: { label: "베트남어", answerLabel: "Tiếng Việt", speech: "vi-VN" },
             mn: { label: "몽골어", answerLabel: "Монгол", speech: "mn-MN" },
-            ar: { label: "아랍어", answerLabel: "العربية", speech: "ar-SA" },
+            ar: { label: "아랍어", answerLabel: "العربية", speech: "ar", dir: "rtl" },
             kk: { label: "카자흐어", answerLabel: "Қазақша", speech: "kk-KZ" },
-            th: { label: "태국어", answerLabel: "ไทย", speech: "th-TH" },
-            ja: { label: "일본어", answerLabel: "日本語", speech: "ja-JP" },
-            zh: { label: "중국어", answerLabel: "中文", speech: "zh-CN" }
+            th: { label: "태국어", answerLabel: "ไทย", speech: "th-TH" }
         };
         const QUIZ_MODE_META = {
             meaning: { label: "뜻", icon: "fa-language" },
@@ -1157,6 +1157,9 @@
         let currentView = "cards";
         let activeLang = readStored("preferred-lang", cfg.defaultLang || "none");
         if (!LANGS[activeLang] || (activeLang !== "none" && !cfg.languages?.includes(activeLang))) activeLang = "none";
+        const standardLangs = ["en", "vi", "mn", "ar", "kk", "th"];
+        const translationLangs = (Array.isArray(cfg.languages) && cfg.languages.length ? cfg.languages : standardLangs)
+            .filter((lang) => LANGS[lang]);
         let currentCategory = "all";
         let searchQuery = "";
         let showFrontHeadword = readStored(`${storagePrefix}-front-headword`, "false") === "true";
@@ -1243,6 +1246,10 @@
             return LANGS[activeLang]?.answerLabel || "한국어 뜻";
         }
 
+        function langDir(lang) {
+            return LANGS[lang]?.dir || "ltr";
+        }
+
         function quizTypeLabel() {
             if (quizMode === "choseong") return "초성 퀴즈";
             if (quizMode === "image") return "그림 퀴즈";
@@ -1278,12 +1285,6 @@
             })[char]);
         }
 
-        function translationAttrs(lang) {
-            const code = lang && lang !== "none" ? lang : "ko";
-            const dir = code === "ar" ? "rtl" : "ltr";
-            return `lang="${escapeHtml(code)}" dir="${dir}"`;
-        }
-
         function speak(text, langCode = "ko-KR") {
             if (!window.speechSynthesis || !text) return;
             window.speechSynthesis.cancel();
@@ -1298,8 +1299,8 @@
                 word.ko,
                 word.meaning,
                 word.example,
-                categoryFor(word.category).label,
-                ...(cfg.languages || []).map((lang) => word[lang] || "")
+                ...translationLangs.map((lang) => word[lang]),
+                categoryFor(word.category).label
             ].join(" ").toLowerCase();
         }
 
@@ -1406,9 +1407,9 @@
                         <span class="word-card__face word-card__back">
                             <button class="card-action card-action--speak" type="button" data-speak="${escapeHtml(word.ko)}" data-lang-code="ko-KR" aria-label="${escapeHtml(word.ko)} 듣기"><i class="fa-solid fa-volume-high"></i></button>
                             <span class="word-card__back-main">${escapeHtml(word.ko)}</span>
-                            <span class="word-card__translation">
+                            <span class="word-card__translation" dir="${escapeHtml(langDir(activeLang))}">
                                 <span class="word-card__lang">${escapeHtml(answerLabel())}</span>
-                                <span class="word-card__translation-text" ${translationAttrs(activeLang)}>${escapeHtml(answerFor(word))}</span>
+                                <span class="word-card__translation-text">${escapeHtml(answerFor(word))}</span>
                             </span>
                             <span class="word-card__category">${escapeHtml(category.label)}</span>
                         </span>
@@ -1458,8 +1459,8 @@
                         <div><strong>뜻</strong> ${escapeHtml(word.meaning || word.example || "")}</div>
                         ${word.example ? `<div><strong>예문</strong> ${escapeHtml(word.example)}</div>` : ""}
                         <div class="translation-grid">
-                            ${(cfg.languages || []).filter((lang) => word[lang] && LANGS[lang]).map((lang) => `
-                                <div class="translation-cell" ${translationAttrs(lang)}><strong dir="ltr">${escapeHtml(LANGS[lang].label)}</strong>${escapeHtml(word[lang])}</div>
+                            ${translationLangs.filter((lang) => word[lang]).map((lang) => `
+                                <div class="translation-cell" dir="${escapeHtml(langDir(lang))}"><strong>${escapeHtml(LANGS[lang].label)}</strong>${escapeHtml(word[lang])}</div>
                             `).join("")}
                         </div>
                     </div>
@@ -1515,11 +1516,13 @@
             const wrong = pool.sort(() => Math.random() - 0.5).slice(0, 3);
             const choices = [current, ...wrong].sort(() => Math.random() - 0.5);
             const correctAnswer = quizAnswerFor(current);
+            els.quizFeedback.dir = quizMode === "meaning" ? langDir(activeLang) : "ltr";
             choices.forEach((choice) => {
                 const option = document.createElement("button");
                 option.className = "quiz-option";
                 option.type = "button";
                 option.textContent = quizAnswerFor(choice);
+                option.dir = quizMode === "meaning" ? langDir(activeLang) : "ltr";
                 option.dataset.correct = String(choice === current);
                 option.addEventListener("click", () => {
                     const ok = choice === current;
@@ -1596,5 +1599,6 @@
     </script>
     <script src="../shared/multilang-toggle.js"></script>
     <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
 </body>
 </html>
