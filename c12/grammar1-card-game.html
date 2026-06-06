@@ -11,11 +11,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>12과 문법 카드 게임 | -았/었더니</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <style>
+    <script src="https://cdn.tailwindcss.com" defer></script>
+<style>
         body { margin:0; font-family:'Noto Sans KR',sans-serif; background:linear-gradient(180deg,#fff7ed 0%,#fffbf5 100%); color:#1f2937; }
         .screen { display:none; }
         .screen.active { display:block; }
@@ -217,7 +214,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const shuffle = (arr) => { const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
         const show = (name) => ['start','break','game','result'].forEach((s) => $('screen-'+s).classList.toggle('active', s===name));
         const q = () => state.questions[state.current];
-        const card = (id) => `<div class="mx-auto w-full max-w-[180px] overflow-hidden rounded-[18px] bg-white shadow-md"><div class="card-media"><img src="${IMG}${CARDS[id].img}" alt="${CARDS[id].label}" loading="lazy"></div><div class="card-label">${CARDS[id].label}</div></div>`;
+        const card = (id) => `<div class="mx-auto w-full max-w-[180px] overflow-hidden rounded-[18px] bg-white shadow-md"><div class="card-media"><img src="${IMG}${CARDS[id].img}" alt="${CARDS[id].label}" loading="lazy" decoding="async"></div><div class="card-label">${CARDS[id].label}</div></div>`;
         const summaryNote = (score,total) => score===total ? '표현 차이를 정확히 구별했어요' : score>=8 ? '비교 단계까지 잘 연결했어요' : score>=6 ? '2단계 연결을 조금 더 연습해 보세요' : '기본형과 비교형을 다시 묶어 보세요';
         function buildQuestions(){ return shuffle(STAGE1).map((x)=>({...x,choices:shuffle(x.choices)})).concat(shuffle(STAGE2).map((x)=>({...x,choices:shuffle(x.choices)}))); }
         function prepare(){ const placements={}; q().slots.forEach((slot)=> placements[slot.key]=null); state.placements=placements; state.checked=false; }

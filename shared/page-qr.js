@@ -40,6 +40,9 @@
     desktopOnly: true,
     targetUrl: ""
   };
+  let panelTracking = false;
+  let placementFrame = 0;
+  let desktopMediaQueries = null;
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -131,11 +134,14 @@
   }
 
   function isDesktopScreen() {
-    return (
-      window.matchMedia("(min-width: 1024px)").matches &&
-      window.matchMedia("(hover: hover)").matches &&
-      window.matchMedia("(pointer: fine)").matches
-    );
+    if (!desktopMediaQueries) {
+      desktopMediaQueries = [
+        window.matchMedia("(min-width: 1024px)"),
+        window.matchMedia("(hover: hover)"),
+        window.matchMedia("(pointer: fine)")
+      ];
+    }
+    return desktopMediaQueries.every((query) => query.matches);
   }
 
   function getVendorUrl() {
@@ -485,6 +491,32 @@
     state.panel.style.setProperty("--page-qr-top", `${top}px`);
   }
 
+  function schedulePanelPlacement() {
+    if (!state.panel || state.panel.hidden || placementFrame) return;
+    placementFrame = window.requestAnimationFrame(() => {
+      placementFrame = 0;
+      placePanel();
+    });
+  }
+
+  function startPanelTracking() {
+    if (panelTracking) return;
+    panelTracking = true;
+    window.addEventListener("resize", onResizeOrScroll, { passive: true });
+    window.addEventListener("scroll", onResizeOrScroll, { passive: true });
+  }
+
+  function stopPanelTracking() {
+    if (!panelTracking) return;
+    panelTracking = false;
+    window.removeEventListener("resize", onResizeOrScroll);
+    window.removeEventListener("scroll", onResizeOrScroll);
+    if (placementFrame) {
+      window.cancelAnimationFrame(placementFrame);
+      placementFrame = 0;
+    }
+  }
+
   function loadQrLibrary() {
     if (
       (window.QRCode && typeof window.QRCode.toCanvas === "function") ||
@@ -602,6 +634,7 @@
     state.panel.hidden = false;
     state.button.setAttribute("aria-pressed", "true");
     placePanel();
+    startPanelTracking();
     renderQr();
   }
 
@@ -609,6 +642,7 @@
     if (!state.panel) return;
     state.panel.hidden = true;
     if (state.button) state.button.setAttribute("aria-pressed", "false");
+    stopPanelTracking();
   }
 
   function togglePanel() {
@@ -621,7 +655,7 @@
 
   function onResizeOrScroll() {
     if (state.desktopOnly && !isDesktopScreen()) closePanel();
-    placePanel();
+    schedulePanelPlacement();
   }
 
   function init() {
@@ -646,8 +680,6 @@
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closePanel();
     });
-    window.addEventListener("resize", onResizeOrScroll, { passive: true });
-    window.addEventListener("scroll", onResizeOrScroll, { passive: true });
   }
 
   if (document.readyState === "loading") {

@@ -23,7 +23,7 @@
                 descriptionVi: "On lai cach so sanh kich thuoc nhu 'bang dien thoai' trong bai nghe."
             },
             activityImage: {
-                src: "../assets/c16/listening/images/lesson16-listening1-cuttoon.png",
+                src: "../assets/c16/listening/images/lesson16-listening1-cuttoon.webp",
                 alt: "남자가 어머니에게 전화해 외장 하드 디스크를 설명하는 열 컷 컷툰",
                 altVi: "Khung tranh tam cho hoi thoai nguoi nam goi me va mo ta o cung ngoai",
                 pendingLabel: "듣기 1 컷툰 이미지를 불러오고 있습니다.",
@@ -36,7 +36,7 @@
             audioSrc: null,
             audioSourceType: "original",
             syncVisual: {
-                imageSrc: "../assets/c16/listening/images/lesson16-listening1-cuttoon.png",
+                imageSrc: "../assets/c16/listening/images/lesson16-listening1-cuttoon.webp",
                 coverImageSrc: "",
                 coverAlt: "듣기 1 컷 보기 커버 자리",
                 coverAltVi: "Anh bia tam cho bai nghe 1",
@@ -275,7 +275,7 @@
                 descriptionVi: "On lai cach noi kich thuoc nhu 'bang dia CD' trong bai nghe."
             },
             activityImage: {
-                src: "../assets/c16/listening/images/lesson16-listening2-cuttoon.png",
+                src: "../assets/c16/listening/images/lesson16-listening2-cuttoon.webp",
                 alt: "두 사람이 네모 모양의 연을 만드는 열 컷 컷툰",
                 altVi: "Khung tranh tam cho hoi thoai lam dieu hinh vuong",
                 pendingLabel: "듣기 2 컷툰 이미지를 불러오고 있습니다.",
@@ -288,7 +288,7 @@
             audioSrc: null,
             audioSourceType: "original",
             syncVisual: {
-                imageSrc: "../assets/c16/listening/images/lesson16-listening2-cuttoon.png",
+                imageSrc: "../assets/c16/listening/images/lesson16-listening2-cuttoon.webp",
                 coverImageSrc: "",
                 coverAlt: "듣기 2 컷 보기 커버 자리",
                 coverAltVi: "Anh bia tam cho bai nghe 2",

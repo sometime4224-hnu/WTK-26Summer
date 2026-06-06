@@ -5,14 +5,23 @@ test("c14 reading page loads webp story images on smartphone", async ({ page }) 
     await page.goto("/c14/reading.html");
 
     await expect(page.locator("h1")).toContainText("도낏자루 썩는 줄 모른다");
-    await expect(page.locator('img[src$=".webp"]')).toHaveCount(7);
+    const images = page.locator('img[src$=".webp"]');
+    await expect(images).toHaveCount(7);
 
     const hasOverflow = await page.evaluate(() => {
         return document.documentElement.scrollWidth > window.innerWidth;
     });
     expect(hasOverflow).toBeFalsy();
 
-    const imageState = await page.locator('img[src$=".webp"]').evaluateAll((images) => {
+    for (let index = 0; index < 7; index += 1) {
+        await images.nth(index).evaluate((img) => img.scrollIntoView({ block: "center" }));
+        await page.waitForFunction((imageIndex) => {
+            const img = document.querySelectorAll('img[src$=".webp"]')[imageIndex];
+            return Boolean(img && img.complete && img.naturalWidth > 0 && img.currentSrc.endsWith(".webp"));
+        }, index);
+    }
+
+    const imageState = await images.evaluateAll((images) => {
         return images.map((img) => ({
             complete: img.complete,
             naturalWidth: img.naturalWidth,

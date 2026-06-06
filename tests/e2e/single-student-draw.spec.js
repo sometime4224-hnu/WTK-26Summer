@@ -40,7 +40,7 @@ async function drawOne(page) {
 test('draws exactly one student from the presentation roster', async ({ page }) => {
   await page.goto('/apps/standalone-pages/single-student-draw.html', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.locator('button')).toHaveCount(1);
+  await expect(page.locator('#draw-button')).toHaveCount(1);
   await expect(page.locator('#draw-button')).toHaveText('뽑기');
   await expect(page.locator('#student-name')).toHaveText('');
 

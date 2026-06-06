@@ -25,7 +25,7 @@
             audioSrc: null,
             audioSourceType: "original",
             activityImage: {
-                src: "../assets/c17/listening/images/lesson17-listening1-cuts.webp?v=20260510-track85-new-source",
+                src: "../assets/c17/listening/images/lesson17-listening1-cuts-optimized.webp?v=20260510-track85-new-source",
                 alt: "운전 습관과 교통사고 뉴스 흐름을 정리한 10컷 컷툰",
                 altVi: "Khung 10 tranh tom tat dong ban tin ve thoi quen lai xe va tai nan giao thong",
                 pendingLabel: "듣기 1 컷툰 이미지를 불러오는 중입니다.",
@@ -36,7 +36,7 @@
                 captionVi: "Anh moi duoc tach thanh 10 tranh theo mach bai nghe."
             },
             syncVisual: {
-                imageSrc: "../assets/c17/listening/images/lesson17-listening1-cuts.webp?v=20260510-track85-new-source",
+                imageSrc: "../assets/c17/listening/images/lesson17-listening1-cuts-optimized.webp?v=20260510-track85-new-source",
                 title: "컷툰으로 듣기 흐름 보기",
                 titleVi: "Xem mach bai nghe bang cattoon",
                 copy: "Track 85를 재생하면 뉴스 흐름에 맞춰 컷이 한 장씩 넘어갑니다.",
@@ -279,7 +279,7 @@
             audioSrc: null,
             audioSourceType: "original",
             activityImage: {
-                src: "../assets/c17/listening/images/lesson17-listening2-cuts.webp",
+                src: "../assets/c17/listening/images/lesson17-listening2-cuts-optimized.webp",
                 alt: "물, 눈 건강, 커피에 대한 건강 상식 문답을 정리한 18컷 컷툰",
                 altVi: "Khung 18 tranh tom tat hoi dap ve nuoc, mat va ca phe",
                 pendingLabel: "듣기 2 컷툰 이미지를 불러오는 중입니다.",
@@ -290,7 +290,7 @@
                 captionVi: "Moi khung tren/duoi cua anh sach giao khoa duoc tach rieng thanh 18 tranh."
             },
             syncVisual: {
-                imageSrc: "../assets/c17/listening/images/lesson17-listening2-cuts.webp",
+                imageSrc: "../assets/c17/listening/images/lesson17-listening2-cuts-optimized.webp",
                 title: "컷툰으로 듣기 흐름 보기",
                 titleVi: "Xem mach bai nghe bang cattoon",
                 copy: "Track 86을 재생하면 건강 상식 문답 흐름에 맞춰 컷이 한 장씩 넘어갑니다.",

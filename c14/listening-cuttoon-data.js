@@ -12,7 +12,7 @@ window.C14_LISTENING_CUTTOON = {
             generatedSrc: "../assets/c14/listening/audio/c14_track52_generated.mp3"
         },
         fallbackImage: {
-            src: "../assets/c14/listening/images/listening1-illustration.webp",
+            src: "../assets/c14/listening/images/listening1-illustration-1600w.webp",
             alt: "주말농장 이야기를 나누는 장면"
         },
         cuts: [
@@ -325,7 +325,7 @@ window.C14_LISTENING_CUTTOON = {
             generatedSrc: "../assets/c14/listening/audio/c14_track53_generated.mp3"
         },
         fallbackImage: {
-            src: "../assets/c14/listening/images/listening2-illustration.webp",
+            src: "../assets/c14/listening/images/listening2-illustration-1600w.webp",
             alt: "옛 서울 전시회 장면"
         },
         cuts: [

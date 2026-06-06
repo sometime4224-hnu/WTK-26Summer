@@ -743,6 +743,15 @@
         return String(type || "original").toLowerCase() === "generated" ? "generated" : "original";
     }
 
+    function normalizeAudioPreload(value) {
+        const normalized = String(value || "").toLowerCase();
+        return ["none", "metadata", "auto"].includes(normalized) ? normalized : "metadata";
+    }
+
+    function getAudioPreload(lesson) {
+        return normalizeAudioPreload((lesson && lesson.audioPreload) || (pageConfig && pageConfig.audioPreload));
+    }
+
     function getRemoteAudioSourceType(lesson, useFallback = false) {
         if (!lesson) return "original";
         return normalizeRemoteAudioSourceType(useFallback ? lesson.fallbackAudioSourceType : lesson.audioSourceType);
@@ -2038,7 +2047,7 @@
                         <strong>${escapeHtml(source.mode === "local" ? uiText.localAudioPlayback : getRemoteAudioLabel(lesson, source.sourceType))}</strong>
                         ${source.mode === "local" && source.foundFileName ? `<span class="lw-mini-chip">${escapeHtml(source.foundFileName)}</span>` : ""}
                     </div>
-                    <audio id="audio-${escapeHtml(lesson.id)}" controls preload="metadata"
+                    <audio id="audio-${escapeHtml(lesson.id)}" controls preload="${escapeHtml(getAudioPreload(lesson))}"
                         data-lesson-id="${escapeHtml(lesson.id)}"
                         data-remote-source-type="${escapeHtml(source.sourceType || "original")}"
                         data-fallback-source-type="${escapeHtml(source.fallbackSourceType || "")}"
@@ -5327,7 +5336,7 @@
                         <strong>${escapeHtml(source.mode === "local" ? uiText.localAudioPlayback : getRemoteAudioLabel(lesson, source.sourceType))}</strong>
                         ${source.mode === "local" && source.foundFileName ? `<span class="lw-mini-chip">${escapeHtml(source.foundFileName)}</span>` : ""}
                     </div>
-                    <audio id="audio-${escapeHtml(lesson.id)}" controls preload="metadata"
+                    <audio id="audio-${escapeHtml(lesson.id)}" controls preload="${escapeHtml(getAudioPreload(lesson))}"
                         data-lesson-id="${escapeHtml(lesson.id)}"
                         data-remote-source-type="${escapeHtml(source.sourceType || "original")}"
                         data-fallback-source-type="${escapeHtml(source.fallbackSourceType || "")}"

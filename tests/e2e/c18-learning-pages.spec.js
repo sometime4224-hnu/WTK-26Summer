@@ -12,7 +12,7 @@ test('renders the c18 learning page set', async ({ page }) => {
 
   const pages = [
     ['/c18/index.html', '거울이 깨지고 말았어요'],
-    ['/c18/vocabulary.html', '18과 어휘 카드'],
+    ['/c18/vocabulary.html', '18'],
     ['/c18/vocab-support-stage-map.html', '무대 역할 지도'],
     ['/c18/vocab-support-script-lines.html', '대본과 대사 구분'],
     ['/c18/vocab-support-action-sequence.html', '무대 행동 순서 배열'],
@@ -58,10 +58,10 @@ test('c18 vocabulary filters and grammar quiz work', async ({ page }) => {
   await blockExternalRequests(page);
 
   await page.goto('/c18/vocabulary.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('.vocab-card')).toHaveCount(16);
-  await expect(page.locator('.vocab-visual img')).toHaveCount(16);
-  await page.waitForFunction(() => Array.from(document.querySelectorAll('.vocab-visual img')).every((img) => img.complete && img.naturalWidth > 0));
-  const imageState = await page.locator('.vocab-visual img').evaluateAll((images) => images.map((img) => ({
+  await expect(page.locator('.word-card')).toHaveCount(16);
+  await expect(page.locator('.word-card__image')).toHaveCount(16);
+  await page.waitForFunction(() => Array.from(document.querySelectorAll('.word-card__image')).every((img) => img.complete && img.naturalWidth > 0));
+  const imageState = await page.locator('.word-card__image').evaluateAll((images) => images.map((img) => ({
     width: img.naturalWidth,
     src: img.currentSrc
   })));
@@ -69,11 +69,11 @@ test('c18 vocabulary filters and grammar quiz work', async ({ page }) => {
     expect(image.width).toBeGreaterThan(0);
     expect(image.src).toContain('/assets/c18/vocabulary/images/cards/');
   }
-  await page.locator('[data-vocab-filter="gesture"]').click();
-  await expect(page.locator('#vocabVisibleCount')).toHaveText('6');
-  await page.locator('[data-vocab-filter="all"]').click();
-  await page.locator('#vocabSearch').fill('거울');
-  await expect(page.locator('#vocabVisibleCount')).toHaveText('4');
+  await page.locator('[data-category-id="object"]').click();
+  await expect(page.locator('.word-card')).toHaveCount(4);
+  await page.locator('[data-category-id="all"]').click();
+  await page.locator('#search-input').fill('거울');
+  await expect(page.locator('.word-card')).toHaveCount(4);
 
   await page.goto('/c18/grammar1.html', { waitUntil: 'domcontentloaded' });
   await page.locator('[data-tab-target="practicePanel"]').click();
