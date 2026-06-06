@@ -327,6 +327,158 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
         ];
 
+        const LANG_ORDER = ["en", "vi", "ar", "mn", "kk", "th"];
+        const CONTEXT_LABELS = {
+            en: "Situation",
+            vi: "Tình huống",
+            ar: "الموقف",
+            mn: "Нөхцөл",
+            kk: "Жағдай",
+            th: "สถานการณ์"
+        };
+        const CONTEXT_TRANSLATIONS = {
+            d1: {
+                en: "Looking for a cup while the coffee was not finished.",
+                ar: "يبحث عن الكوب ولم يكن قد أنهى القهوة بعد.",
+                mn: "Кофегоо дуусаагүй байхад аягаа хайж байна.",
+                kk: "Кофесін әлі ішіп бітірмей, кесесін іздеп жатыр.",
+                th: "ยังดื่มกาแฟไม่เสร็จแล้วกำลังตามหาแก้ว"
+            },
+            d2: {
+                en: "Describing a current habit of reading the news every day.",
+                ar: "يصف عادة حالية، وهي قراءة الأخبار كل يوم.",
+                mn: "Мэдээг өдөр бүр уншдаг одоогийн дадлыг тайлбарлаж байна.",
+                kk: "Күн сайын жаңалық оқитын қазіргі әдетті сипаттап тұр.",
+                th: "อธิบายนิสัยปัจจุบันที่อ่านข่าวทุกวัน"
+            },
+            d3: {
+                en: "Recalling a repeated habit from childhood.",
+                ar: "يتذكر عادة متكررة من أيام الطفولة.",
+                mn: "Бага насны давтагдсан дадлыг дурсаж байна.",
+                kk: "Балалық шақтағы қайталанған әдетті еске алып тұр.",
+                th: "รำลึกถึงนิสัยที่ทำซ้ำในวัยเด็ก"
+            },
+            d4: {
+                en: "Talking about impressions after watching the whole movie last week.",
+                ar: "يتحدث عن انطباعه بعد أن شاهد الفيلم كاملا الأسبوع الماضي.",
+                mn: "Өнгөрсөн долоо хоногт киног дуустал үзээд сэтгэгдлээ хэлж байна.",
+                kk: "Өткен аптада фильмді соңына дейін көріп, әсерін айтып тұр.",
+                th: "พูดความรู้สึกหลังดูหนังจนจบเมื่อสัปดาห์ที่แล้ว"
+            },
+            d5: {
+                en: "The reading action was stopped and is still unfinished.",
+                ar: "توقف فعل القراءة وما زال غير مكتمل.",
+                mn: "Унших үйлдэл тасалдаж, одоо ч дуусаагүй байна.",
+                kk: "Оқу әрекеті тоқтап, әлі аяқталмаған.",
+                th: "การอ่านถูกหยุดไว้และยังอ่านไม่จบ"
+            },
+            d6: {
+                en: "Introducing the song that is playing right now.",
+                ar: "يعرّف الأغنية التي تعمل الآن.",
+                mn: "Одоо тоглож байгаа дууг шууд танилцуулж байна.",
+                kk: "Қазір ойнап тұрған әнді таныстырып тұр.",
+                th: "แนะนำเพลงที่กำลังเล่นอยู่ตอนนี้"
+            },
+            d7: {
+                en: "Recalling a past living situation and comparing it with the present.",
+                ar: "يتذكر حالة السكن في الماضي ويقارنها بالحاضر.",
+                mn: "Өмнө амьдарч байсан байдлаа дурсаж, одоотой харьцуулж байна.",
+                kk: "Бұрын тұрған жерін еске алып, қазіргімен салыстырып тұр.",
+                th: "รำลึกถึงที่เคยอยู่ในอดีตและเปรียบเทียบกับปัจจุบัน"
+            },
+            d8: {
+                en: "Recalling a shop one often visited before and talking about its current state.",
+                ar: "يتذكر محلا كان يزوره كثيرا في الماضي ويتحدث عن حاله الآن.",
+                mn: "Өмнө байнга очдог байсан газраа дурсаж, одоогийн байдлыг хэлж байна.",
+                kk: "Бұрын жиі барған дүкенді еске алып, қазіргі жағдайын айтып тұр.",
+                th: "นึกถึงร้านที่เคยไปบ่อยและพูดถึงสภาพปัจจุบัน"
+            },
+            d9: {
+                en: "Describing a current routine of listening every day.",
+                ar: "يصف روتينا حاليا يتمثل في الاستماع كل يوم.",
+                mn: "Өдөр бүр сонсдог одоогийн хэвшлийг тайлбарлаж байна.",
+                kk: "Күн сайын тыңдайтын қазіргі тәртіпті сипаттап тұр.",
+                th: "อธิบายกิจวัตรปัจจุบันที่ฟังทุกวัน"
+            },
+            d10: {
+                en: "Talking about the completed experience of reading a novel to the end yesterday.",
+                ar: "يتحدث عن تجربة مكتملة، وهي قراءة الرواية حتى النهاية أمس.",
+                mn: "Өчигдөр романыг дуустал уншсан бүрэн туршлагаа хэлж байна.",
+                kk: "Кеше романды соңына дейін оқып біткен тәжірибесін айтып тұр.",
+                th: "พูดถึงประสบการณ์ที่อ่านนิยายจนจบเมื่อวาน"
+            },
+            j1: {
+                en: "All team members already know the Monday meeting schedule.",
+                ar: "كل أعضاء الفريق يعرفون مسبقا جدول اجتماع يوم الاثنين.",
+                mn: "Багийн бүх гишүүн даваа гарагийн хурлын хуваарийг аль хэдийн мэднэ.",
+                kk: "Топ мүшелерінің бәрі дүйсенбі күнгі жиналыс кестесін біледі.",
+                th: "สมาชิกทีมทุกคนรู้อยู่แล้วว่ามีประชุมวันจันทร์"
+            },
+            j2: {
+                en: "The listener does not yet know about the urgent work at the company.",
+                ar: "المستمع لا يعرف بعد الأمر العاجل في الشركة.",
+                mn: "Сонсогч компанийн яаралтай ажлыг хараахан мэдэхгүй байна.",
+                kk: "Тыңдаушы компаниядағы шұғыл істі әлі білмейді.",
+                th: "ผู้ฟังยังไม่รู้เรื่องด่วนที่บริษัท"
+            },
+            j3: {
+                en: "Reminding someone of an appointment time that was already set.",
+                ar: "يذكّر بموعد كان قد تم الاتفاق عليه من قبل.",
+                mn: "Аль хэдийн тогтсон уулзалтын цагийг дахин сануулж байна.",
+                kk: "Бұрын белгіленген кездесу уақытын қайта еске салып тұр.",
+                th: "เตือนเวลานัดที่ตกลงกันไว้แล้วอีกครั้ง"
+            },
+            j4: {
+                en: "A conversation confirming together that today is Monday.",
+                ar: "حوار يؤكد فيه الطرفان أن اليوم هو الاثنين.",
+                mn: "Өнөөдөр даваа гараг гэдгийг хоорондоо баталж байна.",
+                kk: "Бүгін дүйсенбі екенін бірге нақтылап тұрған әңгіме.",
+                th: "บทสนทนาที่ยืนยันร่วมกันว่าวันนี้เป็นวันจันทร์"
+            },
+            j5: {
+                en: "Both people already agree that Korean dramas are fun.",
+                ar: "كلا الطرفين متفقان مسبقا على أن الدراما الكورية ممتعة.",
+                mn: "Солонгос драм хөгжилтэй гэдэгтэй хоёр тал аль хэдийн санал нийлсэн.",
+                kk: "Екі жақ та корей драмалары қызықты екеніне келісіп тұр.",
+                th: "ทั้งสองฝ่ายเห็นพ้องกันอยู่แล้วว่าซีรีส์เกาหลีสนุก"
+            },
+            j6: {
+                en: "The listener has not yet heard that it will rain today.",
+                ar: "المستمع لم يسمع بعد خبر هطول المطر اليوم.",
+                mn: "Сонсогч өнөөдөр бороо орох мэдээг хараахан сонсоогүй байна.",
+                kk: "Тыңдаушы бүгін жаңбыр жауатынын әлі естімеген.",
+                th: "ผู้ฟังยังไม่ได้ยินข่าวว่าวันนี้ฝนจะตก"
+            },
+            j7: {
+                en: "Reminding someone again of something already said.",
+                ar: "يذكّر مرة أخرى بشيء قيل من قبل.",
+                mn: "Өмнө хэлсэн зүйлээ дахин сануулж байна.",
+                kk: "Бұрын айтылған нәрсені қайта еске салып тұр.",
+                th: "เตือนสิ่งที่พูดไปแล้วอีกครั้ง"
+            },
+            j8: {
+                en: "Both people know that there is a test today.",
+                ar: "كلا الشخصين يعرفان أن هناك اختبارا اليوم.",
+                mn: "Хоёулаа өнөөдөр шалгалттай гэдгийг мэдэж байна.",
+                kk: "Екеуі де бүгін емтихан бар екенін біледі.",
+                th: "ทั้งสองคนรู้ว่าวันนี้มีสอบ"
+            },
+            j9: {
+                en: "Both people know this is a school, so one asks the other to be quiet.",
+                ar: "يعرف الطرفان أن هذا المكان مدرسة، لذلك يطلب أحدهما الهدوء.",
+                mn: "Энд сургууль гэдгийг хоёулаа мэдэж байгаа тул чимээгүй байхыг хэлж байна.",
+                kk: "Бұл жер мектеп екенін екеуі де білгендіктен, тыныш болуды айтып тұр.",
+                th: "ทั้งสองรู้ว่าที่นี่คือโรงเรียน จึงบอกให้เงียบ"
+            },
+            j10: {
+                en: "Confirming with each other the actor they just saw together.",
+                ar: "يتأكدان معا من الممثل الذي شاهداه للتو.",
+                mn: "Дөнгөж хамт харсан жүжигчнийг хоорондоо баталж байна.",
+                kk: "Жаңа ғана бірге көрген актерді бір-бірімен нақтылап тұр.",
+                th: "ยืนยันนักแสดงที่เพิ่งเห็นด้วยกันเมื่อสักครู่"
+            }
+        };
+
         const state = {
             screen: "start",
             selectedSet: "all",
@@ -343,6 +495,46 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#39;");
+        }
+
+        function stripContextLabel(value) {
+            return String(value || "")
+                .replace(/^상황:\s*/i, "")
+                .replace(/^Tình huống:\s*/i, "");
+        }
+
+        function langNote(lang, label, value) {
+            if (!value) return "";
+            const dir = lang === "ar" ? ' dir="rtl"' : "";
+            return `<p data-lang="${lang}" lang="${lang}"${dir} class="lang-box safe-wrap"><b>${label}:</b> ${esc(value)}</p>`;
+        }
+
+        function viNote(label, value) {
+            return langNote("vi", label, value);
+        }
+
+        function contextText(question, lang) {
+            if (!question) return "";
+            if (lang === "vi") return stripContextLabel(question.contextVi);
+            return stripContextLabel(CONTEXT_TRANSLATIONS[question.id]?.[lang]);
+        }
+
+        function contextNotes(question, koreanClass = "text-xs text-slate-700") {
+            const korean = stripContextLabel(question?.contextKo);
+            const translated = LANG_ORDER.map((lang) => {
+                const text = contextText(question, lang);
+                if (!text) return "";
+                return langNote(lang, CONTEXT_LABELS[lang] || lang, text);
+            }).join("");
+            return `
+                <p class="${koreanClass} safe-wrap"><b>상황:</b> ${esc(korean)}</p>
+                ${translated}
+            `;
+        }
+
+        function syncMultilang() {
+            const api = window.MultilangToggle;
+            if (api?.setLang) api.setLang(api.getLang?.() || "none");
         }
 
         function shuffle(list) {
@@ -429,7 +621,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <p class="text-xs text-rose-700 mt-1"><b>틀린 형태:</b> <span class="font-black underline decoration-2 decoration-rose-500">${esc(answer.morphologyFocus.wrongPart)}</span></p>
                     <p class="text-xs text-emerald-700 mt-1"><b>올바른 형태:</b> <span class="font-black underline decoration-2 decoration-emerald-500">${esc(answer.morphologyFocus.correctPart)}</span></p>
                     <p class="text-xs text-slate-700 mt-1 safe-wrap"><b>포인트 (KO):</b> ${esc(answer.morphologyFocus.pointKo)}</p>
-                    <p class="text-xs text-blue-700 mt-1 safe-wrap"><b>Điểm chính (VI):</b> ${esc(answer.morphologyFocus.pointVi)}</p>
+                    ${viNote("Điểm chính", answer.morphologyFocus.pointVi)}
                 </div>
             `;
         }
@@ -451,14 +643,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             return `
                 <div class="mt-4 rounded-xl border p-4 ${ok ? "bg-emerald-50 border-emerald-200" : "bg-rose-50 border-rose-200"}">
-                    <p class="text-sm font-bold ${ok ? "text-emerald-700" : "text-rose-700"}">${statusKo} (${statusVi})</p>
+                    <p class="text-sm font-bold ${ok ? "text-emerald-700" : "text-rose-700"}">${statusKo}</p>
+                    ${viNote("Trạng thái", statusVi)}
                     <p class="text-xs text-slate-700 mt-2"><b>정답:</b> ${answer.correctChoice} / <b>내 선택:</b> ${answer.userChoice}</p>
                     <p class="text-xs text-slate-700 mt-1">${summaryKo}</p>
-                    <p class="text-xs text-blue-700 mt-1">${summaryVi}</p>
+                    ${viNote("Tóm tắt", summaryVi)}
                     <div class="mt-3 text-xs text-slate-700 safe-wrap">
                         <p><b>이유 (KO):</b> ${esc(answer.reasonKo)}</p>
-                        <p class="mt-1 text-blue-700"><b>Lý do (VI):</b> ${esc(answer.reasonVi)}</p>
-                        ${answer.correction ? `<p class="mt-2"><b>교정 문장:</b> ${esc(answer.correction)}</p><p class="mt-1 text-blue-700"><b>Câu sửa:</b> ${esc(answer.correction)}</p>` : ""}
+                        ${viNote("Lý do", answer.reasonVi)}
+                        ${answer.correction ? `<p class="mt-2"><b>교정 문장:</b> ${esc(answer.correction)}</p>` : ""}
                     </div>
                     ${!ok ? morphologyBlock(answer) : ""}
                 </div>
@@ -474,7 +667,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-2xl p-5 shadow-sm">
                         <h1 class="text-xl font-black text-blue-700 safe-wrap">문법 1+2 사전 O/X 퀴즈</h1>
                         <p class="text-sm text-slate-700 mt-2">문장을 보고 '-던' / '-잖아요' 사용이 맞으면 O, 틀리면 X를 누르세요.</p>
-                        <p class="text-xs text-slate-500 mt-1">정답/오답 모두 이유를 한국어+베트남어로 제공합니다.</p>
+                        <p class="text-xs text-slate-500 mt-1">문항별 상황은 선택한 언어로 확인할 수 있습니다.</p>
 
                         <div class="mt-4 grid grid-cols-3 gap-2 text-xs">
                             <div class="bg-white border border-blue-100 rounded-lg p-2 text-center"><p class="text-slate-500">전체</p><p class="font-bold">${totalAll}</p></div>
@@ -527,8 +720,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <p class="text-base font-bold text-slate-800 mt-2 leading-relaxed safe-wrap">${esc(q.sentence)}</p>
 
                         <div class="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-                            <p class="text-xs text-slate-700 safe-wrap"><b>상황 (KO):</b> ${esc(q.contextKo)}</p>
-                            <p class="text-xs text-blue-700 mt-1 safe-wrap"><b>Tình huống (VI):</b> ${esc(q.contextVi)}</p>
+                            ${contextNotes(q)}
                         </div>
 
                         ${oxButtons}
@@ -553,7 +745,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <p class="text-sm text-slate-800 mt-1 safe-wrap">${esc(a.sentence)}</p>
                     <p class="text-xs text-slate-700 mt-2"><b>정답:</b> ${a.correctChoice}</p>
                     <p class="text-xs text-slate-700 mt-1 safe-wrap"><b>이유 (KO):</b> ${esc(a.reasonKo)}</p>
-                    <p class="text-xs text-blue-700 mt-1 safe-wrap"><b>Lý do (VI):</b> ${esc(a.reasonVi)}</p>
+                    ${viNote("Lý do", a.reasonVi)}
                     ${a.correction ? `<p class="text-xs text-slate-700 mt-1 safe-wrap"><b>교정:</b> ${esc(a.correction)}</p>` : ""}
                     ${a.morphologyFocus ? `
                         <div class="mt-2 rounded-lg border border-rose-200 bg-white p-2">
@@ -589,12 +781,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             if (state.screen === "start") app.innerHTML = renderStart();
             else if (state.screen === "quiz") app.innerHTML = renderQuiz();
             else app.innerHTML = renderResult();
+            syncMultilang();
         }
 
         document.addEventListener("DOMContentLoaded", () => {
             render();
         });
     </script>
+    <script src="../shared/c10-grammar-support-multilang.js"></script>
+    <script src="../shared/multilang-toggle.js"></script>
     <script src="../shared/learning-enhancements.js"></script>
     <script src="../shared/site-copyright.js"></script>
     <script src="../shared/page-qr.js"></script>

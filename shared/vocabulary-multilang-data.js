@@ -6,7 +6,7 @@
 (function () {
     "use strict";
 
-    const STANDARD_LANGS = ["en", "vi", "mn", "ar", "kk", "th"];
+    const STANDARD_LANGS = ["en", "vi", "ar", "mn", "kk", "th"];
     const TRANSLATIONS = {
         "c10-vocab-01": { en: "to confess one's feelings", mn: "сэтгэлээ илчлэх", ar: "يبوح بمشاعره", kk: "сезімін білдіру", th: "สารภาพความรู้สึก" },
         "c10-vocab-02": { en: "one's heart pounds", vi: "tim đập thình thịch (hồi hộp)", mn: "зүрх хүчтэй цохилох", ar: "يخفق القلب بسرعة", kk: "жүрегі дүрсілдеу", th: "หัวใจเต้นแรง" },

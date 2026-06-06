@@ -238,6 +238,116 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
         ];
 
+        const LANG_ORDER = ["en", "vi", "ar", "mn", "kk", "th"];
+        const CONTEXT_LABELS = {
+            en: "Situation",
+            vi: "Tình huống",
+            ar: "الموقف",
+            mn: "Нөхцөл",
+            kk: "Жағдай",
+            th: "สถานการณ์"
+        };
+        const CONTEXT_TRANSLATIONS = {
+            g1_01: {
+                en: "Looking for a cup after stepping away while drinking coffee.",
+                ar: "يبحث عن الكوب بعد أن ترك مكانه قليلا أثناء شرب القهوة.",
+                mn: "Кофе ууж байгаад түр холдоод аягаа хайж байна.",
+                kk: "Кофе ішіп отырып біраз кетіп, кейін кесесін іздеп жатыр.",
+                th: "กำลังตามหาแก้วหลังจากลุกไปครู่หนึ่งระหว่างดื่มกาแฟ"
+            },
+            g1_02: {
+                en: "Recalling a playground one often visited in childhood.",
+                ar: "يتذكر ملعبا كان يذهب إليه كثيرا في طفولته.",
+                mn: "Багадаа байнга очдог байсан тоглоомын талбайгаа дурсаж байна.",
+                kk: "Балалық шағында жиі барған ойын алаңын еске алып тұр.",
+                th: "รำลึกถึงสนามเด็กเล่นที่เคยไปบ่อยตอนเด็ก"
+            },
+            g1_03: {
+                en: "Talking about feelings after watching the whole movie last week.",
+                ar: "يتحدث عن شعوره بعد أن شاهد الفيلم كاملا الأسبوع الماضي.",
+                mn: "Өнгөрсөн долоо хоногт киног дуустал үзээд сэтгэгдлээ хэлж байна.",
+                kk: "Өткен аптада фильмді соңына дейін көріп, сезімін айтып тұр.",
+                th: "พูดความรู้สึกเกี่ยวกับหนังที่ดูจบเมื่อสัปดาห์ที่แล้ว"
+            },
+            g1_04: {
+                en: "Pointing to the skirt that mother often wore when she was young.",
+                ar: "يشير إلى التنورة التي كانت الأم ترتديها كثيرا في شبابها.",
+                mn: "Ээжийн залуудаа байнга өмсдөг байсан банзлыг зааж байна.",
+                kk: "Анасы жас кезінде жиі киген белдемшені көрсетіп тұр.",
+                th: "ชี้ให้ดูกระโปรงที่แม่เคยใส่บ่อยตอนยังสาว"
+            },
+            g1_05: {
+                en: "Talking about a novel that was started but has not been finished.",
+                ar: "يتحدث عن رواية بدأ قراءتها لكنه لم ينهها بعد.",
+                mn: "Уншиж эхэлсэн ч дуусаагүй романы тухай хэлж байна.",
+                kk: "Оқып бастап, бірақ әлі аяқтамаған роман туралы айтып тұр.",
+                th: "พูดถึงนิยายที่อ่านค้างไว้และยังอ่านไม่จบ"
+            },
+            g1_06: {
+                en: "Describing a current habit of watching the news every day.",
+                ar: "يصف عادة حالية، وهي مشاهدة الأخبار كل يوم.",
+                mn: "Мэдээг өдөр бүр үздэг одоогийн дадлыг тайлбарлаж байна.",
+                kk: "Күн сайын жаңалық көретін қазіргі әдетті сипаттап тұр.",
+                th: "อธิบายนิสัยปัจจุบันที่ดูข่าวทุกวัน"
+            },
+            g1_07: {
+                en: "Recalling the neighborhood one lived in last year and comparing it with now.",
+                ar: "يتذكر الحي الذي كان يعيش فيه العام الماضي ويقارنه بالآن.",
+                mn: "Өнгөрсөн жил амьдарч байсан хорооллоо дурсаж, одоотой харьцуулж байна.",
+                kk: "Былтыр тұрған ауданын еске алып, қазіргімен салыстырып тұр.",
+                th: "นึกถึงย่านที่เคยอยู่เมื่อปีที่แล้วและเปรียบเทียบกับตอนนี้"
+            },
+            g2_01: {
+                en: "The listener also already knows that there is a test tomorrow.",
+                ar: "المستمع يعرف أيضا مسبقا أن هناك اختبارا غدا.",
+                mn: "Сонсогч маргааш шалгалттай гэдгийг аль хэдийн мэдэж байна.",
+                kk: "Тыңдаушы да ертең емтихан бар екенін біледі.",
+                th: "ผู้ฟังก็รู้อยู่แล้วว่าพรุ่งนี้มีสอบ"
+            },
+            g2_02: {
+                en: "Giving a new reason, too much work, that the listener may not know.",
+                ar: "يقدم سببا جديدا قد لا يعرفه المستمع، وهو كثرة العمل.",
+                mn: "Сонсогч мэдэхгүй байж болох шинэ шалтгаан буюу ажил их байгааг тайлбарлаж байна.",
+                kk: "Тыңдаушы білмеуі мүмкін жаңа себепті, жұмыстың көптігін, түсіндіріп тұр.",
+                th: "บอกเหตุผลใหม่ว่า มีงานมาก ซึ่งผู้ฟังอาจยังไม่รู้"
+            },
+            g2_03: {
+                en: "Reminding everyone of Minsu's job, doctor, which they already know.",
+                ar: "يذكّر الجميع بعمل مينسو، وهو طبيب، وهم يعرفون ذلك مسبقا.",
+                mn: "Минсүгийн ажил мэргэжил эмч гэдгийг бүгд мэддэг тул дахин сануулж байна.",
+                kk: "Минсудың дәрігер екенін бәрі білетіндіктен қайта еске салып тұр.",
+                th: "ย้ำอาชีพของมินซูว่าเป็นหมอ ซึ่งทุกคนรู้อยู่แล้ว"
+            },
+            g2_04: {
+                en: "Checking again the shared information that today is Monday, the meeting day.",
+                ar: "يؤكد مرة أخرى المعلومة المشتركة أن اليوم هو الاثنين، يوم الاجتماع.",
+                mn: "Өнөөдөр даваа гараг, хурлын өдөр гэдэг хамтын мэдээллийг дахин баталж байна.",
+                kk: "Бүгін дүйсенбі, жиналыс күні деген ортақ ақпаратты қайта нақтылап тұр.",
+                th: "ยืนยันข้อมูลร่วมกันอีกครั้งว่าวันนี้คือวันจันทร์ซึ่งเป็นวันประชุม"
+            },
+            g2_05: {
+                en: "Confirming the appointment time in the form of a question.",
+                ar: "يتأكد من وقت الموعد بصيغة سؤال.",
+                mn: "Уулзалтын цагийг асуултын хэлбэрээр баталж байна.",
+                kk: "Кездесу уақытын сұрақ түрінде нақтылап тұр.",
+                th: "ยืนยันเวลานัดในรูปประโยคคำถาม"
+            },
+            g2_06: {
+                en: "Reminding the listener that a text message was sent earlier.",
+                ar: "يذكّر المستمع بأنه أرسل رسالة نصية قبل قليل.",
+                mn: "Түрүүн мессеж явуулсан гэдгээ сонсогчид дахин сануулж байна.",
+                kk: "Бұрынырақ хабарлама жібергенін тыңдаушыға қайта еске салып тұр.",
+                th: "เตือนผู้ฟังอีกครั้งว่าเพิ่งส่งข้อความไปก่อนหน้านี้"
+            },
+            g2_07: {
+                en: "Confirming again the shared view that Korean dramas are interesting.",
+                ar: "يؤكد مرة أخرى الرأي المشترك بأن الدراما الكورية ممتعة.",
+                mn: "Солонгос драм сонирхолтой гэдэг хамтын үнэлгээг дахин баталж байна.",
+                kk: "Корей драмалары қызықты деген ортақ пікірді қайта нақтылап тұр.",
+                th: "ยืนยันอีกครั้งถึงความเห็นร่วมกันว่าซีรีส์เกาหลีน่าสนใจ"
+            }
+        };
+
         const state = {
             view: "start",
             quiz: {
@@ -258,6 +368,46 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#39;");
+        }
+
+        function stripContextLabel(value) {
+            return String(value || "")
+                .replace(/^상황:\s*/i, "")
+                .replace(/^Tình huống:\s*/i, "");
+        }
+
+        function langNote(lang, label, value) {
+            if (!value) return "";
+            const dir = lang === "ar" ? ' dir="rtl"' : "";
+            return `<p data-lang="${lang}" lang="${lang}"${dir} class="lang-box safe-wrap"><b>${label}:</b> ${esc(value)}</p>`;
+        }
+
+        function viNote(label, value) {
+            return langNote("vi", label, value);
+        }
+
+        function contextText(question, lang) {
+            if (!question) return "";
+            if (lang === "vi") return stripContextLabel(question.contextVi);
+            return stripContextLabel(CONTEXT_TRANSLATIONS[question.id]?.[lang]);
+        }
+
+        function contextNotes(question, koreanClass = "text-[11px] text-slate-600") {
+            const korean = stripContextLabel(question?.contextKo);
+            const translated = LANG_ORDER.map((lang) => {
+                const text = contextText(question, lang);
+                if (!text) return "";
+                return langNote(lang, CONTEXT_LABELS[lang] || lang, text);
+            }).join("");
+            return `
+                <p class="${koreanClass} safe-wrap"><b>상황:</b> ${esc(korean)}</p>
+                ${translated}
+            `;
+        }
+
+        function syncMultilang() {
+            const api = window.MultilangToggle;
+            if (api?.setLang) api.setLang(api.getLang?.() || "none");
         }
 
         function normalize(text) {
@@ -466,7 +616,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-2xl p-5 shadow-sm">
                         <h1 class="text-xl font-black text-blue-700 safe-wrap">문법 1+2 통합 퀴즈</h1>
                         <p class="text-sm text-slate-700 mt-2">-던 / -잖아요를 섞어 연습합니다.</p>
-                        <p class="text-xs text-slate-500 mt-1">각 문항은 정오답 피드백을 먼저 확인한 뒤 다음 버튼으로 진행합니다.</p>
+                        <p class="text-xs text-slate-500 mt-1">문항별 상황은 선택한 언어로 확인한 뒤 풉니다.</p>
                         <div class="mt-4 grid grid-cols-2 gap-2 text-xs">
                             <div class="bg-white border border-blue-100 rounded-lg p-2">
                                 <p class="text-slate-500">문항 수</p>
@@ -536,17 +686,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="mt-4 rounded-xl border p-4 ${fb.isCorrect ? "bg-emerald-50 border-emerald-200" : "bg-rose-50 border-rose-200"}">
                     <p class="text-sm font-bold ${fb.isCorrect ? "text-emerald-700" : "text-rose-700"}">
                         ${fb.isCorrect ? "정답입니다." : "오답입니다."}
-                        <span class="text-xs ml-1">(${fb.isCorrect ? "Bạn làm đúng." : "Bạn làm sai."})</span>
                     </p>
+                    ${viNote("Trạng thái", fb.isCorrect ? "Bạn làm đúng." : "Bạn làm sai.")}
                     <p class="text-xs text-slate-700 mt-2"><b>내 답:</b> ${esc(fb.userAnswer || "(무응답)")}</p>
                     <p class="text-xs text-slate-700 mt-1"><b>정답:</b> ${esc(fb.correctAnswer)}</p>
                     <p class="text-xs text-slate-700 mt-2 safe-wrap"><b>설명 (KO):</b> ${esc(fb.explainKo || "")}</p>
-                    <p class="text-xs text-blue-700 mt-1 safe-wrap"><b>Giải thích (VI):</b> ${esc(fb.explainVi || "")}</p>
+                    ${viNote("Giải thích", fb.explainVi)}
                     ${fb.nonTargetKo ? `
                         <div class="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
                             <p class="text-xs font-bold text-amber-800">학습 범위 보충</p>
                             <p class="text-xs text-slate-700 mt-1 safe-wrap"><b>KO:</b> ${esc(fb.nonTargetKo)}</p>
-                            <p class="text-xs text-blue-700 mt-1 safe-wrap"><b>VI:</b> ${esc(fb.nonTargetVi || "")}</p>
+                            ${viNote("VI", fb.nonTargetVi)}
                         </div>
                     ` : ""}
                 </div>
@@ -568,8 +718,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <p class="text-xs font-bold text-slate-500">문제</p>
                         <p class="text-base font-bold text-slate-800 mt-2 leading-relaxed safe-wrap">${esc(q.prompt)}</p>
                         <div class="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
-                            <p class="text-[11px] text-slate-600 safe-wrap"><b>상황 (KO):</b> ${esc(q.contextKo || "")}</p>
-                            <p class="text-[11px] text-blue-700 mt-1 safe-wrap"><b>Tình huống (VI):</b> ${esc(q.contextVi || "")}</p>
+                            ${contextNotes(q)}
                         </div>
                         <div class="mt-4 space-y-2">${choicesHtml}</div>
                         ${feedbackHtml}
@@ -598,12 +747,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <p class="text-sm text-slate-800 mt-1 safe-wrap">${esc(a.prompt)}</p>
                             <p class="text-xs text-emerald-700 mt-2">정답입니다.</p>
                             <p class="text-xs text-slate-700 mt-1 safe-wrap"><b>설명 (KO):</b> ${esc(a.explainKo || a.correctFeedback || "")}</p>
-                            <p class="text-xs text-blue-700 mt-1 safe-wrap"><b>Giải thích (VI):</b> ${esc(a.explainVi || a.correctFeedbackVi || "")}</p>
+                            ${viNote("Giải thích", a.explainVi || a.correctFeedbackVi)}
                             ${a.nonTargetKo ? `
                                 <div class="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-2">
                                     <p class="text-xs font-bold text-amber-800">학습 범위 보충</p>
                                     <p class="text-xs text-slate-700 mt-1 safe-wrap"><b>KO:</b> ${esc(a.nonTargetKo)}</p>
-                                    <p class="text-xs text-blue-700 mt-1 safe-wrap"><b>VI:</b> ${esc(a.nonTargetVi || "")}</p>
+                                    ${viNote("VI", a.nonTargetVi)}
                                 </div>
                             ` : ""}
                         </article>
@@ -617,12 +766,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <p class="text-xs text-slate-700 mt-2"><b>내 답:</b> ${esc(a.userAnswer || "(무응답)")}</p>
                         <p class="text-xs text-slate-700 mt-1"><b>정답:</b> ${esc(a.correctAnswer)}</p>
                         <p class="text-xs text-rose-700 mt-2 safe-wrap"><b>설명 (KO):</b> ${esc(a.explainKo || a.wrongFeedback || "")}</p>
-                        <p class="text-xs text-blue-700 mt-1 safe-wrap"><b>Giải thích (VI):</b> ${esc(a.explainVi || a.wrongFeedbackVi || "")}</p>
+                        ${viNote("Giải thích", a.explainVi || a.wrongFeedbackVi)}
                         ${a.nonTargetKo ? `
                             <div class="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-2">
                                 <p class="text-xs font-bold text-amber-800">학습 범위 보충</p>
                                 <p class="text-xs text-slate-700 mt-1 safe-wrap"><b>KO:</b> ${esc(a.nonTargetKo)}</p>
-                                <p class="text-xs text-blue-700 mt-1 safe-wrap"><b>VI:</b> ${esc(a.nonTargetVi || "")}</p>
+                                ${viNote("VI", a.nonTargetVi)}
                             </div>
                         ` : ""}
                     </article>
@@ -658,12 +807,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             } else {
                 app.innerHTML = renderResult();
             }
+            syncMultilang();
         }
 
         document.addEventListener("DOMContentLoaded", () => {
             render();
         });
     </script>
+    <script src="../shared/c10-grammar-support-multilang.js"></script>
+    <script src="../shared/multilang-toggle.js"></script>
     <script src="../shared/learning-enhancements.js"></script>
     <script src="../shared/site-copyright.js"></script>
     <script src="../shared/page-qr.js"></script>

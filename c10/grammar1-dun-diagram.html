@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>문법 1 -던 도식 프로토타입</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --ink: #0f172a;
+            --muted: #475569;
+            --line: #d7dee8;
+            --panel: #ffffff;
+            --soft: #f1f5f9;
+            --past: #d97706;
+            --memory: #0f766e;
+            --present: #2563eb;
+            --future: #7c3aed;
+            --accent: #0f766e;
+            --compare-accent: #0f766e;
+            --accent-soft: #ccfbf1;
+            --shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #ffffff 0%, var(--bg) 58%, #eef6f5 100%);
+            color: var(--ink);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+            letter-spacing: 0;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(215, 222, 232, 0.9);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar__links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .topbar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            padding: 7px 9px;
+            border-radius: 8px;
+            color: #1d4ed8;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .topbar a:hover {
+            background: #eff6ff;
+        }
+
+        .topbar__title {
+            color: #334155;
+            font-size: 0.86rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .shell {
+            width: min(1120px, calc(100% - 28px));
+            margin: 16px auto 36px;
+        }
+
+        .intro {
+            display: grid;
+            grid-template-columns: minmax(0, 1.18fr) minmax(260px, 0.82fr);
+            gap: 16px;
+            align-items: stretch;
+            margin-bottom: 16px;
+        }
+
+        .intro__main,
+        .snapshot,
+        .section,
+        .meaning-panel,
+        .compare-focus {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .intro__main {
+            padding: 20px;
+        }
+
+        .eyebrow {
+            margin: 0 0 8px;
+            color: #0f766e;
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin-top: 0;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: clamp(1.9rem, 4vw, 3.35rem);
+            line-height: 1.06;
+        }
+
+        h2 {
+            margin-bottom: 8px;
+            font-size: clamp(1.35rem, 2.4vw, 2rem);
+            line-height: 1.18;
+        }
+
+        h3 {
+            margin-bottom: 8px;
+            font-size: 1.04rem;
+        }
+
+        .lead {
+            max-width: 760px;
+            margin-bottom: 0;
+            color: var(--muted);
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.75;
+        }
+
+        .formula {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .formula span {
+            display: inline-flex;
+            align-items: center;
+            min-height: 34px;
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #0f172a;
+            font-size: 0.88rem;
+            font-weight: 900;
+        }
+
+        .formula .formula__focus {
+            border-color: #99f6e4;
+            background: #ccfbf1;
+            color: #115e59;
+        }
+
+        .snapshot {
+            display: grid;
+            padding: 16px;
+            align-content: center;
+            background: linear-gradient(135deg, #fefce8 0%, #ffffff 55%, #ecfeff 100%);
+        }
+
+        .snapshot__term {
+            display: inline-flex;
+            width: fit-content;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            background: #0f172a;
+            color: #ffffff;
+            font-size: 0.86rem;
+            font-weight: 900;
+        }
+
+        .snapshot__quote {
+            margin: 0;
+            font-size: clamp(1.35rem, 2.6vw, 2.1rem);
+            font-weight: 950;
+            line-height: 1.18;
+        }
+
+        .snapshot__caption {
+            margin: 12px 0 0;
+            color: #475569;
+            font-size: 0.9rem;
+            font-weight: 700;
+            line-height: 1.6;
+        }
+
+        .section {
+            margin-top: 16px;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.94);
+        }
+
+        .section__head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+
+        .section__head p {
+            max-width: 680px;
+            margin-bottom: 0;
+            color: var(--muted);
+            line-height: 1.68;
+            font-weight: 700;
+        }
+
+        .segmented,
+        .compare-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .segmented button,
+        .compare-controls button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 38px;
+            padding: 8px 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 900;
+            transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+        }
+
+        .segmented button:hover,
+        .compare-controls button:hover,
+        .verb-picker button:hover {
+            transform: translateY(-1px);
+        }
+
+        .segmented button:focus-visible,
+        .compare-controls button:focus-visible,
+        .verb-picker button:focus-visible {
+            outline: 3px solid color-mix(in srgb, var(--accent) 35%, transparent);
+            outline-offset: 2px;
+        }
+
+        .segmented button[aria-pressed="true"] {
+            border-color: var(--accent);
+            background: color-mix(in srgb, var(--accent) 12%, #ffffff);
+            color: #0f172a;
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent);
+        }
+
+        .compare-controls button[aria-pressed="true"] {
+            border-color: var(--compare-accent);
+            background: color-mix(in srgb, var(--compare-accent) 12%, #ffffff);
+            color: #0f172a;
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--compare-accent) 28%, transparent);
+        }
+
+        .diagram-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+            gap: 14px;
+            align-items: stretch;
+        }
+
+        .diagram-stage {
+            position: relative;
+            overflow: hidden;
+            min-height: 360px;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background:
+                linear-gradient(90deg, rgba(217, 119, 6, 0.09) 0%, rgba(15, 118, 110, 0.08) 50%, rgba(37, 99, 235, 0.09) 100%),
+                repeating-linear-gradient(0deg, rgba(148, 163, 184, 0.09) 0 1px, transparent 1px 36px),
+                #ffffff;
+        }
+
+        .diagram-svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            color: var(--accent);
+        }
+
+        .diagram-svg--narrow {
+            display: none;
+        }
+
+        .svg-label {
+            fill: #334155;
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .svg-small {
+            fill: #475569;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .svg-title {
+            fill: #0f172a;
+            font-size: 31px;
+            font-weight: 950;
+        }
+
+        .axis-line {
+            stroke: #475569;
+            stroke-width: 8;
+            stroke-linecap: round;
+        }
+
+        .axis-line--narrow {
+            stroke: #475569;
+        }
+
+        .memory-card {
+            fill: rgba(255, 255, 255, 0.9);
+            stroke: var(--accent);
+            stroke-width: 4;
+            filter: drop-shadow(0 14px 22px color-mix(in srgb, var(--accent) 24%, transparent));
+            transition: stroke 0.22s ease;
+        }
+
+        .memory-tab {
+            fill: var(--accent);
+            transition: fill 0.22s ease;
+        }
+
+        .memory-tab-text {
+            fill: #ffffff;
+            font-size: 16px;
+            font-weight: 950;
+        }
+
+        .speaker-face {
+            fill: #eff6ff;
+            stroke: #bfdbfe;
+            stroke-width: 4;
+            filter: drop-shadow(0 12px 18px rgba(37, 99, 235, 0.16));
+        }
+
+        .speaker-stroke {
+            fill: none;
+            stroke: #1d4ed8;
+            stroke-width: 5;
+            stroke-linecap: round;
+        }
+
+        .speaker-label {
+            fill: #1e3a8a;
+            font-size: 15px;
+            font-weight: 950;
+        }
+
+        .gaze-line {
+            stroke: var(--accent);
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 11 13;
+            marker-end: url(#arrowWide);
+            animation: dashFlow 1.4s linear infinite;
+        }
+
+        .diagram-svg--narrow .gaze-line {
+            marker-end: url(#arrowNarrow);
+        }
+
+        .diagram-mode {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.22s ease, transform 0.22s ease;
+            transform-origin: center;
+        }
+
+        .diagram-stage[data-mode="progress"] .mode-progress,
+        .diagram-stage[data-mode="repeat"] .mode-repeat,
+        .diagram-stage[data-mode="state"] .mode-state {
+            opacity: 1;
+        }
+
+        .diagram-stage[data-mode="progress"] .mode-progress {
+            animation: popIn 0.34s ease both;
+        }
+
+        .diagram-stage[data-mode="repeat"] .mode-repeat {
+            animation: popIn 0.34s ease both;
+        }
+
+        .diagram-stage[data-mode="state"] .mode-state {
+            animation: popIn 0.34s ease both;
+        }
+
+        .progress-track {
+            stroke: #e2e8f0;
+            stroke-width: 19;
+            stroke-linecap: round;
+        }
+
+        .progress-active {
+            stroke: var(--accent);
+            stroke-width: 15;
+            stroke-linecap: round;
+            stroke-dasharray: 242;
+            animation: drawProgress 0.82s ease both;
+        }
+
+        .semantic-solid,
+        .semantic-dashed,
+        .semantic-arrow,
+        .semantic-cut {
+            fill: none;
+            stroke: var(--accent);
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .semantic-solid {
+            stroke-width: 14;
+        }
+
+        .semantic-dashed {
+            stroke-width: 10;
+            stroke-dasharray: 12 12;
+            animation: dashFlow 1.4s linear infinite;
+        }
+
+        .semantic-arrow {
+            stroke-width: 10;
+            marker-end: url(#arrowWide);
+        }
+
+        .semantic-cut {
+            stroke-width: 8;
+        }
+
+        .diagram-svg--narrow .semantic-arrow {
+            marker-end: url(#arrowNarrow);
+        }
+
+        .open-ring {
+            fill: #ffffff;
+            stroke: var(--accent);
+            stroke-width: 6;
+            animation: pulseRing 1.35s ease-in-out infinite;
+        }
+
+        .repeat-dot {
+            fill: var(--accent);
+            transform-origin: center;
+            animation: repeatBlink 1.45s ease-in-out infinite;
+        }
+
+        .repeat-dot:nth-child(2) {
+            animation-delay: 0.12s;
+        }
+
+        .repeat-dot:nth-child(3) {
+            animation-delay: 0.24s;
+        }
+
+        .repeat-dot:nth-child(4) {
+            animation-delay: 0.36s;
+        }
+
+        .repeat-dot:nth-child(5) {
+            animation-delay: 0.48s;
+        }
+
+        .state-house {
+            fill: color-mix(in srgb, var(--accent) 12%, #ffffff);
+            stroke: var(--accent);
+            stroke-width: 4;
+        }
+
+        .state-roof,
+        .state-person,
+        .state-link {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .state-link {
+            stroke-dasharray: 330;
+            animation: drawState 0.95s ease both;
+        }
+
+        .effect-caption {
+            fill: #0f172a;
+            font-size: 18px;
+            font-weight: 950;
+        }
+
+        .meaning-panel {
+            display: grid;
+            gap: 10px;
+            align-content: start;
+            padding: 14px;
+            background: #ffffff;
+        }
+
+        .meaning-chip,
+        .compare-focus__chip {
+            display: inline-flex;
+            width: fit-content;
+            align-items: center;
+            gap: 7px;
+            min-height: 30px;
+            padding: 5px 9px;
+            border-radius: 8px;
+            background: color-mix(in srgb, var(--accent) 12%, #ffffff);
+            color: color-mix(in srgb, var(--accent) 78%, #0f172a);
+            font-size: 0.78rem;
+            font-weight: 950;
+        }
+
+        .compare-focus__chip {
+            background: color-mix(in srgb, var(--compare-accent) 12%, #ffffff);
+            color: color-mix(in srgb, var(--compare-accent) 78%, #0f172a);
+        }
+
+        .meaning-title,
+        .compare-focus__title {
+            margin: 0;
+            font-size: clamp(1.28rem, 2.1vw, 1.72rem);
+            font-weight: 950;
+            line-height: 1.2;
+        }
+
+        .meaning-text,
+        .meaning-example,
+        .compare-focus__text {
+            margin: 0;
+            color: #334155;
+            font-weight: 760;
+            line-height: 1.68;
+        }
+
+        .meaning-example {
+            padding: 10px;
+            border-left: 4px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            background: #f8fafc;
+        }
+
+        .meaning-example b {
+            color: #0f172a;
+        }
+
+        .lens-strip {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .lens-item {
+            min-height: 88px;
+            padding: 10px;
+            border: 1px solid #d7dee8;
+            border-radius: 8px;
+            background: #ffffff;
+            transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lens-item[data-lens="progress"],
+        .lens-item[data-lens="repeat"],
+        .lens-item[data-lens="state"] {
+            border-color: #d7dee8;
+        }
+
+        .diagram-stage[data-mode="progress"] ~ .meaning-panel + .lens-strip .lens-item[data-lens="progress"] {
+            border-color: var(--accent);
+        }
+
+        .lens-item strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #0f172a;
+            font-size: 0.9rem;
+        }
+
+        .lens-item span {
+            color: #475569;
+            font-size: 0.84rem;
+            font-weight: 700;
+            line-height: 1.48;
+        }
+
+        .compare-board {
+            display: grid;
+            gap: 12px;
+        }
+
+        .compare-axis {
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: linear-gradient(90deg, rgba(217, 119, 6, 0.1), rgba(255, 255, 255, 0.95) 49%, rgba(37, 99, 235, 0.1) 56%, rgba(124, 58, 237, 0.1));
+        }
+
+        .compare-svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .compare-svg--narrow {
+            display: none;
+        }
+
+        .compare-line {
+            stroke: #475569;
+            stroke-width: 9;
+            stroke-linecap: round;
+        }
+
+        .compare-line--narrow {
+            stroke: #475569;
+        }
+
+        .compare-pin {
+            opacity: 0;
+            transform-origin: center;
+            transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+
+        .compare-board[data-compare="present"] .pin-present,
+        .compare-board[data-compare="past"] .pin-past,
+        .compare-board[data-compare="dun"] .pin-dun,
+        .compare-board[data-compare="experience"] .pin-experience,
+        .compare-board[data-compare="future"] .pin-future {
+            opacity: 1;
+            transform: scale(1.08);
+        }
+
+        .compare-board[data-compare="dun"] .compare-memory {
+            opacity: 1;
+            animation: popIn 0.35s ease both;
+        }
+
+        .compare-board[data-compare="past"] .past-check,
+        .compare-board[data-compare="experience"] .experience-ring,
+        .compare-board[data-compare="future"] .future-arrow,
+        .compare-board[data-compare="present"] .present-now {
+            opacity: 1;
+        }
+
+        .compare-memory,
+        .past-check,
+        .experience-ring,
+        .future-arrow,
+        .present-now {
+            opacity: 0;
+            transition: none;
+        }
+
+        .pin-circle {
+            fill: #ffffff;
+            stroke-width: 5;
+        }
+
+        .pin-text {
+            fill: #0f172a;
+            font-size: 15px;
+            font-weight: 950;
+        }
+
+        .compare-pin .pin-text {
+            display: none;
+        }
+
+        .compare-semantic-solid,
+        .compare-semantic-dashed,
+        .compare-semantic-cut {
+            fill: none;
+            stroke: var(--compare-accent);
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .compare-semantic-solid {
+            stroke-width: 12;
+        }
+
+        .compare-semantic-dashed {
+            stroke-width: 9;
+            stroke-dasharray: 11 11;
+            animation: dashFlow 1.4s linear infinite;
+        }
+
+        .compare-semantic-cut {
+            stroke-width: 7;
+        }
+
+        .compare-semantic-text {
+            fill: #0f172a;
+            font-size: 16px;
+            font-weight: 950;
+        }
+
+        .compare-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 8px;
+        }
+
+        .compare-card {
+            display: none;
+            min-height: 168px;
+            padding: 12px;
+            border: 1px solid #d7dee8;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .compare-card[aria-pressed="true"] {
+            display: block;
+            border-color: var(--compare-accent);
+            background: color-mix(in srgb, var(--compare-accent) 9%, #ffffff);
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--compare-accent) 32%, transparent);
+        }
+
+        .compare-card__form {
+            display: inline-flex;
+            min-height: 30px;
+            align-items: center;
+            padding: 5px 8px;
+            border-radius: 8px;
+            background: #0f172a;
+            color: #ffffff;
+            font-weight: 950;
+        }
+
+        .compare-card[aria-pressed="true"] .compare-card__form {
+            background: var(--compare-accent);
+        }
+
+        .compare-card__meaning {
+            margin: 10px 0 8px;
+            color: #0f172a;
+            font-size: 0.96rem;
+            font-weight: 950;
+            line-height: 1.35;
+        }
+
+        .compare-card__example {
+            margin: 0;
+            color: #475569;
+            font-size: 0.86rem;
+            font-weight: 720;
+            line-height: 1.55;
+        }
+
+        .compare-focus {
+            display: grid;
+            gap: 8px;
+            padding: 12px;
+            background: #ffffff;
+        }
+
+        .card-lab {
+            display: grid;
+            grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+            gap: 14px;
+        }
+
+        .verb-picker {
+            display: grid;
+            gap: 8px;
+            align-content: start;
+        }
+
+        .verb-picker button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+            min-height: 46px;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            cursor: pointer;
+            font-weight: 950;
+            text-align: left;
+            transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+        }
+
+        .verb-picker button[aria-pressed="true"] {
+            border-color: #2563eb;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .example-table {
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .example-row {
+            display: grid;
+            grid-template-columns: minmax(90px, 0.7fr) minmax(120px, 0.9fr) minmax(0, 1.4fr);
+            min-height: 58px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .example-row:last-child {
+            border-bottom: 0;
+        }
+
+        .example-row > div {
+            display: grid;
+            align-content: center;
+            padding: 10px 12px;
+            line-height: 1.4;
+        }
+
+        .example-row > div + div {
+            border-left: 1px solid #e2e8f0;
+        }
+
+        .example-row__label {
+            color: #475569;
+            font-size: 0.82rem;
+            font-weight: 950;
+        }
+
+        .example-row__form {
+            color: #0f172a;
+            font-size: 1rem;
+            font-weight: 950;
+        }
+
+        .example-row__note {
+            color: #475569;
+            font-size: 0.88rem;
+            font-weight: 730;
+        }
+
+        .example-row[data-focus="dun"] {
+            background: #f0fdfa;
+        }
+
+        .decision-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .decision {
+            min-height: 124px;
+            padding: 12px;
+            border: 1px solid #d7dee8;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .decision strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #0f172a;
+            font-size: 0.94rem;
+        }
+
+        .decision p {
+            margin: 0;
+            color: #475569;
+            font-size: 0.86rem;
+            font-weight: 720;
+            line-height: 1.58;
+        }
+
+        .prototype-note {
+            margin: 16px 0 0;
+            padding: 12px;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            background: #f0f9ff;
+            color: #075985;
+            font-size: 0.88rem;
+            font-weight: 780;
+            line-height: 1.62;
+        }
+
+        @keyframes dashFlow {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: -48; }
+        }
+
+        @keyframes drawProgress {
+            from { stroke-dashoffset: 242; }
+            to { stroke-dashoffset: 64; }
+        }
+
+        @keyframes pulseRing {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.16); opacity: 0.72; }
+        }
+
+        @keyframes repeatBlink {
+            0%, 100% { transform: scale(0.86); opacity: 0.55; }
+            45% { transform: scale(1.2); opacity: 1; }
+        }
+
+        @keyframes drawState {
+            from { stroke-dashoffset: 330; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.96); }
+            to { transform: scale(1); }
+        }
+
+        @media (max-width: 900px) {
+            .intro,
+            .diagram-layout,
+            .card-lab {
+                grid-template-columns: 1fr;
+            }
+
+            .section__head {
+                flex-direction: column;
+            }
+
+            .compare-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .compare-card[data-compare="dun"] {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                width: min(100% - 18px, 1120px);
+                margin-top: 10px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .topbar__links {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 2px;
+            }
+
+            .intro__main,
+            .snapshot,
+            .section {
+                padding: 14px;
+            }
+
+            .segmented {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                width: 100%;
+            }
+
+            .segmented button {
+                justify-content: center;
+                min-width: 0;
+                padding-inline: 7px;
+                font-size: 0.8rem;
+            }
+
+            .diagram-stage {
+                min-height: 0;
+                padding: 8px;
+            }
+
+            .diagram-svg--wide {
+                display: none;
+            }
+
+            .diagram-svg--narrow {
+                display: block;
+            }
+
+            .lens-strip,
+            .decision-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .compare-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .compare-svg--wide {
+                display: none;
+            }
+
+            .compare-svg--narrow {
+                display: block;
+            }
+
+            .compare-card[data-compare="dun"] {
+                grid-column: auto;
+            }
+
+            .compare-controls {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .compare-controls button {
+                justify-content: center;
+                min-width: 0;
+                font-size: 0.8rem;
+            }
+
+            .example-row {
+                grid-template-columns: 1fr;
+            }
+
+            .example-row > div + div {
+                border-left: 0;
+                border-top: 1px solid #e2e8f0;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.001ms !important;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <nav class="topbar" aria-label="페이지 이동">
+        <div class="topbar__links">
+            <a href="../index.html"><i data-lucide="home" aria-hidden="true"></i><span>메인</span></a>
+            <a href="index.html"><i data-lucide="folder-open" aria-hidden="true"></i><span>10과</span></a>
+            <a href="grammar1.html"><i data-lucide="book-open" aria-hidden="true"></i><span>문법 1</span></a>
+        </div>
+        <span class="topbar__title">-던 도식 프로토타입</span>
+    </nav>
+
+    <main class="shell">
+        <section class="intro" aria-labelledby="page-title">
+            <div class="intro__main">
+                <p class="eyebrow">Grammar 1 Diagram</p>
+                <h1 id="page-title">A/V-던</h1>
+                <p class="lead">현재의 화자가 과거의 한 장면을 다시 보면서, 그때 진행 중이었거나 반복되었거나 익숙했던 대상을 꾸밉니다.</p>
+                <div class="formula" aria-label="-던 핵심 공식">
+                    <span>현재 화자</span>
+                    <span>과거 장면 회상</span>
+                    <span class="formula__focus">어간 + 던 + 명사</span>
+                    <span>미완료 · 반복 · 익숙함</span>
+                </div>
+            </div>
+
+            <aside class="snapshot" aria-label="핵심 예문">
+                <span class="snapshot__term"><i data-lucide="scan-eye" aria-hidden="true"></i> 한 문장 감각</span>
+                <p class="snapshot__quote" id="snapshot-quote">읽던 책</p>
+                <p class="snapshot__caption" id="snapshot-caption">지금 책을 보며, 예전에 읽고 있던 장면을 떠올립니다. 다 읽었는지는 아직 말하지 않았습니다.</p>
+            </aside>
+        </section>
+
+        <section class="section" aria-labelledby="core-diagram-title">
+            <div class="section__head">
+                <div>
+                    <p class="eyebrow">Core Diagram</p>
+                    <h2 id="core-diagram-title">현재에서 과거 장면을 다시 보기</h2>
+                    <p>`-던`의 중심은 단순 과거가 아니라 기억 속 장면입니다. 버튼을 누르면 강조되는 위치와 효과가 달라집니다.</p>
+                </div>
+                <div class="segmented" aria-label="예문 선택">
+                    <button type="button" data-scenario="reading" aria-pressed="true"><i data-lucide="book-marked" aria-hidden="true"></i> 읽던 책</button>
+                    <button type="button" data-scenario="cafe" aria-pressed="false"><i data-lucide="coffee" aria-hidden="true"></i> 가던 카페</button>
+                    <button type="button" data-scenario="home" aria-pressed="false"><i data-lucide="home" aria-hidden="true"></i> 살던 집</button>
+                </div>
+            </div>
+
+            <div class="diagram-layout">
+                <div class="diagram-stage" id="diagram-stage" data-mode="progress" aria-label="-던 시간선 도식">
+                    <svg class="diagram-svg diagram-svg--wide" viewBox="0 0 920 420" role="img" aria-label="현재 화자가 과거 기억 장면을 바라보는 -던 도식">
+                        <defs>
+                            <linearGradient id="axisGradientWide" x1="0%" x2="100%">
+                                <stop offset="0%" stop-color="#d97706"></stop>
+                                <stop offset="52%" stop-color="#0f766e"></stop>
+                                <stop offset="100%" stop-color="#2563eb"></stop>
+                            </linearGradient>
+                            <marker id="arrowWide" markerWidth="14" markerHeight="14" refX="10" refY="5" orient="auto">
+                                <path d="M0,0 L10,5 L0,10 Z" fill="currentColor"></path>
+                            </marker>
+                        </defs>
+
+                        <line class="axis-line" x1="75" y1="292" x2="830" y2="292"></line>
+                        <path d="M830 292 L814 282 M830 292 L814 302" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round"></path>
+                        <text class="svg-label" x="75" y="327" fill="#92400e">과거</text>
+                        <text class="svg-label" x="795" y="327" fill="#1d4ed8">현재</text>
+
+                        <rect class="memory-card" x="150" y="80" width="372" height="184" rx="8"></rect>
+                        <rect class="memory-tab" x="174" y="104" width="156" height="40" rx="8"></rect>
+                        <text class="memory-tab-text" x="192" y="130">기억 속 과거 장면</text>
+                        <text class="svg-title" data-scene-title x="184" y="188">어젯밤 읽는 중</text>
+
+                        <g class="diagram-mode mode-progress">
+                            <line class="progress-track" x1="188" y1="220" x2="454" y2="220"></line>
+                            <line class="semantic-solid" x1="188" y1="220" x2="330" y2="220"></line>
+                            <line class="semantic-dashed" x1="330" y1="220" x2="454" y2="220"></line>
+                            <line class="semantic-cut" x1="330" y1="198" x2="330" y2="242"></line>
+                            <circle class="open-ring" cx="454" cy="220" r="16"></circle>
+                            <text class="effect-caption" x="188" y="252">실선 뒤 점선 = 하던 중, 아직 열림</text>
+                        </g>
+
+                        <g class="diagram-mode mode-repeat">
+                            <line class="semantic-dashed" x1="188" y1="220" x2="454" y2="220"></line>
+                            <circle class="repeat-dot" cx="202" cy="220" r="18"></circle>
+                            <circle class="repeat-dot" cx="258" cy="220" r="18"></circle>
+                            <circle class="repeat-dot" cx="314" cy="220" r="18"></circle>
+                            <circle class="repeat-dot" cx="370" cy="220" r="18"></circle>
+                            <circle class="repeat-dot" cx="426" cy="220" r="18"></circle>
+                            <text class="effect-caption" x="190" y="252">점선 위 점들 = 여러 번 반복된 과거</text>
+                        </g>
+
+                        <g class="diagram-mode mode-state">
+                            <path class="state-link" d="M214 224 C278 176 362 176 440 224"></path>
+                            <line class="semantic-solid" x1="206" y1="226" x2="452" y2="226"></line>
+                            <rect class="state-house" x="190" y="180" width="78" height="62" rx="8"></rect>
+                            <path class="state-roof" d="M184 182 L229 145 L274 182"></path>
+                            <path class="state-person" d="M430 177 c18 0 32 14 32 32 M405 238 c10 -24 40 -24 50 0 M430 160 v0"></path>
+                            <text class="effect-caption" x="188" y="264">끊기지 않은 선 = 오래 연결된 장소/상태</text>
+                        </g>
+
+                        <g class="speaker">
+                            <circle class="speaker-face" cx="720" cy="126" r="49"></circle>
+                            <circle class="speaker-stroke" cx="720" cy="112" r="13"></circle>
+                            <path class="speaker-stroke" d="M696 150 c9 -25 39 -25 48 0"></path>
+                            <text class="speaker-label" x="676" y="202">현재의 화자</text>
+                        </g>
+                        <line class="gaze-line" x1="678" y1="145" x2="506" y2="177"></line>
+                        <text class="svg-small" x="598" y="78">현재에서 과거 장면을 다시 봄</text>
+                    </svg>
+
+                    <svg class="diagram-svg diagram-svg--narrow" viewBox="0 0 390 560" role="img" aria-label="모바일 세로형 -던 도식">
+                        <defs>
+                            <linearGradient id="axisGradientNarrow" x1="0%" x2="100%">
+                                <stop offset="0%" stop-color="#d97706"></stop>
+                                <stop offset="54%" stop-color="#0f766e"></stop>
+                                <stop offset="100%" stop-color="#2563eb"></stop>
+                            </linearGradient>
+                            <marker id="arrowNarrow" markerWidth="14" markerHeight="14" refX="10" refY="5" orient="auto">
+                                <path d="M0,0 L10,5 L0,10 Z" fill="currentColor"></path>
+                            </marker>
+                        </defs>
+
+                        <g class="speaker">
+                            <circle class="speaker-face" cx="296" cy="66" r="42"></circle>
+                            <circle class="speaker-stroke" cx="296" cy="54" r="11"></circle>
+                            <path class="speaker-stroke" d="M276 88 c8 -21 32 -21 40 0"></path>
+                            <text class="speaker-label" x="252" y="126">현재의 화자</text>
+                        </g>
+
+                        <line class="gaze-line" x1="270" y1="126" x2="198" y2="184"></line>
+                        <text class="svg-small" x="28" y="58">현재에서</text>
+                        <text class="svg-small" x="28" y="80">과거 장면을 봄</text>
+
+                        <rect class="memory-card" x="38" y="162" width="314" height="196" rx="8"></rect>
+                        <rect class="memory-tab" x="58" y="184" width="146" height="38" rx="8"></rect>
+                        <text class="memory-tab-text" x="74" y="209">기억 속 과거</text>
+                        <text class="svg-title" data-scene-title x="62" y="260">어젯밤 읽는 중</text>
+
+                        <g class="diagram-mode mode-progress">
+                            <line class="progress-track" x1="70" y1="300" x2="302" y2="300"></line>
+                            <line class="semantic-solid" x1="70" y1="300" x2="188" y2="300"></line>
+                            <line class="semantic-dashed" x1="188" y1="300" x2="302" y2="300"></line>
+                            <line class="semantic-cut" x1="188" y1="280" x2="188" y2="320"></line>
+                            <circle class="open-ring" cx="302" cy="300" r="14"></circle>
+                            <text class="effect-caption" x="72" y="334">실선 뒤 점선 = 아직 열림</text>
+                        </g>
+
+                        <g class="diagram-mode mode-repeat">
+                            <line class="semantic-dashed" x1="70" y1="300" x2="302" y2="300"></line>
+                            <circle class="repeat-dot" cx="86" cy="300" r="15"></circle>
+                            <circle class="repeat-dot" cx="136" cy="300" r="15"></circle>
+                            <circle class="repeat-dot" cx="186" cy="300" r="15"></circle>
+                            <circle class="repeat-dot" cx="236" cy="300" r="15"></circle>
+                            <circle class="repeat-dot" cx="286" cy="300" r="15"></circle>
+                            <text class="effect-caption" x="72" y="334">점선과 점 = 여러 번 반복</text>
+                        </g>
+
+                        <g class="diagram-mode mode-state">
+                            <path class="state-link" d="M86 304 C136 256 234 256 286 304"></path>
+                            <line class="semantic-solid" x1="82" y1="306" x2="304" y2="306"></line>
+                            <rect class="state-house" x="70" y="266" width="62" height="52" rx="8"></rect>
+                            <path class="state-roof" d="M65 268 L101 238 L137 268"></path>
+                            <path class="state-person" d="M282 259 c15 0 26 12 26 26 M260 326 c9 -22 36 -22 45 0"></path>
+                            <text class="effect-caption" x="72" y="344">끊기지 않은 선 = 오래 연결됨</text>
+                        </g>
+
+                        <line class="axis-line axis-line--narrow" x1="42" y1="456" x2="340" y2="456"></line>
+                        <path d="M340 456 L325 446 M340 456 L325 466" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round"></path>
+                        <text class="svg-label" x="42" y="494" fill="#92400e">과거</text>
+                        <text class="svg-label" x="296" y="494" fill="#1d4ed8">현재</text>
+                    </svg>
+                </div>
+
+                <aside class="meaning-panel" aria-live="polite">
+                    <span class="meaning-chip" id="meaning-chip"><i data-lucide="circle-dot" aria-hidden="true"></i><span>미완료 진행</span></span>
+                    <h3 class="meaning-title" id="meaning-title">읽던 책</h3>
+                    <p class="meaning-text" id="meaning-text">예전에 읽고 있던 책입니다. 읽기가 끝났다는 뜻은 아직 없습니다.</p>
+                    <p class="meaning-example" id="meaning-example"><b>책상 위에 어젯밤 읽던 책이 있어요.</b><br>어젯밤에 읽다가 멈춘 장면을 현재 다시 봅니다.</p>
+                </aside>
+            </div>
+
+            <div class="lens-strip" aria-label="-던의 세 가지 렌즈">
+                <div class="lens-item" data-lens="progress">
+                    <strong>미완료 진행</strong>
+                    <span>동작이 과거 장면 안에서 열려 있습니다. `먹던 빵`, `읽던 책`</span>
+                </div>
+                <div class="lens-item" data-lens="repeat">
+                    <strong>반복 습관</strong>
+                    <span>과거 구간에 여러 번 있었던 일을 떠올립니다. `자주 가던 식당`</span>
+                </div>
+                <div class="lens-item" data-lens="state">
+                    <strong>익숙했던 상태</strong>
+                    <span>과거에 오래 연결되어 있던 장소나 관계를 말합니다. `살던 집`</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="compare-title">
+            <div class="section__head">
+                <div>
+                    <p class="eyebrow">Contrast Diagram</p>
+                    <h2 id="compare-title">다른 시제 관형형 어미와의 차이</h2>
+                    <p>같은 `읽다`라도 버튼을 누르면 시간선에서 어느 위치와 의미가 켜지는지 바로 볼 수 있습니다.</p>
+                </div>
+                <div class="compare-controls" aria-label="관형형 비교 선택">
+                    <button type="button" data-compare-control="present" aria-pressed="false">읽는 책</button>
+                    <button type="button" data-compare-control="past" aria-pressed="false">읽은 책</button>
+                    <button type="button" data-compare-control="dun" aria-pressed="true">읽던 책</button>
+                    <button type="button" data-compare-control="experience" aria-pressed="false">읽었던 책</button>
+                    <button type="button" data-compare-control="future" aria-pressed="false">읽을 책</button>
+                </div>
+            </div>
+
+            <div class="compare-board" id="compare-board" data-compare="dun">
+                <div class="compare-axis" aria-label="관형형 시간선">
+                    <svg class="compare-svg compare-svg--wide" viewBox="0 0 920 230" role="img" aria-label="관형형 어미 비교 시간선">
+                        <defs>
+                            <linearGradient id="compareGradient" x1="0%" x2="100%">
+                                <stop offset="0%" stop-color="#d97706"></stop>
+                                <stop offset="52%" stop-color="#2563eb"></stop>
+                                <stop offset="100%" stop-color="#7c3aed"></stop>
+                            </linearGradient>
+                        </defs>
+
+                        <text class="svg-label" x="90" y="44" fill="#92400e">과거</text>
+                        <text class="svg-label" x="450" y="44" fill="#1d4ed8">현재</text>
+                        <text class="svg-label" x="772" y="44" fill="#5b21b6">미래</text>
+                        <line class="compare-line" x1="95" y1="114" x2="820" y2="114"></line>
+
+                        <g class="compare-memory">
+                            <rect x="318" y="62" width="176" height="82" rx="8" fill="#f0fdfa" stroke="#0f766e" stroke-width="3"></rect>
+                            <text class="pin-text" x="348" y="96">과거 장면 창</text>
+                            <line class="compare-semantic-solid" x1="340" y1="126" x2="398" y2="126"></line>
+                            <line class="compare-semantic-dashed" x1="398" y1="126" x2="468" y2="126"></line>
+                            <line class="compare-semantic-cut" x1="398" y1="108" x2="398" y2="144"></line>
+                            <path d="M484 72 C560 44 620 46 668 74" fill="none" stroke="#0f766e" stroke-width="4" stroke-dasharray="8 10"></path>
+                            <text class="compare-semantic-text" x="326" y="168">실선+점선 = 미완료 회상</text>
+                        </g>
+
+                        <g class="past-check">
+                            <line class="compare-semantic-solid" x1="178" y1="114" x2="280" y2="114"></line>
+                            <line class="compare-semantic-cut" x1="280" y1="92" x2="280" y2="136"></line>
+                            <path d="M226 87 l18 18 l36 -42" fill="none" stroke="#d97706" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <text class="compare-semantic-text" x="174" y="154">T자 끝 = 완료</text>
+                        </g>
+
+                        <g class="experience-ring">
+                            <line class="compare-semantic-solid" x1="236" y1="114" x2="314" y2="114"></line>
+                            <line class="compare-semantic-cut" x1="314" y1="94" x2="314" y2="134"></line>
+                            <circle cx="290" cy="114" r="38" fill="none" stroke="#9333ea" stroke-width="5" stroke-dasharray="7 9"></circle>
+                            <text class="compare-semantic-text" x="236" y="170">완료 + 회상 고리</text>
+                        </g>
+
+                        <g class="present-now">
+                            <rect x="436" y="70" width="76" height="32" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="3"></rect>
+                            <text class="pin-text" x="454" y="92">지금</text>
+                            <line class="compare-semantic-solid" x1="426" y1="126" x2="520" y2="126"></line>
+                            <path d="M520 126 L500 114 M520 126 L500 138" fill="none" stroke="var(--compare-accent)" stroke-width="7" stroke-linecap="round"></path>
+                            <text class="compare-semantic-text" x="412" y="168">화살표 = 현재 진행/일반</text>
+                        </g>
+
+                        <g class="future-arrow">
+                            <path d="M724 84 C762 78 792 88 822 110" fill="none" stroke="#7c3aed" stroke-width="5" stroke-linecap="round"></path>
+                            <path d="M822 110 l-22 -4 l12 -18" fill="none" stroke="#7c3aed" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <line class="compare-semantic-solid" x1="650" y1="126" x2="810" y2="126"></line>
+                            <path d="M810 126 L790 114 M810 126 L790 138" fill="none" stroke="var(--compare-accent)" stroke-width="7" stroke-linecap="round"></path>
+                            <text class="compare-semantic-text" x="644" y="168">오른쪽 화살표 = 예정</text>
+                        </g>
+
+                        <g class="compare-pin pin-past">
+                            <circle class="pin-circle" cx="238" cy="114" r="18" stroke="#d97706"></circle>
+                            <text class="pin-text" x="212" y="170">완료</text>
+                        </g>
+                        <g class="compare-pin pin-experience">
+                            <circle class="pin-circle" cx="290" cy="114" r="18" stroke="#9333ea"></circle>
+                            <text class="pin-text" x="248" y="194">완료 경험</text>
+                        </g>
+                        <g class="compare-pin pin-dun">
+                            <circle class="pin-circle" cx="384" cy="114" r="18" stroke="#0f766e"></circle>
+                            <text class="pin-text" x="346" y="170">회상 장면</text>
+                        </g>
+                        <g class="compare-pin pin-present">
+                            <circle class="pin-circle" cx="474" cy="114" r="18" stroke="#2563eb"></circle>
+                            <text class="pin-text" x="434" y="194">현재/일반</text>
+                        </g>
+                        <g class="compare-pin pin-future">
+                            <circle class="pin-circle" cx="724" cy="114" r="18" stroke="#7c3aed"></circle>
+                            <text class="pin-text" x="704" y="170">예정</text>
+                        </g>
+                    </svg>
+
+                    <svg class="compare-svg compare-svg--narrow" viewBox="0 0 390 320" role="img" aria-label="모바일 관형형 어미 비교 시간선">
+                        <defs>
+                            <linearGradient id="compareGradientNarrow" x1="0%" x2="100%">
+                                <stop offset="0%" stop-color="#d97706"></stop>
+                                <stop offset="52%" stop-color="#2563eb"></stop>
+                                <stop offset="100%" stop-color="#7c3aed"></stop>
+                            </linearGradient>
+                        </defs>
+
+                        <text class="svg-label" x="32" y="42" fill="#92400e">과거</text>
+                        <text class="svg-label" x="174" y="42" fill="#1d4ed8">현재</text>
+                        <text class="svg-label" x="302" y="42" fill="#5b21b6">미래</text>
+                        <line class="compare-line compare-line--narrow" x1="42" y1="126" x2="340" y2="126"></line>
+
+                        <g class="compare-memory">
+                            <rect x="122" y="66" width="108" height="88" rx="8" fill="#f0fdfa" stroke="#0f766e" stroke-width="3"></rect>
+                            <text class="pin-text" x="142" y="99">과거</text>
+                            <text class="pin-text" x="138" y="120">장면 창</text>
+                            <line class="compare-semantic-solid" x1="136" y1="142" x2="174" y2="142"></line>
+                            <line class="compare-semantic-dashed" x1="174" y1="142" x2="214" y2="142"></line>
+                            <line class="compare-semantic-cut" x1="174" y1="126" x2="174" y2="158"></line>
+                            <path d="M222 72 C252 52 286 54 316 76" fill="none" stroke="#0f766e" stroke-width="4" stroke-dasharray="7 9"></path>
+                            <text class="compare-semantic-text" x="118" y="176">실선+점선</text>
+                        </g>
+
+                        <g class="past-check">
+                            <line class="compare-semantic-solid" x1="38" y1="126" x2="94" y2="126"></line>
+                            <line class="compare-semantic-cut" x1="94" y1="108" x2="94" y2="144"></line>
+                            <path d="M58 100 l14 14 l28 -34" fill="none" stroke="#d97706" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <text class="compare-semantic-text" x="38" y="166">T자 끝 = 완료</text>
+                        </g>
+
+                        <g class="experience-ring">
+                            <line class="compare-semantic-solid" x1="70" y1="126" x2="136" y2="126"></line>
+                            <line class="compare-semantic-cut" x1="136" y1="110" x2="136" y2="142"></line>
+                            <circle cx="104" cy="126" r="34" fill="none" stroke="#9333ea" stroke-width="5" stroke-dasharray="7 9"></circle>
+                            <text class="compare-semantic-text" x="58" y="176">완료+회상</text>
+                        </g>
+
+                        <g class="present-now">
+                            <rect x="186" y="74" width="66" height="32" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="3"></rect>
+                            <text class="pin-text" x="204" y="96">지금</text>
+                            <line class="compare-semantic-solid" x1="180" y1="126" x2="258" y2="126"></line>
+                            <path d="M258 126 L241 116 M258 126 L241 136" fill="none" stroke="var(--compare-accent)" stroke-width="6" stroke-linecap="round"></path>
+                            <text class="compare-semantic-text" x="166" y="176">현재 진행</text>
+                        </g>
+
+                        <g class="future-arrow">
+                            <path d="M292 92 C318 88 338 96 354 116" fill="none" stroke="#7c3aed" stroke-width="5" stroke-linecap="round"></path>
+                            <path d="M354 116 l-18 -4 l10 -15" fill="none" stroke="#7c3aed" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <line class="compare-semantic-solid" x1="262" y1="126" x2="352" y2="126"></line>
+                            <path d="M352 126 L335 116 M352 126 L335 136" fill="none" stroke="var(--compare-accent)" stroke-width="6" stroke-linecap="round"></path>
+                            <text class="compare-semantic-text" x="258" y="176">미래 방향</text>
+                        </g>
+
+                        <g class="compare-pin pin-past">
+                            <circle class="pin-circle" cx="66" cy="126" r="17" stroke="#d97706"></circle>
+                            <text class="pin-text" x="46" y="190">완료</text>
+                        </g>
+                        <g class="compare-pin pin-experience">
+                            <circle class="pin-circle" cx="104" cy="126" r="17" stroke="#9333ea"></circle>
+                            <text class="pin-text" x="68" y="222">완료 경험</text>
+                        </g>
+                        <g class="compare-pin pin-dun">
+                            <circle class="pin-circle" cx="156" cy="126" r="17" stroke="#0f766e"></circle>
+                            <text class="pin-text" x="126" y="190">회상 장면</text>
+                        </g>
+                        <g class="compare-pin pin-present">
+                            <circle class="pin-circle" cx="218" cy="126" r="17" stroke="#2563eb"></circle>
+                            <text class="pin-text" x="186" y="222">현재/일반</text>
+                        </g>
+                        <g class="compare-pin pin-future">
+                            <circle class="pin-circle" cx="312" cy="126" r="17" stroke="#7c3aed"></circle>
+                            <text class="pin-text" x="296" y="190">예정</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="compare-focus" aria-live="polite">
+                    <span class="compare-focus__chip" id="compare-chip"><i data-lucide="scan-line" aria-hidden="true"></i><span>회상 장면</span></span>
+                    <h3 class="compare-focus__title" id="compare-focus-title">읽던 책</h3>
+                    <p class="compare-focus__text" id="compare-focus-text">과거 장면 창이 열립니다. 읽고 있던 중이거나 예전에 반복적으로 읽던 느낌이 중심입니다.</p>
+                </div>
+
+                <div class="compare-grid">
+                    <button class="compare-card" type="button" data-compare="present" aria-pressed="false">
+                        <span class="compare-card__form">V-는 N</span>
+                        <p class="compare-card__meaning">현재 또는 일반 습관</p>
+                        <p class="compare-card__example">`읽는 책`<br>지금 읽거나 평소 읽는 책</p>
+                    </button>
+                    <button class="compare-card" type="button" data-compare="past" aria-pressed="false">
+                        <span class="compare-card__form">V-(으)ㄴ N</span>
+                        <p class="compare-card__meaning">완료된 과거</p>
+                        <p class="compare-card__example">`읽은 책`<br>이미 읽은 책, 완료 중심</p>
+                    </button>
+                    <button class="compare-card" type="button" data-compare="dun" aria-pressed="true">
+                        <span class="compare-card__form">V-던 N</span>
+                        <p class="compare-card__meaning">기억 속 과거 장면</p>
+                        <p class="compare-card__example">`읽던 책`<br>예전에 읽고 있던 책, 완료 여부는 열려 있음</p>
+                    </button>
+                    <button class="compare-card" type="button" data-compare="experience" aria-pressed="false">
+                        <span class="compare-card__form">V-았/었던 N</span>
+                        <p class="compare-card__meaning">과거 완료 경험 회상</p>
+                        <p class="compare-card__example">`읽었던 책`<br>예전에 읽은 경험이 있는 책</p>
+                    </button>
+                    <button class="compare-card" type="button" data-compare="future" aria-pressed="false">
+                        <span class="compare-card__form">V-(으)ㄹ N</span>
+                        <p class="compare-card__meaning">미래 또는 예정</p>
+                        <p class="compare-card__example">`읽을 책`<br>앞으로 읽을 책</p>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="card-title">
+            <div class="section__head">
+                <div>
+                    <p class="eyebrow">Example Cards</p>
+                    <h2 id="card-title">같은 동사로 최소대립 보기</h2>
+                    <p>동사를 바꿔도 `-던`은 완료보다 회상 장면, 반복, 익숙했던 상태를 앞세웁니다.</p>
+                </div>
+            </div>
+
+            <div class="card-lab">
+                <div class="verb-picker" aria-label="동사 선택">
+                    <button type="button" data-verb="read" aria-pressed="true">읽다 <i data-lucide="chevron-right" aria-hidden="true"></i></button>
+                    <button type="button" data-verb="live" aria-pressed="false">살다 <i data-lucide="chevron-right" aria-hidden="true"></i></button>
+                    <button type="button" data-verb="go" aria-pressed="false">가다 <i data-lucide="chevron-right" aria-hidden="true"></i></button>
+                </div>
+
+                <div class="example-table" id="example-table" aria-live="polite"></div>
+            </div>
+
+            <div class="decision-grid" aria-label="-던 판별 질문">
+                <div class="decision">
+                    <strong>1. 지금 말하는 사람이 과거 장면을 떠올리나요?</strong>
+                    <p>그렇다면 `-던` 후보입니다. 현재 장면만 말하면 보통 `-는`이 자연스럽습니다.</p>
+                </div>
+                <div class="decision">
+                    <strong>2. 완료보다 진행·반복·익숙함이 중요한가요?</strong>
+                    <p>읽다가 멈춤, 자주 감, 오래 살았던 상태처럼 장면성이 크면 `-던`이 강합니다.</p>
+                </div>
+                <div class="decision">
+                    <strong>3. 끝까지 했다는 경험을 말하나요?</strong>
+                    <p>완료 경험이면 `-았/었던`이나 `-(으)ㄴ` 쪽으로 옮겨 생각합니다.</p>
+                </div>
+            </div>
+
+            <p class="prototype-note">수업 화면에서는 1단계 핵심 도식으로 감각을 만들고, 2단계 비교 도식에서 `읽은 책 / 읽던 책 / 읽었던 책`을 바로 대조한 뒤, 3단계 예문 카드로 동사를 바꿔 확인합니다.</p>
+        </section>
+    </main>
+
+    <script>
+        const scenarios = {
+            reading: {
+                mode: "progress",
+                accent: "#0f766e",
+                accentSoft: "#ccfbf1",
+                sceneTitle: "어젯밤 읽는 중",
+                chip: "미완료 진행",
+                title: "읽던 책",
+                snapshot: "읽던 책",
+                snapshotCaption: "지금 책을 보며, 예전에 읽고 있던 장면을 떠올립니다. 다 읽었는지는 아직 말하지 않았습니다.",
+                text: "예전에 읽고 있던 책입니다. 읽기가 끝났다는 뜻은 아직 없습니다.",
+                example: "<b>책상 위에 어젯밤 읽던 책이 있어요.</b><br>어젯밤에 읽다가 멈춘 장면을 현재 다시 봅니다."
+            },
+            cafe: {
+                mode: "repeat",
+                accent: "#b45309",
+                accentSoft: "#fef3c7",
+                sceneTitle: "예전에 여러 번 감",
+                chip: "반복 습관",
+                title: "자주 가던 카페",
+                snapshot: "가던 카페",
+                snapshotCaption: "한 번 간 장소보다, 예전에 여러 번 가서 익숙했던 장소라는 느낌이 살아납니다.",
+                text: "과거에 한 번 간 곳이 아니라, 여러 번 가서 익숙했던 장소를 떠올립니다.",
+                example: "<b>학교 앞에 자주 가던 카페가 없어졌어요.</b><br>과거의 반복된 방문 경험을 현재 떠올립니다."
+            },
+            home: {
+                mode: "state",
+                accent: "#2563eb",
+                accentSoft: "#dbeafe",
+                sceneTitle: "전에 오래 살았음",
+                chip: "익숙했던 상태",
+                title: "살던 집",
+                snapshot: "살던 집",
+                snapshotCaption: "과거의 집을 사실로만 말하는 것이 아니라, 오래 연결되어 있던 생활 장면으로 떠올립니다.",
+                text: "과거에 일정 기간 연결되어 있던 집입니다. 사실보다 기억과 익숙함이 앞에 옵니다.",
+                example: "<b>제가 전에 살던 집 근처에 공원이 생겼어요.</b><br>예전 생활 공간을 현재 다시 떠올립니다."
+            }
+        };
+
+        const compareStates = {
+            present: {
+                accent: "#2563eb",
+                chip: "현재/일반",
+                title: "읽는 책",
+                text: "현재 읽고 있거나 평소 읽는 책입니다. 시간선에서 현재 지점이 켜집니다."
+            },
+            past: {
+                accent: "#d97706",
+                chip: "완료된 과거",
+                title: "읽은 책",
+                text: "이미 읽은 책입니다. 과거의 완료 지점에 체크 표시가 찍히는 느낌입니다."
+            },
+            dun: {
+                accent: "#0f766e",
+                chip: "회상 장면",
+                title: "읽던 책",
+                text: "과거 장면 창이 열립니다. 읽고 있던 중이거나 예전에 반복적으로 읽던 느낌이 중심입니다."
+            },
+            experience: {
+                accent: "#9333ea",
+                chip: "완료 경험 회상",
+                title: "읽었던 책",
+                text: "예전에 읽은 경험을 다시 떠올립니다. `-던`보다 완료 경험 쪽이 더 강합니다."
+            },
+            future: {
+                accent: "#7c3aed",
+                chip: "미래/예정",
+                title: "읽을 책",
+                text: "앞으로 읽을 책입니다. 시간선이 미래 방향으로 열립니다."
+            }
+        };
+
+        const examples = {
+            read: [
+                ["V-는 N", "읽는 책", "지금 읽거나 평소 읽는 책"],
+                ["V-(으)ㄴ N", "읽은 책", "이미 읽은 책"],
+                ["V-던 N", "읽던 책", "예전에 읽고 있던 책, 완료 여부는 모름", "dun"],
+                ["V-았/었던 N", "읽었던 책", "예전에 읽은 경험이 있는 책"],
+                ["V-(으)ㄹ N", "읽을 책", "앞으로 읽을 책"]
+            ],
+            live: [
+                ["V-는 N", "사는 집", "지금 살고 있는 집"],
+                ["V-(으)ㄴ N", "산 집", "구입한 집이라는 뜻으로도 읽힘"],
+                ["V-던 N", "살던 집", "예전에 살며 익숙했던 집", "dun"],
+                ["V-았/었던 N", "살았던 집", "예전에 산 적이 있는 집"],
+                ["V-(으)ㄹ N", "살 집", "앞으로 살 집"]
+            ],
+            go: [
+                ["V-는 N", "가는 길", "지금 가는 길"],
+                ["V-(으)ㄴ N", "간 길", "이미 간 길"],
+                ["V-던 N", "가던 길", "전에 가고 있던 길 또는 자주 가던 길", "dun"],
+                ["V-았/었던 N", "갔던 길", "예전에 갔던 경험이 있는 길"],
+                ["V-(으)ㄹ N", "갈 길", "앞으로 갈 길"]
+            ]
+        };
+
+        function setScenario(key) {
+            const data = scenarios[key];
+            if (!data) return;
+
+            document.documentElement.style.setProperty("--accent", data.accent);
+            document.documentElement.style.setProperty("--accent-soft", data.accentSoft);
+            document.getElementById("diagram-stage").dataset.mode = data.mode;
+            document.querySelectorAll("[data-scene-title]").forEach((node) => {
+                node.textContent = data.sceneTitle;
+            });
+            document.querySelector("#meaning-chip span").textContent = data.chip;
+            document.getElementById("meaning-title").textContent = data.title;
+            document.getElementById("meaning-text").textContent = data.text;
+            document.getElementById("meaning-example").innerHTML = data.example;
+            document.getElementById("snapshot-quote").textContent = data.snapshot;
+            document.getElementById("snapshot-caption").textContent = data.snapshotCaption;
+
+            document.querySelectorAll("[data-scenario]").forEach((button) => {
+                button.setAttribute("aria-pressed", String(button.dataset.scenario === key));
+            });
+
+            document.querySelectorAll("[data-lens]").forEach((item) => {
+                const active = item.dataset.lens === data.mode;
+                item.style.borderColor = active ? data.accent : "";
+                item.style.background = active ? data.accentSoft : "";
+                item.style.boxShadow = active ? "inset 0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent)" : "";
+            });
+        }
+
+        function setCompare(key) {
+            const data = compareStates[key];
+            if (!data) return;
+
+            const board = document.getElementById("compare-board");
+            board.dataset.compare = key;
+            document.documentElement.style.setProperty("--compare-accent", data.accent);
+            document.getElementById("compare-chip").querySelector("span").textContent = data.chip;
+            document.getElementById("compare-focus-title").textContent = data.title;
+            document.getElementById("compare-focus-text").textContent = data.text;
+
+            document.querySelectorAll("button[data-compare], [data-compare-control]").forEach((element) => {
+                const value = element.dataset.compare || element.dataset.compareControl;
+                element.setAttribute("aria-pressed", String(value === key));
+            });
+        }
+
+        function renderExamples(key) {
+            const table = document.getElementById("example-table");
+            table.innerHTML = examples[key].map((row) => `
+                <div class="example-row" ${row[3] ? 'data-focus="dun"' : ""}>
+                    <div class="example-row__label">${row[0]}</div>
+                    <div class="example-row__form">${row[1]}</div>
+                    <div class="example-row__note">${row[2]}</div>
+                </div>
+            `).join("");
+
+            document.querySelectorAll("[data-verb]").forEach((button) => {
+                button.setAttribute("aria-pressed", String(button.dataset.verb === key));
+            });
+        }
+
+        document.querySelectorAll("[data-scenario]").forEach((button) => {
+            button.addEventListener("click", () => setScenario(button.dataset.scenario));
+        });
+
+        document.querySelectorAll("button[data-compare]").forEach((button) => {
+            button.addEventListener("click", () => setCompare(button.dataset.compare));
+        });
+
+        document.querySelectorAll("[data-compare-control]").forEach((button) => {
+            button.addEventListener("click", () => setCompare(button.dataset.compareControl));
+        });
+
+        document.querySelectorAll("[data-verb]").forEach((button) => {
+            button.addEventListener("click", () => renderExamples(button.dataset.verb));
+        });
+
+        renderExamples("read");
+        setScenario("reading");
+        setCompare("dun");
+
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    </script>
+    <script src="../shared/learning-enhancements.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>
