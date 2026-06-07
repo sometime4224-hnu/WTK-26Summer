@@ -183,7 +183,8 @@
             box-shadow: 0 20px 32px rgba(79, 70, 229, 0.12);
         }
 
-        .chapter-card.disabled {
+        .chapter-card.disabled,
+        .hub-card.disabled {
             filter: grayscale(1);
             opacity: 0.58;
             cursor: not-allowed;
@@ -443,17 +444,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
             <div class="hub-grid">
-                <a href="review/index.html" class="hub-card hub-card--review">
+                <a href="review/index.html" data-hub="review" class="hub-card hub-card--review">
                     <span class="hub-card__pill"><i class="fa-solid fa-list-check"></i> 복습 퀴즈</span>
                     <h3>복습 퀴즈 허브</h3>
                     <span class="hub-card__foot">퀴즈 고르러 가기 <i class="fa-solid fa-arrow-right"></i></span>
                 </a>
-                <a href="apps/index.html" class="hub-card hub-card--programs">
+                <a href="apps/index.html" data-hub="programs" class="hub-card hub-card--programs">
                     <span class="hub-card__pill"><i class="fa-solid fa-cubes"></i> 공용 프로그램</span>
                     <h3>프로그램 허브</h3>
                     <span class="hub-card__foot">프로그램 보러 가기 <i class="fa-solid fa-arrow-right"></i></span>
                 </a>
-                <a href="c17/rumor-game-next/index.html" class="hub-card hub-card--game">
+                <a href="c17/rumor-game-next/index.html" data-hub="c17-rumor-game" class="hub-card hub-card--game">
                     <span class="hub-card__pill"><i class="fa-solid fa-gamepad"></i> 17과 어휘 보조놀이</span>
                     <h3>소문 무마 게임 NEXT</h3>
                     <span class="hub-card__foot">게임 시작하기 <i class="fa-solid fa-arrow-right"></i></span>
@@ -469,8 +470,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <script>
         (function () {
-            const alwaysReadyChapters = new Set(['c10', 'c11', 'c12', 'c13', 'c14', 'c15', 'c16', 'c17', 'c18']);
-            const notReadyText = '아직 준비 중입니다.';
+            const unlockedChapters = new Set(['c10']);
+            const unlockedHubs = new Set([]);
+            const notReadyText = '수업 진도에 따라 열립니다.';
 
             function markDisabled(card) {
                 if (card.classList.contains('disabled')) return;
@@ -491,7 +493,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (badge) badge.remove();
             }
 
-            function verifyChapterCard(card) {
+            function verifyCard(card) {
                 const target = card.getAttribute('href');
                 if (!target) return;
 
@@ -527,8 +529,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             const chapterCards = document.querySelectorAll('.chapter-card[data-chapter]');
             chapterCards.forEach((card) => {
                 const chapter = (card.dataset.chapter || '').toLowerCase();
-                if (!alwaysReadyChapters.has(chapter)) {
+                if (!unlockedChapters.has(chapter)) {
                     markDisabled(card);
+                } else {
+                    markEnabled(card);
+                }
+            });
+
+            const hubCards = document.querySelectorAll('.hub-card[data-hub]');
+            hubCards.forEach((card) => {
+                const hub = (card.dataset.hub || '').toLowerCase();
+                if (!unlockedHubs.has(hub)) {
+                    markDisabled(card);
+                } else {
+                    markEnabled(card);
                 }
             });
 
@@ -537,7 +551,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
 
             chapterCards.forEach((card) => {
-                verifyChapterCard(card);
+                const chapter = (card.dataset.chapter || '').toLowerCase();
+                if (unlockedChapters.has(chapter)) verifyCard(card);
+            });
+
+            hubCards.forEach((card) => {
+                const hub = (card.dataset.hub || '').toLowerCase();
+                if (unlockedHubs.has(hub)) verifyCard(card);
             });
         })();
     </script>
