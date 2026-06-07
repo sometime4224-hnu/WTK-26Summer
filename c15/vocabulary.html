@@ -222,6 +222,55 @@
         }
         .front-headword-toggle[aria-checked="true"] .front-headword-toggle__switch { background: var(--vocab, #e4582e); }
         .front-headword-toggle[aria-checked="true"] .front-headword-toggle__switch::after { transform: translateX(14px); }
+        .front-headword-size {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 44px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: var(--radius-pill, 999px);
+            padding: 0 8px;
+            background: #fff;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+            transition: opacity 0.14s, border-color 0.14s, color 0.14s, box-shadow 0.14s;
+        }
+        .front-headword-size:not([aria-disabled="true"]) {
+            border-color: #fed7aa;
+            color: var(--vocab, #e4582e);
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+        }
+        .front-headword-size[aria-disabled="true"] {
+            opacity: 0.48;
+        }
+        .front-headword-size__icon { width: 14px; text-align: center; }
+        .front-headword-size__label {
+            min-width: 44px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+        .front-headword-size__btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 50%;
+            background: #f8fafc;
+            color: inherit;
+            cursor: pointer;
+        }
+        .front-headword-size__btn:hover:not(:disabled) {
+            border-color: var(--vocab, #e4582e);
+            background: #fff7ed;
+        }
+        .front-headword-size__btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.38;
+        }
 
         .category-filter { display: flex; flex-wrap: wrap; gap: 6px; }
         .category-btn {
@@ -318,7 +367,7 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            right: 44px;
+            right: 10px;
             z-index: 2;
             display: block;
             border: 1px solid rgba(255, 255, 255, 0.78);
@@ -327,7 +376,7 @@
             background: rgba(255, 255, 255, 0.92);
             color: var(--ink, #172033);
             box-shadow: 0 4px 14px rgba(15, 23, 42, 0.13);
-            font-size: 13px;
+            font-size: var(--front-headword-font-size, 13px);
             font-weight: 900;
             line-height: 1.25;
             text-align: center;
@@ -661,11 +710,12 @@
             .segmented { width: 100%; }
             .segmented button { flex: 1; padding: 0 8px; }
             .control-btn,
-            .front-headword-toggle { flex: 1 1 auto; }
+            .front-headword-toggle,
+            .front-headword-size { flex: 1 1 auto; }
             .word-grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 10px; }
             .word-card__inner { min-height: 160px; }
             .word-card__front { padding: 8px; }
-            .word-card__front-headword { top: 8px; left: 8px; right: 40px; padding: 6px 8px; font-size: 12px; }
+            .word-card__front-headword { top: 8px; left: 8px; right: 8px; padding: 6px 8px; font-size: var(--front-headword-font-size, 13px); }
             .card-action { width: 32px; height: 32px; }
             .card-action--speak { top: 8px; right: 8px; }
             .card-action--flip { right: 8px; bottom: 8px; }
@@ -719,10 +769,20 @@
                 <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                 <input id="search-input" type="search" autocomplete="off" placeholder="어휘 검색" />
             </label>
-            <button id="front-headword-toggle" class="front-headword-toggle" type="button" role="switch" aria-checked="false">
+            <button id="front-headword-toggle" class="front-headword-toggle" type="button" role="switch" aria-checked="true">
                 <span class="front-headword-toggle__switch" aria-hidden="true"></span>
                 <i class="fa-solid fa-tag" aria-hidden="true"></i> 표제어 표시
             </button>
+            <div id="front-headword-size-control" class="front-headword-size" role="group" aria-label="표제어 크기" aria-disabled="false">
+                <i class="fa-solid fa-text-height front-headword-size__icon" aria-hidden="true"></i>
+                <button id="front-headword-size-down" class="front-headword-size__btn" type="button" aria-label="표제어 작게" title="표제어 작게">
+                    <i class="fa-solid fa-minus" aria-hidden="true"></i>
+                </button>
+                <span id="front-headword-size-label" class="front-headword-size__label" aria-live="polite">13px</span>
+                <button id="front-headword-size-up" class="front-headword-size__btn" type="button" aria-label="표제어 크게" title="표제어 크게">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                </button>
+            </div>
             <button id="shuffle-btn" class="control-btn" type="button"><i class="fa-solid fa-shuffle"></i> 섞기</button>
         </section>
 
@@ -1250,6 +1310,8 @@
         const imageCount = words.filter((word) => Boolean(word.image)).length;
         const quizImageCount = words.filter((word) => Boolean(word.quizImage || word.image)).length;
         const availableQuizModes = normalizeQuizModes(cfg.quizModes || ["meaning", "choseong", "image"]);
+        const FRONT_HEADWORD_SIZES = [13, 16, 19, 22];
+        const DEFAULT_FRONT_HEADWORD_SIZE_INDEX = 0;
 
         let currentView = "cards";
         let activeLang = readStored("preferred-lang", cfg.defaultLang || "none");
@@ -1259,7 +1321,11 @@
             .filter((lang) => LANGS[lang]);
         let currentCategory = "all";
         let searchQuery = "";
-        let showFrontHeadword = readStored(`${storagePrefix}-front-headword`, "false") === "true";
+        let showFrontHeadword = readStored(`${storagePrefix}-front-headword`, "true") === "true";
+        let frontHeadwordSizeIndex = Number(readStored(`${storagePrefix}-front-headword-size`, String(DEFAULT_FRONT_HEADWORD_SIZE_INDEX)));
+        if (!Number.isInteger(frontHeadwordSizeIndex) || frontHeadwordSizeIndex < 0 || frontHeadwordSizeIndex >= FRONT_HEADWORD_SIZES.length) {
+            frontHeadwordSizeIndex = DEFAULT_FRONT_HEADWORD_SIZE_INDEX;
+        }
         let quizMode = readStored(`${storagePrefix}-quiz-mode`, availableQuizModes[0] || "meaning");
         if (!availableQuizModes.includes(quizMode)) quizMode = availableQuizModes[0] || "meaning";
         let cardOrder = words.map((_, index) => index);
@@ -1273,6 +1339,10 @@
             categoryFilter: document.getElementById("category-filter"),
             searchInput: document.getElementById("search-input"),
             frontToggle: document.getElementById("front-headword-toggle"),
+            frontSizeControl: document.getElementById("front-headword-size-control"),
+            frontSizeDown: document.getElementById("front-headword-size-down"),
+            frontSizeUp: document.getElementById("front-headword-size-up"),
+            frontSizeLabel: document.getElementById("front-headword-size-label"),
             shuffleBtn: document.getElementById("shuffle-btn"),
             wordGrid: document.getElementById("word-grid"),
             cardsEmpty: document.getElementById("cards-empty"),
@@ -1468,6 +1538,20 @@
 
         function updateFrontHeadwordToggle() {
             els.frontToggle.setAttribute("aria-checked", String(showFrontHeadword));
+            const size = FRONT_HEADWORD_SIZES[frontHeadwordSizeIndex] || FRONT_HEADWORD_SIZES[DEFAULT_FRONT_HEADWORD_SIZE_INDEX];
+            document.documentElement.style.setProperty("--front-headword-font-size", `${size}px`);
+            els.frontSizeLabel.textContent = `${size}px`;
+            els.frontSizeControl.setAttribute("aria-disabled", String(!showFrontHeadword));
+            els.frontSizeDown.disabled = !showFrontHeadword || frontHeadwordSizeIndex <= 0;
+            els.frontSizeUp.disabled = !showFrontHeadword || frontHeadwordSizeIndex >= FRONT_HEADWORD_SIZES.length - 1;
+        }
+
+        function setFrontHeadwordSize(index) {
+            const nextIndex = Math.max(0, Math.min(FRONT_HEADWORD_SIZES.length - 1, index));
+            if (nextIndex === frontHeadwordSizeIndex) return;
+            frontHeadwordSizeIndex = nextIndex;
+            writeStored(`${storagePrefix}-front-headword-size`, String(frontHeadwordSizeIndex));
+            updateFrontHeadwordToggle();
         }
 
         function updateQuizModeButtons() {
@@ -1656,6 +1740,7 @@
             document.getElementById(`${view}-view`).classList.add("active");
             els.shuffleBtn.hidden = view !== "cards";
             els.frontToggle.hidden = view !== "cards";
+            els.frontSizeControl.hidden = view !== "cards";
             render();
         }
 
@@ -1682,6 +1767,8 @@
             renderCards();
             updateFrontHeadwordToggle();
         });
+        els.frontSizeDown.addEventListener("click", () => setFrontHeadwordSize(frontHeadwordSizeIndex - 1));
+        els.frontSizeUp.addEventListener("click", () => setFrontHeadwordSize(frontHeadwordSizeIndex + 1));
         els.shuffleBtn.addEventListener("click", shuffleCards);
         els.nextQuestionBtn.addEventListener("click", nextQuizQuestion);
         document.addEventListener("click", (event) => {
