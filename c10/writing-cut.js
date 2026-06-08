@@ -1075,7 +1075,7 @@ function evaluateSentence(text, cut) {
 function feedbackBlock(type, title, body, extra = '') {
   return `
     <div id="step-feedback" class="feedback ${type}">
-      <strong>${title}</strong>
+      <strong>${String(title).split(' / ')[0]}</strong>
       <div class="feedback-body">${body}</div>
       ${extra}
     </div>
@@ -1086,7 +1086,6 @@ function feedbackLine(ko, vi) {
   return `
     <div class="feedback-line">
       ${escapeHtml(ko)}
-      <div class="feedback-vi">${escapeHtml(vi)}</div>
     </div>
   `;
 }
@@ -1094,7 +1093,7 @@ function feedbackLine(ko, vi) {
 function feedbackModelSentence(sentence) {
   return `
     <div class="feedback-model">
-      <span>모범 문장 / Câu mẫu</span>
+      <span>모범 문장</span>
       ${escapeHtml(sentence)}
     </div>
   `;
@@ -1241,7 +1240,6 @@ function renderProgressActions(chipLabel) {
     <div class="progress-actions">
       <button type="button" class="passage-btn" data-action="open-passage" aria-haspopup="dialog" aria-controls="passage-dialog" aria-expanded="${state.isPassageOpen ? 'true' : 'false'}">
         전체 지문 보기
-        <span>Xem toàn bộ bài đọc</span>
       </button>
       <span class="focus-chip">${chipLabel}</span>
     </div>
