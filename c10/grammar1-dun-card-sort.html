@@ -498,12 +498,12 @@
 
         <details class="teacher-note">
             <summary>원본 보드 보기</summary>
-            <img class="source-board" src="../assets/c10/grammar/images/dun-support/dun-state-cards.webp" alt="-던과 완료 표현을 비교하는 원본 카드 보드">
+            <img class="source-board" src="../assets/c10/grammar/images/dun-support/dun-state-cards.jpg" alt="-던과 완료 표현을 비교하는 원본 카드 보드">
         </details>
     </main>
 
     <script>
-        const SOURCE = "../assets/c10/grammar/images/dun-support/dun-state-cards.webp";
+        const CARD_IMAGE_DIR = "../assets/c10/grammar/images/dun-support/cards";
         const CARDS = [
             { id: "apple-dun", x: 0, row: 0, verb: "먹다", noun: "사과", expression: "먹던 사과", state: "unfinished" },
             { id: "apple-done", x: 1, row: 0, verb: "먹다", noun: "사과", expression: "먹은 사과", state: "completed" },
@@ -523,18 +523,10 @@
             { id: "cook-done", x: 7, row: 1, verb: "끓이다", noun: "찌개", expression: "끓인 찌개", state: "completed" }
         ];
 
-        const sourceImage = new Image();
-        const cropCache = new Map();
         let locations = { bank: [], unfinished: [], completed: [] };
         let selectedId = null;
         let revealAnswers = false;
         let checked = false;
-
-        sourceImage.onload = () => {
-            locations.bank = shuffle([...CARDS.map(card => card.id)]);
-            render();
-        };
-        sourceImage.src = SOURCE;
 
         function iconRefresh() {
             if (window.lucide) window.lucide.createIcons();
@@ -551,22 +543,8 @@
             return CARDS.find(card => card.id === id);
         }
 
-        function makeCrop(card) {
-            if (cropCache.has(card.id)) return cropCache.get(card.id);
-            const cellW = sourceImage.naturalWidth / 8;
-            const rowH = sourceImage.naturalHeight / 2;
-            const sx = card.x * cellW;
-            const sy = card.row * rowH + rowH * 0.18;
-            const sw = cellW;
-            const sh = rowH * 0.68;
-            const canvas = document.createElement("canvas");
-            canvas.width = 360;
-            canvas.height = Math.round(canvas.width * sh / sw);
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(sourceImage, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
-            const url = canvas.toDataURL("image/webp", 0.9);
-            cropCache.set(card.id, url);
-            return url;
+        function cardImage(card) {
+            return `${CARD_IMAGE_DIR}/${card.id}.jpg`;
         }
 
         function whereIs(id) {
@@ -649,7 +627,7 @@
                     ondragstart="dragStart(event, '${id}')"
                     aria-label="${card.verb} ${card.noun} 카드"
                 >
-                    <img src="${makeCrop(card)}" alt="${card.expression} 그림">
+                    <img src="${cardImage(card)}" alt="${card.expression} 그림" decoding="async">
                     <span class="card-meta">
                         <span class="verb-line">${card.verb} + ${card.noun}</span>
                         <span class="expression-line">${showAnswer ? card.expression : "____ " + card.noun}</span>
@@ -703,6 +681,9 @@
             render();
             document.getElementById("scoreLine").textContent = "카드를 다시 섞었습니다. 그림 상태를 보고 분류하세요.";
         }
+
+        locations.bank = shuffle([...CARDS.map(card => card.id)]);
+        render();
     </script>
 </body>
 </html>
