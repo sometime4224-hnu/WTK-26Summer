@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10과 어휘 배치</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --bg: #f6f8fb;
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #dbe3ef;
+            --blue: #2563eb;
+            --green: #16a34a;
+            --red: #dc2626;
+            --shadow: 0 12px 28px rgba(15, 23, 42, 0.09);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+            background:
+                linear-gradient(180deg, #f9fbff 0%, #eef3f8 100%);
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 9px 16px;
+            background: rgba(255, 255, 255, 0.92);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar a,
+        .topbar span {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #334155;
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 800;
+        }
+
+        .topbar a:hover {
+            color: var(--blue);
+        }
+
+        .shell {
+            width: min(1280px, calc(100vw - 24px));
+            margin: 12px auto 26px;
+        }
+
+        .activity-header {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .title-block,
+        .status-strip {
+            min-height: 72px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+        }
+
+        .title-block {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 12px 16px;
+        }
+
+        .eyebrow {
+            margin: 0 0 4px;
+            color: #475569;
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            line-height: 1.2;
+        }
+
+        .status-strip {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+        }
+
+        .stat {
+            min-width: 112px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: var(--surface-soft);
+            border: 1px solid #e5edf6;
+        }
+
+        .stat strong,
+        .stat span {
+            display: block;
+            line-height: 1.2;
+        }
+
+        .stat strong {
+            font-size: 1.22rem;
+            font-weight: 900;
+        }
+
+        .stat span {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .feedback-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 126px;
+            min-height: 40px;
+            padding: 8px 11px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #475569;
+            font-size: 0.84rem;
+            font-weight: 900;
+            transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .feedback-pill.is-correct {
+            border-color: rgba(22, 163, 74, 0.38);
+            background: #f0fdf4;
+            color: #15803d;
+        }
+
+        .feedback-pill.is-wrong {
+            border-color: rgba(220, 38, 38, 0.28);
+            background: #fff1f2;
+            color: #be123c;
+        }
+
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            cursor: pointer;
+        }
+
+        .icon-btn:hover {
+            border-color: #93c5fd;
+            color: var(--blue);
+        }
+
+        .group-view {
+            display: grid;
+            grid-template-columns: 326px 1fr;
+            gap: 12px;
+            min-height: calc(100vh - 132px);
+        }
+
+        .panel {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: var(--shadow);
+        }
+
+        .tray-panel {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            min-height: 48px;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .panel-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 900;
+        }
+
+        .count-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #e0f2fe;
+            color: #075985;
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .card-tray {
+            flex: 1 1 auto;
+            align-content: flex-start;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 260px;
+            max-height: calc(100vh - 192px);
+            padding: 10px;
+            overflow: auto;
+            background: #f8fafc;
+        }
+
+        .zones-panel {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .group-zones {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            height: 100%;
+            padding: 10px;
+        }
+
+        .drop-zone {
+            display: flex;
+            flex-direction: column;
+            min-height: 206px;
+            min-width: 0;
+            border: 2px dashed color-mix(in srgb, var(--zone-color) 42%, #cbd5e1);
+            border-radius: 8px;
+            background:
+                linear-gradient(180deg, color-mix(in srgb, var(--zone-color) 9%, #ffffff) 0%, #ffffff 100%);
+        }
+
+        .drop-zone.is-hot {
+            border-style: solid;
+            background:
+                linear-gradient(180deg, color-mix(in srgb, var(--zone-color) 18%, #ffffff) 0%, #ffffff 100%);
+        }
+
+        .drop-zone.is-hot-right {
+            border-color: rgba(22, 163, 74, 0.7);
+        }
+
+        .drop-zone.is-hot-wrong {
+            border-color: rgba(220, 38, 38, 0.55);
+        }
+
+        .zone-head {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 11px 8px;
+            border-bottom: 1px solid color-mix(in srgb, var(--zone-color) 18%, #e2e8f0);
+        }
+
+        .zone-name {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            font-size: 0.95rem;
+            font-weight: 900;
+        }
+
+        .zone-name-btn {
+            border: 0;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .zone-name-btn:hover {
+            color: var(--zone-color);
+        }
+
+        .zone-term {
+            display: inline-block;
+        }
+
+        .zone-term--ideal {
+            color: #7c3aed;
+        }
+
+        .zone-term--condition {
+            color: #0369a1;
+        }
+
+        .zone-help {
+            position: absolute;
+            z-index: 12;
+            inset: 38px auto auto 10px;
+            width: min(260px, calc(100vw - 42px));
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 16px 28px rgba(15, 23, 42, 0.16);
+        }
+
+        .zone-help[hidden] {
+            display: none;
+        }
+
+        .zone-help strong,
+        .zone-help span {
+            display: block;
+        }
+
+        .zone-help strong {
+            margin-bottom: 6px;
+            color: #0f172a;
+            font-size: 0.84rem;
+        }
+
+        .zone-help span {
+            color: #475569;
+            font-size: 0.78rem;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .zone-help .zone-help-row {
+            display: grid;
+            grid-template-columns: 68px 1fr 1fr;
+            gap: 8px;
+        }
+
+        .zone-help-row b {
+            font-weight: 900;
+        }
+
+        .zone-help .zone-term--ideal {
+            color: #7c3aed;
+        }
+
+        .zone-help .zone-term--condition {
+            color: #0369a1;
+        }
+
+        .zone-help strong .zone-term,
+        .zone-help-row .zone-term {
+            display: inline-block;
+        }
+
+        .zone-dot {
+            flex: 0 0 auto;
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: var(--zone-color);
+        }
+
+        .zone-score {
+            flex: 0 0 auto;
+            color: #475569;
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .zone-body {
+            flex: 1 1 auto;
+            align-content: flex-start;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+            overflow: auto;
+        }
+
+        .word-card {
+            position: relative;
+            flex: 0 0 auto;
+            width: 96px;
+            height: 126px;
+            border: 1px solid #d5deea;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .word-card:active {
+            cursor: grabbing;
+        }
+
+        .word-card.is-correct {
+            border-color: rgba(22, 163, 74, 0.78);
+            box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.13), 0 8px 16px rgba(15, 23, 42, 0.08);
+        }
+
+        .word-card.is-wrong {
+            border-color: rgba(220, 38, 38, 0.72);
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12), 0 8px 16px rgba(15, 23, 42, 0.08);
+        }
+
+        .word-card.is-dragging {
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: 0 22px 36px rgba(15, 23, 42, 0.22);
+            transform: rotate(-1deg);
+        }
+
+        .word-card.is-dragging.is-happy {
+            animation: happy-hop 0.42s ease-in-out infinite alternate;
+            border-color: rgba(22, 163, 74, 0.82);
+        }
+
+        .word-card.is-dragging.is-sweating {
+            animation: awkward-shiver 0.32s ease-in-out infinite;
+            border-color: rgba(220, 38, 38, 0.72);
+        }
+
+        .word-card.is-dragging.is-happy::before,
+        .word-card.is-dragging.is-sweating::before {
+            content: "";
+            position: absolute;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .word-card.is-dragging.is-happy::before {
+            inset: 7px auto auto 7px;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background:
+                radial-gradient(circle at 50% 64%, transparent 0 4px, rgba(22, 163, 74, 0.95) 4.4px 5.8px, transparent 6.2px),
+                #dcfce7;
+            border: 1px solid rgba(22, 163, 74, 0.48);
+        }
+
+        .word-card.is-dragging.is-sweating::before {
+            inset: 7px auto auto 8px;
+            width: 13px;
+            height: 17px;
+            border-radius: 72% 72% 72% 18%;
+            background: #7dd3fc;
+            transform: rotate(20deg);
+            box-shadow: 11px 12px 0 -4px #bae6fd;
+        }
+
+        @keyframes happy-hop {
+            from { transform: translateY(0) rotate(-1deg) scale(1); }
+            to { transform: translateY(-7px) rotate(1deg) scale(1.03); }
+        }
+
+        @keyframes awkward-shiver {
+            0%, 100% { transform: translateX(0) rotate(-1deg); }
+            25% { transform: translateX(-3px) rotate(-3deg); }
+            50% { transform: translateX(2px) rotate(2deg); }
+            75% { transform: translateX(-1px) rotate(-2deg); }
+        }
+
+        .word-card__image {
+            display: block;
+            width: 100%;
+            height: 82px;
+            object-fit: cover;
+            background: #e2e8f0;
+            pointer-events: none;
+        }
+
+        .word-card__label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 43px;
+            padding: 5px;
+            color: #172033;
+            font-size: 0.77rem;
+            font-weight: 900;
+            line-height: 1.18;
+            text-align: center;
+            word-break: keep-all;
+            overflow-wrap: anywhere;
+            pointer-events: none;
+        }
+
+        .word-card::after {
+            content: "";
+            position: absolute;
+            inset: 6px 6px auto auto;
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: var(--card-color, #94a3b8);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.88);
+        }
+
+        .drag-placeholder {
+            flex: 0 0 auto;
+            width: 96px;
+            height: 126px;
+            border: 1px dashed #94a3b8;
+            border-radius: 8px;
+            background: rgba(226, 232, 240, 0.52);
+        }
+
+        .sandbox-view {
+            min-height: calc(100vh - 132px);
+        }
+
+        .sandbox-board {
+            position: relative;
+            height: calc(100vh - 132px);
+            min-height: 560px;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background:
+                linear-gradient(#e6edf6 1px, transparent 1px),
+                linear-gradient(90deg, #e6edf6 1px, transparent 1px),
+                #ffffff;
+            background-size: 28px 28px;
+            box-shadow: var(--shadow);
+        }
+
+        .sandbox-tools {
+            position: absolute;
+            inset: 10px auto auto 10px;
+            z-index: 8;
+            display: flex;
+            gap: 6px;
+            padding: 6px;
+            border: 1px solid #dbe3ef;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 10px 18px rgba(15, 23, 42, 0.1);
+        }
+
+        .relation-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #1f2937;
+            font-size: 1.05rem;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .relation-btn:hover {
+            border-color: #60a5fa;
+            color: var(--blue);
+        }
+
+        .relation-marker {
+            position: absolute;
+            z-index: 6;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 58px;
+            height: 40px;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #172033;
+            font-size: 1.35rem;
+            font-weight: 900;
+            box-shadow: 0 10px 18px rgba(15, 23, 42, 0.14);
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .relation-marker.is-dragging {
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: 0 20px 28px rgba(15, 23, 42, 0.22);
+        }
+
+        .relation-marker[data-type="similar"] {
+            border-style: dotted;
+        }
+
+        .relation-marker[data-type="opposite"] {
+            min-width: 66px;
+            color: #7c2d12;
+            border-color: #f59e0b;
+        }
+
+        .sandbox-board .word-card {
+            position: absolute;
+            width: 112px;
+            height: 138px;
+        }
+
+        .sandbox-board .word-card__image {
+            height: 92px;
+        }
+
+        .sandbox-board .word-card__label {
+            height: 45px;
+            font-size: 0.8rem;
+        }
+
+        .mode-fab {
+            position: fixed;
+            right: 14px;
+            bottom: 14px;
+            z-index: 60;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-width: 0;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            color: #334155;
+            font-size: 0.78rem;
+            font-weight: 900;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.14);
+            cursor: pointer;
+        }
+
+        .mode-fab:hover {
+            border-color: #60a5fa;
+            color: var(--blue);
+        }
+
+        @media (max-width: 980px) {
+            .activity-header {
+                flex-direction: column;
+            }
+
+            .status-strip {
+                justify-content: space-between;
+            }
+
+            .group-view {
+                grid-template-columns: 1fr;
+            }
+
+            .card-tray {
+                max-height: 278px;
+            }
+
+            .group-zones {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                width: min(100vw - 14px, 1280px);
+            }
+
+            .topbar {
+                padding: 9px 10px;
+            }
+
+            .title-block,
+            .status-strip {
+                min-height: 0;
+            }
+
+            h1 {
+                font-size: 1.25rem;
+            }
+
+            .status-strip {
+                flex-wrap: wrap;
+            }
+
+            .stat {
+                flex: 1 1 120px;
+            }
+
+            .group-zones {
+                grid-template-columns: 1fr;
+            }
+
+            .word-card {
+                width: 88px;
+                height: 118px;
+            }
+
+            .word-card__image {
+                height: 76px;
+            }
+
+            .word-card__label {
+                height: 41px;
+                font-size: 0.72rem;
+            }
+
+            .drag-placeholder {
+                width: 88px;
+                height: 118px;
+            }
+
+            .sandbox-board .word-card {
+                width: 96px;
+                height: 126px;
+            }
+
+            .sandbox-board .word-card__image {
+                height: 82px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <nav class="topbar">
+        <a href="index.html"><i class="fa-solid fa-arrow-left"></i><span>10과 목록</span></a>
+        <span>어휘 배치</span>
+        <a href="vocabulary.html"><span>어휘 카드</span><i class="fa-solid fa-layer-group"></i></a>
+    </nav>
+
+    <main class="shell">
+        <header class="activity-header">
+            <div class="title-block">
+                <p class="eyebrow">Vocabulary Board</p>
+                <h1>10과 어휘 배치</h1>
+            </div>
+            <div class="status-strip" aria-live="polite">
+                <div class="stat">
+                    <strong id="score-value">0 / 25</strong>
+                    <span id="score-label">점수</span>
+                </div>
+                <div class="stat">
+                    <strong id="mode-value">묶음</strong>
+                    <span>모드</span>
+                </div>
+                <div id="feedback-pill" class="feedback-pill">카드를 옮겨 보세요</div>
+                <button id="shuffle-btn" class="icon-btn" type="button" aria-label="카드 섞기" title="카드 섞기">
+                    <i class="fa-solid fa-shuffle"></i>
+                </button>
+                <button id="reset-btn" class="icon-btn" type="button" aria-label="초기화" title="초기화">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </button>
+            </div>
+        </header>
+
+        <section id="group-view" class="group-view" aria-label="어휘 묶음 배치">
+            <aside class="panel tray-panel">
+                <div class="panel-head">
+                    <span class="panel-title"><i class="fa-solid fa-grip"></i> 카드</span>
+                    <span id="tray-count" class="count-pill">25</span>
+                </div>
+                <div id="card-tray" class="card-tray" data-drop-target="tray"></div>
+            </aside>
+            <section class="panel zones-panel">
+                <div id="group-zones" class="group-zones"></div>
+            </section>
+        </section>
+
+        <section id="sandbox-view" class="sandbox-view" aria-label="어휘 자유 배치" hidden>
+            <div id="sandbox-board" class="sandbox-board">
+                <div class="sandbox-tools" aria-label="관계 아이콘">
+                    <button class="relation-btn" type="button" data-relation-type="same" aria-label="같다" title="같다">=</button>
+                    <button class="relation-btn" type="button" data-relation-type="similar" aria-label="비슷하다" title="비슷하다">≒</button>
+                    <button class="relation-btn" type="button" data-relation-type="opposite" aria-label="반대다" title="반대다">↔</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <button id="mode-toggle" class="mode-fab" type="button">
+        <i class="fa-solid fa-map"></i>
+        <span id="mode-toggle-label">샌드박스</span>
+    </button>
+
+    <script>
+    (() => {
+        "use strict";
+
+        const groups = [
+            { id: "meeting", label: "첫 만남", color: "#0ea5e9", help: true },
+            { id: "feeling", label: "호감·감정", color: "#f43f5e", help: true },
+            { id: "relationship", label: "연애 관계", color: "#8b5cf6", help: true },
+            { id: "match", label: "이상형 조건", color: "#14b8a6", help: true },
+            { id: "action", label: "행동 표현", color: "#f59e0b", help: true },
+            { id: "marriage", label: "결혼", color: "#2563eb", help: true }
+        ];
+
+        const groupHelp = {
+            meeting: [
+                ["한국어", "첫 만남"],
+                ["영어", "dating introductions"],
+                ["베트남어", "buổi gặp đầu để hẹn hò"],
+                ["아랍어", "لقاء تعارف عاطفي"],
+                ["몽골어", "болзооны анхны танилцалт"],
+                ["카자흐어", "танысуға арналған алғашқы кездесу"],
+                ["태국어", "การพบกันครั้งแรกเพื่อคบกัน"]
+            ],
+            feeling: [
+                ["한국어", "호감·감정"],
+                ["영어", "romantic attraction and feelings"],
+                ["베트남어", "thiện cảm và cảm xúc yêu đương"],
+                ["아랍어", "الإعجاب والمشاعر العاطفية"],
+                ["몽골어", "таалагдах сэтгэл ба мэдрэмж"],
+                ["카자흐어", "ұнату сезімі және эмоциялар"],
+                ["태국어", "ความรู้สึกชอบและความรู้สึกทางใจ"]
+            ],
+            relationship: [
+                ["한국어", "연애 관계"],
+                ["영어", "dating relationship"],
+                ["베트남어", "mối quan hệ hẹn hò yêu đương"],
+                ["아랍어", "علاقة مواعدة أو حب"],
+                ["몽골어", "үерхлийн харилцаа"],
+                ["카자흐어", "кездесіп жүру қарым-қатынасы"],
+                ["태국어", "ความสัมพันธ์แบบคบกัน"]
+            ],
+            match: [
+                ["한국어", "이상형", "조건"],
+                ["영어", "ideal partner", "desired qualities"],
+                ["베트남어", "mẫu người lý tưởng", "tiêu chí"],
+                ["아랍어", "الشريك المثالي", "الشروط"],
+                ["몽골어", "идеал хань", "шалгуур"],
+                ["카자흐어", "мінсіз серік", "талаптар"],
+                ["태국어", "คนในอุดมคติ", "คุณสมบัติ"]
+            ],
+            action: [
+                ["한국어", "행동 표현"],
+                ["영어", "romantic actions and gestures"],
+                ["베트남어", "hành động trong tình yêu"],
+                ["아랍어", "تصرفات عاطفية"],
+                ["몽골어", "хайрын үйлдэл"],
+                ["카자흐어", "сезімді білдіретін әрекеттер"],
+                ["태국어", "การกระทำที่แสดงความรัก"]
+            ],
+            marriage: [
+                ["한국어", "결혼"],
+                ["영어", "marriage and wedding"],
+                ["베트남어", "hôn nhân và đám cưới"],
+                ["아랍어", "الزواج وحفل الزفاف"],
+                ["몽골어", "гэрлэлт ба хурим"],
+                ["카자흐어", "неке және үйлену тойы"],
+                ["태국어", "การแต่งงานและพิธีแต่งงาน"]
+            ]
+        };
+
+        const relationTypes = {
+            same: { label: "같다", symbol: "=" },
+            similar: { label: "비슷하다", symbol: "≒" },
+            opposite: { label: "반대다", symbol: "↔" }
+        };
+
+        const words = [
+            { id: "c10-vocab-11", ko: "소개팅하다", group: "meeting", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_11_blind_date.webp" },
+            { id: "c10-vocab-18", ko: "첫눈에 반하다", group: "feeling", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_18_love_at_first_sight_v2.webp" },
+            { id: "c10-vocab-08", ko: "사귀다", group: "relationship", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_08_date_v2.webp" },
+            { id: "c10-vocab-07", ko: "사랑에 빠지다", group: "feeling", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_07_fall_in_love.webp" },
+            { id: "c10-vocab-01", ko: "고백하다", group: "feeling", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_01_confess.webp" },
+            { id: "c10-vocab-15", ko: "연애하다", group: "relationship", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_15_relationship_v2.webp" },
+            { id: "c10-vocab-10", ko: "선보다", group: "meeting", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_10_matchmaking_v2.webp" },
+            { id: "c10-vocab-20", ko: "청혼하다", group: "marriage", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_20_propose.webp" },
+            { id: "c10-vocab-09", ko: "성격(마음)이 잘 맞다", group: "match", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_09_good_match.webp" },
+            { id: "c10-vocab-17", ko: "조건이 맞다", group: "match", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_17_conditions_match.webp" },
+            { id: "c10-vocab-06", ko: "매력이 있다", group: "feeling", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_06_charming.webp" },
+            { id: "c10-vocab-05", ko: "말(생각)이 잘 통하다", group: "match", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_05_understand.webp" },
+            { id: "c10-vocab-16", ko: "인상이 좋다", group: "match", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_16_good_impression_v2.webp" },
+            { id: "c10-vocab-04", ko: "마음씨가 착하다", group: "match", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_04_kind_heart_v2.webp" },
+            { id: "c10-vocab-03", ko: "나란히 앉다", group: "action", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_03_side_by_side.webp" },
+            { id: "c10-vocab-12", ko: "손을 잡다", group: "action", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_12_hold_hands.webp" },
+            { id: "c10-vocab-14", ko: "얼굴이 빨개지다", group: "feeling", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_14_blush.webp" },
+            { id: "c10-vocab-13", ko: "어깨에 기대다", group: "action", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_13_lean_shoulder.webp" },
+            { id: "c10-vocab-19", ko: "팔짱을 끼다", group: "action", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_19_arm_in_arm.webp" },
+            { id: "c10-vocab-02", ko: "가슴이 두근거리다", group: "feeling", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_02_heart_pounding.webp" },
+            { id: "c10-vocab-21", ko: "신혼여행", group: "marriage", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_21_honeymoon.webp" },
+            { id: "c10-vocab-22", ko: "중매결혼", group: "marriage", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_22_arranged_marriage.webp" },
+            { id: "c10-vocab-23", ko: "연애결혼", group: "marriage", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_23_love_marriage.webp" },
+            { id: "c10-vocab-24", ko: "청첩장", group: "marriage", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_24_wedding_invitation.webp" },
+            { id: "c10-vocab-25", ko: "예식장", group: "marriage", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_25_wedding_hall.webp" }
+        ];
+
+        const wordById = new Map(words.map((word) => [word.id, word]));
+        const groupById = new Map(groups.map((group) => [group.id, group]));
+        const placements = Object.fromEntries(words.map((word) => [word.id, null]));
+        let trayOrder = words.map((word) => word.id);
+        let sandboxPositions = {};
+        let relationMarkers = [];
+        let nextRelationId = 1;
+        let mode = "group";
+        let drag = null;
+
+        const els = {
+            scoreValue: document.getElementById("score-value"),
+            scoreLabel: document.getElementById("score-label"),
+            modeValue: document.getElementById("mode-value"),
+            feedbackPill: document.getElementById("feedback-pill"),
+            shuffleBtn: document.getElementById("shuffle-btn"),
+            resetBtn: document.getElementById("reset-btn"),
+            trayCount: document.getElementById("tray-count"),
+            tray: document.getElementById("card-tray"),
+            groupView: document.getElementById("group-view"),
+            groupZones: document.getElementById("group-zones"),
+            sandboxView: document.getElementById("sandbox-view"),
+            sandboxBoard: document.getElementById("sandbox-board"),
+            modeToggle: document.getElementById("mode-toggle"),
+            modeToggleLabel: document.getElementById("mode-toggle-label")
+        };
+
+        function escapeHtml(value) {
+            return String(value || "").replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[char]);
+        }
+
+        function groupColor(groupId) {
+            return groupById.get(groupId)?.color || "#94a3b8";
+        }
+
+        function zoneNameMarkup(group) {
+            const help = groupHelp[group.id] || [];
+            const label = group.id === "match"
+                ? `<span class="zone-term zone-term--ideal">이상형</span> <span class="zone-term zone-term--condition">조건</span>`
+                : escapeHtml(group.label);
+            const name = `
+                <span class="zone-name">
+                    <span class="zone-dot"></span>${label}
+                </span>
+            `;
+            if (!group.help) return name;
+            return `
+                <button class="zone-name zone-name-btn" type="button" data-zone-help="${escapeHtml(group.id)}" aria-expanded="false">
+                    <span class="zone-dot"></span>${label}
+                </button>
+                <div class="zone-help" data-zone-help-panel="${escapeHtml(group.id)}" hidden>
+                    <strong>${label}</strong>
+                    ${help.map((row) => {
+                        const [lang, first, second] = row;
+                        if (second) {
+                            return `
+                                <span class="zone-help-row">
+                                    <b>${escapeHtml(lang)}</b>
+                                    <span class="zone-term zone-term--ideal">${escapeHtml(first)}</span>
+                                    <span class="zone-term zone-term--condition">${escapeHtml(second)}</span>
+                                </span>
+                            `;
+                        }
+                        return `<span><b>${escapeHtml(lang)}</b> · ${escapeHtml(first)}</span>`;
+                    }).join("")}
+                </div>
+            `;
+        }
+
+        function createCard(word, placedGroup = null) {
+            const card = document.createElement("article");
+            card.className = "word-card";
+            if (placedGroup && placedGroup === word.group) card.classList.add("is-correct");
+            if (placedGroup && placedGroup !== word.group) card.classList.add("is-wrong");
+            card.dataset.wordId = word.id;
+            card.style.setProperty("--card-color", groupColor(word.group));
+            card.setAttribute("role", "button");
+            card.setAttribute("tabindex", "0");
+            card.setAttribute("aria-label", word.ko);
+            card.innerHTML = `
+                <img class="word-card__image" src="${escapeHtml(word.image)}" alt="${escapeHtml(word.ko)} 그림 카드" draggable="false" />
+                <span class="word-card__label">${escapeHtml(word.ko)}</span>
+            `;
+            return card;
+        }
+
+        function createRelationMarker(marker) {
+            const relation = relationTypes[marker.type] || relationTypes.same;
+            const el = document.createElement("button");
+            el.className = "relation-marker";
+            el.type = "button";
+            el.dataset.markerId = marker.id;
+            el.dataset.type = marker.type;
+            el.setAttribute("aria-label", relation.label);
+            el.title = relation.label;
+            el.textContent = relation.symbol;
+            el.style.left = `${marker.x}px`;
+            el.style.top = `${marker.y}px`;
+            return el;
+        }
+
+        function score() {
+            return words.filter((word) => placements[word.id] === word.group).length;
+        }
+
+        function updateStatus() {
+            if (mode === "group") {
+                els.scoreValue.textContent = `${score()} / ${words.length}`;
+                els.scoreLabel.textContent = "점수";
+                els.modeValue.textContent = "묶음";
+                els.shuffleBtn.hidden = false;
+                els.modeToggleLabel.textContent = "샌드박스";
+                if (!els.feedbackPill.textContent.trim()) setFeedback("카드를 옮겨 보세요");
+            } else {
+                els.scoreValue.textContent = `${words.length}`;
+                els.scoreLabel.textContent = "카드";
+                els.modeValue.textContent = "자유";
+                els.shuffleBtn.hidden = true;
+                els.modeToggleLabel.textContent = "묶음";
+                setFeedback("관계 아이콘을 추가하세요");
+            }
+        }
+
+        function setFeedback(message, state = "") {
+            els.feedbackPill.textContent = message;
+            els.feedbackPill.classList.toggle("is-correct", state === "correct");
+            els.feedbackPill.classList.toggle("is-wrong", state === "wrong");
+        }
+
+        function renderGroupMode() {
+            els.tray.innerHTML = "";
+            els.groupZones.innerHTML = "";
+
+            const unplacedIds = trayOrder.filter((id) => !placements[id]);
+            unplacedIds.forEach((id) => {
+                els.tray.appendChild(createCard(wordById.get(id)));
+            });
+            els.trayCount.textContent = String(unplacedIds.length);
+
+            groups.forEach((group) => {
+                const zone = document.createElement("section");
+                zone.className = "drop-zone";
+                zone.dataset.zoneId = group.id;
+                zone.style.setProperty("--zone-color", group.color);
+
+                const placedWords = words.filter((word) => placements[word.id] === group.id);
+                const correct = placedWords.filter((word) => word.group === group.id).length;
+                const total = words.filter((word) => word.group === group.id).length;
+
+                zone.innerHTML = `
+                    <div class="zone-head">
+                        ${zoneNameMarkup(group)}
+                        <span class="zone-score">${correct} / ${total}</span>
+                    </div>
+                    <div class="zone-body"></div>
+                `;
+                const body = zone.querySelector(".zone-body");
+                placedWords.forEach((word) => body.appendChild(createCard(word, group.id)));
+                els.groupZones.appendChild(zone);
+            });
+
+            updateStatus();
+        }
+
+        function computeSandboxPositions() {
+            const boardWidth = Math.max(320, els.sandboxBoard.clientWidth);
+            const cardWidth = boardWidth <= 640 ? 96 : 112;
+            const cardHeight = boardWidth <= 640 ? 126 : 138;
+            const gap = boardWidth <= 640 ? 10 : 12;
+            const left = 16;
+            const top = 16;
+            const cols = Math.max(2, Math.floor((boardWidth - left * 2 + gap) / (cardWidth + gap)));
+
+            sandboxPositions = {};
+            words.forEach((word, index) => {
+                const col = index % cols;
+                const row = Math.floor(index / cols);
+                sandboxPositions[word.id] = {
+                    x: left + col * (cardWidth + gap),
+                    y: top + row * (cardHeight + gap)
+                };
+            });
+        }
+
+        function renderSandboxMode() {
+            els.sandboxBoard.querySelectorAll(".word-card, .relation-marker").forEach((node) => node.remove());
+            if (!Object.keys(sandboxPositions).length) computeSandboxPositions();
+
+            words.forEach((word) => {
+                const card = createCard(word);
+                const pos = sandboxPositions[word.id] || { x: 16, y: 16 };
+                card.style.left = `${pos.x}px`;
+                card.style.top = `${pos.y}px`;
+                els.sandboxBoard.appendChild(card);
+            });
+            relationMarkers.forEach((marker) => {
+                els.sandboxBoard.appendChild(createRelationMarker(marker));
+            });
+
+            updateStatus();
+        }
+
+        function render() {
+            const isGroup = mode === "group";
+            els.groupView.hidden = !isGroup;
+            els.sandboxView.hidden = isGroup;
+            if (isGroup) renderGroupMode();
+            else requestAnimationFrame(renderSandboxMode);
+        }
+
+        function shuffleTray() {
+            const unplaced = trayOrder.filter((id) => !placements[id]);
+            for (let i = unplaced.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [unplaced[i], unplaced[j]] = [unplaced[j], unplaced[i]];
+            }
+            const placed = trayOrder.filter((id) => placements[id]);
+            trayOrder = [...unplaced, ...placed];
+            renderGroupMode();
+            setFeedback("카드를 섞었습니다");
+        }
+
+        function resetCurrentMode() {
+            if (mode === "group") {
+                words.forEach((word) => { placements[word.id] = null; });
+                trayOrder = words.map((word) => word.id);
+                renderGroupMode();
+                setFeedback("카드를 옮겨 보세요");
+                return;
+            }
+            relationMarkers = [];
+            nextRelationId = 1;
+            computeSandboxPositions();
+            renderSandboxMode();
+            setFeedback("관계 아이콘을 추가하세요");
+        }
+
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        function beginDrag(event, card) {
+            const rect = card.getBoundingClientRect();
+            const placeholder = mode === "group" ? document.createElement("div") : null;
+            if (placeholder) {
+                placeholder.className = "drag-placeholder";
+                placeholder.style.width = `${rect.width}px`;
+                placeholder.style.height = `${rect.height}px`;
+                card.parentElement.insertBefore(placeholder, card);
+            }
+
+            drag = {
+                card,
+                placeholder,
+                wordId: card.dataset.wordId,
+                sourceGroup: placements[card.dataset.wordId],
+                offsetX: event.clientX - rect.left,
+                offsetY: event.clientY - rect.top,
+                width: rect.width,
+                height: rect.height
+            };
+
+            card.classList.add("is-dragging");
+            card.style.position = "fixed";
+            card.style.width = `${rect.width}px`;
+            card.style.height = `${rect.height}px`;
+            card.style.left = `${rect.left}px`;
+            card.style.top = `${rect.top}px`;
+            document.body.appendChild(card);
+            moveDrag(event);
+        }
+
+        function beginMarkerDrag(event, marker) {
+            const rect = marker.getBoundingClientRect();
+            drag = {
+                card: marker,
+                markerId: marker.dataset.markerId,
+                offsetX: event.clientX - rect.left,
+                offsetY: event.clientY - rect.top,
+                width: rect.width,
+                height: rect.height
+            };
+
+            marker.classList.add("is-dragging");
+            marker.style.position = "fixed";
+            marker.style.width = `${rect.width}px`;
+            marker.style.height = `${rect.height}px`;
+            marker.style.left = `${rect.left}px`;
+            marker.style.top = `${rect.top}px`;
+            document.body.appendChild(marker);
+            moveDrag(event);
+        }
+
+        function moveDrag(event) {
+            if (!drag) return;
+            drag.card.style.left = `${event.clientX - drag.offsetX}px`;
+            drag.card.style.top = `${event.clientY - drag.offsetY}px`;
+
+            if (mode !== "group") return;
+            drag.card.classList.remove("is-happy", "is-sweating");
+            document.querySelectorAll(".drop-zone.is-hot").forEach((zone) => zone.classList.remove("is-hot", "is-hot-right", "is-hot-wrong"));
+            const target = document.elementFromPoint(event.clientX, event.clientY);
+            const zone = target?.closest?.(".drop-zone");
+            if (!zone) return;
+
+            const isRightGroup = wordById.get(drag.wordId)?.group === zone.dataset.zoneId;
+            zone.classList.add("is-hot", isRightGroup ? "is-hot-right" : "is-hot-wrong");
+            drag.card.classList.add(isRightGroup ? "is-happy" : "is-sweating");
+        }
+
+        function endGroupDrag(event) {
+            const target = document.elementFromPoint(event.clientX, event.clientY);
+            const zone = target?.closest?.(".drop-zone");
+            const tray = target?.closest?.("#card-tray, .tray-panel");
+            const word = wordById.get(drag.wordId);
+            let feedback = null;
+            if (zone) {
+                placements[drag.wordId] = zone.dataset.zoneId;
+                const group = groupById.get(zone.dataset.zoneId);
+                const isCorrect = word?.group === zone.dataset.zoneId;
+                feedback = {
+                    message: isCorrect ? `정답! ${group?.label || ""} 묶음입니다.` : `다시 생각해 봐요. ‘${word?.ko || "이 카드"}’는 다른 묶음이에요.`,
+                    state: isCorrect ? "correct" : "wrong"
+                };
+            } else if (tray) {
+                placements[drag.wordId] = null;
+                feedback = { message: "카드를 다시 가져왔습니다.", state: "" };
+            } else {
+                placements[drag.wordId] = drag.sourceGroup || null;
+            }
+            renderGroupMode();
+            if (feedback) setFeedback(feedback.message, feedback.state);
+        }
+
+        function endSandboxDrag(event) {
+            const boardRect = els.sandboxBoard.getBoundingClientRect();
+            const x = event.clientX - drag.offsetX - boardRect.left;
+            const y = event.clientY - drag.offsetY - boardRect.top;
+            const nextPosition = {
+                x: clamp(x, 0, Math.max(0, boardRect.width - drag.width)),
+                y: clamp(y, 0, Math.max(0, boardRect.height - drag.height))
+            };
+            if (drag.markerId) {
+                const marker = relationMarkers.find((item) => item.id === drag.markerId);
+                if (marker) Object.assign(marker, nextPosition);
+            } else {
+                sandboxPositions[drag.wordId] = nextPosition;
+            }
+            renderSandboxMode();
+        }
+
+        function endDrag(event) {
+            if (!drag) return;
+            const current = drag;
+            if (current.placeholder) current.placeholder.remove();
+            current.card.classList.remove("is-happy", "is-sweating");
+            current.card.remove();
+            document.querySelectorAll(".drop-zone.is-hot").forEach((zone) => zone.classList.remove("is-hot", "is-hot-right", "is-hot-wrong"));
+            if (mode === "group") endGroupDrag(event);
+            else endSandboxDrag(event);
+            drag = null;
+        }
+
+        function addRelationMarker(type) {
+            const markerType = relationTypes[type] ? type : "same";
+            const index = relationMarkers.length;
+            relationMarkers.push({
+                id: `relation-${nextRelationId++}`,
+                type: markerType,
+                x: 18 + (index % 3) * 78,
+                y: 70 + Math.floor(index / 3) * 52
+            });
+            renderSandboxMode();
+            setFeedback(`${relationTypes[markerType].label} 아이콘을 추가했습니다`);
+        }
+
+        document.addEventListener("pointerdown", (event) => {
+            const marker = event.target.closest(".relation-marker");
+            if (marker && mode === "sandbox" && !drag) {
+                event.preventDefault();
+                beginMarkerDrag(event, marker);
+                return;
+            }
+
+            const card = event.target.closest(".word-card");
+            if (!card || drag) return;
+            event.preventDefault();
+            beginDrag(event, card);
+        });
+
+        window.addEventListener("pointermove", (event) => {
+            if (!drag) return;
+            event.preventDefault();
+            moveDrag(event);
+        }, { passive: false });
+
+        window.addEventListener("pointerup", (event) => {
+            if (!drag) return;
+            event.preventDefault();
+            endDrag(event);
+        }, { passive: false });
+
+        els.shuffleBtn.addEventListener("click", shuffleTray);
+        els.resetBtn.addEventListener("click", resetCurrentMode);
+        els.groupZones.addEventListener("click", (event) => {
+            const trigger = event.target.closest("[data-zone-help]");
+            if (!trigger) return;
+            const id = trigger.dataset.zoneHelp;
+            const panel = els.groupZones.querySelector(`[data-zone-help-panel="${CSS.escape(id)}"]`);
+            if (!panel) return;
+            const willOpen = panel.hidden;
+            els.groupZones.querySelectorAll("[data-zone-help-panel]").forEach((item) => { item.hidden = true; });
+            els.groupZones.querySelectorAll("[data-zone-help]").forEach((item) => item.setAttribute("aria-expanded", "false"));
+            panel.hidden = !willOpen;
+            trigger.setAttribute("aria-expanded", String(willOpen));
+        });
+        els.modeToggle.addEventListener("click", () => {
+            mode = mode === "group" ? "sandbox" : "group";
+            render();
+            setFeedback(mode === "group" ? "카드를 옮겨 보세요" : "관계 아이콘을 추가하세요");
+        });
+        els.sandboxBoard.addEventListener("click", (event) => {
+            const button = event.target.closest("[data-relation-type]");
+            if (!button || mode !== "sandbox") return;
+            addRelationMarker(button.dataset.relationType);
+        });
+
+        window.addEventListener("resize", () => {
+            if (mode !== "sandbox") return;
+            computeSandboxPositions();
+            renderSandboxMode();
+        });
+
+        render();
+    })();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>

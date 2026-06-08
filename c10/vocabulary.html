@@ -935,6 +935,10 @@
                         label: "연애 관계"
                 },
                 {
+                        id: "marriage",
+                        label: "결혼"
+                },
+                {
                         id: "action",
                         label: "행동 표현"
                 },
@@ -942,6 +946,34 @@
                         id: "match",
                         label: "조건·인상"
                 }
+        ],
+        // 서울대 한국어 3B Student's Book 24~25쪽의 시각적 배치 순서입니다.
+        defaultWordOrder: [
+                "c10-vocab-11",
+                "c10-vocab-18",
+                "c10-vocab-08",
+                "c10-vocab-07",
+                "c10-vocab-01",
+                "c10-vocab-15",
+                "c10-vocab-10",
+                "c10-vocab-20",
+                "c10-vocab-09",
+                "c10-vocab-17",
+                "c10-vocab-06",
+                "c10-vocab-05",
+                "c10-vocab-16",
+                "c10-vocab-04",
+                "c10-vocab-03",
+                "c10-vocab-12",
+                "c10-vocab-14",
+                "c10-vocab-13",
+                "c10-vocab-19",
+                "c10-vocab-02",
+                "c10-vocab-21",
+                "c10-vocab-22",
+                "c10-vocab-23",
+                "c10-vocab-24",
+                "c10-vocab-25"
         ],
         words: [
                 {
@@ -1228,6 +1260,96 @@
                         imageAlt: "팔짱을 끼다 그림 카드",
                         quizImage: null,
                         quizImageAlt: ""
+                },
+                {
+                        id: "c10-vocab-20",
+                        ko: "청혼하다",
+                        meaning: "결혼하자고 상대방에게 말하는 것.",
+                        pos: "표현",
+                        category: "marriage",
+                        example: "",
+                        vi: "cầu hôn",
+                        ja: "プロポーズする",
+                        zh: "求婚",
+                        image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_20_propose.webp",
+                        imageAlt: "청혼하다 그림 카드",
+                        quizImage: null,
+                        quizImageAlt: ""
+                },
+                {
+                        id: "c10-vocab-21",
+                        ko: "신혼여행",
+                        meaning: "결혼한 뒤 새 부부가 함께 가는 여행.",
+                        pos: "명사",
+                        category: "marriage",
+                        example: "",
+                        vi: "tuần trăng mật",
+                        ja: "新婚旅行",
+                        zh: "蜜月旅行",
+                        image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_21_honeymoon.webp",
+                        imageAlt: "신혼여행 그림 카드",
+                        quizImage: null,
+                        quizImageAlt: ""
+                },
+                {
+                        id: "c10-vocab-22",
+                        ko: "중매결혼",
+                        meaning: "다른 사람의 소개나 중매로 만나서 하는 결혼.",
+                        pos: "명사",
+                        category: "marriage",
+                        example: "",
+                        vi: "kết hôn qua mai mối",
+                        ja: "見合い結婚",
+                        zh: "经介绍结婚",
+                        image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_22_arranged_marriage.webp",
+                        imageAlt: "중매결혼 그림 카드",
+                        quizImage: null,
+                        quizImageAlt: ""
+                },
+                {
+                        id: "c10-vocab-23",
+                        ko: "연애결혼",
+                        meaning: "서로 사랑해서 연애한 뒤 하는 결혼.",
+                        pos: "명사",
+                        category: "marriage",
+                        example: "",
+                        vi: "kết hôn vì tình yêu",
+                        ja: "恋愛結婚",
+                        zh: "恋爱结婚",
+                        image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_23_love_marriage.webp",
+                        imageAlt: "연애결혼 그림 카드",
+                        quizImage: null,
+                        quizImageAlt: ""
+                },
+                {
+                        id: "c10-vocab-24",
+                        ko: "청첩장",
+                        meaning: "결혼식에 초대하기 위해 보내는 카드.",
+                        pos: "명사",
+                        category: "marriage",
+                        example: "",
+                        vi: "thiệp mời đám cưới",
+                        ja: "結婚式の招待状",
+                        zh: "请柬",
+                        image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_24_wedding_invitation.webp",
+                        imageAlt: "청첩장 그림 카드",
+                        quizImage: null,
+                        quizImageAlt: ""
+                },
+                {
+                        id: "c10-vocab-25",
+                        ko: "예식장",
+                        meaning: "결혼식 같은 예식을 하는 장소.",
+                        pos: "명사",
+                        category: "marriage",
+                        example: "",
+                        vi: "sảnh cưới",
+                        ja: "結婚式場",
+                        zh: "婚礼场地",
+                        image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_25_wedding_hall.webp",
+                        imageAlt: "예식장 그림 카드",
+                        quizImage: null,
+                        quizImageAlt: ""
                 }
         ]
 };
@@ -1292,7 +1414,12 @@
 
         const storagePrefix = cfg.storageKey || `vocabulary-${cfg.chapter || "standard"}`;
         const categories = normalizeCategories(cfg.categories || []);
-        const words = normalizeWords(cfg.words || []);
+        const defaultWordOrderRank = new Map((cfg.defaultWordOrder || []).map((id, index) => [id, index]));
+        const words = normalizeWords(cfg.words || []).sort((a, b) => {
+            const aRank = defaultWordOrderRank.has(a.id) ? defaultWordOrderRank.get(a.id) : Number.MAX_SAFE_INTEGER;
+            const bRank = defaultWordOrderRank.has(b.id) ? defaultWordOrderRank.get(b.id) : Number.MAX_SAFE_INTEGER;
+            return aRank - bRank;
+        });
         const imageCount = words.filter((word) => Boolean(word.image)).length;
         const cartoonImageCount = words.filter((word) => Boolean(word.cartoonImage)).length;
         const quizImageCount = words.filter((word) => Boolean(word.quizImage || word.image)).length;
