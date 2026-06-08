@@ -1,35 +1,31 @@
 const { test, expect } = require('@playwright/test');
 
 const studentNames = [
-  '도안 티 응엣 하',
-  '팜 반 탄',
-  '황 티 튀 드엉',
-  '호 티 화이',
-  '응웬 팜 드엉 비',
-  '버 탄 쩡',
-  '당 반 빔',
-  '응웬 휴 득',
-  '보 쑤안 타이',
-  '짠 바오 응옥',
-  '짠 낫 란',
-  '레 딘 하이',
-  '또 자 하오',
-  '훤 티 홍 깜',
-  '응웬 티 응옥 즈앙',
-  '부 티 비',
-  '까오 티 응아',
-  '응웬 당 코이',
-  '레 반 러이',
-  '응웬 티 엔 찌',
-  '응우엔 티 호앙 후이 히에우',
-  '당 티 미 디엔',
-  '응웬 프엉 아잉',
-  '팜 티 프엉 웬',
-  '응웬 티 타잉 후에',
-  '팜 티 응억 란',
-  '레 득 한',
-  '까어 쩐 뜨어 뜨',
-  '다오 티 투 짱'
+  '짠 하 로안 안',
+  '즈엉 반 바오',
+  '부 딩 프엉',
+  '짠 티 김 응옥',
+  '응웬 하 미',
+  '응웬 반 람',
+  '부 티 민 프엉',
+  '짠 투안 아잉',
+  '반 티 하이 옌',
+  '딘 녓 주이',
+  '부이 바오 옌',
+  '응웬 반 퐁',
+  '르엉 득 뚜',
+  '팜 득 러이',
+  '라님 알 하마드',
+  '간바트 운졸',
+  '호앙 후이 리에우',
+  '레티느',
+  '부 후옌 린',
+  '응웬 티 김 풍',
+  '응오 티 번 니',
+  '황 티 탄 쭉',
+  '보 후인 안',
+  '도득흥',
+  '원 티 응옥 린'
 ];
 
 async function drawOne(page) {
@@ -46,7 +42,7 @@ test('draws exactly one student from the presentation roster', async ({ page }) 
 
   const pickedName = await drawOne(page);
   expect(studentNames).toContain(pickedName);
-  expect(pickedName.split(/\s+/).filter(Boolean).length).toBeGreaterThanOrEqual(3);
+  expect(pickedName.length).toBeGreaterThan(0);
 });
 
 test('draws every presentation student once before the pool resets', async ({ page }) => {

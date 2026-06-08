@@ -19,15 +19,15 @@ test('draws a full presentation order and enables copying', async ({ page }) => 
 
   await expect
     .poll(async () => page.locator('[data-result-item]').count(), { timeout: 8_000 })
-    .toBe(29);
+    .toBe(25);
 
   await expect(page.locator('#status-pill')).toHaveText('Done');
   await expect(page.locator('[data-action="copy-result"]')).toBeEnabled();
-  await expect(page.locator('#result-count')).toHaveText('29');
-  await expect(page.locator('[data-mix-board] .chip.compact')).toHaveCount(29);
+  await expect(page.locator('#result-count')).toHaveText('25');
+  await expect(page.locator('[data-mix-board] .chip.compact')).toHaveCount(25);
 
   const names = await page.locator('[data-result-item] .name').allTextContents();
-  expect(new Set(names).size).toBe(29);
+  expect(new Set(names).size).toBe(25);
 });
 
 test('excludes checked students from the draw', async ({ page }) => {
@@ -40,19 +40,19 @@ test('excludes checked students from the draw', async ({ page }) => {
   await page.locator('[data-action="toggle-exclusion"][data-index="5"]').check();
   await page.locator('[data-action="close-exclusions"]').click();
 
-  await expect(page.locator('#active-count')).toHaveText('27');
+  await expect(page.locator('#active-count')).toHaveText('23');
   await expect(page.locator('#excluded-count')).toHaveText('2');
-  await expect(page.locator('#result-total')).toHaveText('27');
+  await expect(page.locator('#result-total')).toHaveText('23');
 
   await page.locator('[data-action="start-draw"]').click();
 
   await expect
     .poll(async () => page.locator('[data-result-item]').count(), { timeout: 8_000 })
-    .toBe(27);
-  await expect(page.locator('[data-mix-board] .chip.compact')).toHaveCount(27);
+    .toBe(23);
+  await expect(page.locator('[data-mix-board] .chip.compact')).toHaveCount(23);
 
   const names = await page.locator('[data-result-item] .name').allTextContents();
-  expect(names).not.toContain('도안 티 응엣 하');
-  expect(names).not.toContain('버 탄 쩡');
-  expect(new Set(names).size).toBe(27);
+  expect(names).not.toContain('짠 하 로안 안');
+  expect(names).not.toContain('응웬 반 람');
+  expect(new Set(names).size).toBe(23);
 });

@@ -9,6 +9,10 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --student-name-scale: 1;
+    }
+
     html,
     body {
       height: 100%;
@@ -54,12 +58,41 @@
       border-radius: 18px;
       background: #fff;
       border: 2px solid #dbeafe;
-      font-size: clamp(2rem, 8vw, 4.5rem);
+      font-size: clamp(
+        calc(1.5rem * var(--student-name-scale)),
+        calc(8vw * var(--student-name-scale)),
+        calc(5rem * var(--student-name-scale))
+      );
       font-weight: 900;
       line-height: 1.18;
       text-align: center;
       word-break: keep-all;
       box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+      transition: font-size 160ms ease;
+    }
+
+    .zoom-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .zoom-button {
+      display: inline-grid;
+      place-items: center;
+      width: 44px;
+      min-height: 44px;
+      border-radius: 999px;
+      background: #e0ecff;
+      color: #1d4ed8;
+      font-size: 1.45rem;
+      line-height: 1;
+      box-shadow: none;
+    }
+
+    .zoom-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.42;
     }
   </style>
 </head>
@@ -67,6 +100,10 @@
   <main>
     <button type="button" id="draw-button">뽑기</button>
     <div id="student-name" aria-live="polite"></div>
+    <div class="zoom-controls" aria-label="학생 이름 크기 조절">
+      <button type="button" class="zoom-button" id="zoom-out" aria-label="학생 이름 축소">-</button>
+      <button type="button" class="zoom-button" id="zoom-in" aria-label="학생 이름 확대">+</button>
+    </div>
   </main>
 
   <script>
@@ -74,45 +111,50 @@
       'use strict';
 
       const students = [
-        '도안 티 응엣 하',
-        '팜 반 탄',
-        '황 티 튀 드엉',
-        '호 티 화이',
-        '응웬 팜 드엉 비',
-        '버 탄 쩡',
-        '당 반 빔',
-        '응웬 휴 득',
-        '보 쑤안 타이',
-        '짠 바오 응옥',
-        '짠 낫 란',
-        '레 딘 하이',
-        '또 자 하오',
-        '훤 티 홍 깜',
-        '응웬 티 응옥 즈앙',
-        '부 티 비',
-        '까오 티 응아',
-        '응웬 당 코이',
-        '레 반 러이',
-        '응웬 티 엔 찌',
-        '응우엔 티 호앙 후이 히에우',
-        '당 티 미 디엔',
-        '응웬 프엉 아잉',
-        '팜 티 프엉 웬',
-        '응웬 티 타잉 후에',
-        '팜 티 응억 란',
-        '레 득 한',
-        '까어 쩐 뜨어 뜨',
-        '다오 티 투 짱'
+        '짠 하 로안 안',
+        '즈엉 반 바오',
+        '부 딩 프엉',
+        '짠 티 김 응옥',
+        '응웬 하 미',
+        '응웬 반 람',
+        '부 티 민 프엉',
+        '짠 투안 아잉',
+        '반 티 하이 옌',
+        '딘 녓 주이',
+        '부이 바오 옌',
+        '응웬 반 퐁',
+        '르엉 득 뚜',
+        '팜 득 러이',
+        '라님 알 하마드',
+        '간바트 운졸',
+        '호앙 후이 리에우',
+        '레티느',
+        '부 후옌 린',
+        '응웬 티 김 풍',
+        '응오 티 번 니',
+        '황 티 탄 쭉',
+        '보 후인 안',
+        '도득흥',
+        '원 티 응옥 린'
       ];
 
       const button = document.getElementById('draw-button');
       const output = document.getElementById('student-name');
+      const zoomOutButton = document.getElementById('zoom-out');
+      const zoomInButton = document.getElementById('zoom-in');
       const storageKey = 'korean3b:single-student-draw-state';
+      const scaleStorageKey = 'korean3b:single-student-draw-name-scale';
       const rosterKey = students.join('|');
+      const minNameScale = 0.7;
+      const maxNameScale = 1.5;
+      const nameScaleStep = 0.1;
 
       const savedState = loadDrawState();
       let remainingStudents = savedState.remainingStudents;
       let lastPickedStudent = savedState.lastPickedStudent;
+      let nameScale = loadNameScale();
+
+      updateNameScale(0);
 
       function shuffle(list) {
         const copy = [...list];
@@ -162,6 +204,33 @@
         }
       }
 
+      function loadNameScale() {
+        try {
+          const savedScale = Number(localStorage.getItem(scaleStorageKey));
+
+          if (Number.isFinite(savedScale) && savedScale >= minNameScale && savedScale <= maxNameScale) {
+            return savedScale;
+          }
+        } catch {
+          // Default to the regular size when browser storage is unavailable.
+        }
+
+        return 1;
+      }
+
+      function updateNameScale(delta) {
+        nameScale = Math.round(Math.min(maxNameScale, Math.max(minNameScale, nameScale + delta)) * 10) / 10;
+        document.documentElement.style.setProperty('--student-name-scale', String(nameScale));
+        zoomOutButton.disabled = nameScale <= minNameScale;
+        zoomInButton.disabled = nameScale >= maxNameScale;
+
+        try {
+          localStorage.setItem(scaleStorageKey, String(nameScale));
+        } catch {
+          // Keep the controls responsive even when browser storage is blocked.
+        }
+      }
+
       function createDrawPool() {
         const pool = shuffle(students);
 
@@ -183,6 +252,9 @@
 
         output.textContent = pickedStudent;
       });
+
+      zoomOutButton.addEventListener('click', () => updateNameScale(-nameScaleStep));
+      zoomInButton.addEventListener('click', () => updateNameScale(nameScaleStep));
     })();
   </script>
     <script src="../../shared/page-qr.js"></script>
