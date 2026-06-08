@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>C10 문법1 보조 활동 - -던 카드 분류</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --ink: #111827;
+            --muted: #536171;
+            --line: #d8e0eb;
+            --panel: #ffffff;
+            --soft: #f1f5f9;
+            --dun: #0f766e;
+            --done: #b45309;
+            --blue: #1d4ed8;
+            --rose: #be123c;
+            --shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            background: linear-gradient(180deg, #ffffff 0%, var(--bg) 48%, #eef7f5 100%);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+            letter-spacing: 0;
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 52px;
+            padding: 8px 14px;
+            border-bottom: 1px solid rgba(216, 224, 235, 0.9);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar__links,
+        .topbar__tools {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .topbar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            padding: 7px 9px;
+            border-radius: 8px;
+            color: #1d4ed8;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
+        .topbar a:hover,
+        .topbar a:focus-visible {
+            background: #eff6ff;
+        }
+
+        .topbar__title {
+            color: #334155;
+            font-size: 0.86rem;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .shell {
+            width: min(1220px, calc(100% - 28px));
+            margin: 18px auto 42px;
+        }
+
+        .unit-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: end;
+            margin-bottom: 14px;
+        }
+
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--dun);
+            font-size: 0.76rem;
+            font-weight: 950;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin-top: 0;
+        }
+
+        h1 {
+            margin-bottom: 6px;
+            font-size: clamp(1.7rem, 3.5vw, 3rem);
+            line-height: 1.08;
+        }
+
+        .lead {
+            max-width: 760px;
+            margin-bottom: 0;
+            color: var(--muted);
+            font-size: 0.98rem;
+            font-weight: 750;
+            line-height: 1.65;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .tool-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            padding: 8px 11px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            font-weight: 900;
+        }
+
+        .tool-btn.primary {
+            border-color: var(--dun);
+            background: var(--dun);
+            color: #ffffff;
+        }
+
+        .tool-btn.warn {
+            border-color: #fed7aa;
+            background: #fff7ed;
+            color: #9a3412;
+        }
+
+        .dun-text {
+            color: var(--dun);
+        }
+
+        .done-text {
+            color: var(--done);
+        }
+
+        .score-line {
+            min-height: 44px;
+            margin-bottom: 14px;
+            padding: 10px 12px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            font-weight: 850;
+            line-height: 1.45;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        .sort-layout {
+            display: grid;
+            grid-template-columns: minmax(260px, 0.84fr) minmax(0, 1.16fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .bank,
+        .zone,
+        .teacher-note {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .bank {
+            padding: 14px;
+        }
+
+        .zone-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .zone {
+            min-height: 560px;
+            overflow: hidden;
+        }
+
+        .zone__head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 82px;
+            padding: 13px 13px 10px;
+            border-bottom: 1px solid var(--line);
+            background: #f8fafc;
+        }
+
+        .zone__head h2 {
+            margin: 0 0 5px;
+            font-size: 1.22rem;
+            line-height: 1.15;
+        }
+
+        .zone__head p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.84rem;
+            font-weight: 750;
+            line-height: 1.45;
+        }
+
+        .zone__drop {
+            min-height: 460px;
+            padding: 12px;
+            background: #ffffff;
+        }
+
+        .zone__drop.is-over {
+            outline: 3px solid rgba(37, 99, 235, 0.28);
+            outline-offset: -7px;
+        }
+
+        .bank h2 {
+            margin-bottom: 7px;
+            font-size: 1.22rem;
+        }
+
+        .bank-note {
+            margin: 0 0 11px;
+            color: var(--muted);
+            font-size: 0.86rem;
+            font-weight: 750;
+            line-height: 1.55;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 9px;
+        }
+
+        .zone .card-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .sort-card {
+            position: relative;
+            display: grid;
+            gap: 7px;
+            min-width: 0;
+            min-height: 202px;
+            padding: 8px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #ffffff;
+            color: var(--ink);
+            text-align: left;
+            box-shadow: 0 7px 16px rgba(15, 23, 42, 0.05);
+        }
+
+        .sort-card:hover,
+        .sort-card:focus-visible,
+        .sort-card.selected {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+        }
+
+        .sort-card.is-correct {
+            border-color: #34d399;
+            background: #f0fdfa;
+        }
+
+        .sort-card.is-wrong {
+            border-color: #fb7185;
+            background: #fff1f2;
+        }
+
+        .sort-card img {
+            display: block;
+            width: 100%;
+            height: 118px;
+            object-fit: cover;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: #f8fafc;
+        }
+
+        .card-meta {
+            display: grid;
+            gap: 4px;
+        }
+
+        .verb-line {
+            color: #475569;
+            font-size: 0.78rem;
+            font-weight: 850;
+            line-height: 1.3;
+        }
+
+        .expression-line {
+            min-height: 30px;
+            color: #111827;
+            font-size: clamp(0.9rem, 1.8vw, 1rem);
+            font-weight: 950;
+            line-height: 1.25;
+            word-break: keep-all;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 28px;
+            padding: 5px 8px;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.78rem;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .badge.dun {
+            background: var(--dun);
+        }
+
+        .badge.done {
+            background: var(--done);
+        }
+
+        .empty-state {
+            display: grid;
+            min-height: 140px;
+            place-items: center;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            color: #64748b;
+            font-weight: 850;
+            text-align: center;
+            line-height: 1.45;
+        }
+
+        .teacher-note {
+            margin-top: 14px;
+            padding: 14px 16px;
+        }
+
+        .teacher-note summary {
+            cursor: pointer;
+            color: #334155;
+            font-weight: 950;
+        }
+
+        .source-board {
+            display: block;
+            width: 100%;
+            margin-top: 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        @media (max-width: 980px) {
+            .unit-head,
+            .sort-layout,
+            .zone-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                justify-content: flex-start;
+            }
+
+            .zone {
+                min-height: 0;
+            }
+
+            .zone__drop {
+                min-height: 220px;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .shell {
+                width: min(100% - 18px, 1220px);
+                margin-top: 12px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .topbar__tools {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 2px;
+            }
+
+            .card-grid,
+            .zone .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar" aria-label="활동 이동">
+        <div class="topbar__links">
+            <a href="../index.html"><i data-lucide="home" aria-hidden="true"></i> 메인</a>
+            <a href="index.html"><i data-lucide="folder-open" aria-hidden="true"></i> 10과</a>
+            <a href="grammar1.html"><i data-lucide="book-open" aria-hidden="true"></i> 문법1</a>
+        </div>
+        <div class="topbar__tools">
+            <span class="topbar__title">-던 카드 분류</span>
+            <a href="grammar1-dun-visual-warmup.html"><i data-lucide="images" aria-hidden="true"></i> 도입</a>
+            <a href="grammar1-dun-memory-museum.html"><i data-lucide="messages-square" aria-hidden="true"></i> 말하기</a>
+        </div>
+    </nav>
+
+    <main class="shell">
+        <header class="unit-head">
+            <div>
+                <p class="eyebrow">C10 Grammar 1 Support</p>
+                <h1>그림 카드 분류: -던 / -(으)ㄴ</h1>
+                <p class="lead">그림만 보고 과거 행동이 아직 남아 있는지, 이미 끝났는지 판단해 두 칸으로 나눕니다.</p>
+            </div>
+            <div class="toolbar" aria-label="활동 도구">
+                <button class="tool-btn" type="button" onclick="shuffleBank()"><i data-lucide="shuffle" aria-hidden="true"></i> 섞기</button>
+                <button class="tool-btn primary" type="button" onclick="checkAnswers()"><i data-lucide="check-check" aria-hidden="true"></i> 채점</button>
+                <button class="tool-btn warn" type="button" onclick="toggleReveal()"><i data-lucide="eye" aria-hidden="true"></i> 정답 보기</button>
+            </div>
+        </header>
+
+        <p id="scoreLine" class="score-line" aria-live="polite">카드를 누른 뒤 넣을 칸을 선택하거나, 카드를 칸으로 끌어 놓으세요.</p>
+
+        <section class="sort-layout" aria-label="카드 분류판">
+            <aside class="bank">
+                <h2>미분류 카드</h2>
+                <p class="bank-note">카드의 상태를 보고 `-던` 또는 `-(으)ㄴ` 표현을 예측합니다.</p>
+                <div id="bankCards" class="card-grid"></div>
+            </aside>
+
+            <section class="zone-grid">
+                <article class="zone">
+                    <div class="zone__head">
+                        <div>
+                            <h2 class="dun-text">미완료 / 회상</h2>
+                            <p>하다가 멈췄거나 과거에 하던 중</p>
+                        </div>
+                        <button class="tool-btn" type="button" onclick="moveSelected('unfinished')"><i data-lucide="log-in" aria-hidden="true"></i> 넣기</button>
+                    </div>
+                    <div id="unfinishedZone" class="zone__drop" ondragover="allowDrop(event)" ondragenter="markOver(event)" ondragleave="unmarkOver(event)" ondrop="dropCard(event, 'unfinished')"></div>
+                </article>
+
+                <article class="zone">
+                    <div class="zone__head">
+                        <div>
+                            <h2 class="done-text">완료</h2>
+                            <p>이미 끝난 행동의 결과</p>
+                        </div>
+                        <button class="tool-btn" type="button" onclick="moveSelected('completed')"><i data-lucide="log-in" aria-hidden="true"></i> 넣기</button>
+                    </div>
+                    <div id="completedZone" class="zone__drop" ondragover="allowDrop(event)" ondragenter="markOver(event)" ondragleave="unmarkOver(event)" ondrop="dropCard(event, 'completed')"></div>
+                </article>
+            </section>
+        </section>
+
+        <details class="teacher-note">
+            <summary>원본 보드 보기</summary>
+            <img class="source-board" src="../assets/c10/grammar/images/dun-support/dun-state-cards.webp" alt="-던과 완료 표현을 비교하는 원본 카드 보드">
+        </details>
+    </main>
+
+    <script>
+        const SOURCE = "../assets/c10/grammar/images/dun-support/dun-state-cards.webp";
+        const CARDS = [
+            { id: "apple-dun", x: 0, row: 0, verb: "먹다", noun: "사과", expression: "먹던 사과", state: "unfinished" },
+            { id: "apple-done", x: 1, row: 0, verb: "먹다", noun: "사과", expression: "먹은 사과", state: "completed" },
+            { id: "book-dun", x: 2, row: 0, verb: "읽다", noun: "책", expression: "읽던 책", state: "unfinished" },
+            { id: "book-done", x: 3, row: 0, verb: "읽다", noun: "책", expression: "읽은 책", state: "completed" },
+            { id: "picture-dun", x: 4, row: 0, verb: "그리다", noun: "그림", expression: "그리던 그림", state: "unfinished" },
+            { id: "picture-done", x: 5, row: 0, verb: "그리다", noun: "그림", expression: "그린 그림", state: "completed" },
+            { id: "coffee-dun", x: 6, row: 0, verb: "마시다", noun: "커피", expression: "마시던 커피", state: "unfinished" },
+            { id: "coffee-done", x: 7, row: 0, verb: "마시다", noun: "커피", expression: "마신 커피", state: "completed" },
+            { id: "clean-dun", x: 0, row: 1, verb: "청소하다", noun: "방", expression: "청소하던 방", state: "unfinished" },
+            { id: "clean-done", x: 1, row: 1, verb: "청소하다", noun: "방", expression: "청소한 방", state: "completed" },
+            { id: "homework-dun", x: 2, row: 1, verb: "풀다", noun: "숙제", expression: "풀던 숙제", state: "unfinished" },
+            { id: "homework-done", x: 3, row: 1, verb: "풀다", noun: "숙제", expression: "푼 숙제", state: "completed" },
+            { id: "robot-dun", x: 4, row: 1, verb: "만들다", noun: "로봇", expression: "만들던 로봇", state: "unfinished" },
+            { id: "robot-done", x: 5, row: 1, verb: "만들다", noun: "로봇", expression: "만든 로봇", state: "completed" },
+            { id: "cook-dun", x: 6, row: 1, verb: "끓이다", noun: "찌개", expression: "끓이던 찌개", state: "unfinished" },
+            { id: "cook-done", x: 7, row: 1, verb: "끓이다", noun: "찌개", expression: "끓인 찌개", state: "completed" }
+        ];
+
+        const sourceImage = new Image();
+        const cropCache = new Map();
+        let locations = { bank: [], unfinished: [], completed: [] };
+        let selectedId = null;
+        let revealAnswers = false;
+        let checked = false;
+
+        sourceImage.onload = () => {
+            locations.bank = shuffle([...CARDS.map(card => card.id)]);
+            render();
+        };
+        sourceImage.src = SOURCE;
+
+        function iconRefresh() {
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function shuffle(items) {
+            return items
+                .map(value => ({ value, sort: Math.random() }))
+                .sort((a, b) => a.sort - b.sort)
+                .map(item => item.value);
+        }
+
+        function getCard(id) {
+            return CARDS.find(card => card.id === id);
+        }
+
+        function makeCrop(card) {
+            if (cropCache.has(card.id)) return cropCache.get(card.id);
+            const cellW = sourceImage.naturalWidth / 8;
+            const rowH = sourceImage.naturalHeight / 2;
+            const sx = card.x * cellW;
+            const sy = card.row * rowH + rowH * 0.18;
+            const sw = cellW;
+            const sh = rowH * 0.68;
+            const canvas = document.createElement("canvas");
+            canvas.width = 360;
+            canvas.height = Math.round(canvas.width * sh / sw);
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(sourceImage, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+            const url = canvas.toDataURL("image/webp", 0.9);
+            cropCache.set(card.id, url);
+            return url;
+        }
+
+        function whereIs(id) {
+            return Object.keys(locations).find(zone => locations[zone].includes(id));
+        }
+
+        function removeFromAll(id) {
+            Object.keys(locations).forEach(zone => {
+                locations[zone] = locations[zone].filter(cardId => cardId !== id);
+            });
+        }
+
+        function selectCard(id) {
+            selectedId = selectedId === id ? null : id;
+            render();
+        }
+
+        function moveCard(id, target) {
+            if (!id || !locations[target]) return;
+            removeFromAll(id);
+            locations[target].push(id);
+            selectedId = null;
+            checked = false;
+            render();
+            updateScore(`'${getCard(id).noun}' 카드를 ${target === "unfinished" ? "미완료 / 회상" : "완료"} 칸에 넣었습니다.`);
+        }
+
+        function moveSelected(target) {
+            if (!selectedId) {
+                updateScore("먼저 이동할 카드를 선택하세요.");
+                return;
+            }
+            moveCard(selectedId, target);
+        }
+
+        function dragStart(event, id) {
+            event.dataTransfer.setData("text/plain", id);
+            selectedId = id;
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function markOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add("is-over");
+        }
+
+        function unmarkOver(event) {
+            event.currentTarget.classList.remove("is-over");
+        }
+
+        function dropCard(event, target) {
+            event.preventDefault();
+            event.currentTarget.classList.remove("is-over");
+            const id = event.dataTransfer.getData("text/plain");
+            moveCard(id, target);
+        }
+
+        function renderCard(id) {
+            const card = getCard(id);
+            const zone = whereIs(id);
+            const assigned = zone !== "bank";
+            const showAnswer = revealAnswers || assigned;
+            const resultClass = checked && assigned
+                ? (zone === card.state ? "is-correct" : "is-wrong")
+                : "";
+            const badge = showAnswer
+                ? `<span class="badge ${card.state === "unfinished" ? "dun" : "done"}">${card.state === "unfinished" ? "-던" : "-(으)ㄴ"}</span>`
+                : "";
+
+            return `
+                <button
+                    class="sort-card ${selectedId === id ? "selected" : ""} ${resultClass}"
+                    type="button"
+                    data-card-id="${id}"
+                    draggable="true"
+                    onclick="selectCard('${id}')"
+                    ondragstart="dragStart(event, '${id}')"
+                    aria-label="${card.verb} ${card.noun} 카드"
+                >
+                    <img src="${makeCrop(card)}" alt="${card.expression} 그림">
+                    <span class="card-meta">
+                        <span class="verb-line">${card.verb} + ${card.noun}</span>
+                        <span class="expression-line">${showAnswer ? card.expression : "____ " + card.noun}</span>
+                        ${badge}
+                    </span>
+                </button>
+            `;
+        }
+
+        function renderList(ids, emptyText) {
+            if (!ids.length) return `<div class="empty-state">${emptyText}</div>`;
+            return `<div class="card-grid">${ids.map(renderCard).join("")}</div>`;
+        }
+
+        function render() {
+            document.getElementById("bankCards").innerHTML = locations.bank.map(renderCard).join("");
+            document.getElementById("unfinishedZone").innerHTML = renderList(locations.unfinished, "여기에 -던 카드를 놓습니다.");
+            document.getElementById("completedZone").innerHTML = renderList(locations.completed, "여기에 완료 카드를 놓습니다.");
+            iconRefresh();
+        }
+
+        function updateScore(message) {
+            const assigned = locations.unfinished.length + locations.completed.length;
+            document.getElementById("scoreLine").textContent = `${message} 현재 ${assigned}/${CARDS.length}장 분류했습니다.`;
+        }
+
+        function checkAnswers() {
+            checked = true;
+            const assignedIds = [...locations.unfinished, ...locations.completed];
+            const correct = assignedIds.filter(id => whereIs(id) === getCard(id).state).length;
+            const remaining = CARDS.length - assignedIds.length;
+            render();
+            document.getElementById("scoreLine").textContent = remaining
+                ? `${correct}/${assignedIds.length}장 정답입니다. 아직 ${remaining}장이 남아 있습니다.`
+                : `${correct}/${CARDS.length}장 정답입니다. 틀린 카드는 다른 칸으로 옮겨 다시 채점하세요.`;
+        }
+
+        function toggleReveal() {
+            revealAnswers = !revealAnswers;
+            render();
+            document.getElementById("scoreLine").textContent = revealAnswers
+                ? "정답 표현을 표시했습니다."
+                : "정답 표현을 숨겼습니다.";
+        }
+
+        function shuffleBank() {
+            locations = { bank: shuffle([...CARDS.map(card => card.id)]), unfinished: [], completed: [] };
+            selectedId = null;
+            checked = false;
+            revealAnswers = false;
+            render();
+            document.getElementById("scoreLine").textContent = "카드를 다시 섞었습니다. 그림 상태를 보고 분류하세요.";
+        }
+    </script>
+</body>
+</html>

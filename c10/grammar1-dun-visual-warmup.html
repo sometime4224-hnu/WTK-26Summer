@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>C10 문법1 보조 활동 - -던 도입 흐름</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #f7f8fb;
+            --ink: #111827;
+            --muted: #526070;
+            --line: #d9e1ec;
+            --panel: #ffffff;
+            --soft: #f1f5f9;
+            --dun: #0f766e;
+            --done: #b45309;
+            --blue: #2563eb;
+            --rose: #be123c;
+            --shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            background: var(--bg);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+            letter-spacing: 0;
+        }
+
+        button,
+        input,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 52px;
+            padding: 8px 14px;
+            border-bottom: 1px solid rgba(217, 225, 236, 0.9);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar__links,
+        .topbar__tools {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .topbar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            padding: 7px 9px;
+            border-radius: 8px;
+            color: #1d4ed8;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
+        .topbar a:hover,
+        .topbar a:focus-visible {
+            background: #eff6ff;
+        }
+
+        .topbar__title {
+            color: #334155;
+            font-size: 0.86rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .shell {
+            width: min(1180px, calc(100% - 28px));
+            margin: 18px auto 42px;
+        }
+
+        .unit-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: end;
+            margin-bottom: 14px;
+        }
+
+        .eyebrow {
+            margin: 0 0 6px;
+            color: #0f766e;
+            font-size: 0.76rem;
+            font-weight: 950;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin-top: 0;
+        }
+
+        h1 {
+            margin-bottom: 6px;
+            font-size: clamp(1.7rem, 3.5vw, 3rem);
+            line-height: 1.08;
+        }
+
+        .lead {
+            max-width: 760px;
+            margin-bottom: 0;
+            color: var(--muted);
+            font-size: 0.98rem;
+            font-weight: 750;
+            line-height: 1.65;
+        }
+
+        .flow-chips {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 7px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 32px;
+            padding: 6px 9px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            font-size: 0.82rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .stage-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin: 14px 0;
+        }
+
+        .stage-tab {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 42px;
+            padding: 8px 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #475569;
+            font-weight: 900;
+        }
+
+        .stage-tab[aria-selected="true"] {
+            border-color: #99f6e4;
+            background: #ccfbf1;
+            color: #115e59;
+        }
+
+        .activity {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.8fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .visual-pane,
+        .task-pane,
+        .rule-band,
+        .teacher-note {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .visual-pane {
+            overflow: hidden;
+        }
+
+        .visual-frame {
+            position: relative;
+            min-height: 280px;
+            background: #e2e8f0;
+        }
+
+        .visual-frame img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .visual-caption {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0;
+            border-top: 1px solid var(--line);
+        }
+
+        .caption-cell {
+            padding: 12px;
+            min-height: 84px;
+        }
+
+        .caption-cell + .caption-cell {
+            border-left: 1px solid var(--line);
+        }
+
+        .caption-cell strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            font-size: 0.92rem;
+            font-weight: 950;
+        }
+
+        .caption-cell p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+            font-weight: 700;
+            line-height: 1.55;
+        }
+
+        .dun-text {
+            color: var(--dun);
+        }
+
+        .done-text {
+            color: var(--done);
+        }
+
+        .task-pane {
+            padding: 16px;
+        }
+
+        .stage-label {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            padding: 5px 8px;
+            border-radius: 8px;
+            background: #eef2ff;
+            color: #3730a3;
+            font-size: 0.78rem;
+            font-weight: 950;
+        }
+
+        .task-pane h2 {
+            margin: 10px 0 8px;
+            font-size: clamp(1.28rem, 2.2vw, 1.7rem);
+            line-height: 1.16;
+        }
+
+        .question-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 13px;
+        }
+
+        .question-card {
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #fbfdff;
+            padding: 11px;
+        }
+
+        .question-card p {
+            margin-bottom: 9px;
+            font-size: 1rem;
+            font-weight: 900;
+            line-height: 1.45;
+        }
+
+        .option-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+        }
+
+        .option-btn {
+            min-height: 40px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #0f172a;
+            font-weight: 950;
+        }
+
+        .option-btn:hover,
+        .option-btn:focus-visible {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .option-btn.correct {
+            border-color: #0f766e;
+            background: #ccfbf1;
+            color: #115e59;
+        }
+
+        .option-btn.incorrect {
+            border-color: #fecdd3;
+            background: #fff1f2;
+            color: #be123c;
+        }
+
+        .feedback {
+            min-height: 44px;
+            margin: 12px 0 0;
+            padding: 10px 11px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.9rem;
+            font-weight: 750;
+            line-height: 1.55;
+        }
+
+        .task-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .tool-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            padding: 8px 11px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            font-weight: 900;
+        }
+
+        .tool-btn.primary {
+            border-color: #0f766e;
+            background: #0f766e;
+            color: #ffffff;
+        }
+
+        .rule-band {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0;
+            margin-top: 14px;
+            overflow: hidden;
+        }
+
+        .rule-cell {
+            padding: 14px;
+            min-height: 132px;
+            border-left: 1px solid var(--line);
+        }
+
+        .rule-cell:first-child {
+            border-left: 0;
+        }
+
+        .rule-cell h3 {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin: 0 0 7px;
+            font-size: 1rem;
+        }
+
+        .rule-cell p,
+        .teacher-note p,
+        .teacher-note li {
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 700;
+            line-height: 1.6;
+        }
+
+        .teacher-note {
+            margin-top: 14px;
+            padding: 14px 16px;
+        }
+
+        .teacher-note summary {
+            cursor: pointer;
+            color: #334155;
+            font-weight: 950;
+        }
+
+        .teacher-note ul {
+            margin: 10px 0 0;
+            padding-left: 20px;
+        }
+
+        @media (max-width: 860px) {
+            .unit-head,
+            .activity,
+            .rule-band {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-chips {
+                justify-content: flex-start;
+            }
+
+            .stage-tabs {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .rule-cell,
+            .rule-cell:first-child {
+                border-left: 0;
+                border-top: 1px solid var(--line);
+            }
+
+            .rule-cell:first-child {
+                border-top: 0;
+            }
+        }
+
+        @media (max-width: 540px) {
+            .shell {
+                width: min(100% - 18px, 1180px);
+                margin-top: 12px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .topbar__tools {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 2px;
+            }
+
+            .stage-tabs,
+            .visual-caption,
+            .option-row {
+                grid-template-columns: 1fr;
+            }
+
+            .caption-cell + .caption-cell {
+                border-left: 0;
+                border-top: 1px solid var(--line);
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar" aria-label="활동 이동">
+        <div class="topbar__links">
+            <a href="../index.html"><i data-lucide="home" aria-hidden="true"></i> 메인</a>
+            <a href="index.html"><i data-lucide="folder-open" aria-hidden="true"></i> 10과</a>
+            <a href="grammar1.html"><i data-lucide="book-open" aria-hidden="true"></i> 문법1</a>
+        </div>
+        <div class="topbar__tools">
+            <span class="topbar__title">-던 도입 흐름</span>
+            <a href="grammar1-dun-card-sort.html"><i data-lucide="layout-grid" aria-hidden="true"></i> 카드 분류</a>
+            <a href="grammar1-dun-memory-museum.html"><i data-lucide="messages-square" aria-hidden="true"></i> 말하기</a>
+        </div>
+    </nav>
+
+    <main class="shell">
+        <header class="unit-head">
+            <div>
+                <p class="eyebrow">C10 Grammar 1 Support</p>
+                <h1>-던 vs -(으)ㄴ 그림 도입</h1>
+                <p class="lead">밥, 그림, 퍼즐 장면을 순서대로 보며 “하다가 멈춘 과거”와 “이미 끝난 과거”를 구별합니다.</p>
+            </div>
+            <div class="flow-chips" aria-label="수업 흐름">
+                <span class="chip"><i data-lucide="eye" aria-hidden="true"></i> 관찰</span>
+                <span class="chip"><i data-lucide="mouse-pointer-click" aria-hidden="true"></i> 선택</span>
+                <span class="chip"><i data-lucide="message-circle" aria-hidden="true"></i> 말하기</span>
+            </div>
+        </header>
+
+        <div id="stageTabs" class="stage-tabs" role="tablist" aria-label="장면 선택"></div>
+
+        <section class="activity" aria-label="도입 활동">
+            <article class="visual-pane">
+                <div class="visual-frame">
+                    <img id="sourceImage" src="" alt="">
+                </div>
+                <div class="visual-caption">
+                    <div class="caption-cell">
+                        <strong class="dun-text"><i data-lucide="refresh-cw" aria-hidden="true"></i> -던</strong>
+                        <p id="dunCaption"></p>
+                    </div>
+                    <div class="caption-cell">
+                        <strong class="done-text"><i data-lucide="check-circle-2" aria-hidden="true"></i> -(으)ㄴ</strong>
+                        <p id="doneCaption"></p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="task-pane">
+                <span id="stageLabel" class="stage-label"></span>
+                <h2 id="stageTitle"></h2>
+                <p id="stagePrompt" class="lead"></p>
+                <div id="questionList" class="question-list"></div>
+                <p id="feedback" class="feedback" aria-live="polite">문장을 보고 알맞은 표현을 선택하세요.</p>
+                <div class="task-actions">
+                    <button class="tool-btn" type="button" onclick="resetStage()"><i data-lucide="rotate-ccw" aria-hidden="true"></i> 다시 풀기</button>
+                    <button class="tool-btn primary" type="button" onclick="nextStage()"><i data-lucide="arrow-right" aria-hidden="true"></i> 다음 장면</button>
+                </div>
+            </article>
+        </section>
+
+        <section class="rule-band" aria-label="정리">
+            <div class="rule-cell">
+                <h3 class="dun-text"><i data-lucide="history" aria-hidden="true"></i> -던</h3>
+                <p>과거에 하던 중이었거나 반복했던 일을 떠올릴 때 씁니다. “마저”와 함께 나오면 미완료 느낌이 강합니다.</p>
+            </div>
+            <div class="rule-cell">
+                <h3 class="done-text"><i data-lucide="badge-check" aria-hidden="true"></i> -(으)ㄴ</h3>
+                <p>과거에 이미 끝난 행동으로 명사를 꾸밀 때 씁니다. 받침에 따라 `-은`, 받침이 없으면 `-ㄴ`이 됩니다.</p>
+            </div>
+            <div class="rule-cell">
+                <h3><i data-lucide="mic-2" aria-hidden="true"></i> 짝 말하기</h3>
+                <p id="pairPrompt">A는 왼쪽 장면, B는 오른쪽 장면을 한 문장으로 말합니다.</p>
+            </div>
+        </section>
+
+        <details class="teacher-note">
+            <summary>교사용 진행 메모</summary>
+            <ul>
+                <li>첫 장면에서는 정답을 바로 설명하지 말고, “왜 마저 먹어요?”를 먼저 묻습니다.</li>
+                <li>두 번째 장면부터 학생이 규칙을 말하게 한 뒤 문장 선택으로 확인합니다.</li>
+                <li>세 장면을 마친 뒤 카드 분류 활동으로 넘어가면 자연스럽습니다.</li>
+            </ul>
+        </details>
+    </main>
+
+    <script>
+        const stages = [
+            {
+                tab: "밥",
+                label: "도입 1",
+                title: "먹던 밥과 먹은 밥",
+                image: "../assets/c10/grammar/images/dun-support/dun-bap-compare.webp",
+                alt: "먹던 밥과 먹은 밥을 비교하는 그림",
+                prompt: "남은 밥과 빈 밥그릇을 보고 과거 행동이 끝났는지 판단합니다.",
+                dunCaption: "`먹던 밥`: 아까 먹고 있었지만 아직 다 끝나지 않은 밥",
+                doneCaption: "`먹은 밥`: 과거에 이미 먹는 행동이 끝난 밥",
+                pair: "A: 아까 먹던 밥을 마저 먹어야 해요. B: 이건 아까 다 먹은 밥이에요.",
+                questions: [
+                    {
+                        sentence: "아까 ____ 밥을 마저 먹어야지!",
+                        options: ["먹던", "먹은"],
+                        answer: "먹던",
+                        reason: "`마저`는 하다가 남은 일을 이어서 한다는 뜻이라 `먹던`이 자연스럽습니다."
+                    },
+                    {
+                        sentence: "이건 아까 내가 다 ____ 밥그릇이에요.",
+                        options: ["먹던", "먹은"],
+                        answer: "먹은",
+                        reason: "`다`가 있어 먹는 행동이 끝났으므로 `먹은`을 씁니다."
+                    }
+                ]
+            },
+            {
+                tab: "그림",
+                label: "확인 2",
+                title: "그리던 그림과 그린 그림",
+                image: "../assets/c10/grammar/images/dun-support/dun-drawing-compare.webp",
+                alt: "그리던 그림과 그린 그림을 비교하는 그림",
+                prompt: "작업 중인 그림과 완성된 그림을 비교하며 같은 규칙을 다시 확인합니다.",
+                dunCaption: "`그리던 그림`: 어제 그리다가 아직 끝내지 못한 그림",
+                doneCaption: "`그린 그림`: 어제 이미 완성한 그림",
+                pair: "A: 어제 그리던 그림을 마저 그려요. B: 이건 어제 그린 그림이에요.",
+                questions: [
+                    {
+                        sentence: "어제 내가 ____ 그림을 마저 그려야지!",
+                        options: ["그리던", "그린"],
+                        answer: "그리던",
+                        reason: "그림을 아직 완성하지 못했기 때문에 `그리던`이 맞습니다."
+                    },
+                    {
+                        sentence: "이건 어제 내가 ____ 그림이에요.",
+                        options: ["그리던", "그린"],
+                        answer: "그린",
+                        reason: "완성된 결과물을 가리키므로 `그린 그림`이 자연스럽습니다."
+                    }
+                ]
+            },
+            {
+                tab: "퍼즐",
+                label: "확인 3",
+                title: "맞추던 퍼즐과 맞춘 퍼즐",
+                image: "../assets/c10/grammar/images/dun-support/dun-puzzle-compare.webp",
+                alt: "맞추던 퍼즐과 맞춘 퍼즐을 비교하는 그림",
+                prompt: "같은 명사라도 상태에 따라 관형형이 달라지는 것을 말로 확인합니다.",
+                dunCaption: "`맞추던 퍼즐`: 어제 맞추다가 아직 끝나지 않은 퍼즐",
+                doneCaption: "`맞춘 퍼즐`: 어제 이미 다 맞춘 퍼즐",
+                pair: "A: 어제 맞추던 퍼즐을 마저 맞춰요. B: 이건 어제 맞춘 퍼즐이에요.",
+                questions: [
+                    {
+                        sentence: "어제 내가 ____ 퍼즐을 마저 맞춰야지!",
+                        options: ["맞추던", "맞춘"],
+                        answer: "맞추던",
+                        reason: "퍼즐을 끝내지 못하고 이어서 해야 하므로 `맞추던`이 맞습니다."
+                    },
+                    {
+                        sentence: "이건 어제 내가 ____ 퍼즐이에요.",
+                        options: ["맞추던", "맞춘"],
+                        answer: "맞춘",
+                        reason: "완성된 퍼즐을 말하므로 `맞춘 퍼즐`을 씁니다."
+                    }
+                ]
+            },
+            {
+                tab: "정리",
+                label: "정리 4",
+                title: "말로 규칙 정리하기",
+                image: "../assets/c10/grammar/images/dun-support/dun-bap-compare.webp",
+                alt: "정리용 먹던 밥과 먹은 밥 비교 그림",
+                prompt: "세 장면 중 하나를 골라 짝에게 미완료 문장과 완료 문장을 각각 말합니다.",
+                dunCaption: "`-던`: 과거에 하던 중이었거나 자주 했던 일을 회상",
+                doneCaption: "`-(으)ㄴ`: 과거에 이미 끝난 행동의 결과",
+                pair: "한 사람은 `-던`, 다른 사람은 `-(으)ㄴ`으로 같은 명사를 꾸며 말합니다.",
+                questions: [
+                    {
+                        sentence: "아직 끝나지 않은 과거 행동을 떠올리면?",
+                        options: ["-던", "-(으)ㄴ"],
+                        answer: "-던",
+                        reason: "하다가 멈췄거나 반복했던 과거 경험에는 `-던`을 씁니다."
+                    },
+                    {
+                        sentence: "이미 끝난 과거 행동의 결과를 말하면?",
+                        options: ["-던", "-(으)ㄴ"],
+                        answer: "-(으)ㄴ",
+                        reason: "완료된 행동이 명사를 꾸밀 때는 `-(으)ㄴ`을 씁니다."
+                    }
+                ]
+            }
+        ];
+
+        let currentStage = 0;
+        const answered = new Map();
+
+        function iconRefresh() {
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function renderTabs() {
+            const tabs = document.getElementById("stageTabs");
+            tabs.innerHTML = stages.map((stage, index) => `
+                <button
+                    class="stage-tab"
+                    type="button"
+                    role="tab"
+                    aria-selected="${index === currentStage}"
+                    onclick="setStage(${index})"
+                >
+                    <i data-lucide="${index === 3 ? "list-checks" : "image"}" aria-hidden="true"></i>
+                    ${index + 1}. ${stage.tab}
+                </button>
+            `).join("");
+        }
+
+        function renderStage() {
+            const stage = stages[currentStage];
+            document.getElementById("sourceImage").src = stage.image;
+            document.getElementById("sourceImage").alt = stage.alt;
+            document.getElementById("stageLabel").textContent = stage.label;
+            document.getElementById("stageTitle").textContent = stage.title;
+            document.getElementById("stagePrompt").textContent = stage.prompt;
+            document.getElementById("dunCaption").textContent = stage.dunCaption;
+            document.getElementById("doneCaption").textContent = stage.doneCaption;
+            document.getElementById("pairPrompt").textContent = stage.pair;
+            document.getElementById("feedback").textContent = "문장을 보고 알맞은 표현을 선택하세요.";
+            renderQuestions();
+            renderTabs();
+            iconRefresh();
+        }
+
+        function renderQuestions() {
+            const stage = stages[currentStage];
+            const list = document.getElementById("questionList");
+            list.innerHTML = stage.questions.map((question, index) => {
+                const key = `${currentStage}-${index}`;
+                const selected = answered.get(key);
+                const optionButtons = question.options.map(option => {
+                    let stateClass = "";
+                    if (selected) {
+                        if (option === question.answer) stateClass = "correct";
+                        else if (option === selected) stateClass = "incorrect";
+                    }
+                    return `<button class="option-btn ${stateClass}" type="button" data-question-index="${index}" data-option="${option}" onclick="chooseAnswer(${index}, '${option.replace(/'/g, "\\'")}')">${option}</button>`;
+                }).join("");
+                return `
+                    <div class="question-card">
+                        <p>${index + 1}. ${question.sentence}</p>
+                        <div class="option-row">${optionButtons}</div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function chooseAnswer(questionIndex, option) {
+            const stage = stages[currentStage];
+            const question = stage.questions[questionIndex];
+            const key = `${currentStage}-${questionIndex}`;
+            answered.set(key, option);
+            renderQuestions();
+            const ok = option === question.answer;
+            document.getElementById("feedback").textContent = ok
+                ? `맞아요. ${question.reason}`
+                : `다시 볼게요. 정답은 '${question.answer}'입니다. ${question.reason}`;
+        }
+
+        function resetStage() {
+            stages[currentStage].questions.forEach((_, index) => answered.delete(`${currentStage}-${index}`));
+            renderStage();
+        }
+
+        function setStage(index) {
+            currentStage = index;
+            renderStage();
+        }
+
+        function nextStage() {
+            currentStage = (currentStage + 1) % stages.length;
+            renderStage();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        renderStage();
+    </script>
+</body>
+</html>

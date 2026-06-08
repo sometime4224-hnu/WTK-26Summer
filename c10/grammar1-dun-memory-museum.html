@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>C10 문법1 보조 활동 - 추억 박물관</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --ink: #111827;
+            --muted: #536171;
+            --line: #d8e0eb;
+            --panel: #ffffff;
+            --soft: #f1f5f9;
+            --dun: #0f766e;
+            --done: #b45309;
+            --blue: #1d4ed8;
+            --rose: #be123c;
+            --shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            background:
+                linear-gradient(180deg, #ffffff 0%, var(--bg) 56%, #f4f1ea 100%);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+            letter-spacing: 0;
+        }
+
+        button,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 52px;
+            padding: 8px 14px;
+            border-bottom: 1px solid rgba(216, 224, 235, 0.9);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar__links,
+        .topbar__tools {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .topbar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            padding: 7px 9px;
+            border-radius: 8px;
+            color: #1d4ed8;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
+        .topbar a:hover,
+        .topbar a:focus-visible {
+            background: #eff6ff;
+        }
+
+        .topbar__title {
+            color: #334155;
+            font-size: 0.86rem;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .shell {
+            width: min(1180px, calc(100% - 28px));
+            margin: 18px auto 42px;
+        }
+
+        .unit-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: end;
+            margin-bottom: 14px;
+        }
+
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--dun);
+            font-size: 0.76rem;
+            font-weight: 950;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin-top: 0;
+        }
+
+        h1 {
+            margin-bottom: 6px;
+            font-size: clamp(1.7rem, 3.5vw, 3rem);
+            line-height: 1.08;
+        }
+
+        .lead {
+            max-width: 760px;
+            margin-bottom: 0;
+            color: var(--muted);
+            font-size: 0.98rem;
+            font-weight: 750;
+            line-height: 1.65;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .tool-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            padding: 8px 11px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            font-weight: 900;
+        }
+
+        .tool-btn.primary {
+            border-color: var(--dun);
+            background: var(--dun);
+            color: #ffffff;
+        }
+
+        .tool-btn.accent {
+            border-color: #fde68a;
+            background: #fffbeb;
+            color: #92400e;
+        }
+
+        .museum-layout {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.86fr) minmax(0, 1.14fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .exhibit,
+        .builder,
+        .deck-section,
+        .saved-section,
+        .teacher-note {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .exhibit {
+            overflow: hidden;
+        }
+
+        .exhibit__image {
+            display: block;
+            width: 100%;
+            min-height: 270px;
+            object-fit: cover;
+            background: #e2e8f0;
+        }
+
+        .exhibit__body {
+            padding: 15px;
+        }
+
+        .state-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 30px;
+            padding: 5px 9px;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.82rem;
+            font-weight: 950;
+        }
+
+        .state-badge.dun {
+            background: var(--dun);
+        }
+
+        .state-badge.done {
+            background: var(--done);
+        }
+
+        .exhibit h2 {
+            margin: 10px 0 6px;
+            font-size: clamp(1.36rem, 2.4vw, 2rem);
+            line-height: 1.12;
+        }
+
+        .meta-line {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+
+        .builder {
+            padding: 16px;
+        }
+
+        .builder h2,
+        .deck-section h2,
+        .saved-section h2 {
+            margin-bottom: 8px;
+            font-size: 1.32rem;
+        }
+
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .pattern-box {
+            min-height: 108px;
+            padding: 12px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #fbfdff;
+        }
+
+        .pattern-box strong {
+            display: block;
+            margin-bottom: 7px;
+            color: #0f172a;
+            font-size: 0.94rem;
+        }
+
+        .pattern-box p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+            font-weight: 750;
+            line-height: 1.55;
+        }
+
+        .sentence-panel {
+            min-height: 104px;
+            padding: 13px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .sentence-panel p {
+            margin-bottom: 8px;
+            color: #334155;
+            font-weight: 850;
+        }
+
+        .sample-sentence {
+            margin: 0;
+            color: #111827;
+            font-size: clamp(1.04rem, 2.2vw, 1.28rem);
+            font-weight: 950;
+            line-height: 1.45;
+            word-break: keep-all;
+        }
+
+        .compose {
+            display: grid;
+            gap: 9px;
+            margin-top: 12px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 94px;
+            resize: vertical;
+            padding: 10px 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #111827;
+            font-weight: 800;
+            line-height: 1.55;
+        }
+
+        .deck-section,
+        .saved-section,
+        .teacher-note {
+            margin-top: 14px;
+            padding: 15px;
+        }
+
+        .deck-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 9px;
+            margin-top: 10px;
+        }
+
+        .deck-card {
+            display: grid;
+            gap: 6px;
+            min-height: 148px;
+            padding: 7px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #111827;
+            text-align: left;
+            box-shadow: 0 7px 14px rgba(15, 23, 42, 0.05);
+        }
+
+        .deck-card:hover,
+        .deck-card:focus-visible,
+        .deck-card.active {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+        }
+
+        .deck-card img {
+            display: block;
+            width: 100%;
+            height: 82px;
+            object-fit: cover;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: #f8fafc;
+        }
+
+        .deck-card span {
+            color: #111827;
+            font-size: 0.82rem;
+            font-weight: 950;
+            line-height: 1.25;
+            word-break: keep-all;
+        }
+
+        .saved-list {
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .saved-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 11px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #fbfdff;
+            color: #334155;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+
+        .teacher-note summary {
+            cursor: pointer;
+            color: #334155;
+            font-weight: 950;
+        }
+
+        .source-board {
+            display: block;
+            width: 100%;
+            margin-top: 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .empty-state {
+            display: grid;
+            min-height: 88px;
+            place-items: center;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            color: #64748b;
+            font-weight: 850;
+            text-align: center;
+            line-height: 1.45;
+        }
+
+        @media (max-width: 980px) {
+            .unit-head,
+            .museum-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                justify-content: flex-start;
+            }
+
+            .deck-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 620px) {
+            .shell {
+                width: min(100% - 18px, 1180px);
+                margin-top: 12px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .topbar__tools {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 2px;
+            }
+
+            .pattern-grid,
+            .deck-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar" aria-label="활동 이동">
+        <div class="topbar__links">
+            <a href="../index.html"><i data-lucide="home" aria-hidden="true"></i> 메인</a>
+            <a href="index.html"><i data-lucide="folder-open" aria-hidden="true"></i> 10과</a>
+            <a href="grammar1.html"><i data-lucide="book-open" aria-hidden="true"></i> 문법1</a>
+        </div>
+        <div class="topbar__tools">
+            <span class="topbar__title">추억 박물관</span>
+            <a href="grammar1-dun-visual-warmup.html"><i data-lucide="images" aria-hidden="true"></i> 도입</a>
+            <a href="grammar1-dun-card-sort.html"><i data-lucide="layout-grid" aria-hidden="true"></i> 카드 분류</a>
+        </div>
+    </nav>
+
+    <main class="shell">
+        <header class="unit-head">
+            <div>
+                <p class="eyebrow">C10 Grammar 1 Support</p>
+                <h1>추억 박물관: 내가 예전에 쓰던 것</h1>
+                <p class="lead">사진 카드를 골라 개인 경험 문장을 만들고, 짝에게 질문하며 `-던`과 `-(으)ㄴ`을 말로 확장합니다.</p>
+            </div>
+            <div class="toolbar" aria-label="활동 도구">
+                <button class="tool-btn" type="button" onclick="randomExhibit()"><i data-lucide="shuffle" aria-hidden="true"></i> 랜덤 카드</button>
+                <button class="tool-btn accent" type="button" onclick="toggleAnswer()"><i data-lucide="eye" aria-hidden="true"></i> 문장 보기</button>
+                <button class="tool-btn primary" type="button" onclick="saveSentence()"><i data-lucide="save" aria-hidden="true"></i> 저장</button>
+            </div>
+        </header>
+
+        <section class="museum-layout" aria-label="말하기 활동">
+            <article class="exhibit">
+                <img id="currentImage" class="exhibit__image" src="" alt="">
+                <div class="exhibit__body">
+                    <span id="stateBadge" class="state-badge"></span>
+                    <h2 id="currentExpression">____</h2>
+                    <p id="currentMeta" class="meta-line"></p>
+                </div>
+            </article>
+
+            <article class="builder">
+                <h2>문장 만들기</h2>
+                <p id="questionLine" class="lead">짝에게 물어볼 질문이 여기에 나옵니다.</p>
+
+                <div class="pattern-grid">
+                    <div class="pattern-box">
+                        <strong>-던</strong>
+                        <p>제가 예전에 자주 ___던 ___이에요.</p>
+                    </div>
+                    <div class="pattern-box">
+                        <strong>-(으)ㄴ</strong>
+                        <p>제가 어제 / 작년에 ___은/ㄴ ___이에요.</p>
+                    </div>
+                </div>
+
+                <div class="sentence-panel" aria-live="polite">
+                    <p>샘플 문장</p>
+                    <div id="sampleSentence" class="sample-sentence">문장 보기를 누르면 확인할 수 있습니다.</div>
+                </div>
+
+                <div class="compose">
+                    <textarea id="mySentence" aria-label="내 문장 입력" placeholder="내 경험으로 문장을 써 보세요."></textarea>
+                    <button class="tool-btn primary" type="button" onclick="saveSentence()"><i data-lucide="plus" aria-hidden="true"></i> 내 문장 추가</button>
+                </div>
+            </article>
+        </section>
+
+        <section class="deck-section">
+            <h2>전시 카드 선택</h2>
+            <p class="lead">카드를 고른 뒤 질문, 샘플 문장, 내 문장을 차례로 말합니다.</p>
+            <div id="deckGrid" class="deck-grid"></div>
+        </section>
+
+        <section class="saved-section">
+            <h2>오늘 만든 문장</h2>
+            <div id="savedList" class="saved-list">
+                <div class="empty-state">아직 저장한 문장이 없습니다.</div>
+            </div>
+        </section>
+
+        <details class="teacher-note">
+            <summary>원본 보드 보기</summary>
+            <img class="source-board" src="../assets/c10/grammar/images/dun-support/dun-memory-museum.webp" alt="-던과 완료 경험을 비교하는 사진 원본 보드">
+        </details>
+    </main>
+
+    <script>
+        const SOURCE = "../assets/c10/grammar/images/dun-support/dun-memory-museum.webp";
+        const EXHIBITS = [
+            {
+                id: "clothes-dun", x: 0, row: 0, verb: "입다", noun: "옷", expression: "입던 옷", state: "unfinished",
+                question: "예전에 자주 입던 옷이 있어요?",
+                sample: "이건 제가 중학교 때 자주 입던 옷이에요."
+            },
+            {
+                id: "clothes-done", x: 1, row: 0, verb: "입다", noun: "옷", expression: "입은 옷", state: "completed",
+                question: "특별한 날에 입은 옷이 기억나요?",
+                sample: "이건 제가 졸업식 때 입은 옷이에요."
+            },
+            {
+                id: "shoes-dun", x: 2, row: 0, verb: "신다", noun: "신발", expression: "신던 신발", state: "unfinished",
+                question: "예전에 자주 신던 신발이 있어요?",
+                sample: "이건 제가 운동할 때마다 신던 신발이에요."
+            },
+            {
+                id: "shoes-done", x: 3, row: 0, verb: "신다", noun: "신발", expression: "신은 신발", state: "completed",
+                question: "최근에 한 번 신은 신발이 있어요?",
+                sample: "이건 제가 면접 날 신은 신발이에요."
+            },
+            {
+                id: "bike-dun", x: 4, row: 0, verb: "타다", noun: "자전거", expression: "타던 자전거", state: "unfinished",
+                question: "어릴 때 타던 자전거가 기억나요?",
+                sample: "이건 제가 초등학교 때 타던 자전거예요."
+            },
+            {
+                id: "bike-done", x: 5, row: 0, verb: "타다", noun: "자전거", expression: "탄 자전거", state: "completed",
+                question: "최근에 탄 자전거가 어땠어요?",
+                sample: "이건 제가 지난 주말에 탄 자전거예요."
+            },
+            {
+                id: "book-dun", x: 6, row: 0, verb: "읽다", noun: "책", expression: "읽던 책", state: "unfinished",
+                question: "읽다가 멈춘 책이 있어요?",
+                sample: "이건 제가 방학 때 읽던 책이에요."
+            },
+            {
+                id: "book-done", x: 7, row: 0, verb: "읽다", noun: "책", expression: "읽은 책", state: "completed",
+                question: "최근에 끝까지 읽은 책이 있어요?",
+                sample: "이건 제가 지난달에 다 읽은 책이에요."
+            },
+            {
+                id: "music-dun", x: 4, row: 1, verb: "듣다", noun: "음악", expression: "듣던 음악", state: "unfinished",
+                question: "예전에 자주 듣던 음악이 있어요?",
+                sample: "이건 제가 고등학교 때 자주 듣던 음악이에요."
+            },
+            {
+                id: "music-done", x: 5, row: 1, verb: "듣다", noun: "음악", expression: "들은 음악", state: "completed",
+                question: "어제 들은 음악은 뭐예요?",
+                sample: "이건 제가 어제 운동하면서 들은 음악이에요."
+            },
+            {
+                id: "hat-dun", x: 6, row: 1, verb: "쓰다", noun: "모자", expression: "쓰던 모자", state: "unfinished",
+                question: "예전에 자주 쓰던 모자가 있어요?",
+                sample: "이건 제가 여행 갈 때마다 쓰던 모자예요."
+            },
+            {
+                id: "hat-done", x: 7, row: 1, verb: "쓰다", noun: "모자", expression: "쓴 모자", state: "completed",
+                question: "사진에서 쓴 모자가 기억나요?",
+                sample: "이건 제가 졸업식 사진에서 쓴 모자예요."
+            }
+        ];
+
+        const sourceImage = new Image();
+        const cropCache = new Map();
+        let currentId = EXHIBITS[0].id;
+        let answerVisible = false;
+        let savedSentences = [];
+
+        sourceImage.onload = () => render();
+        sourceImage.src = SOURCE;
+
+        function iconRefresh() {
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function getExhibit(id) {
+            return EXHIBITS.find(item => item.id === id);
+        }
+
+        function makeCrop(item) {
+            if (cropCache.has(item.id)) return cropCache.get(item.id);
+            const cellW = sourceImage.naturalWidth / 8;
+            const rowH = sourceImage.naturalHeight / 3;
+            const sx = item.x * cellW;
+            const sy = item.row * rowH + rowH * 0.14;
+            const sw = cellW;
+            const sh = rowH * 0.72;
+            const canvas = document.createElement("canvas");
+            canvas.width = 420;
+            canvas.height = Math.round(canvas.width * sh / sw);
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(sourceImage, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+            const url = canvas.toDataURL("image/webp", 0.9);
+            cropCache.set(item.id, url);
+            return url;
+        }
+
+        function setCurrent(id) {
+            currentId = id;
+            answerVisible = false;
+            document.getElementById("mySentence").value = "";
+            render();
+        }
+
+        function randomExhibit() {
+            const pool = EXHIBITS.filter(item => item.id !== currentId);
+            const next = pool[Math.floor(Math.random() * pool.length)];
+            setCurrent(next.id);
+        }
+
+        function toggleAnswer() {
+            answerVisible = !answerVisible;
+            renderCurrent();
+        }
+
+        function renderCurrent() {
+            const item = getExhibit(currentId);
+            document.getElementById("currentImage").src = makeCrop(item);
+            document.getElementById("currentImage").alt = `${item.expression} 사진`;
+            const badge = document.getElementById("stateBadge");
+            badge.className = `state-badge ${item.state === "unfinished" ? "dun" : "done"}`;
+            badge.innerHTML = `<i data-lucide="${item.state === "unfinished" ? "history" : "badge-check"}" aria-hidden="true"></i>${item.state === "unfinished" ? "-던" : "-(으)ㄴ"}`;
+            document.getElementById("currentExpression").textContent = answerVisible ? item.expression : `____ ${item.noun}`;
+            document.getElementById("currentMeta").textContent = `${item.verb} + ${item.noun}`;
+            document.getElementById("questionLine").textContent = item.question;
+            document.getElementById("sampleSentence").textContent = answerVisible ? item.sample : "문장 보기를 누르면 확인할 수 있습니다.";
+            iconRefresh();
+        }
+
+        function renderDeck() {
+            document.getElementById("deckGrid").innerHTML = EXHIBITS.map(item => `
+                <button class="deck-card ${item.id === currentId ? "active" : ""}" type="button" data-exhibit-id="${item.id}" onclick="setCurrent('${item.id}')">
+                    <img src="${makeCrop(item)}" alt="${item.expression} 사진">
+                    <span>${item.expression}</span>
+                </button>
+            `).join("");
+        }
+
+        function renderSaved() {
+            const list = document.getElementById("savedList");
+            if (!savedSentences.length) {
+                list.innerHTML = `<div class="empty-state">아직 저장한 문장이 없습니다.</div>`;
+                return;
+            }
+            list.innerHTML = savedSentences.map((sentence, index) => `
+                <div class="saved-item">
+                    <span>${index + 1}. ${sentence}</span>
+                    <button class="tool-btn" type="button" onclick="removeSaved(${index})"><i data-lucide="trash-2" aria-hidden="true"></i> 삭제</button>
+                </div>
+            `).join("");
+            iconRefresh();
+        }
+
+        function saveSentence() {
+            const input = document.getElementById("mySentence");
+            const item = getExhibit(currentId);
+            const sentence = input.value.trim() || item.sample;
+            savedSentences.push(sentence);
+            input.value = "";
+            renderSaved();
+        }
+
+        function removeSaved(index) {
+            savedSentences = savedSentences.filter((_, itemIndex) => itemIndex !== index);
+            renderSaved();
+        }
+
+        function render() {
+            renderCurrent();
+            renderDeck();
+            renderSaved();
+        }
+    </script>
+</body>
+</html>
