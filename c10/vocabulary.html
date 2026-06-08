@@ -130,7 +130,9 @@
             gap: 4px;
             border-radius: var(--radius, 8px);
             padding: 3px;
-            background: #eaf0f7;
+            border: 1px solid rgba(251, 146, 60, 0.22);
+            background: #fff7ed;
+            box-shadow: 0 8px 18px rgba(251, 146, 60, 0.08);
         }
         .segmented button {
             display: inline-flex;
@@ -138,7 +140,7 @@
             justify-content: center;
             gap: 7px;
             min-height: 44px;
-            border: 0;
+            border: 1px solid transparent;
             border-radius: 8px;
             padding: 0 14px;
             background: transparent;
@@ -146,11 +148,25 @@
             font-size: 13px;
             font-weight: 900;
             cursor: pointer;
+            transition: transform 0.14s, border-color 0.14s, background 0.14s, color 0.14s, box-shadow 0.14s;
+        }
+        .segmented button:not(.active) {
+            border-color: rgba(251, 146, 60, 0.18);
+            background: rgba(255, 255, 255, 0.52);
+            color: #9a3412;
+        }
+        .segmented button:hover,
+        .segmented button:focus-visible {
+            transform: translateY(-1px);
+            border-color: var(--vocab, #e4582e);
+            outline: none;
+            box-shadow: 0 8px 18px rgba(251, 146, 60, 0.12);
         }
         .segmented button.active {
             background: #fff;
             color: var(--ink, #172033);
-            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+            border-color: rgba(251, 146, 60, 0.34);
+            box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.08), var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
         }
         .search {
             display: flex;
@@ -182,18 +198,23 @@
             justify-content: center;
             gap: 8px;
             min-height: 44px;
-            border: 1px solid var(--line, #dbe4f0);
+            border: 1px solid rgba(251, 146, 60, 0.36);
             border-radius: var(--radius-pill, 999px);
             padding: 0 12px;
-            background: #fff;
-            color: var(--muted, #64748b);
+            background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
+            color: #9a3412;
             font-size: 12px;
             font-weight: 900;
             cursor: pointer;
+            box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.06), 0 8px 18px rgba(251, 146, 60, 0.08);
             transition: background 0.14s, border-color 0.14s, color 0.14s, box-shadow 0.14s;
         }
         .control-btn:hover,
-        .front-headword-toggle:hover { border-color: #bfdbfe; color: var(--accent-dark, #1d4ed8); }
+        .front-headword-toggle:hover {
+            border-color: var(--vocab, #e4582e);
+            color: var(--vocab, #e4582e);
+            box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.1), 0 10px 22px rgba(251, 146, 60, 0.12);
+        }
         .front-headword-toggle[aria-checked="true"] {
             border-color: var(--vocab, #e4582e);
             background: #fff4ed;
@@ -240,7 +261,8 @@
         .front-headword-size:not([aria-disabled="true"]) {
             border-color: #fed7aa;
             color: var(--vocab, #e4582e);
-            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+            background: #fffaf5;
+            box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.06), var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
         }
         .front-headword-size[aria-disabled="true"] {
             opacity: 0.48;
@@ -257,9 +279,9 @@
             justify-content: center;
             width: 30px;
             height: 30px;
-            border: 1px solid var(--line, #dbe4f0);
+            border: 1px solid rgba(251, 146, 60, 0.32);
             border-radius: 50%;
-            background: #f8fafc;
+            background: #fff7ed;
             color: inherit;
             cursor: pointer;
         }
@@ -275,14 +297,15 @@
         .category-filter { display: flex; flex-wrap: wrap; gap: 6px; }
         .category-btn {
             min-height: 40px;
-            border: 1px solid var(--line, #dbe4f0);
+            border: 1px solid rgba(251, 146, 60, 0.3);
             border-radius: var(--radius-pill, 999px);
             padding: 0 12px;
-            background: #fff;
-            color: var(--muted, #64748b);
+            background: #fffaf5;
+            color: #9a3412;
             font-size: 12px;
             font-weight: 900;
             cursor: pointer;
+            box-shadow: 0 5px 12px rgba(251, 146, 60, 0.06);
         }
         .category-btn.active { border-color: var(--vocab, #e4582e); background: #fff4ed; color: var(--vocab, #e4582e); }
 
@@ -391,14 +414,14 @@
             justify-content: center;
             width: 34px;
             height: 34px;
-            border: 1px solid rgba(255, 255, 255, 0.74);
+            border: 1px solid rgba(251, 146, 60, 0.38);
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.88);
-            color: #475569;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+            background: rgba(255, 247, 237, 0.96);
+            color: var(--vocab, #e4582e);
+            box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.08), 0 7px 16px rgba(15, 23, 42, 0.1);
             cursor: pointer;
         }
-        .card-action:hover { color: var(--accent-dark, #1d4ed8); }
+        .card-action:hover { border-color: #93c5fd; color: var(--accent-dark, #1d4ed8); }
         .card-action--speak { top: 10px; right: 10px; }
         .card-action--flip { right: 10px; bottom: 10px; }
         .word-card__back {
@@ -563,19 +586,28 @@
             justify-content: center;
             gap: 7px;
             min-height: 38px;
-            border: 0;
+            border: 1px solid rgba(251, 146, 60, 0.18);
             border-radius: 8px;
             padding: 0 10px;
-            background: transparent;
-            color: var(--muted, #64748b);
+            background: rgba(255, 255, 255, 0.56);
+            color: #9a3412;
             font-size: 12px;
             font-weight: 900;
             cursor: pointer;
+            transition: transform 0.14s, border-color 0.14s, background 0.14s, box-shadow 0.14s;
+        }
+        .quiz-mode-btn:hover,
+        .quiz-mode-btn:focus-visible {
+            transform: translateY(-1px);
+            border-color: var(--vocab, #e4582e);
+            outline: none;
+            box-shadow: 0 8px 18px rgba(251, 146, 60, 0.12);
         }
         .quiz-mode-btn.active {
             background: #fff;
             color: var(--ink, #172033);
-            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+            border-color: rgba(251, 146, 60, 0.34);
+            box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.08), var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
         }
         .quiz-meta {
             display: flex;
@@ -653,19 +685,50 @@
         }
         .quiz-options { display: grid; gap: 8px; }
         .quiz-option {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
             width: 100%;
             min-height: 46px;
-            border: 1px solid var(--line, #dbe4f0);
+            border: 1px solid rgba(251, 146, 60, 0.4);
             border-radius: 8px;
             padding: 10px 14px;
-            background: #fff;
+            background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
             color: var(--ink, #172033);
             font-size: 14px;
-            font-weight: 800;
+            font-weight: 900;
             text-align: left;
             cursor: pointer;
+            box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.06), 0 8px 18px rgba(251, 146, 60, 0.08);
+            transition: transform 0.14s, border-color 0.14s, background 0.14s, box-shadow 0.14s;
         }
-        .quiz-option:hover { border-color: #bfdbfe; background: var(--accent-soft, #eff6ff); }
+        .quiz-option::after {
+            content: "";
+            flex: 0 0 auto;
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--vocab, #e4582e);
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.12);
+        }
+        .quiz-option.correct::after,
+        .quiz-option.wrong::after {
+            display: none;
+        }
+        .quiz-option:hover {
+            transform: translateY(-1px);
+            border-color: var(--vocab, #e4582e);
+            background: #fff7ed;
+            box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.1), 0 12px 22px rgba(251, 146, 60, 0.13);
+        }
+        .quiz-option:disabled:not(.correct):not(.wrong) {
+            opacity: 0.62;
+            cursor: default;
+            transform: none;
+            box-shadow: none;
+        }
         .quiz-option.correct { border-color: var(--ok-line, #86efac); background: var(--ok-bg, #dcfce7); color: var(--ok, #15803d); }
         .quiz-option.wrong { border-color: var(--bad-line, #fca5a5); background: var(--bad-bg, #fee2e2); color: var(--bad, #b91c1c); }
         .feedback {
@@ -692,7 +755,12 @@
             text-decoration: none;
             cursor: pointer;
         }
-        .btn.primary { border-color: var(--accent-dark, #1d4ed8); background: var(--accent, #2563eb); color: #fff; }
+        .btn.primary {
+            border-color: var(--accent-dark, #1d4ed8);
+            background: linear-gradient(180deg, var(--accent, #2563eb) 0%, var(--accent-dark, #1d4ed8) 100%);
+            color: #fff;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12), 0 12px 24px rgba(37, 99, 235, 0.18);
+        }
         .footer-nav {
             display: flex;
             flex-wrap: wrap;
@@ -772,6 +840,10 @@
             <button id="front-headword-toggle" class="front-headword-toggle" type="button" role="switch" aria-checked="true">
                 <span class="front-headword-toggle__switch" aria-hidden="true"></span>
                 <i class="fa-solid fa-tag" aria-hidden="true"></i> 표제어 표시
+            </button>
+            <button id="image-version-toggle" class="front-headword-toggle" type="button" role="switch" aria-checked="false" title="구버전 카툰 그림">
+                <span class="front-headword-toggle__switch" aria-hidden="true"></span>
+                <i class="fa-solid fa-images" aria-hidden="true"></i> <span id="image-version-label">현재 그림</span>
             </button>
             <div id="front-headword-size-control" class="front-headword-size" role="group" aria-label="표제어 크기" aria-disabled="false">
                 <i class="fa-solid fa-text-height front-headword-size__icon" aria-hidden="true"></i>
@@ -1196,11 +1268,33 @@
             { bg: "#f5f3ff", ink: "#6d28d9", line: "#ddd6fe" }
         ];
         const CHOSEONG = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+        const CARTOON_IMAGE_BY_ID = {
+            "c10-vocab-01": "../assets/c10/vocabulary/images/legacy-cartoon/v01_confess.webp",
+            "c10-vocab-02": "../assets/c10/vocabulary/images/legacy-cartoon/v02_heart_pound.webp",
+            "c10-vocab-03": "../assets/c10/vocabulary/images/legacy-cartoon/v03_sit_together.webp",
+            "c10-vocab-04": "../assets/c10/vocabulary/images/legacy-cartoon/v04_kind_heart.webp",
+            "c10-vocab-05": "../assets/c10/vocabulary/images/legacy-cartoon/v05_communicate_well.webp",
+            "c10-vocab-06": "../assets/c10/vocabulary/images/legacy-cartoon/v06_attractive.webp",
+            "c10-vocab-07": "../assets/c10/vocabulary/images/legacy-cartoon/v07_fall_in_love.webp",
+            "c10-vocab-08": "../assets/c10/vocabulary/images/legacy-cartoon/v08_start_dating.webp",
+            "c10-vocab-09": "../assets/c10/vocabulary/images/legacy-cartoon/v09_personality_match.webp",
+            "c10-vocab-10": "../assets/c10/vocabulary/images/legacy-cartoon/v10_blind_date.webp",
+            "c10-vocab-11": "../assets/c10/vocabulary/images/legacy-cartoon/v11_group_date_intro.webp",
+            "c10-vocab-12": "../assets/c10/vocabulary/images/legacy-cartoon/v12_hold_hands.webp",
+            "c10-vocab-13": "../assets/c10/vocabulary/images/legacy-cartoon/v13_lean_on_shoulder.webp",
+            "c10-vocab-14": "../assets/c10/vocabulary/images/legacy-cartoon/v14_blush.webp",
+            "c10-vocab-15": "../assets/c10/vocabulary/images/legacy-cartoon/v15_be_in_relationship.webp",
+            "c10-vocab-16": "../assets/c10/vocabulary/images/legacy-cartoon/v16_good_impression.webp",
+            "c10-vocab-17": "../assets/c10/vocabulary/images/legacy-cartoon/v17_match_conditions.webp",
+            "c10-vocab-18": "../assets/c10/vocabulary/images/legacy-cartoon/v18_love_at_first_sight.webp",
+            "c10-vocab-19": "../assets/c10/vocabulary/images/legacy-cartoon/v19_lock_arms.webp"
+        };
 
         const storagePrefix = cfg.storageKey || `vocabulary-${cfg.chapter || "standard"}`;
         const categories = normalizeCategories(cfg.categories || []);
         const words = normalizeWords(cfg.words || []);
         const imageCount = words.filter((word) => Boolean(word.image)).length;
+        const cartoonImageCount = words.filter((word) => Boolean(word.cartoonImage)).length;
         const quizImageCount = words.filter((word) => Boolean(word.quizImage || word.image)).length;
         const availableQuizModes = normalizeQuizModes(cfg.quizModes || ["meaning", "choseong", "image"]);
         const FRONT_HEADWORD_SIZES = [13, 16, 19, 22];
@@ -1215,6 +1309,7 @@
         let currentCategory = "all";
         let searchQuery = "";
         let showFrontHeadword = readStored(`${storagePrefix}-front-headword`, "true") === "true";
+        let showCartoonImages = cartoonImageCount > 0 && readStored(`${storagePrefix}-image-version`, "current") === "cartoon";
         let frontHeadwordSizeIndex = Number(readStored(`${storagePrefix}-front-headword-size`, String(DEFAULT_FRONT_HEADWORD_SIZE_INDEX)));
         if (!Number.isInteger(frontHeadwordSizeIndex) || frontHeadwordSizeIndex < 0 || frontHeadwordSizeIndex >= FRONT_HEADWORD_SIZES.length) {
             frontHeadwordSizeIndex = DEFAULT_FRONT_HEADWORD_SIZE_INDEX;
@@ -1236,6 +1331,8 @@
             frontSizeDown: document.getElementById("front-headword-size-down"),
             frontSizeUp: document.getElementById("front-headword-size-up"),
             frontSizeLabel: document.getElementById("front-headword-size-label"),
+            imageVersionToggle: document.getElementById("image-version-toggle"),
+            imageVersionLabel: document.getElementById("image-version-label"),
             shuffleBtn: document.getElementById("shuffle-btn"),
             wordGrid: document.getElementById("word-grid"),
             cardsEmpty: document.getElementById("cards-empty"),
@@ -1269,17 +1366,23 @@
         }
 
         function normalizeWords(source) {
-            return source.map((word, index) => ({
-                ...word,
-                id: word.id || `word-${index + 1}`,
-                ko: word.ko || word.term || word.korean || "",
-                meaning: word.meaning || word.definition || word.foreign || "",
-                category: word.category || "all",
-                image: word.image || null,
-                imageAlt: word.imageAlt || word.alt || "",
-                quizImage: word.quizImage || word.maskedImage || null,
-                quizImageAlt: word.quizImageAlt || word.imageAlt || word.alt || ""
-            })).filter((word) => word.ko);
+            return source.map((word, index) => {
+                const id = word.id || `word-${index + 1}`;
+                const ko = word.ko || word.term || word.korean || "";
+                return {
+                    ...word,
+                    id,
+                    ko,
+                    meaning: word.meaning || word.definition || word.foreign || "",
+                    category: word.category || "all",
+                    image: word.image || null,
+                    imageAlt: word.imageAlt || word.alt || "",
+                    cartoonImage: word.cartoonImage || CARTOON_IMAGE_BY_ID[id] || null,
+                    cartoonImageAlt: word.cartoonImageAlt || (ko ? `${ko} 구버전 카툰 그림 카드` : ""),
+                    quizImage: word.quizImage || word.maskedImage || null,
+                    quizImageAlt: word.quizImageAlt || word.imageAlt || word.alt || ""
+                };
+            }).filter((word) => word.ko);
         }
 
         function normalizeQuizModes(source) {
@@ -1375,18 +1478,41 @@
                 });
         }
 
+        function primaryVisualFor(word) {
+            const useCartoon = showCartoonImages && word.cartoonImage;
+            return {
+                src: useCartoon ? word.cartoonImage : word.image,
+                alt: useCartoon
+                    ? (word.cartoonImageAlt || word.imageAlt || `${word.ko} 구버전 카툰 그림 카드`)
+                    : (word.imageAlt || `${word.ko} 그림 카드`)
+            };
+        }
+
+        function quizVisualImageFor(word) {
+            if (showCartoonImages && word.cartoonImage) {
+                return {
+                    src: word.cartoonImage,
+                    alt: word.cartoonImageAlt || word.imageAlt || `${word.ko} 구버전 카툰 그림`
+                };
+            }
+            return {
+                src: word.quizImage || word.image,
+                alt: word.quizImageAlt || word.imageAlt || "어휘 그림"
+            };
+        }
+
         function imageMarkup(word, className, fallbackText) {
-            if (word.image) {
-                return `<img class="${className}" src="${escapeHtml(word.image)}" alt="${escapeHtml(word.imageAlt || `${word.ko} 그림 카드`)}" loading="lazy" decoding="async" />`;
+            const image = primaryVisualFor(word);
+            if (image.src) {
+                return `<img class="${className}" src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt)}" loading="lazy" decoding="async" />`;
             }
             return `<span class="${className === "word-card__image" ? "word-card__placeholder" : "quiz-visual__fallback"}">${escapeHtml(fallbackText || word.ko)}</span>`;
         }
 
         function quizVisualFor(word, overlay = "") {
-            const quizImage = word.quizImage || word.image;
-            const quizImageAlt = word.quizImageAlt || word.imageAlt || "어휘 그림";
-            const visual = quizImage
-                ? `<img class="quiz-image" src="${escapeHtml(quizImage)}" alt="${escapeHtml(quizImageAlt)}" loading="lazy" decoding="async" />`
+            const image = quizVisualImageFor(word);
+            const visual = image.src
+                ? `<img class="quiz-image" src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt)}" loading="lazy" decoding="async" />`
                 : `<span class="quiz-visual__fallback">${escapeHtml(word.ko)}</span>`;
             return `<div class="quiz-visual">${visual}${overlay}</div>`;
         }
@@ -1437,6 +1563,17 @@
             els.frontSizeControl.setAttribute("aria-disabled", String(!showFrontHeadword));
             els.frontSizeDown.disabled = !showFrontHeadword || frontHeadwordSizeIndex <= 0;
             els.frontSizeUp.disabled = !showFrontHeadword || frontHeadwordSizeIndex >= FRONT_HEADWORD_SIZES.length - 1;
+        }
+
+        function updateImageVersionToggle() {
+            if (!els.imageVersionToggle) return;
+            els.imageVersionToggle.hidden = cartoonImageCount === 0;
+            els.imageVersionToggle.setAttribute("aria-checked", String(showCartoonImages));
+            els.imageVersionToggle.setAttribute("aria-label", showCartoonImages ? "현재 그림으로 보기" : "구버전 카툰 그림으로 보기");
+            els.imageVersionToggle.title = showCartoonImages ? "현재 그림으로 보기" : "구버전 카툰 그림으로 보기";
+            if (els.imageVersionLabel) {
+                els.imageVersionLabel.textContent = showCartoonImages ? "카툰 그림" : "현재 그림";
+            }
         }
 
         function setFrontHeadwordSize(index) {
@@ -1520,8 +1657,9 @@
                 const category = categoryFor(word.category);
                 const item = document.createElement("article");
                 item.className = "list-item";
-                const thumb = word.image
-                    ? `<img class="list-item__thumb" src="${escapeHtml(word.image)}" alt="${escapeHtml(word.imageAlt || `${word.ko} 그림`)}" loading="lazy" decoding="async" />`
+                const image = primaryVisualFor(word);
+                const thumb = image.src
+                    ? `<img class="list-item__thumb" src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt || `${word.ko} 그림`)}" loading="lazy" decoding="async" />`
                     : '<span class="list-item__thumb-placeholder"><i class="fa-solid fa-image"></i></span>';
                 item.innerHTML = `
                     ${thumb}
@@ -1556,7 +1694,7 @@
 
         function quizSourceWords() {
             const filtered = filteredWords();
-            if (quizMode === "image") return filtered.filter((word) => Boolean(word.quizImage || word.image));
+            if (quizMode === "image") return filtered.filter((word) => Boolean(quizVisualImageFor(word).src));
             return filtered;
         }
 
@@ -1641,6 +1779,7 @@
             activeLang = window.MultilangToggle?.getLang?.() || readStored("preferred-lang", cfg.defaultLang || "none");
             if (!LANGS[activeLang] || (activeLang !== "none" && !cfg.languages?.includes(activeLang))) activeLang = "none";
             updateFrontHeadwordToggle();
+            updateImageVersionToggle();
             updateQuizModeButtons();
             if (currentView === "cards") renderCards();
             else if (currentView === "list") renderList();
@@ -1648,7 +1787,7 @@
         }
 
         els.vocabCount.textContent = `어휘 ${words.length}개`;
-        els.imageCount.textContent = `이미지 ${imageCount}개`;
+        els.imageCount.textContent = cartoonImageCount ? `이미지 ${imageCount}개 · 카툰 ${cartoonImageCount}개` : `이미지 ${imageCount}개`;
         els.viewButtons.forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
         els.searchInput.addEventListener("input", (event) => {
             searchQuery = event.target.value.trim();
@@ -1659,6 +1798,11 @@
             writeStored(`${storagePrefix}-front-headword`, String(showFrontHeadword));
             renderCards();
             updateFrontHeadwordToggle();
+        });
+        els.imageVersionToggle?.addEventListener("click", () => {
+            showCartoonImages = !showCartoonImages;
+            writeStored(`${storagePrefix}-image-version`, showCartoonImages ? "cartoon" : "current");
+            render();
         });
         els.frontSizeDown.addEventListener("click", () => setFrontHeadwordSize(frontHeadwordSizeIndex - 1));
         els.frontSizeUp.addEventListener("click", () => setFrontHeadwordSize(frontHeadwordSizeIndex + 1));

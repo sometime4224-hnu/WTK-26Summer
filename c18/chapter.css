@@ -160,6 +160,20 @@ h3 {
     line-height: 1.75;
 }
 
+.hero-actions {
+    margin-top: 14px;
+}
+
+.hero-actions .btn {
+    min-height: 38px;
+}
+
+.hero-actions .btn.primary {
+    border-color: #0f766e;
+    background: linear-gradient(180deg, #0f766e 0%, #0d9488 100%);
+    box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.14), 0 12px 24px rgba(15, 118, 110, 0.18);
+}
+
 .chips,
 .button-row,
 .filter-row,
@@ -261,6 +275,55 @@ h3 {
     margin-bottom: 14px;
 }
 
+.section-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.interaction-section {
+    position: relative;
+    border-color: rgba(20, 184, 166, 0.34);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 253, 250, 0.78) 100%);
+}
+
+.interaction-section::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    border-radius: 20px 0 0 20px;
+    background: linear-gradient(180deg, var(--teal), #38bdf8);
+    pointer-events: none;
+}
+
+.interaction-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 34px;
+    width: max-content;
+    border: 1px solid #99f6e4;
+    border-radius: 999px;
+    padding: 0 11px;
+    background: #ecfeff;
+    color: var(--teal-dark);
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1.2;
+    white-space: nowrap;
+    box-shadow: 0 8px 18px rgba(15, 118, 110, 0.1);
+}
+
+.interaction-badge i {
+    color: var(--teal);
+    font-size: 11px;
+}
+
 .path-grid,
 .card-grid,
 .learn-grid,
@@ -290,6 +353,16 @@ h3 {
 .card {
     padding: 16px;
     border-radius: 18px;
+}
+
+.interaction-section [data-choice-group] {
+    border-color: rgba(20, 184, 166, 0.28);
+    background:
+        linear-gradient(180deg, #ffffff 0%, rgba(248, 250, 252, 0.95) 100%);
+}
+
+.interaction-section [data-choice-group]:first-child {
+    box-shadow: 0 16px 30px rgba(15, 118, 110, 0.1);
 }
 
 .card p,
@@ -790,13 +863,58 @@ h3 {
 }
 
 .choice-row button {
-    min-height: 42px;
-    border: 1px solid var(--line);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    border: 1px solid rgba(15, 118, 110, 0.42);
     border-radius: 999px;
-    padding: 0 14px;
-    background: #fff;
-    color: #334155;
+    padding: 0 16px;
+    background: linear-gradient(180deg, #ffffff 0%, #ecfeff 100%);
+    color: #1f3a44;
     font-weight: 900;
+    box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 10px 20px rgba(15, 118, 110, 0.09);
+    transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+
+.choice-row button::after {
+    content: "";
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #14b8a6;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.13);
+}
+
+.choice-row button.correct::after,
+.choice-row button.wrong::after {
+    display: none;
+}
+
+.choice-row button:not(.correct):not(.wrong):hover {
+    transform: translateY(-1px);
+    border-color: #14b8a6;
+    background: #ecfeff;
+    box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.1), 0 12px 22px rgba(15, 118, 110, 0.14);
+}
+
+.choice-row button:not(.correct):not(.wrong):active {
+    transform: translateY(0);
+}
+
+.choice-row button:focus-visible,
+.sequence-row select:focus-visible,
+.question-card label:focus-within {
+    border-color: #14b8a6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.22), 0 10px 22px rgba(15, 118, 110, 0.1);
+}
+
+.interaction-section--choice [data-choice-group]:first-child .choice-row button:not(.correct):not(.wrong) {
+    animation: interactionCue 1.35s ease-out 0.35s 2;
 }
 
 .choice-row button.correct {
@@ -824,13 +942,33 @@ h3 {
 }
 
 .sequence-row select {
-    min-height: 44px;
-    border: 1px solid var(--line);
+    min-height: 48px;
+    border: 1px solid rgba(15, 118, 110, 0.42);
     border-radius: 12px;
-    padding: 0 10px;
-    background: #fff;
-    color: #334155;
-    font-weight: 800;
+    padding: 0 38px 0 12px;
+    background-color: #f8ffff;
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--teal) 50%),
+        linear-gradient(135deg, var(--teal) 50%, transparent 50%);
+    background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 13px) 50%;
+    background-repeat: no-repeat;
+    background-size: 5px 5px, 5px 5px;
+    color: #1f3a44;
+    font-weight: 900;
+    appearance: none;
+    box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 10px 20px rgba(15, 118, 110, 0.09);
+    transition: border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.sequence-row select:hover {
+    border-color: #14b8a6;
+    background-color: #ecfeff;
+}
+
+.interaction-section--sequence .sequence-row:first-child select {
+    animation: interactionCue 1.35s ease-out 0.35s 2;
 }
 
 .exam-grid {
@@ -863,6 +1001,27 @@ h3 {
     color: #334155;
     font-weight: 800;
     line-height: 1.5;
+}
+
+.interaction-section .btn.primary {
+    box-shadow: 0 12px 24px rgba(15, 118, 110, 0.18);
+}
+
+.interaction-section .btn.primary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.22), 0 12px 24px rgba(15, 118, 110, 0.18);
+}
+
+@keyframes interactionCue {
+    0% {
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 0 0 rgba(20, 184, 166, 0.22);
+    }
+    52% {
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 0 5px rgba(20, 184, 166, 0.16);
+    }
+    100% {
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 0 0 rgba(20, 184, 166, 0);
+    }
 }
 
 .question-card.is-correct {
@@ -922,6 +1081,24 @@ h3 {
         flex-direction: column;
     }
 
+    .section-actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .interaction-badge {
+        min-height: 32px;
+    }
+
+    .choice-row button,
+    .sequence-row select {
+        width: 100%;
+    }
+
+    .sequence-row {
+        grid-template-columns: 42px minmax(0, 1fr);
+    }
+
     .stats-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -933,5 +1110,15 @@ h3 {
 
     .pattern-row {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .choice-row button,
+    .sequence-row select,
+    .interaction-section--choice [data-choice-group]:first-child .choice-row button:not(.correct):not(.wrong),
+    .interaction-section--sequence .sequence-row:first-child select {
+        animation: none;
+        transition: none;
     }
 }

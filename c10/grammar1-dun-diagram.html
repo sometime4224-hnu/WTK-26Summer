@@ -265,20 +265,34 @@
             gap: 6px;
             min-height: 38px;
             padding: 8px 11px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid color-mix(in srgb, var(--accent) 34%, #cbd5e1);
             border-radius: 8px;
-            background: #ffffff;
-            color: #334155;
+            background: linear-gradient(180deg, #ffffff 0%, color-mix(in srgb, var(--accent) 8%, #ffffff) 100%);
+            color: #123f3d;
             cursor: pointer;
             font-size: 0.88rem;
             font-weight: 900;
+            box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 8%, transparent), 0 8px 18px rgba(15, 118, 110, 0.08);
             transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+        }
+
+        .segmented button::after,
+        .compare-controls button::after {
+            content: "";
+            flex: 0 0 auto;
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: currentColor;
+            opacity: 0.42;
+            box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 10%, transparent);
         }
 
         .segmented button:hover,
         .compare-controls button:hover,
         .verb-picker button:hover {
             transform: translateY(-1px);
+            box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 12%, transparent), 0 10px 22px rgba(15, 118, 110, 0.11);
         }
 
         .segmented button:focus-visible,
@@ -292,14 +306,14 @@
             border-color: var(--accent);
             background: color-mix(in srgb, var(--accent) 12%, #ffffff);
             color: #0f172a;
-            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent);
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent), 0 10px 22px rgba(15, 118, 110, 0.12);
         }
 
         .compare-controls button[aria-pressed="true"] {
             border-color: var(--compare-accent);
             background: color-mix(in srgb, var(--compare-accent) 12%, #ffffff);
             color: #0f172a;
-            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--compare-accent) 28%, transparent);
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--compare-accent) 28%, transparent), 0 10px 22px rgba(15, 118, 110, 0.12);
         }
 
         .diagram-layout {
@@ -771,7 +785,7 @@
             display: block;
             border-color: var(--compare-accent);
             background: color-mix(in srgb, var(--compare-accent) 9%, #ffffff);
-            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--compare-accent) 32%, transparent);
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--compare-accent) 32%, transparent), 0 12px 24px rgba(15, 118, 110, 0.1);
         }
 
         .compare-card__form {
@@ -825,6 +839,7 @@
         }
 
         .verb-picker button {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -832,20 +847,22 @@
             width: 100%;
             min-height: 46px;
             padding: 10px 12px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid rgba(37, 99, 235, 0.34);
             border-radius: 8px;
-            background: #ffffff;
-            color: #334155;
+            background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
+            color: #1e3a8a;
             cursor: pointer;
             font-weight: 950;
             text-align: left;
-            transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.06), 0 8px 18px rgba(37, 99, 235, 0.08);
+            transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
         }
 
         .verb-picker button[aria-pressed="true"] {
             border-color: #2563eb;
             background: #eff6ff;
             color: #1d4ed8;
+            box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.18), 0 10px 22px rgba(37, 99, 235, 0.12);
         }
 
         .example-table {
