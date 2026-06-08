@@ -19,6 +19,7 @@
 
     const DATA = {
         "c10/grammar1-game-soccer.html": {
+            minimizeOnLoad: true,
             title: "다국어 보조 안내",
             subtitle: "게임은 한국어 문장을 그대로 풀고, 선택한 언어로 규칙만 확인합니다.",
             terms: ["A/V-던"],
@@ -303,7 +304,8 @@
         ensureStylesheet();
         window.MULTILANG_CONFIG = Object.assign({}, window.MULTILANG_CONFIG || {}, {
             langs: LANG_ORDER.slice(),
-            defaultLang: "none"
+            defaultLang: "none",
+            ignoreStoredLang: Boolean(entry.minimizeOnLoad)
         });
         insertPanel(buildPanel(entry));
     }

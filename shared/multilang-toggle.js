@@ -32,7 +32,7 @@
         .filter(Boolean);
     const defaultLang = cfg.defaultLang || NONE;
 
-    let currentLang = getStored();
+    let currentLang = cfg.ignoreStoredLang ? defaultLang : getStored();
     if (currentLang !== NONE && !activeLangs.some((lang) => lang.code === currentLang)) {
         currentLang = defaultLang;
     }
