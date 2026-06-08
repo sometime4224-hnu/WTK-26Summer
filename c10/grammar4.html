@@ -31,7 +31,11 @@
     <!-- Tailwind & Fonts Injected -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 <style>
-        body { font-family: 'Noto Sans KR', sans-serif !important; }
+        body {
+            --grammar-page-max: 1180px;
+            --grammar-page-gutter: 16px;
+            font-family: 'Noto Sans KR', sans-serif !important;
+        }
         .injected-global-nav {
             width: 100%;
             background-color: rgba(255, 255, 255, 0.9);
@@ -46,6 +50,8 @@
             z-index: 999999;
             box-sizing: border-box;
             gap: 15px;
+            padding-left: max(16px, calc((100vw - var(--grammar-page-max)) / 2 + var(--grammar-page-gutter)));
+            padding-right: max(16px, calc((100vw - var(--grammar-page-max)) / 2 + var(--grammar-page-gutter)));
         }
         .injected-global-nav a {
             display: flex;
@@ -65,10 +71,103 @@
         }
         /* Ensure body has no top margin/padding resetting the nav */
         body { margin: 0; }
+        .grammar-page {
+            width: 100%;
+            overflow-x: hidden;
+        }
+        .grammar-shell {
+            width: min(calc(100% - var(--grammar-page-gutter) * 2), var(--grammar-page-max)) !important;
+            margin: 16px auto 40px;
+            box-sizing: border-box;
+        }
+        .grammar-shell main,
+        .grammar-shell section,
+        .grammar-shell div {
+            min-width: 0;
+        }
+        .grammar-learn-grid,
+        .grammar-quiz-grid,
+        .grammar-practice-grid {
+            display: grid;
+            gap: 20px;
+        }
+        .grammar-learn-grid.hidden,
+        .grammar-quiz-grid.hidden,
+        .grammar-practice-grid.hidden {
+            display: none;
+        }
+        .grammar-form-grid {
+            grid-template-columns: 1fr;
+        }
+        .grammar-shell .multilang-scaffold {
+            width: auto;
+            max-width: none;
+            margin: 12px;
+        }
+        @media (min-width: 700px) {
+            body {
+                --grammar-page-gutter: 24px;
+            }
+            .grammar-shell {
+                margin-top: 20px;
+            }
+            .grammar-learn-grid {
+                grid-template-columns: minmax(240px, 0.8fr) minmax(380px, 1.2fr);
+                align-items: start;
+            }
+            .grammar-examples {
+                grid-column: 1 / -1;
+            }
+            .grammar-form-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .grammar-quiz-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                align-items: start;
+            }
+            .grammar-quiz-intro,
+            .grammar-quiz-actions {
+                grid-column: 1 / -1;
+            }
+            .grammar-practice-grid {
+                grid-template-columns: minmax(260px, 0.7fr) minmax(420px, 1.3fr);
+                align-items: start;
+            }
+            .grammar-practice-scenarios {
+                grid-column: 2;
+                grid-row: 1 / span 3;
+            }
+        }
+        @media (min-width: 1024px) {
+            body {
+                --grammar-page-gutter: 32px;
+            }
+            .grammar-learn-grid {
+                grid-template-columns: minmax(220px, 0.7fr) minmax(260px, 1fr) minmax(300px, 1.15fr);
+            }
+            .grammar-examples {
+                grid-column: auto;
+            }
+            .grammar-quiz-grid {
+                grid-template-columns: minmax(220px, 0.7fr) repeat(2, minmax(260px, 1fr));
+            }
+            .grammar-quiz-intro {
+                grid-column: auto;
+                text-align: left;
+            }
+            .grammar-quiz-actions {
+                grid-column: 1 / -1;
+            }
+        }
+        @media (min-width: 1280px) {
+            body {
+                --grammar-page-max: 1240px;
+            }
+        }
     </style>
             <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
-<body class="bg-indigo-50 min-h-screen flex flex-col items-center p-4">
+<body class="grammar-page bg-indigo-50 min-h-screen">
         <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -81,7 +180,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     
 
     <!-- App Container -->
-    <div class="bg-white max-w-md w-full rounded-xl shadow-lg overflow-hidden flex flex-col min-h-[80vh]">
+    <div class="grammar-shell bg-white w-full rounded-xl shadow-lg overflow-hidden flex flex-col min-h-[80vh]">
         
         <!-- Header -->
         <header class="bg-indigo-600 text-white p-4 relative">
@@ -92,7 +191,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
             
             <div class="text-center pb-2">
-                <h1 class="text-xl font-bold">오늘의 문법 (Ngữ pháp)</h1>
+                <h1 class="text-xl font-bold">오늘의 문법</h1>
                 <p class="text-sm opacity-90 mt-1">V-(으)려면 멀었다</p>
             </div>
         </header>
@@ -111,10 +210,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
 
         <!-- Content Area -->
-        <main class="flex-1 p-5 overflow-y-auto">
+        <main class="flex-1 p-5 md:p-6 overflow-y-auto">
             
             <!-- Tab 1: Learn -->
-            <div id="content-learn" class="fade-in space-y-6">
+            <div id="content-learn" class="fade-in grammar-learn-grid">
                 
                 <!-- Meaning -->
                 <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
@@ -124,11 +223,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
 
                 <!-- Conjugation Rules -->
-                <div class="space-y-3">
+                <div class="grammar-forms space-y-3">
                     <h3 class="font-bold text-gray-800 border-l-4 border-indigo-500 pl-2">형태 변화</h3>
                     <p class="vietnamese mb-2">Cách chia</p>
                     
-                    <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div class="grammar-form-grid grid gap-3 text-sm">
                         <!-- Vowel Ending -->
                         <div class="bg-gray-50 p-3 rounded-lg text-center">
                             <div class="font-bold text-blue-600 mb-1">받침 X / ㄹ 받침</div>
@@ -151,7 +250,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
 
                 <!-- Examples from Image -->
-                <div class="space-y-3">
+                <div class="grammar-examples space-y-3">
                     <h3 class="font-bold text-gray-800 border-l-4 border-indigo-500 pl-2">예문</h3>
                     <p class="vietnamese mb-2">Ví dụ</p>
                     
@@ -191,8 +290,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
 
             <!-- Tab 2: Quiz -->
-            <div id="content-quiz" class="hidden fade-in space-y-6">
-                <div class="text-center mb-4">
+            <div id="content-quiz" class="hidden fade-in grammar-quiz-grid">
+                <div class="grammar-quiz-intro text-center mb-4">
                     <h3 class="font-bold text-lg text-gray-800">알맞은 것을 고르세요.</h3>
                     <p class="vietnamese">Chọn đáp án đúng.</p>
                 </div>
@@ -226,7 +325,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="result-msg hidden mt-2 text-sm font-bold"></div>
                 </div>
 
-                <div class="text-center">
+                <div class="grammar-quiz-actions text-center">
                     <button onclick="resetQuiz()" class="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition shadow">
                         다시 풀기 <span class="vietnamese inline">(Làm lại)</span>
                     </button>
@@ -234,13 +333,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
 
             <!-- Tab 3: Practice (Scenarios) -->
-            <div id="content-practice" class="hidden fade-in space-y-5">
+            <div id="content-practice" class="hidden fade-in grammar-practice-grid">
                 <div class="text-center">
                     <h3 class="font-bold text-lg text-gray-800">대화를 완성해 보세요.</h3>
                     <p class="vietnamese text-sm mb-4">빈칸을 채우거나 알맞은 말을 생각해 보세요.</p>
                 </div>
 
-                <div class="space-y-6">
+                <div class="grammar-practice-scenarios space-y-6">
                     
                     <!-- Scenario 1: Baby -->
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">

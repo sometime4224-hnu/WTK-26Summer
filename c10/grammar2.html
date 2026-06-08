@@ -27,7 +27,13 @@
     <!-- Tailwind & Fonts Injected -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 <style>
-        body { font-family: 'Noto Sans KR', sans-serif !important; }
+        body {
+            --grammar-page-max: 1180px;
+            --grammar-page-gutter: 16px;
+            --grammar-nav-height: 60px;
+            --grammar-header-height: 76px;
+            font-family: 'Noto Sans KR', sans-serif !important;
+        }
         .injected-global-nav {
             width: 100%;
             background-color: rgba(255, 255, 255, 0.9);
@@ -42,6 +48,8 @@
             z-index: 999999;
             box-sizing: border-box;
             gap: 15px;
+            padding-left: max(16px, calc((100vw - var(--grammar-page-max)) / 2 + var(--grammar-page-gutter)));
+            padding-right: max(16px, calc((100vw - var(--grammar-page-max)) / 2 + var(--grammar-page-gutter)));
         }
         .injected-global-nav a {
             display: flex;
@@ -61,10 +69,90 @@
         }
         /* Ensure body has no top margin/padding resetting the nav */
         body { margin: 0; }
+        .grammar-page {
+            width: 100%;
+            overflow-x: hidden;
+        }
+        .grammar-header {
+            top: var(--grammar-nav-height) !important;
+        }
+        .grammar-header > div,
+        .grammar-main,
+        .grammar-footer-tip {
+            width: min(100%, var(--grammar-page-max));
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        .grammar-tabs {
+            top: calc(var(--grammar-nav-height) + var(--grammar-header-height)) !important;
+            width: min(100%, var(--grammar-page-max));
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .grammar-learn-grid,
+        .grammar-practice-grid {
+            display: grid;
+            gap: 16px;
+        }
+        .grammar-learn-grid > *,
+        .grammar-practice-grid > * {
+            min-width: 0;
+        }
+        @media (min-width: 700px) {
+            body {
+                --grammar-page-gutter: 24px;
+            }
+            .grammar-main {
+                padding: 24px var(--grammar-page-gutter) 56px !important;
+            }
+            .grammar-footer-tip {
+                padding-left: var(--grammar-page-gutter) !important;
+                padding-right: var(--grammar-page-gutter) !important;
+            }
+            .grammar-learn-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .grammar-rule {
+                grid-column: 1 / -1;
+            }
+            .grammar-practice-grid {
+                grid-template-columns: minmax(220px, 0.7fr) minmax(420px, 1.35fr);
+                align-items: start;
+            }
+            .grammar-quiz-card,
+            .grammar-finished {
+                grid-column: 2;
+            }
+        }
+        @media (min-width: 1024px) {
+            body {
+                --grammar-page-gutter: 32px;
+            }
+            .grammar-learn-grid {
+                grid-template-columns: minmax(220px, 0.75fr) minmax(280px, 1fr) minmax(280px, 1fr);
+                align-items: start;
+            }
+            .grammar-rule {
+                grid-column: auto;
+            }
+            .grammar-practice-grid {
+                grid-template-columns: minmax(300px, 0.8fr) minmax(560px, 1.4fr);
+            }
+        }
+        @media (min-width: 1280px) {
+            body {
+                --grammar-page-max: 1240px;
+            }
+        }
+        body.grammar-page .multilang-scaffold {
+            width: min(calc(100% - var(--grammar-page-gutter) * 2), var(--grammar-page-max));
+            max-width: var(--grammar-page-max);
+        }
     </style>
             <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col max-w-md mx-auto shadow-xl">
+<body class="grammar-page bg-gray-50 min-h-screen flex flex-col">
         <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -77,7 +165,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     
 
     <!-- Header -->
-    <header class="bg-white px-6 py-4 shadow-sm border-b border-gray-100 sticky top-0 z-10">
+    <header class="grammar-header bg-white px-6 py-4 shadow-sm border-b border-gray-100 sticky top-0 z-10">
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-lg font-bold text-gray-900 flex items-center">
@@ -85,7 +173,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </h1>
                 <p class="text-xs text-gray-500 mt-1">3과: 확인과 이유 (-잖아요)</p>
             </div>
-            <button id="translation-btn" class="flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-all bg-gray-100 text-gray-500 border border-gray-200">
+            <button id="translation-btn" class="flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-all bg-gray-100 text-gray-500 border border-gray-200" style="display: none;" hidden aria-hidden="true" tabindex="-1">
                 <i data-lucide="globe" class="w-3 h-3 mr-1"></i>
                 <span id="translation-text">Tiếng Việt OFF</span>
             </button>
@@ -93,31 +181,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </header>
 
     <!-- Navigation Tabs -->
-    <div class="flex border-b border-gray-200 bg-white">
+    <div class="grammar-tabs flex border-b border-gray-200 bg-white sticky z-10">
         <button onclick="setTab('learn')" id="tab-learn" class="flex items-center justify-center flex-1 py-3 text-sm font-medium transition-colors duration-200 text-blue-600 border-b-2 border-blue-600 bg-blue-50">
             <i data-lucide="book" class="w-4 h-4 mr-2"></i>
-            공부해요 (Học)
+            공부해요
         </button>
         <button onclick="setTab('practice')" id="tab-practice" class="flex items-center justify-center flex-1 py-3 text-sm font-medium transition-colors duration-200 text-gray-500 hover:text-gray-700">
             <i data-lucide="graduation-cap" class="w-4 h-4 mr-2"></i>
-            연습해요 (Luyện tập)
+            연습해요
         </button>
     </div>
 
     <!-- Main Content Area -->
-    <main id="app-content" class="flex-1 p-4 pb-12">
+    <main id="app-content" class="grammar-main flex-1 p-4 pb-12">
         <!-- Content will be injected here by JavaScript -->
     </main>
 
     <!-- Footer Tip Area (Only for Learn Tab) -->
-    <div id="footer-tip" class="px-4 pb-6 hidden">
+    <div id="footer-tip" class="grammar-footer-tip px-4 pb-6 hidden">
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <h4 class="text-sm font-bold text-yellow-800 mb-1">💡 선생님의 팁</h4>
             <p class="text-xs text-yellow-700 mb-2">
                 화를 내거나 짜증을 낼 때도 쓸 수 있어요. ("내가 말했잖아요!" = I told you so!) <br/>
                 하지만 보통은 부드럽게 확인하는 의미예요.
             </p>
-            <div id="tip-translation" class="hidden text-xs text-yellow-600 border-t border-yellow-200 pt-2">
+            <div id="tip-translation" class="hidden text-xs text-yellow-600 border-t border-yellow-200 pt-2" style="display: none;" hidden aria-hidden="true">
                 Cũng có thể dùng khi tức giận hoặc khó chịu ("Tôi đã nói rồi mà!"). <br/>
                 Nhưng thông thường mang ý nghĩa xác nhận một cách nhẹ nhàng.
             </div>
@@ -155,7 +243,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const quizData = [
             {
                 id: 1,
-                item: "한글날 (Ngày Hangeul)",
+                item: "한글날",
                 icon: "📅",
                 question: "10월 9일에 왜 학교에 안 가요?",
                 answer_prefix: "그 날은 ",
@@ -166,7 +254,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             },
             {
                 id: 2,
-                item: "김밥 (Kimbap)",
+                item: "김밥",
                 icon: "🍙",
                 question: "정우 씨는 김밥을 자주 먹네요.",
                 answer_prefix: "싸고 ",
@@ -177,7 +265,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             },
             {
                 id: 3,
-                item: "프랑스어 (Tiếng Pháp)",
+                item: "프랑스어",
                 icon: "🇫🇷",
                 question: "누가 프랑스어를 할 수 있어요?",
                 answer_prefix: "줄리앙 씨에게 물어보세요. ",
@@ -188,7 +276,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             },
             {
                 id: 4,
-                item: "드라마 (Phim truyền hình)",
+                item: "드라마",
                 icon: "📺",
                 question: "한국 드라마를 왜 많이 봐요?",
                 answer_prefix: "",
@@ -246,31 +334,44 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             // Re-initialize icons
             lucide.createIcons();
+            syncMultilangBlocks();
+            updateResponsiveOffsets();
+        }
+
+        function syncMultilangBlocks() {
+            if (!window.MultilangToggle || typeof window.MultilangToggle.getLang !== "function" || typeof window.MultilangToggle.setLang !== "function") return;
+            window.MultilangToggle.setLang(window.MultilangToggle.getLang());
+        }
+
+        function updateResponsiveOffsets() {
+            const nav = document.querySelector(".injected-global-nav");
+            const header = document.querySelector(".grammar-header");
+            const navHeight = nav ? nav.offsetHeight : 60;
+            const headerHeight = header ? header.offsetHeight : 76;
+            document.body.style.setProperty("--grammar-nav-height", `${navHeight}px`);
+            document.body.style.setProperty("--grammar-header-height", `${headerHeight}px`);
         }
 
         function renderLearnSection() {
-            const vnClass = state.showTranslation ? "block animate-fade-in" : "hidden";
             return `
-                <div class="space-y-6">
+                <div class="grammar-learn-grid">
                     <!-- Concept -->
-                    <div class="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-xl p-6 shadow-sm">
+                    <div class="grammar-concept bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-xl p-6 shadow-sm">
                         <h2 class="text-2xl font-bold text-blue-800 mb-2">${grammarPoint.title}</h2>
                         <p class="text-gray-800 font-bold mb-1">${grammarPoint.meaning_kr}</p>
-                        <p class="text-blue-600 font-medium mb-4 text-sm ${vnClass}">${grammarPoint.meaning_vn}</p>
                         
                         <div class="bg-white p-4 rounded-lg border border-blue-100 text-sm text-gray-700 leading-relaxed mt-2 whitespace-pre-line">
                             <p>${grammarPoint.description_kr}</p>
-                            <p class="text-blue-600 mt-2 pt-2 border-t border-blue-50 ${vnClass}">${grammarPoint.description_vn}</p>
                         </div>
                     </div>
 
                     <!-- Example -->
-                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <div class="grammar-example bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                         <div class="flex items-center mb-4">
                             <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 mr-3">
                                 <i data-lucide="volume-2" class="w-5 h-5"></i>
                             </div>
-                            <h3 class="font-bold text-gray-800">상황: 유진 씨 (Tình huống: Yujin)</h3>
+                            <h3 class="font-bold text-gray-800">상황: 유진 씨</h3>
                         </div>
                         
                         <div class="space-y-4">
@@ -279,27 +380,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <div class="space-y-3">
                                     <div>
                                         <p class="text-gray-600 text-sm">A: ${grammarPoint.examples[0].kr}</p>
-                                        <p class="text-gray-400 text-xs ${vnClass}">${grammarPoint.examples[0].vn}</p>
                                     </div>
                                     <div class="pl-4 border-l-2 border-blue-200">
                                         <p class="text-gray-800 font-bold">B: "${grammarPoint.examples[0].answer_kr}"</p>
-                                        <p class="text-blue-600 text-xs ${vnClass}">${grammarPoint.examples[0].answer_vn}</p>
                                     </div>
                                 </div>
                                 
                                 <div class="mt-4 text-xs bg-blue-100 text-blue-800 px-3 py-2 rounded-lg inline-block w-full">
                                     <span class="font-bold">이유:</span> ${grammarPoint.examples[0].context_kr}
-                                    <span class="mt-1 pt-1 border-t border-blue-200 text-blue-700 ${state.showTranslation ? 'block' : 'hidden'}">${grammarPoint.examples[0].context_vn}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Rule -->
-                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <div class="grammar-rule bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                         <h3 class="font-bold text-gray-800 mb-4 flex items-center">
                            <i data-lucide="graduation-cap" class="w-5 h-5 mr-2 text-green-600"></i>
-                           만드는 법 (Quy tắc)
+                           만드는 법
                         </h3>
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div class="bg-gray-50 p-3 rounded-lg text-center">
@@ -329,24 +427,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         function renderPracticeSection() {
             if (state.quizFinished) {
                 return `
-                    <div class="text-center py-12">
+                    <div class="grammar-practice-grid">
+                    <div class="grammar-finished bg-white border border-gray-200 rounded-xl p-8 text-center shadow-sm">
                         <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600">
                             <i data-lucide="check" class="w-10 h-10"></i>
                         </div>
                         <h2 class="text-2xl font-bold text-gray-800 mb-2">참 잘했어요!</h2>
-                        <p class="text-gray-500 text-sm mb-2 ${state.showTranslation ? 'block' : 'hidden'}">Làm tốt lắm!</p>
                         <p class="text-gray-600 mb-8">점수: ${state.quizScore} / ${quizData.length}</p>
                         <button onclick="resetQuiz()" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center mx-auto">
                             <i data-lucide="rotate-ccw" class="w-4 h-4 mr-2"></i>
                             다시 하기
                         </button>
                     </div>
+                    </div>
                 `;
             }
 
             const currentQuiz = quizData[state.currentQuizIndex];
-            const vnClass = state.showTranslation ? "block" : "hidden";
-
             let optionsHtml = currentQuiz.options.map(option => {
                 let btnClass = "border-gray-200 hover:border-blue-300 hover:bg-blue-50 text-gray-700";
                 let iconHtml = "";
@@ -375,13 +472,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }).join('');
 
             return `
-                <div class="space-y-6">
-                    <div class="flex justify-between items-center mb-2">
+                <div class="grammar-practice-grid">
+                    <div class="grammar-status bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
                         <span class="text-sm font-medium text-gray-500">문제 ${state.currentQuizIndex + 1}/${quizData.length}</span>
-                        <span class="text-sm font-medium text-blue-600">점수: ${state.quizScore}</span>
+                        <span class="block mt-2 text-2xl font-black text-blue-600">점수 ${state.quizScore}</span>
                     </div>
 
-                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <div class="grammar-quiz-card bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                         <!-- Visual Aid -->
                         <div class="flex justify-center mb-6">
                             <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center text-5xl shadow-inner">
@@ -414,9 +511,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <div class="flex items-start mb-2">
                                         <i data-lucide="help-circle" class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5"></i>
                                         <span>${currentQuiz.explanation_kr}</span>
-                                    </div>
-                                    <div class="pl-7 pt-2 border-t border-blue-200 text-blue-600 w-full ${vnClass}">
-                                        ${currentQuiz.explanation_vn}
                                     </div>
                                 </div>
                                 <button onclick="nextQuiz()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center">
@@ -487,6 +581,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         // --- Initial Render & Events ---
         document.addEventListener('DOMContentLoaded', () => {
             renderApp();
+            updateResponsiveOffsets();
+            window.addEventListener('resize', updateResponsiveOffsets);
             
             // Translation Toggle Event
             document.getElementById('translation-btn').addEventListener('click', toggleTranslation);

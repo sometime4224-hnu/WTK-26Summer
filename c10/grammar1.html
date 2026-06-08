@@ -15,7 +15,14 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 <style>
-        body { font-family: 'Noto Sans KR', sans-serif; margin: 0; }
+        body {
+            --grammar-page-max: 1180px;
+            --grammar-page-gutter: 16px;
+            --grammar-nav-height: 60px;
+            --grammar-header-height: 78px;
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+        }
         .injected-global-nav {
             width: 100%;
             background: rgba(255, 255, 255, 0.9);
@@ -30,6 +37,8 @@
             top: 0;
             z-index: 99999;
             box-sizing: border-box;
+            padding-left: max(16px, calc((100vw - var(--grammar-page-max)) / 2 + var(--grammar-page-gutter)));
+            padding-right: max(16px, calc((100vw - var(--grammar-page-max)) / 2 + var(--grammar-page-gutter)));
         }
         .injected-global-nav a {
             display: flex;
@@ -41,10 +50,102 @@
             font-size: 14px;
         }
         .injected-global-nav .divider { color: #cbd5e1; }
+        .grammar-page {
+            width: 100%;
+            overflow-x: hidden;
+        }
+        .grammar-header {
+            top: var(--grammar-nav-height) !important;
+        }
+        .grammar-header > div,
+        .grammar-main {
+            width: min(100%, var(--grammar-page-max));
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .grammar-tabs {
+            top: calc(var(--grammar-nav-height) + var(--grammar-header-height)) !important;
+            width: min(100%, var(--grammar-page-max));
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .grammar-main {
+            box-sizing: border-box;
+        }
+        .grammar-learn-grid,
+        .grammar-practice-grid {
+            display: grid;
+            gap: 16px;
+        }
+        .grammar-learn-grid > section,
+        .grammar-practice-grid > section {
+            min-width: 0;
+        }
+        .grammar-compare .overflow-x-auto {
+            max-width: 100%;
+        }
+        .grammar-compare table {
+            min-width: 520px;
+        }
+        @media (min-width: 700px) {
+            body {
+                --grammar-page-gutter: 24px;
+            }
+            .grammar-main {
+                padding: 24px var(--grammar-page-gutter) 56px !important;
+            }
+            .grammar-learn-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .grammar-compare {
+                grid-column: 1 / -1;
+            }
+            .grammar-compare table {
+                min-width: 100%;
+            }
+            .grammar-practice-grid {
+                grid-template-columns: minmax(240px, 0.75fr) minmax(420px, 1.35fr);
+                align-items: start;
+            }
+        }
+        @media (min-width: 1024px) {
+            body {
+                --grammar-page-gutter: 32px;
+            }
+            .grammar-main {
+                padding-top: 28px !important;
+            }
+            .grammar-learn-grid {
+                grid-template-columns: minmax(300px, 0.8fr) minmax(560px, 1.3fr);
+                align-items: start;
+            }
+            .grammar-hero {
+                grid-column: 1;
+            }
+            .grammar-compare {
+                grid-column: 2;
+                grid-row: 1 / span 2;
+            }
+            .grammar-mini {
+                grid-column: 1;
+            }
+            .grammar-practice-grid {
+                grid-template-columns: minmax(300px, 0.8fr) minmax(560px, 1.3fr);
+            }
+        }
+        @media (min-width: 1280px) {
+            body {
+                --grammar-page-max: 1240px;
+            }
+        }
+        body.grammar-page .multilang-scaffold {
+            width: min(calc(100% - var(--grammar-page-gutter) * 2), var(--grammar-page-max));
+            max-width: var(--grammar-page-max);
+        }
     </style>
         <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
-<body class="bg-slate-50 min-h-screen flex flex-col max-w-md mx-auto shadow-xl">
+<body class="grammar-page bg-slate-50 min-h-screen flex flex-col">
         <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -55,7 +156,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="index.html"><i class="fa-solid fa-folder-open"></i> 단원 홈</a>
     </nav>
 
-    <header class="bg-white px-5 py-4 border-b border-slate-200 sticky top-[60px] z-20">
+    <header class="grammar-header bg-white px-5 py-4 border-b border-slate-200 sticky top-[60px] z-20">
         <div class="flex justify-between items-start gap-3">
             <div>
                 <p class="text-xs text-indigo-600 font-bold uppercase tracking-wide">Grammar Upgrade</p>
@@ -69,12 +170,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </header>
 
-    <div class="flex border-b border-slate-200 bg-white sticky top-[139px] z-10">
+    <div class="grammar-tabs flex border-b border-slate-200 bg-white sticky top-[139px] z-10">
         <button id="tab-learn" type="button" onclick="setTab('learn')" class="flex-1 py-3 text-sm font-semibold text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50">공부해요</button>
         <button id="tab-practice" type="button" onclick="setTab('practice')" class="flex-1 py-3 text-sm font-semibold text-slate-500">연습해요</button>
     </div>
 
-    <main id="app-content" class="flex-1 p-4 pb-14"></main>
+    <main id="app-content" class="grammar-main flex-1 p-4 pb-14"></main>
 
     <script>
         const questionBank = [
@@ -131,6 +232,56 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 explanationVi: "Hành động chưa hoàn tất -> '읽던'."
             }
         ];
+
+        const compareMeaningTranslations = {
+            dun: {
+                en: "Past repeated habit / unfinished action recalled from the past",
+                vi: "Thói quen lặp lại trong quá khứ / hành động chưa hoàn tất",
+                ar: "عادة متكررة في الماضي أو فعل غير مكتمل يتم تذكره",
+                mn: "Өнгөрсөнд давтагдсан зуршил эсвэл дуусаагүй үйлдлийг санах",
+                kk: "Өткендегі қайталанған әдет немесе аяқталмаған іс-әрекетті еске алу",
+                th: "นิสัยที่เคยทำซ้ำในอดีต หรือการกระทำที่ยังไม่เสร็จ"
+            },
+            pastCompleted: {
+                en: "Completed past experience",
+                vi: "Kinh nghiệm quá khứ đã hoàn tất",
+                ar: "تجربة ماضية اكتملت بوضوح",
+                mn: "Бүрэн дууссан өнгөрсөн туршлага",
+                kk: "Толық аяқталған өткен тәжірибе",
+                th: "ประสบการณ์ในอดีตที่จบแล้ว"
+            },
+            present: {
+                en: "Present habit / general fact",
+                vi: "Thói quen hiện tại / sự thật chung",
+                ar: "عادة حالية أو حقيقة عامة",
+                mn: "Одоогийн зуршил эсвэл ерөнхий үнэн",
+                kk: "Қазіргі әдет немесе жалпы шындық",
+                th: "นิสัยปัจจุบัน หรือข้อเท็จจริงทั่วไป"
+            }
+        };
+
+        const compareLangOrder = ["en", "vi", "ar", "mn", "kk", "th"];
+
+        function escapeHtml(value) {
+            return String(value == null ? "" : value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function renderCompareMeaningTranslations(key) {
+            const translations = compareMeaningTranslations[key] || {};
+            return compareLangOrder
+                .filter((lang) => translations[lang])
+                .map((lang) => {
+                    const dir = lang === "ar" ? ' dir="rtl"' : "";
+                    const align = lang === "ar" ? " text-right" : "";
+                    return `<p data-lang="${lang}"${dir} class="text-[11px] leading-4 text-indigo-600 mt-1 break-words${align}">${escapeHtml(translations[lang])}</p>`;
+                })
+                .join("");
+        }
 
         const KEY = "c10.grammar1.upgraded.v2";
 
@@ -191,6 +342,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             state.showVi = !state.showVi;
             savePref({ showVi: state.showVi, best: state.best });
             render();
+        }
+
+        function syncMultilangBlocks() {
+            if (!window.MultilangToggle || typeof window.MultilangToggle.getLang !== "function" || typeof window.MultilangToggle.setLang !== "function") return;
+            window.MultilangToggle.setLang(window.MultilangToggle.getLang());
+        }
+
+        function updateResponsiveOffsets() {
+            const nav = document.querySelector(".injected-global-nav");
+            const header = document.querySelector(".grammar-header");
+            const navHeight = nav ? nav.offsetHeight : 60;
+            const headerHeight = header ? header.offsetHeight : 78;
+            document.body.style.setProperty("--grammar-nav-height", `${navHeight}px`);
+            document.body.style.setProperty("--grammar-header-height", `${headerHeight}px`);
         }
 
         function chooseOption(option) {
@@ -285,8 +450,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         function renderLearn() {
             const vi = viClass();
             return `
-                <div class="space-y-4">
-                    <section class="bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 rounded-2xl p-5 shadow-sm">
+                <div class="grammar-learn-grid">
+                    <section class="grammar-hero bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 rounded-2xl p-5 shadow-sm">
                         <h2 class="text-2xl font-black text-indigo-700">A/V-던</h2>
                         <p class="text-sm font-semibold text-slate-700 mt-1">과거에 자주 했던 일, 하다가 멈춘 일을 떠올릴 때</p>
                         <p class="text-xs text-indigo-600 mt-1 ${vi}">Dùng để hồi tưởng thói quen quá khứ hoặc hành động dang dở</p>
@@ -301,7 +466,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                     </section>
 
-                    <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <section class="grammar-compare bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                         <h3 class="font-bold text-slate-800 flex items-center">
                             <i data-lucide="split-square-horizontal" class="w-4 h-4 mr-2 text-indigo-600"></i>
                             헷갈림 비교
@@ -320,7 +485,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         <td class="p-2 border border-slate-200 font-bold text-indigo-700">-던</td>
                                         <td class="p-2 border border-slate-200">
     <p>과거 반복/미완료 회상</p>
-    <p class="text-[11px] leading-4 text-indigo-600 mt-1 break-words ${vi}">Thói quen lặp lại trong quá khứ / hành động chưa hoàn tất</p>
+    ${renderCompareMeaningTranslations("dun")}
 </td>
                                         <td class="p-2 border border-slate-200">내가 읽던 책</td>
                                     </tr>
@@ -328,7 +493,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         <td class="p-2 border border-slate-200 font-bold text-sky-700">-았/었던</td>
                                         <td class="p-2 border border-slate-200">
     <p>완료된 과거 경험</p>
-    <p class="text-[11px] leading-4 text-indigo-600 mt-1 break-words ${vi}">Kinh nghiệm quá khứ đã hoàn tất</p>
+    ${renderCompareMeaningTranslations("pastCompleted")}
 </td>
                                         <td class="p-2 border border-slate-200">어제 봤던 영화</td>
                                     </tr>
@@ -336,7 +501,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         <td class="p-2 border border-slate-200 font-bold text-emerald-700">-는</td>
                                         <td class="p-2 border border-slate-200">
     <p>현재 습관/일반 사실</p>
-    <p class="text-[11px] leading-4 text-indigo-600 mt-1 break-words ${vi}">Thói quen hiện tại / sự thật chung</p>
+    ${renderCompareMeaningTranslations("present")}
 </td>
                                         <td class="p-2 border border-slate-200">요즘 읽는 책</td>
                                     </tr>
@@ -345,7 +510,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                     </section>
 
-                    <section class="bg-amber-50 border border-amber-200 rounded-2xl p-5 shadow-sm">
+                    <section class="grammar-mini bg-amber-50 border border-amber-200 rounded-2xl p-5 shadow-sm">
                         <h3 class="font-bold text-amber-900 flex items-center">
                             <i data-lucide="brain" class="w-4 h-4 mr-2"></i>
                             미니 인출 연습
@@ -388,7 +553,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     : `<li class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs text-emerald-700">오답이 없습니다. 훌륭해요!</li>`;
 
                 return `
-                    <div class="space-y-4">
+                    <div class="grammar-practice-grid">
                         <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm text-center">
                             <div class="w-16 h-16 rounded-full bg-indigo-100 mx-auto flex items-center justify-center text-indigo-600">
                                 <i data-lucide="trophy" class="w-8 h-8"></i>
@@ -447,7 +612,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             ` : "";
 
             return `
-                <div class="space-y-4">
+                <div class="grammar-practice-grid">
                     <section class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 shadow-sm">
                         <h2 class="text-sm font-bold text-indigo-700">전략 기반 연습</h2>
                         <p class="text-xs text-slate-600 mt-1">즉시 피드백과 오답 재풀이로 기억을 고정합니다.</p>
@@ -499,6 +664,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
 
             lucide.createIcons();
+            syncMultilangBlocks();
+            updateResponsiveOffsets();
 
             if (state.activeTab === "practice") {
                 const q = currentQ();
@@ -512,6 +679,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("translation-btn").addEventListener("click", toggleTranslation);
             render();
+            window.addEventListener("resize", updateResponsiveOffsets);
         });
     </script>
     <script src="../shared/learning-enhancements.js"></script>

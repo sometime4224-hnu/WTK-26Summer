@@ -131,14 +131,77 @@
         document.body.insertAdjacentElement("afterbegin", panel);
     }
 
+    function hideElement(element) {
+        if (!element) return;
+        element.hidden = true;
+        element.setAttribute("aria-hidden", "true");
+        element.setAttribute("tabindex", "-1");
+        element.style.display = "none";
+    }
+
     function hideLegacyVietnameseControls() {
-        ["viToggle", "viToggleBtn", "translation-btn"].forEach((id) => {
-            const control = document.getElementById(id);
-            if (!control) return;
-            control.hidden = true;
-            control.setAttribute("aria-hidden", "true");
-            control.style.display = "none";
+        const legacyControls = new Set();
+        [
+            "#viToggle",
+            "#viToggleBtn",
+            "#translation-btn",
+            "[data-vi-toggle]",
+            ".js-vi-toggle",
+            ".translation-toggle"
+        ].forEach((selector) => {
+            document.querySelectorAll(selector).forEach((control) => legacyControls.add(control));
         });
+
+        legacyControls.forEach(hideElement);
+        document.querySelectorAll(".vi-on").forEach((element) => element.classList.remove("vi-on"));
+        document.querySelectorAll("[data-vi-panel]").forEach(hideElement);
+    }
+
+    function hideLegacyVietnameseContent(root) {
+        if (root && root.nodeType !== 1 && root.nodeType !== 9) return;
+        const scope = root && root.nodeType === 1 ? root : document;
+        const elements = [];
+
+        if (scope.matches && (scope.matches(".vi-text") || scope.matches("[data-vi-panel]"))) {
+            elements.push(scope);
+        }
+        scope.querySelectorAll(".vi-text, [data-vi-panel]").forEach((element) => elements.push(element));
+
+        const textCandidates = scope.matches
+            ? [scope].concat(Array.from(scope.querySelectorAll("p, span, div, li")))
+            : Array.from(scope.querySelectorAll("p, span, div, li"));
+
+        textCandidates.forEach((element) => {
+            if (element.closest("[data-multilang-scaffold='auto']")) return;
+            const text = element.textContent.trim();
+            const plainText = text.replace(/[()]/g, "").trim();
+            if (
+                text.includes("Giải thích (VI):")
+                || /\bVI:\s/.test(text)
+                || plainText === "Đúng"
+                || plainText === "Sai"
+            ) {
+                elements.push(element);
+            }
+        });
+
+        elements.forEach((element) => {
+            if (element.closest("[data-multilang-scaffold='auto']")) return;
+            hideElement(element);
+        });
+    }
+
+    function watchLegacyVietnameseContent() {
+        hideLegacyVietnameseContent(document);
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    hideLegacyVietnameseContent(node);
+                });
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
     }
 
     function init() {
@@ -156,6 +219,7 @@
 
         insertPanel(buildPanel(entry, languages));
         hideLegacyVietnameseControls();
+        watchLegacyVietnameseContent();
     }
 
     if (document.body) {
