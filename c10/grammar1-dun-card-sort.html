@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>C10 문법1 보조 활동 - -던 카드 분류</title>
+    <title>C10 문법1 보조 활동 - -던 카드 퀴즈</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -164,12 +164,509 @@
             color: #9a3412;
         }
 
+        .needs-action {
+            position: relative;
+            isolation: isolate;
+            overflow: visible;
+            animation: actionPulse 0.9s ease-in-out infinite;
+        }
+
+        .needs-action::before,
+        .needs-action::after {
+            content: "";
+            position: absolute;
+            inset: -8px;
+            z-index: -1;
+            border: 3px solid rgba(20, 184, 166, 0.72);
+            border-radius: inherit;
+            animation: actionWave 1.08s ease-out infinite;
+            pointer-events: none;
+        }
+
+        .needs-action::after {
+            animation-delay: 0.34s;
+        }
+
+        .tool-btn.needs-action,
+        .phase-btn.needs-action {
+            border-color: #0f766e;
+            background: #0f766e;
+            color: #ffffff;
+            box-shadow: 0 14px 30px rgba(15, 118, 110, 0.28);
+        }
+
+        .tool-btn.warn.needs-action {
+            border-color: #f59e0b;
+            background: #f59e0b;
+            color: #ffffff;
+            box-shadow: 0 14px 30px rgba(245, 158, 11, 0.3);
+        }
+
         .dun-text {
             color: var(--dun);
         }
 
         .done-text {
             color: var(--done);
+        }
+
+        .start-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: rgba(15, 23, 42, 0.46);
+            backdrop-filter: brightness(0.82) blur(2px);
+        }
+
+        .start-overlay.is-hidden {
+            display: none;
+        }
+
+        .start-overlay__button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 13px;
+            min-width: min(320px, 82vw);
+            min-height: 92px;
+            padding: 22px 34px;
+            border: 2px solid rgba(255, 255, 255, 0.82);
+            border-radius: 8px;
+            background: #0f766e;
+            color: #ffffff;
+            box-shadow: 0 26px 58px rgba(15, 23, 42, 0.38);
+            font-size: clamp(2rem, 8vw, 3.65rem);
+            font-weight: 950;
+            line-height: 1;
+        }
+
+        .start-overlay__button:hover,
+        .start-overlay__button:focus-visible {
+            background: #115e59;
+            outline: 4px solid rgba(255, 255, 255, 0.42);
+            outline-offset: 4px;
+        }
+
+        .start-overlay__button i {
+            width: 0.86em;
+            height: 0.86em;
+            flex: 0 0 auto;
+        }
+
+        .answer-feedback {
+            position: fixed;
+            inset: 0;
+            z-index: 46;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.03);
+            transition: opacity 0.16s ease, transform 0.16s ease;
+        }
+
+        .answer-feedback.is-visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .answer-feedback.correct {
+            background:
+                radial-gradient(circle at center, rgba(16, 185, 129, 0.42) 0%, rgba(16, 185, 129, 0.24) 34%, rgba(15, 23, 42, 0.55) 100%);
+        }
+
+        .answer-feedback.incorrect {
+            background:
+                radial-gradient(circle at center, rgba(244, 63, 94, 0.42) 0%, rgba(244, 63, 94, 0.22) 36%, rgba(15, 23, 42, 0.58) 100%);
+        }
+
+        .answer-feedback.timeout {
+            background:
+                radial-gradient(circle at center, rgba(245, 158, 11, 0.44) 0%, rgba(245, 158, 11, 0.23) 36%, rgba(15, 23, 42, 0.58) 100%);
+        }
+
+        .answer-feedback__burst {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .answer-feedback__burst span {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 14px;
+            height: 82px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.78);
+            opacity: 0;
+            transform: rotate(calc(var(--i) * 30deg)) translateY(-54px);
+        }
+
+        .answer-feedback.is-visible .answer-feedback__burst span {
+            animation: feedbackBurst 0.82s ease-out both;
+        }
+
+        .answer-feedback__panel {
+            position: relative;
+            display: grid;
+            justify-items: center;
+            gap: 12px;
+            width: min(760px, calc(100vw - 42px));
+            padding: 34px 28px;
+            border: 2px solid rgba(255, 255, 255, 0.72);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 28px 70px rgba(15, 23, 42, 0.38);
+            text-align: center;
+        }
+
+        .answer-feedback.is-visible .answer-feedback__panel {
+            animation: feedbackPanel 0.55s cubic-bezier(.18, 1.18, .32, 1) both;
+        }
+
+        .answer-feedback__answer {
+            display: grid;
+            justify-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .answer-feedback__grammar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 220px;
+            padding: 8px 24px 12px;
+            border: 3px solid currentColor;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #0f766e;
+            font-size: 6.4rem;
+            font-weight: 950;
+            line-height: 0.95;
+        }
+
+        .answer-feedback__grammar.dun {
+            color: var(--dun);
+        }
+
+        .answer-feedback__grammar.done {
+            color: var(--done);
+        }
+
+        .answer-feedback__expression {
+            color: #0f172a;
+            font-size: 4.3rem;
+            font-weight: 950;
+            line-height: 1.04;
+            word-break: keep-all;
+        }
+
+        .answer-feedback__title {
+            color: #0f172a;
+            font-size: 2.1rem;
+            font-weight: 950;
+            line-height: 1.05;
+            letter-spacing: 0;
+        }
+
+        .answer-feedback.correct .answer-feedback__title {
+            color: #047857;
+        }
+
+        .answer-feedback.incorrect .answer-feedback__title {
+            color: #be123c;
+        }
+
+        .answer-feedback.timeout .answer-feedback__title {
+            color: #b45309;
+        }
+
+        .answer-feedback__sub {
+            color: #334155;
+            font-size: 1.35rem;
+            font-weight: 900;
+            line-height: 1.32;
+            word-break: keep-all;
+        }
+
+        @keyframes feedbackPanel {
+            0% {
+                transform: scale(0.72);
+                opacity: 0;
+            }
+            58% {
+                transform: scale(1.06);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes feedbackBurst {
+            0% {
+                opacity: 0;
+                transform: rotate(calc(var(--i) * 30deg)) translateY(-54px) scaleY(0.2);
+            }
+            28% {
+                opacity: 0.85;
+            }
+            100% {
+                opacity: 0;
+                transform: rotate(calc(var(--i) * 30deg)) translateY(-48vh) scaleY(1);
+            }
+        }
+
+        @keyframes actionPulse {
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-2px) scale(1.045);
+            }
+        }
+
+        @keyframes actionWave {
+            0% {
+                opacity: 0.85;
+                transform: scale(0.96);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.45);
+            }
+        }
+
+        .phase-switch {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .phase-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            padding: 8px 11px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            font-weight: 900;
+        }
+
+        .phase-btn.active {
+            border-color: var(--dun);
+            background: var(--dun);
+            color: #ffffff;
+        }
+
+        .phase-panel.is-hidden {
+            display: none;
+        }
+
+        .choice-layout {
+            display: grid;
+            grid-template-columns: minmax(320px, 0.92fr) minmax(0, 1.08fr);
+            gap: 14px;
+            align-items: stretch;
+            margin-bottom: 14px;
+        }
+
+        .choice-card,
+        .choice-control,
+        .phase-subhead {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .choice-card {
+            overflow: hidden;
+        }
+
+        .choice-visual {
+            display: grid;
+            grid-template-rows: auto minmax(260px, 1fr);
+            min-height: clamp(420px, 58vh, 620px);
+            background: #f8fafc;
+        }
+
+        .choice-question {
+            display: grid;
+            justify-items: center;
+            gap: 6px;
+            padding: 18px 16px 8px;
+            text-align: center;
+        }
+
+        .choice-question__prompt {
+            color: #0f172a;
+            font-size: clamp(2.4rem, 6vw, 4.5rem);
+            font-weight: 950;
+            line-height: 1.05;
+            word-break: keep-all;
+        }
+
+        .choice-question__base {
+            color: #0f766e;
+            font-size: clamp(1.45rem, 3.4vw, 2.5rem);
+            font-weight: 950;
+            line-height: 1.15;
+            word-break: keep-all;
+        }
+
+        .choice-image {
+            display: block;
+            width: 100%;
+            height: clamp(260px, 40vh, 430px);
+            object-fit: contain;
+            object-position: center;
+            background: #f8fafc;
+        }
+
+        .choice-control {
+            display: grid;
+            align-content: start;
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .quiz-status {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .status-box {
+            min-height: 72px;
+            padding: 10px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #fbfdff;
+        }
+
+        .status-box span {
+            display: block;
+            color: #64748b;
+            font-size: 0.76rem;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .status-box strong {
+            display: block;
+            margin-top: 5px;
+            color: #0f172a;
+            font-size: 1.2rem;
+            font-weight: 950;
+        }
+
+        .timer-track {
+            overflow: hidden;
+            height: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        .timer-fill {
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #0f766e 0%, #f59e0b 68%, #dc2626 100%);
+            transition: width 0.1s linear;
+        }
+
+        .choice-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .choice-option {
+            min-height: 78px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #111827;
+            font-size: clamp(1.2rem, 2.7vw, 1.8rem);
+            font-weight: 950;
+        }
+
+        .choice-option:hover,
+        .choice-option:focus-visible {
+            border-color: var(--blue);
+            background: #eff6ff;
+        }
+
+        .choice-option.correct {
+            border-color: #10b981;
+            background: #ccfbf1;
+            color: #115e59;
+        }
+
+        .choice-option.incorrect {
+            border-color: #fb7185;
+            background: #fff1f2;
+            color: #be123c;
+        }
+
+        .choice-option:disabled {
+            cursor: default;
+            opacity: 0.74;
+        }
+
+        .choice-feedback {
+            min-height: 64px;
+            padding: 11px 12px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            font-weight: 850;
+            line-height: 1.55;
+        }
+
+        .choice-actions,
+        .phase-subhead {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .phase-subhead {
+            margin-bottom: 14px;
+            padding: 14px;
+        }
+
+        .phase-subhead h2 {
+            margin: 0 0 5px;
+            font-size: 1.3rem;
+        }
+
+        .phase-subhead p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+            font-weight: 750;
+            line-height: 1.45;
         }
 
         .score-line {
@@ -280,7 +777,7 @@
             display: grid;
             gap: 7px;
             min-width: 0;
-            min-height: 202px;
+            min-height: 226px;
             padding: 8px;
             border: 1px solid #dbe4ef;
             border-radius: 8px;
@@ -310,11 +807,12 @@
         .sort-card img {
             display: block;
             width: 100%;
-            height: 118px;
-            object-fit: cover;
+            height: 156px;
+            object-fit: contain;
+            object-position: center;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
-            background: #f8fafc;
+            background: #fffdf8;
         }
 
         .card-meta {
@@ -392,12 +890,14 @@
 
         @media (max-width: 980px) {
             .unit-head,
+            .choice-layout,
             .sort-layout,
             .zone-grid {
                 grid-template-columns: 1fr;
             }
 
-            .toolbar {
+            .toolbar,
+            .phase-switch {
                 justify-content: flex-start;
             }
 
@@ -428,8 +928,32 @@
             }
 
             .card-grid,
-            .zone .card-grid {
+            .zone .card-grid,
+            .choice-options,
+            .quiz-status {
                 grid-template-columns: 1fr;
+            }
+
+            .answer-feedback__panel {
+                padding: 24px 18px;
+            }
+
+            .answer-feedback__grammar {
+                min-width: 0;
+                max-width: 100%;
+                font-size: 3.7rem;
+            }
+
+            .answer-feedback__expression {
+                font-size: 2.45rem;
+            }
+
+            .answer-feedback__title {
+                font-size: 1.55rem;
+            }
+
+            .answer-feedback__sub {
+                font-size: 1.05rem;
             }
         }
     </style>
@@ -442,64 +966,157 @@
             <a href="grammar1.html"><i data-lucide="book-open" aria-hidden="true"></i> 문법1</a>
         </div>
         <div class="topbar__tools">
-            <span class="topbar__title">-던 카드 분류</span>
+            <span class="topbar__title">-던 카드 퀴즈</span>
             <a href="grammar1-dun-visual-warmup.html"><i data-lucide="images" aria-hidden="true"></i> 도입</a>
             <a href="grammar1-dun-memory-museum.html"><i data-lucide="messages-square" aria-hidden="true"></i> 말하기</a>
         </div>
     </nav>
 
+    <div id="startOverlay" class="start-overlay" role="dialog" aria-modal="true" aria-label="게임 시작">
+        <button id="entryStartBtn" class="start-overlay__button needs-action" type="button" onclick="startFromOverlay()" autofocus>
+            <i data-lucide="play" aria-hidden="true"></i>
+            <span>시작</span>
+        </button>
+    </div>
+
+    <div id="answerFeedback" class="answer-feedback" aria-hidden="true" aria-live="assertive">
+        <div class="answer-feedback__burst" aria-hidden="true">
+            <span style="--i: 0"></span>
+            <span style="--i: 1"></span>
+            <span style="--i: 2"></span>
+            <span style="--i: 3"></span>
+            <span style="--i: 4"></span>
+            <span style="--i: 5"></span>
+            <span style="--i: 6"></span>
+            <span style="--i: 7"></span>
+            <span style="--i: 8"></span>
+            <span style="--i: 9"></span>
+            <span style="--i: 10"></span>
+            <span style="--i: 11"></span>
+        </div>
+        <div class="answer-feedback__panel">
+            <div class="answer-feedback__answer">
+                <div id="answerFeedbackGrammar" class="answer-feedback__grammar dun">-던</div>
+                <div id="answerFeedbackExpression" class="answer-feedback__expression">마시던 커피</div>
+            </div>
+            <div id="answerFeedbackTitle" class="answer-feedback__title">정답!</div>
+            <div id="answerFeedbackSub" class="answer-feedback__sub">좋아요. 다음 카드로 갑니다.</div>
+        </div>
+    </div>
+
     <main class="shell">
         <header class="unit-head">
             <div>
                 <p class="eyebrow">C10 Grammar 1 Support</p>
-                <h1>그림 카드 분류: -던 / -(으)ㄴ</h1>
-                <p class="lead">그림만 보고 과거 행동이 아직 남아 있는지, 이미 끝났는지 판단해 두 칸으로 나눕니다.</p>
+                <h1>그림 카드 퀴즈: -던 / -(으)ㄴ</h1>
+                <p class="lead">1페이즈에서는 7초 안에 표현을 선택하고, 2페이즈에서는 그림 카드를 두 칸으로 분류합니다.</p>
             </div>
-            <div class="toolbar" aria-label="활동 도구">
-                <button class="tool-btn" type="button" onclick="shuffleBank()"><i data-lucide="shuffle" aria-hidden="true"></i> 섞기</button>
-                <button class="tool-btn primary" type="button" onclick="checkAnswers()"><i data-lucide="check-check" aria-hidden="true"></i> 채점</button>
-                <button class="tool-btn warn" type="button" onclick="toggleReveal()"><i data-lucide="eye" aria-hidden="true"></i> 정답 보기</button>
+            <div class="phase-switch" aria-label="페이즈 선택">
+                <button id="phaseChoiceBtn" class="phase-btn active" type="button" onclick="showPhase('choice')"><i data-lucide="timer" aria-hidden="true"></i> 1페이즈</button>
+                <button id="phaseSortBtn" class="phase-btn" type="button" onclick="showPhase('sort')"><i data-lucide="layout-grid" aria-hidden="true"></i> 2페이즈</button>
             </div>
         </header>
 
-        <p id="scoreLine" class="score-line" aria-live="polite">카드를 누른 뒤 넣을 칸을 선택하거나, 카드를 칸으로 끌어 놓으세요.</p>
-
-        <section class="sort-layout" aria-label="카드 분류판">
-            <aside class="bank">
-                <h2>미분류 카드</h2>
-                <p class="bank-note">카드의 상태를 보고 `-던` 또는 `-(으)ㄴ` 표현을 예측합니다.</p>
-                <div id="bankCards" class="card-grid"></div>
-            </aside>
-
-            <section class="zone-grid">
-                <article class="zone">
-                    <div class="zone__head">
-                        <div>
-                            <h2 class="dun-text">미완료 / 회상</h2>
-                            <p>하다가 멈췄거나 과거에 하던 중</p>
+        <section id="phaseChoice" class="phase-panel" aria-label="1페이즈 빠른 선택">
+            <div class="choice-layout">
+                <article class="choice-card">
+                    <div class="choice-visual">
+                        <div class="choice-question">
+                            <div id="quizPrompt" class="choice-question__prompt">____</div>
+                            <div id="quizBase" class="choice-question__base">기본형</div>
                         </div>
-                        <button class="tool-btn" type="button" onclick="moveSelected('unfinished')"><i data-lucide="log-in" aria-hidden="true"></i> 넣기</button>
+                        <img id="quizImage" class="choice-image" src="" alt="">
                     </div>
-                    <div id="unfinishedZone" class="zone__drop" ondragover="allowDrop(event)" ondragenter="markOver(event)" ondragleave="unmarkOver(event)" ondrop="dropCard(event, 'unfinished')"></div>
                 </article>
 
-                <article class="zone">
-                    <div class="zone__head">
-                        <div>
-                            <h2 class="done-text">완료</h2>
-                            <p>이미 끝난 행동의 결과</p>
+                <article class="choice-control">
+                    <div class="quiz-status">
+                        <div class="status-box">
+                            <span>카드</span>
+                            <strong id="quizProgress">0/16</strong>
                         </div>
-                        <button class="tool-btn" type="button" onclick="moveSelected('completed')"><i data-lucide="log-in" aria-hidden="true"></i> 넣기</button>
+                        <div class="status-box">
+                            <span>점수</span>
+                            <strong id="quizScore">0</strong>
+                        </div>
+                        <div class="status-box">
+                            <span>남은 시간</span>
+                            <strong id="quizTime">7</strong>
+                        </div>
                     </div>
-                    <div id="completedZone" class="zone__drop" ondragover="allowDrop(event)" ondragenter="markOver(event)" ondragleave="unmarkOver(event)" ondrop="dropCard(event, 'completed')"></div>
+
+                    <div class="timer-track" aria-hidden="true">
+                        <div id="timerFill" class="timer-fill"></div>
+                    </div>
+
+                    <div class="choice-options">
+                        <button id="choiceDun" class="choice-option" type="button" onclick="chooseQuizAnswer('unfinished')">-던</button>
+                        <button id="choiceDone" class="choice-option" type="button" onclick="chooseQuizAnswer('completed')">-(으)ㄴ</button>
+                    </div>
+
+                    <p id="choiceFeedback" class="choice-feedback" aria-live="polite">시작을 누르면 카드마다 7초 제한으로 진행합니다.</p>
+
+                    <div class="choice-actions">
+                        <button id="quizStartBtn" class="tool-btn primary" type="button" onclick="startChoiceQuiz()"><i data-lucide="play" aria-hidden="true"></i> 시작</button>
+                        <button class="tool-btn" type="button" onclick="resetChoiceQuiz()"><i data-lucide="rotate-ccw" aria-hidden="true"></i> 다시 섞기</button>
+                        <button id="goPhaseSortBtn" class="tool-btn warn" type="button" onclick="showPhase('sort')"><i data-lucide="arrow-right" aria-hidden="true"></i> 2페이즈</button>
+                    </div>
                 </article>
-            </section>
+            </div>
         </section>
 
-        <details class="teacher-note">
-            <summary>원본 보드 보기</summary>
-            <img class="source-board" src="../assets/c10/grammar/images/dun-support/dun-state-cards.jpg" alt="-던과 완료 표현을 비교하는 원본 카드 보드">
-        </details>
+        <section id="phaseSort" class="phase-panel is-hidden" aria-label="2페이즈 카드 분류">
+            <div class="phase-subhead">
+                <div>
+                    <h2>2페이즈: 카드 분류</h2>
+                    <p>1페이즈에서 본 카드를 `-던`과 `-(으)ㄴ` 두 칸으로 다시 정리합니다.</p>
+                </div>
+                <div class="toolbar" aria-label="분류 도구">
+                    <button class="tool-btn" type="button" onclick="shuffleBank()"><i data-lucide="shuffle" aria-hidden="true"></i> 섞기</button>
+                    <button id="sortCheckBtn" class="tool-btn primary" type="button" onclick="checkAnswers()"><i data-lucide="check-check" aria-hidden="true"></i> 채점</button>
+                    <button class="tool-btn warn" type="button" onclick="toggleReveal()"><i data-lucide="eye" aria-hidden="true"></i> 정답 보기</button>
+                </div>
+            </div>
+
+            <p id="scoreLine" class="score-line" aria-live="polite">카드를 누른 뒤 넣을 칸을 선택하거나, 카드를 칸으로 끌어 놓으세요.</p>
+
+            <section class="sort-layout" aria-label="카드 분류판">
+                <aside class="bank">
+                    <h2>미분류 카드</h2>
+                    <p class="bank-note">카드의 상태를 보고 `-던` 또는 `-(으)ㄴ` 표현을 예측합니다.</p>
+                    <div id="bankCards" class="card-grid"></div>
+                </aside>
+
+                <section class="zone-grid">
+                    <article class="zone">
+                        <div class="zone__head">
+                            <div>
+                                <h2 class="dun-text">미완료 / 회상</h2>
+                                <p>하다가 멈췄거나 과거에 하던 중</p>
+                            </div>
+                            <button id="putUnfinishedBtn" class="tool-btn" type="button" onclick="moveSelected('unfinished')"><i data-lucide="log-in" aria-hidden="true"></i> 넣기</button>
+                        </div>
+                        <div id="unfinishedZone" class="zone__drop" ondragover="allowDrop(event)" ondragenter="markOver(event)" ondragleave="unmarkOver(event)" ondrop="dropCard(event, 'unfinished')"></div>
+                    </article>
+
+                    <article class="zone">
+                        <div class="zone__head">
+                            <div>
+                                <h2 class="done-text">완료</h2>
+                                <p>이미 끝난 행동의 결과</p>
+                            </div>
+                            <button id="putCompletedBtn" class="tool-btn" type="button" onclick="moveSelected('completed')"><i data-lucide="log-in" aria-hidden="true"></i> 넣기</button>
+                        </div>
+                        <div id="completedZone" class="zone__drop" ondragover="allowDrop(event)" ondragenter="markOver(event)" ondragleave="unmarkOver(event)" ondrop="dropCard(event, 'completed')"></div>
+                    </article>
+                </section>
+            </section>
+
+            <details class="teacher-note">
+                <summary>원본 보드 보기</summary>
+                <img class="source-board" src="../assets/c10/grammar/images/dun-support/dun-state-cards.jpg" alt="-던과 완료 표현을 비교하는 원본 카드 보드">
+            </details>
+        </section>
     </main>
 
     <script>
@@ -520,13 +1137,23 @@
             { id: "robot-dun", x: 4, row: 1, verb: "만들다", noun: "로봇", expression: "만들던 로봇", state: "unfinished" },
             { id: "robot-done", x: 5, row: 1, verb: "만들다", noun: "로봇", expression: "만든 로봇", state: "completed" },
             { id: "cook-dun", x: 6, row: 1, verb: "끓이다", noun: "찌개", expression: "끓이던 찌개", state: "unfinished" },
-            { id: "cook-done", x: 7, row: 1, verb: "끓이다", noun: "찌개", expression: "끓인 찌개", state: "completed" }
+            { id: "cook-done", x: 7, row: 1, verb: "요리하다", noun: "음식", expression: "요리한 음식", state: "completed" }
         ];
 
         let locations = { bank: [], unfinished: [], completed: [] };
         let selectedId = null;
         let revealAnswers = false;
         let checked = false;
+        const QUIZ_SECONDS = 7;
+        let quizOrder = [];
+        let quizIndex = 0;
+        let quizScoreValue = 0;
+        let quizRunning = false;
+        let quizAnswered = false;
+        let quizTimerId = null;
+        let quizAdvanceId = null;
+        let answerFeedbackTimerId = null;
+        let quizDeadline = 0;
 
         function iconRefresh() {
             if (window.lucide) window.lucide.createIcons();
@@ -545,6 +1172,244 @@
 
         function cardImage(card) {
             return `${CARD_IMAGE_DIR}/${card.id}.jpg`;
+        }
+
+        function hideStartOverlay() {
+            const overlay = document.getElementById("startOverlay");
+            overlay.classList.add("is-hidden");
+            overlay.setAttribute("aria-hidden", "true");
+        }
+
+        function startFromOverlay() {
+            hideStartOverlay();
+            showPhase("choice");
+            startChoiceQuiz();
+        }
+
+        function toggleActionCue(id, shouldCue) {
+            const button = document.getElementById(id);
+            if (button) button.classList.toggle("needs-action", Boolean(shouldCue));
+        }
+
+        function updateActionCues() {
+            const phaseChoiceVisible = !document.getElementById("phaseChoice").classList.contains("is-hidden");
+            const phaseSortVisible = !document.getElementById("phaseSort").classList.contains("is-hidden");
+            const choiceComplete = quizOrder.length > 0 && quizIndex >= quizOrder.length;
+            const assignedCount = locations.unfinished.length + locations.completed.length;
+
+            toggleActionCue("quizStartBtn", phaseChoiceVisible && !quizRunning && !choiceComplete);
+            toggleActionCue("goPhaseSortBtn", phaseChoiceVisible && choiceComplete);
+            toggleActionCue("phaseSortBtn", phaseChoiceVisible && choiceComplete);
+            toggleActionCue("putUnfinishedBtn", phaseSortVisible && Boolean(selectedId));
+            toggleActionCue("putCompletedBtn", phaseSortVisible && Boolean(selectedId));
+            toggleActionCue("sortCheckBtn", phaseSortVisible && !checked && !selectedId && assignedCount === CARDS.length);
+        }
+
+        function showPhase(phase) {
+            document.getElementById("phaseChoice").classList.toggle("is-hidden", phase !== "choice");
+            document.getElementById("phaseSort").classList.toggle("is-hidden", phase !== "sort");
+            document.getElementById("phaseChoiceBtn").classList.toggle("active", phase === "choice");
+            document.getElementById("phaseSortBtn").classList.toggle("active", phase === "sort");
+
+            if (phase === "sort") {
+                stopChoiceTimer();
+                clearQuizAdvance();
+                hideAnswerFeedback();
+                if (quizRunning) {
+                    quizRunning = false;
+                    quizAnswered = false;
+                    document.getElementById("choiceFeedback").textContent = "2페이즈로 이동했습니다. 다시 1페이즈를 하려면 시작을 누르세요.";
+                    renderChoiceCard();
+                }
+            }
+
+            updateActionCues();
+            iconRefresh();
+        }
+
+        function stateLabel(state) {
+            return state === "unfinished" ? "-던" : "-(으)ㄴ";
+        }
+
+        function currentQuizCard() {
+            return getCard(quizOrder[quizIndex]);
+        }
+
+        function clearQuizAdvance() {
+            if (quizAdvanceId) {
+                clearTimeout(quizAdvanceId);
+                quizAdvanceId = null;
+            }
+        }
+
+        function hideAnswerFeedback() {
+            if (answerFeedbackTimerId) {
+                clearTimeout(answerFeedbackTimerId);
+                answerFeedbackTimerId = null;
+            }
+            const feedback = document.getElementById("answerFeedback");
+            feedback.className = "answer-feedback";
+            feedback.setAttribute("aria-hidden", "true");
+        }
+
+        function showAnswerFeedback(type, title, grammar, expression, subText, state) {
+            hideAnswerFeedback();
+            const feedback = document.getElementById("answerFeedback");
+            const grammarNode = document.getElementById("answerFeedbackGrammar");
+            grammarNode.textContent = grammar;
+            grammarNode.className = `answer-feedback__grammar ${state === "unfinished" ? "dun" : "done"}`;
+            document.getElementById("answerFeedbackExpression").textContent = expression;
+            document.getElementById("answerFeedbackTitle").textContent = title;
+            document.getElementById("answerFeedbackSub").textContent = subText;
+            feedback.className = `answer-feedback ${type} is-visible`;
+            feedback.setAttribute("aria-hidden", "false");
+            answerFeedbackTimerId = setTimeout(hideAnswerFeedback, 1050);
+        }
+
+        function stopChoiceTimer() {
+            if (quizTimerId) {
+                clearInterval(quizTimerId);
+                quizTimerId = null;
+            }
+        }
+
+        function setChoiceButtonsDisabled(disabled) {
+            document.getElementById("choiceDun").disabled = disabled;
+            document.getElementById("choiceDone").disabled = disabled;
+        }
+
+        function clearChoiceMarks() {
+            document.getElementById("choiceDun").classList.remove("correct", "incorrect");
+            document.getElementById("choiceDone").classList.remove("correct", "incorrect");
+        }
+
+        function markChoiceButtons(selectedState, correctState) {
+            clearChoiceMarks();
+            const correctButton = correctState === "unfinished" ? document.getElementById("choiceDun") : document.getElementById("choiceDone");
+            correctButton.classList.add("correct");
+            if (selectedState && selectedState !== correctState) {
+                const selectedButton = selectedState === "unfinished" ? document.getElementById("choiceDun") : document.getElementById("choiceDone");
+                selectedButton.classList.add("incorrect");
+            }
+        }
+
+        function updateTimerDisplay(seconds, ratio = 1) {
+            document.getElementById("quizTime").textContent = seconds;
+            document.getElementById("timerFill").style.width = `${Math.max(0, Math.min(1, ratio)) * 100}%`;
+        }
+
+        function tickChoiceTimer() {
+            if (!quizRunning || quizAnswered) return;
+            const remainingMs = Math.max(0, quizDeadline - Date.now());
+            const ratio = remainingMs / (QUIZ_SECONDS * 1000);
+            updateTimerDisplay(Math.ceil(remainingMs / 1000), ratio);
+            if (remainingMs <= 0) chooseQuizAnswer(null);
+        }
+
+        function startChoiceTimer() {
+            stopChoiceTimer();
+            quizDeadline = Date.now() + QUIZ_SECONDS * 1000;
+            updateTimerDisplay(QUIZ_SECONDS, 1);
+            quizTimerId = setInterval(tickChoiceTimer, 100);
+        }
+
+        function renderChoiceCard() {
+            clearChoiceMarks();
+            const isComplete = quizOrder.length > 0 && quizIndex >= quizOrder.length;
+            const currentCard = isComplete ? getCard(quizOrder[quizOrder.length - 1]) : currentQuizCard();
+            const progress = isComplete ? quizOrder.length : quizIndex + 1;
+
+            document.getElementById("quizProgress").textContent = `${progress}/${CARDS.length}`;
+            document.getElementById("quizScore").textContent = quizScoreValue;
+            document.getElementById("quizImage").src = currentCard ? cardImage(currentCard) : "";
+            document.getElementById("quizImage").alt = currentCard ? `${currentCard.verb} ${currentCard.noun} 그림` : "";
+            document.getElementById("quizPrompt").textContent = isComplete ? "1페이즈 완료" : `____ ${currentCard.noun}`;
+            document.getElementById("quizBase").textContent = isComplete
+                ? `${quizScoreValue}/${CARDS.length}개 맞았습니다.`
+                : currentCard.verb;
+            document.getElementById("quizStartBtn").innerHTML = isComplete
+                ? '<i data-lucide="rotate-ccw" aria-hidden="true"></i> 다시 시작'
+                : quizRunning
+                    ? '<i data-lucide="timer" aria-hidden="true"></i> 진행 중'
+                    : '<i data-lucide="play" aria-hidden="true"></i> 시작';
+
+            setChoiceButtonsDisabled(!quizRunning || quizAnswered || isComplete);
+            if (!quizRunning && !isComplete) updateTimerDisplay(QUIZ_SECONDS, 1);
+            iconRefresh();
+            updateActionCues();
+        }
+
+        function resetChoiceQuiz() {
+            stopChoiceTimer();
+            clearQuizAdvance();
+            hideAnswerFeedback();
+            quizOrder = shuffle([...CARDS.map(card => card.id)]);
+            quizIndex = 0;
+            quizScoreValue = 0;
+            quizRunning = false;
+            quizAnswered = false;
+            renderChoiceCard();
+            document.getElementById("choiceFeedback").textContent = "시작을 누르면 카드마다 7초 제한으로 진행합니다.";
+        }
+
+        function startChoiceQuiz() {
+            clearQuizAdvance();
+            if (quizIndex >= quizOrder.length) resetChoiceQuiz();
+            if (quizRunning && !quizAnswered) return;
+            quizRunning = true;
+            quizAnswered = false;
+            renderChoiceCard();
+            document.getElementById("choiceFeedback").textContent = "그림 상태를 보고 알맞은 표현을 선택하세요.";
+            startChoiceTimer();
+        }
+
+        function chooseQuizAnswer(selectedState) {
+            if (!quizRunning || quizAnswered || quizIndex >= quizOrder.length) return;
+            const card = currentQuizCard();
+            const correct = selectedState === card.state;
+            quizAnswered = true;
+            stopChoiceTimer();
+            if (correct) quizScoreValue += 1;
+            renderChoiceCard();
+            markChoiceButtons(selectedState, card.state);
+            document.getElementById("choiceFeedback").textContent = selectedState === null
+                ? `시간 초과입니다. 정답은 ${stateLabel(card.state)}, 표현은 '${card.expression}'입니다.`
+                : correct
+                    ? `맞아요. '${card.expression}'입니다.`
+                    : `정답은 ${stateLabel(card.state)}, 표현은 '${card.expression}'입니다.`;
+            showAnswerFeedback(
+                selectedState === null ? "timeout" : correct ? "correct" : "incorrect",
+                selectedState === null ? "시간 초과!" : correct ? "정답!" : "아쉬워요!",
+                stateLabel(card.state),
+                card.expression,
+                selectedState === null
+                    ? "시간 안에 정답 표현을 다시 확인하세요."
+                    : correct
+                        ? "좋아요. 다음 카드로 갑니다."
+                        : "정답 표현을 보고 다음 카드로 갑니다.",
+                card.state
+            );
+            quizAdvanceId = setTimeout(nextChoiceCard, 1150);
+        }
+
+        function nextChoiceCard() {
+            clearQuizAdvance();
+            hideAnswerFeedback();
+            quizIndex += 1;
+            quizAnswered = false;
+
+            if (quizIndex >= quizOrder.length) {
+                quizRunning = false;
+                stopChoiceTimer();
+                renderChoiceCard();
+                updateTimerDisplay(0, 0);
+                document.getElementById("choiceFeedback").textContent = `1페이즈 완료: ${quizScoreValue}/${CARDS.length}개 맞았습니다. 2페이즈에서 다시 분류해 보세요.`;
+                return;
+            }
+
+            renderChoiceCard();
+            document.getElementById("choiceFeedback").textContent = "그림 상태를 보고 알맞은 표현을 선택하세요.";
+            startChoiceTimer();
         }
 
         function whereIs(id) {
@@ -583,6 +1448,7 @@
         function dragStart(event, id) {
             event.dataTransfer.setData("text/plain", id);
             selectedId = id;
+            updateActionCues();
         }
 
         function allowDrop(event) {
@@ -647,6 +1513,7 @@
             document.getElementById("unfinishedZone").innerHTML = renderList(locations.unfinished, "여기에 -던 카드를 놓습니다.");
             document.getElementById("completedZone").innerHTML = renderList(locations.completed, "여기에 완료 카드를 놓습니다.");
             iconRefresh();
+            updateActionCues();
         }
 
         function updateScore(message) {
@@ -683,6 +1550,7 @@
         }
 
         locations.bank = shuffle([...CARDS.map(card => card.id)]);
+        resetChoiceQuiz();
         render();
     </script>
 </body>
