@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10과 듣기2 학생 퀴즈</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --ink: #0f172a;
+            --muted: #64748b;
+            --line: rgba(148, 163, 184, 0.32);
+            --orange: #ea580c;
+            --sky: #0284c7;
+            --green: #16a34a;
+            --rose: #e11d48;
+            --shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+            color: var(--ink);
+            background: linear-gradient(180deg, #fff7ed 0%, #f0f9ff 46%, #f8fafc 100%);
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 48px;
+            padding: 0 16px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.24);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .topbar a:hover { color: var(--sky); }
+
+        .topbar a[aria-current="page"] {
+            color: var(--sky);
+        }
+
+        .shell {
+            width: min(1180px, calc(100% - 28px));
+            margin: 14px auto 34px;
+        }
+
+        .page-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: end;
+            padding: 16px 18px;
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: var(--shadow);
+        }
+
+        .page-head h1 {
+            margin: 0;
+            font-size: clamp(1.35rem, 3vw, 2.1rem);
+            line-height: 1.16;
+        }
+
+        .page-head p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 126px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: #0f172a;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .tab {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.84);
+            color: #334155;
+            cursor: pointer;
+            font-weight: 900;
+            text-align: left;
+        }
+
+        .tab.is-active {
+            border-color: transparent;
+            background: linear-gradient(135deg, #fb923c, #0ea5e9);
+            color: #fff;
+            box-shadow: 0 12px 24px rgba(14, 165, 233, 0.18);
+        }
+
+        .single-lesson-title {
+            margin: 12px 0;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #fb923c, #0ea5e9);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 900;
+            box-shadow: 0 12px 24px rgba(14, 165, 233, 0.16);
+        }
+
+        .lesson-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.92fr);
+            gap: 12px;
+            align-items: start;
+        }
+
+        .panel {
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: var(--shadow);
+        }
+
+        .panel__head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 13px 14px 10px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .panel__head h2 {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.25;
+        }
+
+        .panel__head span {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .panel__body { padding: 12px 14px 14px; }
+
+        .sequence-work {
+            display: grid;
+            gap: 10px;
+        }
+
+        .slot-row {
+            display: grid;
+            grid-template-columns: repeat(var(--slot-count), minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .drop-slot {
+            position: relative;
+            min-height: 132px;
+            overflow: hidden;
+            border: 2px dashed rgba(100, 116, 139, 0.32);
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+
+        .drop-slot.is-over {
+            border-color: var(--sky);
+            background: #eff6ff;
+        }
+
+        .drop-slot.is-correct { border-color: var(--green); }
+        .drop-slot.is-wrong { border-color: var(--rose); }
+
+        .slot-index {
+            position: absolute;
+            left: 7px;
+            top: 7px;
+            z-index: 2;
+            display: grid;
+            place-items: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.92);
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 900;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+        }
+
+        .empty-slot {
+            display: grid;
+            place-items: center;
+            height: 100%;
+            min-height: 132px;
+            padding: 12px;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .card-bank {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: 8px;
+            padding: 10px;
+            border-radius: 12px;
+            background: #eef6fb;
+            border: 1px solid rgba(14, 165, 233, 0.16);
+        }
+
+        .picture-card {
+            position: relative;
+            overflow: hidden;
+            min-height: 108px;
+            border: 2px solid transparent;
+            border-radius: 11px;
+            padding: 0;
+            background: #fff;
+            cursor: grab;
+            touch-action: none;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        }
+
+        .picture-card:active { cursor: grabbing; }
+
+        .picture-card.is-dragging {
+            opacity: 0.58;
+            transform: scale(0.98);
+        }
+
+        .picture-card.is-selected {
+            border-color: var(--orange);
+            box-shadow: 0 10px 22px rgba(234, 88, 12, 0.2);
+        }
+
+        .picture-card img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: 108px;
+            object-fit: cover;
+        }
+
+        .slot-row .picture-card {
+            width: 100%;
+            height: 100%;
+            min-height: 132px;
+            border-radius: 10px;
+            box-shadow: none;
+        }
+
+        .slot-row .picture-card img { min-height: 132px; }
+
+        .card-tag {
+            position: absolute;
+            left: 6px;
+            bottom: 6px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.94);
+            color: #334155;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .result-note {
+            min-height: 38px;
+            padding: 9px 11px;
+            border-radius: 11px;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.45;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .result-note[data-tone="success"] {
+            background: #ecfdf5;
+            color: #166534;
+            border-color: rgba(22, 163, 74, 0.24);
+        }
+
+        .result-note[data-tone="warn"] {
+            background: #fff7ed;
+            color: #9a3412;
+            border-color: rgba(234, 88, 12, 0.24);
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 999px;
+            padding: 8px 13px;
+            background: #0f172a;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 13px;
+        }
+
+        .btn.secondary {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .btn.sky { background: var(--sky); }
+
+        .quiz-list {
+            display: grid;
+            gap: 9px;
+        }
+
+        .question-card {
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-radius: 12px;
+            padding: 11px;
+            background: #fff;
+        }
+
+        .question-card.is-correct { border-color: rgba(22, 163, 74, 0.42); background: #f0fdf4; }
+        .question-card.is-wrong { border-color: rgba(225, 29, 72, 0.38); background: #fff1f2; }
+
+        .question-card strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .option {
+            display: flex;
+            gap: 7px;
+            align-items: center;
+            min-height: 32px;
+            margin-top: 5px;
+            padding: 7px 9px;
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            border-radius: 10px;
+            color: #334155;
+            background: #fff;
+            font-size: 13px;
+            line-height: 1.35;
+        }
+
+        .option input { accent-color: var(--sky); }
+
+        .feedback {
+            display: none;
+            margin-top: 8px;
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        .is-submitted .feedback { display: block; }
+
+        .lesson-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin: 0 0 10px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.84);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            color: #475569;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        @media (max-width: 980px) {
+            .lesson-grid { grid-template-columns: 1fr; }
+            .slot-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 640px) {
+            .shell { width: min(100% - 20px, 1180px); margin-top: 10px; }
+            .page-head { grid-template-columns: 1fr; }
+            .score-pill { width: fit-content; }
+            .slot-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .card-bank { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar">
+        <a href="../index.html">메인으로</a>
+        <a href="index.html">10과</a>
+        <a href="listening1.html">교사용 듣기1</a>
+        <a href="listening2.html">교사용 듣기2</a>
+        <a href="listening1-student-quiz.html">학생퀴즈1</a>
+        <a href="listening2-student-quiz.html" aria-current="page">학생퀴즈2</a>
+    </nav>
+
+    <main class="shell">
+        <header class="page-head">
+            <div>
+                <h1>10과 듣기2 학생 퀴즈</h1>
+                <p>선생님이 들려주는 듣기2 음원을 들으며 그림 순서와 내용 문제를 바로 풀어 보세요.</p>
+            </div>
+            <div class="score-pill" id="total-score">결과 대기</div>
+        </header>
+
+        <div class="single-lesson-title">듣기 2: 사랑 이야기</div>
+
+        <section id="app" aria-live="polite"></section>
+    </main>
+
+    <script>
+        const lessons = {
+            listen1: {
+                id: "listen1",
+                title: "듣기 1: 수상 인터뷰",
+                sequenceTitle: "그림 순서 맞추기",
+                tags: ["인터뷰", "결혼 소식", "만난 계기", "결심 이유"],
+                panels: [
+                    { id: "l1-1", image: "../assets/c10/listening/cuttoon/listening1/listening1-cuttoon-panel-01.webp", title: "수상 인터뷰" },
+                    { id: "l1-2", image: "../assets/c10/listening/cuttoon/listening1/listening1-cuttoon-panel-02.webp", title: "팬들에게 감사" },
+                    { id: "l1-3", image: "../assets/c10/listening/cuttoon/listening1/listening1-cuttoon-panel-03.webp", title: "결혼 발표" },
+                    { id: "l1-4", image: "../assets/c10/listening/cuttoon/listening1/listening1-cuttoon-panel-04.webp", title: "예비 신부" },
+                    { id: "l1-5", image: "../assets/c10/listening/cuttoon/listening1/listening1-cuttoon-panel-05.webp", title: "만난 계기" },
+                    { id: "l1-6", image: "../assets/c10/listening/cuttoon/listening1/listening1-cuttoon-panel-06.webp", title: "결심한 이유" }
+                ],
+                questions: [
+                    {
+                        prompt: "남자가 받은 상은 무엇입니까?",
+                        answer: "2",
+                        explanation: "박민호 선수는 올해의 선수상을 받았습니다.",
+                        options: [
+                            ["1", "인기상"],
+                            ["2", "올해의 선수상"],
+                            ["3", "최우수 신인상"],
+                            ["4", "배우상"]
+                        ]
+                    },
+                    {
+                        prompt: "박민호 선수는 언제 결혼할 예정입니까?",
+                        answer: "3",
+                        explanation: "내년 1월에 결혼식을 할 예정이라고 말합니다.",
+                        options: [
+                            ["1", "이번 달"],
+                            ["2", "올해 12월"],
+                            ["3", "내년 1월"],
+                            ["4", "내년 여름"]
+                        ]
+                    },
+                    {
+                        prompt: "두 사람은 어떻게 만났습니까?",
+                        answer: "1",
+                        explanation: "박민호 선수는 선을 봐서 만났다고 말합니다.",
+                        options: [
+                            ["1", "선을 봐서 만났다."],
+                            ["2", "운동하다가 만났다."],
+                            ["3", "결혼식장에서 만났다."],
+                            ["4", "팬 사인회에서 만났다."]
+                        ]
+                    },
+                    {
+                        prompt: "남자가 결혼을 결심한 이유로 맞는 것은 무엇입니까?",
+                        answer: "4",
+                        explanation: "예비 신부가 운동선수 생활을 잘 이해해 주고 성격이 잘 맞는다고 했습니다.",
+                        options: [
+                            ["1", "여자가 유명해서"],
+                            ["2", "여자의 외모가 마음에 들어서"],
+                            ["3", "여자가 야구를 잘해서"],
+                            ["4", "생활을 이해해 주고 성격이 잘 맞아서"]
+                        ]
+                    }
+                ]
+            },
+            listen2: {
+                id: "listen2",
+                title: "듣기 2: 사랑 이야기",
+                sequenceTitle: "그림 순서 맞추기",
+                tags: ["라디오 사연", "일본 유학", "교통사고", "빵집 계획"],
+                panels: [
+                    { id: "l2-1", image: "../assets/c10/listening/cuttoon/listening2/listening2-cuttoon-panel-01.webp", title: "라디오 사연" },
+                    { id: "l2-2", image: "../assets/c10/listening/cuttoon/listening2/listening2-cuttoon-panel-02.webp", title: "요리학교에서 만남" },
+                    { id: "l2-3", image: "../assets/c10/listening/cuttoon/listening2/listening2-cuttoon-panel-03.webp", title: "친절한 도움" },
+                    { id: "l2-4", image: "../assets/c10/listening/cuttoon/listening2/listening2-cuttoon-panel-04.webp", title: "귀국 전 망설임" },
+                    { id: "l2-5", image: "../assets/c10/listening/cuttoon/listening2/listening2-cuttoon-panel-05.webp", title: "사고와 간호" },
+                    { id: "l2-6", image: "../assets/c10/listening/cuttoon/listening2/listening2-cuttoon-panel-06.webp", title: "청혼과 반대" },
+                    { id: "l2-7", image: "../assets/c10/listening/cuttoon/listening2/listening2-cuttoon-panel-07.webp", title: "빵집의 꿈" }
+                ],
+                questions: [
+                    {
+                        prompt: "이준서 씨는 왜 일본으로 유학을 갔습니까?",
+                        answer: "2",
+                        explanation: "요리를 배우기 위해 일본으로 유학을 갔습니다.",
+                        options: [
+                            ["1", "일본어를 공부하기 위해서"],
+                            ["2", "요리를 배우기 위해서"],
+                            ["3", "여행을 하기 위해서"],
+                            ["4", "회사에 취직하기 위해서"]
+                        ]
+                    },
+                    {
+                        prompt: "처음에 이준서 씨가 고백하지 못한 이유는 무엇입니까?",
+                        answer: "3",
+                        explanation: "졸업하자마자 한국으로 돌아올 생각이었기 때문입니다.",
+                        options: [
+                            ["1", "그녀가 싫어해서"],
+                            ["2", "나이 차이가 너무 커서"],
+                            ["3", "곧 한국으로 돌아가야 해서"],
+                            ["4", "부모님이 이미 반대해서"]
+                        ]
+                    },
+                    {
+                        prompt: "이준서 씨가 병원에 있을 때 그녀는 무엇을 했습니까?",
+                        answer: "1",
+                        explanation: "그녀는 병원에서 이준서 씨를 간호해 주었습니다.",
+                        options: [
+                            ["1", "간호해 주었다."],
+                            ["2", "한국으로 돌아갔다."],
+                            ["3", "빵집을 열었다."],
+                            ["4", "라디오에 전화를 했다."]
+                        ]
+                    },
+                    {
+                        prompt: "이준서 씨는 언제 그녀에게 청혼했습니까?",
+                        answer: "2",
+                        explanation: "병원에서 퇴원하던 날 청혼했습니다.",
+                        options: [
+                            ["1", "처음 만난 날"],
+                            ["2", "퇴원하던 날"],
+                            ["3", "졸업식 날"],
+                            ["4", "부모님을 만난 날"]
+                        ]
+                    },
+                    {
+                        prompt: "처음에는 양쪽 부모님이 결혼을 반대했습니다.",
+                        answer: "O",
+                        explanation: "양쪽 부모님이 처음에 결혼을 반대했다고 나옵니다.",
+                        options: [
+                            ["O", "O"],
+                            ["X", "X"]
+                        ]
+                    },
+                    {
+                        prompt: "두 사람은 앞으로 무엇을 만들 계획입니까?",
+                        answer: "4",
+                        explanation: "세상에서 제일 맛있는 빵집을 만들 계획이라고 했습니다.",
+                        options: [
+                            ["1", "요리 학교"],
+                            ["2", "라디오 방송국"],
+                            ["3", "일본어 학원"],
+                            ["4", "빵집"]
+                        ]
+                    }
+                ]
+            }
+        };
+
+        const state = {
+            activeLesson: "listen2",
+            drag: null,
+            pointerDrag: null,
+            selectedPanelId: null,
+            suppressClick: false,
+            lessons: {}
+        };
+
+        function shuffle(items) {
+            const copy = [...items];
+            for (let index = copy.length - 1; index > 0; index -= 1) {
+                const swapIndex = Math.floor(Math.random() * (index + 1));
+                [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+            }
+            return copy;
+        }
+
+        function ensureLessonState(lessonId) {
+            if (!state.lessons[lessonId]) resetLessonState(lessonId);
+            return state.lessons[lessonId];
+        }
+
+        function resetLessonState(lessonId) {
+            const lesson = lessons[lessonId];
+            state.lessons[lessonId] = {
+                pool: shuffle(lesson.panels.map((panel) => panel.id)),
+                slots: Array(lesson.panels.length).fill(null),
+                sequenceSubmitted: false,
+                quizSubmitted: false,
+                answers: {}
+            };
+            state.selectedPanelId = null;
+        }
+
+        function getPanel(lessonId, panelId) {
+            return lessons[lessonId].panels.find((panel) => panel.id === panelId);
+        }
+
+        function escapeHtml(value) {
+            return String(value == null ? "" : value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function renderPictureCard(lessonId, panelId, location, slotIndex = "") {
+            const panel = getPanel(lessonId, panelId);
+            const selected = state.selectedPanelId === panelId ? " is-selected" : "";
+            return `
+                <button
+                    type="button"
+                    class="picture-card${selected}"
+                    draggable="true"
+                    data-panel-id="${escapeHtml(panelId)}"
+                    data-location="${escapeHtml(location)}"
+                    data-slot-index="${escapeHtml(slotIndex)}"
+                    aria-label="${escapeHtml(panel.title)}"
+                >
+                    <img src="${escapeHtml(panel.image)}" alt="">
+                    <span class="card-tag">그림</span>
+                </button>
+            `;
+        }
+
+        function renderSequence(lessonId) {
+            const lesson = lessons[lessonId];
+            const lessonState = ensureLessonState(lessonId);
+            const correctOrder = lesson.panels.map((panel) => panel.id);
+            const slots = lessonState.slots.map((panelId, index) => {
+                const resultClass = lessonState.sequenceSubmitted
+                    ? (panelId === correctOrder[index] ? " is-correct" : " is-wrong")
+                    : "";
+                return `
+                    <div
+                        class="drop-slot${resultClass}"
+                        data-slot-index="${index}"
+                        aria-label="${index + 1}번째 칸"
+                    >
+                        <span class="slot-index">${index + 1}</span>
+                        ${panelId
+                            ? renderPictureCard(lessonId, panelId, "slot", index)
+                            : `<div class="empty-slot">${index + 1}번째</div>`}
+                    </div>
+                `;
+            }).join("");
+            const pool = lessonState.pool.map((panelId) => renderPictureCard(lessonId, panelId, "pool")).join("");
+            const sequenceScore = getSequenceScore(lessonId);
+            const note = lessonState.sequenceSubmitted
+                ? `${lesson.panels.length}컷 중 ${sequenceScore}컷을 알맞은 자리에 놓았습니다.`
+                : "그림을 듣기 순서대로 위 칸에 배치하세요.";
+
+            return `
+                <section class="panel">
+                    <div class="panel__head">
+                        <h2>${escapeHtml(lesson.sequenceTitle)}</h2>
+                        <span>${lesson.panels.length}컷</span>
+                    </div>
+                    <div class="panel__body sequence-work">
+                        <div class="slot-row" style="--slot-count:${lesson.panels.length}">
+                            ${slots}
+                        </div>
+                        <div class="card-bank" aria-label="그림 카드 모음">
+                            ${pool || `<div class="empty-slot">모든 그림을 배치했습니다.</div>`}
+                        </div>
+                        <div class="actions">
+                            <button class="btn sky" type="button" data-action="check-sequence">순서 확인</button>
+                            <button class="btn secondary" type="button" data-action="reset-sequence">그림 다시 섞기</button>
+                        </div>
+                        <div class="result-note" data-tone="${lessonState.sequenceSubmitted && sequenceScore === lesson.panels.length ? "success" : lessonState.sequenceSubmitted ? "warn" : "info"}">
+                            ${escapeHtml(note)}
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderQuiz(lessonId) {
+            const lesson = lessons[lessonId];
+            const lessonState = ensureLessonState(lessonId);
+            const score = getQuizScore(lessonId);
+            const note = lessonState.quizSubmitted
+                ? `${lesson.questions.length}문제 중 ${score}문제를 맞혔습니다.`
+                : "들은 내용을 바탕으로 답을 고르세요.";
+            const questions = lesson.questions.map((question, questionIndex) => {
+                const selected = lessonState.answers[questionIndex] || "";
+                const isCorrect = selected === question.answer;
+                const cardClass = lessonState.quizSubmitted ? (isCorrect ? " is-correct is-submitted" : " is-wrong is-submitted") : "";
+                const options = question.options.map(([value, label]) => `
+                    <label class="option">
+                        <input type="radio" name="${lessonId}-q${questionIndex}" value="${escapeHtml(value)}" ${selected === value ? "checked" : ""}>
+                        <span>${escapeHtml(label)}</span>
+                    </label>
+                `).join("");
+                return `
+                    <article class="question-card${cardClass}" data-question-index="${questionIndex}">
+                        <strong>${questionIndex + 1}. ${escapeHtml(question.prompt)}</strong>
+                        ${options}
+                        <div class="feedback">${escapeHtml(question.explanation)}</div>
+                    </article>
+                `;
+            }).join("");
+
+            return `
+                <section class="panel">
+                    <div class="panel__head">
+                        <h2>듣고 문제 풀기</h2>
+                        <span>${lesson.questions.length}문제</span>
+                    </div>
+                    <div class="panel__body">
+                        <div class="quiz-list">${questions}</div>
+                        <div class="actions" style="margin-top:10px">
+                            <button class="btn" type="button" data-action="check-quiz">채점하기</button>
+                            <button class="btn secondary" type="button" data-action="reset-quiz">답 지우기</button>
+                        </div>
+                        <div class="result-note" data-tone="${lessonState.quizSubmitted && score === lesson.questions.length ? "success" : lessonState.quizSubmitted ? "warn" : "info"}" style="margin-top:10px">
+                            ${escapeHtml(note)}
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderLesson() {
+            const lessonId = state.activeLesson;
+            const lesson = lessons[lessonId];
+            ensureLessonState(lessonId);
+            document.querySelectorAll(".tab").forEach((button) => {
+                const isActive = button.dataset.tab === lessonId;
+                button.classList.toggle("is-active", isActive);
+                button.setAttribute("aria-selected", String(isActive));
+            });
+            document.getElementById("app").innerHTML = `
+                <div class="lesson-summary">
+                    <span class="chip">${escapeHtml(lesson.title)}</span>
+                    ${lesson.tags.map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}
+                </div>
+                <div class="lesson-grid">
+                    ${renderSequence(lessonId)}
+                    ${renderQuiz(lessonId)}
+                </div>
+            `;
+            updateTotalScore();
+        }
+
+        function getSequenceScore(lessonId) {
+            const lesson = lessons[lessonId];
+            const lessonState = ensureLessonState(lessonId);
+            return lessonState.slots.reduce((score, panelId, index) => (
+                score + (panelId === lesson.panels[index].id ? 1 : 0)
+            ), 0);
+        }
+
+        function getQuizScore(lessonId) {
+            const lesson = lessons[lessonId];
+            const lessonState = ensureLessonState(lessonId);
+            return lesson.questions.reduce((score, question, index) => (
+                score + (lessonState.answers[index] === question.answer ? 1 : 0)
+            ), 0);
+        }
+
+        function updateTotalScore() {
+            const lessonId = state.activeLesson;
+            const lesson = lessons[lessonId];
+            const lessonState = ensureLessonState(lessonId);
+            const sequenceScore = lessonState.sequenceSubmitted ? getSequenceScore(lessonId) : null;
+            const quizScore = lessonState.quizSubmitted ? getQuizScore(lessonId) : null;
+            const parts = [];
+            if (sequenceScore != null) parts.push(`순서 ${sequenceScore}/${lesson.panels.length}`);
+            if (quizScore != null) parts.push(`문제 ${quizScore}/${lesson.questions.length}`);
+            document.getElementById("total-score").textContent = parts.length ? parts.join(" · ") : "결과 대기";
+        }
+
+        function removePanelFromCurrentLocation(lessonState, panelId) {
+            lessonState.pool = lessonState.pool.filter((id) => id !== panelId);
+            lessonState.slots = lessonState.slots.map((id) => id === panelId ? null : id);
+        }
+
+        function placePanel(lessonId, panelId, slotIndex) {
+            const lessonState = ensureLessonState(lessonId);
+            if (!panelId || slotIndex < 0 || slotIndex >= lessonState.slots.length) return;
+            const replaced = lessonState.slots[slotIndex];
+            removePanelFromCurrentLocation(lessonState, panelId);
+            if (replaced && replaced !== panelId) lessonState.pool.push(replaced);
+            lessonState.slots[slotIndex] = panelId;
+            lessonState.sequenceSubmitted = false;
+            state.selectedPanelId = null;
+            renderLesson();
+        }
+
+        function returnPanelToPool(lessonId, panelId) {
+            const lessonState = ensureLessonState(lessonId);
+            removePanelFromCurrentLocation(lessonState, panelId);
+            if (!lessonState.pool.includes(panelId)) lessonState.pool.push(panelId);
+            lessonState.sequenceSubmitted = false;
+            state.selectedPanelId = null;
+            renderLesson();
+        }
+
+        function clearDropHighlights() {
+            document.querySelectorAll(".drop-slot.is-over").forEach((node) => node.classList.remove("is-over"));
+        }
+
+        document.addEventListener("click", (event) => {
+            if (state.suppressClick) {
+                state.suppressClick = false;
+                return;
+            }
+
+            const tab = event.target.closest("[data-tab]");
+            if (tab) {
+                state.activeLesson = tab.dataset.tab;
+                state.selectedPanelId = null;
+                renderLesson();
+                return;
+            }
+
+            const card = event.target.closest(".picture-card");
+            if (card) {
+                const panelId = card.dataset.panelId;
+                if (card.dataset.location === "slot") {
+                    returnPanelToPool(state.activeLesson, panelId);
+                    return;
+                }
+                state.selectedPanelId = state.selectedPanelId === panelId ? null : panelId;
+                renderLesson();
+                return;
+            }
+
+            const slot = event.target.closest(".drop-slot");
+            if (slot && state.selectedPanelId) {
+                placePanel(state.activeLesson, state.selectedPanelId, Number(slot.dataset.slotIndex));
+                return;
+            }
+
+            const action = event.target.closest("[data-action]")?.dataset.action;
+            if (!action) return;
+            const lessonState = ensureLessonState(state.activeLesson);
+            if (action === "check-sequence") {
+                lessonState.sequenceSubmitted = true;
+                renderLesson();
+            } else if (action === "reset-sequence") {
+                const answers = lessonState.answers;
+                const quizSubmitted = lessonState.quizSubmitted;
+                resetLessonState(state.activeLesson);
+                state.lessons[state.activeLesson].answers = answers;
+                state.lessons[state.activeLesson].quizSubmitted = quizSubmitted;
+                renderLesson();
+            } else if (action === "check-quiz") {
+                lessonState.quizSubmitted = true;
+                renderLesson();
+            } else if (action === "reset-quiz") {
+                lessonState.answers = {};
+                lessonState.quizSubmitted = false;
+                renderLesson();
+            }
+        });
+
+        document.addEventListener("change", (event) => {
+            const input = event.target;
+            if (!(input instanceof HTMLInputElement) || input.type !== "radio") return;
+            const card = input.closest("[data-question-index]");
+            if (!card) return;
+            const lessonState = ensureLessonState(state.activeLesson);
+            lessonState.answers[card.dataset.questionIndex] = input.value;
+            lessonState.quizSubmitted = false;
+            updateTotalScore();
+        });
+
+        document.addEventListener("pointerdown", (event) => {
+            const card = event.target.closest(".picture-card");
+            if (!card || event.button !== 0) return;
+            state.pointerDrag = {
+                panelId: card.dataset.panelId,
+                startX: event.clientX,
+                startY: event.clientY,
+                active: false,
+                pointerId: event.pointerId,
+                card
+            };
+        });
+
+        document.addEventListener("pointermove", (event) => {
+            const drag = state.pointerDrag;
+            if (!drag || drag.pointerId !== event.pointerId) return;
+            const moved = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY);
+            if (!drag.active && moved > 8) {
+                drag.active = true;
+                drag.card.classList.add("is-dragging");
+                state.suppressClick = true;
+            }
+            if (!drag.active) return;
+            const target = document.elementFromPoint(event.clientX, event.clientY);
+            const slot = target?.closest(".drop-slot");
+            clearDropHighlights();
+            if (slot) slot.classList.add("is-over");
+        });
+
+        document.addEventListener("pointerup", (event) => {
+            const drag = state.pointerDrag;
+            if (!drag || drag.pointerId !== event.pointerId) return;
+            drag.card.classList.remove("is-dragging");
+            state.pointerDrag = null;
+            if (!drag.active) return;
+            window.setTimeout(() => {
+                state.suppressClick = false;
+            }, 0);
+            const target = document.elementFromPoint(event.clientX, event.clientY);
+            const slot = target?.closest(".drop-slot");
+            const bank = target?.closest(".card-bank");
+            clearDropHighlights();
+            if (slot) {
+                placePanel(state.activeLesson, drag.panelId, Number(slot.dataset.slotIndex));
+            } else if (bank) {
+                returnPanelToPool(state.activeLesson, drag.panelId);
+            } else {
+                renderLesson();
+            }
+        });
+
+        document.addEventListener("pointercancel", () => {
+            if (state.pointerDrag?.card) state.pointerDrag.card.classList.remove("is-dragging");
+            state.pointerDrag = null;
+            clearDropHighlights();
+        });
+
+        document.addEventListener("dragstart", (event) => {
+            const card = event.target.closest(".picture-card");
+            if (!card) return;
+            state.drag = {
+                panelId: card.dataset.panelId,
+                location: card.dataset.location,
+                slotIndex: card.dataset.slotIndex
+            };
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", card.dataset.panelId);
+        });
+
+        document.addEventListener("dragover", (event) => {
+            const slot = event.target.closest(".drop-slot");
+            const bank = event.target.closest(".card-bank");
+            if (!slot && !bank) return;
+            event.preventDefault();
+            if (slot) slot.classList.add("is-over");
+        });
+
+        document.addEventListener("dragleave", (event) => {
+            const slot = event.target.closest(".drop-slot");
+            if (slot) slot.classList.remove("is-over");
+        });
+
+        document.addEventListener("drop", (event) => {
+            const panelId = event.dataTransfer.getData("text/plain") || state.drag?.panelId;
+            const slot = event.target.closest(".drop-slot");
+            const bank = event.target.closest(".card-bank");
+            if (!panelId || (!slot && !bank)) return;
+            event.preventDefault();
+            clearDropHighlights();
+            if (slot) {
+                placePanel(state.activeLesson, panelId, Number(slot.dataset.slotIndex));
+            } else if (bank) {
+                returnPanelToPool(state.activeLesson, panelId);
+            }
+            state.drag = null;
+        });
+
+        Object.keys(lessons).forEach(resetLessonState);
+        renderLesson();
+    </script>
+</body>
+</html>
