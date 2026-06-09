@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10과 어휘 문단 완성 게임</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --bg: #f6f8fb;
+            --surface: #ffffff;
+            --surface-soft: #f1f5f9;
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #d9e2ef;
+            --line-strong: #b8c7da;
+            --accent: #e4582e;
+            --accent-dark: #9a3412;
+            --blue: #2563eb;
+            --green: #16a34a;
+            --red: #dc2626;
+            --amber: #f59e0b;
+            --shadow: 0 14px 34px rgba(15, 23, 42, 0.09);
+            --shadow-sm: 0 8px 18px rgba(15, 23, 42, 0.07);
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                linear-gradient(180deg, #f8fafc 0%, #eef6ff 55%, #fff7ed 100%);
+            color: var(--ink);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button { font: inherit; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 0 14px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(12px);
+        }
+
+        .topbar a {
+            color: var(--accent-dark);
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .topbar__divider {
+            color: #cbd5e1;
+            font-weight: 900;
+        }
+
+        .shell {
+            width: min(1440px, calc(100vw - 28px));
+            margin: 14px auto 36px;
+        }
+
+        .game-header {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: stretch;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .title-panel,
+        .metrics,
+        .game-panel,
+        .paragraph-panel {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .title-panel {
+            min-height: 86px;
+            padding: 16px 18px;
+        }
+
+        .eyebrow {
+            margin: 0 0 5px;
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(24px, 3vw, 34px);
+            line-height: 1.15;
+        }
+
+        .subtitle {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(92px, 1fr));
+            gap: 8px;
+            min-width: min(430px, 100%);
+            padding: 10px;
+        }
+
+        .metric {
+            display: grid;
+            align-content: center;
+            min-height: 66px;
+            padding: 9px 10px;
+            border: 1px solid #e8eef6;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .metric strong {
+            font-size: 21px;
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .metric span {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .game-layout {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.92fr) minmax(360px, 1.08fr) minmax(320px, 0.98fr);
+            gap: 12px;
+            align-items: start;
+        }
+
+        .game-panel {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 48px;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .panel-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .panel-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .icon-btn {
+            display: inline-grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            cursor: pointer;
+        }
+
+        .icon-btn:hover,
+        .icon-btn:focus-visible {
+            border-color: #93c5fd;
+            color: var(--blue);
+            outline: none;
+        }
+
+        .icon-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.42;
+            box-shadow: none;
+        }
+
+        .icon-btn.is-ready {
+            border-color: #fbbf24;
+            background: #fffbeb;
+            color: #b45309;
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.14);
+        }
+
+        .picture-body {
+            display: grid;
+            gap: 10px;
+            padding: 12px;
+        }
+
+        .current-sentence-card {
+            display: grid;
+            gap: 9px;
+            border: 2px solid #fed7aa;
+            border-radius: 8px;
+            background:
+                linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+            padding: 13px 14px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.74), 0 10px 22px rgba(249, 115, 22, 0.08);
+        }
+
+        .current-sentence-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: #9a3412;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .current-sentence-progress {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            min-height: 24px;
+            border-radius: 999px;
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .current-sentence-card .sentence-text {
+            font-size: clamp(16px, 2vw, 19px);
+            line-height: 1.85;
+        }
+
+        .picture-stage {
+            position: relative;
+            display: grid;
+            place-items: center;
+            min-height: 300px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background:
+                linear-gradient(135deg, #ffffff 0%, #f8fafc 44%, #eff6ff 100%);
+            overflow: hidden;
+        }
+
+        .picture-stage.is-hot {
+            border-color: #f97316;
+            background:
+                linear-gradient(135deg, #fff7ed 0%, #ffffff 48%, #eff6ff 100%);
+            box-shadow: inset 0 0 0 3px rgba(249, 115, 22, 0.12), 0 12px 22px rgba(249, 115, 22, 0.12);
+        }
+
+        .picture-stage img {
+            display: block;
+            width: 100%;
+            max-height: 292px;
+            object-fit: contain;
+            padding: 14px;
+            pointer-events: none;
+        }
+
+        .complete-visual {
+            display: grid;
+            place-items: center;
+            gap: 12px;
+            min-height: 220px;
+            color: #166534;
+            font-size: 22px;
+            font-weight: 900;
+            pointer-events: none;
+        }
+
+        .complete-visual i {
+            display: grid;
+            place-items: center;
+            width: 76px;
+            height: 76px;
+            border: 3px solid #86efac;
+            border-radius: 999px;
+            background: #dcfce7;
+            font-size: 36px;
+        }
+
+        .picture-counter {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 30px;
+            padding: 0 10px;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            background: rgba(239, 246, 255, 0.95);
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 900;
+            pointer-events: none;
+        }
+
+        .drop-zone {
+            display: grid;
+            place-items: center;
+            min-height: 74px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #475569;
+            font-size: 15px;
+            font-weight: 900;
+            line-height: 1.35;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 160ms ease, background 160ms ease, color 160ms ease, transform 160ms ease;
+        }
+
+        .drop-zone.is-hot,
+        .drop-zone:focus-visible {
+            border-color: #f97316;
+            background: #fff7ed;
+            color: #9a3412;
+            outline: none;
+            transform: translateY(-1px);
+        }
+
+        .drop-zone.is-correct {
+            border-style: solid;
+            border-color: #22c55e;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .feedback {
+            min-height: 46px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #f8fafc;
+            padding: 10px 12px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .feedback.is-correct {
+            border-color: #86efac;
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .feedback.is-wrong {
+            border-color: #fecdd3;
+            background: #fff1f2;
+            color: #be123c;
+        }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 9px;
+            min-height: 450px;
+            padding: 16px;
+            background:
+                linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .word-chip {
+            --tilt: 0deg;
+            --lift: 0px;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            max-width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #1e293b;
+            padding: 0 12px;
+            font-size: 13px;
+            font-weight: 900;
+            word-break: keep-all;
+            cursor: grab;
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+            transform: translateY(var(--lift)) rotate(var(--tilt));
+            transition: transform 140ms ease, border-color 140ms ease, background 140ms ease, color 140ms ease, opacity 140ms ease;
+        }
+
+        .word-chip:hover,
+        .word-chip:focus-visible,
+        .word-chip.is-selected {
+            border-color: #f97316;
+            background: #fff7ed;
+            color: #9a3412;
+            outline: none;
+            transform: translateY(calc(var(--lift) - 2px)) rotate(0deg);
+        }
+
+        .word-chip:active {
+            cursor: grabbing;
+        }
+
+        .word-chip.is-used {
+            opacity: 0.28;
+            cursor: default;
+            text-decoration: line-through;
+            transform: none;
+        }
+
+        .word-chip.is-dragging {
+            opacity: 0.72;
+        }
+
+        .word-chip.is-hint:not(.is-used) {
+            border-color: #f59e0b;
+            background: #fffbeb;
+            color: #92400e;
+            animation: hintWiggle 760ms ease-in-out infinite;
+        }
+
+        .text-body {
+            display: grid;
+            gap: 12px;
+            padding: 12px;
+        }
+
+        .sentence-list,
+        .paragraph-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .sentence-row {
+            display: grid;
+            gap: 8px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 12px;
+        }
+
+        .sentence-row.is-complete {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+
+        .sentence-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .sentence-progress {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            min-height: 24px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .sentence-row.is-complete .sentence-progress {
+            background: #bbf7d0;
+            color: #166534;
+        }
+
+        .sentence-text {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.8;
+            word-break: keep-all;
+            overflow-wrap: anywhere;
+        }
+
+        .blank {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 76px;
+            min-height: 30px;
+            margin: 0 2px;
+            border: 1px solid #bfdbfe;
+            border-bottom: 3px solid #2563eb;
+            border-radius: 8px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 0 8px;
+            vertical-align: middle;
+            font-size: 13px;
+            font-weight: 900;
+            white-space: normal;
+        }
+
+        button.blank {
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        button.blank:hover,
+        button.blank:focus-visible {
+            outline: none;
+            border-color: #f97316;
+            background: #fff7ed;
+            color: #9a3412;
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+        }
+
+        .blank.is-filled {
+            border-color: #fed7aa;
+            border-bottom-color: #f97316;
+            background: #fff7ed;
+            color: #9a3412;
+        }
+
+        .blank.is-target {
+            border-color: #2563eb;
+            border-bottom-color: #f97316;
+            background: linear-gradient(135deg, #2563eb 0%, #f97316 100%);
+            color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), 0 10px 20px rgba(249, 115, 22, 0.22);
+            animation: targetPulse 960ms ease-in-out infinite;
+        }
+
+        .blank.is-drop-hot {
+            border-color: #22c55e;
+            border-bottom-color: #16a34a;
+            background: #dcfce7;
+            color: #166534;
+            box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.18), 0 12px 22px rgba(22, 163, 74, 0.16);
+        }
+
+        .paragraph-panel {
+            overflow: hidden;
+        }
+
+        .paragraph-body {
+            display: grid;
+            gap: 8px;
+            padding: 12px;
+            background: #f8fafc;
+        }
+
+        .paragraph-slot {
+            min-height: 56px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 11px 12px;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.55;
+            word-break: keep-all;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        button.paragraph-slot {
+            width: 100%;
+            font-family: inherit;
+        }
+
+        button.paragraph-slot:hover,
+        button.paragraph-slot:focus-visible {
+            outline: none;
+            border-style: solid;
+            border-color: #93c5fd;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .paragraph-slot.is-filled {
+            border-style: solid;
+            border-color: #86efac;
+            background: #f0fdf4;
+            color: #172033;
+            animation: settle 360ms ease both;
+        }
+
+        .paragraph-slot.is-active {
+            border-style: solid;
+            border-color: #fbbf24;
+            background: #fffbeb;
+            color: #92400e;
+            box-shadow: inset 4px 0 0 #f59e0b;
+        }
+
+        .paragraph-slot.is-rewarding {
+            position: relative;
+            border-color: #f59e0b;
+            background:
+                radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.95) 0 9%, transparent 10%),
+                linear-gradient(135deg, #fef3c7 0%, #dcfce7 48%, #dbeafe 100%);
+            color: #172033;
+            overflow: hidden;
+            animation: treasureSlot 1450ms ease both;
+        }
+
+        .paragraph-slot.is-rewarding::before,
+        .paragraph-slot.is-rewarding::after {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            pointer-events: none;
+        }
+
+        .paragraph-slot.is-rewarding::before {
+            background:
+                conic-gradient(from 0deg, transparent 0 12%, rgba(255, 255, 255, 0.92) 15%, transparent 20% 33%, rgba(250, 204, 21, 0.78) 36%, transparent 41% 64%, rgba(59, 130, 246, 0.42) 68%, transparent 74%);
+            animation: rewardSpin 1200ms ease-out both;
+        }
+
+        .paragraph-slot.is-rewarding::after {
+            background:
+                radial-gradient(circle at 22% 28%, #ffffff 0 2px, transparent 3px),
+                radial-gradient(circle at 66% 20%, #facc15 0 3px, transparent 4px),
+                radial-gradient(circle at 84% 58%, #60a5fa 0 2px, transparent 3px),
+                radial-gradient(circle at 35% 78%, #34d399 0 2px, transparent 3px);
+            animation: sparklePop 1000ms ease-out both;
+        }
+
+        .reward-card {
+            position: fixed;
+            z-index: 80;
+            display: grid;
+            gap: 8px;
+            pointer-events: none;
+            border: 2px solid #fbbf24;
+            border-radius: 8px;
+            background:
+                linear-gradient(135deg, rgba(255, 251, 235, 0.98) 0%, rgba(255, 255, 255, 0.98) 46%, rgba(239, 246, 255, 0.98) 100%);
+            color: #172033;
+            padding: 13px 14px;
+            box-shadow:
+                0 0 0 5px rgba(251, 191, 36, 0.15),
+                0 28px 56px rgba(15, 23, 42, 0.26);
+            transform-origin: center;
+            overflow: hidden;
+        }
+
+        .reward-card::before {
+            content: "";
+            position: absolute;
+            inset: -35%;
+            background:
+                linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.88) 45%, transparent 60%);
+            animation: rewardSweep 900ms ease-in-out infinite;
+        }
+
+        .reward-card__badge,
+        .reward-card__text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .reward-card__badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: max-content;
+            border-radius: 999px;
+            background: #fffbeb;
+            color: #b45309;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .reward-card__badge i {
+            color: #2563eb;
+            filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.35));
+        }
+
+        .reward-card__text {
+            margin: 0;
+            font-size: clamp(14px, 1.8vw, 18px);
+            font-weight: 900;
+            line-height: 1.65;
+            word-break: keep-all;
+            overflow-wrap: anywhere;
+        }
+
+        .reward-burst {
+            position: fixed;
+            z-index: 79;
+            width: 220px;
+            height: 220px;
+            pointer-events: none;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle, rgba(255, 255, 255, 0.98) 0 8%, rgba(254, 243, 199, 0.86) 9% 16%, transparent 18%),
+                conic-gradient(from 0deg, transparent 0 6%, rgba(250, 204, 21, 1) 8% 12%, transparent 13% 22%, rgba(37, 99, 235, 0.8) 24% 29%, transparent 30% 43%, rgba(52, 211, 153, 0.86) 46% 51%, transparent 52% 68%, rgba(249, 115, 22, 0.92) 71% 77%, transparent 78%),
+                radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.95) 0 2px, transparent 3px),
+                radial-gradient(circle at 78% 34%, rgba(250, 204, 21, 0.95) 0 3px, transparent 4px),
+                radial-gradient(circle at 48% 84%, rgba(96, 165, 250, 0.9) 0 3px, transparent 4px);
+            transform: translate(-50%, -50%) scale(0.18);
+            animation: rewardBurst 1120ms ease-out both;
+        }
+
+        .paragraph-column .completion-banner {
+            margin: 0 12px 12px;
+        }
+
+        .completion-banner {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            min-height: 56px;
+            border: 2px solid #22c55e;
+            border-radius: 8px;
+            background: #dcfce7;
+            color: #166534;
+            font-size: 17px;
+            font-weight: 900;
+        }
+
+        .completion-banner.is-visible {
+            display: flex;
+            animation: settle 360ms ease both;
+        }
+
+        @keyframes settle {
+            0% { transform: translateY(6px); opacity: 0.2; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes targetPulse {
+            0%, 100% {
+                transform: translateY(0);
+                box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), 0 10px 20px rgba(249, 115, 22, 0.2);
+            }
+            50% {
+                transform: translateY(-2px);
+                box-shadow: 0 0 0 7px rgba(249, 115, 22, 0.18), 0 14px 26px rgba(37, 99, 235, 0.2);
+            }
+        }
+
+        @keyframes hintWiggle {
+            0%, 100% { transform: translateY(var(--lift)) rotate(var(--tilt)); }
+            40% { transform: translateY(calc(var(--lift) - 3px)) rotate(-2deg); }
+            70% { transform: translateY(calc(var(--lift) - 1px)) rotate(2deg); }
+        }
+
+        @keyframes treasureSlot {
+            0% { transform: scale(1); box-shadow: inset 4px 0 0 #f59e0b, 0 0 0 rgba(251, 191, 36, 0); }
+            18% { transform: scale(1.055); box-shadow: inset 4px 0 0 #f59e0b, 0 0 0 10px rgba(251, 191, 36, 0.3), 0 22px 38px rgba(245, 158, 11, 0.26); }
+            52% { transform: scale(1.018); box-shadow: inset 4px 0 0 #f59e0b, 0 0 0 16px rgba(96, 165, 250, 0.18), 0 18px 30px rgba(37, 99, 235, 0.18); }
+            100% { transform: scale(1); box-shadow: inset 4px 0 0 #f59e0b, 0 0 0 rgba(251, 191, 36, 0); }
+        }
+
+        @keyframes rewardSpin {
+            0% { transform: rotate(0deg) scale(0.22); opacity: 0; }
+            25% { opacity: 1; }
+            100% { transform: rotate(180deg) scale(1.18); opacity: 0; }
+        }
+
+        @keyframes sparklePop {
+            0% { transform: scale(0.4); opacity: 0; }
+            22% { opacity: 1; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+
+        @keyframes rewardSweep {
+            0% { transform: translateX(-46%) rotate(0deg); }
+            100% { transform: translateX(46%) rotate(0deg); }
+        }
+
+        @keyframes rewardBurst {
+            0% { transform: translate(-50%, -50%) scale(0.18) rotate(0deg); opacity: 0; }
+            14% { opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.68) rotate(105deg); opacity: 0; }
+        }
+
+        @media (max-width: 1180px) {
+            .game-layout {
+                grid-template-columns: minmax(165px, 0.86fr) minmax(225px, 1.12fr) minmax(165px, 0.92fr);
+            }
+
+            .word-bank {
+                min-height: 360px;
+                gap: 7px;
+                padding: 10px;
+            }
+
+            .word-chip {
+                min-height: 38px;
+                padding: 0 8px;
+                font-size: 12px;
+                transform: none;
+            }
+
+            .paragraph-slot {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .current-sentence-card {
+                padding: 11px;
+            }
+
+            .current-sentence-card .sentence-text {
+                font-size: 14px;
+            }
+
+            .blank {
+                min-width: 58px;
+                min-height: 28px;
+                padding: 0 6px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .shell {
+                width: min(100% - 18px, 720px);
+                margin-top: 10px;
+            }
+
+            .game-header {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics {
+                grid-template-columns: repeat(3, 1fr);
+                min-width: 0;
+            }
+
+            .metric {
+                min-height: 58px;
+                padding: 8px;
+            }
+
+            .metric strong {
+                font-size: 18px;
+            }
+
+            .picture-stage {
+                min-height: 240px;
+            }
+
+            .picture-stage img {
+                max-height: 230px;
+            }
+
+            .word-bank {
+                min-height: 260px;
+                padding: 12px;
+            }
+
+            .word-chip {
+                flex: 1 1 auto;
+                transform: none;
+            }
+
+            .sentence-text {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인으로</a>
+        <span class="topbar__divider">|</span>
+        <a href="index.html"><i class="fa-solid fa-folder-open"></i> 10과</a>
+        <span class="topbar__divider">|</span>
+        <a href="vocabulary.html"><i class="fa-solid fa-layer-group"></i> 어휘 카드</a>
+    </nav>
+
+    <main class="shell">
+        <header class="game-header">
+            <section class="title-panel">
+                <p class="eyebrow">Chapter 10 Vocabulary</p>
+                <h1>그림 문장 조립</h1>
+                <p class="subtitle">그림과 표현이 맞으면 문장이 완성되고, 완성된 문장이 문단으로 모입니다.</p>
+            </section>
+
+            <section class="metrics" aria-label="진행 상태">
+                <div class="metric">
+                    <strong id="matched-count">0 / 25</strong>
+                    <span>표현</span>
+                </div>
+                <div class="metric">
+                    <strong id="sentence-count">0 / 5</strong>
+                    <span>문장</span>
+                </div>
+                <div class="metric">
+                    <strong id="attempt-count">0</strong>
+                    <span>시도</span>
+                </div>
+            </section>
+        </header>
+
+        <section class="game-layout">
+            <section class="game-panel paragraph-column" aria-label="완성 문단">
+                <div class="panel-head">
+                    <span class="panel-title"><i class="fa-solid fa-align-left"></i> 문단</span>
+                </div>
+                <div id="paragraph-list" class="paragraph-body"></div>
+                <div id="completion-banner" class="completion-banner">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>문단 완성</span>
+                </div>
+            </section>
+
+            <section class="game-panel picture-panel" aria-label="그림 문제">
+                <div class="panel-head">
+                    <span class="panel-title"><i class="fa-solid fa-pen-nib"></i> 현재 문장</span>
+                    <div class="panel-actions">
+                        <button id="prev-task-btn" class="icon-btn" type="button" aria-label="이전 그림" title="이전 그림">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button id="next-task-btn" class="icon-btn" type="button" aria-label="다음 그림" title="다음 그림">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button id="hint-btn" class="icon-btn" type="button" aria-label="힌트" title="10초 후 힌트" disabled>
+                            <i class="fa-solid fa-lightbulb"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="picture-body">
+                    <div id="current-sentence-card" class="current-sentence-card"></div>
+                    <div id="picture-stage" class="picture-stage">
+                        <span id="picture-counter" class="picture-counter">1 / 25</span>
+                        <img id="task-image" src="" alt="10과 어휘 그림" />
+                        <div id="complete-visual" class="complete-visual" hidden>
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>문단 완성</span>
+                        </div>
+                    </div>
+                    <button id="drop-zone" class="drop-zone" type="button" aria-label="표현 놓기">
+                        표현 후보를 여기에 놓기
+                    </button>
+                    <div id="feedback" class="feedback" aria-live="polite">그림에 맞는 표현을 고르세요.</div>
+                </div>
+            </section>
+
+            <section class="game-panel bank-panel" aria-label="표현 후보">
+                <div class="panel-head">
+                    <span class="panel-title"><i class="fa-solid fa-grip"></i> 후보</span>
+                    <div class="panel-actions">
+                        <button id="shuffle-bank-btn" class="icon-btn" type="button" aria-label="후보 섞기" title="후보 섞기">
+                            <i class="fa-solid fa-shuffle"></i>
+                        </button>
+                        <button id="reset-btn" class="icon-btn" type="button" aria-label="처음부터" title="처음부터">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="word-bank" class="word-bank"></div>
+            </section>
+        </section>
+    </main>
+
+    <script src="../shared/page-qr.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script>
+    (function () {
+        "use strict";
+
+        const WORDS = [
+            { id: "c10-vocab-01", term: "고백하다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_01_confess.webp" },
+            { id: "c10-vocab-02", term: "가슴이 두근거리다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_02_heart_pounding.webp" },
+            { id: "c10-vocab-03", term: "나란히 앉다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_03_side_by_side.webp" },
+            { id: "c10-vocab-04", term: "마음씨가 착하다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_04_kind_heart_v2.webp" },
+            { id: "c10-vocab-05", term: "말(생각)이 잘 통하다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_05_understand.webp" },
+            { id: "c10-vocab-06", term: "매력이 있다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_06_charming.webp" },
+            { id: "c10-vocab-07", term: "사랑에 빠지다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_07_fall_in_love.webp" },
+            { id: "c10-vocab-08", term: "사귀다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_08_date_v2.webp" },
+            { id: "c10-vocab-09", term: "성격(마음)이 잘 맞다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_09_good_match.webp" },
+            { id: "c10-vocab-10", term: "선보다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_10_matchmaking_v2.webp" },
+            { id: "c10-vocab-11", term: "소개팅하다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_11_blind_date.webp" },
+            { id: "c10-vocab-12", term: "손을 잡다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_12_hold_hands.webp" },
+            { id: "c10-vocab-13", term: "어깨에 기대다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_13_lean_shoulder.webp" },
+            { id: "c10-vocab-14", term: "얼굴이 빨개지다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_14_blush.webp" },
+            { id: "c10-vocab-15", term: "연애하다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_15_relationship_v2.webp" },
+            { id: "c10-vocab-16", term: "인상이 좋다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_16_good_impression_v2.webp" },
+            { id: "c10-vocab-17", term: "조건이 맞다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_17_conditions_match.webp" },
+            { id: "c10-vocab-18", term: "첫눈에 반하다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_18_love_at_first_sight_v2.webp" },
+            { id: "c10-vocab-19", term: "팔짱을 끼다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_19_arm_in_arm.webp" },
+            { id: "c10-vocab-20", term: "청혼하다", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_20_propose.webp" },
+            { id: "c10-vocab-21", term: "신혼여행", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_21_honeymoon.webp" },
+            { id: "c10-vocab-22", term: "중매결혼", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_22_arranged_marriage.webp" },
+            { id: "c10-vocab-23", term: "연애결혼", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_23_love_marriage.webp" },
+            { id: "c10-vocab-24", term: "청첩장", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_24_wedding_invitation.webp" },
+            { id: "c10-vocab-25", term: "예식장", image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_25_wedding_hall.webp" }
+        ];
+
+        const SENTENCES = [
+            {
+                id: "s1",
+                title: "첫 만남",
+                parts: [
+                    "민수는 친구의 소개로 지연과 ",
+                    { wordId: "c10-vocab-11", display: "소개팅했고" },
+                    ", 처음 보자마자 ",
+                    { wordId: "c10-vocab-16", display: "인상이 좋고" },
+                    " ",
+                    { wordId: "c10-vocab-06", display: "매력이 있다고" },
+                    " 느껴 ",
+                    { wordId: "c10-vocab-18", display: "첫눈에 반했으며" },
+                    " ",
+                    { wordId: "c10-vocab-02", display: "가슴이 두근거렸다" },
+                    "."
+                ]
+            },
+            {
+                id: "s2",
+                title: "대화",
+                parts: [
+                    "두 사람은 카페에 ",
+                    { wordId: "c10-vocab-03", display: "나란히 앉아" },
+                    " 오래 이야기했는데, 지연은 ",
+                    { wordId: "c10-vocab-04", display: "마음씨가 착했고" },
+                    " 민수와 ",
+                    { wordId: "c10-vocab-05", display: "말이 잘 통했으며" },
+                    " ",
+                    { wordId: "c10-vocab-09", display: "성격도 잘 맞고" },
+                    " 원하는 만남의 ",
+                    { wordId: "c10-vocab-17", display: "조건도 맞았다" },
+                    "."
+                ]
+            },
+            {
+                id: "s3",
+                title: "고백",
+                parts: [
+                    "며칠 뒤 민수는 용기를 내어 ",
+                    { wordId: "c10-vocab-01", display: "고백했고" },
+                    ", 지연은 ",
+                    { wordId: "c10-vocab-14", display: "얼굴이 빨개졌지만" },
+                    " 두 사람은 곧 ",
+                    { wordId: "c10-vocab-08", display: "사귀기" },
+                    " 시작해 서로 ",
+                    { wordId: "c10-vocab-07", display: "사랑에 빠지고" },
+                    " 행복하게 ",
+                    { wordId: "c10-vocab-15", display: "연애했다" },
+                    "."
+                ]
+            },
+            {
+                id: "s4",
+                title: "데이트와 비교",
+                parts: [
+                    "데이트 때 두 사람은 ",
+                    { wordId: "c10-vocab-12", display: "손을 잡고" },
+                    " 걸었고, 지연은 민수의 ",
+                    { wordId: "c10-vocab-13", display: "어깨에 기대거나" },
+                    " ",
+                    { wordId: "c10-vocab-19", display: "팔짱을 끼기도" },
+                    " 했는데, 민수의 사촌은 같은 시기에 ",
+                    { wordId: "c10-vocab-10", display: "선을 보고" },
+                    " ",
+                    { wordId: "c10-vocab-22", display: "중매결혼을" },
+                    " 준비했다."
+                ]
+            },
+            {
+                id: "s5",
+                title: "결혼",
+                parts: [
+                    "오랜 만남 뒤 민수는 지연에게 ",
+                    { wordId: "c10-vocab-20", display: "청혼했고" },
+                    ", 두 사람은 ",
+                    { wordId: "c10-vocab-23", display: "연애결혼을" },
+                    " 하기로 한 뒤 ",
+                    { wordId: "c10-vocab-25", display: "예식장을" },
+                    " 예약하고 ",
+                    { wordId: "c10-vocab-24", display: "청첩장을" },
+                    " 보냈으며 ",
+                    { wordId: "c10-vocab-21", display: "신혼여행을" },
+                    " 준비했다."
+                ]
+            }
+        ];
+
+        const wordById = new Map(WORDS.map((word) => [word.id, word]));
+        const slots = SENTENCES.flatMap((sentence) => sentence.parts
+            .filter((part) => typeof part === "object")
+            .map((part) => ({ ...part, sentenceId: sentence.id })));
+        const orderedSlots = slots.map((slot, index) => ({ ...slot, index }));
+        const slotByWordId = new Map(slots.map((slot) => [slot.wordId, slot]));
+        const orderedSlotByWordId = new Map(orderedSlots.map((slot) => [slot.wordId, slot]));
+        const sentenceById = new Map(SENTENCES.map((sentence) => [sentence.id, sentence]));
+        const WORD_GROUPS = {
+            "c10-vocab-01": "feeling",
+            "c10-vocab-02": "feeling",
+            "c10-vocab-03": "action",
+            "c10-vocab-04": "match",
+            "c10-vocab-05": "match",
+            "c10-vocab-06": "feeling",
+            "c10-vocab-07": "feeling",
+            "c10-vocab-08": "relationship",
+            "c10-vocab-09": "match",
+            "c10-vocab-10": "meeting",
+            "c10-vocab-11": "meeting",
+            "c10-vocab-12": "action",
+            "c10-vocab-13": "action",
+            "c10-vocab-14": "feeling",
+            "c10-vocab-15": "relationship",
+            "c10-vocab-16": "match",
+            "c10-vocab-17": "match",
+            "c10-vocab-18": "feeling",
+            "c10-vocab-19": "action",
+            "c10-vocab-20": "marriage",
+            "c10-vocab-21": "marriage",
+            "c10-vocab-22": "marriage",
+            "c10-vocab-23": "marriage",
+            "c10-vocab-24": "marriage",
+            "c10-vocab-25": "marriage"
+        };
+        const STORAGE_KEY = "c10.vocabulary.paragraphBuilder.progress.v1";
+        const tiltValues = [-2, 1, -1, 2, 0, -3, 2, -1, 1, -2, 3, 0, -1, 2, -2, 1, 0, -3, 2, -1, 1, -2, 3, 0, -1];
+        const liftValues = [0, -4, 3, -2, 4, -1, 2, -3, 1, 5, -4, 2, -1, 3, -2, 4, -3, 1, 0, -4, 3, -2, 4, -1, 2];
+
+        const state = {
+            matched: new Set(),
+            selectedWordId: null,
+            attempts: 0,
+            bankOrder: [],
+            currentWordId: null,
+            viewSentenceId: SENTENCES[0].id,
+            hintReady: false,
+            hintActive: false
+        };
+
+        let hintTimer = null;
+
+        const els = {
+            matchedCount: document.getElementById("matched-count"),
+            sentenceCount: document.getElementById("sentence-count"),
+            attemptCount: document.getElementById("attempt-count"),
+            pictureCounter: document.getElementById("picture-counter"),
+            pictureStage: document.getElementById("picture-stage"),
+            taskImage: document.getElementById("task-image"),
+            completeVisual: document.getElementById("complete-visual"),
+            dropZone: document.getElementById("drop-zone"),
+            feedback: document.getElementById("feedback"),
+            wordBank: document.getElementById("word-bank"),
+            currentSentenceCard: document.getElementById("current-sentence-card"),
+            paragraphList: document.getElementById("paragraph-list"),
+            completionBanner: document.getElementById("completion-banner"),
+            prevTaskBtn: document.getElementById("prev-task-btn"),
+            nextTaskBtn: document.getElementById("next-task-btn"),
+            hintBtn: document.getElementById("hint-btn"),
+            shuffleBankBtn: document.getElementById("shuffle-bank-btn"),
+            resetBtn: document.getElementById("reset-btn")
+        };
+
+        function shuffle(array) {
+            const next = [...array];
+            for (let i = next.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [next[i], next[j]] = [next[j], next[i]];
+            }
+            return next;
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                "\"": "&quot;",
+                "'": "&#39;"
+            }[char]));
+        }
+
+        function sentenceSlots(sentence) {
+            return sentence.parts.filter((part) => typeof part === "object");
+        }
+
+        function isAllComplete() {
+            return state.matched.size === orderedSlots.length;
+        }
+
+        function currentTask() {
+            if (!state.currentWordId || state.matched.has(state.currentWordId)) return null;
+            return wordById.get(state.currentWordId) || null;
+        }
+
+        function currentSlot() {
+            return state.currentWordId ? orderedSlotByWordId.get(state.currentWordId) : null;
+        }
+
+        function currentSentence() {
+            return sentenceById.get(state.viewSentenceId) || null;
+        }
+
+        function isSentenceComplete(sentence) {
+            return sentenceSlots(sentence).every((slot) => state.matched.has(slot.wordId));
+        }
+
+        function completedSentenceText(sentence) {
+            return sentence.parts.map((part) => {
+                if (typeof part === "string") return part;
+                return part.display;
+            }).join("");
+        }
+
+        function setFeedback(message, mode) {
+            els.feedback.textContent = message;
+            els.feedback.classList.toggle("is-correct", mode === "correct");
+            els.feedback.classList.toggle("is-wrong", mode === "wrong");
+        }
+
+        function firstUnmatchedSlot() {
+            return orderedSlots.find((slot) => !state.matched.has(slot.wordId)) || null;
+        }
+
+        function firstUnmatchedSlotInSentence(sentenceId) {
+            return orderedSlots.find((slot) => slot.sentenceId === sentenceId && !state.matched.has(slot.wordId)) || null;
+        }
+
+        function firstUnmatchedSlotAfter(wordId) {
+            const current = orderedSlotByWordId.get(wordId);
+            const startIndex = current ? current.index : -1;
+            return orderedSlots.find((slot) => slot.index > startIndex && !state.matched.has(slot.wordId))
+                || firstUnmatchedSlot();
+        }
+
+        function unmatchedSlotByDelta(delta) {
+            const unmatched = orderedSlots.filter((slot) => !state.matched.has(slot.wordId));
+            if (!unmatched.length) return null;
+            const currentIndex = state.currentWordId
+                ? unmatched.findIndex((slot) => slot.wordId === state.currentWordId)
+                : -1;
+            const baseIndex = currentIndex >= 0 ? currentIndex : 0;
+            return unmatched[(baseIndex + delta + unmatched.length) % unmatched.length];
+        }
+
+        function validateBankOrder(order) {
+            if (!Array.isArray(order) || order.length !== WORDS.length) return null;
+            const validIds = new Set(WORDS.map((word) => word.id));
+            const seen = new Set();
+            for (const id of order) {
+                if (!validIds.has(id) || seen.has(id)) return null;
+                seen.add(id);
+            }
+            return order;
+        }
+
+        function saveProgress() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    matched: [...state.matched],
+                    selectedWordId: state.selectedWordId,
+                    attempts: state.attempts,
+                    bankOrder: state.bankOrder,
+                    currentWordId: state.currentWordId,
+                    viewSentenceId: state.viewSentenceId
+                }));
+            } catch (error) {
+                // 저장 공간이 막힌 환경에서도 게임은 계속 진행됩니다.
+            }
+        }
+
+        function loadProgress() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return false;
+                const data = JSON.parse(raw);
+                const validWordIds = new Set(WORDS.map((word) => word.id));
+                const validSentenceIds = new Set(SENTENCES.map((sentence) => sentence.id));
+                state.matched = new Set((Array.isArray(data.matched) ? data.matched : []).filter((id) => validWordIds.has(id)));
+                state.selectedWordId = validWordIds.has(data.selectedWordId) && !state.matched.has(data.selectedWordId) ? data.selectedWordId : null;
+                state.attempts = Number.isInteger(data.attempts) && data.attempts >= 0 ? data.attempts : 0;
+                state.bankOrder = validateBankOrder(data.bankOrder) || shuffle(WORDS.map((word) => word.id));
+                state.currentWordId = validWordIds.has(data.currentWordId) && !state.matched.has(data.currentWordId) ? data.currentWordId : null;
+                state.viewSentenceId = validSentenceIds.has(data.viewSentenceId) ? data.viewSentenceId : SENTENCES[0].id;
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function clearProgress() {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+            } catch (error) {
+                // 저장소 접근이 막혀도 초기화 UI는 유지합니다.
+            }
+        }
+
+        function normalizeCurrentPosition() {
+            if (state.currentWordId && !state.matched.has(state.currentWordId)) {
+                const slot = orderedSlotByWordId.get(state.currentWordId);
+                if (slot) {
+                    state.viewSentenceId = slot.sentenceId;
+                    return;
+                }
+            }
+
+            const next = firstUnmatchedSlotInSentence(state.viewSentenceId) || firstUnmatchedSlot();
+            state.currentWordId = next ? next.wordId : null;
+            if (next) state.viewSentenceId = next.sentenceId;
+            if (!next && !sentenceById.has(state.viewSentenceId)) {
+                state.viewSentenceId = SENTENCES[SENTENCES.length - 1].id;
+            }
+        }
+
+        function hintCandidateIds() {
+            const task = currentTask();
+            if (!task) return new Set();
+            const group = WORD_GROUPS[task.id];
+            const sentence = currentSentence();
+            const candidates = [task.id];
+
+            WORDS.forEach((word) => {
+                if (word.id !== task.id && WORD_GROUPS[word.id] === group && !state.matched.has(word.id)) {
+                    candidates.push(word.id);
+                }
+            });
+
+            if (sentence) {
+                sentenceSlots(sentence).forEach((slot) => {
+                    if (slot.wordId !== task.id && !state.matched.has(slot.wordId)) candidates.push(slot.wordId);
+                });
+            }
+
+            return new Set(candidates.filter((id, index, array) => array.indexOf(id) === index).slice(0, 4));
+        }
+
+        function renderHintButton() {
+            const canHint = Boolean(currentTask());
+            els.hintBtn.disabled = !canHint || !state.hintReady;
+            els.hintBtn.classList.toggle("is-ready", canHint && state.hintReady);
+            els.hintBtn.title = canHint
+                ? (state.hintReady ? "힌트 보기" : "10초 후 힌트")
+                : "선택할 빈칸이 없습니다";
+            els.hintBtn.setAttribute("aria-label", state.hintReady ? "힌트 보기" : "10초 후 힌트");
+        }
+
+        function restartHintTimer() {
+            if (hintTimer) window.clearTimeout(hintTimer);
+            hintTimer = null;
+            state.hintReady = false;
+            state.hintActive = false;
+            renderHintButton();
+            if (!currentTask()) return;
+
+            hintTimer = window.setTimeout(() => {
+                state.hintReady = true;
+                state.hintActive = true;
+                renderBank();
+                renderHintButton();
+                setFeedback("힌트가 켜졌습니다. 살짝 움직이는 후보를 보세요.", "");
+            }, 10000);
+        }
+
+        function renderTask() {
+            const task = currentTask();
+            if (!task) {
+                els.pictureCounter.textContent = `${state.matched.size} / ${orderedSlots.length}`;
+                els.taskImage.removeAttribute("src");
+                els.taskImage.alt = isAllComplete() ? "문단 완성" : "문장 완성";
+                els.taskImage.hidden = true;
+                els.completeVisual.hidden = false;
+                const completeText = els.completeVisual.querySelector("span");
+                if (completeText) completeText.textContent = isAllComplete() ? "문단 완성" : "문장 완성";
+                els.dropZone.textContent = isAllComplete() ? "완성" : "빈칸을 선택하세요";
+                els.dropZone.classList.toggle("is-correct", isAllComplete());
+                return;
+            }
+
+            const slot = orderedSlotByWordId.get(task.id);
+            els.pictureCounter.textContent = `${slot.index + 1} / ${orderedSlots.length}`;
+            els.taskImage.src = task.image;
+            els.taskImage.alt = `${task.term} 그림`;
+            els.taskImage.hidden = false;
+            els.completeVisual.hidden = true;
+            els.dropZone.textContent = state.selectedWordId
+                ? `${wordById.get(state.selectedWordId).term} 선택됨`
+                : "표현 후보를 여기에 놓기";
+            els.dropZone.classList.remove("is-correct");
+        }
+
+        function renderBank() {
+            const order = state.bankOrder.length ? state.bankOrder : WORDS.map((word) => word.id);
+            const hintIds = state.hintActive ? hintCandidateIds() : new Set();
+            els.wordBank.innerHTML = order.map((id, index) => {
+                const word = wordById.get(id);
+                const used = state.matched.has(id);
+                const selected = state.selectedWordId === id;
+                return `
+                    <button
+                        class="word-chip${used ? " is-used" : ""}${selected ? " is-selected" : ""}${hintIds.has(id) ? " is-hint" : ""}"
+                        type="button"
+                        draggable="${used ? "false" : "true"}"
+                        data-word-id="${escapeHtml(id)}"
+                        style="--tilt:${tiltValues[index % tiltValues.length]}deg; --lift:${liftValues[index % liftValues.length]}px"
+                        ${used ? "disabled" : ""}
+                    >${escapeHtml(word.term)}</button>
+                `;
+            }).join("");
+        }
+
+        function renderCurrentSentence() {
+            const task = currentTask();
+            const sentence = currentSentence();
+            if (!sentence) {
+                els.currentSentenceCard.innerHTML = `
+                    <div class="current-sentence-meta">
+                        <span>완성</span>
+                        <span class="current-sentence-progress">5/5</span>
+                    </div>
+                    <p class="sentence-text">모든 문장이 완성되었습니다.</p>
+                `;
+                return;
+            }
+
+            const ownedSlots = sentenceSlots(sentence);
+            const done = ownedSlots.filter((slot) => state.matched.has(slot.wordId)).length;
+            const sentenceIndex = SENTENCES.findIndex((item) => item.id === sentence.id);
+            const html = sentence.parts.map((part) => {
+                if (typeof part === "string") return escapeHtml(part);
+                const isFilled = state.matched.has(part.wordId);
+                const isTarget = task && !isFilled && part.wordId === task.id;
+                const label = isFilled ? part.display : (isTarget ? "빈칸" : "선택");
+                if (isFilled) {
+                    return `<span class="blank is-filled" data-slot="${escapeHtml(part.wordId)}">${escapeHtml(label)}</span>`;
+                }
+                return `<button class="blank${isTarget ? " is-target" : ""}" type="button" data-slot="${escapeHtml(part.wordId)}" aria-label="${escapeHtml(label)} 선택">${escapeHtml(label)}</button>`;
+            }).join("");
+
+            els.currentSentenceCard.innerHTML = `
+                <div class="current-sentence-meta">
+                    <span>${sentenceIndex + 1}. ${escapeHtml(sentence.title)}</span>
+                    <span class="current-sentence-progress">${done}/${ownedSlots.length}</span>
+                </div>
+                <p class="sentence-text">${html}</p>
+            `;
+        }
+
+        function renderParagraph() {
+            const activeSlot = currentSlot();
+            els.paragraphList.innerHTML = SENTENCES.map((sentence, index) => {
+                const ownedSlots = sentenceSlots(sentence);
+                const done = ownedSlots.filter((slot) => state.matched.has(slot.wordId)).length;
+                const complete = isSentenceComplete(sentence);
+                const active = state.viewSentenceId === sentence.id || activeSlot?.sentenceId === sentence.id;
+                const text = complete
+                    ? completedSentenceText(sentence)
+                    : (active ? `${index + 1}. ${sentence.title} 조립 중 (${done}/${ownedSlots.length})` : `${index + 1}번 문장 대기`);
+                return `<button class="paragraph-slot${complete ? " is-filled" : ""}${active ? " is-active" : ""}" type="button" data-sentence-id="${escapeHtml(sentence.id)}">${escapeHtml(text)}</button>`;
+            }).join("");
+        }
+
+        function triggerSentenceReward(sentence, sourceRect) {
+            const destination = els.paragraphList.querySelector(`[data-sentence-id="${CSS.escape(sentence.id)}"]`);
+            if (!destination || !sourceRect) return;
+
+            const destRect = destination.getBoundingClientRect();
+            const width = Math.max(220, Math.min(sourceRect.width, 520));
+            const height = Math.max(100, Math.min(sourceRect.height, 210));
+            const startLeft = sourceRect.left + (sourceRect.width - width) / 2;
+            const startTop = sourceRect.top + (sourceRect.height - height) / 2;
+            const endLeft = destRect.left + (destRect.width - width) / 2;
+            const endTop = destRect.top + (destRect.height - height) / 2;
+            const dx = endLeft - startLeft;
+            const dy = endTop - startTop;
+
+            const card = document.createElement("div");
+            card.className = "reward-card";
+            card.style.left = `${startLeft}px`;
+            card.style.top = `${startTop}px`;
+            card.style.width = `${width}px`;
+            card.style.minHeight = `${height}px`;
+            card.innerHTML = `
+                <span class="reward-card__badge"><i class="fa-solid fa-gem"></i> 문장 완성</span>
+                <p class="reward-card__text">${escapeHtml(completedSentenceText(sentence))}</p>
+            `;
+            document.body.appendChild(card);
+
+            let impactPlayed = false;
+            function playImpact() {
+                if (impactPlayed) return;
+                impactPlayed = true;
+
+                const impactTarget = els.paragraphList.querySelector(`[data-sentence-id="${CSS.escape(sentence.id)}"]`) || destination;
+                const impactRect = impactTarget.getBoundingClientRect();
+                const burst = document.createElement("div");
+                burst.className = "reward-burst";
+                burst.style.left = `${impactRect.left + impactRect.width / 2}px`;
+                burst.style.top = `${impactRect.top + impactRect.height / 2}px`;
+                document.body.appendChild(burst);
+
+                impactTarget.classList.add("is-rewarding");
+
+                const impact = card.animate([
+                    { transform: `translate(${dx}px, ${dy}px) scale(0.52)`, opacity: 0.98, filter: "brightness(1.55)" },
+                    { transform: `translate(${dx}px, ${dy}px) scale(0.32)`, opacity: 0, filter: "brightness(2)" }
+                ], {
+                    duration: 180,
+                    easing: "cubic-bezier(.18, .9, .22, 1)",
+                    fill: "forwards"
+                });
+
+                window.setTimeout(() => {
+                    impactTarget.classList.remove("is-rewarding");
+                }, 1500);
+
+                window.setTimeout(() => {
+                    burst.remove();
+                }, 1150);
+
+                impact.finished.then(() => {
+                    card.remove();
+                }).catch(() => {
+                    card.remove();
+                });
+            }
+
+            const travelDuration = 1180;
+            const travel = card.animate([
+                { transform: "translate(0, 0) scale(0.96)", opacity: 0, filter: "brightness(1)" },
+                { transform: "translate(0, -18px) scale(1.14)", opacity: 1, filter: "brightness(1.2)", offset: 0.18 },
+                { transform: `translate(${dx * 0.58}px, ${dy * 0.58 - 20}px) scale(1.08)`, opacity: 1, filter: "brightness(1.24)", offset: 0.66 },
+                { transform: `translate(${dx * 0.92}px, ${dy * 0.92 - 4}px) scale(0.72)`, opacity: 1, filter: "brightness(1.35)", offset: 0.9 },
+                { transform: `translate(${dx}px, ${dy}px) scale(0.52)`, opacity: 0.98, filter: "brightness(1.55)" }
+            ], {
+                duration: travelDuration,
+                easing: "cubic-bezier(.16, .84, .22, 1)",
+                fill: "forwards"
+            });
+
+            travel.finished.then(() => {
+                playImpact();
+            }).catch(() => {
+                playImpact();
+            });
+            window.setTimeout(playImpact, travelDuration + 120);
+        }
+
+        function renderMetrics() {
+            const sentenceDone = SENTENCES.filter(isSentenceComplete).length;
+            els.matchedCount.textContent = `${state.matched.size} / ${WORDS.length}`;
+            els.sentenceCount.textContent = `${sentenceDone} / ${SENTENCES.length}`;
+            els.attemptCount.textContent = String(state.attempts);
+            els.completionBanner.classList.toggle("is-visible", state.matched.size === WORDS.length);
+        }
+
+        function renderAll() {
+            renderMetrics();
+            renderTask();
+            renderBank();
+            renderCurrentSentence();
+            renderParagraph();
+            renderHintButton();
+        }
+
+        function setCurrentSlot(slot, message) {
+            if (!slot) return;
+            state.currentWordId = slot.wordId;
+            state.viewSentenceId = slot.sentenceId;
+            state.selectedWordId = null;
+            saveProgress();
+            renderAll();
+            restartHintTimer();
+            if (message) setFeedback(message, "");
+        }
+
+        function selectSentence(sentenceId) {
+            if (!sentenceById.has(sentenceId)) return;
+            const slot = firstUnmatchedSlotInSentence(sentenceId);
+            state.viewSentenceId = sentenceId;
+            state.selectedWordId = null;
+            if (slot) {
+                state.currentWordId = slot.wordId;
+                saveProgress();
+                renderAll();
+                restartHintTimer();
+                setFeedback(`${SENTENCES.find((sentence) => sentence.id === sentenceId).title} 문장으로 이동했습니다.`, "");
+                return;
+            }
+
+            state.currentWordId = null;
+            saveProgress();
+            renderAll();
+            restartHintTimer();
+            setFeedback("이미 완성된 문장입니다. 다른 문단을 선택할 수 있습니다.", "correct");
+        }
+
+        function tryAnswer(wordId) {
+            const task = currentTask();
+            if (!task) {
+                setFeedback("먼저 빈칸을 선택하세요.", "wrong");
+                return;
+            }
+            if (!wordId || state.matched.has(wordId)) return;
+
+            state.attempts += 1;
+
+            if (wordId !== task.id) {
+                const selected = wordById.get(wordId);
+                state.selectedWordId = null;
+                state.hintReady = false;
+                state.hintActive = false;
+                saveProgress();
+                renderAll();
+                setFeedback(`‘${selected.term}’은 다른 그림에 어울립니다.`, "wrong");
+                restartHintTimer();
+                return;
+            }
+
+            const word = wordById.get(wordId);
+            const slot = orderedSlotByWordId.get(wordId);
+            const sentence = sentenceById.get(slot.sentenceId);
+            const wasSentenceComplete = isSentenceComplete(sentence);
+            const sourceRect = els.currentSentenceCard.getBoundingClientRect();
+            state.matched.add(wordId);
+            const nextSlot = firstUnmatchedSlotAfter(wordId);
+            state.selectedWordId = null;
+            state.currentWordId = nextSlot ? nextSlot.wordId : null;
+            state.viewSentenceId = nextSlot ? nextSlot.sentenceId : sentence.id;
+            state.hintReady = false;
+            state.hintActive = false;
+            saveProgress();
+            renderAll();
+
+            if (!wasSentenceComplete && isSentenceComplete(sentence)) {
+                setFeedback(`‘${sentence.title}’ 문장이 완성되었습니다.`, "correct");
+                window.requestAnimationFrame(() => triggerSentenceReward(sentence, sourceRect));
+            } else {
+                setFeedback(`‘${word.term}’ 표현이 문장에 들어갔습니다.`, "correct");
+            }
+            restartHintTimer();
+        }
+
+        function selectWord(wordId) {
+            if (state.matched.has(wordId)) return;
+            state.selectedWordId = state.selectedWordId === wordId ? null : wordId;
+            saveProgress();
+            renderAll();
+        }
+
+        function moveTask(delta) {
+            const slot = unmatchedSlotByDelta(delta);
+            if (slot) setCurrentSlot(slot);
+        }
+
+        function resetGame() {
+            if (hintTimer) window.clearTimeout(hintTimer);
+            hintTimer = null;
+            clearProgress();
+            state.matched.clear();
+            state.selectedWordId = null;
+            state.attempts = 0;
+            state.bankOrder = shuffle(WORDS.map((word) => word.id));
+            state.currentWordId = orderedSlots[0].wordId;
+            state.viewSentenceId = orderedSlots[0].sentenceId;
+            state.hintReady = false;
+            state.hintActive = false;
+            saveProgress();
+            setFeedback("그림에 맞는 표현을 고르세요.", "");
+            renderAll();
+            restartHintTimer();
+        }
+
+        function initGame() {
+            if (!loadProgress()) {
+                state.bankOrder = shuffle(WORDS.map((word) => word.id));
+                state.currentWordId = orderedSlots[0].wordId;
+                state.viewSentenceId = orderedSlots[0].sentenceId;
+                saveProgress();
+            }
+            normalizeCurrentPosition();
+            renderAll();
+            restartHintTimer();
+        }
+
+        function draggedWordId(event) {
+            return event.dataTransfer?.getData("text/plain") || state.selectedWordId;
+        }
+
+        function clearDropHighlights() {
+            els.dropZone.classList.remove("is-hot");
+            els.pictureStage.classList.remove("is-hot");
+            els.currentSentenceCard.querySelectorAll(".blank.is-drop-hot").forEach((blank) => {
+                blank.classList.remove("is-drop-hot");
+            });
+        }
+
+        function dropWordOnSlot(wordId, slotId) {
+            const slot = orderedSlotByWordId.get(slotId);
+            if (!wordId || !slot || state.matched.has(slot.wordId)) return;
+            state.currentWordId = slot.wordId;
+            state.viewSentenceId = slot.sentenceId;
+            tryAnswer(wordId);
+        }
+
+        els.wordBank.addEventListener("click", (event) => {
+            const chip = event.target.closest(".word-chip");
+            if (!chip) return;
+            selectWord(chip.dataset.wordId);
+        });
+
+        els.wordBank.addEventListener("dragstart", (event) => {
+            const chip = event.target.closest(".word-chip");
+            if (!chip || chip.disabled) return;
+            event.dataTransfer.setData("text/plain", chip.dataset.wordId);
+            event.dataTransfer.effectAllowed = "move";
+            chip.classList.add("is-dragging");
+        });
+
+        els.wordBank.addEventListener("dragend", (event) => {
+            const chip = event.target.closest(".word-chip");
+            if (chip) chip.classList.remove("is-dragging");
+        });
+
+        els.currentSentenceCard.addEventListener("click", (event) => {
+            const blank = event.target.closest(".blank");
+            if (!blank || !blank.dataset.slot) return;
+            const slot = orderedSlotByWordId.get(blank.dataset.slot);
+            if (!slot || state.matched.has(slot.wordId)) return;
+            setCurrentSlot(slot, "선택한 빈칸으로 이동했습니다.");
+        });
+
+        els.currentSentenceCard.addEventListener("dragover", (event) => {
+            const blank = event.target.closest(".blank");
+            if (!blank || !blank.dataset.slot || state.matched.has(blank.dataset.slot)) return;
+            event.preventDefault();
+            els.currentSentenceCard.querySelectorAll(".blank.is-drop-hot").forEach((item) => {
+                if (item !== blank) item.classList.remove("is-drop-hot");
+            });
+            blank.classList.add("is-drop-hot");
+        });
+
+        els.currentSentenceCard.addEventListener("dragleave", (event) => {
+            const blank = event.target.closest(".blank");
+            if (blank) blank.classList.remove("is-drop-hot");
+        });
+
+        els.currentSentenceCard.addEventListener("drop", (event) => {
+            const blank = event.target.closest(".blank");
+            if (!blank || !blank.dataset.slot) return;
+            event.preventDefault();
+            clearDropHighlights();
+            dropWordOnSlot(draggedWordId(event), blank.dataset.slot);
+        });
+
+        els.paragraphList.addEventListener("click", (event) => {
+            const paragraph = event.target.closest(".paragraph-slot");
+            if (!paragraph || !paragraph.dataset.sentenceId) return;
+            selectSentence(paragraph.dataset.sentenceId);
+        });
+
+        els.dropZone.addEventListener("click", () => {
+            tryAnswer(state.selectedWordId);
+        });
+
+        els.dropZone.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            els.dropZone.classList.add("is-hot");
+        });
+
+        els.dropZone.addEventListener("dragleave", () => {
+            els.dropZone.classList.remove("is-hot");
+        });
+
+        els.dropZone.addEventListener("drop", (event) => {
+            event.preventDefault();
+            clearDropHighlights();
+            tryAnswer(draggedWordId(event));
+        });
+
+        els.pictureStage.addEventListener("dragover", (event) => {
+            if (!currentTask()) return;
+            event.preventDefault();
+            els.pictureStage.classList.add("is-hot");
+        });
+
+        els.pictureStage.addEventListener("dragleave", () => {
+            els.pictureStage.classList.remove("is-hot");
+        });
+
+        els.pictureStage.addEventListener("drop", (event) => {
+            event.preventDefault();
+            clearDropHighlights();
+            tryAnswer(draggedWordId(event));
+        });
+
+        els.prevTaskBtn.addEventListener("click", () => moveTask(-1));
+        els.nextTaskBtn.addEventListener("click", () => moveTask(1));
+        els.hintBtn.addEventListener("click", () => {
+            if (!state.hintReady || !currentTask()) return;
+            state.hintActive = true;
+            renderBank();
+            renderHintButton();
+            setFeedback("힌트: 움직이는 후보 중 하나를 골라 보세요.", "");
+        });
+        els.shuffleBankBtn.addEventListener("click", () => {
+            state.bankOrder = shuffle(state.bankOrder.length ? state.bankOrder : WORDS.map((word) => word.id));
+            saveProgress();
+            renderBank();
+        });
+        els.resetBtn.addEventListener("click", resetGame);
+
+        initGame();
+    }());
+    </script>
+</body>
+</html>
