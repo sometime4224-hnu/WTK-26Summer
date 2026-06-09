@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10과 WB 문법 1 도우미 | A/V-던</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --indigo: #4f46e5;
+            --indigo-soft: #eef2ff;
+            --teal: #0f766e;
+            --teal-soft: #ecfdf5;
+            --amber: #b45309;
+            --amber-soft: #fffbeb;
+            --rose: #be123c;
+            --rose-soft: #fff1f2;
+            --ink-local: #172033;
+            --muted-local: #64748b;
+            --line-local: #dbe4f0;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink-local);
+            font-family: "Noto Sans KR", "Noto Sans", sans-serif;
+            background: linear-gradient(180deg, #f8fafc 0%, #f3f0ff 100%);
+        }
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 0 14px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line-local);
+            backdrop-filter: blur(12px);
+        }
+        .topbar a {
+            color: var(--indigo);
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+        .topbar span { color: #cbd5e1; }
+        .shell {
+            width: min(1120px, calc(100% - 28px));
+            margin: 14px auto 40px;
+            display: grid;
+            gap: 14px;
+        }
+        .hero {
+            display: grid;
+            gap: 12px;
+            padding: 18px 0 8px;
+        }
+        .eyebrow {
+            margin: 0;
+            color: var(--indigo);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+        h1 {
+            margin: 0;
+            font-size: clamp(24px, 4.2vw, 36px);
+            line-height: 1.16;
+        }
+        .lead {
+            max-width: 760px;
+            margin: 0;
+            color: var(--muted-local);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.65;
+        }
+        .quick-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .quick-nav a,
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 36px;
+            border: 1px solid var(--line-local);
+            border-radius: 999px;
+            padding: 0 12px;
+            background: #fff;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+        .band {
+            display: grid;
+            gap: 12px;
+            padding: 16px;
+            border: 1px solid var(--line-local);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+        .band-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        h2 {
+            margin: 0;
+            font-size: clamp(19px, 3vw, 25px);
+        }
+        h3 { margin: 0; font-size: 16px; }
+        .grid-2,
+        .grid-3 {
+            display: grid;
+            gap: 10px;
+        }
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .card {
+            display: grid;
+            gap: 8px;
+            border: 1px solid var(--line-local);
+            border-radius: 8px;
+            background: #fff;
+            padding: 14px;
+        }
+        .card p,
+        .card ul,
+        .table-wrap {
+            margin: 0;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 750;
+            line-height: 1.65;
+        }
+        .card ul { padding-left: 18px; }
+        .card li + li { margin-top: 4px; }
+        .rule-chip {
+            width: fit-content;
+            border-radius: 999px;
+            padding: 4px 9px;
+            background: var(--indigo-soft);
+            color: var(--indigo);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        code,
+        .example {
+            border-radius: 6px;
+            padding: 3px 7px;
+            background: #f8fafc;
+            color: #1e293b;
+            font-family: inherit;
+            font-weight: 900;
+        }
+        .compare-table {
+            width: 100%;
+            min-width: 620px;
+            border-collapse: collapse;
+            background: #fff;
+            font-size: 14px;
+            font-weight: 750;
+        }
+        .compare-table th,
+        .compare-table td {
+            border: 1px solid var(--line-local);
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .compare-table th {
+            background: var(--indigo-soft);
+            color: #3730a3;
+            font-weight: 900;
+        }
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--line-local);
+            border-radius: 8px;
+        }
+        details.card {
+            cursor: pointer;
+        }
+        summary {
+            font-weight: 900;
+            color: var(--indigo);
+        }
+        details[open] summary { margin-bottom: 8px; }
+        .footer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 4px 0;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            border: 1px solid var(--line-local);
+            border-radius: 999px;
+            padding: 0 14px;
+            background: #fff;
+            color: var(--indigo);
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+        .btn.primary {
+            border-color: var(--indigo);
+            background: var(--indigo);
+            color: #fff;
+        }
+        @media (max-width: 640px) {
+            .shell { width: min(100% - 20px, 1120px); margin-top: 8px; }
+            .band { padding: 13px; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .topbar { overflow-x: auto; }
+            .topbar a, .topbar strong { white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html">10과 목록</a>
+        <span>|</span>
+        <a href="grammar1.html">문법 1</a>
+        <span>|</span>
+        <strong style="font-size:13px;font-weight:900">WB 문법 1</strong>
+    </nav>
+
+    <main class="shell">
+        <header class="hero">
+            <p class="eyebrow">Workbook Grammar 1</p>
+            <h1>문법 1 WB 도우미: A/V-던</h1>
+            <p class="lead">WB 20~21쪽을 풀 때 필요한 회상 표현의 의미, 형태, 선택 기준을 먼저 정리합니다.</p>
+            <nav class="quick-nav" aria-label="빠른 이동">
+                <a href="#meaning"><i class="fa-solid fa-seedling"></i> 의미</a>
+                <a href="#compare"><i class="fa-solid fa-scale-balanced"></i> 비교</a>
+                <a href="#wb-help"><i class="fa-solid fa-lightbulb"></i> WB 힌트</a>
+                <a href="#check"><i class="fa-solid fa-circle-question"></i> 점검</a>
+            </nav>
+        </header>
+
+        <section id="meaning" class="band" aria-label="-던 의미">
+            <div class="band-head">
+                <div>
+                    <p class="eyebrow">Core Meaning</p>
+                    <h2>전에 그랬던 일을 떠올릴 때</h2>
+                </div>
+                <span class="pill"><i class="fa-solid fa-book-open"></i> WB 20~21쪽</span>
+            </div>
+            <div class="grid-3">
+                <article class="card">
+                    <span class="rule-chip">반복</span>
+                    <h3>예전에 자주 하던 일</h3>
+                    <p>과거에 여러 번 했던 습관이나 모습을 떠올립니다.</p>
+                    <span class="example">항상 책을 읽던 친구</span>
+                </article>
+                <article class="card">
+                    <span class="rule-chip">미완료</span>
+                    <h3>하다가 남은 느낌</h3>
+                    <p>완전히 끝났다고 말하기보다, 그때 하고 있던 장면이 떠오릅니다.</p>
+                    <span class="example">제가 쓰던 공책</span>
+                </article>
+                <article class="card">
+                    <span class="rule-chip">형태</span>
+                    <h3>동사/형용사 어간 + 던</h3>
+                    <p>받침 유무와 상관없이 어간 뒤에 <code>-던</code>을 붙입니다.</p>
+                    <span class="example">먹다 → 먹던, 예쁘다 → 예쁘던</span>
+                </article>
+            </div>
+        </section>
+
+        <section id="compare" class="band" aria-label="-던과 -(으)ㄴ 비교">
+            <div class="band-head">
+                <div>
+                    <p class="eyebrow">Contrast</p>
+                    <h2><code>-던</code>과 <code>-(으)ㄴ</code> 고르기</h2>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>표현</th>
+                            <th>느낌</th>
+                            <th>WB에서 보는 신호</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>읽던 책</code></td>
+                            <td>예전에 읽고 있었거나 자주 읽던 책</td>
+                            <td>조금 전까지, 예전에, 항상, 자주 같은 회상 단서</td>
+                        </tr>
+                        <tr>
+                            <td><code>읽은 책</code></td>
+                            <td>이미 다 읽은 책</td>
+                            <td>완료된 결과를 말하는 단서</td>
+                        </tr>
+                        <tr>
+                            <td><code>사귀던 사람</code></td>
+                            <td>예전에 사귀고 있었던 사람</td>
+                            <td>지금은 끝난 과거 관계를 떠올림</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="wb-help" class="band" aria-label="WB 연습별 힌트">
+            <div class="band-head">
+                <div>
+                    <p class="eyebrow">Workbook Hints</p>
+                    <h2>WB 문법 1을 풀 때의 순서</h2>
+                </div>
+            </div>
+            <div class="grid-2">
+                <article class="card">
+                    <span class="rule-chip">연습 1</span>
+                    <h3>동창 근황 말하기</h3>
+                    <ul>
+                        <li>먼저 그림 속 인물이 예전에 어떤 사람이었는지 고릅니다.</li>
+                        <li>그 뒤에 <code>-던 친구</code>, <code>-던 사람</code>으로 붙입니다.</li>
+                        <li>현재 모습은 뒤 문장에서 따로 말하면 자연스럽습니다.</li>
+                    </ul>
+                    <span class="example">예전에 ____던 친구가 지금은 ____이/가 되었어요.</span>
+                </article>
+                <article class="card">
+                    <span class="rule-chip">연습 2</span>
+                    <h3>둘 중 하나 고르기</h3>
+                    <ul>
+                        <li>그 물건이나 사람이 과거 장면과 연결되면 <code>-던</code>을 봅니다.</li>
+                        <li>이미 끝낸 행동의 결과이면 <code>-(으)ㄴ</code>을 봅니다.</li>
+                        <li>헷갈리면 “아직 그 장면이 이어지는 느낌인가?”를 먼저 묻습니다.</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <section id="check" class="band" aria-label="짧은 점검">
+            <div class="band-head">
+                <div>
+                    <p class="eyebrow">Quick Check</p>
+                    <h2>판단 연습</h2>
+                </div>
+            </div>
+            <div class="grid-2">
+                <details class="card">
+                    <summary>어제까지 쓰고 있던 보고서</summary>
+                    <p>과거에 진행 중이던 일이므로 <strong>쓰던 보고서</strong>가 자연스럽습니다.</p>
+                </details>
+                <details class="card">
+                    <summary>이미 다 읽은 책</summary>
+                    <p>완료된 결과이므로 <strong>읽은 책</strong>이 자연스럽습니다.</p>
+                </details>
+                <details class="card">
+                    <summary>예전에 자주 부르던 노래</summary>
+                    <p>반복된 과거 습관이므로 <strong>부르던 노래</strong>를 씁니다.</p>
+                </details>
+                <details class="card">
+                    <summary>제주도 여행 때 찍은 사진</summary>
+                    <p>사진을 찍은 행동은 완료된 결과이므로 <strong>찍은 사진</strong>이 자연스럽습니다.</p>
+                </details>
+            </div>
+        </section>
+
+        <nav class="footer-nav" aria-label="다음 학습">
+            <a class="btn" href="vocabulary-wb-support.html"><i class="fa-solid fa-arrow-left"></i> 어휘 WB</a>
+            <a class="btn" href="index.html">10과 목록</a>
+            <a class="btn primary" href="grammar2-wb-support.html">문법 2 WB <i class="fa-solid fa-arrow-right"></i></a>
+        </nav>
+    </main>
+
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

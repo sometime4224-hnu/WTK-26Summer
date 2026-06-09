@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10과 WB 어휘 도우미 | 연애와 결혼</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+            --mint: #0f766e;
+            --mint-soft: #ecfdf5;
+            --rose: #be123c;
+            --rose-soft: #fff1f2;
+            --amber: #b45309;
+            --amber-soft: #fffbeb;
+            --ink-local: #172033;
+            --muted-local: #64748b;
+            --line-local: #dbe4f0;
+            --surface-local: #ffffff;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink-local);
+            font-family: "Noto Sans KR", "Noto Sans", sans-serif;
+            background: linear-gradient(180deg, #f8fbfd 0%, #fff7ed 100%);
+        }
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 0 14px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line-local);
+            backdrop-filter: blur(12px);
+        }
+        .topbar a {
+            color: var(--blue);
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+        .topbar span { color: #cbd5e1; }
+        .shell {
+            width: min(1120px, calc(100% - 28px));
+            margin: 14px auto 40px;
+            display: grid;
+            gap: 14px;
+        }
+        .hero {
+            display: grid;
+            gap: 12px;
+            padding: 18px 0 8px;
+        }
+        .eyebrow {
+            margin: 0;
+            color: var(--rose);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+        h1 {
+            margin: 0;
+            font-size: clamp(24px, 4.2vw, 36px);
+            line-height: 1.16;
+        }
+        .lead {
+            max-width: 760px;
+            margin: 0;
+            color: var(--muted-local);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.65;
+        }
+        .quick-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .quick-nav a,
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 36px;
+            border: 1px solid var(--line-local);
+            border-radius: 999px;
+            padding: 0 12px;
+            background: #fff;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+        .band {
+            display: grid;
+            gap: 12px;
+            padding: 16px;
+            border: 1px solid var(--line-local);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+        .band-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        h2 {
+            margin: 0;
+            font-size: clamp(19px, 3vw, 25px);
+        }
+        h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 10px;
+        }
+        .word-card,
+        .support-card,
+        .practice-card {
+            border: 1px solid var(--line-local);
+            border-radius: 8px;
+            background: var(--surface-local);
+            padding: 14px;
+        }
+        .word-card {
+            display: grid;
+            gap: 7px;
+            border-top: 4px solid var(--tone, var(--blue));
+        }
+        .word-card[data-group="start"] { --tone: var(--blue); }
+        .word-card[data-group="feeling"] { --tone: var(--rose); }
+        .word-card[data-group="fit"] { --tone: var(--mint); }
+        .term {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            align-items: baseline;
+        }
+        .term strong {
+            font-size: 18px;
+            line-height: 1.25;
+        }
+        .term span {
+            color: var(--muted-local);
+            font-size: 12px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .word-card p,
+        .support-card p,
+        .practice-card p,
+        .hint-list {
+            margin: 0;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 750;
+            line-height: 1.65;
+        }
+        .example {
+            display: block;
+            width: fit-content;
+            border-radius: 6px;
+            padding: 5px 8px;
+            background: #f8fafc;
+            color: #1e293b;
+            font-weight: 900;
+        }
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 10px;
+        }
+        .support-card {
+            display: grid;
+            gap: 8px;
+        }
+        .support-card .tag {
+            width: fit-content;
+            border-radius: 999px;
+            padding: 4px 9px;
+            background: var(--amber-soft);
+            color: var(--amber);
+            font-size: 11px;
+            font-weight: 900;
+        }
+        .hint-list {
+            padding-left: 18px;
+        }
+        .hint-list li + li { margin-top: 4px; }
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 10px;
+        }
+        details.practice-card {
+            cursor: pointer;
+        }
+        summary {
+            font-weight: 900;
+            color: var(--blue);
+        }
+        details[open] summary {
+            margin-bottom: 8px;
+        }
+        .footer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 4px 0;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            border: 1px solid var(--line-local);
+            border-radius: 999px;
+            padding: 0 14px;
+            background: #fff;
+            color: var(--blue);
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+        .btn.primary {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: #fff;
+        }
+        @media (max-width: 640px) {
+            .shell { width: min(100% - 20px, 1120px); margin-top: 8px; }
+            .band { padding: 13px; }
+            .card-grid, .support-grid, .template-grid { grid-template-columns: 1fr; }
+            .topbar { overflow-x: auto; }
+            .topbar a, .topbar strong { white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html">10과 목록</a>
+        <span>|</span>
+        <a href="vocabulary.html">어휘 카드</a>
+        <span>|</span>
+        <strong style="font-size:13px;font-weight:900">WB 어휘</strong>
+    </nav>
+
+    <main class="shell">
+        <header class="hero">
+            <p class="eyebrow">Workbook Vocabulary</p>
+            <h1>10과 WB 어휘 도우미</h1>
+            <p class="lead">WB 18~19쪽의 연애와 결혼 어휘를 풀기 전에 뜻, 상황, 말하기 틀을 빠르게 확인합니다.</p>
+            <nav class="quick-nav" aria-label="빠른 이동">
+                <a href="#words"><i class="fa-solid fa-layer-group"></i> 단어 확인</a>
+                <a href="#wb-help"><i class="fa-solid fa-lightbulb"></i> WB 힌트</a>
+                <a href="#speaking"><i class="fa-solid fa-comment-dots"></i> 말하기 틀</a>
+                <a href="#check"><i class="fa-solid fa-circle-question"></i> 점검</a>
+            </nav>
+        </header>
+
+        <section id="words" class="band" aria-label="핵심 어휘">
+            <div class="band-head">
+                <div>
+                    <p class="eyebrow">Meaning Map</p>
+                    <h2>단어를 상황으로 기억하기</h2>
+                </div>
+                <span class="pill"><i class="fa-solid fa-book-open"></i> WB 18~19쪽</span>
+            </div>
+            <div class="card-grid">
+                <article class="word-card" data-group="start">
+                    <div class="term"><strong>소개팅하다</strong><span>blind date</span></div>
+                    <p>아는 사람이 소개해 준 사람을 처음 만나 봅니다.</p>
+                    <span class="example">주말에 소개팅했어요.</span>
+                </article>
+                <article class="word-card" data-group="feeling">
+                    <div class="term"><strong>첫눈에 반하다</strong><span>at first sight</span></div>
+                    <p>처음 보자마자 마음이 확 끌립니다.</p>
+                    <span class="example">보자마자 첫눈에 반했어요.</span>
+                </article>
+                <article class="word-card" data-group="feeling">
+                    <div class="term"><strong>사랑에 빠지다</strong><span>fall in love</span></div>
+                    <p>좋아하는 마음이 점점 커져 사랑이 됩니다.</p>
+                    <span class="example">그 사람과 사랑에 빠졌어요.</span>
+                </article>
+                <article class="word-card" data-group="start">
+                    <div class="term"><strong>고백하다</strong><span>confess</span></div>
+                    <p>좋아하는 마음을 상대에게 직접 말합니다.</p>
+                    <span class="example">좋아한다고 고백했어요.</span>
+                </article>
+                <article class="word-card" data-group="start">
+                    <div class="term"><strong>연애하다</strong><span>date</span></div>
+                    <p>서로 좋아해서 남자 친구, 여자 친구로 만납니다.</p>
+                    <span class="example">두 사람이 연애하고 있어요.</span>
+                </article>
+                <article class="word-card" data-group="start">
+                    <div class="term"><strong>청혼하다</strong><span>propose</span></div>
+                    <p>결혼하자고 진지하게 말합니다.</p>
+                    <span class="example">바닷가에서 청혼했어요.</span>
+                </article>
+                <article class="word-card" data-group="fit">
+                    <div class="term"><strong>조건이 맞다</strong><span>match</span></div>
+                    <p>나이, 직업, 생각하는 미래 같은 조건이 서로 괜찮습니다.</p>
+                    <span class="example">두 사람은 조건이 잘 맞아요.</span>
+                </article>
+                <article class="word-card" data-group="fit">
+                    <div class="term"><strong>성격이 잘 맞다</strong><span>personality</span></div>
+                    <p>함께 있을 때 불편하지 않고 성격이 잘 어울립니다.</p>
+                    <span class="example">성격이 잘 맞아서 편해요.</span>
+                </article>
+                <article class="word-card" data-group="fit">
+                    <div class="term"><strong>말이 잘 통하다</strong><span>communicate</span></div>
+                    <p>대화가 자연스럽고 서로의 생각을 잘 이해합니다.</p>
+                    <span class="example">우리는 말이 잘 통해요.</span>
+                </article>
+                <article class="word-card" data-group="fit">
+                    <div class="term"><strong>인상이 좋다</strong><span>impression</span></div>
+                    <p>처음 봤을 때 느낌이 좋고 편안해 보입니다.</p>
+                    <span class="example">첫인상이 좋았어요.</span>
+                </article>
+                <article class="word-card" data-group="fit">
+                    <div class="term"><strong>마음씨가 착하다</strong><span>kind</span></div>
+                    <p>다른 사람을 배려하고 마음이 따뜻합니다.</p>
+                    <span class="example">마음씨가 착한 사람이에요.</span>
+                </article>
+                <article class="word-card" data-group="feeling">
+                    <div class="term"><strong>매력이 있다</strong><span>charming</span></div>
+                    <p>계속 보고 싶게 만드는 좋은 느낌이 있습니다.</p>
+                    <span class="example">말하는 모습이 매력 있어요.</span>
+                </article>
+            </div>
+        </section>
+
+        <section id="wb-help" class="band" aria-label="WB 연습별 힌트">
+            <div class="band-head">
+                <div>
+                    <p class="eyebrow">Workbook Hints</p>
+                    <h2>WB 문제를 풀 때 보는 힌트</h2>
+                </div>
+                <span class="pill"><i class="fa-solid fa-pen"></i> 정답보다 먼저 힌트</span>
+            </div>
+            <div class="support-grid">
+                <article class="support-card">
+                    <span class="tag">연습 1</span>
+                    <h3>빈칸 대화 완성</h3>
+                    <ul class="hint-list">
+                        <li>처음 만난 이야기이면 <strong>소개팅</strong>, 처음 보자마자 좋아졌으면 <strong>첫눈</strong>을 떠올립니다.</li>
+                        <li>결혼하자고 말하는 장면이면 <strong>청혼</strong>입니다.</li>
+                        <li>좋아한다고 말하는 행동은 <strong>고백</strong>입니다.</li>
+                    </ul>
+                </article>
+                <article class="support-card">
+                    <span class="tag">연습 2</span>
+                    <h3>소개팅 후기 말하기</h3>
+                    <p>좋았던 점을 먼저 고르고, 뒤에 이유를 붙이면 자연스럽습니다.</p>
+                    <span class="example">인상도 좋고 말이 잘 통했어요.</span>
+                </article>
+                <article class="support-card">
+                    <span class="tag">연습 3</span>
+                    <h3>그림 보고 말하기</h3>
+                    <p>누가 누구와 있는지 먼저 말한 뒤, 행동을 붙입니다.</p>
+                    <span class="example">두 사람이 나란히 앉아서 이야기하고 있어요.</span>
+                </article>
+                <article class="support-card">
+                    <span class="tag">연습 4</span>
+                    <h3>줄거리 빈칸 추론</h3>
+                    <p>문장 앞뒤 감정을 보고 고릅니다. 자신이 부족하다고 생각하면 <strong>조건</strong>, 좋아한다고 말하지 못하면 <strong>고백</strong>이 단서입니다.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="speaking" class="band" aria-label="말하기 틀">
+            <div class="band-head">
+                <div>
+                    <p class="eyebrow">Speaking Frames</p>
+                    <h2>WB 옆에 적어 두면 좋은 문장틀</h2>
+                </div>
+            </div>
+            <div class="template-grid">
+                <article class="practice-card">
+                    <h3>소개팅 후기</h3>
+                    <p>어제 만난 사람은 <strong>____</strong>고 <strong>____</strong> 사람이었어요.</p>
+                </article>
+                <article class="practice-card">
+                    <h3>이상형 말하기</h3>
+                    <p>저는 <strong>____</strong>고 <strong>____</strong> 사람을 좋아해요.</p>
+                </article>
+                <article class="practice-card">
+                    <h3>연애 이야기</h3>
+                    <p>처음에는 <strong>____</strong>했는데, 나중에 서로 <strong>____</strong>하게 됐어요.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="check" class="band" aria-label="짧은 점검">
+            <div class="band-head">
+                <div>
+                    <p class="eyebrow">Quick Check</p>
+                    <h2>헷갈리는 뜻만 확인</h2>
+                </div>
+            </div>
+            <div class="support-grid">
+                <details class="practice-card">
+                    <summary>처음 보자마자 좋아졌어요.</summary>
+                    <p><strong>첫눈에 반하다</strong>를 떠올립니다.</p>
+                </details>
+                <details class="practice-card">
+                    <summary>좋아한다고 직접 말했어요.</summary>
+                    <p><strong>고백하다</strong>를 씁니다.</p>
+                </details>
+                <details class="practice-card">
+                    <summary>대화가 편하고 생각이 비슷해요.</summary>
+                    <p><strong>말이 잘 통하다</strong>, <strong>성격이 잘 맞다</strong>가 어울립니다.</p>
+                </details>
+                <details class="practice-card">
+                    <summary>결혼하자고 말했어요.</summary>
+                    <p><strong>청혼하다</strong>를 씁니다.</p>
+                </details>
+            </div>
+        </section>
+
+        <nav class="footer-nav" aria-label="다음 학습">
+            <a class="btn" href="vocabulary.html"><i class="fa-solid fa-arrow-left"></i> 어휘 카드</a>
+            <a class="btn" href="index.html">10과 목록</a>
+            <a class="btn primary" href="grammar1-wb-support.html">문법 1 WB <i class="fa-solid fa-arrow-right"></i></a>
+        </nav>
+    </main>
+
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

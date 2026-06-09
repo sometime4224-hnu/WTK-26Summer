@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10과 WB 문법 2 도우미 | A/V-잖아(요)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+            --green: #15803d;
+            --green-soft: #f0fdf4;
+            --orange: #c2410c;
+            --orange-soft: #fff7ed;
+            --purple: #7c3aed;
+            --purple-soft: #f5f3ff;
+            --ink-local: #172033;
+            --muted-local: #64748b;
+            --line-local: #dbe4f0;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink-local);
+            font-family: "Noto Sans KR", "Noto Sans", sans-serif;
+            background: linear-gradient(180deg, #f8fbfd 0%, #ecfeff 100%);
+        }
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 0 14px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line-local);
+            backdrop-filter: blur(12px);
+        }
+        .topbar a {
+            color: var(--blue);
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+        .topbar span { color: #cbd5e1; }
+        .shell {
+            width: min(1120px, calc(100% - 28px));
+            margin: 14px auto 40px;
+            display: grid;
+            gap: 14px;
+        }
+        .hero {
+            display: grid;
+            gap: 12px;
+            padding: 18px 0 8px;
+        }
+        .eyebrow {
+            margin: 0;
+            color: var(--blue);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+        h1 {
+            margin: 0;
+            font-size: clamp(24px, 4.2vw, 36px);
+            line-height: 1.16;
+        }
+        .lead {
+            max-width: 760px;
+            margin: 0;
+            color: var(--muted-local);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.65;
+        }
+        .quick-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .quick-nav a,
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 36px;
+            border: 1px solid var(--line-local);
+            border-radius: 999px;
+            padding: 0 12px;
+            background: #fff;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+        .band {
+            display: grid;
+            gap: 12px;
+            padding: 16px;
+            border: 1px solid var(--line-local);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+        .band-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        h2 {
+            margin: 0;
+            font-size: clamp(19px, 3vw, 25px);
+        }
+        h3 { margin: 0; font-size: 16px; }
+        .grid-2,
+        .grid-3 {
+            display: grid;
+            gap: 10px;
+        }
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .card {
+            display: grid;
+            gap: 8px;
+            border: 1px solid var(--line-local);
+            border-radius: 8px;
+            background: #fff;
+            padding: 14px;
+        }
+        .card p,
+        .card ul {
+            margin: 0;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 750;
+            line-height: 1.65;
+        }
+        .card ul { padding-left: 18px; }
+        .card li + li { margin-top: 4px; }
+        .rule-chip {
+            width: fit-content;
+            border-radius: 999px;
+            padding: 4px 9px;
+            background: var(--blue-soft);
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .rule-chip.green { background: var(--green-soft); color: var(--green); }
+        .rule-chip.orange { background: var(--orange-soft); color: var(--orange); }
+        .rule-chip.purple { background: var(--purple-soft); color: var(--purple); }
+        code,
+        .example {
+            border-radius: 6px;
+            padding: 3px 7px;
+            background: #f8fafc;
+            color: #1e293b;
+            font-family: inherit;
+            font-weight: 900;
+        }
+        .flow {
+            display: grid;
+            gap: 10px;
+        }
+        .flow-row {
+            display: grid;
+            grid-template-columns: 110px 1fr;
+            gap: 10px;
+            align-items: start;
+            border: 1px solid var(--line-local);
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+        }
+        .flow-label {
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .flow-row p {
+            margin: 0;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 750;
+            line-height: 1.65;
+        }
+        details.card {
+            cursor: pointer;
+        }
+        summary {
+            font-weight: 900;
+            color: var(--blue);
+        }
+        details[open] summary { margin-bottom: 8px; }
+        .footer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 4px 0;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            border: 1px solid var(--line-local);
+            border-radius: 999px;
+            padding: 0 14px;
+            background: #fff;
+            color: var(--blue);
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+        .btn.primary {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: #fff;
+        }
+        @media (max-width: 640px) {
+            .shell { width: min(100% - 20px, 1120px); margin-top: 8px; }
+            .band { padding: 13px; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .flow-row { grid-template-columns: 1fr; }
+            .topbar { overflow-x: auto; }
+            .topbar a, .topbar strong { white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html">10과 목록</a>
+        <span>|</span>
+        <a href="grammar2.html">문법 2</a>
+        <span>|</span>
+        <strong style="font-size:13px;font-weight:900">WB 문법 2</strong>
+    </nav>
+
+    <main class="shell">
+        <header class="hero">
+            <p class="eyebrow">Workbook Grammar 2</p>
+            <h1>문법 2 WB 도우미: A/V-잖아(요)</h1>
+            <p class="lead">WB 22~23쪽의 대화 완성 문제를 풀기 전에, 상대도 아는 사실을 이유처럼 말하는 방법을 정리합니다.</p>
+            <nav class="quick-nav" aria-label="빠른 이동">
+                <a href="#meaning"><i class="fa-solid fa-comment"></i> 의미</a>
+                <a href="#form"><i class="fa-solid fa-pen-nib"></i> 형태</a>
+                <a href="#wb-help"><i class="fa-solid fa-lightbulb"></i> WB 힌트</a>
+                <a href="#check"><i class="fa-solid fa-circle-question"></i> 점검</a>
+            </nav>
+        </header>
+
+        <section id="meaning" class="band" aria-label="-잖아요 의미">
+            <div class="band-head">
+                <div>
+                    <p class="eyebrow">Core Meaning</p>
+                    <h2>“알고 있죠?”를 이유로 말하기</h2>
+                </div>
+                <span class="pill"><i class="fa-solid fa-book-open"></i> WB 22~23쪽</span>
+            </div>
+            <div class="grid-3">
+                <article class="card">
+                    <span class="rule-chip">확인</span>
+                    <h3>상대도 아는 사실</h3>
+                    <p>상대가 이미 알고 있거나 같이 확인한 사실을 다시 꺼냅니다.</p>
+                    <span class="example">오늘 시험이 있잖아요.</span>
+                </article>
+                <article class="card">
+                    <span class="rule-chip green">이유</span>
+                    <h3>왜 그런지 설명</h3>
+                    <p>질문에 답할 때 “그 이유는 알다시피…”라는 느낌을 줍니다.</p>
+                    <span class="example">길이 막히잖아요.</span>
+                </article>
+                <article class="card">
+                    <span class="rule-chip orange">말투</span>
+                    <h3>부드럽게 또는 강하게</h3>
+                    <p>목소리가 부드러우면 친절한 확인, 강하면 짜증이나 반박처럼 들릴 수 있습니다.</p>
+                    <span class="example">내가 말했잖아요.</span>
+                </article>
+            </div>
+        </section>
+
+        <section id="form" class="band" aria-label="-잖아요 형태">
+            <div class="band-head">
+                <div>
+                    <p class="eyebrow">Forms</p>
+                    <h2>형태는 짧게 확인</h2>
+                </div>
+            </div>
+            <div class="grid-3">
+                <article class="card">
+                    <span class="rule-chip">동사</span>
+                    <h3>V-잖아요</h3>
+                    <p>가다 → <code>가잖아요</code>, 먹다 → <code>먹잖아요</code></p>
+                </article>
+                <article class="card">
+                    <span class="rule-chip green">형용사</span>
+                    <h3>A-잖아요</h3>
+                    <p>좋다 → <code>좋잖아요</code>, 예쁘다 → <code>예쁘잖아요</code></p>
+                </article>
+                <article class="card">
+                    <span class="rule-chip purple">명사</span>
+                    <h3>N(이)잖아요</h3>
+                    <p>학생 → <code>학생이잖아요</code>, 친구 → <code>친구잖아요</code></p>
+                </article>
+            </div>
+        </section>
+
+        <section id="wb-help" class="band" aria-label="WB 연습별 힌트">
+            <div class="band-head">
+                <div>
+                    <p class="eyebrow">Workbook Hints</p>
+                    <h2>WB 문법 2를 풀 때의 사고 순서</h2>
+                </div>
+            </div>
+            <div class="flow">
+                <div class="flow-row">
+                    <div class="flow-label">1. 상황 보기</div>
+                    <p>상대가 무엇을 묻거나 걱정하는지 먼저 확인합니다. 빈칸은 보통 그 걱정에 대한 이유나 해결책입니다.</p>
+                </div>
+                <div class="flow-row">
+                    <div class="flow-label">2. 단서 찾기</div>
+                    <p>괄호 안의 단서나 앞 문장에서 이미 나온 정보를 찾습니다. 그 정보를 <code>-잖아요</code>로 바꿉니다.</p>
+                </div>
+                <div class="flow-row">
+                    <div class="flow-label">3. 자연스럽게 말하기</div>
+                    <p>걱정에 답할 때는 <code>-(으)면 되잖아요</code>, 이미 말한 일은 <code>-았/었잖아요</code>가 자주 어울립니다.</p>
+                </div>
+            </div>
+            <div class="grid-2">
+                <article class="card">
+                    <span class="rule-chip">연습 1</span>
+                    <h3>대화 완성</h3>
+                    <ul>
+                        <li>단서가 과거 일이면 <code>-았/었잖아요</code>를 먼저 생각합니다.</li>
+                        <li>현재 상태나 사실이면 기본형 어간 뒤에 <code>-잖아요</code>를 붙입니다.</li>
+                    </ul>
+                </article>
+                <article class="card">
+                    <span class="rule-chip green">연습 2</span>
+                    <h3>친구 걱정에 답하기</h3>
+                    <ul>
+                        <li>문제 상황을 바로 해결할 방법을 말합니다.</li>
+                        <li><code>도서관에서 빌리면 되잖아요</code>처럼 <code>-(으)면 되잖아요</code>가 유용합니다.</li>
+                    </ul>
+                </article>
+                <article class="card">
+                    <span class="rule-chip orange">연습 3</span>
+                    <h3>근거 들어 말하기</h3>
+                    <ul>
+                        <li>상대가 놓친 근거를 다시 보여 주는 느낌입니다.</li>
+                        <li>“이것 보세요”, “잘 생각해 봐요” 뒤에 근거 문장이 잘 옵니다.</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <section id="check" class="band" aria-label="짧은 점검">
+            <div class="band-head">
+                <div>
+                    <p class="eyebrow">Quick Check</p>
+                    <h2>어떤 형태가 자연스러운가요?</h2>
+                </div>
+            </div>
+            <div class="grid-2">
+                <details class="card">
+                    <summary>오늘 내 생일인 거 어떻게 알았어요?</summary>
+                    <p>전에 말한 정보라면 <strong>지난번에 얘기했잖아요</strong>처럼 과거형을 씁니다.</p>
+                </details>
+                <details class="card">
+                    <summary>한국 친구 사귀기가 어려워요.</summary>
+                    <p>해결 방법을 제안하면 <strong>동아리에 가입하면 되잖아요</strong> 같은 형태가 자연스럽습니다.</p>
+                </details>
+                <details class="card">
+                    <summary>왜 등산을 안 갔어요?</summary>
+                    <p>이유가 날씨라면 <strong>비가 많이 오잖아요</strong>처럼 현재 사실을 말합니다.</p>
+                </details>
+                <details class="card">
+                    <summary>가방을 왜 환불하려고 해요?</summary>
+                    <p>상대에게 근거를 보여 주며 <strong>끈이 끊어졌잖아요</strong>처럼 말할 수 있습니다.</p>
+                </details>
+            </div>
+        </section>
+
+        <nav class="footer-nav" aria-label="다음 학습">
+            <a class="btn" href="grammar1-wb-support.html"><i class="fa-solid fa-arrow-left"></i> 문법 1 WB</a>
+            <a class="btn" href="index.html">10과 목록</a>
+            <a class="btn primary" href="grammar12-quiz-menu.html">문법 1+2 점검 <i class="fa-solid fa-arrow-right"></i></a>
+        </nav>
+    </main>
+
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>
