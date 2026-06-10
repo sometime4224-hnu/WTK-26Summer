@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>C10 문법1 보조 활동 - -던 시간축 배치판</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --bg: #f6f8fb;
+            --ink: #111827;
+            --muted: #526070;
+            --line: #d7dee8;
+            --panel: #ffffff;
+            --soft: #eef3f8;
+            --past: #b45309;
+            --present: #1d4ed8;
+            --future: #6d28d9;
+            --complete: #0f766e;
+            --accent: #0f766e;
+            --danger: #be123c;
+            --shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            background: var(--bg);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+            letter-spacing: 0;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 52px;
+            padding: 8px 14px;
+            border-bottom: 1px solid rgba(215, 222, 232, 0.9);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar__links,
+        .topbar__tools {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .topbar a,
+        .tool-btn,
+        .icon-btn,
+        .mode-btn,
+        .period-btn,
+        .tab-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            text-decoration: none;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
+        .topbar a {
+            min-height: 34px;
+            padding: 7px 9px;
+            color: #1d4ed8;
+            font-size: 0.82rem;
+        }
+
+        .topbar a:hover,
+        .topbar a:focus-visible,
+        .tool-btn:hover,
+        .icon-btn:hover,
+        .mode-btn:hover,
+        .period-btn:hover,
+        .tab-btn:hover {
+            background: #eff6ff;
+        }
+
+        .topbar__title {
+            min-width: 0;
+            color: #334155;
+            font-size: 0.86rem;
+            font-weight: 950;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .shell {
+            width: min(1420px, calc(100% - 28px));
+            margin: 16px auto 34px;
+        }
+
+        .unit-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: end;
+            margin-bottom: 14px;
+        }
+
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--accent);
+            font-size: 0.76rem;
+            font-weight: 950;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin-top: 0;
+        }
+
+        h1 {
+            margin-bottom: 6px;
+            font-size: clamp(1.7rem, 3vw, 2.75rem);
+            line-height: 1.08;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            line-height: 1.2;
+        }
+
+        .lead {
+            max-width: 840px;
+            margin-bottom: 0;
+            color: var(--muted);
+            font-size: 0.98rem;
+            font-weight: 750;
+            line-height: 1.62;
+        }
+
+        .head-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .tool-btn,
+        .icon-btn {
+            min-height: 38px;
+            padding: 8px 10px;
+            font-size: 0.86rem;
+        }
+
+        .tool-btn.primary {
+            border-color: #0f766e;
+            background: #0f766e;
+            color: #ffffff;
+        }
+
+        .tool-btn.danger {
+            border-color: #fecdd3;
+            background: #fff1f2;
+            color: #9f1239;
+        }
+
+        .tool-btn:disabled,
+        .icon-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(270px, 330px) minmax(0, 1fr);
+            gap: 14px;
+            align-items: stretch;
+        }
+
+        .tool-panel,
+        .board-shell {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .tool-panel {
+            display: grid;
+            gap: 12px;
+            align-content: start;
+            padding: 12px;
+        }
+
+        .control-block {
+            min-width: 0;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .control-block:last-child {
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+
+        .mode-grid,
+        .period-grid,
+        .tab-row {
+            display: grid;
+            gap: 8px;
+        }
+
+        .mode-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .period-grid,
+        .tab-row {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .tab-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .mode-btn,
+        .period-btn,
+        .tab-btn {
+            min-height: 42px;
+            padding: 8px;
+            font-size: 0.83rem;
+        }
+
+        .mode-btn {
+            justify-content: flex-start;
+        }
+
+        .mode-btn[aria-pressed="true"],
+        .period-btn[aria-pressed="true"],
+        .tab-btn[aria-selected="true"] {
+            border-color: #99f6e4;
+            background: #ccfbf1;
+            color: #115e59;
+        }
+
+        .mode-preview {
+            flex: 0 0 34px;
+            height: 16px;
+        }
+
+        .mode-label {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .search-wrap {
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            width: 16px;
+            height: 16px;
+            color: #64748b;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        #cardSearch {
+            width: 100%;
+            min-height: 40px;
+            padding: 8px 10px 8px 34px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            outline: none;
+            color: #172033;
+            background: #ffffff;
+            font-weight: 750;
+        }
+
+        #cardSearch:focus {
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.16);
+        }
+
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            max-height: min(52vh, 520px);
+            overflow: auto;
+            padding-right: 2px;
+        }
+
+        .library-item {
+            display: grid;
+            place-items: center;
+            gap: 6px;
+            min-height: 114px;
+            padding: 8px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #172033;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .library-item:hover,
+        .library-item:focus-visible {
+            border-color: #14b8a6;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        }
+
+        .library-item img {
+            width: 74px;
+            height: 62px;
+            object-fit: contain;
+            border-radius: 6px;
+            background: #f8fafc;
+        }
+
+        .library-emoji {
+            display: grid;
+            place-items: center;
+            width: 64px;
+            height: 62px;
+            border-radius: 8px;
+            background: #f8fafc;
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .board-shell {
+            display: grid;
+            grid-template-rows: auto minmax(520px, 1fr);
+            overflow: hidden;
+        }
+
+        .board-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 50px;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--line);
+            background: #ffffff;
+        }
+
+        .status-line {
+            min-width: 0;
+            color: #475569;
+            font-size: 0.84rem;
+            font-weight: 850;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .board-counts {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 7px;
+        }
+
+        .count-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 30px;
+            padding: 5px 8px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .timeline-board {
+            position: relative;
+            min-height: 520px;
+            overflow: hidden;
+            touch-action: none;
+            background:
+                linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0 33.333%, rgba(37, 99, 235, 0.08) 33.333% 66.666%, rgba(109, 40, 217, 0.08) 66.666% 100%),
+                linear-gradient(#ffffff, #f8fafc);
+            cursor: crosshair;
+            user-select: none;
+        }
+
+        .timeline-board[data-tool="move"] {
+            cursor: default;
+        }
+
+        .timeline-zones {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            pointer-events: none;
+        }
+
+        .time-zone {
+            position: relative;
+            padding: 18px 18px 0;
+            border-right: 1px solid rgba(148, 163, 184, 0.28);
+        }
+
+        .time-zone:last-child {
+            border-right: 0;
+        }
+
+        .time-label {
+            display: inline-grid;
+            gap: 2px;
+            padding: 8px 10px;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+        }
+
+        .time-label strong {
+            font-size: 0.95rem;
+            font-weight: 950;
+        }
+
+        .time-label span {
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .time-zone[data-period="past"] .time-label strong {
+            color: var(--past);
+        }
+
+        .time-zone[data-period="present"] .time-label strong {
+            color: var(--present);
+        }
+
+        .time-zone[data-period="future"] .time-label strong {
+            color: var(--future);
+        }
+
+        .axis {
+            position: absolute;
+            left: 4%;
+            right: 4%;
+            top: 50%;
+            z-index: 2;
+            height: 4px;
+            border-radius: 99px;
+            background: #334155;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .axis::before,
+        .axis::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 15px;
+            height: 15px;
+            border-top: 4px solid #334155;
+            border-right: 4px solid #334155;
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+        .axis::before {
+            left: -3px;
+            transform: translateY(-50%) rotate(225deg);
+        }
+
+        .axis::after {
+            right: -4px;
+        }
+
+        .axis-marker {
+            position: absolute;
+            top: 50%;
+            z-index: 2;
+            width: 2px;
+            height: 50px;
+            background: rgba(51, 65, 85, 0.48);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .axis-marker.m1 {
+            left: 33.333%;
+        }
+
+        .axis-marker.m2 {
+            left: 66.666%;
+        }
+
+        .draw-layer,
+        .item-layer {
+            position: absolute;
+            inset: 0;
+        }
+
+        .draw-layer {
+            z-index: 4;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .item-layer {
+            z-index: 6;
+            pointer-events: none;
+        }
+
+        .line-main {
+            fill: none;
+            stroke-width: 0.82;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .line-current {
+            stroke: var(--present);
+        }
+
+        .line-future {
+            stroke: var(--future);
+            stroke-dasharray: 3.2 2.4;
+        }
+
+        .line-complete {
+            stroke: var(--complete);
+        }
+
+        .line-cap {
+            fill: none;
+            stroke: var(--complete);
+            stroke-width: 0.92;
+            stroke-linecap: round;
+        }
+
+        .line-selected {
+            filter: drop-shadow(0 0 4px rgba(15, 118, 110, 0.55));
+        }
+
+        .line-selected .line-main,
+        .line-selected .line-cap {
+            stroke-width: 1.18;
+        }
+
+        .line-handle {
+            position: absolute;
+            z-index: 8;
+            display: grid;
+            place-items: center;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #0f766e;
+            border-radius: 999px;
+            background: #ffffff;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+            transform: translate(-50%, -50%);
+            pointer-events: auto;
+            touch-action: none;
+            cursor: grab;
+        }
+
+        .line-handle:active,
+        .board-item:active {
+            cursor: grabbing;
+        }
+
+        .line-handle::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #0f766e;
+        }
+
+        .line-handle--body {
+            width: 28px;
+            height: 28px;
+            border-color: #334155;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .line-handle--body::before {
+            width: 12px;
+            height: 4px;
+            border-radius: 999px;
+            background: #334155;
+        }
+
+        .temp-line {
+            fill: none;
+            stroke: #0f766e;
+            stroke-width: 1.1;
+            stroke-linecap: round;
+            stroke-dasharray: 2.8 2;
+            opacity: 0.72;
+        }
+
+        .board-item {
+            position: absolute;
+            display: grid;
+            grid-template-rows: minmax(70px, 1fr) auto;
+            place-items: center;
+            gap: 5px;
+            width: 112px;
+            min-height: 118px;
+            padding: 8px;
+            border: 2px solid rgba(148, 163, 184, 0.58);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+            transform: translate(-50%, -50%);
+            pointer-events: auto;
+            touch-action: none;
+            cursor: grab;
+        }
+
+        .board-item.is-selected {
+            border-color: #0f766e;
+            box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.18), 0 14px 28px rgba(15, 23, 42, 0.15);
+        }
+
+        .board-item img {
+            width: 86px;
+            height: 72px;
+            object-fit: contain;
+            border-radius: 6px;
+            background: #f8fafc;
+        }
+
+        .board-item__emoji {
+            display: grid;
+            place-items: center;
+            width: 84px;
+            height: 72px;
+            border-radius: 8px;
+            background: #f8fafc;
+            font-size: 2.65rem;
+            line-height: 1;
+        }
+
+        .board-item__label {
+            max-width: 100%;
+            color: #172033;
+            font-size: 0.78rem;
+            font-weight: 950;
+            line-height: 1.2;
+            text-align: center;
+            overflow-wrap: anywhere;
+        }
+
+        .empty-state {
+            display: grid;
+            place-items: center;
+            min-height: 120px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            color: #64748b;
+            font-size: 0.84rem;
+            font-weight: 850;
+            text-align: center;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        @media (max-width: 980px) {
+            .unit-head,
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .head-actions {
+                justify-content: flex-start;
+            }
+
+            .library-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                max-height: 270px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                width: min(100% - 18px, 1420px);
+                margin-top: 10px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .topbar__links,
+            .topbar__tools {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 2px;
+            }
+
+            .lead {
+                font-size: 0.9rem;
+            }
+
+            .head-actions,
+            .board-toolbar,
+            .board-counts {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .tool-btn,
+            .icon-btn {
+                width: 100%;
+            }
+
+            .mode-grid,
+            .period-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .library-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                max-height: 340px;
+            }
+
+            .board-shell {
+                grid-template-rows: auto minmax(560px, 1fr);
+            }
+
+            .timeline-board {
+                min-height: 560px;
+            }
+
+            .time-zone {
+                padding: 10px 8px 0;
+            }
+
+            .time-label {
+                padding: 7px 8px;
+            }
+
+            .time-label span {
+                display: none;
+            }
+
+            .board-item {
+                width: 98px;
+                min-height: 108px;
+            }
+
+            .board-item img,
+            .board-item__emoji {
+                width: 74px;
+                height: 62px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar">
+        <div class="topbar__links">
+            <a href="../index.html"><i data-lucide="home" aria-hidden="true"></i><span>메인</span></a>
+            <a href="index.html"><i data-lucide="folder-open" aria-hidden="true"></i><span>10과</span></a>
+            <a href="grammar1.html"><i data-lucide="book-open" aria-hidden="true"></i><span>문법 1</span></a>
+        </div>
+        <span class="topbar__title">-던 시간축 배치판</span>
+        <div class="topbar__tools">
+            <button id="topDeleteBtn" class="icon-btn" type="button" disabled><i data-lucide="trash-2" aria-hidden="true"></i><span>선택 삭제</span></button>
+            <button id="topClearBtn" class="icon-btn" type="button"><i data-lucide="eraser" aria-hidden="true"></i><span>전체 지우기</span></button>
+        </div>
+    </nav>
+
+    <main class="shell">
+        <header class="unit-head">
+            <div>
+                <p class="eyebrow">Grammar 1 Activity</p>
+                <h1>-던 시간축 배치판</h1>
+                <p class="lead">과거에 하던 일, 지금 이어지는 일, 앞으로 이어질 일을 한 화면에 놓고 문장으로 확인합니다.</p>
+            </div>
+            <div class="head-actions">
+                <button id="undoBtn" class="tool-btn" type="button" disabled><i data-lucide="undo-2" aria-hidden="true"></i> 되돌리기</button>
+                <button id="sampleBtn" class="tool-btn primary" type="button"><i data-lucide="sparkles" aria-hidden="true"></i> 예시 배치</button>
+            </div>
+        </header>
+
+        <section class="workspace">
+            <aside class="tool-panel" aria-label="배치 도구">
+                <section class="control-block">
+                    <h2>선을 그려요</h2>
+                    <div class="mode-grid" id="modeGrid">
+                        <button class="mode-btn" type="button" data-mode="move" aria-pressed="true">
+                            <i data-lucide="mouse-pointer-2" aria-hidden="true"></i>
+                            <span class="mode-label">이동</span>
+                        </button>
+                        <button class="mode-btn" type="button" data-mode="current" aria-pressed="false">
+                            <svg class="mode-preview" viewBox="0 0 60 20" aria-hidden="true">
+                                <line x1="5" y1="10" x2="47" y2="10" stroke="#1d4ed8" stroke-width="4" stroke-linecap="round"></line>
+                                <path d="M45 4 L55 10 L45 16" fill="none" stroke="#1d4ed8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                            <span class="mode-label">현재 진행</span>
+                        </button>
+                        <button class="mode-btn" type="button" data-mode="future" aria-pressed="false">
+                            <svg class="mode-preview" viewBox="0 0 60 20" aria-hidden="true">
+                                <line x1="5" y1="10" x2="47" y2="10" stroke="#6d28d9" stroke-width="4" stroke-dasharray="7 5" stroke-linecap="round"></line>
+                                <path d="M45 4 L55 10 L45 16" fill="none" stroke="#6d28d9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                            <span class="mode-label">미래 진행</span>
+                        </button>
+                        <button class="mode-btn" type="button" data-mode="complete" aria-pressed="false">
+                            <svg class="mode-preview" viewBox="0 0 60 20" aria-hidden="true">
+                                <line x1="7" y1="10" x2="50" y2="10" stroke="#0f766e" stroke-width="4" stroke-linecap="round"></line>
+                                <line x1="49" y1="3" x2="49" y2="17" stroke="#0f766e" stroke-width="4" stroke-linecap="round"></line>
+                            </svg>
+                            <span class="mode-label">완료선</span>
+                        </button>
+                    </div>
+                </section>
+
+                <section class="control-block">
+                    <h2>놓을 위치</h2>
+                    <div class="period-grid" id="periodGrid">
+                        <button class="period-btn" type="button" data-period="past" aria-pressed="true">과거</button>
+                        <button class="period-btn" type="button" data-period="present" aria-pressed="false">현재</button>
+                        <button class="period-btn" type="button" data-period="future" aria-pressed="false">미래</button>
+                    </div>
+                </section>
+
+                <section class="control-block">
+                    <h2>불러오기</h2>
+                    <div class="tab-row" role="tablist" aria-label="그림과 이모지">
+                        <button id="vocabTab" class="tab-btn" type="button" role="tab" data-library="vocab" aria-selected="true">어휘 그림</button>
+                        <button id="emojiTab" class="tab-btn" type="button" role="tab" data-library="emoji" aria-selected="false">감정 이모지</button>
+                    </div>
+                    <label class="search-wrap" for="cardSearch">
+                        <i data-lucide="search" aria-hidden="true"></i>
+                        <input id="cardSearch" type="search" autocomplete="off" placeholder="검색">
+                    </label>
+                    <div id="libraryGrid" class="library-grid" aria-live="polite"></div>
+                </section>
+            </aside>
+
+            <section class="board-shell" aria-label="시간축 배치판">
+                <div class="board-toolbar">
+                    <div id="statusLine" class="status-line">카드나 이모지를 선택해 시간축에 놓을 수 있습니다.</div>
+                    <div class="board-counts">
+                        <span class="count-pill"><i data-lucide="image" aria-hidden="true"></i><span id="itemCount">0개</span></span>
+                        <span class="count-pill"><i data-lucide="pen-line" aria-hidden="true"></i><span id="lineCount">0선</span></span>
+                    </div>
+                </div>
+                <div id="timelineBoard" class="timeline-board" data-tool="move" role="application" aria-label="과거 현재 미래 시간축">
+                    <div class="timeline-zones" aria-hidden="true">
+                        <div class="time-zone" data-period="past">
+                            <span class="time-label"><strong>과거</strong><span>그때 하던 일</span></span>
+                        </div>
+                        <div class="time-zone" data-period="present">
+                            <span class="time-label"><strong>현재</strong><span>지금 이어지는 일</span></span>
+                        </div>
+                        <div class="time-zone" data-period="future">
+                            <span class="time-label"><strong>미래</strong><span>앞으로 이어질 일</span></span>
+                        </div>
+                    </div>
+                    <div class="axis" aria-hidden="true"></div>
+                    <div class="axis-marker m1" aria-hidden="true"></div>
+                    <div class="axis-marker m2" aria-hidden="true"></div>
+                    <svg id="drawLayer" class="draw-layer" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                        <defs>
+                            <marker id="arrow-current" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="3.7" markerHeight="3.7" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#1d4ed8"></path>
+                            </marker>
+                            <marker id="arrow-future" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="3.7" markerHeight="3.7" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#6d28d9"></path>
+                            </marker>
+                        </defs>
+                        <g id="lineGroup"></g>
+                        <path id="tempLine" class="temp-line" d="" hidden></path>
+                    </svg>
+                    <div id="itemLayer" class="item-layer"></div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        const STORAGE_KEY = "c10.grammar1.dunTimelineBoard.v1";
+        const VOCAB_URL = "../assets/c10/vocabulary/images/split-hq/manifest.json";
+
+        const fallbackVocabCards = [
+            { word: "고백하다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_01_confess.webp" },
+            { word: "가슴이 두근거리다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_02_heart_pounding.webp" },
+            { word: "나란히 앉다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_03_side_by_side.webp" },
+            { word: "마음씨가 착하다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_04_kind_heart_v2.webp" },
+            { word: "말(생각)이 잘 통하다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_05_understand.webp" },
+            { word: "매력이 있다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_06_charming.webp" },
+            { word: "사랑에 빠지다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_07_fall_in_love.webp" },
+            { word: "사귀다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_08_date_v2.webp" },
+            { word: "성격(마음)이 잘 맞다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_09_good_match.webp" },
+            { word: "선보다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_10_matchmaking_v2.webp" },
+            { word: "소개팅하다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_11_blind_date.webp" },
+            { word: "손을 잡다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_12_hold_hands.webp" },
+            { word: "어깨에 기대다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_13_lean_shoulder.webp" },
+            { word: "얼굴이 빨개지다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_14_blush.webp" },
+            { word: "연애하다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_15_relationship_v2.webp" },
+            { word: "인상이 좋다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_16_good_impression_v2.webp" },
+            { word: "조건이 맞다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_17_conditions_match.webp" },
+            { word: "첫눈에 반하다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_18_love_at_first_sight_v2.webp" },
+            { word: "팔짱을 끼다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_19_arm_in_arm.webp" },
+            { word: "청혼하다", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_20_propose.webp" },
+            { word: "신혼여행", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_21_honeymoon.webp" },
+            { word: "중매결혼", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_22_arranged_marriage.webp" },
+            { word: "연애결혼", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_23_love_marriage.webp" },
+            { word: "청첩장", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_24_wedding_invitation.webp" },
+            { word: "예식장", src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_25_wedding_hall.webp" }
+        ];
+
+        const emotionCards = [
+            { label: "기쁨", emoji: "😄" },
+            { label: "설렘", emoji: "💓" },
+            { label: "웃음", emoji: "😊" },
+            { label: "슬픔", emoji: "😢" },
+            { label: "놀람", emoji: "😮" },
+            { label: "당황", emoji: "😳" },
+            { label: "걱정", emoji: "😟" },
+            { label: "화남", emoji: "😠" },
+            { label: "무서움", emoji: "😨" },
+            { label: "피곤함", emoji: "😴" },
+            { label: "편안함", emoji: "🙂" },
+            { label: "생각 중", emoji: "🤔" }
+        ];
+
+        const periodPositions = {
+            past: { min: 12, max: 30 },
+            present: { min: 40, max: 60 },
+            future: { min: 70, max: 88 }
+        };
+
+        const state = {
+            activeMode: "move",
+            activePeriod: "past",
+            activeLibrary: "vocab",
+            query: "",
+            vocabulary: fallbackVocabCards,
+            items: [],
+            lines: [],
+            selected: null,
+            history: []
+        };
+
+        const refs = {
+            board: document.getElementById("timelineBoard"),
+            itemLayer: document.getElementById("itemLayer"),
+            lineGroup: document.getElementById("lineGroup"),
+            tempLine: document.getElementById("tempLine"),
+            libraryGrid: document.getElementById("libraryGrid"),
+            search: document.getElementById("cardSearch"),
+            status: document.getElementById("statusLine"),
+            itemCount: document.getElementById("itemCount"),
+            lineCount: document.getElementById("lineCount"),
+            undoBtn: document.getElementById("undoBtn"),
+            deleteBtn: document.getElementById("topDeleteBtn")
+        };
+
+        let dragInfo = null;
+        let drawInfo = null;
+        let lineDragInfo = null;
+
+        function uid(prefix) {
+            return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+        }
+
+        function escapeHtml(value) {
+            return String(value == null ? "" : value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function clamp(value, min, max) {
+            return Math.min(max, Math.max(min, value));
+        }
+
+        function randomBetween(min, max) {
+            return min + Math.random() * (max - min);
+        }
+
+        function pointFromEvent(event) {
+            const box = refs.board.getBoundingClientRect();
+            return {
+                x: clamp(((event.clientX - box.left) / box.width) * 100, 2.5, 97.5),
+                y: clamp(((event.clientY - box.top) / box.height) * 100, 8, 92)
+            };
+        }
+
+        function pointToPixels(point) {
+            const box = refs.board.getBoundingClientRect();
+            return {
+                x: (point.x / 100) * box.width,
+                y: (point.y / 100) * box.height
+            };
+        }
+
+        function getLineById(id) {
+            return state.lines.find((line) => line.id === id);
+        }
+
+        function loadBoard() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+                if (Array.isArray(saved.items)) state.items = saved.items;
+                if (Array.isArray(saved.lines)) state.lines = saved.lines;
+            } catch (error) {
+                state.items = [];
+                state.lines = [];
+            }
+        }
+
+        function saveBoard() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    items: state.items,
+                    lines: state.lines
+                }));
+            } catch (error) {}
+        }
+
+        function pushHistory() {
+            state.history.push(JSON.stringify({
+                items: state.items,
+                lines: state.lines
+            }));
+            if (state.history.length > 24) state.history.shift();
+            refs.undoBtn.disabled = state.history.length === 0;
+        }
+
+        function restoreHistory() {
+            const snapshot = state.history.pop();
+            if (!snapshot) return;
+            try {
+                const data = JSON.parse(snapshot);
+                state.items = Array.isArray(data.items) ? data.items : [];
+                state.lines = Array.isArray(data.lines) ? data.lines : [];
+                state.selected = null;
+                refs.undoBtn.disabled = state.history.length === 0;
+                renderBoard();
+            } catch (error) {}
+        }
+
+        function setMode(mode) {
+            state.activeMode = mode;
+            refs.board.dataset.tool = mode;
+            document.querySelectorAll(".mode-btn").forEach((button) => {
+                button.setAttribute("aria-pressed", String(button.dataset.mode === mode));
+            });
+            const labels = {
+                move: "그림과 선을 끌어서 자유롭게 옮길 수 있습니다.",
+                current: "현재 진행선을 그립니다.",
+                future: "미래 진행선을 그립니다.",
+                complete: "완료선을 그립니다."
+            };
+            refs.status.textContent = labels[mode] || "";
+        }
+
+        function setPeriod(period) {
+            state.activePeriod = period;
+            document.querySelectorAll(".period-btn").forEach((button) => {
+                button.setAttribute("aria-pressed", String(button.dataset.period === period));
+            });
+        }
+
+        function setLibrary(library) {
+            state.activeLibrary = library;
+            document.querySelectorAll(".tab-btn").forEach((button) => {
+                button.setAttribute("aria-selected", String(button.dataset.library === library));
+            });
+            refs.search.value = "";
+            state.query = "";
+            renderLibrary();
+        }
+
+        function makeCardPayload(kind, card) {
+            if (kind === "emoji") {
+                return {
+                    type: "emoji",
+                    label: card.label,
+                    emoji: card.emoji
+                };
+            }
+            return {
+                type: "vocab",
+                label: card.word,
+                src: card.src
+            };
+        }
+
+        function addItem(payload, point) {
+            pushHistory();
+            const zone = periodPositions[state.activePeriod] || periodPositions.past;
+            const item = {
+                id: uid("item"),
+                type: payload.type,
+                label: payload.label,
+                src: payload.src || "",
+                emoji: payload.emoji || "",
+                x: point ? point.x : randomBetween(zone.min, zone.max),
+                y: point ? point.y : randomBetween(30, 72)
+            };
+            state.items.push(item);
+            state.selected = { type: "item", id: item.id };
+            setMode("move");
+            renderBoard();
+        }
+
+        function renderLibrary() {
+            const query = state.query.trim().toLowerCase();
+            const list = state.activeLibrary === "emoji"
+                ? emotionCards.map((card) => ({ kind: "emoji", card }))
+                : state.vocabulary.map((card) => ({ kind: "vocab", card }));
+            const filtered = list.filter(({ kind, card }) => {
+                const label = kind === "emoji" ? card.label : card.word;
+                return label.toLowerCase().includes(query);
+            });
+
+            refs.libraryGrid.innerHTML = "";
+            if (!filtered.length) {
+                refs.libraryGrid.innerHTML = '<div class="empty-state">검색 결과 없음</div>';
+                return;
+            }
+
+            filtered.forEach(({ kind, card }) => {
+                const label = kind === "emoji" ? card.label : card.word;
+                const button = document.createElement("button");
+                button.className = "library-item";
+                button.type = "button";
+                button.draggable = true;
+                button.dataset.kind = kind;
+                button.dataset.label = label;
+                if (kind === "emoji") {
+                    button.dataset.emoji = card.emoji;
+                    button.innerHTML = `<span class="library-emoji" aria-hidden="true">${card.emoji}</span><span>${escapeHtml(label)}</span>`;
+                } else {
+                    button.dataset.src = card.src;
+                    button.innerHTML = `<img src="${escapeHtml(card.src)}" alt="" loading="lazy"><span>${escapeHtml(label)}</span>`;
+                }
+                button.addEventListener("click", () => addItem(makeCardPayload(kind, card)));
+                button.addEventListener("dragstart", (event) => {
+                    event.dataTransfer.setData("application/json", JSON.stringify(makeCardPayload(kind, card)));
+                    event.dataTransfer.effectAllowed = "copy";
+                });
+                refs.libraryGrid.appendChild(button);
+            });
+        }
+
+        function linePath(line) {
+            return `M ${line.start.x.toFixed(2)} ${line.start.y.toFixed(2)} L ${line.end.x.toFixed(2)} ${line.end.y.toFixed(2)}`;
+        }
+
+        function capCoordinates(line, atEnd) {
+            const point = atEnd ? line.end : line.start;
+            const other = atEnd ? line.start : line.end;
+            const dx = point.x - other.x;
+            const dy = point.y - other.y;
+            const length = Math.hypot(dx, dy) || 1;
+            const nx = -dy / length;
+            const ny = dx / length;
+            const size = 2.9;
+            return {
+                x1: point.x + nx * size,
+                y1: point.y + ny * size,
+                x2: point.x - nx * size,
+                y2: point.y - ny * size
+            };
+        }
+
+        function renderLines() {
+            refs.lineGroup.innerHTML = "";
+            state.lines.forEach((line) => {
+                const selected = state.selected && state.selected.type === "line" && state.selected.id === line.id;
+                const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                group.classList.toggle("line-selected", selected);
+                group.dataset.lineId = line.id;
+
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", linePath(line));
+                path.setAttribute("class", `line-main line-${line.type}`);
+                if (line.type === "current") path.setAttribute("marker-end", "url(#arrow-current)");
+                if (line.type === "future") path.setAttribute("marker-end", "url(#arrow-future)");
+                group.appendChild(path);
+
+                if (line.type === "complete") {
+                    [capCoordinates(line, false), capCoordinates(line, true)].forEach((cap) => {
+                        const capLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                        capLine.setAttribute("class", "line-cap");
+                        capLine.setAttribute("x1", cap.x1.toFixed(2));
+                        capLine.setAttribute("y1", cap.y1.toFixed(2));
+                        capLine.setAttribute("x2", cap.x2.toFixed(2));
+                        capLine.setAttribute("y2", cap.y2.toFixed(2));
+                        group.appendChild(capLine);
+                    });
+                }
+
+                refs.lineGroup.appendChild(group);
+            });
+        }
+
+        function renderItems() {
+            refs.itemLayer.innerHTML = "";
+            state.items.forEach((item) => {
+                const node = document.createElement("div");
+                node.className = "board-item";
+                node.classList.toggle("is-selected", state.selected && state.selected.type === "item" && state.selected.id === item.id);
+                node.dataset.itemId = item.id;
+                node.style.left = `${item.x}%`;
+                node.style.top = `${item.y}%`;
+                node.setAttribute("role", "button");
+                node.setAttribute("tabindex", "0");
+                node.setAttribute("aria-label", item.label);
+                if (item.type === "emoji") {
+                    node.innerHTML = `<span class="board-item__emoji" aria-hidden="true">${item.emoji}</span><span class="board-item__label">${escapeHtml(item.label)}</span>`;
+                } else {
+                    node.innerHTML = `<img src="${escapeHtml(item.src)}" alt=""><span class="board-item__label">${escapeHtml(item.label)}</span>`;
+                }
+                node.addEventListener("pointerdown", startItemDrag);
+                node.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    state.selected = { type: "item", id: item.id };
+                    renderBoard();
+                });
+                node.addEventListener("keydown", (event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        state.selected = { type: "item", id: item.id };
+                        renderBoard();
+                    }
+                });
+                refs.itemLayer.appendChild(node);
+            });
+            renderLineHandles();
+        }
+
+        function renderLineHandles() {
+            if (!state.selected || state.selected.type !== "line") return;
+            const line = getLineById(state.selected.id);
+            if (!line) return;
+
+            const midpoint = {
+                x: (line.start.x + line.end.x) / 2,
+                y: (line.start.y + line.end.y) / 2
+            };
+            [
+                { handle: "start", label: "선 시작점 조정", point: line.start },
+                { handle: "body", label: "선 전체 이동", point: midpoint },
+                { handle: "end", label: "선 끝점 조정", point: line.end }
+            ].forEach((handleData) => {
+                const handle = document.createElement("button");
+                handle.className = `line-handle${handleData.handle === "body" ? " line-handle--body" : ""}`;
+                handle.type = "button";
+                handle.dataset.lineId = line.id;
+                handle.dataset.handle = handleData.handle;
+                handle.style.left = `${handleData.point.x}%`;
+                handle.style.top = `${handleData.point.y}%`;
+                handle.setAttribute("aria-label", handleData.label);
+                handle.addEventListener("pointerdown", startLineHandleDrag);
+                refs.itemLayer.appendChild(handle);
+            });
+        }
+
+        function updateSelectedLineHandles() {
+            if (!state.selected || state.selected.type !== "line") return;
+            const line = getLineById(state.selected.id);
+            if (!line) return;
+            const midpoint = {
+                x: (line.start.x + line.end.x) / 2,
+                y: (line.start.y + line.end.y) / 2
+            };
+            const points = { start: line.start, body: midpoint, end: line.end };
+            refs.itemLayer.querySelectorAll(".line-handle").forEach((handle) => {
+                const point = points[handle.dataset.handle];
+                if (!point) return;
+                handle.style.left = `${point.x}%`;
+                handle.style.top = `${point.y}%`;
+            });
+        }
+
+        function renderBoard() {
+            renderLines();
+            renderItems();
+            refs.itemCount.textContent = `${state.items.length}개`;
+            refs.lineCount.textContent = `${state.lines.length}선`;
+            refs.deleteBtn.disabled = !state.selected;
+            refs.undoBtn.disabled = state.history.length === 0;
+            saveBoard();
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function startItemDrag(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const id = event.currentTarget.dataset.itemId;
+            const item = state.items.find((candidate) => candidate.id === id);
+            if (!item) return;
+
+            pushHistory();
+            state.selected = { type: "item", id };
+            const point = pointFromEvent(event);
+            dragInfo = {
+                id,
+                offsetX: item.x - point.x,
+                offsetY: item.y - point.y,
+                moved: false
+            };
+            event.currentTarget.setPointerCapture(event.pointerId);
+            event.currentTarget.addEventListener("pointermove", moveItemDrag);
+            event.currentTarget.addEventListener("pointerup", endItemDrag, { once: true });
+            event.currentTarget.addEventListener("pointercancel", endItemDrag, { once: true });
+            refs.itemLayer.querySelectorAll(".line-handle").forEach((handle) => handle.remove());
+            refs.itemLayer.querySelectorAll(".board-item").forEach((node) => {
+                node.classList.toggle("is-selected", node.dataset.itemId === id);
+            });
+            refs.deleteBtn.disabled = false;
+        }
+
+        function moveItemDrag(event) {
+            if (!dragInfo) return;
+            const item = state.items.find((candidate) => candidate.id === dragInfo.id);
+            if (!item) return;
+            const point = pointFromEvent(event);
+            const nextX = clamp(point.x + dragInfo.offsetX, 5, 95);
+            const nextY = clamp(point.y + dragInfo.offsetY, 10, 90);
+            if (Math.hypot(nextX - item.x, nextY - item.y) > 0.1) {
+                dragInfo.moved = true;
+            }
+            item.x = nextX;
+            item.y = nextY;
+            const node = refs.itemLayer.querySelector(`[data-item-id="${CSS.escape(item.id)}"]`);
+            if (node) {
+                node.style.left = `${item.x}%`;
+                node.style.top = `${item.y}%`;
+            }
+        }
+
+        function endItemDrag(event) {
+            if (event.currentTarget) {
+                event.currentTarget.releasePointerCapture(event.pointerId);
+                event.currentTarget.removeEventListener("pointermove", moveItemDrag);
+            }
+            if (dragInfo && !dragInfo.moved) {
+                state.history.pop();
+            }
+            dragInfo = null;
+            renderBoard();
+        }
+
+        function startDrawing(event) {
+            if (state.activeMode === "move") {
+                const nearest = nearestLine(event);
+                if (nearest) {
+                    event.preventDefault();
+                    pushHistory();
+                    state.selected = { type: "line", id: nearest.id };
+                    lineDragInfo = {
+                        id: nearest.id,
+                        handle: "body",
+                        last: pointFromEvent(event),
+                        moved: false,
+                        source: "board"
+                    };
+                    refs.board.setPointerCapture(event.pointerId);
+                    refs.status.textContent = "선을 끌어서 위치를 옮깁니다.";
+                } else {
+                    state.selected = null;
+                }
+                renderBoard();
+                return;
+            }
+            event.preventDefault();
+            pushHistory();
+            const start = pointFromEvent(event);
+            drawInfo = { start, end: start };
+            refs.board.setPointerCapture(event.pointerId);
+            refs.tempLine.hidden = false;
+            refs.tempLine.setAttribute("d", `M ${start.x} ${start.y} L ${start.x} ${start.y}`);
+        }
+
+        function moveDrawing(event) {
+            if (lineDragInfo) {
+                moveLineDrag(event);
+                return;
+            }
+            if (!drawInfo) return;
+            const end = pointFromEvent(event);
+            drawInfo.end = end;
+            refs.tempLine.setAttribute("d", `M ${drawInfo.start.x} ${drawInfo.start.y} L ${end.x} ${end.y}`);
+        }
+
+        function endDrawing(event) {
+            if (lineDragInfo && lineDragInfo.source === "board") {
+                finishLineDrag(event, refs.board);
+                return;
+            }
+            if (!drawInfo) return;
+            refs.board.releasePointerCapture(event.pointerId);
+            const start = drawInfo.start;
+            const end = drawInfo.end;
+            refs.tempLine.hidden = true;
+            refs.tempLine.setAttribute("d", "");
+            drawInfo = null;
+
+            if (Math.hypot(end.x - start.x, end.y - start.y) < 3) {
+                state.history.pop();
+                refs.undoBtn.disabled = state.history.length === 0;
+                return;
+            }
+
+            const line = {
+                id: uid("line"),
+                type: state.activeMode,
+                start,
+                end
+            };
+            state.lines.push(line);
+            state.selected = { type: "line", id: line.id };
+            renderBoard();
+        }
+
+        function startLineHandleDrag(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const id = event.currentTarget.dataset.lineId;
+            const line = getLineById(id);
+            if (!line) return;
+            pushHistory();
+            state.selected = { type: "line", id };
+            lineDragInfo = {
+                id,
+                handle: event.currentTarget.dataset.handle,
+                last: pointFromEvent(event),
+                moved: false,
+                source: "handle"
+            };
+            event.currentTarget.setPointerCapture(event.pointerId);
+            event.currentTarget.addEventListener("pointermove", moveLineHandleDrag);
+            event.currentTarget.addEventListener("pointerup", endLineHandleDrag, { once: true });
+            event.currentTarget.addEventListener("pointercancel", endLineHandleDrag, { once: true });
+            refs.status.textContent = lineDragInfo.handle === "body"
+                ? "선을 끌어서 위치를 옮깁니다."
+                : "선의 끝점을 끌어서 길이와 방향을 조절합니다.";
+        }
+
+        function moveLineHandleDrag(event) {
+            moveLineDrag(event);
+        }
+
+        function endLineHandleDrag(event) {
+            if (event.currentTarget) {
+                event.currentTarget.releasePointerCapture(event.pointerId);
+                event.currentTarget.removeEventListener("pointermove", moveLineHandleDrag);
+            }
+            finishLineDrag(event, event.currentTarget);
+        }
+
+        function moveLineDrag(event) {
+            if (!lineDragInfo) return;
+            const line = getLineById(lineDragInfo.id);
+            if (!line) return;
+            const point = pointFromEvent(event);
+
+            if (lineDragInfo.handle === "body") {
+                const rawDx = point.x - lineDragInfo.last.x;
+                const rawDy = point.y - lineDragInfo.last.y;
+                const minX = Math.min(line.start.x, line.end.x);
+                const maxX = Math.max(line.start.x, line.end.x);
+                const minY = Math.min(line.start.y, line.end.y);
+                const maxY = Math.max(line.start.y, line.end.y);
+                const dx = clamp(rawDx, 2.5 - minX, 97.5 - maxX);
+                const dy = clamp(rawDy, 8 - minY, 92 - maxY);
+                line.start = { x: line.start.x + dx, y: line.start.y + dy };
+                line.end = { x: line.end.x + dx, y: line.end.y + dy };
+                if (Math.hypot(dx, dy) > 0.05) lineDragInfo.moved = true;
+                lineDragInfo.last = point;
+            } else {
+                const endpoint = lineDragInfo.handle === "start" ? "start" : "end";
+                if (Math.hypot(point.x - line[endpoint].x, point.y - line[endpoint].y) > 0.05) {
+                    lineDragInfo.moved = true;
+                }
+                line[endpoint] = point;
+            }
+
+            renderLines();
+            updateSelectedLineHandles();
+        }
+
+        function finishLineDrag(event, captureTarget) {
+            if (captureTarget && captureTarget.hasPointerCapture && captureTarget.hasPointerCapture(event.pointerId)) {
+                captureTarget.releasePointerCapture(event.pointerId);
+            }
+            if (lineDragInfo && !lineDragInfo.moved) {
+                state.history.pop();
+            }
+            lineDragInfo = null;
+            renderBoard();
+        }
+
+        function nearestLine(event) {
+            if (!state.lines.length) return null;
+            const point = pointFromEvent(event);
+            const p = pointToPixels(point);
+            let best = null;
+            state.lines.forEach((line) => {
+                const a = pointToPixels(line.start);
+                const b = pointToPixels(line.end);
+                const distance = distanceToSegment(p, a, b);
+                if (distance < 16 && (!best || distance < best.distance)) {
+                    best = { id: line.id, distance };
+                }
+            });
+            return best;
+        }
+
+        function distanceToSegment(p, a, b) {
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const lengthSq = dx * dx + dy * dy || 1;
+            const t = clamp(((p.x - a.x) * dx + (p.y - a.y) * dy) / lengthSq, 0, 1);
+            const x = a.x + t * dx;
+            const y = a.y + t * dy;
+            return Math.hypot(p.x - x, p.y - y);
+        }
+
+        function deleteSelected() {
+            if (!state.selected) return;
+            pushHistory();
+            if (state.selected.type === "item") {
+                state.items = state.items.filter((item) => item.id !== state.selected.id);
+            } else {
+                state.lines = state.lines.filter((line) => line.id !== state.selected.id);
+            }
+            state.selected = null;
+            renderBoard();
+        }
+
+        function clearBoard() {
+            if (!state.items.length && !state.lines.length) return;
+            if (!window.confirm("시간축 배치판을 모두 지울까요?")) return;
+            pushHistory();
+            state.items = [];
+            state.lines = [];
+            state.selected = null;
+            renderBoard();
+        }
+
+        function loadSample() {
+            pushHistory();
+            const byWord = new Map(state.vocabulary.map((card) => [card.word, card]));
+            const sampleWords = [
+                ["소개팅하다", 18, 36],
+                ["가슴이 두근거리다", 34, 68],
+                ["사귀다", 50, 35],
+                ["청혼하다", 74, 38]
+            ];
+            state.items = sampleWords
+                .map(([word, x, y]) => {
+                    const card = byWord.get(word) || state.vocabulary[0];
+                    if (!card) return null;
+                    return {
+                        id: uid("item"),
+                        type: "vocab",
+                        label: card.word,
+                        src: card.src,
+                        emoji: "",
+                        x,
+                        y
+                    };
+                })
+                .filter(Boolean);
+            state.items.push(
+                { id: uid("item"), type: "emoji", label: "설렘", src: "", emoji: "💓", x: 27, y: 25 },
+                { id: uid("item"), type: "emoji", label: "기쁨", src: "", emoji: "😄", x: 84, y: 64 }
+            );
+            state.lines = [
+                { id: uid("line"), type: "current", start: { x: 18, y: 52 }, end: { x: 54, y: 52 } },
+                { id: uid("line"), type: "future", start: { x: 55, y: 62 }, end: { x: 82, y: 62 } },
+                { id: uid("line"), type: "complete", start: { x: 18, y: 78 }, end: { x: 35, y: 78 } }
+            ];
+            state.selected = null;
+            setMode("move");
+            renderBoard();
+        }
+
+        async function loadVocabularyCards() {
+            try {
+                const response = await fetch(VOCAB_URL);
+                if (!response.ok) throw new Error("manifest unavailable");
+                const data = await response.json();
+                if (Array.isArray(data) && data.length) {
+                    state.vocabulary = data.map((card) => ({
+                        word: card.word,
+                        src: card.src
+                    }));
+                }
+            } catch (error) {
+                state.vocabulary = fallbackVocabCards;
+            }
+            renderLibrary();
+        }
+
+        function bindEvents() {
+            document.querySelectorAll(".mode-btn").forEach((button) => {
+                button.addEventListener("click", () => setMode(button.dataset.mode));
+            });
+            document.querySelectorAll(".period-btn").forEach((button) => {
+                button.addEventListener("click", () => setPeriod(button.dataset.period));
+            });
+            document.querySelectorAll(".tab-btn").forEach((button) => {
+                button.addEventListener("click", () => setLibrary(button.dataset.library));
+            });
+
+            refs.search.addEventListener("input", (event) => {
+                state.query = event.target.value;
+                renderLibrary();
+            });
+
+            refs.board.addEventListener("pointerdown", startDrawing);
+            refs.board.addEventListener("pointermove", moveDrawing);
+            refs.board.addEventListener("pointerup", endDrawing);
+            refs.board.addEventListener("pointercancel", endDrawing);
+            refs.board.addEventListener("dragover", (event) => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "copy";
+            });
+            refs.board.addEventListener("drop", (event) => {
+                event.preventDefault();
+                try {
+                    const payload = JSON.parse(event.dataTransfer.getData("application/json"));
+                    addItem(payload, pointFromEvent(event));
+                } catch (error) {}
+            });
+
+            refs.undoBtn.addEventListener("click", restoreHistory);
+            refs.deleteBtn.addEventListener("click", deleteSelected);
+            document.getElementById("topClearBtn").addEventListener("click", clearBoard);
+            document.getElementById("sampleBtn").addEventListener("click", loadSample);
+
+            document.addEventListener("keydown", (event) => {
+                if ((event.key === "Delete" || event.key === "Backspace") && state.selected) {
+                    const activeTag = document.activeElement ? document.activeElement.tagName : "";
+                    if (activeTag !== "INPUT" && activeTag !== "TEXTAREA") {
+                        event.preventDefault();
+                        deleteSelected();
+                    }
+                }
+                if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
+                    event.preventDefault();
+                    restoreHistory();
+                }
+            });
+        }
+
+        function init() {
+            loadBoard();
+            bindEvents();
+            renderLibrary();
+            renderBoard();
+            loadVocabularyCards();
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        window.C10_DUN_TIMELINE_APP = {
+            state,
+            addItem,
+            loadSample,
+            setMode,
+            setPeriod,
+            setLibrary,
+            deleteSelected,
+            clearWithoutConfirm() {
+                pushHistory();
+                state.items = [];
+                state.lines = [];
+                state.selected = null;
+                renderBoard();
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>
