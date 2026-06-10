@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>과거·현재·미래 2·3차</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --bg: #f6f8fb;
+            --panel: #fff;
+            --ink: #142033;
+            --muted: #5d697c;
+            --line: #d8e1ee;
+            --present: #2563eb;
+            --accent: #0f766e;
+            --accent-soft: #ecfdf5;
+            --danger: #be123c;
+            --danger-soft: #fff1f2;
+            --shadow: 0 14px 28px rgba(15, 23, 42, 0.07);
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            background: var(--bg);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+            letter-spacing: 0;
+        }
+
+        button { font: inherit; cursor: pointer; }
+        button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 52px;
+            padding: 8px 14px;
+            border-bottom: 1px solid rgba(216, 225, 238, 0.92);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            overflow-x: auto;
+        }
+
+        .topbar a,
+        .topbar strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            white-space: nowrap;
+            color: #1d4ed8;
+            font-size: 0.82rem;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .topbar strong { color: #334155; }
+        .topbar span { color: #cbd5e1; }
+
+        .icon {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 auto;
+            stroke-width: 2.4;
+        }
+
+        .shell {
+            width: min(1280px, calc(100% - 28px));
+            margin: 16px auto 36px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .unit-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: end;
+        }
+
+        h1,
+        h2,
+        h3,
+        p { margin-top: 0; }
+
+        h1 {
+            margin-bottom: 0;
+            font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+            line-height: 1.08;
+        }
+
+        h2 {
+            margin-bottom: 8px;
+            font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+            line-height: 1.22;
+        }
+
+        h3 { margin-bottom: 4px; font-size: 1rem; }
+
+        .head-actions,
+        .round-footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .btn,
+        .round-tab,
+        .tense-btn,
+        .choice-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: #334155;
+            font-weight: 900;
+            text-decoration: none;
+            transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease, transform 0.18s ease;
+        }
+
+        .btn {
+            min-height: 40px;
+            padding: 8px 11px;
+            font-size: 0.88rem;
+        }
+
+        .btn.primary {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn.ghost { background: #f8fafc; }
+
+        .btn:hover,
+        .btn:focus-visible,
+        .round-tab:hover,
+        .round-tab:focus-visible,
+        .tense-btn:hover,
+        .tense-btn:focus-visible,
+        .choice-btn:hover,
+        .choice-btn:focus-visible {
+            border-color: #93c5fd;
+            background: #eff6ff;
+            outline: none;
+        }
+
+        .round-tabs {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .round-tab {
+            position: relative;
+            min-height: 72px;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        .round-tab b {
+            font-size: 0.96rem;
+            line-height: 1.25;
+        }
+
+        .round-tab span {
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 850;
+            line-height: 1.35;
+        }
+
+        .round-tab.is-active {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: #064e3b;
+        }
+
+        .round-tab.is-complete::after {
+            content: "완료";
+            position: absolute;
+            top: 8px;
+            right: 9px;
+            border-radius: 8px;
+            padding: 3px 6px;
+            background: #dcfce7;
+            color: #166534;
+            font-size: 0.68rem;
+            font-weight: 950;
+        }
+
+        .round-tab.is-locked { opacity: 0.56; }
+
+        .guide-card,
+        .activity-page,
+        .complete-box {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .guide-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
+            padding: 14px;
+        }
+
+        .guide-copy h2 {
+            margin-bottom: 4px;
+            font-size: 1.08rem;
+        }
+
+        .guide-copy p {
+            margin-bottom: 0;
+            color: #475569;
+            font-size: 0.94rem;
+            font-weight: 800;
+            line-height: 1.55;
+        }
+
+        .guide-metric {
+            display: grid;
+            gap: 7px;
+            width: min(280px, 32vw);
+            min-width: 210px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            color: #334155;
+            font-size: 0.78rem;
+            font-weight: 950;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 10px;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #f1f5f9;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.25s ease;
+        }
+
+        .activity-page {
+            display: grid;
+            gap: 14px;
+            padding: 14px;
+        }
+
+        .activity-page[hidden] { display: none; }
+
+        .activity-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 36px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 7px 10px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.82rem;
+            font-weight: 950;
+        }
+
+        .coach-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 10px 12px;
+            background: #eff6ff;
+            color: #1e3a8a;
+            font-size: 0.91rem;
+            font-weight: 880;
+            line-height: 1.45;
+        }
+
+        .quiz-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(240px, 310px);
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .sentence-card {
+            position: relative;
+            display: grid;
+            gap: 10px;
+            min-height: 260px;
+            align-content: center;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 22px;
+            background: #fff;
+            text-align: center;
+            overflow: hidden;
+            transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .sentence-card.is-correct {
+            border-color: #22c55e;
+            background: linear-gradient(180deg, #f0fdf4 0%, #fff 82%);
+            box-shadow: 0 14px 28px rgba(34, 197, 94, 0.16);
+            animation: cardPop 0.32s ease;
+        }
+
+        .sentence-card.is-wrong {
+            border-color: #fb7185;
+            background: linear-gradient(180deg, #fff1f2 0%, #fff 82%);
+            box-shadow: 0 14px 28px rgba(244, 63, 94, 0.14);
+            animation: answerShake 0.34s ease;
+        }
+
+        .question-label {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 950;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .sentence-text {
+            margin: 0;
+            font-size: clamp(1.55rem, 4.2vw, 2.55rem);
+            font-weight: 950;
+            line-height: 1.32;
+            word-break: keep-all;
+        }
+
+        .timer-box {
+            display: grid;
+            gap: 10px;
+            align-content: start;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            background: #f8fafc;
+        }
+
+        .time-number {
+            color: #111827;
+            font-size: 2.35rem;
+            font-weight: 950;
+            line-height: 1;
+        }
+
+        .time-number.is-low { color: var(--danger); }
+
+        .timer-bar {
+            height: 14px;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .timer-fill {
+            width: 100%;
+            height: 100%;
+            background: var(--present);
+            transition: width 0.1s linear, background 0.2s ease;
+        }
+
+        .timer-fill.is-low { background: var(--danger); }
+
+        .tense-grid,
+        .choice-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .tense-btn,
+        .choice-btn {
+            position: relative;
+            flex-direction: column;
+            min-height: 88px;
+            padding: 10px;
+            text-align: center;
+            line-height: 1.25;
+            overflow: hidden;
+        }
+
+        .choice-btn { min-height: 104px; }
+
+        .tense-btn:not(:disabled):active,
+        .choice-btn:not(:disabled):active {
+            transform: scale(0.98);
+        }
+
+        .tense-btn strong,
+        .choice-btn strong { font-size: 1.02rem; }
+
+        .tense-btn span,
+        .choice-btn span {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .tense-btn.is-correct,
+        .choice-btn.is-correct {
+            border-color: #16a34a;
+            background: #dcfce7;
+            color: #166534;
+            box-shadow: 0 10px 24px rgba(22, 163, 74, 0.18);
+            opacity: 1;
+            transform: translateY(-2px);
+            animation: answerPop 0.28s ease;
+        }
+
+        .tense-btn.is-wrong,
+        .choice-btn.is-wrong {
+            border-color: #f43f5e;
+            background: var(--danger-soft);
+            color: #9f1239;
+            box-shadow: 0 10px 24px rgba(244, 63, 94, 0.16);
+            opacity: 1;
+            animation: answerShake 0.34s ease;
+        }
+
+        .tense-btn.is-selected,
+        .choice-btn.is-selected {
+            outline: 3px solid rgba(37, 99, 235, 0.2);
+            outline-offset: 2px;
+        }
+
+        .tense-btn.is-dimmed,
+        .choice-btn.is-dimmed {
+            opacity: 0.42;
+        }
+
+        .tense-btn.is-correct:disabled,
+        .tense-btn.is-wrong:disabled,
+        .choice-btn.is-correct:disabled,
+        .choice-btn.is-wrong:disabled {
+            opacity: 1;
+        }
+
+        .feedback {
+            display: grid;
+            gap: 10px;
+            min-height: 48px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 11px 12px;
+            background: #fff;
+            color: #334155;
+            font-size: 0.92rem;
+            font-weight: 850;
+            line-height: 1.5;
+            transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+        }
+
+        .feedback.good {
+            border-color: #86efac;
+            background: #f0fdf4;
+            color: #166534;
+            box-shadow: 0 12px 24px rgba(22, 163, 74, 0.12);
+        }
+
+        .feedback.bad {
+            border-color: #fecdd3;
+            background: var(--danger-soft);
+            color: #9f1239;
+            box-shadow: 0 12px 24px rgba(244, 63, 94, 0.1);
+        }
+
+        .feedback.timeout {
+            border-color: #fed7aa;
+            background: #fff7ed;
+            color: #9a3412;
+        }
+
+        .feedback.is-live {
+            animation: feedbackEnter 0.25s ease;
+        }
+
+        .feedback-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .reaction-badge,
+        .next-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 30px;
+            border-radius: 8px;
+            padding: 5px 9px;
+            font-weight: 950;
+        }
+
+        .reaction-badge.good {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .reaction-badge.bad {
+            background: #ffe4e6;
+            color: #9f1239;
+        }
+
+        .reaction-badge.timeout {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .next-chip {
+            border: 1px solid #bfdbfe;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 0.78rem;
+        }
+
+        .answer-compare {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .answer-pill {
+            display: grid;
+            gap: 3px;
+            min-height: 62px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 9px 10px;
+            background: #fff;
+        }
+
+        .answer-pill b {
+            color: #64748b;
+            font-size: 0.74rem;
+        }
+
+        .answer-pill span {
+            color: #111827;
+            font-size: 1.02rem;
+            font-weight: 950;
+            word-break: keep-all;
+        }
+
+        .answer-pill.selected.good,
+        .answer-pill.correct {
+            border-color: #86efac;
+            background: #dcfce7;
+        }
+
+        .answer-pill.selected.bad {
+            border-color: #fecdd3;
+            background: #ffe4e6;
+        }
+
+        .answer-pill.selected.timeout {
+            border-color: #fed7aa;
+            background: #ffedd5;
+        }
+
+        .feedback-clue {
+            margin: 0;
+            color: #334155;
+            font-weight: 850;
+        }
+
+        .inline-next-bar {
+            height: 7px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.24);
+        }
+
+        .inline-next-bar span {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            background: #2563eb;
+            transform-origin: left center;
+            animation: nextFill 1.85s linear forwards;
+        }
+
+        .complete-box {
+            display: grid;
+            gap: 8px;
+            padding: 14px;
+            background: var(--accent-soft);
+        }
+
+        .complete-box h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            color: #065f46;
+            font-size: 1.05rem;
+        }
+
+        .blank {
+            display: inline-flex;
+            min-width: min(420px, 70vw);
+            justify-content: center;
+            border-bottom: 4px solid #334155;
+            padding: 0 10px 3px;
+            color: #64748b;
+        }
+
+        .context-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-self: center;
+            min-height: 34px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 6px 10px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.86rem;
+            font-weight: 950;
+        }
+
+        .final-panel {
+            display: grid;
+            gap: 12px;
+            padding: 18px;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            background: #f0fdf4;
+        }
+
+        .final-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .final-stat {
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+        }
+
+        .final-stat strong {
+            display: block;
+            color: #166534;
+            font-size: 1.28rem;
+        }
+
+        .final-stat span {
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 900;
+        }
+
+        .transition-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1001;
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            background: transparent;
+            pointer-events: none;
+        }
+
+        .transition-card {
+            display: grid;
+            gap: 12px;
+            width: min(360px, calc(100vw - 36px));
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 22px;
+            background: #fff;
+            text-align: center;
+            box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
+            pointer-events: auto;
+            animation: cardPop 0.26s ease;
+        }
+
+        .transition-icon {
+            display: grid;
+            place-items: center;
+            width: 52px;
+            height: 52px;
+            justify-self: center;
+            border-radius: 8px;
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .transition-icon .icon {
+            width: 28px;
+            height: 28px;
+        }
+
+        .transition-card h2 {
+            margin: 0;
+            font-size: clamp(1.55rem, 5vw, 2.1rem);
+        }
+
+        .transition-card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.98rem;
+            font-weight: 900;
+        }
+
+        .transition-count {
+            display: grid;
+            place-items: center;
+            width: 64px;
+            height: 64px;
+            justify-self: center;
+            border: 2px solid #bfdbfe;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 2rem;
+            font-weight: 950;
+            line-height: 1;
+        }
+
+        @keyframes cardPop {
+            0% { transform: scale(0.97); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes answerPop {
+            0% { transform: translateY(0) scale(0.98); }
+            70% { transform: translateY(-3px) scale(1.02); }
+            100% { transform: translateY(-2px) scale(1); }
+        }
+
+        @keyframes answerShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            55% { transform: translateX(4px); }
+            80% { transform: translateX(-2px); }
+        }
+
+        @keyframes feedbackEnter {
+            0% { transform: translateY(6px); opacity: 0.4; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes nextFill {
+            0% { transform: scaleX(1); }
+            100% { transform: scaleX(0); }
+        }
+
+        @media (max-width: 900px) {
+            .unit-head,
+            .guide-card,
+            .quiz-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .head-actions { justify-content: flex-start; }
+            .guide-metric { width: 100%; min-width: 0; }
+            .tense-grid,
+            .choice-grid,
+            .final-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                width: min(100% - 20px, 1280px);
+                margin-top: 10px;
+            }
+
+            .round-tabs { grid-template-columns: 1fr; }
+            .activity-page { padding: 12px; }
+            .sentence-card { min-height: 220px; padding: 16px; }
+            .answer-compare { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i data-lucide="home" class="icon"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html"><i data-lucide="folder-open" class="icon"></i> 10과 목록</a>
+        <span>|</span>
+        <a href="grammar3.html"><i data-lucide="book-open" class="icon"></i> 문법 3</a>
+        <span>|</span>
+        <a href="grammar3-wb-support.html">1차</a>
+        <span>|</span>
+        <strong>2·3차</strong>
+    </nav>
+
+    <main class="shell">
+        <header class="unit-head">
+            <div>
+                <h1>과거 · 현재 · 미래</h1>
+            </div>
+            <div class="head-actions">
+                <a class="btn ghost" href="grammar3-wb-support.html"><i data-lucide="arrow-left" class="icon"></i> 1차</a>
+                <button class="btn ghost" id="resetAllBtn" type="button"><i data-lucide="rotate-ccw" class="icon"></i> 처음부터</button>
+            </div>
+        </header>
+
+        <nav class="round-tabs" aria-label="2·3차 활동 순서">
+            <button class="round-tab is-active" type="button" data-round-target="2">
+                <b>2차</b>
+                <span>7초 선택</span>
+            </button>
+            <button class="round-tab is-locked" type="button" data-round-target="3">
+                <b>3차</b>
+                <span>빈칸 선택</span>
+            </button>
+        </nav>
+
+        <aside class="guide-card" aria-live="polite">
+            <div class="guide-copy">
+                <h2 id="guideTitle">시작</h2>
+                <p id="guideText">7초</p>
+            </div>
+            <div class="guide-metric" aria-label="현재 진행률">
+                <div class="metric-row">
+                    <span id="progressLabel">2차 진행률</span>
+                    <span id="progressCount">0/9</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="activity-page" id="round2Page" aria-label="2차 7초 시제 퀴즈">
+            <div class="activity-head">
+                <div>
+                    <h2>7초 선택</h2>
+                </div>
+                <div class="score-pill"><i data-lucide="gauge" class="icon"></i> 점수 <span id="round2Score">0</span>/<span id="round2Total">0</span></div>
+            </div>
+
+            <div class="coach-line" id="round2Guide"><i data-lucide="timer" class="icon"></i> 시작 → 과거/현재/미래 선택</div>
+
+            <div class="quiz-shell">
+                <article class="sentence-card">
+                    <p class="question-label" id="round2QuestionLabel">대기</p>
+                    <p class="sentence-text" id="round2Sentence">시작 버튼을 누르세요.</p>
+                </article>
+                <aside class="timer-box">
+                    <h3>남은 시간</h3>
+                    <div class="time-number" id="timeNumber">7.0</div>
+                    <div class="timer-bar" aria-hidden="true">
+                        <div class="timer-fill" id="timerFill"></div>
+                    </div>
+                    <button class="btn primary" id="round2StartBtn" type="button"><i data-lucide="play" class="icon"></i> 2차 시작</button>
+                </aside>
+            </div>
+
+            <div class="tense-grid" aria-label="시제 선택 버튼">
+                <button class="tense-btn" type="button" data-round2-answer="past" disabled>
+                    <strong>과거</strong>
+                    <span>-았/었어요</span>
+                </button>
+                <button class="tense-btn" type="button" data-round2-answer="present" disabled>
+                    <strong>현재</strong>
+                    <span>-고 있어요</span>
+                </button>
+                <button class="tense-btn" type="button" data-round2-answer="future" disabled>
+                    <strong>미래</strong>
+                    <span>-(으)ㄹ 거예요</span>
+                </button>
+            </div>
+
+            <div class="feedback" id="round2Feedback" aria-live="polite">대기</div>
+
+            <div class="complete-box" id="round2Complete" hidden>
+                <h3><i data-lucide="check-circle-2" class="icon"></i> 2차 완료</h3>
+                <p id="round2ResultText">0/0</p>
+            </div>
+
+            <div class="round-footer">
+                <button class="btn ghost" id="round2RestartBtn" type="button"><i data-lucide="refresh-cw" class="icon"></i> 다시 풀기</button>
+            </div>
+        </section>
+
+        <section class="activity-page" id="round3Page" aria-label="3차 빈칸 완성" hidden>
+            <div class="activity-head">
+                <div>
+                    <h2>빈칸 선택</h2>
+                </div>
+                <div class="score-pill"><i data-lucide="list-checks" class="icon"></i> 점수 <span id="round3Score">0</span>/<span id="round3Total">0</span></div>
+            </div>
+
+            <div class="coach-line" id="round3Guide"><i data-lucide="search-check" class="icon"></i> 시간 단서 → 형태 선택</div>
+
+            <article class="sentence-card">
+                <span class="context-chip" id="round3Context">시간 단서</span>
+                <p class="question-label" id="round3QuestionLabel">1 / 9</p>
+                <p class="sentence-text" id="round3Sentence"></p>
+            </article>
+
+            <div class="choice-grid" id="round3Choices" aria-label="빈칸 선택 버튼"></div>
+
+            <div class="feedback" id="round3Feedback" aria-live="polite">대기</div>
+
+            <div class="final-panel" id="finalPanel" hidden>
+                <div>
+                    <h2>완료</h2>
+                </div>
+                <div class="final-grid">
+                    <div class="final-stat">
+                        <strong id="finalRound2">0/0</strong>
+                        <span>2차 정답</span>
+                    </div>
+                    <div class="final-stat">
+                        <strong id="finalRound3">0/0</strong>
+                        <span>3차 정답</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="round-footer">
+                <button class="btn ghost" id="round3RestartBtn" type="button"><i data-lucide="refresh-cw" class="icon"></i> 3차 다시 풀기</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="transition-overlay" id="transitionOverlay" hidden aria-live="polite">
+        <div class="transition-card" role="status">
+            <div class="transition-icon"><i data-lucide="arrow-right" class="icon"></i></div>
+            <h2 id="transitionTitle">다음</h2>
+            <p id="transitionText">다음</p>
+            <div class="transition-count" id="transitionCount" hidden>2</div>
+            <button class="btn primary" id="transitionButton" type="button">다음 <i data-lucide="arrow-right" class="icon"></i></button>
+        </div>
+    </div>
+
+    <script>
+        const tenseMeta = {
+            past: { label: "과거", pattern: "-았/었어요" },
+            present: { label: "현재", pattern: "-고 있어요" },
+            future: { label: "미래", pattern: "-(으)ㄹ 거예요" }
+        };
+
+        const round2Questions = [
+            { sentence: "어제 친구와 점심을 먹었어요.", answer: "past", clue: "어제와 -었어요가 끝난 일을 보여 줍니다." },
+            { sentence: "지금 도서관에서 책을 읽고 있어요.", answer: "present", clue: "지금과 -고 있어요가 현재 진행 중인 일을 말합니다." },
+            { sentence: "내일 한국어 시험을 볼 거예요.", answer: "future", clue: "내일과 -ㄹ 거예요가 앞으로의 일을 말합니다." },
+            { sentence: "방금 숙제를 끝냈어요.", answer: "past", clue: "방금과 -었어요는 이미 끝난 일입니다." },
+            { sentence: "지금 버스를 기다리고 있어요.", answer: "present", clue: "기다리고 있어요는 지금 계속되는 행동입니다." },
+            { sentence: "이번 주말에 영화를 볼 거예요.", answer: "future", clue: "이번 주말에 할 예정인 일이므로 미래입니다." },
+            { sentence: "지난달에 새 자전거를 샀어요.", answer: "past", clue: "지난달과 -았어요는 과거를 가리킵니다." },
+            { sentence: "친구가 지금 노래를 부르고 있어요.", answer: "present", clue: "지금 부르고 있으므로 현재입니다." },
+            { sentence: "다음 방학에 여행을 갈 거예요.", answer: "future", clue: "다음 방학에 할 일이므로 미래입니다." }
+        ];
+
+        const round3Questions = [
+            {
+                context: "어제",
+                sentence: "어제 친구와 커피를 ____.",
+                answer: "past",
+                clue: "어제는 과거 시간입니다.",
+                choices: { past: "마셨어요", present: "마시고 있어요", future: "마실 거예요" }
+            },
+            {
+                context: "지금",
+                sentence: "지금 동생이 방에서 음악을 ____.",
+                answer: "present",
+                clue: "지금은 현재 진행 중인 상황입니다.",
+                choices: { past: "들었어요", present: "듣고 있어요", future: "들을 거예요" }
+            },
+            {
+                context: "내일",
+                sentence: "내일 친구를 공항에서 ____.",
+                answer: "future",
+                clue: "내일은 앞으로의 시간입니다.",
+                choices: { past: "만났어요", present: "만나고 있어요", future: "만날 거예요" }
+            },
+            {
+                context: "지난 주말",
+                sentence: "지난 주말에 가족하고 영화를 ____.",
+                answer: "past",
+                clue: "지난 주말은 이미 지나간 시간입니다.",
+                choices: { past: "봤어요", present: "보고 있어요", future: "볼 거예요" }
+            },
+            {
+                context: "오늘 밤",
+                sentence: "오늘 밤에 친구에게 전화를 ____.",
+                answer: "future",
+                clue: "오늘 밤에 할 예정인 일이므로 미래형이 자연스럽습니다.",
+                choices: { past: "했어요", present: "하고 있어요", future: "할 거예요" }
+            },
+            {
+                context: "지금",
+                sentence: "지금 학생들이 교실에서 문제를 ____.",
+                answer: "present",
+                clue: "지금 하고 있는 행동은 -고 있어요로 말합니다.",
+                choices: { past: "풀었어요", present: "풀고 있어요", future: "풀 거예요" }
+            },
+            {
+                context: "아까",
+                sentence: "아까 선생님이 새 문법을 ____.",
+                answer: "past",
+                clue: "아까는 조금 전의 과거입니다.",
+                choices: { past: "설명했어요", present: "설명하고 있어요", future: "설명할 거예요" }
+            },
+            {
+                context: "다음 주",
+                sentence: "다음 주에 친구들이 우리 집에 ____.",
+                answer: "future",
+                clue: "다음 주는 미래 시간입니다.",
+                choices: { past: "왔어요", present: "오고 있어요", future: "올 거예요" }
+            },
+            {
+                context: "지금",
+                sentence: "지금 저는 한국어 숙제를 ____.",
+                answer: "present",
+                clue: "지금 하는 중인 일은 현재형 진행 표현이 맞습니다.",
+                choices: { past: "했어요", present: "하고 있어요", future: "할 거예요" }
+            }
+        ];
+
+        const state = {
+            activeRound: 2,
+            completed: { round2: false, round3: false },
+            round2: {
+                index: 0,
+                score: 0,
+                started: false,
+                answered: false,
+                timer: null,
+                questionStartedAt: 0
+            },
+            round3: {
+                index: 0,
+                score: 0,
+                answered: false
+            },
+            transition: {
+                timer: null,
+                action: null
+            }
+        };
+
+        const refs = {
+            roundTabs: Array.from(document.querySelectorAll(".round-tab")),
+            pages: [
+                document.getElementById("round2Page"),
+                document.getElementById("round3Page")
+            ],
+            guideTitle: document.getElementById("guideTitle"),
+            guideText: document.getElementById("guideText"),
+            progressLabel: document.getElementById("progressLabel"),
+            progressCount: document.getElementById("progressCount"),
+            progressFill: document.getElementById("progressFill"),
+            round2SentenceCard: document.querySelector("#round2Page .sentence-card"),
+            round2QuestionLabel: document.getElementById("round2QuestionLabel"),
+            round2Sentence: document.getElementById("round2Sentence"),
+            round2Score: document.getElementById("round2Score"),
+            round2Total: document.getElementById("round2Total"),
+            round2Feedback: document.getElementById("round2Feedback"),
+            round2StartBtn: document.getElementById("round2StartBtn"),
+            round2Complete: document.getElementById("round2Complete"),
+            round2ResultText: document.getElementById("round2ResultText"),
+            timeNumber: document.getElementById("timeNumber"),
+            timerFill: document.getElementById("timerFill"),
+            round3SentenceCard: document.querySelector("#round3Page .sentence-card"),
+            round3Context: document.getElementById("round3Context"),
+            round3QuestionLabel: document.getElementById("round3QuestionLabel"),
+            round3Sentence: document.getElementById("round3Sentence"),
+            round3Choices: document.getElementById("round3Choices"),
+            round3Score: document.getElementById("round3Score"),
+            round3Total: document.getElementById("round3Total"),
+            round3Feedback: document.getElementById("round3Feedback"),
+            finalPanel: document.getElementById("finalPanel"),
+            finalRound2: document.getElementById("finalRound2"),
+            finalRound3: document.getElementById("finalRound3"),
+            transitionOverlay: document.getElementById("transitionOverlay"),
+            transitionTitle: document.getElementById("transitionTitle"),
+            transitionText: document.getElementById("transitionText"),
+            transitionCount: document.getElementById("transitionCount"),
+            transitionButton: document.getElementById("transitionButton")
+        };
+
+        function iconRefresh() {
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            })[char]);
+        }
+
+        function resetReaction(element) {
+            element.classList.remove("is-correct", "is-wrong");
+        }
+
+        function markReaction(element, isCorrect) {
+            resetReaction(element);
+            void element.offsetWidth;
+            element.classList.add(isCorrect ? "is-correct" : "is-wrong");
+        }
+
+        function renderAnswerFeedback({ element, isCorrect, timeout = false, selectedText, correctText, clue }) {
+            const statusClass = timeout ? "timeout" : (isCorrect ? "good" : "bad");
+            const statusText = timeout ? "시간 초과" : (isCorrect ? "정답" : "오답");
+            const icon = timeout ? "timer" : (isCorrect ? "check-circle-2" : "x-circle");
+
+            element.className = `feedback ${statusClass} is-live`;
+            element.innerHTML = `
+                <div class="feedback-head">
+                    <span class="reaction-badge ${statusClass}"><i data-lucide="${icon}" class="icon"></i>${statusText}</span>
+                    <span class="next-chip">곧 다음</span>
+                </div>
+                <div class="answer-compare">
+                    <div class="answer-pill selected ${statusClass}">
+                        <b>선택</b>
+                        <span>${escapeHtml(selectedText)}</span>
+                    </div>
+                    <div class="answer-pill correct">
+                        <b>정답</b>
+                        <span>${escapeHtml(correctText)}</span>
+                    </div>
+                </div>
+                <p class="feedback-clue">${escapeHtml(clue)}</p>
+                <div class="inline-next-bar" aria-hidden="true"><span></span></div>
+            `;
+            iconRefresh();
+        }
+
+        function queueAutoAdvance(onDone, delay = 1850) {
+            clearTransitionTimer();
+            state.transition.action = onDone;
+            state.transition.timer = setTimeout(() => {
+                const action = state.transition.action;
+                state.transition.timer = null;
+                state.transition.action = null;
+                if (action) action();
+            }, delay);
+        }
+
+        function clearTransitionTimer() {
+            if (state.transition.timer) {
+                clearInterval(state.transition.timer);
+                clearTimeout(state.transition.timer);
+                state.transition.timer = null;
+            }
+        }
+
+        function hideTransition() {
+            clearTransitionTimer();
+            state.transition.action = null;
+            refs.transitionOverlay.hidden = true;
+            refs.transitionButton.onclick = null;
+        }
+
+        function setTransitionIcon(iconName) {
+            const iconBox = document.querySelector(".transition-icon");
+            iconBox.innerHTML = `<i data-lucide="${iconName}" class="icon"></i>`;
+            iconRefresh();
+        }
+
+        function showStageTransition({ title, text = "", buttonText = "다음", icon = "arrow-right", onNext }) {
+            clearTransitionTimer();
+            state.transition.action = onNext;
+            refs.transitionTitle.textContent = title;
+            refs.transitionText.textContent = text;
+            refs.transitionText.hidden = !text;
+            refs.transitionCount.hidden = true;
+            refs.transitionButton.hidden = false;
+            refs.transitionButton.innerHTML = `${buttonText} <i data-lucide="arrow-right" class="icon"></i>`;
+            refs.transitionButton.onclick = () => {
+                const action = state.transition.action;
+                hideTransition();
+                if (action) action();
+            };
+            setTransitionIcon(icon);
+            refs.transitionOverlay.hidden = false;
+        }
+
+        function showAutoTransition({ seconds = 2, onDone }) {
+            queueAutoAdvance(onDone, Math.max(500, seconds * 1000 - 150));
+        }
+
+        function clearRound2Timer() {
+            if (state.round2.timer) {
+                clearInterval(state.round2.timer);
+                state.round2.timer = null;
+            }
+        }
+
+        function resetTimerDisplay() {
+            refs.timeNumber.textContent = "7.0";
+            refs.timeNumber.classList.remove("is-low");
+            refs.timerFill.style.width = "100%";
+            refs.timerFill.classList.remove("is-low");
+        }
+
+        function updateTimer() {
+            const elapsed = (performance.now() - state.round2.questionStartedAt) / 1000;
+            const remaining = Math.max(0, 7 - elapsed);
+            const percent = (remaining / 7) * 100;
+            refs.timeNumber.textContent = remaining.toFixed(1);
+            refs.timerFill.style.width = `${percent}%`;
+            refs.timeNumber.classList.toggle("is-low", remaining <= 2);
+            refs.timerFill.classList.toggle("is-low", remaining <= 2);
+            if (remaining <= 0) answerRound2(null);
+        }
+
+        function startTimer() {
+            clearRound2Timer();
+            state.round2.questionStartedAt = performance.now();
+            updateTimer();
+            state.round2.timer = setInterval(updateTimer, 80);
+        }
+
+        function resetRound2(clearCompletion = true) {
+            hideTransition();
+            clearRound2Timer();
+            state.round2.index = 0;
+            state.round2.score = 0;
+            state.round2.started = false;
+            state.round2.answered = false;
+            if (clearCompletion) {
+                state.completed.round2 = false;
+                state.completed.round3 = false;
+            }
+            refs.round2Score.textContent = "0";
+            refs.round2Total.textContent = String(round2Questions.length);
+            refs.round2QuestionLabel.textContent = "대기";
+            refs.round2Sentence.textContent = "시작 버튼을 누르세요.";
+            refs.round2Feedback.className = "feedback";
+            refs.round2Feedback.textContent = "대기";
+            resetReaction(refs.round2SentenceCard);
+            refs.round2Complete.hidden = true;
+            refs.round2StartBtn.disabled = false;
+            refs.round2StartBtn.hidden = false;
+            resetTimerDisplay();
+            document.querySelectorAll("[data-round2-answer]").forEach((button) => {
+                button.disabled = true;
+                button.classList.remove("is-correct", "is-wrong", "is-selected", "is-dimmed");
+            });
+            updateStepper();
+            updateGuide();
+        }
+
+        function startRound2() {
+            resetRound2(true);
+            state.round2.started = true;
+            refs.round2StartBtn.hidden = true;
+            showRound2Question();
+        }
+
+        function showRound2Question() {
+            const question = round2Questions[state.round2.index];
+            state.round2.answered = false;
+            refs.round2QuestionLabel.textContent = `${state.round2.index + 1} / ${round2Questions.length}`;
+            refs.round2Sentence.textContent = question.sentence;
+            refs.round2Feedback.className = "feedback";
+            refs.round2Feedback.textContent = "선택";
+            resetReaction(refs.round2SentenceCard);
+            document.querySelectorAll("[data-round2-answer]").forEach((button) => {
+                button.disabled = false;
+                button.classList.remove("is-correct", "is-wrong", "is-selected", "is-dimmed");
+            });
+            resetTimerDisplay();
+            startTimer();
+            updateGuide();
+        }
+
+        function answerRound2(answer) {
+            if (!state.round2.started || state.round2.answered) return;
+            state.round2.answered = true;
+            clearRound2Timer();
+
+            const question = round2Questions[state.round2.index];
+            const isCorrect = answer === question.answer;
+            if (isCorrect) state.round2.score += 1;
+            refs.round2Score.textContent = String(state.round2.score);
+
+            document.querySelectorAll("[data-round2-answer]").forEach((button) => {
+                button.disabled = true;
+                const value = button.dataset.round2Answer;
+                button.classList.remove("is-correct", "is-wrong", "is-selected", "is-dimmed");
+                if (answer && value === answer) button.classList.add("is-selected");
+                if (value === question.answer) button.classList.add("is-correct");
+                if (answer && value === answer && !isCorrect) button.classList.add("is-wrong");
+                if (value !== question.answer && value !== answer) button.classList.add("is-dimmed");
+            });
+
+            markReaction(refs.round2SentenceCard, isCorrect);
+            renderAnswerFeedback({
+                element: refs.round2Feedback,
+                isCorrect,
+                timeout: answer === null,
+                selectedText: answer === null ? "선택 없음" : `${tenseMeta[answer].label} · ${tenseMeta[answer].pattern}`,
+                correctText: `${tenseMeta[question.answer].label} · ${tenseMeta[question.answer].pattern}`,
+                clue: question.clue
+            });
+
+            updateGuide();
+            queueAutoAdvance(nextRound2);
+            iconRefresh();
+        }
+
+        function nextRound2() {
+            if (!state.round2.answered) return;
+            if (state.round2.index < round2Questions.length - 1) {
+                state.round2.index += 1;
+                showRound2Question();
+            } else {
+                finishRound2();
+            }
+        }
+
+        function finishRound2() {
+            clearRound2Timer();
+            state.round2.started = false;
+            state.completed.round2 = true;
+            refs.round2Complete.hidden = false;
+            refs.round2StartBtn.hidden = false;
+            refs.round2StartBtn.disabled = false;
+            refs.round2ResultText.textContent = `${state.round2.score}/${round2Questions.length}`;
+            refs.round2QuestionLabel.textContent = "완료";
+            refs.round2Sentence.textContent = "2차 완료";
+            resetReaction(refs.round2SentenceCard);
+            refs.round2Feedback.className = "feedback good";
+            refs.round2Feedback.innerHTML = `<div class="feedback-head"><span class="reaction-badge good"><i data-lucide="check-circle-2" class="icon"></i>완료</span><span class="next-chip">3차 시작</span></div>`;
+            document.querySelectorAll("[data-round2-answer]").forEach((button) => {
+                button.disabled = true;
+                button.classList.remove("is-correct", "is-wrong", "is-selected", "is-dimmed");
+            });
+            resetTimerDisplay();
+            updateStepper();
+            updateGuide();
+            showStageTransition({
+                title: "3차 시작",
+                buttonText: "3차 시작",
+                icon: "arrow-right",
+                onNext: () => {
+                    if (!state.completed.round3) resetRound3(false);
+                    switchRound(3);
+                }
+            });
+            iconRefresh();
+        }
+
+        function resetRound3(clearCompletion = true) {
+            hideTransition();
+            state.round3.index = 0;
+            state.round3.score = 0;
+            state.round3.answered = false;
+            if (clearCompletion) state.completed.round3 = false;
+            refs.round3Score.textContent = "0";
+            refs.round3Total.textContent = String(round3Questions.length);
+            refs.round3Feedback.className = "feedback";
+            refs.round3Feedback.textContent = "대기";
+            resetReaction(refs.round3SentenceCard);
+            refs.finalPanel.hidden = true;
+            showRound3Question();
+            updateStepper();
+            updateGuide();
+            iconRefresh();
+        }
+
+        function showRound3Question() {
+            const question = round3Questions[state.round3.index];
+            state.round3.answered = false;
+            refs.round3Context.textContent = `시간 단서: ${question.context}`;
+            refs.round3QuestionLabel.textContent = `${state.round3.index + 1} / ${round3Questions.length}`;
+            refs.round3Sentence.innerHTML = escapeHtml(question.sentence).replace("____", `<span class="blank">____</span>`);
+            refs.round3Choices.innerHTML = ["past", "present", "future"].map((tense) => `
+                <button class="choice-btn" type="button" data-round3-answer="${tense}">
+                    <strong>${escapeHtml(question.choices[tense])}</strong>
+                    <span>${tenseMeta[tense].label}형 · ${tenseMeta[tense].pattern}</span>
+                </button>
+            `).join("");
+            refs.round3Choices.querySelectorAll("[data-round3-answer]").forEach((button) => {
+                button.addEventListener("click", () => answerRound3(button.dataset.round3Answer));
+            });
+            refs.round3Feedback.className = "feedback";
+            refs.round3Feedback.textContent = "선택";
+            resetReaction(refs.round3SentenceCard);
+            iconRefresh();
+        }
+
+        function answerRound3(answer) {
+            if (state.round3.answered) return;
+            state.round3.answered = true;
+            const question = round3Questions[state.round3.index];
+            const isCorrect = answer === question.answer;
+            if (isCorrect) state.round3.score += 1;
+            refs.round3Score.textContent = String(state.round3.score);
+
+            refs.round3Choices.querySelectorAll("[data-round3-answer]").forEach((button) => {
+                const value = button.dataset.round3Answer;
+                button.disabled = true;
+                button.classList.remove("is-correct", "is-wrong", "is-selected", "is-dimmed");
+                if (value === answer) button.classList.add("is-selected");
+                if (value === question.answer) button.classList.add("is-correct");
+                if (value === answer && !isCorrect) button.classList.add("is-wrong");
+                if (value !== question.answer && value !== answer) button.classList.add("is-dimmed");
+            });
+
+            markReaction(refs.round3SentenceCard, isCorrect);
+            renderAnswerFeedback({
+                element: refs.round3Feedback,
+                isCorrect,
+                selectedText: `${question.choices[answer]} · ${tenseMeta[answer].label}`,
+                correctText: `${question.choices[question.answer]} · ${tenseMeta[question.answer].label}`,
+                clue: question.clue
+            });
+            updateGuide();
+            queueAutoAdvance(nextRound3);
+        }
+
+        function nextRound3() {
+            if (!state.round3.answered) return;
+            if (state.round3.index < round3Questions.length - 1) {
+                state.round3.index += 1;
+                showRound3Question();
+            } else {
+                finishRound3();
+            }
+            updateGuide();
+        }
+
+        function finishRound3() {
+            state.completed.round3 = true;
+            refs.finalPanel.hidden = false;
+            refs.finalRound2.textContent = `${state.round2.score}/${round2Questions.length}`;
+            refs.finalRound3.textContent = `${state.round3.score}/${round3Questions.length}`;
+            updateStepper();
+            updateGuide();
+            iconRefresh();
+        }
+
+        function switchRound(round) {
+            const canOpenRound3 = state.completed.round2;
+            if (round === 3 && !canOpenRound3) {
+                updateGuide();
+                return;
+            }
+            if (state.activeRound === 2 && round !== 2) clearRound2Timer();
+            state.activeRound = round;
+            refs.pages.forEach((page, index) => {
+                page.hidden = index + 2 !== round;
+            });
+            if (round === 3 && !state.completed.round3 && !state.round3.answered) {
+                showRound3Question();
+            }
+            updateStepper();
+            updateGuide();
+            iconRefresh();
+        }
+
+        function updateStepper() {
+            refs.roundTabs.forEach((tab) => {
+                const round = Number(tab.dataset.roundTarget);
+                tab.classList.toggle("is-active", state.activeRound === round);
+                tab.classList.toggle("is-complete", state.completed[`round${round}`]);
+                const locked = round === 3 && !state.completed.round2;
+                tab.classList.toggle("is-locked", locked);
+                tab.setAttribute("aria-disabled", locked ? "true" : "false");
+            });
+        }
+
+        function updateGuide() {
+            let title = "";
+            let text = "";
+            let label = "";
+            let count = "";
+            let percent = 0;
+
+            if (state.activeRound === 2) {
+                label = "2차 진행률";
+                count = `${Math.min(state.round2.index + (state.round2.answered ? 1 : 0), round2Questions.length)}/${round2Questions.length}`;
+                percent = Math.min(100, ((state.round2.index + (state.round2.answered ? 1 : 0)) / round2Questions.length) * 100);
+                if (state.completed.round2) {
+                    title = "3차 시작";
+                    text = "버튼을 누르세요.";
+                    count = `${round2Questions.length}/${round2Questions.length}`;
+                    percent = 100;
+                } else if (!state.round2.started) {
+                    title = "시작";
+                    text = "7초";
+                    count = `0/${round2Questions.length}`;
+                    percent = 0;
+                } else if (state.round2.answered) {
+                    title = "피드백";
+                    text = "곧 다음";
+                } else {
+                    title = "선택";
+                    text = "과거 · 현재 · 미래";
+                }
+            } else {
+                label = "3차 진행률";
+                count = `${Math.min(state.round3.index + (state.round3.answered ? 1 : 0), round3Questions.length)}/${round3Questions.length}`;
+                percent = Math.min(100, ((state.round3.index + (state.round3.answered ? 1 : 0)) / round3Questions.length) * 100);
+                if (state.completed.round3) {
+                    title = "완료";
+                    text = "";
+                    count = `${round3Questions.length}/${round3Questions.length}`;
+                    percent = 100;
+                } else if (state.round3.answered) {
+                    title = "피드백";
+                    text = "곧 다음";
+                } else {
+                    title = "빈칸 선택";
+                    text = "시간 단서 보기";
+                }
+            }
+
+            refs.guideTitle.textContent = title;
+            refs.guideText.textContent = text;
+            refs.guideText.hidden = !text;
+            refs.progressLabel.textContent = label;
+            refs.progressCount.textContent = count;
+            refs.progressFill.style.width = `${percent}%`;
+        }
+
+        function bindEvents() {
+            refs.roundTabs.forEach((tab) => {
+                tab.addEventListener("click", () => switchRound(Number(tab.dataset.roundTarget)));
+            });
+            refs.round2StartBtn.addEventListener("click", startRound2);
+            document.querySelectorAll("[data-round2-answer]").forEach((button) => {
+                button.addEventListener("click", () => answerRound2(button.dataset.round2Answer));
+            });
+            document.getElementById("round2RestartBtn").addEventListener("click", () => {
+                resetRound2(true);
+                startRound2();
+            });
+            document.getElementById("round3RestartBtn").addEventListener("click", () => resetRound3(true));
+            document.getElementById("resetAllBtn").addEventListener("click", () => {
+                resetRound2(true);
+                resetRound3(false);
+                switchRound(2);
+            });
+        }
+
+        function init() {
+            refs.round2Total.textContent = String(round2Questions.length);
+            refs.round3Total.textContent = String(round3Questions.length);
+            resetRound2(false);
+            resetRound3(false);
+            switchRound(2);
+            bindEvents();
+            iconRefresh();
+        }
+
+        init();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

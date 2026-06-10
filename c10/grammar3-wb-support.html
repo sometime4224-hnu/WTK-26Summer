@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>과거·현재·미래 1차</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --bg: #f6f8fb;
+            --panel: #fff;
+            --ink: #142033;
+            --muted: #5d697c;
+            --line: #d8e1ee;
+            --past: #b45309;
+            --past-soft: #fff7ed;
+            --present: #2563eb;
+            --present-soft: #eff6ff;
+            --future: #7c3aed;
+            --future-soft: #f5f3ff;
+            --accent: #0f766e;
+            --accent-soft: #ecfdf5;
+            --shadow: 0 14px 28px rgba(15, 23, 42, 0.07);
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            background: var(--bg);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+            letter-spacing: 0;
+        }
+
+        button { font: inherit; cursor: pointer; }
+        button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 52px;
+            padding: 8px 14px;
+            border-bottom: 1px solid rgba(216, 225, 238, 0.92);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            overflow-x: auto;
+        }
+
+        .topbar a,
+        .topbar strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            white-space: nowrap;
+            color: #1d4ed8;
+            font-size: 0.82rem;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .topbar strong { color: #334155; }
+        .topbar span { color: #cbd5e1; }
+
+        .icon {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 auto;
+            stroke-width: 2.4;
+        }
+
+        .shell {
+            width: min(1280px, calc(100% - 28px));
+            margin: 16px auto 36px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .unit-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: end;
+        }
+
+        h1,
+        h2,
+        h3,
+        p { margin-top: 0; }
+
+        h1 {
+            margin-bottom: 0;
+            font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+            line-height: 1.08;
+        }
+
+        h2 {
+            margin-bottom: 8px;
+            font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+            line-height: 1.22;
+        }
+
+        h3 { margin-bottom: 4px; font-size: 1rem; }
+
+        .head-actions,
+        .round-footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .btn,
+        .round-tab,
+        .base-card {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: #334155;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .btn {
+            min-height: 40px;
+            padding: 8px 11px;
+            font-size: 0.88rem;
+        }
+
+        .btn.primary {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn.ghost { background: #f8fafc; }
+
+        .btn:hover,
+        .btn:focus-visible,
+        .round-tab:hover,
+        .round-tab:focus-visible,
+        .base-card:hover,
+        .base-card:focus-visible {
+            border-color: #93c5fd;
+            background: #eff6ff;
+            outline: none;
+        }
+
+        .round-tabs {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .round-tab {
+            min-height: 72px;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        .round-tab b {
+            font-size: 0.96rem;
+            line-height: 1.25;
+        }
+
+        .round-tab span {
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 850;
+            line-height: 1.35;
+        }
+
+        .round-tab.is-active {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: #064e3b;
+        }
+
+        .guide-card,
+        .activity-page,
+        .complete-box {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .guide-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
+            padding: 14px;
+        }
+
+        .guide-copy h2 {
+            margin-bottom: 4px;
+            font-size: 1.08rem;
+        }
+
+        .guide-copy p {
+            margin-bottom: 0;
+            color: #475569;
+            font-size: 0.94rem;
+            font-weight: 800;
+            line-height: 1.55;
+        }
+
+        .guide-metric {
+            display: grid;
+            gap: 7px;
+            width: min(280px, 32vw);
+            min-width: 210px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            color: #334155;
+            font-size: 0.78rem;
+            font-weight: 950;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 10px;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #f1f5f9;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.25s ease;
+        }
+
+        .activity-page {
+            display: grid;
+            gap: 14px;
+            padding: 14px;
+        }
+
+        .activity-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 36px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 7px 10px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.82rem;
+            font-weight: 950;
+        }
+
+        .coach-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 10px 12px;
+            background: #eff6ff;
+            color: #1e3a8a;
+            font-size: 0.91rem;
+            font-weight: 880;
+            line-height: 1.45;
+        }
+
+        .interaction-state {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .state-token {
+            display: grid;
+            gap: 3px;
+            min-height: 58px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 9px 10px;
+            background: #fff;
+            color: #475569;
+        }
+
+        .state-token b {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #1f2937;
+            font-size: 0.82rem;
+            line-height: 1.25;
+        }
+
+        .state-token span {
+            font-size: 0.76rem;
+            font-weight: 850;
+            line-height: 1.35;
+        }
+
+        .state-token.is-active {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: #065f46;
+        }
+
+        .state-token.is-active b { color: #064e3b; }
+        .state-token.is-waiting { background: #f8fafc; }
+        .state-token.is-dragging {
+            border-color: var(--present);
+            background: var(--present-soft);
+            color: #1d4ed8;
+        }
+
+        .base-bank {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 9px;
+            padding: 12px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .base-card {
+            position: relative;
+            justify-content: flex-start;
+            min-height: 62px;
+            padding: 10px 11px;
+            text-align: left;
+            line-height: 1.35;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .base-card.is-selected {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: #064e3b;
+            box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.14);
+        }
+
+        .base-card small {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.73rem;
+            font-weight: 850;
+        }
+
+        .base-card > span {
+            display: block;
+            word-break: keep-all;
+        }
+
+        .select-badge {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            display: none;
+            border-radius: 8px;
+            padding: 3px 6px;
+            background: #ccfbf1;
+            color: #0f766e;
+            font-size: 0.68rem;
+            font-weight: 950;
+        }
+
+        .base-card.is-selected .select-badge { display: inline-flex; }
+        .base-card.is-touch-dragging { opacity: 0.62; }
+
+        .drag-ghost {
+            position: fixed;
+            z-index: 1000;
+            width: min(280px, 72vw);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 11px 12px;
+            background: #fff;
+            color: #064e3b;
+            box-shadow: 0 18px 34px rgba(15, 23, 42, 0.2);
+            font-size: 0.93rem;
+            font-weight: 950;
+            line-height: 1.35;
+        }
+
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .drop-zone {
+            display: grid;
+            grid-template-rows: auto auto auto 1fr;
+            min-height: 268px;
+            border: 2px dashed var(--line);
+            border-radius: 8px;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .drop-zone.is-ready {
+            border-color: #93c5fd;
+            background: #f8fbff;
+        }
+
+        .drop-zone.is-over {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            box-shadow: inset 0 0 0 2px rgba(15, 118, 110, 0.16);
+        }
+
+        .zone-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .zone-head strong {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 1.02rem;
+        }
+
+        .zone-head span {
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 900;
+        }
+
+        .zone-pattern,
+        .zone-hint {
+            margin: 10px 12px 0;
+            border-radius: 8px;
+            padding: 7px 9px;
+            font-size: 0.8rem;
+            font-weight: 950;
+        }
+
+        .zone-hint {
+            margin-top: 8px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 0.76rem;
+            line-height: 1.35;
+        }
+
+        .drop-zone.is-ready .zone-hint,
+        .drop-zone.is-over .zone-hint {
+            border-color: #99f6e4;
+            background: #f0fdfa;
+            color: #0f766e;
+        }
+
+        .drop-zone[data-tense="past"] .zone-pattern {
+            background: var(--past-soft);
+            color: var(--past);
+        }
+
+        .drop-zone[data-tense="present"] .zone-pattern {
+            background: var(--present-soft);
+            color: var(--present);
+        }
+
+        .drop-zone[data-tense="future"] .zone-pattern {
+            background: var(--future-soft);
+            color: var(--future);
+        }
+
+        .placed-list {
+            display: grid;
+            gap: 8px;
+            align-content: start;
+            min-height: 130px;
+            margin: 0;
+            padding: 12px;
+            list-style: none;
+        }
+
+        .placed-list:empty::before {
+            content: "여기에 문장을 놓으세요";
+            display: grid;
+            place-items: center;
+            min-height: 112px;
+            border: 1px dashed #dbe4ef;
+            border-radius: 8px;
+            color: #94a3b8;
+            font-size: 0.86rem;
+            font-weight: 900;
+        }
+
+        .placed-card {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 9px 10px;
+            background: #fff;
+            color: #1f2937;
+            font-size: 0.9rem;
+            font-weight: 880;
+            line-height: 1.4;
+        }
+
+        .placed-card mark {
+            border-radius: 6px;
+            padding: 0 4px;
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .complete-box {
+            display: grid;
+            gap: 8px;
+            padding: 14px;
+            background: var(--accent-soft);
+        }
+
+        .complete-box h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            color: #065f46;
+            font-size: 1.05rem;
+        }
+
+        .transition-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1001;
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            background: rgba(15, 23, 42, 0.34);
+            backdrop-filter: blur(4px);
+        }
+
+        .transition-card {
+            display: grid;
+            gap: 12px;
+            width: min(360px, calc(100vw - 36px));
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 22px;
+            background: #fff;
+            text-align: center;
+            box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
+        }
+
+        .transition-icon {
+            display: grid;
+            place-items: center;
+            width: 52px;
+            height: 52px;
+            justify-self: center;
+            border-radius: 8px;
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .transition-icon .icon {
+            width: 28px;
+            height: 28px;
+        }
+
+        .transition-card h2 {
+            margin: 0;
+            font-size: clamp(1.55rem, 5vw, 2.1rem);
+        }
+
+        @media (max-width: 900px) {
+            .unit-head,
+            .guide-card {
+                grid-template-columns: 1fr;
+            }
+
+            .head-actions { justify-content: flex-start; }
+            .guide-metric { width: 100%; min-width: 0; }
+            .timeline,
+            .interaction-state { grid-template-columns: 1fr; }
+            .drop-zone { min-height: 220px; }
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                width: min(100% - 20px, 1280px);
+                margin-top: 10px;
+            }
+
+            .round-tabs { grid-template-columns: 1fr; }
+            .activity-page { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i data-lucide="home" class="icon"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html"><i data-lucide="folder-open" class="icon"></i> 10과 목록</a>
+        <span>|</span>
+        <a href="grammar3.html"><i data-lucide="book-open" class="icon"></i> 문법 3</a>
+        <span>|</span>
+        <strong>1차</strong>
+    </nav>
+
+    <main class="shell">
+        <header class="unit-head">
+            <div>
+                <h1>과거 · 현재 · 미래</h1>
+            </div>
+            <div class="head-actions">
+                <button class="btn ghost" id="resetAllBtn" type="button"><i data-lucide="rotate-ccw" class="icon"></i> 처음부터</button>
+                <a class="btn" href="grammar3.html"><i data-lucide="arrow-left" class="icon"></i> 문법 3</a>
+            </div>
+        </header>
+
+        <nav class="round-tabs" aria-label="1단계 활동 순서">
+            <button class="round-tab is-active" type="button">
+                <b>1차</b>
+                <span>카드 → 시간축</span>
+            </button>
+            <a class="round-tab" href="grammar3-wb-support-quiz.html">
+                <b>2·3차</b>
+                <span>7초 선택 · 빈칸 선택</span>
+            </a>
+        </nav>
+
+        <aside class="guide-card" aria-live="polite">
+            <div class="guide-copy">
+                <h2 id="guideTitle">카드 선택</h2>
+                <p id="guideText">카드를 누르거나 끌어 놓으세요.</p>
+            </div>
+            <div class="guide-metric" aria-label="현재 진행률">
+                <div class="metric-row">
+                    <span>1차 진행률</span>
+                    <span id="progressCount">0/9</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="activity-page" aria-label="1차 변신 시간축">
+            <div class="activity-head">
+                <div>
+                    <h2>카드 → 시간축</h2>
+                </div>
+                <div class="score-pill"><i data-lucide="sparkles" class="icon"></i> 변환 <span id="round1Count">0</span>/9</div>
+            </div>
+
+            <div class="coach-line" id="round1Guide"><i data-lucide="hand" class="icon"></i> 카드 선택 → 시간축 선택</div>
+            <div class="interaction-state" aria-label="현재 조작 상태">
+                <div class="state-token is-active" id="pickState">
+                    <b><i data-lucide="mouse-pointer-2" class="icon"></i> 카드</b>
+                    <span>누르기</span>
+                </div>
+                <div class="state-token is-waiting" id="moveState">
+                    <b><i data-lucide="move" class="icon"></i> 이동</b>
+                    <span>다시 누르기 또는 끌기</span>
+                </div>
+                <div class="state-token is-waiting" id="dropState">
+                    <b><i data-lucide="map-pin" class="icon"></i> 시간축</b>
+                    <span>과거 · 현재 · 미래</span>
+                </div>
+            </div>
+
+            <div class="base-bank" id="baseBank" aria-label="기본형 문장 카드"></div>
+
+            <div class="timeline" aria-label="과거 현재 미래 시간축">
+                <section class="drop-zone" data-tense="past" aria-label="과거 시간축">
+                    <div class="zone-head">
+                        <strong><i data-lucide="history" class="icon"></i> 과거</strong>
+                        <span id="pastCount">0개</span>
+                    </div>
+                    <div class="zone-pattern">-았/었어요</div>
+                    <div class="zone-hint" id="pastHint">카드 선택</div>
+                    <ul class="placed-list" id="pastList"></ul>
+                </section>
+                <section class="drop-zone" data-tense="present" aria-label="현재 시간축">
+                    <div class="zone-head">
+                        <strong><i data-lucide="activity" class="icon"></i> 현재</strong>
+                        <span id="presentCount">0개</span>
+                    </div>
+                    <div class="zone-pattern">-고 있어요</div>
+                    <div class="zone-hint" id="presentHint">카드 선택</div>
+                    <ul class="placed-list" id="presentList"></ul>
+                </section>
+                <section class="drop-zone" data-tense="future" aria-label="미래 시간축">
+                    <div class="zone-head">
+                        <strong><i data-lucide="calendar-days" class="icon"></i> 미래</strong>
+                        <span id="futureCount">0개</span>
+                    </div>
+                    <div class="zone-pattern">-(으)ㄹ 거예요</div>
+                    <div class="zone-hint" id="futureHint">카드 선택</div>
+                    <ul class="placed-list" id="futureList"></ul>
+                </section>
+            </div>
+
+            <div class="complete-box" id="round1Complete" hidden>
+                <h3><i data-lucide="check-circle-2" class="icon"></i> 1차 완료</h3>
+            </div>
+
+            <div class="round-footer">
+                <button class="btn ghost" id="round1ClearBtn" type="button"><i data-lucide="eraser" class="icon"></i> 1차 지우기</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="transition-overlay" id="transitionOverlay" hidden aria-live="polite">
+        <div class="transition-card" role="status">
+            <div class="transition-icon"><i data-lucide="arrow-right" class="icon"></i></div>
+            <h2>2차 시작</h2>
+            <button class="btn primary" id="transitionButton" type="button">2차 시작 <i data-lucide="arrow-right" class="icon"></i></button>
+        </div>
+    </div>
+
+    <script>
+        const tenseMeta = {
+            past: { label: "과거", pattern: "-았/었어요" },
+            present: { label: "현재", pattern: "-고 있어요" },
+            future: { label: "미래", pattern: "-(으)ㄹ 거예요" }
+        };
+
+        const baseCards = [
+            {
+                id: "eat",
+                base: "저는 아침을 먹다",
+                verb: "먹다",
+                forms: {
+                    past: "저는 아침을 먹었어요.",
+                    present: "저는 아침을 먹고 있어요.",
+                    future: "저는 아침을 먹을 거예요."
+                }
+            },
+            {
+                id: "read",
+                base: "동생이 책을 읽다",
+                verb: "읽다",
+                forms: {
+                    past: "동생이 책을 읽었어요.",
+                    present: "동생이 책을 읽고 있어요.",
+                    future: "동생이 책을 읽을 거예요."
+                }
+            },
+            {
+                id: "exercise",
+                base: "친구가 운동하다",
+                verb: "운동하다",
+                forms: {
+                    past: "친구가 운동했어요.",
+                    present: "친구가 운동하고 있어요.",
+                    future: "친구가 운동할 거예요."
+                }
+            },
+            {
+                id: "explain",
+                base: "선생님이 설명하다",
+                verb: "설명하다",
+                forms: {
+                    past: "선생님이 설명했어요.",
+                    present: "선생님이 설명하고 있어요.",
+                    future: "선생님이 설명할 거예요."
+                }
+            },
+            {
+                id: "takePhoto",
+                base: "저는 사진을 찍다",
+                verb: "찍다",
+                forms: {
+                    past: "저는 사진을 찍었어요.",
+                    present: "저는 사진을 찍고 있어요.",
+                    future: "저는 사진을 찍을 거예요."
+                }
+            },
+            {
+                id: "close",
+                base: "민수가 문을 닫다",
+                verb: "닫다",
+                forms: {
+                    past: "민수가 문을 닫았어요.",
+                    present: "민수가 문을 닫고 있어요.",
+                    future: "민수가 문을 닫을 거예요."
+                }
+            }
+        ];
+
+        const state = {
+            selectedId: null,
+            advanceShown: false,
+            drag: null,
+            combos: new Set(),
+            placements: { past: [], present: [], future: [] }
+        };
+
+        const refs = {
+            baseBank: document.getElementById("baseBank"),
+            guideTitle: document.getElementById("guideTitle"),
+            guideText: document.getElementById("guideText"),
+            progressCount: document.getElementById("progressCount"),
+            progressFill: document.getElementById("progressFill"),
+            round1Guide: document.getElementById("round1Guide"),
+            pickState: document.getElementById("pickState"),
+            moveState: document.getElementById("moveState"),
+            dropState: document.getElementById("dropState"),
+            round1Count: document.getElementById("round1Count"),
+            round1Complete: document.getElementById("round1Complete"),
+            transitionOverlay: document.getElementById("transitionOverlay"),
+            transitionButton: document.getElementById("transitionButton")
+        };
+
+        function iconRefresh() {
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            })[char]);
+        }
+
+        function renderSentenceWithMark(sentence, word) {
+            const safeSentence = escapeHtml(sentence);
+            const safeWord = escapeHtml(word);
+            return safeSentence.replace(safeWord, `<mark>${safeWord}</mark>`);
+        }
+
+        function getTotal() {
+            return state.combos.size;
+        }
+
+        function getCounts() {
+            return {
+                past: state.placements.past.length,
+                present: state.placements.present.length,
+                future: state.placements.future.length
+            };
+        }
+
+        function setStateToken(element, mode, title, text, icon) {
+            element.className = `state-token ${mode}`;
+            element.innerHTML = `
+                <b><i data-lucide="${icon}" class="icon"></i> ${title}</b>
+                <span>${text}</span>
+            `;
+        }
+
+        function selectedCard() {
+            return baseCards.find((item) => item.id === state.selectedId) || null;
+        }
+
+        function markSelectedCard(cardId) {
+            state.selectedId = cardId;
+            refs.baseBank.querySelectorAll(".base-card").forEach((button) => {
+                const isSelected = button.dataset.cardId === cardId;
+                button.classList.toggle("is-selected", isSelected);
+                button.setAttribute("aria-pressed", isSelected ? "true" : "false");
+            });
+            updateInteractionState();
+            iconRefresh();
+        }
+
+        function updateInteractionState() {
+            const card = selectedCard();
+            const drag = state.drag;
+            const isComplete = checkComplete();
+
+            if (isComplete) {
+                setStateToken(refs.pickState, "is-active", "완료", "1차", "check-circle-2");
+                setStateToken(refs.moveState, "is-active", "다음", "2차 시작", "arrow-right");
+                setStateToken(refs.dropState, "is-active", "7초", "선택", "timer");
+            } else if (drag && drag.moved) {
+                setStateToken(refs.pickState, "is-active", "이동 중", card ? card.base : "선택한 카드", "hand");
+                setStateToken(refs.moveState, "is-dragging", "드래그 중", "카드를 시간축 위로 옮기세요.", "move");
+                setStateToken(refs.dropState, drag.currentTense ? "is-active" : "is-waiting", "놓기", drag.currentTense ? tenseMeta[drag.currentTense].label : "시간축", "map-pin");
+            } else if (card) {
+                setStateToken(refs.pickState, "is-active", "선택됨", card.base, "check");
+                setStateToken(refs.moveState, "is-active", "이동", "터치 또는 드래그", "move");
+                setStateToken(refs.dropState, "is-active", "시간축", "과거 · 현재 · 미래", "map-pin");
+            } else {
+                setStateToken(refs.pickState, "is-active", "카드", "누르기", "mouse-pointer-2");
+                setStateToken(refs.moveState, "is-waiting", "이동", "터치 또는 드래그", "move");
+                setStateToken(refs.dropState, "is-waiting", "시간축", "과거 · 현재 · 미래", "map-pin");
+            }
+
+            document.querySelectorAll(".drop-zone").forEach((zone) => {
+                const tense = zone.dataset.tense;
+                const hint = document.getElementById(`${tense}Hint`);
+                const comboExists = card ? state.combos.has(`${card.id}:${tense}`) : false;
+                zone.classList.toggle("is-ready", Boolean(card) && !isComplete);
+                if (drag && drag.moved) {
+                    hint.textContent = drag.currentTense === tense ? "여기에 놓기" : tenseMeta[tense].label;
+                } else if (!card) {
+                    hint.textContent = "카드 선택";
+                } else if (comboExists) {
+                    hint.textContent = "완료";
+                } else {
+                    hint.textContent = tenseMeta[tense].pattern;
+                }
+            });
+        }
+
+        function checkComplete() {
+            const counts = getCounts();
+            return getTotal() >= 9 && counts.past >= 2 && counts.present >= 2 && counts.future >= 2;
+        }
+
+        function renderBaseBank() {
+            refs.baseBank.innerHTML = baseCards.map((card) => `
+                <button class="base-card ${state.selectedId === card.id ? "is-selected" : ""}" type="button" draggable="false" data-card-id="${card.id}" aria-pressed="${state.selectedId === card.id ? "true" : "false"}">
+                    <span>${renderSentenceWithMark(card.base, card.verb)}</span>
+                    <small>기본형: ${escapeHtml(card.verb)}</small>
+                    <span class="select-badge">선택됨</span>
+                </button>
+            `).join("");
+
+            refs.baseBank.querySelectorAll(".base-card").forEach((button) => {
+                button.addEventListener("click", () => {
+                    markSelectedCard(button.dataset.cardId);
+                    renderRound();
+                });
+                button.addEventListener("pointerdown", startTouchDrag);
+                button.addEventListener("mousedown", startMouseDrag);
+            });
+        }
+
+        function createDragGhost(card, x, y) {
+            const ghost = document.createElement("div");
+            ghost.className = "drag-ghost";
+            ghost.textContent = card.base;
+            document.body.appendChild(ghost);
+            moveDragGhost(ghost, x, y);
+            return ghost;
+        }
+
+        function moveDragGhost(ghost, x, y) {
+            ghost.style.left = `${x}px`;
+            ghost.style.top = `${y}px`;
+        }
+
+        function dropZoneFromPoint(x, y) {
+            const element = document.elementFromPoint(x, y);
+            return element ? element.closest(".drop-zone") : null;
+        }
+
+        function setActiveDropZone(zone) {
+            document.querySelectorAll(".drop-zone").forEach((item) => item.classList.toggle("is-over", item === zone));
+            state.drag.currentTense = zone ? zone.dataset.tense : null;
+            updateInteractionState();
+            iconRefresh();
+        }
+
+        function startTouchDrag(event) {
+            if (event.pointerType === "mouse" || event.button !== 0 || event.isPrimary === false) return;
+            const cardId = event.currentTarget.dataset.cardId;
+            const card = baseCards.find((item) => item.id === cardId);
+            if (!card) return;
+
+            markSelectedCard(cardId);
+            state.drag = {
+                cardId,
+                pointerId: event.pointerId,
+                startX: event.clientX,
+                startY: event.clientY,
+                source: event.currentTarget,
+                ghost: null,
+                moved: false,
+                currentTense: null
+            };
+            event.currentTarget.setPointerCapture(event.pointerId);
+            event.currentTarget.addEventListener("pointermove", moveTouchDrag);
+            event.currentTarget.addEventListener("pointerup", endTouchDrag, { once: true });
+            event.currentTarget.addEventListener("pointercancel", cancelTouchDrag, { once: true });
+        }
+
+        function startMouseDrag(event) {
+            if (event.button !== 0 || state.drag) return;
+            const cardId = event.currentTarget.dataset.cardId;
+            const card = baseCards.find((item) => item.id === cardId);
+            if (!card) return;
+
+            markSelectedCard(cardId);
+            state.drag = {
+                cardId,
+                pointerId: null,
+                startX: event.clientX,
+                startY: event.clientY,
+                source: event.currentTarget,
+                ghost: null,
+                moved: false,
+                currentTense: null
+            };
+            document.addEventListener("mousemove", moveMouseDrag);
+            document.addEventListener("mouseup", endMouseDrag, { once: true });
+        }
+
+        function updateDragPosition(x, y, event) {
+            const drag = state.drag;
+            if (!drag) return;
+            const distance = Math.hypot(x - drag.startX, y - drag.startY);
+            if (!drag.moved && distance < 8) return;
+
+            event.preventDefault();
+            if (!drag.moved) {
+                const card = baseCards.find((item) => item.id === drag.cardId);
+                drag.moved = true;
+                drag.source.classList.add("is-touch-dragging");
+                drag.ghost = createDragGhost(card, x, y);
+                refs.round1Guide.innerHTML = `<i data-lucide="move" class="icon"></i> 시간축에 놓기`;
+                iconRefresh();
+            } else {
+                moveDragGhost(drag.ghost, x, y);
+            }
+
+            setActiveDropZone(dropZoneFromPoint(x, y));
+        }
+
+        function moveTouchDrag(event) {
+            const drag = state.drag;
+            if (!drag || drag.pointerId !== event.pointerId) return;
+            updateDragPosition(event.clientX, event.clientY, event);
+        }
+
+        function moveMouseDrag(event) {
+            updateDragPosition(event.clientX, event.clientY, event);
+        }
+
+        function endTouchDrag(event) {
+            const drag = state.drag;
+            if (!drag || drag.pointerId !== event.pointerId) return;
+            const targetZone = drag.moved ? dropZoneFromPoint(event.clientX, event.clientY) : null;
+            const shouldPlace = Boolean(drag.moved && targetZone);
+            cleanupDrag();
+            if (shouldPlace) addPlacement(drag.cardId, targetZone.dataset.tense);
+            else renderRound();
+        }
+
+        function cancelTouchDrag() {
+            cleanupDrag();
+            renderRound();
+        }
+
+        function endMouseDrag(event) {
+            const drag = state.drag;
+            if (!drag || drag.pointerId !== null) return;
+            const targetZone = drag.moved ? dropZoneFromPoint(event.clientX, event.clientY) : null;
+            const shouldPlace = Boolean(drag.moved && targetZone);
+            cleanupDrag();
+            if (shouldPlace) addPlacement(drag.cardId, targetZone.dataset.tense);
+            else renderRound();
+        }
+
+        function cleanupDrag() {
+            const drag = state.drag;
+            if (!drag) return;
+            if (drag.pointerId !== null && drag.source.hasPointerCapture && drag.source.hasPointerCapture(drag.pointerId)) {
+                drag.source.releasePointerCapture(drag.pointerId);
+            }
+            drag.source.removeEventListener("pointermove", moveTouchDrag);
+            document.removeEventListener("mousemove", moveMouseDrag);
+            drag.source.classList.remove("is-touch-dragging");
+            if (drag.ghost) drag.ghost.remove();
+            document.querySelectorAll(".drop-zone").forEach((zone) => zone.classList.remove("is-over"));
+            state.drag = null;
+            updateInteractionState();
+            iconRefresh();
+        }
+
+        function renderRound() {
+            renderBaseBank();
+            ["past", "present", "future"].forEach((tense) => {
+                const list = document.getElementById(`${tense}List`);
+                list.innerHTML = state.placements[tense].map((item) => `
+                    <li class="placed-card">${renderSentenceWithMark(item.sentence, item.mark)}</li>
+                `).join("");
+                document.getElementById(`${tense}Count`).textContent = `${state.placements[tense].length}개`;
+            });
+
+            const total = getTotal();
+            const counts = getCounts();
+            const complete = checkComplete();
+            refs.round1Count.textContent = String(Math.min(total, 9));
+            refs.progressCount.textContent = `${Math.min(total, 9)}/9`;
+            refs.progressFill.style.width = `${Math.min(100, (total / 9) * 100)}%`;
+            refs.round1Complete.hidden = !complete;
+
+            if (complete) {
+                refs.round1Guide.innerHTML = `<i data-lucide="check-circle-2" class="icon"></i> 2차 시작`;
+                refs.guideTitle.textContent = "2차 시작";
+                refs.guideText.textContent = "버튼을 누르세요.";
+                refs.guideText.hidden = false;
+                if (!state.advanceShown) showNextOverlay();
+            } else if (state.selectedId) {
+                const card = selectedCard();
+                refs.round1Guide.innerHTML = `<i data-lucide="mouse-pointer-2" class="icon"></i> <strong>${escapeHtml(card.base)}</strong> → 시간축`;
+                refs.guideTitle.textContent = "시간축 선택";
+                refs.guideText.textContent = `${card.base} → 과거 · 현재 · 미래`;
+                refs.guideText.hidden = false;
+            } else {
+                const needed = Math.max(0, 9 - total);
+                refs.round1Guide.innerHTML = `<i data-lucide="hand" class="icon"></i> 카드 선택 · 남은 ${needed} · 과거 ${counts.past} 현재 ${counts.present} 미래 ${counts.future}`;
+                refs.guideTitle.textContent = "카드 선택";
+                refs.guideText.textContent = `과거 ${counts.past} · 현재 ${counts.present} · 미래 ${counts.future}`;
+                refs.guideText.hidden = false;
+            }
+
+            updateInteractionState();
+            iconRefresh();
+        }
+
+        function addPlacement(cardId, tense) {
+            const card = baseCards.find((item) => item.id === cardId);
+            if (!card) return;
+
+            const key = `${cardId}:${tense}`;
+            if (state.combos.has(key)) {
+                refs.round1Guide.innerHTML = `<i data-lucide="info" class="icon"></i> 이미 완료`;
+                updateInteractionState();
+                iconRefresh();
+                return;
+            }
+
+            state.combos.add(key);
+            const transformed = card.forms[tense];
+            const mark = transformed.replace(/^.*?([가-힣]+(?:었어요|았어요|했어요|고 있어요|을 거예요|ㄹ 거예요|할 거예요)).*$/u, "$1");
+            state.placements[tense].unshift({
+                sentence: transformed,
+                mark: mark === transformed ? tenseMeta[tense].pattern : mark
+            });
+            state.selectedId = cardId;
+            renderRound();
+        }
+
+        function bindDropZones() {
+            document.querySelectorAll(".drop-zone").forEach((zone) => {
+                zone.addEventListener("click", () => {
+                    if (state.selectedId) {
+                        addPlacement(state.selectedId, zone.dataset.tense);
+                    } else {
+                        refs.round1Guide.innerHTML = `<i data-lucide="mouse-pointer-2" class="icon"></i> 카드 먼저 선택`;
+                        updateInteractionState();
+                        iconRefresh();
+                    }
+                });
+            });
+        }
+
+        function showNextOverlay() {
+            state.advanceShown = true;
+            refs.transitionOverlay.hidden = false;
+            iconRefresh();
+        }
+
+        function clearRound() {
+            refs.transitionOverlay.hidden = true;
+            state.selectedId = null;
+            state.advanceShown = false;
+            state.drag = null;
+            state.combos = new Set();
+            state.placements = { past: [], present: [], future: [] };
+            renderRound();
+        }
+
+        function init() {
+            refs.transitionButton.addEventListener("click", () => {
+                window.location.href = "grammar3-wb-support-quiz.html";
+            });
+            document.getElementById("round1ClearBtn").addEventListener("click", clearRound);
+            document.getElementById("resetAllBtn").addEventListener("click", clearRound);
+            bindDropZones();
+            renderRound();
+            iconRefresh();
+        }
+
+        init();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

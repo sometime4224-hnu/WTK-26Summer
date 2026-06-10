@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10과 읽기 컷툰 탐색</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <style>
+        :root {
+            --bg: #f6f8f4;
+            --paper: #ffffff;
+            --ink: #172033;
+            --muted: #667085;
+            --line: #d9e2d4;
+            --line-strong: #b9c8b1;
+            --teal: #0f766e;
+            --teal-dark: #115e59;
+            --rose: #be123c;
+            --rose-soft: #ffe4e6;
+            --amber: #d97706;
+            --amber-soft: #fef3c7;
+            --green-soft: #dcfce7;
+            --shadow: 0 18px 42px rgba(17, 24, 39, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans KR", system-ui, sans-serif;
+            color: var(--ink);
+            background:
+                linear-gradient(135deg, rgba(220, 252, 231, 0.7), transparent 34%),
+                linear-gradient(315deg, rgba(255, 228, 230, 0.58), transparent 38%),
+                var(--bg);
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 50px;
+            padding: 8px 16px;
+            border-bottom: 1px solid rgba(217, 226, 212, 0.9);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar a,
+        .topbar strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--teal-dark);
+            font-size: 0.92rem;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar span {
+            color: #cbd5e1;
+            font-weight: 900;
+        }
+
+        .topbar strong {
+            min-width: 0;
+            overflow: hidden;
+            color: #334155;
+            text-overflow: ellipsis;
+        }
+
+        .shell {
+            width: min(1440px, calc(100% - 28px));
+            margin: 14px auto 34px;
+        }
+
+        .page-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--teal-dark);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            word-break: keep-all;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.7rem, 3.1vw, 3rem);
+            line-height: 1.1;
+        }
+
+        .head-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 34px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 0 11px;
+            background: rgba(255, 255, 255, 0.92);
+            color: #475569;
+            font-size: 0.86rem;
+            font-weight: 900;
+        }
+
+        .reader-app {
+            display: grid;
+            grid-template-columns: minmax(340px, 470px) minmax(0, 1fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .tool-pane {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow);
+        }
+
+        .visual-pane {
+            position: sticky;
+            top: 64px;
+            padding: 12px;
+        }
+
+        .cut-toolbar {
+            display: grid;
+            grid-template-columns: 40px minmax(0, 1fr) 40px;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--teal-dark);
+            font-weight: 900;
+        }
+
+        .icon-btn:hover,
+        .icon-btn:focus-visible {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+            outline: none;
+        }
+
+        .cut-title {
+            min-width: 0;
+            text-align: center;
+        }
+
+        .cut-title strong {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 1.02rem;
+        }
+
+        .cut-title span {
+            display: block;
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+
+        .stage {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            background: #f8fafc;
+            aspect-ratio: 1 / 1;
+        }
+
+        .stage img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .stage-action {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            z-index: 6;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(15, 23, 42, 0.16);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.94);
+            color: #0f172a;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.2);
+        }
+
+        .stage-action:hover,
+        .stage-action:focus-visible {
+            border-color: var(--teal);
+            color: var(--teal);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.18), 0 12px 28px rgba(15, 23, 42, 0.2);
+        }
+
+        .hotspot-layer {
+            position: absolute;
+            inset: 0;
+        }
+
+        .debug-selection {
+            position: absolute;
+            display: none;
+            border: 2px dashed #2563eb;
+            border-radius: 6px;
+            background: rgba(37, 99, 235, 0.12);
+            pointer-events: none;
+        }
+
+        .hotspot {
+            position: absolute;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            color: #fff;
+            padding: 0;
+        }
+
+        .hotspot::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 7px;
+            background: rgba(15, 118, 110, 0.04);
+            opacity: 0;
+            transition: opacity 0.16s ease;
+        }
+
+        .hotspot:hover,
+        .hotspot:focus-visible,
+        .hotspot.is-active {
+            border-color: rgba(15, 118, 110, 0.9);
+            outline: none;
+        }
+
+        .hotspot:hover::before,
+        .hotspot:focus-visible::before,
+        .hotspot.is-active::before {
+            opacity: 1;
+        }
+
+        .hotspot-marker {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 27px;
+            height: 27px;
+            border: 2px solid #fff;
+            border-radius: 999px;
+            background: var(--rose);
+            color: #fff;
+            font-size: 0.75rem;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.26);
+        }
+
+        .hotspot.is-active .hotspot-marker {
+            background: var(--teal);
+        }
+
+        .hotspot-label {
+            position: absolute;
+            left: 50%;
+            bottom: calc(50% + 18px);
+            width: max-content;
+            max-width: min(220px, 80vw);
+            border-radius: 8px;
+            padding: 6px 8px;
+            background: rgba(17, 24, 39, 0.88);
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 900;
+            line-height: 1.3;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(4px);
+            transition: opacity 0.16s ease, transform 0.16s ease;
+            white-space: normal;
+        }
+
+        .hotspot:hover .hotspot-label,
+        .hotspot:focus-visible .hotspot-label,
+        .hotspot.is-active .hotspot-label {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        body.debug-mode .hotspot {
+            border-color: rgba(190, 18, 60, 0.72);
+        }
+
+        body.debug-mode .hotspot:nth-child(even) {
+            border-color: rgba(15, 118, 110, 0.76);
+        }
+
+        body.debug-mode .hotspot::before {
+            opacity: 1;
+        }
+
+        body.debug-mode .hotspot-label {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        body.lightbox-open {
+            overflow: hidden;
+        }
+
+        .image-lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+
+        .image-lightbox.is-open {
+            display: flex;
+        }
+
+        .lightbox-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(3px);
+        }
+
+        .lightbox-card {
+            position: relative;
+            width: min(92vw, 820px);
+            max-height: min(92vh, 820px);
+        }
+
+        .lightbox-stage {
+            position: relative;
+            overflow: hidden;
+            width: min(92vw, 82vh, 820px);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 8px;
+            background: #0f172a;
+            aspect-ratio: 1 / 1;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+        }
+
+        .lightbox-stage img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .lightbox-stage .hotspot {
+            border-width: 3px;
+        }
+
+        .lightbox-stage .hotspot-marker {
+            width: 32px;
+            height: 32px;
+            font-size: 0.82rem;
+        }
+
+        .lightbox-sentence {
+            position: absolute;
+            left: 14px;
+            right: 70px;
+            bottom: 14px;
+            z-index: 5;
+            display: none;
+            gap: 3px;
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            border-radius: 8px;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.96);
+            color: #111827;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.24);
+            line-height: 1.55;
+        }
+
+        .lightbox-sentence.is-visible {
+            display: grid;
+        }
+
+        .lightbox-sentence strong {
+            color: var(--teal);
+            font-size: 0.84rem;
+        }
+
+        .lightbox-sentence span {
+            font-size: clamp(0.9rem, 1.8vw, 1.04rem);
+            font-weight: 800;
+        }
+
+        .debug-panel {
+            display: none;
+            gap: 8px;
+            margin-top: 10px;
+            border: 1px dashed #93c5fd;
+            border-radius: 8px;
+            padding: 10px;
+            background: #eff6ff;
+            color: #1e3a8a;
+        }
+
+        body.debug-mode .debug-panel {
+            display: grid;
+        }
+
+        .debug-panel h2 {
+            margin: 0;
+            font-size: 0.92rem;
+        }
+
+        .debug-panel code {
+            display: block;
+            overflow-x: auto;
+            border-radius: 7px;
+            padding: 8px;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 0.78rem;
+            line-height: 1.45;
+            white-space: pre;
+        }
+
+        .debug-panel p {
+            margin: 0;
+            color: #1d4ed8;
+            font-size: 0.8rem;
+            line-height: 1.45;
+        }
+
+        .cut-note {
+            display: grid;
+            gap: 8px;
+            min-height: 112px;
+            margin-top: 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 11px;
+            background: #fbfdf9;
+        }
+
+        .cut-note h2 {
+            margin: 0;
+            font-size: 0.96rem;
+        }
+
+        .cut-note p {
+            margin: 0;
+            color: #475569;
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+
+        .target-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .target-chips span {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            border-radius: 999px;
+            padding: 0 9px;
+            background: var(--amber-soft);
+            color: #78350f;
+            font-size: 0.8rem;
+            font-weight: 900;
+        }
+
+        .thumb-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 7px;
+            min-width: 0;
+            width: 100%;
+            max-width: 100%;
+            margin-top: 10px;
+        }
+
+        .thumb {
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 0;
+            background: #fff;
+            aspect-ratio: 1 / 1;
+        }
+
+        .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumb span {
+            position: absolute;
+            left: 6px;
+            top: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.92);
+            color: #111827;
+            font-size: 0.77rem;
+            font-weight: 900;
+        }
+
+        .thumb:hover,
+        .thumb:focus-visible,
+        .thumb.is-active {
+            border-color: var(--teal);
+            outline: none;
+        }
+
+        .text-pane {
+            min-width: 0;
+            padding: 18px;
+        }
+
+        .text-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .text-head h2 {
+            margin: 0;
+            font-size: clamp(1.35rem, 2.3vw, 2.1rem);
+        }
+
+        .text-head p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .progress-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 38px;
+            border-radius: 999px;
+            padding: 0 12px;
+            background: var(--green-soft);
+            color: #166534;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .passage {
+            display: grid;
+            gap: 15px;
+            font-size: clamp(1rem, 1.45vw, 1.17rem);
+            line-height: 2.05;
+        }
+
+        .passage p,
+        .passage ol {
+            margin: 0;
+        }
+
+        .passage ol {
+            display: grid;
+            gap: 6px;
+            padding: 12px 16px 12px 42px;
+            border-left: 4px solid #fbbf24;
+            border-radius: 8px;
+            background: #fffaf0;
+        }
+
+        .sentence {
+            border-radius: 6px;
+            padding: 2px 3px;
+            transition: background 0.18s ease, box-shadow 0.18s ease;
+            cursor: pointer;
+        }
+
+        .sentence:hover,
+        .sentence:focus-visible {
+            background: rgba(15, 118, 110, 0.1);
+            outline: none;
+        }
+
+        .sentence.is-active {
+            background: rgba(190, 18, 60, 0.1);
+            box-shadow: 0 0 0 2px rgba(190, 18, 60, 0.16);
+        }
+
+        .text-target {
+            border-radius: 5px;
+            padding: 1px 3px;
+            background: transparent;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+            transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .text-target.is-active {
+            background: #fde68a;
+            color: #111827;
+            box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.18);
+        }
+
+        .sentence-index {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 26px;
+            height: 26px;
+            margin-right: 6px;
+            border-radius: 999px;
+            background: #e0f2fe;
+            color: #075985;
+            font-size: 0.76rem;
+            font-weight: 900;
+            vertical-align: text-bottom;
+        }
+
+        .list-sentence .sentence-index {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 980px) {
+            .reader-app {
+                grid-template-columns: 1fr;
+            }
+
+            .visual-pane {
+                position: static;
+            }
+
+            .thumb-grid {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding-bottom: 2px;
+            }
+
+            .thumb {
+                flex: 0 0 68px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .shell {
+                width: min(100% - 18px, 1440px);
+                margin-top: 10px;
+            }
+
+            .topbar {
+                overflow-x: auto;
+                padding: 8px 10px;
+            }
+
+            .page-head,
+            .text-head {
+                grid-template-columns: 1fr;
+                display: grid;
+                align-items: start;
+            }
+
+            .head-meta {
+                justify-content: flex-start;
+            }
+
+            .visual-pane,
+            .text-pane {
+                padding: 10px;
+            }
+
+            .stage-action {
+                right: 10px;
+                bottom: 10px;
+                width: 38px;
+                height: 38px;
+            }
+
+            .image-lightbox {
+                padding: 10px;
+            }
+
+            .lightbox-stage {
+                width: min(96vw, 82vh);
+            }
+
+            .lightbox-sentence {
+                left: 10px;
+                right: 58px;
+                bottom: 10px;
+                max-height: 42%;
+                overflow-y: auto;
+                padding: 9px 10px;
+            }
+
+            .thumb-grid {
+                display: flex;
+                flex-wrap: nowrap;
+            }
+
+            .passage {
+                line-height: 1.9;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <nav class="topbar">
+        <a href="./index.html"><i class="fa-solid fa-folder-open"></i><span>10과 홈</span></a>
+        <span>|</span>
+        <a href="./reading.html"><i class="fa-solid fa-book-open"></i><span>읽기</span></a>
+        <span>|</span>
+        <a href="./writing-cut.html"><i class="fa-solid fa-pen-to-square"></i><span>컷 쓰기</span></a>
+        <span>|</span>
+        <strong>읽기 컷툰 탐색</strong>
+    </nav>
+
+    <main class="shell">
+        <header class="page-head">
+            <div>
+                <p class="eyebrow">C10 Reading Cuttoon</p>
+                <h1>사랑에도 유통 기한이 있을까요?</h1>
+            </div>
+            <div class="head-meta">
+                <span class="pill"><i class="fa-solid fa-image"></i><span id="cut-count-label">16컷</span></span>
+                <span class="pill"><i class="fa-solid fa-highlighter"></i><span>문장 연결</span></span>
+            </div>
+        </header>
+
+        <section class="reader-app" aria-label="10과 읽기 컷툰 탐색 앱">
+            <aside class="tool-pane visual-pane" aria-label="컷 이미지 탐색">
+                <div class="cut-toolbar">
+                    <button class="icon-btn" type="button" id="prev-cut" aria-label="이전 컷">
+                        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+                    </button>
+                    <div class="cut-title">
+                        <strong id="cut-title">컷 제목</strong>
+                        <span id="cut-subtitle">1 / 16</span>
+                    </div>
+                    <button class="icon-btn" type="button" id="next-cut" aria-label="다음 컷">
+                        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div class="stage" id="stage">
+                    <img id="cut-image" src="" alt="">
+                    <div class="hotspot-layer" id="hotspot-layer"></div>
+                    <div class="debug-selection" id="debug-selection"></div>
+                    <button class="stage-action" type="button" id="open-lightbox" aria-label="그림 크게 보기" title="그림 크게 보기">
+                        <i class="fa-solid fa-up-right-and-down-left-from-center" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <section class="cut-note" aria-live="polite">
+                    <h2 id="active-label">대표 문장</h2>
+                    <p id="active-note"></p>
+                    <div class="target-chips" id="target-chips"></div>
+                </section>
+
+                <section class="debug-panel" id="debug-panel" aria-label="핫스팟 좌표 디버그">
+                    <h2>Debug hotspot box</h2>
+                    <p>이미지의 빈 곳을 드래그하면 소수 1자리 % 좌표가 계산됩니다.</p>
+                    <code id="debug-output">?debug=1 mode</code>
+                </section>
+
+                <div class="thumb-grid" id="thumb-grid" aria-label="컷 목록"></div>
+            </aside>
+
+            <article class="tool-pane text-pane" aria-label="읽기 지문">
+                <div class="text-head">
+                    <div>
+                        <p class="eyebrow">Passage</p>
+                        <h2 id="passage-title">김영희의 연애 칼럼</h2>
+                        <p>원문 문장을 컷 이미지와 연결해 확인합니다.</p>
+                    </div>
+                    <span class="progress-badge"><i class="fa-solid fa-location-dot"></i><span id="progress-label">1 / 16</span></span>
+                </div>
+                <div class="passage" id="passage"></div>
+            </article>
+        </section>
+    </main>
+
+    <div class="image-lightbox" id="image-lightbox" aria-hidden="true">
+        <div class="lightbox-backdrop" data-close-lightbox></div>
+        <div class="lightbox-card" role="dialog" aria-modal="true" aria-label="컷 크게 보기">
+            <div class="lightbox-stage" id="lightbox-stage">
+                <img id="lightbox-image" src="" alt="">
+                <div class="hotspot-layer" id="lightbox-hotspot-layer"></div>
+                <div class="lightbox-sentence" id="lightbox-sentence" aria-live="polite"></div>
+                <button class="stage-action" type="button" id="close-lightbox" aria-label="크게 보기 닫기" title="닫기">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./reading-cuttoon-data.js"></script>
+    <script>
+        (function () {
+            const data = window.C10_READING_CUTTOON_DATA;
+            if (!data) {
+                return;
+            }
+
+            const cutTitle = document.getElementById("cut-title");
+            const cutSubtitle = document.getElementById("cut-subtitle");
+            const cutImage = document.getElementById("cut-image");
+            const stage = document.getElementById("stage");
+            const hotspotLayer = document.getElementById("hotspot-layer");
+            const debugSelection = document.getElementById("debug-selection");
+            const debugOutput = document.getElementById("debug-output");
+            const activeLabel = document.getElementById("active-label");
+            const activeNote = document.getElementById("active-note");
+            const targetChips = document.getElementById("target-chips");
+            const thumbGrid = document.getElementById("thumb-grid");
+            const passage = document.getElementById("passage");
+            const progressLabel = document.getElementById("progress-label");
+            const cutCountLabel = document.getElementById("cut-count-label");
+            const openLightboxButton = document.getElementById("open-lightbox");
+            const imageLightbox = document.getElementById("image-lightbox");
+            const lightboxImage = document.getElementById("lightbox-image");
+            const lightboxHotspotLayer = document.getElementById("lightbox-hotspot-layer");
+            const lightboxSentence = document.getElementById("lightbox-sentence");
+            const closeLightboxButton = document.getElementById("close-lightbox");
+
+            const sentenceMap = new Map(data.sentences.map((sentence) => [sentence.id, sentence]));
+            const cutMap = new Map(data.cuts.map((cut) => [cut.id, cut]));
+            const segmentMap = new Map();
+            data.sentences.forEach((sentence) => {
+                sentence.segments.forEach((segment) => {
+                    if (segment.id) {
+                        segmentMap.set(segment.id, { sentence, segment });
+                    }
+                });
+            });
+
+            let activeCutId = data.cuts[0].id;
+            let activeHotspotId = null;
+            let activeTargets = new Set(data.cuts[0].sentenceIds);
+            const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
+            let debugDragStart = null;
+            let lightboxReturnFocus = null;
+
+            if (debugMode) {
+                document.body.classList.add("debug-mode");
+            }
+
+            function escapeHtml(value) {
+                return String(value)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            function flattenSentence(sentence) {
+                return sentence.segments.map((segment) => segment.text).join("");
+            }
+
+            function getCutIndex(cutId) {
+                return Math.max(0, data.cuts.findIndex((cut) => cut.id === cutId));
+            }
+
+            function getActiveCut() {
+                return cutMap.get(activeCutId) || data.cuts[0];
+            }
+
+            function roundBoxValue(value) {
+                return Math.round(value * 10) / 10;
+            }
+
+            function getStagePoint(event) {
+                const rect = stage.getBoundingClientRect();
+                const x = Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100));
+                const y = Math.min(100, Math.max(0, ((event.clientY - rect.top) / rect.height) * 100));
+                return { x, y };
+            }
+
+            function formatHotspotBox(box) {
+                return `x: ${roundBoxValue(box.x)}, y: ${roundBoxValue(box.y)}, w: ${roundBoxValue(box.w)}, h: ${roundBoxValue(box.h)}`;
+            }
+
+            function updateDebugOutput(label, box) {
+                if (!debugMode || !debugOutput) {
+                    return;
+                }
+                const cut = getActiveCut();
+                debugOutput.textContent = `${cut.id} ${label}\n{ ${formatHotspotBox(box)} }`;
+            }
+
+            function setDebugSelection(start, end) {
+                const left = Math.min(start.x, end.x);
+                const top = Math.min(start.y, end.y);
+                const width = Math.abs(end.x - start.x);
+                const height = Math.abs(end.y - start.y);
+                debugSelection.style.display = width > 0.4 && height > 0.4 ? "block" : "none";
+                debugSelection.style.left = `${left}%`;
+                debugSelection.style.top = `${top}%`;
+                debugSelection.style.width = `${width}%`;
+                debugSelection.style.height = `${height}%`;
+                return { x: left, y: top, w: width, h: height };
+            }
+
+            function renderSentence(sentence, index, isList) {
+                const segments = sentence.segments.map((segment) => {
+                    if (!segment.id) {
+                        return escapeHtml(segment.text);
+                    }
+                    return `<span class="text-target" data-target-id="${escapeHtml(segment.id)}">${escapeHtml(segment.text)}</span>`;
+                }).join("");
+                const listClass = isList ? " list-sentence" : "";
+                return `<span class="sentence${listClass}" role="button" tabindex="0" data-sentence-id="${escapeHtml(sentence.id)}" data-target-id="${escapeHtml(sentence.id)}"><span class="sentence-index">${index + 1}</span>${segments}</span>`;
+            }
+
+            function renderPassage() {
+                let sentenceIndex = 0;
+                const blocks = data.passageLayout.map((block) => {
+                    if (block.type === "list") {
+                        const items = block.sentenceIds.map((id) => {
+                            const sentence = sentenceMap.get(id);
+                            const html = renderSentence(sentence, sentenceIndex, true);
+                            sentenceIndex += 1;
+                            return `<li>${html}</li>`;
+                        }).join("");
+                        return `<ol>${items}</ol>`;
+                    }
+
+                    const body = block.sentenceIds.map((id) => {
+                        const sentence = sentenceMap.get(id);
+                        const html = renderSentence(sentence, sentenceIndex, false);
+                        sentenceIndex += 1;
+                        return html;
+                    }).join(" ");
+                    return `<p>${body}</p>`;
+                });
+                passage.innerHTML = blocks.join("");
+            }
+
+            function renderThumbs() {
+                thumbGrid.innerHTML = data.cuts.map((cut) => {
+                    return `
+                        <button class="thumb" type="button" data-cut-id="${escapeHtml(cut.id)}" aria-label="${escapeHtml(cut.label)}번 컷 ${escapeHtml(cut.title)}">
+                            <img src="${escapeHtml(data.assetBase + cut.image)}" alt="" loading="eager" decoding="async">
+                            <span>${escapeHtml(cut.label)}</span>
+                        </button>
+                    `;
+                }).join("");
+            }
+
+            function findHotspot(cut, hotspotId) {
+                return cut.hotspots.find((hotspot) => hotspot.id === hotspotId) || null;
+            }
+
+            function getTargetTexts(targets) {
+                const chips = [];
+                targets.forEach((targetId) => {
+                    if (segmentMap.has(targetId)) {
+                        chips.push(segmentMap.get(targetId).segment.text);
+                    } else if (sentenceMap.has(targetId)) {
+                        chips.push(flattenSentence(sentenceMap.get(targetId)));
+                    }
+                });
+                return [...new Set(chips)].slice(0, 4);
+            }
+
+            function isLightboxOpen() {
+                return imageLightbox.classList.contains("is-open");
+            }
+
+            function getSentenceForTargets(targetIds, fallbackCut) {
+                const ids = targetIds || [];
+                for (const targetId of ids) {
+                    if (sentenceMap.has(targetId)) {
+                        return sentenceMap.get(targetId);
+                    }
+                    if (segmentMap.has(targetId)) {
+                        return segmentMap.get(targetId).sentence;
+                    }
+                }
+                return sentenceMap.get(fallbackCut.sentenceIds[0]) || null;
+            }
+
+            function setLightboxSentence(cut, hotspot) {
+                if (!hotspot) {
+                    lightboxSentence.classList.remove("is-visible");
+                    lightboxSentence.innerHTML = "";
+                    return;
+                }
+                const sentence = getSentenceForTargets(hotspot.targetIds, cut);
+                lightboxSentence.innerHTML = `
+                    <strong>${escapeHtml(hotspot.label)}</strong>
+                    <span>${escapeHtml(sentence ? flattenSentence(sentence) : hotspot.note)}</span>
+                `;
+                lightboxSentence.classList.add("is-visible");
+            }
+
+            function renderHotspotButtons(cut, layer) {
+                layer.innerHTML = cut.hotspots.map((item, index) => {
+                    const isActive = item.id === activeHotspotId;
+                    return `
+                        <button
+                            class="hotspot${isActive ? " is-active" : ""}"
+                            type="button"
+                            data-hotspot-id="${escapeHtml(item.id)}"
+                            style="left:${item.x}%;top:${item.y}%;width:${item.w}%;height:${item.h}%;"
+                            aria-label="${escapeHtml(item.label)}"
+                            title="${escapeHtml(item.label)}"
+                        >
+                            <span class="hotspot-marker">${index + 1}</span>
+                            <span class="hotspot-label">${escapeHtml(item.label)}</span>
+                        </button>
+                    `;
+                }).join("");
+            }
+
+            function renderLightboxCut() {
+                if (!isLightboxOpen()) {
+                    return;
+                }
+                const cut = getActiveCut();
+                const hotspot = activeHotspotId ? findHotspot(cut, activeHotspotId) : null;
+                lightboxImage.src = data.assetBase + cut.image;
+                lightboxImage.alt = `${cut.label}번 컷, ${cut.title}`;
+                renderHotspotButtons(cut, lightboxHotspotLayer);
+                setLightboxSentence(cut, hotspot);
+            }
+
+            function openLightbox() {
+                lightboxReturnFocus = document.activeElement;
+                imageLightbox.classList.add("is-open");
+                imageLightbox.setAttribute("aria-hidden", "false");
+                document.body.classList.add("lightbox-open");
+                renderLightboxCut();
+                closeLightboxButton.focus({ preventScroll: true });
+            }
+
+            function closeLightbox() {
+                imageLightbox.classList.remove("is-open");
+                imageLightbox.setAttribute("aria-hidden", "true");
+                document.body.classList.remove("lightbox-open");
+                if (lightboxReturnFocus && typeof lightboxReturnFocus.focus === "function") {
+                    lightboxReturnFocus.focus({ preventScroll: true });
+                } else {
+                    openLightboxButton.focus({ preventScroll: true });
+                }
+            }
+
+            function renderCurrentCut() {
+                const cut = getActiveCut();
+                const cutIndex = getCutIndex(cut.id);
+                const hotspot = activeHotspotId ? findHotspot(cut, activeHotspotId) : null;
+
+                cutTitle.textContent = cut.title;
+                cutSubtitle.textContent = `${cutIndex + 1} / ${data.cuts.length}`;
+                progressLabel.textContent = `${cutIndex + 1} / ${data.cuts.length}`;
+                cutCountLabel.textContent = `${data.cuts.length}컷`;
+                cutImage.src = data.assetBase + cut.image;
+                cutImage.alt = `${cut.label}번 컷, ${cut.title}`;
+                debugSelection.style.display = "none";
+
+                renderHotspotButtons(cut, hotspotLayer);
+                renderLightboxCut();
+
+                const noteLabel = hotspot ? hotspot.label : "대표 문장";
+                const noteText = hotspot ? hotspot.note : cut.sentenceIds.map((id) => flattenSentence(sentenceMap.get(id))).join(" ");
+                activeLabel.textContent = noteLabel;
+                activeNote.textContent = noteText;
+                targetChips.innerHTML = getTargetTexts(activeTargets).map((text) => `<span>${escapeHtml(text)}</span>`).join("");
+                if (debugMode) {
+                    const debugBox = hotspot || cut.hotspots[0];
+                    if (debugBox) {
+                        updateDebugOutput(debugBox.label, debugBox);
+                    }
+                }
+            }
+
+            function sentenceHasActiveSegment(sentence) {
+                return sentence.segments.some((segment) => segment.id && activeTargets.has(segment.id));
+            }
+
+            function applyHighlights() {
+                document.querySelectorAll(".sentence").forEach((node) => {
+                    const sentenceId = node.dataset.sentenceId;
+                    const sentence = sentenceMap.get(sentenceId);
+                    node.classList.toggle("is-active", activeTargets.has(sentenceId) || sentenceHasActiveSegment(sentence));
+                });
+
+                document.querySelectorAll(".text-target").forEach((node) => {
+                    node.classList.toggle("is-active", activeTargets.has(node.dataset.targetId));
+                });
+
+                document.querySelectorAll(".thumb").forEach((node) => {
+                    node.classList.toggle("is-active", node.dataset.cutId === activeCutId);
+                });
+            }
+
+            function scrollToActiveTarget() {
+                const segmentTarget = [...activeTargets].find((targetId) => segmentMap.has(targetId));
+                const sentenceTarget = [...activeTargets].find((targetId) => sentenceMap.has(targetId));
+                const selector = segmentTarget
+                    ? `.text-target[data-target-id="${CSS.escape(segmentTarget)}"]`
+                    : `.sentence[data-sentence-id="${CSS.escape(sentenceTarget || "")}"]`;
+                const node = document.querySelector(selector);
+                if (node) {
+                    node.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+            }
+
+            function setActiveTargets(cut, hotspot) {
+                activeTargets = new Set(cut.sentenceIds);
+                if (hotspot) {
+                    hotspot.targetIds.forEach((targetId) => activeTargets.add(targetId));
+                }
+            }
+
+            function selectCut(cutId, options = {}) {
+                const cut = cutMap.get(cutId);
+                if (!cut) {
+                    return;
+                }
+                activeCutId = cut.id;
+                activeHotspotId = options.hotspotId || null;
+                const hotspot = activeHotspotId ? findHotspot(cut, activeHotspotId) : null;
+                setActiveTargets(cut, hotspot);
+                renderCurrentCut();
+                applyHighlights();
+                if (options.scrollText) {
+                    scrollToActiveTarget();
+                }
+            }
+
+            function selectHotspot(hotspotId) {
+                const cut = getActiveCut();
+                const hotspot = findHotspot(cut, hotspotId);
+                selectCut(activeCutId, { hotspotId, scrollText: true });
+                if (debugMode && hotspot) {
+                    updateDebugOutput(hotspot.label, hotspot);
+                }
+            }
+
+            function moveCut(delta) {
+                const currentIndex = getCutIndex(activeCutId);
+                const nextIndex = (currentIndex + delta + data.cuts.length) % data.cuts.length;
+                selectCut(data.cuts[nextIndex].id, { scrollText: true });
+            }
+
+            function selectCutForSentence(sentenceId) {
+                const cut = data.cuts.find((item) => item.sentenceIds.includes(sentenceId));
+                if (cut) {
+                    selectCut(cut.id, { scrollText: false });
+                }
+            }
+
+            renderPassage();
+            renderThumbs();
+            renderCurrentCut();
+            applyHighlights();
+
+            document.getElementById("prev-cut").addEventListener("click", () => moveCut(-1));
+            document.getElementById("next-cut").addEventListener("click", () => moveCut(1));
+            openLightboxButton.addEventListener("click", openLightbox);
+            closeLightboxButton.addEventListener("click", closeLightbox);
+            imageLightbox.addEventListener("click", (event) => {
+                if (event.target.closest("[data-close-lightbox]")) {
+                    closeLightbox();
+                }
+            });
+
+            hotspotLayer.addEventListener("click", (event) => {
+                const hotspotButton = event.target.closest("[data-hotspot-id]");
+                if (hotspotButton) {
+                    selectHotspot(hotspotButton.dataset.hotspotId);
+                }
+            });
+
+            lightboxHotspotLayer.addEventListener("click", (event) => {
+                const hotspotButton = event.target.closest("[data-hotspot-id]");
+                if (hotspotButton) {
+                    selectHotspot(hotspotButton.dataset.hotspotId);
+                }
+            });
+
+            stage.addEventListener("pointerdown", (event) => {
+                if (!debugMode || event.target.closest("button")) {
+                    return;
+                }
+                debugDragStart = getStagePoint(event);
+                debugSelection.style.display = "none";
+                stage.setPointerCapture(event.pointerId);
+            });
+
+            stage.addEventListener("pointermove", (event) => {
+                if (!debugMode || !debugDragStart) {
+                    return;
+                }
+                const box = setDebugSelection(debugDragStart, getStagePoint(event));
+                updateDebugOutput("draft", box);
+            });
+
+            stage.addEventListener("pointerup", (event) => {
+                if (!debugMode || !debugDragStart) {
+                    return;
+                }
+                const box = setDebugSelection(debugDragStart, getStagePoint(event));
+                updateDebugOutput("draft", box);
+                debugDragStart = null;
+            });
+
+            stage.addEventListener("pointercancel", () => {
+                if (!debugMode) {
+                    return;
+                }
+                debugDragStart = null;
+                debugSelection.style.display = "none";
+            });
+
+            thumbGrid.addEventListener("click", (event) => {
+                const thumbButton = event.target.closest("[data-cut-id]");
+                if (thumbButton) {
+                    selectCut(thumbButton.dataset.cutId, { scrollText: true });
+                }
+            });
+
+            passage.addEventListener("click", (event) => {
+                const sentenceNode = event.target.closest("[data-sentence-id]");
+                if (sentenceNode) {
+                    selectCutForSentence(sentenceNode.dataset.sentenceId);
+                }
+            });
+
+            passage.addEventListener("keydown", (event) => {
+                if (event.key !== "Enter" && event.key !== " ") {
+                    return;
+                }
+                const sentenceNode = event.target.closest("[data-sentence-id]");
+                if (sentenceNode) {
+                    event.preventDefault();
+                    selectCutForSentence(sentenceNode.dataset.sentenceId);
+                }
+            });
+
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape" && isLightboxOpen()) {
+                    closeLightbox();
+                }
+            });
+        })();
+    </script>
+    <script src="../shared/page-qr.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>
