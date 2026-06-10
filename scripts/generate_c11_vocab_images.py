@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE_DIR = Path(r"C:\Users\somet\Downloads")
 OUTPUT_BASE = ROOT / "assets" / "c11" / "vocabulary" / "images"
 RANK_SOURCE = ROOT / "backup" / "asset-sources" / "c11" / "vocabulary" / "rank-hierarchy-source.png"
+NEW_EMPLOYEE_SOURCE = ROOT / "backup" / "asset-sources" / "c11" / "vocabulary" / "new-employee-first-day-source.png"
 TARGET_SIZE = 512
 WEBP_QUALITY = 72
 POSITIONS = ("TL", "TR", "BL", "BR")
@@ -51,6 +52,10 @@ RANK_REPLACEMENTS = {
     (1, "TL"): ("TL", "부장"),
     (6, "BL"): ("BL", "대리"),
     (6, "BR"): ("TR", "과장"),
+}
+
+FULL_IMAGE_REPLACEMENTS = {
+    (5, "BL"): (NEW_EMPLOYEE_SOURCE, "신입 사원"),
 }
 
 INITIALS = [
@@ -189,6 +194,17 @@ def build_card(sheet_number: int, position: str, word: str) -> Image.Image:
             source = source.convert("RGB")
             crop = source.crop(crop_box(source.width, source.height, rank_position))
         return crop.resize((TARGET_SIZE, TARGET_SIZE), Image.Resampling.LANCZOS)
+
+    full_image_replacement = FULL_IMAGE_REPLACEMENTS.get((sheet_number, position))
+    if full_image_replacement:
+        replacement_path, expected_word = full_image_replacement
+        if word != expected_word:
+            raise ValueError(f"Image replacement mismatch: expected {expected_word}, got {word}")
+        if not replacement_path.exists():
+            raise FileNotFoundError(replacement_path)
+        with Image.open(replacement_path) as source:
+            source = source.convert("RGB")
+        return source.resize((TARGET_SIZE, TARGET_SIZE), Image.Resampling.LANCZOS)
 
     with Image.open(source_path(sheet_number)) as source:
         source = source.convert("RGB")
