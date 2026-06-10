@@ -816,12 +816,30 @@
             lessonState.slots = lessonState.slots.map((id) => id === panelId ? null : id);
         }
 
+        function getPanelSlotIndex(lessonState, panelId) {
+            return lessonState.slots.findIndex((id) => id === panelId);
+        }
+
         function placePanel(lessonId, panelId, slotIndex) {
             const lessonState = ensureLessonState(lessonId);
             if (!panelId || slotIndex < 0 || slotIndex >= lessonState.slots.length) return;
+            const sourceSlotIndex = getPanelSlotIndex(lessonState, panelId);
             const replaced = lessonState.slots[slotIndex];
-            removePanelFromCurrentLocation(lessonState, panelId);
-            if (replaced && replaced !== panelId) lessonState.pool.push(replaced);
+
+            if (sourceSlotIndex === slotIndex) {
+                state.selectedPanelId = null;
+                renderLesson();
+                return;
+            }
+
+            lessonState.pool = lessonState.pool.filter((id) => id !== panelId);
+
+            if (sourceSlotIndex >= 0) {
+                lessonState.slots[sourceSlotIndex] = replaced || null;
+            } else if (replaced && replaced !== panelId && !lessonState.pool.includes(replaced)) {
+                lessonState.pool.push(replaced);
+            }
+
             lessonState.slots[slotIndex] = panelId;
             lessonState.sequenceSubmitted = false;
             state.selectedPanelId = null;
@@ -858,8 +876,9 @@
             const card = event.target.closest(".picture-card");
             if (card) {
                 const panelId = card.dataset.panelId;
-                if (card.dataset.location === "slot") {
-                    returnPanelToPool(state.activeLesson, panelId);
+                const slotIndex = card.dataset.location === "slot" ? Number(card.dataset.slotIndex) : null;
+                if (state.selectedPanelId && state.selectedPanelId !== panelId && slotIndex != null) {
+                    placePanel(state.activeLesson, state.selectedPanelId, slotIndex);
                     return;
                 }
                 state.selectedPanelId = state.selectedPanelId === panelId ? null : panelId;
@@ -870,6 +889,12 @@
             const slot = event.target.closest(".drop-slot");
             if (slot && state.selectedPanelId) {
                 placePanel(state.activeLesson, state.selectedPanelId, Number(slot.dataset.slotIndex));
+                return;
+            }
+
+            const bank = event.target.closest(".card-bank");
+            if (bank && state.selectedPanelId) {
+                returnPanelToPool(state.activeLesson, state.selectedPanelId);
                 return;
             }
 
