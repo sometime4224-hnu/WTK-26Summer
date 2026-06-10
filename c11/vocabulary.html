@@ -676,6 +676,52 @@
             text-align: center;
         }
         .quiz-actions { display: flex; justify-content: center; margin-top: 12px; }
+        .text-panel {
+            display: grid;
+            gap: 12px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: var(--radius-lg, 16px);
+            padding: 16px;
+            background: #fff;
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+        }
+        .text-panel__head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .text-panel__title {
+            margin: 0;
+            color: var(--ink, #172033);
+            font-size: 18px;
+            font-weight: 900;
+        }
+        .text-panel__meta {
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .vocab-textbox {
+            width: 100%;
+            min-height: 430px;
+            resize: vertical;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            padding: 14px;
+            background: #f8fafc;
+            color: var(--ink, #172033);
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.7;
+            outline: none;
+            white-space: pre;
+        }
+        .vocab-textbox:focus {
+            border-color: #bfdbfe;
+            box-shadow: 0 0 0 3px rgba(191, 219, 254, 0.38);
+        }
         .btn {
             display: inline-flex;
             align-items: center;
@@ -693,6 +739,10 @@
             cursor: pointer;
         }
         .btn.primary { border-color: var(--accent-dark, #1d4ed8); background: var(--accent, #2563eb); color: #fff; }
+        .btn:disabled {
+            opacity: 0.48;
+            cursor: not-allowed;
+        }
         .footer-nav {
             display: flex;
             flex-wrap: wrap;
@@ -729,6 +779,8 @@
             .translation-grid { grid-template-columns: 1fr; }
             .quiz-layout { padding: 14px; }
             .quiz-prompt { font-size: 18px; }
+            .text-panel { padding: 12px; }
+            .vocab-textbox { min-height: 360px; font-size: 14px; }
         }
     </style>
 </head>
@@ -763,6 +815,7 @@
             <div class="segmented" role="tablist" aria-label="보기">
                 <button class="active" data-view="cards" type="button" role="tab"><i class="fa-solid fa-table-cells-large"></i> 카드</button>
                 <button data-view="list" type="button" role="tab"><i class="fa-solid fa-list"></i> 정리</button>
+                <button data-view="text" type="button" role="tab"><i class="fa-solid fa-align-left"></i> 텍스트</button>
                 <button data-view="quiz" type="button" role="tab"><i class="fa-solid fa-circle-question"></i> 퀴즈</button>
             </div>
             <label class="search" for="search-input">
@@ -798,6 +851,20 @@
         <section id="list-view" class="view" aria-label="어휘 정리">
             <div id="list-panel" class="list-panel"></div>
             <div id="list-empty" class="empty-state" hidden>검색 결과가 없습니다.</div>
+        </section>
+
+        <section id="text-view" class="view" aria-label="어휘 텍스트 목록">
+            <div class="text-panel">
+                <div class="text-panel__head">
+                    <div>
+                        <h2 class="text-panel__title">11과 어휘 목록</h2>
+                        <span id="text-count" class="text-panel__meta">0개</span>
+                    </div>
+                    <button id="copy-text-btn" class="btn" type="button"><i class="fa-solid fa-copy"></i> 복사</button>
+                </div>
+                <textarea id="vocab-textbox" class="vocab-textbox" readonly aria-label="11과 어휘 목록 텍스트"></textarea>
+            </div>
+            <div id="text-empty" class="empty-state" hidden>검색 결과가 없습니다.</div>
         </section>
 
         <section id="quiz-view" class="view" aria-label="어휘 퀴즈">
@@ -1361,6 +1428,10 @@
             cardsEmpty: document.getElementById("cards-empty"),
             listPanel: document.getElementById("list-panel"),
             listEmpty: document.getElementById("list-empty"),
+            textBox: document.getElementById("vocab-textbox"),
+            textCount: document.getElementById("text-count"),
+            textEmpty: document.getElementById("text-empty"),
+            copyTextBtn: document.getElementById("copy-text-btn"),
             quizModeSelector: document.getElementById("quiz-mode-selector"),
             quizProgress: document.getElementById("quiz-progress"),
             quizType: document.getElementById("quiz-type"),
@@ -1663,6 +1734,55 @@
             });
         }
 
+        function vocabTextFor(list) {
+            return list.map((word, index) => {
+                const category = categoryFor(word.category);
+                const meta = [category.label, word.pos].filter(Boolean).join(" · ");
+                const meaning = word.meaning || word.example || "";
+                return `${index + 1}. ${word.ko}${meta ? ` (${meta})` : ""}${meaning ? ` - ${meaning}` : ""}`;
+            }).join("\n");
+        }
+
+        function renderTextList() {
+            const list = filteredWords();
+            els.textBox.value = vocabTextFor(list);
+            els.textCount.textContent = `${list.length}개`;
+            els.textEmpty.hidden = list.length > 0;
+            els.textBox.hidden = list.length === 0;
+            els.copyTextBtn.disabled = list.length === 0;
+        }
+
+        function copyTextList() {
+            const text = els.textBox.value;
+            if (!text) return;
+            const showCopyState = (ok) => {
+                els.copyTextBtn.innerHTML = ok
+                    ? '<i class="fa-solid fa-check"></i> 복사됨'
+                    : '<i class="fa-solid fa-triangle-exclamation"></i> 실패';
+                setTimeout(() => {
+                    els.copyTextBtn.innerHTML = '<i class="fa-solid fa-copy"></i> 복사';
+                }, 1200);
+            };
+            const fallbackCopy = () => {
+                els.textBox.hidden = false;
+                els.textBox.focus();
+                els.textBox.select();
+                els.textBox.setSelectionRange(0, text.length);
+                try {
+                    return document.execCommand("copy");
+                } catch (error) {
+                    return false;
+                }
+            };
+            if (navigator.clipboard?.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => showCopyState(true))
+                    .catch(() => showCopyState(fallbackCopy()));
+                return;
+            }
+            showCopyState(fallbackCopy());
+        }
+
         function shuffleCards() {
             for (let i = cardOrder.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -1764,6 +1884,7 @@
             updateQuizModeButtons();
             if (currentView === "cards") renderCards();
             else if (currentView === "list") renderList();
+            else if (currentView === "text") renderTextList();
             else startQuiz();
         }
 
@@ -1783,6 +1904,7 @@
         els.frontSizeDown.addEventListener("click", () => setFrontHeadwordSize(frontHeadwordSizeIndex - 1));
         els.frontSizeUp.addEventListener("click", () => setFrontHeadwordSize(frontHeadwordSizeIndex + 1));
         els.shuffleBtn.addEventListener("click", shuffleCards);
+        els.copyTextBtn.addEventListener("click", copyTextList);
         els.nextQuestionBtn.addEventListener("click", nextQuizQuestion);
         document.addEventListener("click", (event) => {
             if (!event.target.closest("[data-multilang-btn]")) return;
