@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_DIR = Path(r"C:\Users\somet\Downloads")
 OUTPUT_BASE = ROOT / "assets" / "c11" / "vocabulary" / "images"
+RANK_SOURCE = ROOT / "backup" / "asset-sources" / "c11" / "vocabulary" / "rank-hierarchy-source.png"
 TARGET_SIZE = 512
 WEBP_QUALITY = 72
 POSITIONS = ("TL", "TR", "BL", "BR")
@@ -44,6 +45,12 @@ SHEETS = {
         "source": "ChatGPT Image 2026년 6월 10일 오후 04_55_20 (7).png",
         "words": ["출퇴근 시간이 자유롭다", "승진 기회가 많다", "휴가가 길다", ""],
     },
+}
+
+RANK_REPLACEMENTS = {
+    (1, "TL"): ("TL", "부장"),
+    (6, "BL"): ("BL", "대리"),
+    (6, "BR"): ("TR", "과장"),
 }
 
 INITIALS = [
@@ -171,6 +178,18 @@ def save_webp(image: Image.Image, output_path: Path) -> None:
 
 
 def build_card(sheet_number: int, position: str, word: str) -> Image.Image:
+    rank_replacement = RANK_REPLACEMENTS.get((sheet_number, position))
+    if rank_replacement:
+        rank_position, expected_word = rank_replacement
+        if word != expected_word:
+            raise ValueError(f"Rank replacement mismatch: expected {expected_word}, got {word}")
+        if not RANK_SOURCE.exists():
+            raise FileNotFoundError(RANK_SOURCE)
+        with Image.open(RANK_SOURCE) as source:
+            source = source.convert("RGB")
+            crop = source.crop(crop_box(source.width, source.height, rank_position))
+        return crop.resize((TARGET_SIZE, TARGET_SIZE), Image.Resampling.LANCZOS)
+
     with Image.open(source_path(sheet_number)) as source:
         source = source.convert("RGB")
         crop = source.crop(crop_box(source.width, source.height, position))
