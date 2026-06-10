@@ -58,6 +58,15 @@ FULL_IMAGE_REPLACEMENTS = {
     (5, "BL"): (NEW_EMPLOYEE_SOURCE, "신입 사원"),
 }
 
+EXTRA_CARDS = [
+    {
+        "base_name": "c11_08_TL.webp",
+        "word": "직급",
+        "source": RANK_SOURCE,
+        "position": "BR",
+    },
+]
+
 INITIALS = [
     "ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ",
     "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ",
@@ -213,6 +222,21 @@ def build_card(sheet_number: int, position: str, word: str) -> Image.Image:
     return cleaned.resize((TARGET_SIZE, TARGET_SIZE), Image.Resampling.LANCZOS)
 
 
+def build_source_quadrant(source_path: Path, position: str) -> Image.Image:
+    if not source_path.exists():
+        raise FileNotFoundError(source_path)
+    with Image.open(source_path) as source:
+        source = source.convert("RGB")
+        crop = source.crop(crop_box(source.width, source.height, position))
+    return crop.resize((TARGET_SIZE, TARGET_SIZE), Image.Resampling.LANCZOS)
+
+
+def save_card_variants(base_name: str, word: str, card: Image.Image) -> None:
+    save_webp(card, OUTPUT_BASE / "split" / base_name)
+    save_webp(card, OUTPUT_BASE / "masked" / base_name.replace(".webp", "_masked.webp"))
+    save_webp(apply_choseong_overlay(card, word), OUTPUT_BASE / "choseong" / base_name)
+
+
 def main() -> None:
     generated = 0
     for sheet_number, sheet in SHEETS.items():
@@ -222,11 +246,15 @@ def main() -> None:
         for position, word in zip(POSITIONS, sheet["words"], strict=True):
             base_name = f"c11_{sheet_number:02d}_{position}.webp"
             card = build_card(sheet_number, position, word)
-            save_webp(card, OUTPUT_BASE / "split" / base_name)
-            save_webp(card, OUTPUT_BASE / "masked" / base_name.replace(".webp", "_masked.webp"))
-            save_webp(apply_choseong_overlay(card, word), OUTPUT_BASE / "choseong" / base_name)
+            save_card_variants(base_name, word, card)
             generated += 3
             print(f"{sheet_number:02d}_{position} {word or '(unused)'}")
+
+    for extra in EXTRA_CARDS:
+        card = build_source_quadrant(extra["source"], extra["position"])
+        save_card_variants(extra["base_name"], extra["word"], card)
+        generated += 3
+        print(f"{extra['base_name'].replace('.webp', '')} {extra['word']}")
 
     print(f"Generated {generated} c11 vocabulary WebP assets.")
 
