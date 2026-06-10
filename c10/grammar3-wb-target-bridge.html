@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>문법 3 2단계 1차</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="../shared/multilang-toggle.css" />
+    <style>
+        :root {
+            --bg: #f6f8fb;
+            --panel: #fff;
+            --ink: #142033;
+            --muted: #5d697c;
+            --line: #d8e1ee;
+            --accent: #0f766e;
+            --accent-soft: #ecfdf5;
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+            --amber: #b45309;
+            --amber-soft: #fffbeb;
+            --violet: #6d28d9;
+            --violet-soft: #f5f3ff;
+            --shadow: 0 14px 28px rgba(15, 23, 42, 0.07);
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            background: var(--bg);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+            letter-spacing: 0;
+        }
+
+        button { font: inherit; cursor: pointer; }
+        button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 52px;
+            padding: 8px 14px;
+            border-bottom: 1px solid rgba(216, 225, 238, 0.92);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            overflow-x: auto;
+        }
+
+        .topbar a,
+        .topbar strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            white-space: nowrap;
+            color: #1d4ed8;
+            font-size: 0.82rem;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .topbar strong { color: #334155; }
+        .topbar span { color: #cbd5e1; }
+
+        .icon {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 auto;
+            stroke-width: 2.4;
+        }
+
+        .shell {
+            width: min(1280px, calc(100% - 28px));
+            margin: 16px auto 36px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .unit-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: end;
+        }
+
+        h1,
+        h2,
+        h3,
+        p { margin-top: 0; }
+
+        h1 {
+            margin-bottom: 0;
+            font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+            line-height: 1.08;
+        }
+
+        h2 {
+            margin-bottom: 8px;
+            font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+            line-height: 1.22;
+        }
+
+        h3 { margin-bottom: 4px; font-size: 1rem; }
+
+        .head-actions,
+        .round-footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .btn,
+        .round-tab,
+        .future-card,
+        .form-card {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: #334155;
+            font-weight: 900;
+            text-decoration: none;
+            transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease, transform 0.18s ease;
+        }
+
+        .btn {
+            min-height: 40px;
+            padding: 8px 11px;
+            font-size: 0.88rem;
+        }
+
+        .btn.primary {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn.ghost { background: #f8fafc; }
+
+        .btn:hover,
+        .btn:focus-visible,
+        .round-tab:hover,
+        .round-tab:focus-visible,
+        .future-card:hover,
+        .future-card:focus-visible,
+        .form-card:hover,
+        .form-card:focus-visible {
+            border-color: #93c5fd;
+            background: var(--blue-soft);
+            outline: none;
+        }
+
+        .round-tabs {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .round-tab {
+            position: relative;
+            min-height: 72px;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .round-tab b {
+            color: #111827;
+            font-size: 1rem;
+        }
+
+        .round-tab span {
+            color: var(--muted);
+            font-size: 0.78rem;
+            line-height: 1.25;
+        }
+
+        .round-tab.is-active {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .guide-card,
+        .activity-page,
+        .complete-box {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .guide-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(260px, 390px);
+            gap: 14px;
+            align-items: center;
+            padding: 14px;
+        }
+
+        .guide-copy h2 { margin-bottom: 4px; }
+        .guide-copy p {
+            margin-bottom: 0;
+            color: var(--muted);
+            font-weight: 850;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            color: #334155;
+            font-size: 0.82rem;
+            font-weight: 950;
+        }
+
+        .progress-track {
+            height: 10px;
+            margin-top: 8px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        .progress-fill {
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: var(--accent);
+            transition: width 0.25s ease;
+        }
+
+        .activity-page {
+            display: grid;
+            gap: 14px;
+            padding: 14px;
+        }
+
+        .activity-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 38px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 7px 10px;
+            background: var(--blue-soft);
+            color: #1e3a8a;
+            font-weight: 950;
+        }
+
+        .coach-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 10px 12px;
+            background: var(--blue-soft);
+            color: #1e3a8a;
+            font-size: 0.91rem;
+            font-weight: 880;
+            line-height: 1.45;
+        }
+
+        .bridge-layout {
+            display: grid;
+            grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .future-deck,
+        .transform-panel {
+            display: grid;
+            gap: 10px;
+        }
+
+        .future-card {
+            position: relative;
+            min-height: 76px;
+            justify-content: flex-start;
+            padding: 12px 14px;
+            text-align: left;
+            line-height: 1.35;
+        }
+
+        .future-card.is-active {
+            border-color: var(--blue);
+            background: var(--blue-soft);
+            color: #1e3a8a;
+            box-shadow: 0 12px 22px rgba(37, 99, 235, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .future-card.is-complete::after {
+            content: "완료";
+            position: absolute;
+            right: 10px;
+            bottom: 8px;
+            border-radius: 999px;
+            padding: 3px 8px;
+            background: #dcfce7;
+            color: #166534;
+            font-size: 0.7rem;
+            font-weight: 950;
+        }
+
+        .same-line {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .same-card {
+            display: grid;
+            align-content: center;
+            gap: 8px;
+            min-height: 148px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 16px;
+            background: #fff;
+            text-align: center;
+        }
+
+        .same-card b {
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        .same-card strong {
+            color: #111827;
+            font-size: clamp(1.25rem, 3vw, 2rem);
+            line-height: 1.35;
+            word-break: keep-all;
+        }
+
+        .same-arrow {
+            display: grid;
+            place-items: center;
+            width: 52px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            background: var(--blue-soft);
+            color: var(--blue);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .form-card {
+            position: relative;
+            display: grid;
+            min-height: 154px;
+            align-content: center;
+            padding: 12px;
+            text-align: center;
+            line-height: 1.35;
+            overflow: hidden;
+        }
+
+        .form-card strong {
+            color: #111827;
+            font-size: clamp(1.05rem, 2.4vw, 1.45rem);
+            word-break: keep-all;
+        }
+
+        .form-card span {
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 950;
+        }
+
+        .form-card[data-form="thought"].is-done {
+            border-color: #7dd3fc;
+            background: #ecfeff;
+            color: #155e75;
+        }
+
+        .form-card[data-form="plan"].is-done {
+            border-color: #fcd34d;
+            background: var(--amber-soft);
+            color: var(--amber);
+        }
+
+        .form-card[data-form="schedule"].is-done {
+            border-color: #c4b5fd;
+            background: var(--violet-soft);
+            color: var(--violet);
+        }
+
+        .form-card.is-done::after {
+            content: "";
+            position: absolute;
+            top: 9px;
+            right: 9px;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: var(--accent);
+            box-shadow: inset 0 0 0 5px #fff;
+        }
+
+        .complete-box {
+            display: grid;
+            gap: 8px;
+            padding: 14px;
+            background: var(--accent-soft);
+        }
+
+        .complete-box h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            color: #065f46;
+            font-size: 1.05rem;
+        }
+
+        .nuance-panel {
+            display: grid;
+            gap: 10px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px;
+            background: #f8fafc;
+        }
+
+        .nuance-panel__head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .nuance-panel__head strong {
+            color: #111827;
+            font-size: 0.98rem;
+        }
+
+        .nuance-panel .multilang-bar {
+            padding: 0;
+        }
+
+        .multilang-btn--ko {
+            border-color: #94a3b8;
+            color: #334155;
+        }
+
+        .multilang-btn--ko.active {
+            background: #f8fafc;
+            box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.1);
+        }
+
+        .multilang-btn--all {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .multilang-btn--all.active {
+            background: var(--accent-soft);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+        }
+
+        .note-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 8px;
+        }
+
+        .note-card {
+            display: grid;
+            gap: 7px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 11px 12px;
+            background: #fff;
+            color: #334155;
+            line-height: 1.45;
+        }
+
+        .note-card[dir="rtl"] {
+            text-align: right;
+        }
+
+        .note-card b {
+            color: #111827;
+            font-size: 0.82rem;
+        }
+
+        .note-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 850;
+            overflow-wrap: anywhere;
+        }
+
+        .note-card small {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 900;
+            line-height: 1.45;
+        }
+
+        .note-card[data-note-lang="en"] {
+            border-color: #7dd3fc;
+            background: #f0f9ff;
+        }
+
+        .note-card[data-note-lang="vi"] {
+            border-color: #6ee7b7;
+            background: #ecfdf5;
+        }
+
+        .note-card[data-note-lang="ar"] {
+            border-color: #f0abfc;
+            background: #fdf4ff;
+        }
+
+        .note-card[data-note-lang="mn"] {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .note-card[data-note-lang="kk"] {
+            border-color: #67e8f9;
+            background: #ecfeff;
+        }
+
+        .note-card[data-note-lang="th"] {
+            border-color: #fde68a;
+            background: #fffbeb;
+        }
+
+        .empty-note {
+            margin: 0;
+            color: var(--muted);
+            font-weight: 900;
+        }
+
+        .transition-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1001;
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            background: transparent;
+            pointer-events: none;
+        }
+
+        .transition-card {
+            display: grid;
+            gap: 12px;
+            width: min(360px, calc(100vw - 36px));
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 22px;
+            background: #fff;
+            text-align: center;
+            box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
+            pointer-events: auto;
+            animation: cardPop 0.26s ease;
+        }
+
+        .transition-icon {
+            display: grid;
+            place-items: center;
+            width: 52px;
+            height: 52px;
+            justify-self: center;
+            border-radius: 8px;
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .transition-icon .icon {
+            width: 28px;
+            height: 28px;
+        }
+
+        .transition-card h2 {
+            margin: 0;
+            font-size: clamp(1.55rem, 5vw, 2.1rem);
+        }
+
+        @keyframes cardPop {
+            0% { transform: scale(0.97); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 980px) {
+            .unit-head,
+            .guide-card,
+            .bridge-layout,
+            .same-line {
+                grid-template-columns: 1fr;
+            }
+
+            .same-arrow {
+                width: auto;
+                min-height: 44px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .shell {
+                width: min(100% - 20px, 1280px);
+                margin-top: 10px;
+            }
+
+            .round-tabs,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .activity-page { padding: 12px; }
+            .head-actions { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i data-lucide="home" class="icon"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html"><i data-lucide="folder-open" class="icon"></i> 10과 목록</a>
+        <span>|</span>
+        <a href="grammar3.html"><i data-lucide="book-open" class="icon"></i> 문법 3</a>
+        <span>|</span>
+        <a href="grammar3-wb-support-quiz.html">1단계</a>
+        <span>|</span>
+        <strong>2단계 1차</strong>
+    </nav>
+
+    <main class="shell">
+        <header class="unit-head">
+            <div>
+                <h1>미래 표현</h1>
+            </div>
+            <div class="head-actions">
+                <button class="btn ghost" id="resetBtn" type="button"><i data-lucide="rotate-ccw" class="icon"></i> 처음부터</button>
+                <a class="btn primary" href="grammar3-wb-target-nuance.html">2차 <i data-lucide="arrow-right" class="icon"></i></a>
+            </div>
+        </header>
+
+        <nav class="round-tabs" aria-label="2단계 활동 순서">
+            <button class="round-tab is-active" type="button">
+                <b>1차</b>
+                <span>-을 거예요 → 목표 문법</span>
+            </button>
+            <a class="round-tab" href="grammar3-wb-target-nuance.html">
+                <b>2차</b>
+                <span>생각 · 계획 · 예정</span>
+            </a>
+        </nav>
+
+        <aside class="guide-card" aria-live="polite">
+            <div class="guide-copy">
+                <h2 id="guideTitle">카드 선택</h2>
+                <p id="guideText">같은 미래 표현 보기</p>
+            </div>
+            <div class="guide-metric" aria-label="현재 진행률">
+                <div class="metric-row">
+                    <span>확인</span>
+                    <span id="progressCount">0/18</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="activity-page" aria-label="2단계 1차 미래 표현 변환">
+            <div class="activity-head">
+                <div>
+                    <h2>-을 거예요</h2>
+                </div>
+                <div class="score-pill"><i data-lucide="sparkles" class="icon"></i> 표현 <span id="doneCount">0</span>/18</div>
+            </div>
+
+            <div class="coach-line" id="coachLine"><i data-lucide="mouse-pointer-2" class="icon"></i> 문장 선택 → 표현 선택</div>
+
+            <div class="bridge-layout">
+                <div class="future-deck" id="futureDeck" aria-label="-을 거예요 문장"></div>
+
+                <div class="transform-panel">
+                    <div class="same-line">
+                        <article class="same-card">
+                            <b>-을 거예요</b>
+                            <strong id="sourceSentence"></strong>
+                        </article>
+                        <div class="same-arrow" aria-hidden="true"><i data-lucide="arrow-right" class="icon"></i></div>
+                        <article class="same-card">
+                            <b>같은 미래</b>
+                            <strong id="targetPreview"></strong>
+                        </article>
+                    </div>
+
+                    <div class="form-grid" id="formGrid" aria-label="목표 문법 선택"></div>
+
+                    <section class="nuance-panel" aria-live="polite">
+                        <div class="nuance-panel__head">
+                            <strong id="nuanceTitle">의미 · 느낌</strong>
+                            <div class="multilang-bar" id="languageBar" role="group" aria-label="설명 언어 선택"></div>
+                        </div>
+                        <div class="note-grid" id="nuanceNotes">
+                            <p class="empty-note">표현을 선택하세요.</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div class="complete-box" id="completeBox" hidden>
+                <h3><i data-lucide="check-circle-2" class="icon"></i> 1차 완료</h3>
+            </div>
+
+            <div class="round-footer">
+                <a class="btn ghost" href="grammar3-wb-support-quiz.html"><i data-lucide="arrow-left" class="icon"></i> 1단계</a>
+            </div>
+        </section>
+    </main>
+
+    <div class="transition-overlay" id="transitionOverlay" hidden aria-live="polite">
+        <div class="transition-card" role="status">
+            <div class="transition-icon"><i data-lucide="arrow-right" class="icon"></i></div>
+            <h2>2차 시작</h2>
+            <button class="btn primary" id="nextBtn" type="button">2차 시작 <i data-lucide="arrow-right" class="icon"></i></button>
+        </div>
+    </div>
+
+    <script>
+        const forms = {
+            thought: { label: "생각", tag: "-ㄹ 생각이에요", icon: "brain" },
+            plan: { label: "계획", tag: "-ㄹ 계획이에요", icon: "list-checks" },
+            schedule: { label: "예정", tag: "-ㄹ 예정이에요", icon: "calendar-clock" }
+        };
+
+        const languages = [
+            { code: "ko", label: "한국어" },
+            { code: "en", label: "English" },
+            { code: "vi", label: "Tiếng Việt" },
+            { code: "ar", label: "العربية", dir: "rtl" },
+            { code: "mn", label: "Монгол" },
+            { code: "kk", label: "Қазақша" },
+            { code: "th", label: "ไทย" }
+        ];
+
+        const formNotes = {
+            thought: {
+                ko: { meaning: "하려고 마음먹었어요.", nuance: "개인적인 의도, 아직 유동적이에요." },
+                en: { meaning: "I have it in mind to do it.", nuance: "Personal intention; still flexible." },
+                vi: { meaning: "Tôi đang định làm việc đó.", nuance: "Ý định cá nhân; vẫn còn linh hoạt." },
+                ar: { meaning: "أنوي أن أفعل ذلك.", nuance: "نية شخصية؛ ما زالت مرنة." },
+                mn: { meaning: "Хийнэ гэж бодож байна.", nuance: "Хувийн санаа; өөрчлөгдөж болно." },
+                kk: { meaning: "Істеуді ойлап жүрмін.", nuance: "Жеке ниет; әлі икемді." },
+                th: { meaning: "ตั้งใจว่าจะทำ", nuance: "ความตั้งใจส่วนตัว ยังยืดหยุ่นได้" }
+            },
+            plan: {
+                ko: { meaning: "하려고 계획을 세웠어요.", nuance: "준비나 순서가 있는 미래예요." },
+                en: { meaning: "I have made a plan to do it.", nuance: "More organized; with steps or preparation." },
+                vi: { meaning: "Tôi đã có kế hoạch làm việc đó.", nuance: "Có sự chuẩn bị hoặc các bước." },
+                ar: { meaning: "لدي خطة للقيام بذلك.", nuance: "أكثر تنظيمًا؛ فيه إعداد أو خطوات." },
+                mn: { meaning: "Хийх төлөвлөгөөтэй байна.", nuance: "Бэлтгэл, дараалалтай." },
+                kk: { meaning: "Істеуге жоспарым бар.", nuance: "Дайындық не кезеңдері бар." },
+                th: { meaning: "มีแผนว่าจะทำ", nuance: "มีการเตรียมหรือขั้นตอน" }
+            },
+            schedule: {
+                ko: { meaning: "이미 일정이 잡혔어요.", nuance: "시간표나 공식 일정 느낌이에요." },
+                en: { meaning: "It is scheduled to happen.", nuance: "A fixed time or official schedule." },
+                vi: { meaning: "Việc đó đã được định sẵn.", nuance: "Một lịch trình hoặc thời gian đã cố định." },
+                ar: { meaning: "من المقرر أن يحدث ذلك.", nuance: "موعد أو جدول ثابت." },
+                mn: { meaning: "Хуваарьт орсон байна.", nuance: "Тогтсон цаг эсвэл албан хуваарь." },
+                kk: { meaning: "Бұл белгіленген.", nuance: "Уақыты бекітілген кесте." },
+                th: { meaning: "มีกำหนดว่าจะเกิดขึ้น", nuance: "เป็นกำหนดการหรือเวลาที่แน่นอน" }
+            }
+        };
+
+        const items = [
+            {
+                future: "주말에 영화를 볼 거예요.",
+                preview: "주말에 영화를 볼",
+                forms: {
+                    thought: "주말에 영화를 볼 생각이에요.",
+                    plan: "주말에 영화를 볼 계획이에요.",
+                    schedule: "주말에 영화를 볼 예정이에요."
+                }
+            },
+            {
+                future: "방학에 제주도에 갈 거예요.",
+                preview: "방학에 제주도에 갈",
+                forms: {
+                    thought: "방학에 제주도에 갈 생각이에요.",
+                    plan: "방학에 제주도에 갈 계획이에요.",
+                    schedule: "방학에 제주도에 갈 예정이에요."
+                }
+            },
+            {
+                future: "내년에 한국어를 더 공부할 거예요.",
+                preview: "내년에 한국어를 더 공부할",
+                forms: {
+                    thought: "내년에 한국어를 더 공부할 생각이에요.",
+                    plan: "내년에 한국어를 더 공부할 계획이에요.",
+                    schedule: "내년에 한국어를 더 공부할 예정이에요."
+                }
+            },
+            {
+                future: "숙제를 한 후에 친구에게 전화할 거예요.",
+                preview: "숙제를 한 후에 친구에게 전화할",
+                forms: {
+                    thought: "숙제를 한 후에 친구에게 전화할 생각이에요.",
+                    plan: "숙제를 한 후에 친구에게 전화할 계획이에요.",
+                    schedule: "숙제를 한 후에 친구에게 전화할 예정이에요."
+                }
+            },
+            {
+                future: "다음 주에 발표를 할 거예요.",
+                preview: "다음 주에 발표를 할",
+                forms: {
+                    thought: "다음 주에 발표를 할 생각이에요.",
+                    plan: "다음 주에 발표를 할 계획이에요.",
+                    schedule: "다음 주에 발표를 할 예정이에요."
+                }
+            },
+            {
+                future: "오늘 저녁에 운동할 거예요.",
+                preview: "오늘 저녁에 운동할",
+                forms: {
+                    thought: "오늘 저녁에 운동할 생각이에요.",
+                    plan: "오늘 저녁에 운동할 계획이에요.",
+                    schedule: "오늘 저녁에 운동할 예정이에요."
+                }
+            }
+        ];
+
+        const state = {
+            selected: 0,
+            done: new Set(),
+            lastForm: null,
+            activeLang: "ko",
+            finished: false
+        };
+
+        const refs = {
+            futureDeck: document.getElementById("futureDeck"),
+            formGrid: document.getElementById("formGrid"),
+            sourceSentence: document.getElementById("sourceSentence"),
+            targetPreview: document.getElementById("targetPreview"),
+            doneCount: document.getElementById("doneCount"),
+            progressCount: document.getElementById("progressCount"),
+            progressFill: document.getElementById("progressFill"),
+            guideTitle: document.getElementById("guideTitle"),
+            guideText: document.getElementById("guideText"),
+            coachLine: document.getElementById("coachLine"),
+            languageBar: document.getElementById("languageBar"),
+            nuanceTitle: document.getElementById("nuanceTitle"),
+            nuanceNotes: document.getElementById("nuanceNotes"),
+            completeBox: document.getElementById("completeBox"),
+            transitionOverlay: document.getElementById("transitionOverlay")
+        };
+
+        function iconRefresh() {
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            })[char]);
+        }
+
+        function doneKey(index, form) {
+            return `${index}:${form}`;
+        }
+
+        function itemComplete(index) {
+            return Object.keys(forms).every((form) => state.done.has(doneKey(index, form)));
+        }
+
+        function renderLanguageBar() {
+            refs.languageBar.innerHTML = [
+                ...languages.map((lang) => `
+                    <button class="multilang-btn multilang-btn--${lang.code} ${state.activeLang === lang.code ? "active" : ""}" type="button" data-bridge-lang="${lang.code}" aria-pressed="${state.activeLang === lang.code}">
+                        ${escapeHtml(lang.label)}
+                    </button>
+                `),
+                `<button class="multilang-btn multilang-btn--all ${state.activeLang === "all" ? "active" : ""}" type="button" data-bridge-lang="all" aria-pressed="${state.activeLang === "all"}">모두</button>`
+            ].join("");
+            refs.languageBar.querySelectorAll("[data-bridge-lang]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    state.activeLang = button.dataset.bridgeLang;
+                    renderLanguageBar();
+                    renderNuanceNotes();
+                });
+            });
+        }
+
+        function renderNuanceNotes() {
+            if (!state.lastForm) {
+                refs.nuanceTitle.textContent = "의미 · 느낌";
+                refs.nuanceNotes.innerHTML = `<p class="empty-note">표현을 선택하세요.</p>`;
+                return;
+            }
+
+            const form = forms[state.lastForm];
+            const visibleLangs = state.activeLang === "all"
+                ? languages
+                : languages.filter((lang) => lang.code === state.activeLang);
+
+            refs.nuanceTitle.textContent = `${form.label} · ${form.tag}`;
+            refs.nuanceNotes.innerHTML = visibleLangs.map((lang) => {
+                const note = formNotes[state.lastForm][lang.code];
+                return `
+                    <article class="note-card" data-note-lang="${lang.code}" dir="${lang.dir || "ltr"}">
+                        <b>${escapeHtml(lang.label)}</b>
+                        <p>${escapeHtml(note.meaning)}</p>
+                        <small>${escapeHtml(note.nuance)}</small>
+                    </article>
+                `;
+            }).join("");
+        }
+
+        function renderFutureDeck() {
+            refs.futureDeck.innerHTML = items.map((item, index) => `
+                <button class="future-card ${index === state.selected ? "is-active" : ""} ${itemComplete(index) ? "is-complete" : ""}" type="button" data-index="${index}">
+                    ${escapeHtml(item.future)}
+                </button>
+            `).join("");
+            refs.futureDeck.querySelectorAll("[data-index]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    state.selected = Number(button.dataset.index);
+                    render();
+                });
+            });
+        }
+
+        function renderForms() {
+            const item = items[state.selected];
+            refs.sourceSentence.textContent = item.future;
+            refs.targetPreview.textContent = `${item.preview} ...`;
+            refs.formGrid.innerHTML = Object.entries(forms).map(([key, form]) => {
+                const done = state.done.has(doneKey(state.selected, key));
+                return `
+                    <button class="form-card ${done ? "is-done" : ""}" type="button" data-form="${key}">
+                        <i data-lucide="${form.icon}" class="icon"></i>
+                        <span>${form.label} · ${form.tag}</span>
+                        <strong>${escapeHtml(item.forms[key])}</strong>
+                    </button>
+                `;
+            }).join("");
+            refs.formGrid.querySelectorAll("[data-form]").forEach((button) => {
+                button.addEventListener("click", () => checkForm(button.dataset.form));
+            });
+        }
+
+        function checkForm(form) {
+            state.done.add(doneKey(state.selected, form));
+            state.lastForm = form;
+            refs.guideTitle.textContent = forms[form].label;
+            refs.guideText.textContent = forms[form].tag;
+            refs.coachLine.innerHTML = `<i data-lucide="check-circle-2" class="icon"></i> 뜻과 느낌 확인`;
+
+            if (itemComplete(state.selected)) {
+                const next = items.findIndex((_, index) => !itemComplete(index));
+                if (next >= 0) state.selected = next;
+            }
+
+            render();
+            if (state.done.size === items.length * Object.keys(forms).length && !state.finished) {
+                state.finished = true;
+                refs.completeBox.hidden = false;
+                refs.transitionOverlay.hidden = false;
+            }
+        }
+
+        function updateProgress() {
+            const total = items.length * Object.keys(forms).length;
+            refs.doneCount.textContent = String(state.done.size);
+            refs.progressCount.textContent = `${state.done.size}/${total}`;
+            refs.progressFill.style.width = `${(state.done.size / total) * 100}%`;
+            if (!state.finished) {
+                refs.completeBox.hidden = true;
+                refs.transitionOverlay.hidden = true;
+                if (state.done.size === 0) {
+                    refs.guideTitle.textContent = "카드 선택";
+                    refs.guideText.textContent = "같은 미래 표현 보기";
+                    refs.coachLine.innerHTML = `<i data-lucide="mouse-pointer-2" class="icon"></i> 문장 선택 → 표현 선택`;
+                }
+            }
+        }
+
+        function render() {
+            renderFutureDeck();
+            renderForms();
+            renderLanguageBar();
+            renderNuanceNotes();
+            updateProgress();
+            iconRefresh();
+        }
+
+        function resetAll() {
+            state.selected = 0;
+            state.done = new Set();
+            state.lastForm = null;
+            state.activeLang = "ko";
+            state.finished = false;
+            render();
+        }
+
+        document.getElementById("resetBtn").addEventListener("click", resetAll);
+        document.getElementById("nextBtn").addEventListener("click", () => {
+            window.location.href = "grammar3-wb-target-nuance.html";
+        });
+
+        render();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

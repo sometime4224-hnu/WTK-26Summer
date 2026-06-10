@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>문법 3 2단계 2차</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --bg: #f6f8fb;
+            --panel: #fff;
+            --ink: #142033;
+            --muted: #5d697c;
+            --line: #d8e1ee;
+            --accent: #0f766e;
+            --accent-soft: #ecfdf5;
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+            --danger: #be123c;
+            --danger-soft: #fff1f2;
+            --thought: #0891b2;
+            --thought-soft: #ecfeff;
+            --plan: #b45309;
+            --plan-soft: #fffbeb;
+            --schedule: #6d28d9;
+            --schedule-soft: #f5f3ff;
+            --shadow: 0 14px 28px rgba(15, 23, 42, 0.07);
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            background: var(--bg);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+            letter-spacing: 0;
+        }
+
+        button { font: inherit; cursor: pointer; }
+        button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 52px;
+            padding: 8px 14px;
+            border-bottom: 1px solid rgba(216, 225, 238, 0.92);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            overflow-x: auto;
+        }
+
+        .topbar a,
+        .topbar strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            white-space: nowrap;
+            color: #1d4ed8;
+            font-size: 0.82rem;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .topbar strong { color: #334155; }
+        .topbar span { color: #cbd5e1; }
+
+        .icon {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 auto;
+            stroke-width: 2.4;
+        }
+
+        .shell {
+            width: min(1280px, calc(100% - 28px));
+            margin: 16px auto 36px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .unit-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: end;
+        }
+
+        h1,
+        h2,
+        h3,
+        p { margin-top: 0; }
+
+        h1 {
+            margin-bottom: 0;
+            font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+            line-height: 1.08;
+        }
+
+        h2 {
+            margin-bottom: 8px;
+            font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+            line-height: 1.22;
+        }
+
+        h3 { margin-bottom: 4px; font-size: 1rem; }
+
+        .head-actions,
+        .round-footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .btn,
+        .choice-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: #334155;
+            font-weight: 900;
+            text-decoration: none;
+            transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease, transform 0.18s ease;
+        }
+
+        .btn {
+            min-height: 40px;
+            padding: 8px 11px;
+            font-size: 0.88rem;
+        }
+
+        .btn.primary {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn.ghost { background: #f8fafc; }
+
+        .btn:hover,
+        .btn:focus-visible,
+        .choice-btn:hover,
+        .choice-btn:focus-visible {
+            border-color: #93c5fd;
+            background: var(--blue-soft);
+            outline: none;
+        }
+
+        .activity-page,
+        .question-card,
+        .feedback,
+        .final-panel {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .activity-page {
+            display: grid;
+            gap: 14px;
+            padding: 14px;
+        }
+
+        .activity-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 38px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 7px 10px;
+            background: var(--blue-soft);
+            color: #1e3a8a;
+            font-weight: 950;
+        }
+
+        .coach-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 10px 12px;
+            background: var(--blue-soft);
+            color: #1e3a8a;
+            font-size: 0.91rem;
+            font-weight: 880;
+            line-height: 1.45;
+        }
+
+        .question-card {
+            display: grid;
+            gap: 12px;
+            min-height: 340px;
+            align-content: center;
+            padding: 22px;
+            text-align: center;
+            overflow: hidden;
+            transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .question-card.is-correct {
+            border-color: #22c55e;
+            background: linear-gradient(180deg, #f0fdf4 0%, #fff 82%);
+            animation: cardPop 0.28s ease;
+        }
+
+        .question-card.is-wrong {
+            border-color: #fb7185;
+            background: linear-gradient(180deg, #fff1f2 0%, #fff 82%);
+            animation: answerShake 0.34s ease;
+        }
+
+        .context-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-self: center;
+            min-height: 34px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 6px 10px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.86rem;
+            font-weight: 950;
+        }
+
+        .situation-ko {
+            width: min(820px, 100%);
+            justify-self: center;
+            margin: 4px 0 0;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px 14px;
+            background: var(--blue-soft);
+            color: #1e3a8a;
+            font-size: clamp(1.08rem, 2.2vw, 1.42rem);
+            font-weight: 950;
+            line-height: 1.42;
+            word-break: keep-all;
+        }
+
+        .hint-toggle {
+            justify-self: center;
+            min-height: 36px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 7px 12px;
+            background: #fff;
+            color: #1d4ed8;
+            font-size: 0.88rem;
+            font-weight: 950;
+        }
+
+        .hint-toggle[aria-expanded="true"] {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .context-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 2px;
+            text-align: left;
+        }
+
+        .context-note {
+            display: grid;
+            gap: 4px;
+            border: 1px solid #d8e1ee;
+            border-radius: 8px;
+            padding: 9px 10px;
+            background: #fff;
+            color: #334155;
+            line-height: 1.45;
+        }
+
+        .context-note[dir="rtl"] {
+            text-align: right;
+        }
+
+        .context-note b {
+            color: #64748b;
+            font-size: 0.72rem;
+            font-weight: 950;
+        }
+
+        .context-note span {
+            color: #111827;
+            font-size: 0.84rem;
+            font-weight: 850;
+            overflow-wrap: anywhere;
+        }
+
+        .context-note[data-lang="en"] {
+            border-color: #7dd3fc;
+            background: #f0f9ff;
+        }
+
+        .context-note[data-lang="vi"] {
+            border-color: #6ee7b7;
+            background: #ecfdf5;
+        }
+
+        .context-note[data-lang="ar"] {
+            border-color: #f0abfc;
+            background: #fdf4ff;
+        }
+
+        .context-note[data-lang="mn"] {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .context-note[data-lang="kk"] {
+            border-color: #67e8f9;
+            background: #ecfeff;
+        }
+
+        .context-note[data-lang="th"] {
+            border-color: #fde68a;
+            background: #fffbeb;
+        }
+
+        .question-label {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 950;
+        }
+
+        .sentence-text {
+            margin: 0;
+            color: #111827;
+            font-size: clamp(1.55rem, 4.2vw, 2.55rem);
+            font-weight: 950;
+            line-height: 1.32;
+            word-break: keep-all;
+        }
+
+        .blank {
+            display: inline-flex;
+            min-width: min(220px, 62vw);
+            justify-content: center;
+            border-bottom: 4px solid #334155;
+            padding: 0 10px 3px;
+            color: #64748b;
+        }
+
+        .choice-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .choice-btn {
+            position: relative;
+            flex-direction: column;
+            min-height: 104px;
+            padding: 12px;
+            text-align: center;
+            line-height: 1.25;
+            overflow: hidden;
+        }
+
+        .choice-btn strong {
+            color: #111827;
+            font-size: 1.12rem;
+        }
+
+        .choice-btn span {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .choice-btn:not(:disabled):active {
+            transform: scale(0.98);
+        }
+
+        .choice-btn.is-correct {
+            border-color: #16a34a;
+            background: #dcfce7;
+            color: #166534;
+            opacity: 1;
+            transform: translateY(-2px);
+            animation: answerPop 0.28s ease;
+        }
+
+        .choice-btn.is-wrong {
+            border-color: #f43f5e;
+            background: var(--danger-soft);
+            color: #9f1239;
+            opacity: 1;
+            animation: answerShake 0.34s ease;
+        }
+
+        .choice-btn.is-selected {
+            outline: 3px solid rgba(37, 99, 235, 0.2);
+            outline-offset: 2px;
+        }
+
+        .choice-btn.is-dimmed {
+            opacity: 0.42;
+        }
+
+        .choice-btn.is-correct:disabled,
+        .choice-btn.is-wrong:disabled {
+            opacity: 1;
+        }
+
+        .feedback {
+            display: grid;
+            gap: 10px;
+            min-height: 48px;
+            padding: 11px 12px;
+            color: #334155;
+            font-size: 0.92rem;
+            font-weight: 850;
+            line-height: 1.5;
+            transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+        }
+
+        .feedback.good {
+            border-color: #86efac;
+            background: #f0fdf4;
+            color: #166534;
+            box-shadow: 0 12px 24px rgba(22, 163, 74, 0.12);
+        }
+
+        .feedback.bad {
+            border-color: #fecdd3;
+            background: var(--danger-soft);
+            color: #9f1239;
+            box-shadow: 0 12px 24px rgba(244, 63, 94, 0.1);
+        }
+
+        .feedback.is-live {
+            animation: feedbackEnter 0.25s ease;
+        }
+
+        .feedback-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .reaction-badge,
+        .next-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 30px;
+            border-radius: 8px;
+            padding: 5px 9px;
+            font-weight: 950;
+        }
+
+        .reaction-badge.good {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .reaction-badge.bad {
+            background: #ffe4e6;
+            color: #9f1239;
+        }
+
+        .next-chip {
+            border: 1px solid #bfdbfe;
+            background: var(--blue-soft);
+            color: #1d4ed8;
+            font-size: 0.78rem;
+        }
+
+        .answer-compare {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .answer-pill {
+            display: grid;
+            gap: 3px;
+            min-height: 62px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 9px 10px;
+            background: #fff;
+        }
+
+        .answer-pill b {
+            color: #64748b;
+            font-size: 0.74rem;
+        }
+
+        .answer-pill span {
+            color: #111827;
+            font-size: 1.02rem;
+            font-weight: 950;
+            word-break: keep-all;
+        }
+
+        .answer-pill.selected.good,
+        .answer-pill.correct {
+            border-color: #86efac;
+            background: #dcfce7;
+        }
+
+        .answer-pill.selected.bad {
+            border-color: #fecdd3;
+            background: #ffe4e6;
+        }
+
+        .feedback-clue {
+            margin: 0;
+            color: #334155;
+            font-weight: 850;
+        }
+
+        .inline-next-bar {
+            height: 7px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.24);
+        }
+
+        .inline-next-bar span {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            background: var(--blue);
+            transform-origin: left center;
+            animation: nextFill 1.85s linear forwards;
+        }
+
+        .final-panel {
+            display: grid;
+            gap: 12px;
+            padding: 18px;
+            border-color: #bbf7d0;
+            background: #f0fdf4;
+        }
+
+        .final-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .final-stat {
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+        }
+
+        .final-stat strong {
+            display: block;
+            color: #166534;
+            font-size: 1.28rem;
+        }
+
+        .final-stat span {
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 900;
+        }
+
+        @keyframes cardPop {
+            0% { transform: scale(0.97); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes answerPop {
+            0% { transform: translateY(0) scale(0.98); }
+            70% { transform: translateY(-3px) scale(1.02); }
+            100% { transform: translateY(-2px) scale(1); }
+        }
+
+        @keyframes answerShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            55% { transform: translateX(4px); }
+            80% { transform: translateX(-2px); }
+        }
+
+        @keyframes feedbackEnter {
+            0% { transform: translateY(6px); opacity: 0.4; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes nextFill {
+            0% { transform: scaleX(1); }
+            100% { transform: scaleX(0); }
+        }
+
+        @media (max-width: 900px) {
+            .unit-head,
+            .context-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .head-actions { justify-content: flex-start; }
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                width: min(100% - 20px, 1280px);
+                margin-top: 10px;
+            }
+
+            .choice-grid,
+            .final-grid,
+            .answer-compare {
+                grid-template-columns: 1fr;
+            }
+
+            .activity-page { padding: 12px; }
+            .question-card { min-height: 220px; padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i data-lucide="home" class="icon"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html"><i data-lucide="folder-open" class="icon"></i> 10과 목록</a>
+        <span>|</span>
+        <a href="grammar3.html"><i data-lucide="book-open" class="icon"></i> 문법 3</a>
+        <span>|</span>
+        <a href="grammar3-wb-target-bridge.html">2단계 1차</a>
+        <span>|</span>
+        <strong>2단계 2차</strong>
+    </nav>
+
+    <main class="shell">
+        <header class="unit-head">
+            <div>
+                <h1>생각 · 계획 · 예정</h1>
+            </div>
+            <div class="head-actions">
+                <a class="btn ghost" href="grammar3-wb-target-bridge.html"><i data-lucide="arrow-left" class="icon"></i> 1차</a>
+                <button class="btn ghost" id="restartBtn" type="button"><i data-lucide="rotate-ccw" class="icon"></i> 다시 풀기</button>
+            </div>
+        </header>
+
+        <section class="activity-page" aria-label="2단계 2차 느낌 선택">
+            <div class="activity-head">
+                <div>
+                    <h2>맥락 보고 고르기</h2>
+                </div>
+                <div class="score-pill"><i data-lucide="target" class="icon"></i> 점수 <span id="scoreText">0</span>/<span id="totalText">12</span></div>
+            </div>
+
+            <div class="coach-line" id="coachLine"><i data-lucide="mouse-pointer-2" class="icon"></i> 문장과 상황 보기 → 표현 선택</div>
+
+            <article class="question-card" id="questionCard">
+                <p class="question-label" id="questionLabel">1 / 12</p>
+                <p class="sentence-text" id="sentenceText"></p>
+                <p class="situation-ko" id="situationKo">상황: </p>
+                <button class="hint-toggle" id="hintToggle" type="button" aria-expanded="false" aria-controls="contextGrid">번역 힌트 (Hint)</button>
+                <div class="context-grid" id="contextGrid" aria-label="다국어 상황" hidden></div>
+            </article>
+
+            <div class="choice-grid" aria-label="느낌 선택 버튼">
+                <button class="choice-btn" type="button" data-answer="thought">
+                    <i data-lucide="brain" class="icon"></i>
+                    <strong>생각이에요</strong>
+                    <span>마음속 의도</span>
+                </button>
+                <button class="choice-btn" type="button" data-answer="plan">
+                    <i data-lucide="list-checks" class="icon"></i>
+                    <strong>계획이에요</strong>
+                    <span>준비 · 순서</span>
+                </button>
+                <button class="choice-btn" type="button" data-answer="schedule">
+                    <i data-lucide="calendar-clock" class="icon"></i>
+                    <strong>예정이에요</strong>
+                    <span>정해진 일정</span>
+                </button>
+            </div>
+
+            <div class="feedback" id="feedback" aria-live="polite">선택</div>
+
+            <div class="final-panel" id="finalPanel" hidden>
+                <div>
+                    <h2>완료</h2>
+                </div>
+                <div class="final-grid">
+                    <div class="final-stat">
+                        <strong id="finalScore">0/0</strong>
+                        <span>정답</span>
+                    </div>
+                    <div class="final-stat">
+                        <strong id="finalRate">0%</strong>
+                        <span>성공률</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="round-footer">
+                <a class="btn ghost" href="grammar3-wb-target-bridge.html"><i data-lucide="arrow-left" class="icon"></i> 1차</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const toneMeta = {
+            thought: { label: "생각", answer: "생각이에요", clue: "마음속 의도", icon: "brain" },
+            plan: { label: "계획", answer: "계획이에요", clue: "준비나 순서", icon: "list-checks" },
+            schedule: { label: "예정", answer: "예정이에요", clue: "정해진 일정", icon: "calendar-clock" }
+        };
+
+        const contextLangs = [
+            { code: "en", label: "English" },
+            { code: "vi", label: "Tiếng Việt" },
+            { code: "ar", label: "العربية", dir: "rtl" },
+            { code: "mn", label: "Монгол" },
+            { code: "kk", label: "Қазақша" },
+            { code: "th", label: "ไทย" }
+        ];
+
+        const questions = [
+            {
+                sentence: "주말에는 집에서 푹 쉴 ____.",
+                situation: {
+                    ko: "상황: 아직 약속이나 예약은 없고, 스스로 쉬려고 마음먹었어요.",
+                    en: "Situation: There is no fixed appointment; the speaker personally wants to rest.",
+                    vi: "Tình huống: Chưa có lịch hẹn cố định; người nói tự muốn nghỉ ngơi.",
+                    ar: "الموقف: لا يوجد موعد ثابت؛ المتحدث يريد أن يستريح شخصيًا.",
+                    mn: "Нөхцөл: Тогтсон уулзалт байхгүй; яригч өөрөө амрахыг хүсэж байна.",
+                    kk: "Жағдай: Белгіленген кездесу жоқ; сөйлеуші өзі демалғысы келеді.",
+                    th: "สถานการณ์: ยังไม่มีนัดที่กำหนดไว้ ผู้พูดอยากพักเอง"
+                },
+                answer: "thought",
+                clue: "개인적으로 마음먹은 일이므로 생각이 자연스럽습니다."
+            },
+            {
+                sentence: "이번 주에 발표 자료를 먼저 만들 ____.",
+                situation: {
+                    ko: "상황: 발표 준비 순서를 정했고, 이번 주에는 자료를 만들기로 했어요.",
+                    en: "Situation: The preparation steps are set; this week the speaker will make the materials.",
+                    vi: "Tình huống: Đã sắp xếp các bước chuẩn bị; tuần này sẽ làm tài liệu.",
+                    ar: "الموقف: تم ترتيب خطوات التحضير؛ هذا الأسبوع سيُعدّ المواد.",
+                    mn: "Нөхцөл: Бэлтгэлийн дарааллыг тогтоосон; энэ долоо хоногт материалаа хийнэ.",
+                    kk: "Жағдай: Дайындық кезеңдері белгіленді; осы аптада материал жасайды.",
+                    th: "สถานการณ์: กำหนดขั้นตอนเตรียมงานแล้ว สัปดาห์นี้จะทำเอกสาร"
+                },
+                answer: "plan",
+                clue: "해야 할 일을 정해 두었으므로 계획이 자연스럽습니다."
+            },
+            {
+                sentence: "회의는 오후 3시에 시작될 ____.",
+                situation: {
+                    ko: "상황: 회의 시간이 오후 3시로 이미 정해져 있어요.",
+                    en: "Situation: The meeting time is already fixed at 3 p.m.",
+                    vi: "Tình huống: Giờ họp đã được ấn định là 3 giờ chiều.",
+                    ar: "الموقف: وقت الاجتماع محدد مسبقًا في الساعة الثالثة بعد الظهر.",
+                    mn: "Нөхцөл: Хурлын цаг 15:00 гэж аль хэдийн тогтсон.",
+                    kk: "Жағдай: Жиналыс уақыты сағат 15:00 болып бекітілген.",
+                    th: "สถานการณ์: เวลาประชุมกำหนดไว้แล้วตอนบ่ายสามโมง"
+                },
+                answer: "schedule",
+                clue: "시간이 정해진 일정이므로 예정이 자연스럽습니다."
+            },
+            {
+                sentence: "방학에는 기타를 배울 ____.",
+                situation: {
+                    ko: "상황: 학원 등록은 아직 안 했고, 배우고 싶다고 생각하고 있어요.",
+                    en: "Situation: The speaker has not registered yet; they are thinking of learning guitar.",
+                    vi: "Tình huống: Chưa đăng ký lớp; người nói đang nghĩ sẽ học ghi-ta.",
+                    ar: "الموقف: لم يسجل في معهد بعد؛ يفكر في تعلم الغيتار.",
+                    mn: "Нөхцөл: Дугуйланд бүртгүүлээгүй; гитар сурах талаар бодож байна.",
+                    kk: "Жағдай: Әлі курсқа жазылған жоқ; гитара үйренуді ойлап жүр.",
+                    th: "สถานการณ์: ยังไม่ได้สมัครเรียน แค่คิดว่าอยากเรียนกีตาร์"
+                },
+                answer: "thought",
+                clue: "아직 마음속 의도에 가까우므로 생각이 자연스럽습니다."
+            },
+            {
+                sentence: "여행 전에 호텔을 예약할 ____.",
+                situation: {
+                    ko: "상황: 여행 준비 목록을 만들었고, 호텔 예약을 그 목록에 넣었어요.",
+                    en: "Situation: A travel checklist is made, and booking a hotel is on it.",
+                    vi: "Tình huống: Đã lập danh sách chuẩn bị du lịch, trong đó có đặt khách sạn.",
+                    ar: "الموقف: وُضعت قائمة التحضير للسفر، ومنها حجز الفندق.",
+                    mn: "Нөхцөл: Аяллын бэлтгэлийн жагсаалт гаргаж, буудал захиалахыг оруулсан.",
+                    kk: "Жағдай: Саяхатқа дайындық тізімі жасалды, оған қонақүй брондау кірді.",
+                    th: "สถานการณ์: ทำรายการเตรียมเที่ยวแล้ว และใส่เรื่องจองโรงแรมไว้"
+                },
+                answer: "plan",
+                clue: "여행 준비에 필요한 단계이므로 계획이 자연스럽습니다."
+            },
+            {
+                sentence: "시험은 다음 주 금요일에 있을 ____.",
+                situation: {
+                    ko: "상황: 학교에서 시험 날짜를 다음 주 금요일로 공지했어요.",
+                    en: "Situation: The school announced the exam date as next Friday.",
+                    vi: "Tình huống: Nhà trường đã thông báo ngày thi là thứ Sáu tuần sau.",
+                    ar: "الموقف: أعلنت المدرسة أن موعد الاختبار هو الجمعة القادمة.",
+                    mn: "Нөхцөл: Сургууль шалгалтын өдрийг ирэх баасан гэж зарласан.",
+                    kk: "Жағдай: Мектеп емтихан күнін келесі жұма деп жариялады.",
+                    th: "สถานการณ์: โรงเรียนประกาศวันสอบเป็นวันศุกร์หน้า"
+                },
+                answer: "schedule",
+                clue: "날짜가 정해진 일정이므로 예정이 자연스럽습니다."
+            },
+            {
+                sentence: "내년에는 운동을 더 열심히 할 ____.",
+                situation: {
+                    ko: "상황: 아직 구체적인 운동표는 없고, 스스로 다짐하고 있어요.",
+                    en: "Situation: There is no detailed workout schedule yet; the speaker is making a personal resolution.",
+                    vi: "Tình huống: Chưa có lịch tập cụ thể; người nói tự quyết tâm.",
+                    ar: "الموقف: لا يوجد جدول تمرين مفصل بعد؛ المتحدث يعزم شخصيًا.",
+                    mn: "Нөхцөл: Нарийн дасгалын хуваарь хараахан байхгүй; өөрөө шийдэж байна.",
+                    kk: "Жағдай: Нақты жаттығу кестесі әлі жоқ; сөйлеуші өзі ниеттеніп отыр.",
+                    th: "สถานการณ์: ยังไม่มีตารางออกกำลังกายชัดเจน เป็นความตั้งใจของผู้พูด"
+                },
+                answer: "thought",
+                clue: "스스로 마음먹은 일이므로 생각이 자연스럽습니다."
+            },
+            {
+                sentence: "프로젝트를 세 단계로 나누어 진행할 ____.",
+                situation: {
+                    ko: "상황: 프로젝트 진행 방법을 1단계, 2단계, 3단계로 정했어요.",
+                    en: "Situation: The project method is organized into step 1, step 2, and step 3.",
+                    vi: "Tình huống: Cách làm dự án đã được chia thành bước 1, 2, 3.",
+                    ar: "الموقف: تم تنظيم المشروع إلى المرحلة الأولى والثانية والثالثة.",
+                    mn: "Нөхцөл: Төслийг 1, 2, 3-р үе шаттайгаар хийхээр тогтсон.",
+                    kk: "Жағдай: Жоба 1, 2, 3-кезеңге бөлініп ұйымдастырылды.",
+                    th: "สถานการณ์: กำหนดวิธีทำโครงการเป็นขั้นที่ 1, 2, 3 แล้ว"
+                },
+                answer: "plan",
+                clue: "단계와 순서가 있으므로 계획이 자연스럽습니다."
+            },
+            {
+                sentence: "비행기는 내일 아침에 도착할 ____.",
+                situation: {
+                    ko: "상황: 항공권에 도착 시간이 내일 아침으로 표시되어 있어요.",
+                    en: "Situation: The ticket shows the arrival time as tomorrow morning.",
+                    vi: "Tình huống: Vé máy bay ghi thời gian đến là sáng mai.",
+                    ar: "الموقف: تظهر التذكرة أن وقت الوصول صباح الغد.",
+                    mn: "Нөхцөл: Тасалбар дээр ирэх цаг маргааш өглөө гэж бичсэн.",
+                    kk: "Жағдай: Билетте келу уақыты ертең таңертең деп көрсетілген.",
+                    th: "สถานการณ์: ในตั๋วเครื่องบินระบุเวลาถึงเป็นพรุ่งนี้เช้า"
+                },
+                answer: "schedule",
+                clue: "도착 시간이 잡혀 있으므로 예정이 자연스럽습니다."
+            },
+            {
+                sentence: "졸업 후에는 한국에서 일할 ____.",
+                situation: {
+                    ko: "상황: 아직 회사가 정해진 것은 아니고, 그렇게 하고 싶어 해요.",
+                    en: "Situation: No company is fixed yet; the speaker wants to do that.",
+                    vi: "Tình huống: Chưa có công ty cụ thể; người nói muốn làm như vậy.",
+                    ar: "الموقف: لم تُحدَّد شركة بعد؛ المتحدث يريد ذلك.",
+                    mn: "Нөхцөл: Ажиллах компани хараахан тодорхой биш; тэгж хүсэж байна.",
+                    kk: "Жағдай: Компания әлі анықталған жоқ; сөйлеуші соны қалайды.",
+                    th: "สถานการณ์: ยังไม่ได้กำหนดบริษัท แค่ผู้พูดอยากทำแบบนั้น"
+                },
+                answer: "thought",
+                clue: "개인의 의도와 바람에 가까우므로 생각이 자연스럽습니다."
+            },
+            {
+                sentence: "다음 달부터 매일 단어를 외울 ____.",
+                situation: {
+                    ko: "상황: 공부 방법을 정했고, 매일 할 일로 단어 외우기를 넣었어요.",
+                    en: "Situation: The study method is set, and memorizing words is a daily task.",
+                    vi: "Tình huống: Đã chọn cách học, và việc học từ vựng là nhiệm vụ hằng ngày.",
+                    ar: "الموقف: تم تحديد طريقة الدراسة، وحفظ الكلمات مهمة يومية.",
+                    mn: "Нөхцөл: Сурах аргаа тогтоож, үг цээжлэхийг өдөр бүрийн ажил болгосон.",
+                    kk: "Жағдай: Оқу тәсілі белгіленді, сөз жаттау күнделікті тапсырма болды.",
+                    th: "สถานการณ์: กำหนดวิธีเรียนแล้ว และใส่การท่องศัพท์เป็นงานประจำวัน"
+                },
+                answer: "plan",
+                clue: "반복할 방법을 정했으므로 계획이 자연스럽습니다."
+            },
+            {
+                sentence: "공연은 저녁 7시에 열릴 ____.",
+                situation: {
+                    ko: "상황: 공연 안내문에 시작 시간이 저녁 7시로 적혀 있어요.",
+                    en: "Situation: The event notice says the performance starts at 7 p.m.",
+                    vi: "Tình huống: Thông báo biểu diễn ghi giờ bắt đầu là 7 giờ tối.",
+                    ar: "الموقف: يذكر إعلان العرض أن البداية في الساعة السابعة مساءً.",
+                    mn: "Нөхцөл: Тоглолтын зар дээр эхлэх цаг 19:00 гэж бичсэн.",
+                    kk: "Жағдай: Қойылым хабарламасында басталу уақыты кешкі 7 деп жазылған.",
+                    th: "สถานการณ์: ประกาศการแสดงระบุว่าเริ่มหนึ่งทุ่ม"
+                },
+                answer: "schedule",
+                clue: "시간이 정해진 공식 일정이므로 예정이 자연스럽습니다."
+            }
+        ];
+
+        const state = {
+            index: 0,
+            score: 0,
+            answered: false,
+            hintOpen: false,
+            timer: null
+        };
+
+        const refs = {
+            scoreText: document.getElementById("scoreText"),
+            totalText: document.getElementById("totalText"),
+            coachLine: document.getElementById("coachLine"),
+            questionCard: document.getElementById("questionCard"),
+            questionLabel: document.getElementById("questionLabel"),
+            sentenceText: document.getElementById("sentenceText"),
+            situationKo: document.getElementById("situationKo"),
+            hintToggle: document.getElementById("hintToggle"),
+            contextGrid: document.getElementById("contextGrid"),
+            feedback: document.getElementById("feedback"),
+            finalPanel: document.getElementById("finalPanel"),
+            finalScore: document.getElementById("finalScore"),
+            finalRate: document.getElementById("finalRate")
+        };
+
+        function iconRefresh() {
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            })[char]);
+        }
+
+        function clearAuto() {
+            if (state.timer) {
+                clearTimeout(state.timer);
+                state.timer = null;
+            }
+        }
+
+        function queueNext() {
+            clearAuto();
+            state.timer = setTimeout(() => {
+                state.timer = null;
+                nextQuestion();
+            }, 1850);
+        }
+
+        function markCard(isCorrect) {
+            refs.questionCard.classList.remove("is-correct", "is-wrong");
+            void refs.questionCard.offsetWidth;
+            refs.questionCard.classList.add(isCorrect ? "is-correct" : "is-wrong");
+        }
+
+        function renderSentence(sentence) {
+            refs.sentenceText.innerHTML = escapeHtml(sentence).replace("____", `<span class="blank">____</span>`);
+        }
+
+        function renderSituation(question) {
+            refs.situationKo.textContent = question.situation.ko;
+            refs.contextGrid.innerHTML = contextLangs.map((lang) => `
+                <article class="context-note" data-lang="${lang.code}" dir="${lang.dir || "ltr"}">
+                    <b>${escapeHtml(lang.label)}</b>
+                    <span>${escapeHtml(question.situation[lang.code])}</span>
+                </article>
+            `).join("");
+            updateHint();
+        }
+
+        function updateHint() {
+            refs.contextGrid.hidden = !state.hintOpen;
+            refs.hintToggle.setAttribute("aria-expanded", String(state.hintOpen));
+            refs.hintToggle.textContent = state.hintOpen ? "번역 힌트 접기" : "번역 힌트 (Hint)";
+        }
+
+        function toggleHint() {
+            state.hintOpen = !state.hintOpen;
+            updateHint();
+        }
+
+        function renderQuestion() {
+            const question = questions[state.index];
+            state.answered = false;
+            state.hintOpen = false;
+            clearAuto();
+            refs.finalPanel.hidden = true;
+            refs.questionCard.classList.remove("is-correct", "is-wrong");
+            refs.questionLabel.textContent = `${state.index + 1} / ${questions.length}`;
+            renderSentence(question.sentence);
+            renderSituation(question);
+            refs.feedback.className = "feedback";
+            refs.feedback.textContent = "선택";
+            refs.coachLine.innerHTML = `<i data-lucide="mouse-pointer-2" class="icon"></i> 문장과 상황 보기 → 표현 선택`;
+            document.querySelectorAll("[data-answer]").forEach((button) => {
+                button.disabled = false;
+                button.classList.remove("is-correct", "is-wrong", "is-selected", "is-dimmed");
+            });
+            iconRefresh();
+        }
+
+        function renderFeedback(answer, isCorrect) {
+            const question = questions[state.index];
+            const selected = toneMeta[answer];
+            const correct = toneMeta[question.answer];
+            refs.feedback.className = `feedback ${isCorrect ? "good" : "bad"} is-live`;
+            refs.feedback.innerHTML = `
+                <div class="feedback-head">
+                    <span class="reaction-badge ${isCorrect ? "good" : "bad"}"><i data-lucide="${isCorrect ? "check-circle-2" : "x-circle"}" class="icon"></i>${isCorrect ? "정답" : "오답"}</span>
+                    <span class="next-chip">곧 다음</span>
+                </div>
+                <div class="answer-compare">
+                    <div class="answer-pill selected ${isCorrect ? "good" : "bad"}">
+                        <b>선택</b>
+                        <span>${escapeHtml(selected.answer)} · ${escapeHtml(selected.clue)}</span>
+                    </div>
+                    <div class="answer-pill correct">
+                        <b>정답</b>
+                        <span>${escapeHtml(correct.answer)} · ${escapeHtml(correct.clue)}</span>
+                    </div>
+                </div>
+                <p class="feedback-clue">${escapeHtml(question.clue)}</p>
+                <div class="inline-next-bar" aria-hidden="true"><span></span></div>
+            `;
+            iconRefresh();
+        }
+
+        function answerQuestion(answer) {
+            if (state.answered) return;
+            state.answered = true;
+            const question = questions[state.index];
+            const isCorrect = answer === question.answer;
+            if (isCorrect) state.score += 1;
+            refs.scoreText.textContent = String(state.score);
+            markCard(isCorrect);
+            document.querySelectorAll("[data-answer]").forEach((button) => {
+                const value = button.dataset.answer;
+                button.disabled = true;
+                button.classList.remove("is-correct", "is-wrong", "is-selected", "is-dimmed");
+                if (value === answer) button.classList.add("is-selected");
+                if (value === question.answer) button.classList.add("is-correct");
+                if (value === answer && !isCorrect) button.classList.add("is-wrong");
+                if (value !== question.answer && value !== answer) button.classList.add("is-dimmed");
+            });
+            renderFeedback(answer, isCorrect);
+            refs.coachLine.innerHTML = `<i data-lucide="${isCorrect ? "check-circle-2" : "search-check"}" class="icon"></i> ${toneMeta[question.answer].label}`;
+            queueNext();
+        }
+
+        function nextQuestion() {
+            if (!state.answered) return;
+            if (state.index < questions.length - 1) {
+                state.index += 1;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            clearAuto();
+            refs.finalPanel.hidden = false;
+            refs.finalScore.textContent = `${state.score}/${questions.length}`;
+            refs.finalRate.textContent = `${Math.round((state.score / questions.length) * 100)}%`;
+            refs.coachLine.innerHTML = `<i data-lucide="check-circle-2" class="icon"></i> 완료`;
+            iconRefresh();
+        }
+
+        function restart() {
+            state.index = 0;
+            state.score = 0;
+            state.answered = false;
+            state.hintOpen = false;
+            refs.scoreText.textContent = "0";
+            renderQuestion();
+        }
+
+        document.querySelectorAll("[data-answer]").forEach((button) => {
+            button.addEventListener("click", () => answerQuestion(button.dataset.answer));
+        });
+        refs.hintToggle.addEventListener("click", toggleHint);
+        document.getElementById("restartBtn").addEventListener("click", restart);
+        refs.totalText.textContent = String(questions.length);
+        restart();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>
