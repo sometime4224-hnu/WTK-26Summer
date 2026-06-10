@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>C10 문법1 교사용 - -던 카드 퀴즈</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --ink: #0f172a;
+            --muted: #64748b;
+            --line: #d8e2ee;
+            --panel: #ffffff;
+            --wash: #f6f8fb;
+            --dun: #0f766e;
+            --done: #2563eb;
+            --warn: #b45309;
+            --shadow: 0 18px 42px rgba(15, 23, 42, 0.11);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--wash);
+            color: var(--ink);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif;
+        }
+
+        button,
+        a {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 56px;
+            padding: 10px max(16px, calc((100vw - 1240px) / 2 + 16px));
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar a,
+        .topbar__title {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            color: #334155;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
+        .topbar__links,
+        .topbar__tools {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .topbar__title {
+            color: var(--dun);
+        }
+
+        .shell {
+            width: min(100% - 32px, 1240px);
+            margin: 18px auto 34px;
+        }
+
+        .unit-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 16px;
+            align-items: end;
+            margin-bottom: 14px;
+        }
+
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--dun);
+            font-size: 0.76rem;
+            font-weight: 950;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            line-height: 1.14;
+        }
+
+        .lead {
+            max-width: 760px;
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-weight: 750;
+            line-height: 1.6;
+            word-break: keep-all;
+        }
+
+        .teacher-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 9px 13px;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            background: #fff7ed;
+            color: #9a3412;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.82fr) minmax(0, 1.18fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .card-menu,
+        .display-panel,
+        .all-panel {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .card-menu {
+            overflow: hidden;
+        }
+
+        .menu-head {
+            display: grid;
+            gap: 10px;
+            padding: 14px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .menu-head h2,
+        .all-panel h2 {
+            margin: 0;
+            font-size: 1.18rem;
+        }
+
+        .menu-head p,
+        .all-panel p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 750;
+            line-height: 1.45;
+            word-break: keep-all;
+        }
+
+        .filter-row,
+        .display-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-btn,
+        .tool-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            padding: 8px 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            font-weight: 900;
+        }
+
+        .filter-btn.active,
+        .tool-btn.primary {
+            border-color: var(--dun);
+            background: var(--dun);
+            color: #ffffff;
+        }
+
+        .tool-btn.warn {
+            border-color: #f59e0b;
+            background: #f59e0b;
+            color: #ffffff;
+        }
+
+        .menu-list {
+            display: grid;
+            max-height: calc(100vh - 260px);
+            overflow: auto;
+            padding: 10px;
+            gap: 8px;
+        }
+
+        .menu-card {
+            display: grid;
+            grid-template-columns: 76px minmax(0, 1fr);
+            gap: 10px;
+            width: 100%;
+            padding: 7px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: #f8fafc;
+            text-align: left;
+        }
+
+        .menu-card:hover,
+        .menu-card:focus-visible,
+        .menu-card.active {
+            border-color: var(--dun);
+            background: #ecfeff;
+            outline: none;
+        }
+
+        .menu-card img {
+            width: 76px;
+            height: 88px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: #fffdf8;
+            object-fit: contain;
+        }
+
+        .menu-card__meta {
+            display: grid;
+            align-content: center;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .menu-card__expression {
+            color: var(--ink);
+            font-size: 1.05rem;
+            font-weight: 950;
+            line-height: 1.22;
+            word-break: keep-all;
+        }
+
+        .menu-card__base {
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 850;
+            line-height: 1.35;
+            word-break: keep-all;
+        }
+
+        .grammar-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: max-content;
+            min-height: 24px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            color: #ffffff;
+            font-size: 0.78rem;
+            font-weight: 950;
+            line-height: 1;
+        }
+
+        .grammar-pill.dun {
+            background: var(--dun);
+        }
+
+        .grammar-pill.done {
+            background: var(--done);
+        }
+
+        .display-panel {
+            overflow: hidden;
+        }
+
+        .display-stage {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.95fr) minmax(260px, 1.05fr);
+            gap: 0;
+            min-height: 560px;
+        }
+
+        .visual-side {
+            display: grid;
+            align-content: start;
+            gap: 12px;
+            padding: 18px;
+            background: #fffdf8;
+        }
+
+        .question-line {
+            display: grid;
+            justify-items: center;
+            gap: 7px;
+            text-align: center;
+        }
+
+        .question-line__blank {
+            color: var(--ink);
+            font-size: 4.6rem;
+            font-weight: 950;
+            line-height: 1;
+            word-break: keep-all;
+        }
+
+        .question-line__base {
+            color: var(--dun);
+            font-size: 2.2rem;
+            font-weight: 950;
+            line-height: 1.12;
+            word-break: keep-all;
+        }
+
+        .hero-image {
+            display: block;
+            width: 100%;
+            height: min(52vh, 420px);
+            min-height: 300px;
+            object-fit: contain;
+            object-position: center;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fffdf8;
+        }
+
+        .answer-side {
+            display: grid;
+            align-content: center;
+            gap: 16px;
+            padding: 20px;
+            border-left: 1px solid var(--line);
+            background: #ffffff;
+        }
+
+        .answer-label {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 950;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .answer-box {
+            display: grid;
+            justify-items: start;
+            gap: 14px;
+        }
+
+        .answer-grammar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 220px;
+            padding: 9px 24px 13px;
+            border: 3px solid currentColor;
+            border-radius: 8px;
+            background: #ffffff;
+            color: var(--dun);
+            font-size: 6.2rem;
+            font-weight: 950;
+            line-height: 0.95;
+        }
+
+        .answer-grammar.done {
+            color: var(--done);
+        }
+
+        .answer-expression {
+            color: var(--ink);
+            font-size: 4rem;
+            font-weight: 950;
+            line-height: 1.06;
+            word-break: keep-all;
+        }
+
+        .answer-detail {
+            display: grid;
+            gap: 8px;
+            padding-top: 2px;
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 82px minmax(0, 1fr);
+            gap: 10px;
+            align-items: baseline;
+            color: #334155;
+            font-weight: 850;
+            line-height: 1.45;
+        }
+
+        .detail-row span {
+            color: var(--muted);
+            font-size: 0.84rem;
+            font-weight: 950;
+        }
+
+        .display-actions {
+            padding-top: 2px;
+        }
+
+        .answer-side.answer-hidden .answer-box,
+        .answer-side.answer-hidden .answer-detail {
+            filter: blur(10px);
+            opacity: 0.28;
+            user-select: none;
+        }
+
+        .all-panel {
+            margin-top: 14px;
+            padding: 14px;
+        }
+
+        .all-panel__head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .all-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .all-card {
+            display: grid;
+            gap: 7px;
+            min-width: 0;
+            padding: 8px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #fbfdff;
+        }
+
+        .all-card img {
+            display: block;
+            width: 100%;
+            height: 150px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: #fffdf8;
+            object-fit: contain;
+        }
+
+        .all-card strong {
+            color: var(--ink);
+            font-size: 1rem;
+            font-weight: 950;
+            line-height: 1.25;
+            word-break: keep-all;
+        }
+
+        .all-card span {
+            color: var(--muted);
+            font-size: 0.84rem;
+            font-weight: 850;
+            line-height: 1.35;
+            word-break: keep-all;
+        }
+
+        .is-hidden {
+            display: none;
+        }
+
+        @media (max-width: 1020px) {
+            .unit-head,
+            .workspace,
+            .display-stage {
+                grid-template-columns: 1fr;
+            }
+
+            .answer-side {
+                border-left: 0;
+                border-top: 1px solid var(--line);
+            }
+
+            .menu-list {
+                max-height: none;
+            }
+
+            .all-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 620px) {
+            .shell {
+                width: min(100% - 18px, 1240px);
+                margin-top: 12px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 1.55rem;
+            }
+
+            .teacher-badge {
+                white-space: normal;
+            }
+
+            .question-line__blank {
+                font-size: 3rem;
+            }
+
+            .question-line__base {
+                font-size: 1.55rem;
+            }
+
+            .hero-image {
+                min-height: 240px;
+                height: 300px;
+            }
+
+            .answer-grammar {
+                min-width: 0;
+                max-width: 100%;
+                font-size: 3.7rem;
+            }
+
+            .answer-expression {
+                font-size: 2.45rem;
+            }
+
+            .detail-row {
+                grid-template-columns: 1fr;
+                gap: 2px;
+            }
+
+            .all-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar" aria-label="활동 이동">
+        <div class="topbar__links">
+            <a href="../index.html"><i data-lucide="home" aria-hidden="true"></i> 메인</a>
+            <a href="index.html"><i data-lucide="folder-open" aria-hidden="true"></i> 10과</a>
+            <a href="grammar1.html"><i data-lucide="book-open" aria-hidden="true"></i> 문법1</a>
+        </div>
+        <div class="topbar__tools">
+            <span class="topbar__title">교사용 -던 카드</span>
+            <a href="grammar1-dun-card-sort.html"><i data-lucide="timer" aria-hidden="true"></i> 학생용 퀴즈</a>
+            <a href="grammar1-dun-visual-warmup.html"><i data-lucide="images" aria-hidden="true"></i> 도입</a>
+            <a href="grammar1-dun-memory-museum.html"><i data-lucide="messages-square" aria-hidden="true"></i> 말하기</a>
+        </div>
+    </nav>
+
+    <main class="shell">
+        <header class="unit-head">
+            <div>
+                <p class="eyebrow">C10 Grammar 1 Teacher View</p>
+                <h1>교사용 카드 퀴즈: -던 / -(으)ㄴ</h1>
+                <p class="lead">시간 제한 없이 모든 그림 카드를 열람하고, 선택한 카드의 정답 문법과 정답 표현을 크게 띄워 수업 중 바로 확인합니다.</p>
+            </div>
+            <div class="teacher-badge">
+                <i data-lucide="presentation" aria-hidden="true"></i>
+                시간 제한 없음 · 전체 카드 메뉴
+            </div>
+        </header>
+
+        <section class="workspace" aria-label="교사용 카드 열람">
+            <aside class="card-menu" aria-label="전체 카드 메뉴">
+                <div class="menu-head">
+                    <div>
+                        <h2>전체 카드 메뉴</h2>
+                        <p>카드를 누르면 오른쪽 화면에 문제와 정답이 크게 표시됩니다.</p>
+                    </div>
+                    <div class="filter-row" aria-label="카드 필터">
+                        <button id="filterAll" class="filter-btn active" type="button" onclick="setFilter('all')">전체</button>
+                        <button id="filterDun" class="filter-btn" type="button" onclick="setFilter('unfinished')">-던</button>
+                        <button id="filterDone" class="filter-btn" type="button" onclick="setFilter('completed')">-(으)ㄴ</button>
+                    </div>
+                </div>
+                <div id="menuList" class="menu-list"></div>
+            </aside>
+
+            <section class="display-panel" aria-label="선택 카드 크게 보기">
+                <div class="display-stage">
+                    <article class="visual-side">
+                        <div class="question-line">
+                            <div id="displayPrompt" class="question-line__blank">____ 커피</div>
+                            <div id="displayBase" class="question-line__base">마시다</div>
+                        </div>
+                        <img id="displayImage" class="hero-image" src="" alt="">
+                    </article>
+
+                    <article id="answerSide" class="answer-side">
+                        <p class="answer-label">Correct Answer</p>
+                        <div class="answer-box">
+                            <div id="answerGrammar" class="answer-grammar">-던</div>
+                            <div id="answerExpression" class="answer-expression">마시던 커피</div>
+                        </div>
+                        <div class="answer-detail">
+                            <div class="detail-row"><span>기본형</span><strong id="answerBase">마시다 + 커피</strong></div>
+                            <div class="detail-row"><span>의미</span><strong id="answerMeaning">과거에 하던 중이거나 미완료로 남은 상태</strong></div>
+                            <div class="detail-row"><span>카드</span><strong id="answerCount">1 / 16</strong></div>
+                        </div>
+                        <div class="display-actions" aria-label="카드 보기 도구">
+                            <button class="tool-btn" type="button" onclick="moveCard(-1)"><i data-lucide="chevron-left" aria-hidden="true"></i> 이전</button>
+                            <button class="tool-btn primary" type="button" onclick="moveCard(1)">다음 <i data-lucide="chevron-right" aria-hidden="true"></i></button>
+                            <button id="toggleAnswerBtn" class="tool-btn warn" type="button" onclick="toggleAnswer()"><i data-lucide="eye-off" aria-hidden="true"></i> 정답 가리기</button>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </section>
+
+        <section class="all-panel" aria-label="전체 카드 한눈에 보기">
+            <div class="all-panel__head">
+                <div>
+                    <h2>전체 정답 보기</h2>
+                    <p>수업 전 확인용 목록입니다. 모든 그림, 기본형, 정답 표현을 한 번에 봅니다.</p>
+                </div>
+            </div>
+            <div id="allGrid" class="all-grid"></div>
+        </section>
+    </main>
+
+    <script>
+        const CARD_IMAGE_DIR = "../assets/c10/grammar/images/dun-support/cards";
+        const CARDS = [
+            { id: "coffee-dun", verb: "마시다", noun: "커피", expression: "마시던 커피", state: "unfinished" },
+            { id: "coffee-done", verb: "마시다", noun: "커피", expression: "마신 커피", state: "completed" },
+            { id: "book-dun", verb: "읽다", noun: "책", expression: "읽던 책", state: "unfinished" },
+            { id: "book-done", verb: "읽다", noun: "책", expression: "읽은 책", state: "completed" },
+            { id: "apple-dun", verb: "먹다", noun: "사과", expression: "먹던 사과", state: "unfinished" },
+            { id: "apple-done", verb: "먹다", noun: "사과", expression: "먹은 사과", state: "completed" },
+            { id: "clean-dun", verb: "청소하다", noun: "방", expression: "청소하던 방", state: "unfinished" },
+            { id: "clean-done", verb: "청소하다", noun: "방", expression: "청소한 방", state: "completed" },
+            { id: "homework-dun", verb: "풀다", noun: "숙제", expression: "풀던 숙제", state: "unfinished" },
+            { id: "homework-done", verb: "풀다", noun: "숙제", expression: "푼 숙제", state: "completed" },
+            { id: "picture-dun", verb: "그리다", noun: "그림", expression: "그리던 그림", state: "unfinished" },
+            { id: "picture-done", verb: "그리다", noun: "그림", expression: "그린 그림", state: "completed" },
+            { id: "robot-dun", verb: "만들다", noun: "로봇", expression: "만들던 로봇", state: "unfinished" },
+            { id: "robot-done", verb: "만들다", noun: "로봇", expression: "만든 로봇", state: "completed" },
+            { id: "cook-dun", verb: "끓이다", noun: "찌개", expression: "끓이던 찌개", state: "unfinished" },
+            { id: "cook-done", verb: "요리하다", noun: "음식", expression: "요리한 음식", state: "completed" }
+        ];
+
+        let selectedIndex = 0;
+        let currentFilter = "all";
+        let answerVisible = true;
+
+        function iconRefresh() {
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function cardImage(card) {
+            return `${CARD_IMAGE_DIR}/${card.id}.jpg`;
+        }
+
+        function stateLabel(state) {
+            return state === "unfinished" ? "-던" : "-(으)ㄴ";
+        }
+
+        function stateClass(state) {
+            return state === "unfinished" ? "dun" : "done";
+        }
+
+        function stateMeaning(state) {
+            return state === "unfinished"
+                ? "과거에 하던 중이거나 미완료로 남은 상태"
+                : "이미 끝난 행동의 결과 또는 완료된 상태";
+        }
+
+        function filteredCards() {
+            return currentFilter === "all" ? CARDS : CARDS.filter(card => card.state === currentFilter);
+        }
+
+        function selectedCard() {
+            return CARDS[selectedIndex];
+        }
+
+        function selectCard(id) {
+            const nextIndex = CARDS.findIndex(card => card.id === id);
+            if (nextIndex < 0) return;
+            selectedIndex = nextIndex;
+            render();
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            const visibleCards = filteredCards();
+            if (visibleCards.length && !visibleCards.some(card => card.id === selectedCard().id)) {
+                selectedIndex = CARDS.findIndex(card => card.id === visibleCards[0].id);
+            }
+            render();
+        }
+
+        function moveCard(direction) {
+            const visibleCards = filteredCards();
+            const activeIndex = visibleCards.findIndex(card => card.id === selectedCard().id);
+            const nextVisibleIndex = (activeIndex + direction + visibleCards.length) % visibleCards.length;
+            selectedIndex = CARDS.findIndex(card => card.id === visibleCards[nextVisibleIndex].id);
+            render();
+        }
+
+        function toggleAnswer() {
+            answerVisible = !answerVisible;
+            renderDisplay();
+        }
+
+        function renderMenu() {
+            const visibleCards = filteredCards();
+            document.getElementById("filterAll").classList.toggle("active", currentFilter === "all");
+            document.getElementById("filterDun").classList.toggle("active", currentFilter === "unfinished");
+            document.getElementById("filterDone").classList.toggle("active", currentFilter === "completed");
+            document.getElementById("menuList").innerHTML = visibleCards.map(card => `
+                <button
+                    class="menu-card ${card.id === selectedCard().id ? "active" : ""}"
+                    type="button"
+                    onclick="selectCard('${card.id}')"
+                    aria-label="${card.expression} 카드 보기"
+                >
+                    <img src="${cardImage(card)}" alt="${card.expression} 그림" decoding="async">
+                    <span class="menu-card__meta">
+                        <span class="grammar-pill ${stateClass(card.state)}">${stateLabel(card.state)}</span>
+                        <span class="menu-card__expression">${card.expression}</span>
+                        <span class="menu-card__base">${card.verb} + ${card.noun}</span>
+                    </span>
+                </button>
+            `).join("");
+        }
+
+        function renderDisplay() {
+            const card = selectedCard();
+            const answerSide = document.getElementById("answerSide");
+            document.getElementById("displayPrompt").textContent = `____ ${card.noun}`;
+            document.getElementById("displayBase").textContent = card.verb;
+            document.getElementById("displayImage").src = cardImage(card);
+            document.getElementById("displayImage").alt = `${card.expression} 그림`;
+            document.getElementById("answerGrammar").textContent = stateLabel(card.state);
+            document.getElementById("answerGrammar").className = `answer-grammar ${stateClass(card.state)}`;
+            document.getElementById("answerExpression").textContent = card.expression;
+            document.getElementById("answerBase").textContent = `${card.verb} + ${card.noun}`;
+            document.getElementById("answerMeaning").textContent = stateMeaning(card.state);
+            document.getElementById("answerCount").textContent = `${selectedIndex + 1} / ${CARDS.length}`;
+            answerSide.classList.toggle("answer-hidden", !answerVisible);
+            document.getElementById("toggleAnswerBtn").innerHTML = answerVisible
+                ? '<i data-lucide="eye-off" aria-hidden="true"></i> 정답 가리기'
+                : '<i data-lucide="eye" aria-hidden="true"></i> 정답 보이기';
+            iconRefresh();
+        }
+
+        function renderAllGrid() {
+            document.getElementById("allGrid").innerHTML = CARDS.map(card => `
+                <article class="all-card">
+                    <img src="${cardImage(card)}" alt="${card.expression} 그림" decoding="async">
+                    <span class="grammar-pill ${stateClass(card.state)}">${stateLabel(card.state)}</span>
+                    <strong>${card.expression}</strong>
+                    <span>${card.verb} + ${card.noun}</span>
+                </article>
+            `).join("");
+        }
+
+        function render() {
+            renderMenu();
+            renderDisplay();
+            renderAllGrid();
+        }
+
+        document.addEventListener("keydown", event => {
+            if (event.key === "ArrowRight") moveCard(1);
+            if (event.key === "ArrowLeft") moveCard(-1);
+        });
+
+        render();
+    </script>
+</body>
+</html>
