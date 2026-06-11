@@ -139,6 +139,8 @@
   let recognitionRunning = false;
   let recognitionShouldRun = false;
   let recognitionRestartTimer = 0;
+  let recognitionPrepareResolver = null;
+  let recognitionPrepareTimer = 0;
 
   function setSetupStatus(text) {
     els.setupStatus.textContent = text;
@@ -213,7 +215,15 @@
     return recognition;
   }
 
-  function primeSpeechRecognition() {
+  function resolveSpeechPreparation(value) {
+    if (!recognitionPrepareResolver) return;
+    const resolve = recognitionPrepareResolver;
+    recognitionPrepareResolver = null;
+    window.clearTimeout(recognitionPrepareTimer);
+    resolve(value);
+  }
+
+  function prepareSpeechRecognition() {
     state.speechSupported = !!Recognition;
     if (!Recognition) {
       els.fallbackForm.hidden = false;
@@ -221,48 +231,26 @@
     }
 
     return new Promise((resolve) => {
-      let settled = false;
-      let started = false;
-      const recognition = createRecognition();
-
-      function finish(value) {
-        if (settled) return;
-        settled = true;
-        recognition.onstart = null;
-        recognition.onerror = null;
-        recognition.onend = null;
-        try {
-          recognition.stop();
-        } catch (error) {
-          // The recognizer may already be stopped.
-        }
-        resolve(value);
+      if (recognitionRunning) {
+        resolve("ready");
+        return;
       }
 
-      recognition.onstart = () => {
-        started = true;
-        window.setTimeout(() => finish("ready"), 320);
-      };
-      recognition.onerror = (event) => {
-        if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-          state.speechSupported = false;
-          els.fallbackForm.hidden = false;
-          finish("blocked");
+      recognitionShouldRun = true;
+      ensureRecognition();
+      recognitionPrepareResolver = resolve;
+      window.clearTimeout(recognitionPrepareTimer);
+      recognitionPrepareTimer = window.setTimeout(() => {
+        if (recognitionRunning) {
+          resolveSpeechPreparation("ready");
           return;
         }
-        finish(started ? "ready" : "fallback");
-      };
-      recognition.onend = () => finish(started ? "ready" : "fallback");
-
-      try {
-        recognition.start();
-      } catch (error) {
         state.speechSupported = false;
         els.fallbackForm.hidden = false;
-        finish("fallback");
-      }
-
-      window.setTimeout(() => finish(started ? "ready" : "fallback"), 1600);
+        recognitionShouldRun = false;
+        resolveSpeechPreparation("fallback");
+      }, 6000);
+      startRecognitionLoop();
     });
   }
 
@@ -278,7 +266,7 @@
     }
 
     els.prepareMicButton.disabled = true;
-    setSetupStatus("마이크 권한을 기다리는 중입니다.");
+    setSetupStatus("마이크와 음성 인식을 준비하는 중입니다.");
 
     if (!window.isSecureContext) {
       setSetupStatus("마이크는 HTTPS 또는 localhost 환경에서 사용할 수 있습니다.");
@@ -310,8 +298,8 @@
       source.connect(mic.analyser);
       updateMicMeter();
 
-      setSetupStatus("음성 인식을 준비하는 중입니다.");
-      const speechState = await primeSpeechRecognition();
+      setSetupStatus("음성 인식을 켜는 중입니다. 브라우저 창이 나오면 허용해 주세요.");
+      const speechState = await prepareSpeechRecognition();
       if (speechState === "blocked") {
         state.speechSupported = false;
         els.fallbackForm.hidden = false;
@@ -374,6 +362,7 @@
     activeRecognition = createRecognition();
     activeRecognition.onstart = () => {
       recognitionRunning = true;
+      resolveSpeechPreparation("ready");
       if (state.phase === "waiting") {
         setSpeechStatus("듣는 중", "목표 발음을 말해 보세요.");
       }
@@ -420,6 +409,7 @@
         state.speechSupported = false;
         els.fallbackForm.hidden = false;
         recognitionShouldRun = false;
+        resolveSpeechPreparation("blocked");
         setSpeechStatus("입력 보조 대기", "음성 인식 권한이 꺼져 있습니다.");
         return;
       }
@@ -443,9 +433,11 @@
     } catch (error) {
       if (error && error.name === "InvalidStateError") {
         recognitionRunning = true;
+        resolveSpeechPreparation("ready");
         return;
       }
       els.fallbackForm.hidden = false;
+      resolveSpeechPreparation("fallback");
       setSpeechStatus("입력 보조 대기", "음성 인식 시작이 지연되었습니다.");
     }
   }
@@ -454,6 +446,8 @@
     recognitionShouldRun = false;
     recognitionRunning = false;
     window.clearTimeout(recognitionRestartTimer);
+    window.clearTimeout(recognitionPrepareTimer);
+    recognitionPrepareResolver = null;
     if (!activeRecognition) return;
     activeRecognition.onstart = null;
     activeRecognition.onresult = null;
@@ -492,10 +486,11 @@
       mic.context.resume();
     }
 
-    shutdownRecognition();
-    recognitionShouldRun = true;
-    ensureRecognition();
-    startRecognitionLoop();
+    if (state.speechSupported && Recognition) {
+      recognitionShouldRun = true;
+      ensureRecognition();
+      startRecognitionLoop();
+    }
     state.phase = "playing";
     state.score = 0;
     state.streak = 0;
