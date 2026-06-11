@@ -86,6 +86,10 @@
     lastFeedback: "",
     speechSession: 0,
     demoMode: new URLSearchParams(window.location.search).get("demo") === "1",
+    successBurst: 0,
+    failPulse: 0,
+    scoreFloat: 0,
+    scoreFloatText: "",
   };
 
   const mic = {
@@ -139,8 +143,11 @@
   let recognitionRunning = false;
   let recognitionShouldRun = false;
   let recognitionRestartTimer = 0;
+  let recognitionRestartCount = 0;
+  let recognitionRestartGateIndex = -1;
   let recognitionPrepareResolver = null;
   let recognitionPrepareTimer = 0;
+  const MAX_RESTARTS_PER_GATE = 1;
 
   function setSetupStatus(text) {
     els.setupStatus.textContent = text;
@@ -346,6 +353,11 @@
       return;
     }
 
+    if (recognitionRestartGateIndex !== state.gateIndex) {
+      recognitionRestartGateIndex = state.gateIndex;
+      recognitionRestartCount = 0;
+    }
+
     ensureRecognition();
     startRecognitionLoop();
 
@@ -420,7 +432,17 @@
     };
     activeRecognition.onend = () => {
       recognitionRunning = false;
-      if (!recognitionShouldRun || state.phase === "result") return;
+      if (!recognitionShouldRun || state.phase !== "waiting") return;
+      if (recognitionRestartGateIndex !== state.gateIndex) {
+        recognitionRestartGateIndex = state.gateIndex;
+        recognitionRestartCount = 0;
+      }
+      if (recognitionRestartCount >= MAX_RESTARTS_PER_GATE) {
+        els.fallbackForm.hidden = false;
+        setSpeechStatus("입력 보조 대기", "음성 인식이 반복 종료되어 입력 보조로 진행합니다.");
+        return;
+      }
+      recognitionRestartCount += 1;
       window.clearTimeout(recognitionRestartTimer);
       recognitionRestartTimer = window.setTimeout(startRecognitionLoop, 320);
     };
@@ -448,6 +470,8 @@
     window.clearTimeout(recognitionRestartTimer);
     window.clearTimeout(recognitionPrepareTimer);
     recognitionPrepareResolver = null;
+    recognitionRestartCount = 0;
+    recognitionRestartGateIndex = -1;
     if (!activeRecognition) return;
     activeRecognition.onstart = null;
     activeRecognition.onresult = null;
@@ -505,6 +529,10 @@
     state.currentTranscript = "";
     state.currentFinal = "";
     state.lastFeedback = "";
+    state.successBurst = 0;
+    state.failPulse = 0;
+    state.scoreFloat = 0;
+    state.scoreFloatText = "";
 
     els.setupView.hidden = true;
     els.resultView.hidden = true;
@@ -534,9 +562,13 @@
     if (state.phase !== "waiting") return;
     const gate = gates[state.gateIndex];
     const result = evaluateSpeech(gate, spoken);
+    const earned = 100 + Math.max(0, MAX_ATTEMPTS - state.attempt) * 25 + state.streak * 10;
     state.phase = "success";
     state.openAmount = 0;
-    state.score += 100 + Math.max(0, MAX_ATTEMPTS - state.attempt) * 25 + state.streak * 10;
+    state.successBurst = 1;
+    state.scoreFloat = 1;
+    state.scoreFloatText = `+${earned}`;
+    state.score += earned;
     state.streak += 1;
     state.bestStreak = Math.max(state.bestStreak, state.streak);
     state.results.push({
@@ -566,6 +598,7 @@
     }
 
     state.phase = "retry";
+    state.failPulse = 1;
     setSpeechStatus("다시 시도", spoken ? `${spoken} · ${message}` : message);
     els.gateFocus.textContent = message;
 
@@ -580,6 +613,9 @@
     const gate = gates[state.gateIndex];
     state.phase = "success";
     state.openAmount = 0;
+    state.successBurst = 0.72;
+    state.scoreFloat = 1;
+    state.scoreFloatText = "연습";
     state.results.push({
       prompt: gate.prompt,
       kind: gate.kind,
@@ -601,6 +637,9 @@
     state.waitLeft = WAIT_SECONDS;
     state.currentTranscript = "";
     state.currentFinal = "";
+    state.failPulse = 0;
+    state.successBurst = 0;
+    state.scoreFloat = 0;
     setGateCardVisible(false);
 
     if (state.gateIndex >= gates.length) {
@@ -643,6 +682,9 @@
 
   function update(dt) {
     state.heroStep += dt * 7.5;
+    state.successBurst = Math.max(0, state.successBurst - dt * 0.85);
+    state.failPulse = Math.max(0, state.failPulse - dt * 1.55);
+    state.scoreFloat = Math.max(0, state.scoreFloat - dt * 0.72);
 
     if (state.phase === "playing") {
       state.approach += dt * 0.48;
@@ -682,7 +724,16 @@
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   }
 
-  function drawDiamond(ctx, cx, cy, width, height, fill, stroke) {
+  function clamp(value, min = 0, max = 1) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function easeOut(value) {
+    const t = clamp(value);
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function drawDiamond(ctx, cx, cy, width, height, fill, stroke, lineWidth = 2) {
     ctx.beginPath();
     ctx.moveTo(cx, cy - height / 2);
     ctx.lineTo(cx + width / 2, cy);
@@ -693,156 +744,397 @@
     ctx.fill();
     if (stroke) {
       ctx.strokeStyle = stroke;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = lineWidth;
       ctx.stroke();
     }
   }
 
   function roadCenter(y) {
-    return LOGICAL_WIDTH / 2 + (y - 330) * 0.19;
+    return LOGICAL_WIDTH / 2 + (y - 330) * 0.17;
   }
 
-  function drawScene(ctx, progress, openAmount, heroStep, gate) {
-    ctx.clearRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
+  function drawScene(ctx, progress, openAmount, heroStep, gate, gameState = {}) {
+    const phase = gameState.phase || "preview";
+    const success = gameState.successBurst || 0;
+    const fail = gameState.failPulse || 0;
+    const scoreFloat = gameState.scoreFloat || 0;
+    const scoreText = gameState.scoreFloatText || "";
+    const motion = phase === "playing" || phase === "preview" ? heroStep : progress * 11;
+    const visualProgress = phase === "success" ? 1 : progress;
 
+    ctx.clearRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
+    drawSky(ctx, motion);
+    drawDistantWorld(ctx, motion);
+    drawTileField(ctx, visualProgress, motion);
+    drawRoad(ctx, visualProgress, motion, phase);
+
+    const gateY = 112 + visualProgress * 222;
+    const gateScale = 0.76 + visualProgress * 0.42;
+    const failShake = fail > 0 ? Math.sin(fail * 34) * 8 * fail : 0;
+    const gateX = roadCenter(gateY) + failShake;
+
+    drawGateGlow(ctx, gateX, gateY, gateScale, openAmount, success, fail);
+    drawGate(ctx, gateX, gateY, gateScale, openAmount, gate, phase, fail);
+    drawSuccessEffects(ctx, gateX, gateY, gateScale, openAmount, success, motion);
+    drawHero(ctx, LOGICAL_WIDTH / 2 - 34, 488, heroStep, visualProgress, phase, openAmount, success, fail);
+    drawFloatingScore(ctx, gateX, gateY, scoreFloat, scoreText);
+    drawForeground(ctx, phase, success, fail);
+  }
+
+  function drawSky(ctx, motion) {
     const sky = ctx.createLinearGradient(0, 0, 0, LOGICAL_HEIGHT);
-    sky.addColorStop(0, "#b9d9df");
-    sky.addColorStop(0.48, "#dcebc7");
-    sky.addColorStop(1, "#8fb87e");
+    sky.addColorStop(0, "#8fcdd7");
+    sky.addColorStop(0.38, "#d8eac7");
+    sky.addColorStop(1, "#7aa76f");
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
 
-    drawHills(ctx);
-    drawTileField(ctx, progress);
-    drawRoad(ctx, progress);
-
-    const gateY = 146 + progress * 210;
-    const gateX = roadCenter(gateY);
-    const gateScale = 0.72 + progress * 0.34;
-    drawGate(ctx, gateX, gateY, gateScale, openAmount, gate);
-    drawHero(ctx, LOGICAL_WIDTH / 2 - 38, 474, heroStep, progress);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.36)";
+    for (let i = 0; i < 4; i += 1) {
+      const x = ((i * 290 - motion * 6) % 1180) - 110;
+      const y = 60 + (i % 2) * 36;
+      ctx.beginPath();
+      ctx.ellipse(x, y, 116, 28, 0, 0, Math.PI * 2);
+      ctx.ellipse(x + 78, y + 10, 88, 24, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
-  function drawHills(ctx) {
-    ctx.fillStyle = "rgba(108, 154, 95, 0.52)";
+  function drawDistantWorld(ctx, motion) {
+    ctx.fillStyle = "rgba(68, 113, 122, 0.18)";
+    ctx.fillRect(0, 225, LOGICAL_WIDTH, 12);
+
+    ctx.fillStyle = "rgba(255, 246, 209, 0.28)";
     ctx.beginPath();
-    ctx.moveTo(0, 250);
-    ctx.bezierCurveTo(170, 160, 290, 238, 430, 180);
-    ctx.bezierCurveTo(570, 120, 680, 210, 960, 142);
+    ctx.moveTo(0, 270);
+    ctx.lineTo(160, 184);
+    ctx.lineTo(302, 270);
+    ctx.lineTo(430, 196);
+    ctx.lineTo(620, 270);
+    ctx.lineTo(770, 178);
+    ctx.lineTo(960, 270);
+    ctx.lineTo(960, 360);
+    ctx.lineTo(0, 360);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "rgba(82, 138, 87, 0.52)";
+    ctx.beginPath();
+    ctx.moveTo(0, 306);
+    ctx.bezierCurveTo(170, 210, 282, 292, 428, 218);
+    ctx.bezierCurveTo(600, 130, 724, 250, 960, 190);
     ctx.lineTo(960, 600);
     ctx.lineTo(0, 600);
     ctx.closePath();
     ctx.fill();
 
-    ctx.fillStyle = "rgba(46, 107, 153, 0.16)";
-    ctx.fillRect(0, 236, 960, 10);
+    const mist = ctx.createLinearGradient(0, 210, 0, 352);
+    mist.addColorStop(0, "rgba(255,255,255,0.28)");
+    mist.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = mist;
+    ctx.fillRect(0, 210 + Math.sin(motion * 0.16) * 3, LOGICAL_WIDTH, 150);
   }
 
-  function drawTileField(ctx, progress) {
-    const offset = (progress * 76) % 76;
-    for (let row = -2; row < 10; row += 1) {
-      const y = 166 + row * 76 + offset;
-      for (let col = -5; col < 7; col += 1) {
-        const x = roadCenter(y) + col * 138 - 52;
-        const fill = (row + col) % 2 === 0 ? "rgba(244, 231, 186, 0.42)" : "rgba(180, 210, 150, 0.28)";
-        drawDiamond(ctx, x, y, 136, 58, fill, "rgba(255, 255, 255, 0.22)");
+  function drawTileField(ctx, progress, motion) {
+    const offset = (motion * 22 + progress * 54) % 74;
+    for (let row = -3; row < 11; row += 1) {
+      const y = 142 + row * 74 + offset;
+      const depth = clamp((y - 120) / 520, 0.18, 1);
+      for (let col = -6; col < 8; col += 1) {
+        const x = roadCenter(y) + col * 128 - 60;
+        const alpha = 0.18 + depth * 0.22;
+        const fill = (row + col) % 2 === 0
+          ? `rgba(232, 228, 174, ${alpha})`
+          : `rgba(170, 211, 150, ${alpha})`;
+        drawDiamond(ctx, x, y, 128 * depth, 54 * depth, fill, "rgba(255,255,255,0.18)", 1.4);
       }
     }
   }
 
-  function drawRoad(ctx, progress) {
-    const offset = (progress * 92) % 92;
+  function drawRoad(ctx, progress, motion, phase) {
+    const moving = phase === "playing" || phase === "preview";
+    const offset = ((moving ? motion * 46 : progress * 80) % 94);
+
     for (let row = -2; row < 9; row += 1) {
-      const y = 146 + row * 92 + offset;
-      const scale = 0.62 + y / 920;
+      const y = 124 + row * 94 + offset;
+      const scale = 0.58 + y / 760;
       const x = roadCenter(y);
-      const fill = row % 2 === 0 ? "#ead8a9" : "#dfc98f";
-      drawDiamond(ctx, x, y, 322 * scale, 92 * scale, fill, "rgba(118, 96, 56, 0.2)");
-      ctx.fillStyle = "rgba(255, 255, 255, 0.18)";
-      ctx.fillRect(x - 4, y - 33 * scale, 8, 66 * scale);
+      const width = 280 * scale;
+      const height = 82 * scale;
+      const fill = row % 2 === 0 ? "#f1d98d" : "#e5c778";
+
+      ctx.fillStyle = "rgba(35, 46, 36, 0.13)";
+      ctx.beginPath();
+      ctx.ellipse(x + 6, y + height * 0.42, width * 0.55, height * 0.24, 0, 0, Math.PI * 2);
+      ctx.fill();
+      drawDiamond(ctx, x, y, width, height, fill, "rgba(120, 92, 44, 0.24)", 2.4 * scale);
+
+      ctx.save();
+      ctx.globalAlpha = 0.36;
+      ctx.strokeStyle = "#fff6cc";
+      ctx.lineWidth = Math.max(3, 8 * scale);
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(x, y - height * 0.31);
+      ctx.lineTo(x, y + height * 0.31);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    const rail = ctx.createLinearGradient(0, 260, 0, 600);
+    rail.addColorStop(0, "rgba(81, 80, 53, 0)");
+    rail.addColorStop(1, "rgba(81, 80, 53, 0.16)");
+    ctx.fillStyle = rail;
+    ctx.beginPath();
+    ctx.moveTo(roadCenter(204) - 120, 204);
+    ctx.lineTo(roadCenter(590) - 250, 600);
+    ctx.lineTo(roadCenter(590) + 250, 600);
+    ctx.lineTo(roadCenter(204) + 120, 204);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawGateGlow(ctx, x, y, scale, openAmount, success, fail) {
+    const open = easeOut(openAmount);
+    const glowAlpha = 0.18 + open * 0.5 + success * 0.45;
+    const gradient = ctx.createRadialGradient(x, y + 22 * scale, 10, x, y + 22 * scale, 180 * scale);
+    gradient.addColorStop(0, `rgba(255, 244, 172, ${glowAlpha})`);
+    gradient.addColorStop(0.56, `rgba(242, 188, 89, ${glowAlpha * 0.22})`);
+    gradient.addColorStop(1, "rgba(242, 188, 89, 0)");
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(x, y + 20 * scale, 190 * scale, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (fail > 0) {
+      ctx.strokeStyle = `rgba(223, 83, 68, ${0.48 * fail})`;
+      ctx.lineWidth = 8 * scale;
+      ctx.beginPath();
+      ctx.arc(x, y + 20 * scale, 136 * scale + fail * 20, 0, Math.PI * 2);
+      ctx.stroke();
     }
   }
 
-  function drawGate(ctx, x, y, scale, openAmount, gate) {
-    const width = 226 * scale;
-    const height = 142 * scale;
-    const postW = 22 * scale;
-    const baseY = y + 52 * scale;
-    const open = Math.min(openAmount, 1) * 54 * scale;
-    const alpha = Math.min(1, Math.max(0.22, scale));
+  function drawGate(ctx, x, y, scale, openAmount, gate, phase, fail) {
+    const width = 268 * scale;
+    const height = 178 * scale;
+    const baseY = y + 70 * scale;
+    const open = easeOut(openAmount) * 72 * scale;
+    const postW = 26 * scale;
+    const signH = 46 * scale;
 
     ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = "rgba(29, 39, 50, 0.18)";
+    ctx.fillStyle = "rgba(24, 33, 44, 0.2)";
     ctx.beginPath();
-    ctx.ellipse(x, baseY + 10 * scale, width * 0.58, 16 * scale, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + 8 * scale, baseY + 12 * scale, width * 0.64, 20 * scale, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "#875f3a";
-    roundRect(ctx, x - width / 2, baseY - height, postW, height, 6 * scale);
-    roundRect(ctx, x + width / 2 - postW, baseY - height, postW, height, 6 * scale);
+    const postGradient = ctx.createLinearGradient(x - width / 2, 0, x - width / 2 + postW, 0);
+    postGradient.addColorStop(0, "#6f4d33");
+    postGradient.addColorStop(0.42, "#9b7046");
+    postGradient.addColorStop(1, "#5d3c28");
+    ctx.fillStyle = postGradient;
+    roundRect(ctx, x - width / 2, baseY - height, postW, height, 8 * scale);
+    roundRect(ctx, x + width / 2 - postW, baseY - height, postW, height, 8 * scale);
 
-    ctx.fillStyle = "#df6b52";
-    roundRect(ctx, x - width / 2 + postW, baseY - height + 12 * scale, width - postW * 2, 32 * scale, 7 * scale);
+    ctx.fillStyle = "rgba(64, 43, 28, 0.16)";
+    roundRect(ctx, x - width / 2 + 6 * scale, baseY - height + 8 * scale, 8 * scale, height - 16 * scale, 4 * scale);
+    roundRect(ctx, x + width / 2 - postW + 6 * scale, baseY - height + 8 * scale, 8 * scale, height - 16 * scale, 4 * scale);
 
-    ctx.fillStyle = "#fff8e7";
-    ctx.strokeStyle = "rgba(23, 32, 42, 0.18)";
-    ctx.lineWidth = 2 * scale;
-    roundRect(ctx, x - 78 * scale - open, baseY - 92 * scale, 74 * scale, 92 * scale, 5 * scale, true);
-    roundRect(ctx, x + 4 * scale + open, baseY - 92 * scale, 74 * scale, 92 * scale, 5 * scale, true);
+    ctx.fillStyle = "#dd6b53";
+    roundRect(ctx, x - width / 2 + postW - 5 * scale, baseY - height + 10 * scale, width - postW * 2 + 10 * scale, signH, 10 * scale);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.18)";
+    roundRect(ctx, x - width / 2 + postW + 2 * scale, baseY - height + 15 * scale, width - postW * 2 - 4 * scale, 10 * scale, 5 * scale);
 
-    ctx.fillStyle = "#17202a";
-    ctx.font = `900 ${Math.max(18, 26 * scale)}px "Malgun Gothic", sans-serif`;
+    const doorY = baseY - height + signH + 12 * scale;
+    const doorH = height - signH - 16 * scale;
+    const doorW = 82 * scale;
+    drawDoor(ctx, x - doorW - 6 * scale - open, doorY, doorW, doorH, scale, false);
+    drawDoor(ctx, x + 6 * scale + open, doorY, doorW, doorH, scale, true);
+
+    ctx.fillStyle = "#16202b";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(gate ? gate.prompt : "사과", x, baseY - height + 28 * scale);
+    ctx.font = `900 ${Math.max(22, 30 * scale)}px "Malgun Gothic", sans-serif`;
+    ctx.fillText(gate ? gate.prompt : "사과", x, baseY - height + 34 * scale);
+
+    const tagText = phase === "waiting" ? "말하면 열립니다" : phase === "retry" ? "다시 도전" : phase === "success" ? "통과" : "다가가는 중";
+    ctx.font = `800 ${Math.max(10, 12 * scale)}px "Malgun Gothic", sans-serif`;
+    ctx.fillStyle = fail > 0 ? "#b9342c" : "rgba(22, 32, 43, 0.62)";
+    ctx.fillText(tagText, x, baseY - height + 62 * scale);
     ctx.restore();
   }
 
-  function drawHero(ctx, x, y, step, progress) {
-    const bob = Math.sin(step) * 4;
-    const lean = Math.sin(step * 0.5) * 1.5;
-    const dash = progress > 0.94 ? (progress - 0.94) * 160 : 0;
-    const hx = x + dash;
-    const hy = y - dash * 0.42 + bob;
+  function drawDoor(ctx, x, y, width, height, scale, flipped) {
+    ctx.save();
+    if (flipped) {
+      ctx.translate(x + width, y);
+      ctx.scale(-1, 1);
+      x = 0;
+      y = 0;
+    }
 
-    ctx.fillStyle = "rgba(29, 39, 50, 0.2)";
+    const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
+    gradient.addColorStop(0, "#fffdf1");
+    gradient.addColorStop(0.62, "#fff3ce");
+    gradient.addColorStop(1, "#e4ca8b");
+    ctx.fillStyle = gradient;
+    ctx.strokeStyle = "rgba(121, 92, 44, 0.34)";
+    ctx.lineWidth = 3 * scale;
+    roundRect(ctx, x, y, width, height, 10 * scale, true);
+
+    ctx.fillStyle = "rgba(255, 255, 255, 0.46)";
+    roundRect(ctx, x + 10 * scale, y + 10 * scale, width - 22 * scale, 16 * scale, 6 * scale);
+    ctx.fillStyle = "#bb8745";
     ctx.beginPath();
-    ctx.ellipse(hx + 6, hy + 64, 38, 10, -0.08, 0, Math.PI * 2);
+    ctx.arc(x + width - 18 * scale, y + height * 0.54, 5 * scale, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawSuccessEffects(ctx, x, y, scale, openAmount, success, motion) {
+    const open = easeOut(openAmount);
+    if (open <= 0.02 && success <= 0.02) return;
+
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    for (let i = 0; i < 22; i += 1) {
+      const angle = i * 0.74 + motion * 0.42;
+      const radius = (58 + i * 2.5 + open * 42) * scale;
+      const alpha = (open * 0.34 + success * 0.48) * (0.55 + Math.sin(motion + i) * 0.35);
+      ctx.fillStyle = `rgba(255, 239, 150, ${clamp(alpha, 0, 0.82)})`;
+      ctx.beginPath();
+      ctx.arc(x + Math.cos(angle) * radius, y + 12 * scale + Math.sin(angle) * radius * 0.58, (3 + (i % 4)) * scale, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.strokeStyle = `rgba(255, 246, 177, ${0.42 * success})`;
+    ctx.lineWidth = 6 * scale;
+    ctx.beginPath();
+    ctx.arc(x, y + 18 * scale, (120 + (1 - success) * 90) * scale, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawHero(ctx, x, y, step, progress, phase, openAmount, success, fail) {
+    const pass = phase === "success" ? easeOut((openAmount - 0.42) / 0.82) : 0;
+    const waitPose = phase === "waiting" ? 1 : 0;
+    const bob = Math.sin(step) * (phase === "waiting" ? 2 : 5);
+    const legSwing = Math.sin(step) * (phase === "waiting" ? 0.5 : 1);
+    const armSwing = Math.sin(step + Math.PI) * (phase === "waiting" ? 0.4 : 1);
+    const shake = fail > 0 ? Math.sin(fail * 30) * 6 * fail : 0;
+    const hx = x + pass * 175 + shake;
+    const hy = y - pass * 84 + bob;
+    const scale = 1 - pass * 0.08 + success * 0.03;
+
+    ctx.save();
+    ctx.translate(hx, hy);
+    ctx.scale(scale, scale);
+
+    ctx.fillStyle = "rgba(24, 33, 44, 0.22)";
+    ctx.beginPath();
+    ctx.ellipse(42, 66, 46, 13, -0.04, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.strokeStyle = "#21364c";
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 10;
     ctx.lineCap = "round";
+    ctx.strokeStyle = "#163752";
     ctx.beginPath();
-    ctx.moveTo(hx - 8, hy + 42);
-    ctx.lineTo(hx - 24 + lean, hy + 60);
-    ctx.moveTo(hx + 12, hy + 42);
-    ctx.lineTo(hx + 28 - lean, hy + 60);
+    ctx.moveTo(25, 42);
+    ctx.lineTo(10 - legSwing * 9, 66);
+    ctx.moveTo(56, 42);
+    ctx.lineTo(74 + legSwing * 9, 66);
     ctx.stroke();
 
-    ctx.fillStyle = "#2e6b99";
-    roundRect(ctx, hx - 22, hy + 12, 48, 42, 14);
-    ctx.fillStyle = "#f1c59b";
+    const bodyGradient = ctx.createLinearGradient(14, 4, 68, 58);
+    bodyGradient.addColorStop(0, "#3390c4");
+    bodyGradient.addColorStop(1, "#1f5f91");
+    ctx.fillStyle = bodyGradient;
+    roundRect(ctx, 14, 0, 58, 52, 17);
+
+    ctx.strokeStyle = "#f4c49a";
+    ctx.lineWidth = 8;
     ctx.beginPath();
-    ctx.arc(hx + 2, hy, 22, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#17202a";
-    ctx.fillRect(hx - 9, hy - 4, 5, 5);
-    ctx.fillRect(hx + 9, hy - 4, 5, 5);
-    ctx.fillStyle = "#3d2b24";
+    ctx.moveTo(16, 14);
+    ctx.lineTo(-4 - armSwing * 8, 30 + waitPose * 4);
+    ctx.moveTo(70, 14);
+    ctx.lineTo(88 + armSwing * 8, 30 + waitPose * 4);
+    ctx.stroke();
+
+    ctx.fillStyle = "#f5c293";
     ctx.beginPath();
-    ctx.ellipse(hx + 1, hy - 20, 23, 10, 0.04, 0, Math.PI * 2);
+    ctx.arc(42, -22, 26, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.strokeStyle = "#f1c59b";
-    ctx.lineWidth = 7;
+    ctx.fillStyle = "#34221d";
     ctx.beginPath();
-    ctx.moveTo(hx - 19, hy + 24);
-    ctx.lineTo(hx - 38 - lean, hy + 36);
-    ctx.moveTo(hx + 25, hy + 24);
-    ctx.lineTo(hx + 42 + lean, hy + 34);
+    ctx.ellipse(42, -43, 27, 12, -0.02, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#101821";
+    ctx.fillRect(30, -24, 5, 7);
+    ctx.fillRect(50, -24, 5, 7);
+    ctx.strokeStyle = phase === "retry" ? "#9d4437" : "#b75d4a";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    if (phase === "retry") {
+      ctx.moveTo(35, -8);
+      ctx.lineTo(52, -8);
+    } else {
+      ctx.arc(42, -11, 10, 0.15, Math.PI - 0.15);
+    }
     ctx.stroke();
+
+    if (phase === "waiting") {
+      ctx.fillStyle = "rgba(255,255,255,0.88)";
+      roundRect(ctx, 72, -62, 56, 28, 8);
+      ctx.fillStyle = "#2f6f9f";
+      ctx.font = '900 13px "Malgun Gothic", sans-serif';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("듣는 중", 100, -48);
+    }
+
+    ctx.restore();
+  }
+
+  function drawFloatingScore(ctx, x, y, scoreFloat, text) {
+    if (!scoreFloat || !text) return;
+    const p = 1 - scoreFloat;
+    ctx.save();
+    ctx.globalAlpha = clamp(scoreFloat * 1.4, 0, 1);
+    ctx.translate(x, y - 92 - p * 70);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
+    roundRect(ctx, -54, -24, 108, 46, 8);
+    ctx.fillStyle = "#dd6b53";
+    ctx.font = '900 26px "Malgun Gothic", sans-serif';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, 0, 0);
+    ctx.restore();
+  }
+
+  function drawForeground(ctx, phase, success, fail) {
+    const vignette = ctx.createRadialGradient(LOGICAL_WIDTH / 2, 300, 160, LOGICAL_WIDTH / 2, 300, 620);
+    vignette.addColorStop(0, "rgba(255,255,255,0)");
+    vignette.addColorStop(1, "rgba(20,40,46,0.14)");
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
+
+    if (phase === "waiting") {
+      ctx.fillStyle = "rgba(255,255,255,0.06)";
+      ctx.fillRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
+    }
+
+    if (success > 0) {
+      ctx.fillStyle = `rgba(255, 244, 188, ${0.12 * success})`;
+      ctx.fillRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
+    }
+
+    if (fail > 0) {
+      ctx.fillStyle = `rgba(223, 83, 68, ${0.08 * fail})`;
+      ctx.fillRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
+    }
   }
 
   function roundRect(ctx, x, y, width, height, radius, shouldStroke) {
@@ -867,7 +1159,7 @@
     const progress = gameState.phase === "waiting" || gameState.phase === "retry" || gameState.phase === "success"
       ? 1
       : gameState.approach;
-    drawScene(ctx, progress, gameState.openAmount, gameState.heroStep, gate);
+    drawScene(ctx, progress, gameState.openAmount, gameState.heroStep, gate, gameState);
   }
 
   function drawPreview() {
@@ -879,11 +1171,15 @@
         approach: 0.62 + Math.sin(frame / 80) * 0.18,
         openAmount: Math.max(0, Math.sin(frame / 90) - 0.2),
         heroStep: frame / 8,
+        phase: "preview",
+        successBurst: Math.max(0, Math.sin(frame / 90) - 0.2),
+        failPulse: 0,
+        scoreFloat: 0,
       };
 
       previewCtx.save();
       previewCtx.scale(520 / LOGICAL_WIDTH, 420 / LOGICAL_HEIGHT);
-      drawScene(previewCtx, previewState.approach, previewState.openAmount, previewState.heroStep, gates[0]);
+      drawScene(previewCtx, previewState.approach, previewState.openAmount, previewState.heroStep, gates[0], previewState);
       previewCtx.restore();
       frame += 1;
       requestAnimationFrame(paint);
