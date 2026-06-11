@@ -1105,6 +1105,8 @@
                 recognition: null,
                 recognitionSerial: 0,
                 restartTimer: 0,
+                resultCursor: 0,
+                latestResultLength: 0,
                 finalText: '',
                 interimText: '',
                 lastResultAt: 0,
@@ -1216,11 +1218,16 @@
                 if (!RecognitionClass || !state.running) {
                     return;
                 }
+                if (state.recognition) {
+                    return;
+                }
 
-                stopRecognition();
+                window.clearTimeout(state.restartTimer);
+                state.restartTimer = 0;
+                state.resultCursor = 0;
+                state.latestResultLength = 0;
                 state.recognitionSerial += 1;
                 const serial = state.recognitionSerial;
-                const recognitionLine = state.current;
                 const recognition = new RecognitionClass();
                 recognition.lang = 'ko-KR';
                 recognition.continuous = true;
@@ -1228,13 +1235,13 @@
                 recognition.maxAlternatives = 1;
 
                 recognition.onresult = function (event) {
-                    if (serial !== state.recognitionSerial || recognitionLine !== state.current) {
+                    if (serial !== state.recognitionSerial) {
                         return;
                     }
                     handleSpeechResult(event);
                 };
                 recognition.onerror = function (event) {
-                    if (serial !== state.recognitionSerial || recognitionLine !== state.current) {
+                    if (serial !== state.recognitionSerial) {
                         return;
                     }
                     if (event.error === 'aborted') {
@@ -1251,8 +1258,10 @@
                     if (serial !== state.recognitionSerial) {
                         return;
                     }
+                    state.recognition = null;
                     if (state.running && state.current < lines.length) {
-                        window.setTimeout(function () {
+                        state.restartTimer = window.setTimeout(function () {
+                            state.restartTimer = 0;
                             if (serial === state.recognitionSerial && state.running && state.current < lines.length) {
                                 startRecognition();
                             }
@@ -1265,6 +1274,7 @@
                     recognition.start();
                 } catch (error) {
                     console.error(error);
+                    state.recognition = null;
                     setFeedback('음성 인식을 시작하지 못했습니다. 잠시 후 다시 시작해 주세요.', 0);
                 }
             }
@@ -1293,19 +1303,6 @@
                 }
             }
 
-            function restartRecognitionForLine() {
-                if (!RecognitionClass || !state.running || state.current >= lines.length) {
-                    return;
-                }
-                stopRecognition();
-                state.restartTimer = window.setTimeout(function () {
-                    state.restartTimer = 0;
-                    if (state.running && state.current < lines.length) {
-                        startRecognition();
-                    }
-                }, 140);
-            }
-
             function handleSpeechResult(event) {
                 if (!state.running || state.current >= lines.length) {
                     return;
@@ -1313,16 +1310,22 @@
 
                 let interim = '';
                 let finalChunk = '';
-                for (let index = event.resultIndex; index < event.results.length; index += 1) {
+                state.latestResultLength = Math.max(state.latestResultLength, event.results.length);
+                for (let index = Math.max(event.resultIndex || 0, state.resultCursor); index < event.results.length; index += 1) {
                     const phrase = String(event.results[index][0].transcript || '').trim();
                     if (!phrase) {
                         continue;
                     }
                     if (event.results[index].isFinal) {
                         finalChunk += ' ' + phrase;
+                        state.resultCursor = Math.max(state.resultCursor, index + 1);
                     } else {
                         interim += ' ' + phrase;
                     }
+                }
+
+                if (!finalChunk.trim() && !interim.trim()) {
+                    return;
                 }
 
                 if (finalChunk.trim()) {
@@ -1371,7 +1374,6 @@
                         state.statuses[retryIndex] = 'waiting';
                         clearLineCapture();
                         renderScript();
-                        restartRecognitionForLine();
                     }
                 }, 950);
             }
@@ -1392,7 +1394,6 @@
 
                 render();
                 scrollCurrentLine();
-                restartRecognitionForLine();
             }
 
             function completeCurrentManually() {
@@ -1416,7 +1417,6 @@
                 setFeedback('다음 문장으로 이동했습니다.', 0);
                 render();
                 scrollCurrentLine();
-                restartRecognitionForLine();
             }
 
             function previousLine() {
@@ -1431,7 +1431,6 @@
                 setFeedback('이전 문장으로 돌아왔습니다.', 0);
                 render();
                 scrollCurrentLine();
-                restartRecognitionForLine();
             }
 
             function finishConversation() {
@@ -1623,6 +1622,7 @@
 
             function clearLineCapture() {
                 window.clearTimeout(state.silenceTimer);
+                state.resultCursor = Math.max(state.resultCursor, state.latestResultLength);
                 state.finalText = '';
                 state.interimText = '';
                 state.lastEvaluatedText = '';
