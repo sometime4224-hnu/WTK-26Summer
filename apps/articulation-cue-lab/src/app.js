@@ -18,10 +18,10 @@
       pitch: 212,
       feedback: ["같은 자리", "부드럽게", "숨 보통"],
       frames: [
-        { id: "base-neutral", label: "준비", file: "base-neutral.png" },
-        { id: "velar-contact-highlight", label: "자리", file: "velar-contact-highlight.png" },
-        { id: "airflow-soft-out", label: "숨", file: "airflow-soft-out.png" },
-        { id: "tongue-b-rest-side", label: "마침", file: "tongue-b-rest-side.png" },
+        { id: "base-neutral", label: "준비", file: "base-neutral.webp" },
+        { id: "velar-contact-highlight", label: "자리", file: "velar-contact-highlight.webp" },
+        { id: "airflow-soft-out", label: "숨", file: "airflow-soft-out.webp" },
+        { id: "tongue-b-rest-side", label: "마침", file: "tongue-b-rest-side.webp" },
       ],
     },
     {
@@ -36,10 +36,10 @@
       pitch: 252,
       feedback: ["같은 자리", "숨 크게", "길게"],
       frames: [
-        { id: "velar-contact-highlight", label: "자리", file: "velar-contact-highlight.png" },
-        { id: "air-burst-outside", label: "터짐", file: "air-burst-outside.png" },
-        { id: "aspiration-inside-strong", label: "기식", file: "aspiration-inside-strong.png" },
-        { id: "airflow-strong-out", label: "숨", file: "airflow-strong-out.png" },
+        { id: "velar-contact-highlight", label: "자리", file: "velar-contact-highlight.webp" },
+        { id: "air-burst-outside", label: "터짐", file: "air-burst-outside.webp" },
+        { id: "aspiration-inside-strong", label: "기식", file: "aspiration-inside-strong.webp" },
+        { id: "airflow-strong-out", label: "숨", file: "airflow-strong-out.webp" },
       ],
     },
     {
@@ -54,10 +54,10 @@
       pitch: 250,
       feedback: ["같은 자리", "힘", "짧게"],
       frames: [
-        { id: "velar-contact-highlight", label: "자리", file: "velar-contact-highlight.png" },
-        { id: "tongue-b-high-back-emphasis", label: "힘", file: "tongue-b-high-back-emphasis.png" },
-        { id: "vocal-fold-tension-cue", label: "긴장", file: "vocal-fold-tension-cue.png" },
-        { id: "airflow-contact-short", label: "짧게", file: "airflow-contact-short.png" },
+        { id: "velar-contact-highlight", label: "자리", file: "velar-contact-highlight.webp" },
+        { id: "tongue-b-high-back-emphasis", label: "힘", file: "tongue-b-high-back-emphasis.webp" },
+        { id: "vocal-fold-tension-cue", label: "긴장", file: "vocal-fold-tension-cue.webp" },
+        { id: "airflow-contact-short", label: "짧게", file: "airflow-contact-short.webp" },
       ],
     },
   ];

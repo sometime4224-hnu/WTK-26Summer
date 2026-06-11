@@ -8,7 +8,8 @@ window.ARTICULATION_ASSET_MANIFEST = {
     "확장 에셋은 category 필드로 base/tongue/air/voice/mouth/nasal/place/sequence 분류를 제공합니다.",
     "기본 자음 확장 에셋은 2026-06-11 17:42 묶음에서 2x2 패널 단위로 분할한 sequence/place/mouth/air/nasal/voice 자료입니다.",
     "sequence 프레임 에셋은 움직임 순서 지도용으로 4열 분할 후 흰 여백을 다듬은 frame role 자료입니다.",
-    "2026-06-11 조음 원리 매칭 보강 후보 generated-remediation 에셋 54개를 기본 자음 지도 앱 적용용으로 병합했습니다."
+    "2026-06-11 조음 원리 매칭 보강 후보 generated-remediation 에셋 54개를 기본 자음 지도 앱 적용용으로 병합했습니다.",
+    "런타임 split 에셋은 2026-06-11 WebP near-lossless 95로 변환했습니다. source PNG 원본은 보존합니다."
   ],
   "sources": [
     {
@@ -323,17 +324,18 @@ window.ARTICULATION_ASSET_MANIFEST = {
   "assets": [
     {
       "id": "base-neutral",
-      "file": "split/base-neutral.png",
+      "file": "split/base-neutral.webp",
       "source": "source/base-neutral.png",
       "role": "base",
       "description": "기본 입 단면도. 화살표나 강조 표시가 없는 기준 배경.",
       "width": 1254,
       "height": 1254,
-      "category": "base"
+      "category": "base",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "tongue-a-rest-low",
-      "file": "split/tongue-a-rest-low.png",
+      "file": "split/tongue-a-rest-low.webp",
       "source": "source/tongue-position-set-a.png",
       "position": "tl",
       "quadrant": 1,
@@ -341,11 +343,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "혀가 낮고 편안한 기본 위치",
       "width": 627,
       "height": 627,
-      "category": "tongue"
+      "category": "tongue",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "tongue-a-front-raised",
-      "file": "split/tongue-a-front-raised.png",
+      "file": "split/tongue-a-front-raised.webp",
       "source": "source/tongue-position-set-a.png",
       "position": "tr",
       "quadrant": 2,
@@ -353,11 +356,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "혀 몸통이 앞쪽으로 올라간 상태",
       "width": 627,
       "height": 627,
-      "category": "tongue"
+      "category": "tongue",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "tongue-a-open-low",
-      "file": "split/tongue-a-open-low.png",
+      "file": "split/tongue-a-open-low.webp",
       "source": "source/tongue-position-set-a.png",
       "position": "bl",
       "quadrant": 3,
@@ -365,11 +369,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "입을 열고 혀가 낮은 상태",
       "width": 627,
       "height": 627,
-      "category": "tongue"
+      "category": "tongue",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "tongue-a-back-raised",
-      "file": "split/tongue-a-back-raised.png",
+      "file": "split/tongue-a-back-raised.webp",
       "source": "source/tongue-position-set-a.png",
       "position": "br",
       "quadrant": 4,
@@ -377,11 +382,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "혀 뒤쪽이 위로 올라간 상태",
       "width": 627,
       "height": 627,
-      "category": "tongue"
+      "category": "tongue",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "velar-contact-highlight",
-      "file": "split/velar-contact-highlight.png",
+      "file": "split/velar-contact-highlight.webp",
       "source": "source/velar-contact-set.png",
       "position": "tl",
       "quadrant": 1,
@@ -389,11 +395,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "혀 뒤쪽이 연구개 쪽으로 올라가 닿는 핵심 장면",
       "width": 627,
       "height": 627,
-      "category": "place"
+      "category": "place",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "tongue-high-open",
-      "file": "split/tongue-high-open.png",
+      "file": "split/tongue-high-open.webp",
       "source": "source/velar-contact-set.png",
       "position": "tr",
       "quadrant": 2,
@@ -401,11 +408,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "혀가 위로 들린 열린 구강 상태",
       "width": 627,
       "height": 627,
-      "category": "tongue"
+      "category": "tongue",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "jaw-open-neutral",
-      "file": "split/jaw-open-neutral.png",
+      "file": "split/jaw-open-neutral.webp",
       "source": "source/velar-contact-set.png",
       "position": "bl",
       "quadrant": 3,
@@ -413,11 +421,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "입을 연 중립 상태",
       "width": 627,
       "height": 627,
-      "category": "mouth"
+      "category": "mouth",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "tongue-mid-open",
-      "file": "split/tongue-mid-open.png",
+      "file": "split/tongue-mid-open.webp",
       "source": "source/velar-contact-set.png",
       "position": "br",
       "quadrant": 4,
@@ -425,11 +434,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "혀가 중간 높이에 있는 열린 상태",
       "width": 627,
       "height": 627,
-      "category": "tongue"
+      "category": "tongue",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "tongue-b-high-back-emphasis",
-      "file": "split/tongue-b-high-back-emphasis.png",
+      "file": "split/tongue-b-high-back-emphasis.webp",
       "source": "source/tongue-position-set-b.png",
       "position": "tl",
       "quadrant": 1,
@@ -437,11 +447,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "혀 뒤쪽 상승과 긴장감이 강조된 상태",
       "width": 627,
       "height": 627,
-      "category": "tongue"
+      "category": "tongue",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "tongue-b-rest-side",
-      "file": "split/tongue-b-rest-side.png",
+      "file": "split/tongue-b-rest-side.webp",
       "source": "source/tongue-position-set-b.png",
       "position": "tr",
       "quadrant": 2,
@@ -449,11 +460,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "기본 단면에 가까운 혀 위치",
       "width": 627,
       "height": 627,
-      "category": "tongue"
+      "category": "tongue",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "tongue-b-relaxed-closed",
-      "file": "split/tongue-b-relaxed-closed.png",
+      "file": "split/tongue-b-relaxed-closed.webp",
       "source": "source/tongue-position-set-b.png",
       "position": "bl",
       "quadrant": 3,
@@ -461,11 +473,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "입술이 가까운 편안한 혀 위치",
       "width": 627,
       "height": 627,
-      "category": "tongue"
+      "category": "tongue",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "tongue-b-front-closure",
-      "file": "split/tongue-b-front-closure.png",
+      "file": "split/tongue-b-front-closure.webp",
       "source": "source/tongue-position-set-b.png",
       "position": "br",
       "quadrant": 4,
@@ -473,11 +486,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "앞쪽 폐쇄에 가까운 입 모양",
       "width": 627,
       "height": 627,
-      "category": "mouth"
+      "category": "mouth",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "airflow-soft-out",
-      "file": "split/airflow-soft-out.png",
+      "file": "split/airflow-soft-out.webp",
       "source": "source/airflow-set.png",
       "position": "tl",
       "quadrant": 1,
@@ -485,11 +499,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "약한 입 밖 공기 흐름",
       "width": 627,
       "height": 627,
-      "category": "air"
+      "category": "air",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "airflow-strong-out",
-      "file": "split/airflow-strong-out.png",
+      "file": "split/airflow-strong-out.webp",
       "source": "source/airflow-set.png",
       "position": "tr",
       "quadrant": 2,
@@ -497,11 +512,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "강한 입 밖 공기 흐름",
       "width": 627,
       "height": 627,
-      "category": "air"
+      "category": "air",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "airflow-nasal-path",
-      "file": "split/airflow-nasal-path.png",
+      "file": "split/airflow-nasal-path.webp",
       "source": "source/airflow-set.png",
       "position": "bl",
       "quadrant": 3,
@@ -509,11 +525,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "비강 쪽 공기 흐름 표시",
       "width": 627,
       "height": 627,
-      "category": "nasal"
+      "category": "nasal",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "airflow-contact-short",
-      "file": "split/airflow-contact-short.png",
+      "file": "split/airflow-contact-short.webp",
       "source": "source/airflow-set.png",
       "position": "br",
       "quadrant": 4,
@@ -521,11 +538,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "입 앞/혀 주변의 짧은 공기 표시",
       "width": 627,
       "height": 627,
-      "category": "air"
+      "category": "air",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "air-burst-outside",
-      "file": "split/air-burst-outside.png",
+      "file": "split/air-burst-outside.webp",
       "source": "source/air-voice-tension-set.png",
       "position": "tl",
       "quadrant": 1,
@@ -533,11 +551,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "입 밖으로 터지는 공기 폭발",
       "width": 627,
       "height": 627,
-      "category": "air"
+      "category": "air",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "aspiration-inside-strong",
-      "file": "split/aspiration-inside-strong.png",
+      "file": "split/aspiration-inside-strong.webp",
       "source": "source/air-voice-tension-set.png",
       "position": "tr",
       "quadrant": 2,
@@ -545,11 +564,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "입안에서 입 밖으로 이어지는 강한 기식",
       "width": 627,
       "height": 627,
-      "category": "air"
+      "category": "air",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "larynx-vibration-cue",
-      "file": "split/larynx-vibration-cue.png",
+      "file": "split/larynx-vibration-cue.webp",
       "source": "source/air-voice-tension-set.png",
       "position": "bl",
       "quadrant": 3,
@@ -557,11 +577,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "목/성대 주변 진동 표시",
       "width": 627,
       "height": 627,
-      "category": "voice"
+      "category": "voice",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "vocal-fold-tension-cue",
-      "file": "split/vocal-fold-tension-cue.png",
+      "file": "split/vocal-fold-tension-cue.webp",
       "source": "source/air-voice-tension-set.png",
       "position": "br",
       "quadrant": 4,
@@ -569,11 +590,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "성대 닫힘 또는 긴장 표시",
       "width": 627,
       "height": 627,
-      "category": "voice"
+      "category": "voice",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "oral-front-air-arrow",
-      "file": "split/oral-front-air-arrow.png",
+      "file": "split/oral-front-air-arrow.webp",
       "source": "source/expansion-mixed-cues.png",
       "position": "tl",
       "quadrant": 1,
@@ -581,11 +603,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "입 앞쪽 약한 공기 방향 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "front-closure-neutral",
-      "file": "split/front-closure-neutral.png",
+      "file": "split/front-closure-neutral.webp",
       "source": "source/expansion-mixed-cues.png",
       "position": "tr",
       "quadrant": 2,
@@ -593,11 +616,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "mouth",
       "description": "입술과 치아 앞쪽 폐쇄를 보는 중립 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "nasal-route-with-voice-split",
-      "file": "split/nasal-route-with-voice-split.png",
+      "file": "split/nasal-route-with-voice-split.webp",
       "source": "source/expansion-mixed-cues.png",
       "position": "bl",
       "quadrant": 3,
@@ -605,11 +629,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "nasal",
       "description": "비강 흐름과 목 진동을 함께 비교하는 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "oral-burst-closeup-split",
-      "file": "split/oral-burst-closeup-split.png",
+      "file": "split/oral-burst-closeup-split.webp",
       "source": "source/expansion-mixed-cues.png",
       "position": "br",
       "quadrant": 4,
@@ -617,11 +642,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "입 앞 파열과 접촉부 확대 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-front-wide-open",
-      "file": "split/mouth-front-wide-open.png",
+      "file": "split/mouth-front-wide-open.webp",
       "source": "source/mouth-shapes-frontal.png",
       "position": "tl",
       "quadrant": 1,
@@ -629,11 +655,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "mouth",
       "description": "정면에서 크게 열린 입 모양",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-front-smile-open",
-      "file": "split/mouth-front-smile-open.png",
+      "file": "split/mouth-front-smile-open.webp",
       "source": "source/mouth-shapes-frontal.png",
       "position": "tr",
       "quadrant": 2,
@@ -641,11 +668,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "mouth",
       "description": "정면에서 치아와 혀가 보이는 넓은 입 모양",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-front-rounded-open",
-      "file": "split/mouth-front-rounded-open.png",
+      "file": "split/mouth-front-rounded-open.webp",
       "source": "source/mouth-shapes-frontal.png",
       "position": "bl",
       "quadrant": 3,
@@ -653,11 +681,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "mouth",
       "description": "정면에서 둥글게 열린 입 모양",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-front-small-round",
-      "file": "split/mouth-front-small-round.png",
+      "file": "split/mouth-front-small-round.webp",
       "source": "source/mouth-shapes-frontal.png",
       "position": "br",
       "quadrant": 4,
@@ -665,11 +694,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "mouth",
       "description": "정면에서 작고 둥근 입술 모양",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "voice-channel-purple",
-      "file": "split/voice-channel-purple.png",
+      "file": "split/voice-channel-purple.webp",
       "source": "source/airflow-route-channels.png",
       "position": "tl",
       "quadrant": 1,
@@ -677,11 +707,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "voice",
       "description": "목/성대 진동 경로를 보라색으로 강조한 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "nasal-route-blue",
-      "file": "split/nasal-route-blue.png",
+      "file": "split/nasal-route-blue.webp",
       "source": "source/airflow-route-channels.png",
       "position": "tr",
       "quadrant": 2,
@@ -689,11 +720,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "nasal",
       "description": "비강 공기 흐름을 파란색으로 강조한 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "oral-route-green",
-      "file": "split/oral-route-green.png",
+      "file": "split/oral-route-green.webp",
       "source": "source/airflow-route-channels.png",
       "position": "bl",
       "quadrant": 3,
@@ -701,11 +733,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "구강 공기 흐름을 초록색으로 강조한 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "dual-route-blue-green",
-      "file": "split/dual-route-blue-green.png",
+      "file": "split/dual-route-blue-green.webp",
       "source": "source/airflow-route-channels.png",
       "position": "br",
       "quadrant": 4,
@@ -713,11 +746,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "nasal",
       "description": "비강과 구강 흐름을 함께 보여주는 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "airflow-card-soft",
-      "file": "split/airflow-card-soft.png",
+      "file": "split/airflow-card-soft.webp",
       "source": "source/airflow-intensity-cards.png",
       "position": "tl",
       "quadrant": 1,
@@ -725,11 +759,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "약한 입 밖 공기 흐름 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "airflow-card-burst-voice",
-      "file": "split/airflow-card-burst-voice.png",
+      "file": "split/airflow-card-burst-voice.webp",
       "source": "source/airflow-intensity-cards.png",
       "position": "tr",
       "quadrant": 2,
@@ -737,11 +772,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "입 앞 파열과 목 진동 표시 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "airflow-card-strong",
-      "file": "split/airflow-card-strong.png",
+      "file": "split/airflow-card-strong.webp",
       "source": "source/airflow-intensity-cards.png",
       "position": "bl",
       "quadrant": 3,
@@ -749,11 +785,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "강한 입 밖 공기 흐름 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "airflow-card-intensity-scale",
-      "file": "split/airflow-card-intensity-scale.png",
+      "file": "split/airflow-card-intensity-scale.webp",
       "source": "source/airflow-intensity-cards.png",
       "position": "br",
       "quadrant": 4,
@@ -761,11 +798,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "공기 세기를 단계로 비교하는 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "place-lips-highlight",
-      "file": "split/place-lips-highlight.png",
+      "file": "split/place-lips-highlight.webp",
       "source": "source/articulation-place-highlights.png",
       "position": "tl",
       "quadrant": 1,
@@ -773,11 +811,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "place",
       "description": "입술과 앞쪽 구강 위치 강조",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "place-nasal-highlight",
-      "file": "split/place-nasal-highlight.png",
+      "file": "split/place-nasal-highlight.webp",
       "source": "source/articulation-place-highlights.png",
       "position": "tr",
       "quadrant": 2,
@@ -785,11 +824,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "place",
       "description": "비강과 윗구강 위치 강조",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "place-palate-highlight",
-      "file": "split/place-palate-highlight.png",
+      "file": "split/place-palate-highlight.webp",
       "source": "source/articulation-place-highlights.png",
       "position": "bl",
       "quadrant": 3,
@@ -797,11 +837,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "place",
       "description": "입천장 위치 강조",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "place-velum-highlight-red",
-      "file": "split/place-velum-highlight-red.png",
+      "file": "split/place-velum-highlight-red.webp",
       "source": "source/articulation-place-highlights.png",
       "position": "br",
       "quadrant": 4,
@@ -809,11 +850,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "place",
       "description": "연구개/뒤쪽 입천장 위치 강조",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-round-to-wide-open",
-      "file": "split/mouth-round-to-wide-open.png",
+      "file": "split/mouth-round-to-wide-open.webp",
       "source": "source/mouth-transition-frontal.png",
       "position": "tl",
       "quadrant": 1,
@@ -821,11 +863,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "mouth",
       "description": "둥근 입술에서 넓게 여는 변화",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-small-round-to-open",
-      "file": "split/mouth-small-round-to-open.png",
+      "file": "split/mouth-small-round-to-open.webp",
       "source": "source/mouth-transition-frontal.png",
       "position": "tr",
       "quadrant": 2,
@@ -833,11 +876,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "mouth",
       "description": "작은 둥근 입에서 열린 둥근 입으로 가는 변화",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-open-to-teeth-close",
-      "file": "split/mouth-open-to-teeth-close.png",
+      "file": "split/mouth-open-to-teeth-close.webp",
       "source": "source/mouth-transition-frontal.png",
       "position": "bl",
       "quadrant": 3,
@@ -845,11 +889,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "mouth",
       "description": "열린 입에서 치아가 가까워지는 변화",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-teeth-close-to-wide-open",
-      "file": "split/mouth-teeth-close-to-wide-open.png",
+      "file": "split/mouth-teeth-close-to-wide-open.webp",
       "source": "source/mouth-transition-frontal.png",
       "position": "br",
       "quadrant": 4,
@@ -857,11 +902,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "mouth",
       "description": "치아가 가까운 상태에서 크게 여는 변화",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "micro-air-lip-inlet",
-      "file": "split/micro-air-lip-inlet.png",
+      "file": "split/micro-air-lip-inlet.webp",
       "source": "source/micro-airflow-cues.png",
       "position": "tl",
       "quadrant": 1,
@@ -869,11 +915,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "입술 앞 작은 공기 방향 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "micro-air-front-cavity",
-      "file": "split/micro-air-front-cavity.png",
+      "file": "split/micro-air-front-cavity.webp",
       "source": "source/micro-airflow-cues.png",
       "position": "tr",
       "quadrant": 2,
@@ -881,11 +928,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "앞구강 안쪽 작은 공기 방향 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "micro-air-back-palate",
-      "file": "split/micro-air-back-palate.png",
+      "file": "split/micro-air-back-palate.webp",
       "source": "source/micro-airflow-cues.png",
       "position": "bl",
       "quadrant": 3,
@@ -893,11 +941,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "뒤입천장 주변 작은 공기 방향 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "micro-air-front-release",
-      "file": "split/micro-air-front-release.png",
+      "file": "split/micro-air-front-release.webp",
       "source": "source/micro-airflow-cues.png",
       "position": "br",
       "quadrant": 4,
@@ -905,11 +954,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "앞구강 방출 방향 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "nasal-route-open",
-      "file": "split/nasal-route-open.png",
+      "file": "split/nasal-route-open.webp",
       "source": "source/nasal-airflow-sequence.png",
       "position": "tl",
       "quadrant": 1,
@@ -917,11 +967,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "nasal",
       "description": "비강으로 흐르는 공기 방향 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "nasal-route-side",
-      "file": "split/nasal-route-side.png",
+      "file": "split/nasal-route-side.webp",
       "source": "source/nasal-airflow-sequence.png",
       "position": "tr",
       "quadrant": 2,
@@ -929,11 +980,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "nasal",
       "description": "측면 단면의 비강 흐름 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "nasal-route-with-tongue-emphasis",
-      "file": "split/nasal-route-with-tongue-emphasis.png",
+      "file": "split/nasal-route-with-tongue-emphasis.webp",
       "source": "source/nasal-airflow-sequence.png",
       "position": "bl",
       "quadrant": 3,
@@ -941,11 +993,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "nasal",
       "description": "비강 흐름과 혀 뒤쪽 강조 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "nasal-route-split-highlight",
-      "file": "split/nasal-route-split-highlight.png",
+      "file": "split/nasal-route-split-highlight.webp",
       "source": "source/nasal-airflow-sequence.png",
       "position": "br",
       "quadrant": 4,
@@ -953,11 +1006,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "비강 흐름과 앞쪽 강조를 비교하는 분할 큐",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "template-oral-lip-breath",
-      "file": "split/template-oral-lip-breath.png",
+      "file": "split/template-oral-lip-breath.webp",
       "source": "source/template-cue-cards.png",
       "position": "tl",
       "quadrant": 1,
@@ -965,11 +1019,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "입술과 구강 숨 흐름 템플릿 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "template-nasal-route",
-      "file": "split/template-nasal-route.png",
+      "file": "split/template-nasal-route.webp",
       "source": "source/template-cue-cards.png",
       "position": "tr",
       "quadrant": 2,
@@ -977,11 +1032,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "비강 흐름 템플릿 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "template-front-closure-motion",
-      "file": "split/template-front-closure-motion.png",
+      "file": "split/template-front-closure-motion.webp",
       "source": "source/template-cue-cards.png",
       "position": "bl",
       "quadrant": 3,
@@ -989,11 +1045,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "앞쪽 폐쇄와 혀 움직임 템플릿 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "template-lip-burst",
-      "file": "split/template-lip-burst.png",
+      "file": "split/template-lip-burst.webp",
       "source": "source/template-cue-cards.png",
       "position": "br",
       "quadrant": 4,
@@ -1001,11 +1058,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "입술 앞 파열 템플릿 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "front-place-palate-reference",
-      "file": "split/front-place-palate-reference.png",
+      "file": "split/front-place-palate-reference.webp",
       "source": "source/consonant-front-place-set.png",
       "position": "tl",
       "quadrant": 1,
@@ -1013,11 +1071,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "place",
       "description": "앞혀/입천장 위치 기준 단면",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "front-tongue-raised-contact",
-      "file": "split/front-tongue-raised-contact.png",
+      "file": "split/front-tongue-raised-contact.webp",
       "source": "source/consonant-front-place-set.png",
       "position": "tr",
       "quadrant": 2,
@@ -1025,11 +1084,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "tongue",
       "description": "혀 앞쪽이 올라가 앞쪽 입천장에 접근한 상태",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "front-contact-close-highlight",
-      "file": "split/front-contact-close-highlight.png",
+      "file": "split/front-contact-close-highlight.webp",
       "source": "source/consonant-front-place-set.png",
       "position": "bl",
       "quadrant": 3,
@@ -1037,11 +1097,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "place",
       "description": "앞쪽 접촉부를 크게 강조한 상태",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "front-contact-vibration-cue",
-      "file": "split/front-contact-vibration-cue.png",
+      "file": "split/front-contact-vibration-cue.webp",
       "source": "source/consonant-front-place-set.png",
       "position": "br",
       "quadrant": 4,
@@ -1049,11 +1110,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "voice",
       "description": "앞쪽 접촉과 가벼운 울림/진동 표시",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velum-close-to-nasal-open",
-      "file": "split/sequence-velum-close-to-nasal-open.png",
+      "file": "split/sequence-velum-close-to-nasal-open.webp",
       "source": "source/consonant-velum-flow-sequences.png",
       "position": "tl",
       "quadrant": 1,
@@ -1061,11 +1123,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "연구개 위치 변화와 비강 흐름 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velum-lowering-nasal-route",
-      "file": "split/sequence-velum-lowering-nasal-route.png",
+      "file": "split/sequence-velum-lowering-nasal-route.webp",
       "source": "source/consonant-velum-flow-sequences.png",
       "position": "tr",
       "quadrant": 2,
@@ -1073,11 +1136,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "연구개 하강 후 비강으로 흐르는 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-larynx-to-oral-route",
-      "file": "split/sequence-larynx-to-oral-route.png",
+      "file": "split/sequence-larynx-to-oral-route.webp",
       "source": "source/consonant-velum-flow-sequences.png",
       "position": "bl",
       "quadrant": 3,
@@ -1085,11 +1149,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "목에서 시작한 숨이 구강으로 나가는 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-oral-release-with-tongue-route",
-      "file": "split/sequence-oral-release-with-tongue-route.png",
+      "file": "split/sequence-oral-release-with-tongue-route.webp",
       "source": "source/consonant-velum-flow-sequences.png",
       "position": "br",
       "quadrant": 4,
@@ -1097,11 +1162,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "혀 위치 변화 뒤 구강 방출로 이어지는 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "paired-mouth-soft-and-strong-release",
-      "file": "split/paired-mouth-soft-and-strong-release.png",
+      "file": "split/paired-mouth-soft-and-strong-release.webp",
       "source": "source/consonant-mouth-side-airflow-set.png",
       "position": "tl",
       "quadrant": 1,
@@ -1109,11 +1175,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "입술 모양과 약한/강한 구강 방출 비교",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "paired-mouth-burst-and-wide-release",
-      "file": "split/paired-mouth-burst-and-wide-release.png",
+      "file": "split/paired-mouth-burst-and-wide-release.webp",
       "source": "source/consonant-mouth-side-airflow-set.png",
       "position": "tr",
       "quadrant": 2,
@@ -1121,11 +1188,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "입 앞 파열과 큰 구강 방출 비교",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "paired-mouth-frication-voice-flow",
-      "file": "split/paired-mouth-frication-voice-flow.png",
+      "file": "split/paired-mouth-frication-voice-flow.webp",
       "source": "source/consonant-mouth-side-airflow-set.png",
       "position": "bl",
       "quadrant": 3,
@@ -1133,11 +1201,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "입 모양과 마찰성 흐름/울림 흐름 비교",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-air-intensity-comparison",
-      "file": "split/sequence-air-intensity-comparison.png",
+      "file": "split/sequence-air-intensity-comparison.webp",
       "source": "source/consonant-mouth-side-airflow-set.png",
       "position": "br",
       "quadrant": 4,
@@ -1145,11 +1214,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "약함에서 강함으로 이어지는 공기 세기 비교 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "glottis-open-breath-front",
-      "file": "split/glottis-open-breath-front.png",
+      "file": "split/glottis-open-breath-front.webp",
       "source": "source/consonant-glottis-voice-flow-set.png",
       "position": "tl",
       "quadrant": 1,
@@ -1157,11 +1227,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "voice",
       "description": "성문이 열린 상태와 강한 숨 흐름",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "glottis-vibration-and-tension",
-      "file": "split/glottis-vibration-and-tension.png",
+      "file": "split/glottis-vibration-and-tension.webp",
       "source": "source/consonant-glottis-voice-flow-set.png",
       "position": "tr",
       "quadrant": 2,
@@ -1169,11 +1240,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "voice",
       "description": "성대 진동과 성문 긴장 표시",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "larynx-to-oral-airflow-route",
-      "file": "split/larynx-to-oral-airflow-route.png",
+      "file": "split/larynx-to-oral-airflow-route.webp",
       "source": "source/consonant-glottis-voice-flow-set.png",
       "position": "bl",
       "quadrant": 3,
@@ -1181,11 +1253,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "목에서 시작해 입으로 나가는 공기 경로",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "larynx-nasal-route-comparison",
-      "file": "split/larynx-nasal-route-comparison.png",
+      "file": "split/larynx-nasal-route-comparison.webp",
       "source": "source/consonant-glottis-voice-flow-set.png",
       "position": "br",
       "quadrant": 4,
@@ -1193,11 +1266,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "nasal",
       "description": "목 울림과 비강 흐름 경로 비교",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-soft-stop",
-      "file": "split/sequence-bilabial-soft-stop.png",
+      "file": "split/sequence-bilabial-soft-stop.webp",
       "source": "source/consonant-bilabial-front-sequences.png",
       "position": "tl",
       "quadrant": 1,
@@ -1205,11 +1279,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "ㅂ 계열: 입술 닫힘 뒤 약한 방출 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-aspirated-stop",
-      "file": "split/sequence-bilabial-aspirated-stop.png",
+      "file": "split/sequence-bilabial-aspirated-stop.webp",
       "source": "source/consonant-bilabial-front-sequences.png",
       "position": "tr",
       "quadrant": 2,
@@ -1217,11 +1292,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "ㅍ 계열: 입술 닫힘 뒤 강한 숨 방출 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-nasal",
-      "file": "split/sequence-bilabial-nasal.png",
+      "file": "split/sequence-bilabial-nasal.webp",
       "source": "source/consonant-bilabial-front-sequences.png",
       "position": "bl",
       "quadrant": 3,
@@ -1229,11 +1305,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "ㅁ 계열: 입술 닫힘 뒤 코로 흐르는 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-stop-release",
-      "file": "split/sequence-front-stop-release.png",
+      "file": "split/sequence-front-stop-release.webp",
       "source": "source/consonant-bilabial-front-sequences.png",
       "position": "br",
       "quadrant": 4,
@@ -1241,11 +1318,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "ㄷ 계열: 앞쪽 접촉 뒤 짧은 방출 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-soft-release",
-      "file": "split/sequence-front-soft-release.png",
+      "file": "split/sequence-front-soft-release.webp",
       "source": "source/consonant-front-sequences-a.png",
       "position": "tl",
       "quadrant": 1,
@@ -1253,11 +1331,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "앞쪽 접촉 뒤 약한 방출 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-nasal-voice-route",
-      "file": "split/sequence-front-nasal-voice-route.png",
+      "file": "split/sequence-front-nasal-voice-route.webp",
       "source": "source/consonant-front-sequences-a.png",
       "position": "tr",
       "quadrant": 2,
@@ -1265,11 +1344,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "앞쪽 접촉과 비강/울림 경로 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-liquid-vibration",
-      "file": "split/sequence-front-liquid-vibration.png",
+      "file": "split/sequence-front-liquid-vibration.webp",
       "source": "source/consonant-front-sequences-a.png",
       "position": "bl",
       "quadrant": 3,
@@ -1277,11 +1357,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "ㄹ 계열: 가벼운 접촉과 울림 표시 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-release",
-      "file": "split/sequence-front-fricative-release.png",
+      "file": "split/sequence-front-fricative-release.webp",
       "source": "source/consonant-front-sequences-a.png",
       "position": "br",
       "quadrant": 4,
@@ -1289,11 +1370,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "ㅅ 계열: 좁힘 뒤 마찰 흐름 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-soft",
-      "file": "split/sequence-front-fricative-soft.png",
+      "file": "split/sequence-front-fricative-soft.webp",
       "source": "source/consonant-front-palatal-sequences.png",
       "position": "tl",
       "quadrant": 1,
@@ -1301,11 +1383,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "앞쪽 좁힘 뒤 약한 마찰 흐름 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-strong",
-      "file": "split/sequence-front-fricative-strong.png",
+      "file": "split/sequence-front-fricative-strong.webp",
       "source": "source/consonant-front-palatal-sequences.png",
       "position": "tr",
       "quadrant": 2,
@@ -1313,11 +1396,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "앞쪽 좁힘 뒤 강한 마찰/숨 흐름 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-affricate-soft",
-      "file": "split/sequence-palatal-affricate-soft.png",
+      "file": "split/sequence-palatal-affricate-soft.webp",
       "source": "source/consonant-front-palatal-sequences.png",
       "position": "bl",
       "quadrant": 3,
@@ -1325,11 +1409,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "ㅈ 계열: 앞쪽 막힘에서 파찰로 이어지는 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-affricate-strong",
-      "file": "split/sequence-palatal-affricate-strong.png",
+      "file": "split/sequence-palatal-affricate-strong.webp",
       "source": "source/consonant-front-palatal-sequences.png",
       "position": "br",
       "quadrant": 4,
@@ -1337,11 +1422,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "ㅊ 계열: 앞쪽 막힘에서 강한 파찰로 이어지는 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "place-front-tongue-broad-contact",
-      "file": "split/place-front-tongue-broad-contact.png",
+      "file": "split/place-front-tongue-broad-contact.webp",
       "source": "source/consonant-tongue-place-release-set.png",
       "position": "tl",
       "quadrant": 1,
@@ -1349,11 +1435,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "place",
       "description": "혀 앞쪽이 넓게 올라가 접촉하는 상태",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "place-front-contact-burst-highlight",
-      "file": "split/place-front-contact-burst-highlight.png",
+      "file": "split/place-front-contact-burst-highlight.webp",
       "source": "source/consonant-tongue-place-release-set.png",
       "position": "tr",
       "quadrant": 2,
@@ -1361,11 +1448,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "place",
       "description": "앞쪽 접촉부와 짧은 터짐 강조",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "place-back-velum-contact-blue",
-      "file": "split/place-back-velum-contact-blue.png",
+      "file": "split/place-back-velum-contact-blue.webp",
       "source": "source/consonant-tongue-place-release-set.png",
       "position": "bl",
       "quadrant": 3,
@@ -1373,11 +1461,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "place",
       "description": "혀 뒤쪽과 연구개 접촉 위치 강조",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-contact-release",
-      "file": "split/sequence-velar-contact-release.png",
+      "file": "split/sequence-velar-contact-release.webp",
       "source": "source/consonant-tongue-place-release-set.png",
       "position": "br",
       "quadrant": 4,
@@ -1385,11 +1474,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "뒤혀 접촉에서 구강 방출로 이어지는 순서",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "flow-oral-and-nasal-route-pair",
-      "file": "split/flow-oral-and-nasal-route-pair.png",
+      "file": "split/flow-oral-and-nasal-route-pair.webp",
       "source": "source/consonant-route-flow-cards.png",
       "position": "tl",
       "quadrant": 1,
@@ -1397,11 +1487,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "nasal",
       "description": "구강 방출과 비강 경로를 함께 비교한 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "flow-oral-nasal-strong-pair",
-      "file": "split/flow-oral-nasal-strong-pair.png",
+      "file": "split/flow-oral-nasal-strong-pair.webp",
       "source": "source/consonant-route-flow-cards.png",
       "position": "tr",
       "quadrant": 2,
@@ -1409,11 +1500,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "nasal",
       "description": "구강 방출과 강한 비강/구강 경로 비교 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "flow-lip-release-and-nasal-pair",
-      "file": "split/flow-lip-release-and-nasal-pair.png",
+      "file": "split/flow-lip-release-and-nasal-pair.webp",
       "source": "source/consonant-route-flow-cards.png",
       "position": "bl",
       "quadrant": 3,
@@ -1421,11 +1513,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "입 앞 방출과 비강 경로 비교 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "flow-nasal-route-intensity-stack",
-      "file": "split/flow-nasal-route-intensity-stack.png",
+      "file": "split/flow-nasal-route-intensity-stack.webp",
       "source": "source/consonant-route-flow-cards.png",
       "position": "br",
       "quadrant": 4,
@@ -1433,11 +1526,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "sequence",
       "description": "비강/구강 경로 세기를 단계로 비교한 카드",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-open-close-reference-pair",
-      "file": "split/mouth-open-close-reference-pair.png",
+      "file": "split/mouth-open-close-reference-pair.webp",
       "source": "source/consonant-mouth-shape-breath-set.png",
       "position": "tl",
       "quadrant": 1,
@@ -1445,11 +1539,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "mouth",
       "description": "자연스러운 열린 입과 닫힌 입 비교",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-round-wide-open-pair",
-      "file": "split/mouth-round-wide-open-pair.png",
+      "file": "split/mouth-round-wide-open-pair.webp",
       "source": "source/consonant-mouth-shape-breath-set.png",
       "position": "tr",
       "quadrant": 2,
@@ -1457,11 +1552,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "mouth",
       "description": "둥근 입술과 크게 열린 입 비교",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-teeth-close-open-transition",
-      "file": "split/mouth-teeth-close-open-transition.png",
+      "file": "split/mouth-teeth-close-open-transition.webp",
       "source": "source/consonant-mouth-shape-breath-set.png",
       "position": "bl",
       "quadrant": 3,
@@ -1469,11 +1565,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "mouth",
       "description": "치아가 보이는 상태에서 열린 입으로 전환",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-round-airflow-strong",
-      "file": "split/mouth-round-airflow-strong.png",
+      "file": "split/mouth-round-airflow-strong.webp",
       "source": "source/consonant-mouth-shape-breath-set.png",
       "position": "br",
       "quadrant": 4,
@@ -1481,12 +1578,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "category": "air",
       "description": "둥근 입술에서 강한 숨이 나가는 상태",
       "width": 627,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velum-close-to-nasal-open-frame-01",
-      "file": "split/sequence-velum-close-to-nasal-open-frame-01.png",
-      "source": "split/sequence-velum-close-to-nasal-open.png",
+      "file": "split/sequence-velum-close-to-nasal-open-frame-01.webp",
+      "source": "split/sequence-velum-close-to-nasal-open.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-velum-close-to-nasal-open",
@@ -1494,12 +1592,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "연구개 위치 변화와 비강 흐름 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velum-close-to-nasal-open-frame-02",
-      "file": "split/sequence-velum-close-to-nasal-open-frame-02.png",
-      "source": "split/sequence-velum-close-to-nasal-open.png",
+      "file": "split/sequence-velum-close-to-nasal-open-frame-02.webp",
+      "source": "split/sequence-velum-close-to-nasal-open.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-velum-close-to-nasal-open",
@@ -1507,12 +1606,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "연구개 위치 변화와 비강 흐름 순서 - 2단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velum-close-to-nasal-open-frame-03",
-      "file": "split/sequence-velum-close-to-nasal-open-frame-03.png",
-      "source": "split/sequence-velum-close-to-nasal-open.png",
+      "file": "split/sequence-velum-close-to-nasal-open-frame-03.webp",
+      "source": "split/sequence-velum-close-to-nasal-open.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-velum-close-to-nasal-open",
@@ -1520,12 +1620,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "연구개 위치 변화와 비강 흐름 순서 - 3단계 프레임",
       "width": 156,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velum-close-to-nasal-open-frame-04",
-      "file": "split/sequence-velum-close-to-nasal-open-frame-04.png",
-      "source": "split/sequence-velum-close-to-nasal-open.png",
+      "file": "split/sequence-velum-close-to-nasal-open-frame-04.webp",
+      "source": "split/sequence-velum-close-to-nasal-open.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-velum-close-to-nasal-open",
@@ -1533,12 +1634,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "연구개 위치 변화와 비강 흐름 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velum-lowering-nasal-route-frame-01",
-      "file": "split/sequence-velum-lowering-nasal-route-frame-01.png",
-      "source": "split/sequence-velum-lowering-nasal-route.png",
+      "file": "split/sequence-velum-lowering-nasal-route-frame-01.webp",
+      "source": "split/sequence-velum-lowering-nasal-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-velum-lowering-nasal-route",
@@ -1546,12 +1648,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "연구개 하강 후 비강으로 흐르는 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velum-lowering-nasal-route-frame-02",
-      "file": "split/sequence-velum-lowering-nasal-route-frame-02.png",
-      "source": "split/sequence-velum-lowering-nasal-route.png",
+      "file": "split/sequence-velum-lowering-nasal-route-frame-02.webp",
+      "source": "split/sequence-velum-lowering-nasal-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-velum-lowering-nasal-route",
@@ -1559,12 +1662,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "연구개 하강 후 비강으로 흐르는 순서 - 2단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velum-lowering-nasal-route-frame-03",
-      "file": "split/sequence-velum-lowering-nasal-route-frame-03.png",
-      "source": "split/sequence-velum-lowering-nasal-route.png",
+      "file": "split/sequence-velum-lowering-nasal-route-frame-03.webp",
+      "source": "split/sequence-velum-lowering-nasal-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-velum-lowering-nasal-route",
@@ -1572,12 +1676,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "연구개 하강 후 비강으로 흐르는 순서 - 3단계 프레임",
       "width": 156,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velum-lowering-nasal-route-frame-04",
-      "file": "split/sequence-velum-lowering-nasal-route-frame-04.png",
-      "source": "split/sequence-velum-lowering-nasal-route.png",
+      "file": "split/sequence-velum-lowering-nasal-route-frame-04.webp",
+      "source": "split/sequence-velum-lowering-nasal-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-velum-lowering-nasal-route",
@@ -1585,12 +1690,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "연구개 하강 후 비강으로 흐르는 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-larynx-to-oral-route-frame-01",
-      "file": "split/sequence-larynx-to-oral-route-frame-01.png",
-      "source": "split/sequence-larynx-to-oral-route.png",
+      "file": "split/sequence-larynx-to-oral-route-frame-01.webp",
+      "source": "split/sequence-larynx-to-oral-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-larynx-to-oral-route",
@@ -1598,12 +1704,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "목에서 시작한 숨이 구강으로 나가는 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-larynx-to-oral-route-frame-02",
-      "file": "split/sequence-larynx-to-oral-route-frame-02.png",
-      "source": "split/sequence-larynx-to-oral-route.png",
+      "file": "split/sequence-larynx-to-oral-route-frame-02.webp",
+      "source": "split/sequence-larynx-to-oral-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-larynx-to-oral-route",
@@ -1611,12 +1718,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "목에서 시작한 숨이 구강으로 나가는 순서 - 2단계 프레임",
       "width": 157,
-      "height": 513
+      "height": 513,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-larynx-to-oral-route-frame-03",
-      "file": "split/sequence-larynx-to-oral-route-frame-03.png",
-      "source": "split/sequence-larynx-to-oral-route.png",
+      "file": "split/sequence-larynx-to-oral-route-frame-03.webp",
+      "source": "split/sequence-larynx-to-oral-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-larynx-to-oral-route",
@@ -1624,12 +1732,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "목에서 시작한 숨이 구강으로 나가는 순서 - 3단계 프레임",
       "width": 156,
-      "height": 513
+      "height": 513,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-larynx-to-oral-route-frame-04",
-      "file": "split/sequence-larynx-to-oral-route-frame-04.png",
-      "source": "split/sequence-larynx-to-oral-route.png",
+      "file": "split/sequence-larynx-to-oral-route-frame-04.webp",
+      "source": "split/sequence-larynx-to-oral-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-larynx-to-oral-route",
@@ -1637,12 +1746,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "목에서 시작한 숨이 구강으로 나가는 순서 - 4단계 프레임",
       "width": 157,
-      "height": 509
+      "height": 509,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-oral-release-with-tongue-route-frame-01",
-      "file": "split/sequence-oral-release-with-tongue-route-frame-01.png",
-      "source": "split/sequence-oral-release-with-tongue-route.png",
+      "file": "split/sequence-oral-release-with-tongue-route-frame-01.webp",
+      "source": "split/sequence-oral-release-with-tongue-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-oral-release-with-tongue-route",
@@ -1650,12 +1760,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "혀 위치 변화 뒤 구강 방출로 이어지는 순서 - 1단계 프레임",
       "width": 157,
-      "height": 514
+      "height": 514,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-oral-release-with-tongue-route-frame-02",
-      "file": "split/sequence-oral-release-with-tongue-route-frame-02.png",
-      "source": "split/sequence-oral-release-with-tongue-route.png",
+      "file": "split/sequence-oral-release-with-tongue-route-frame-02.webp",
+      "source": "split/sequence-oral-release-with-tongue-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-oral-release-with-tongue-route",
@@ -1663,12 +1774,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "혀 위치 변화 뒤 구강 방출로 이어지는 순서 - 2단계 프레임",
       "width": 157,
-      "height": 509
+      "height": 509,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-oral-release-with-tongue-route-frame-03",
-      "file": "split/sequence-oral-release-with-tongue-route-frame-03.png",
-      "source": "split/sequence-oral-release-with-tongue-route.png",
+      "file": "split/sequence-oral-release-with-tongue-route-frame-03.webp",
+      "source": "split/sequence-oral-release-with-tongue-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-oral-release-with-tongue-route",
@@ -1676,12 +1788,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "혀 위치 변화 뒤 구강 방출로 이어지는 순서 - 3단계 프레임",
       "width": 156,
-      "height": 517
+      "height": 517,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-oral-release-with-tongue-route-frame-04",
-      "file": "split/sequence-oral-release-with-tongue-route-frame-04.png",
-      "source": "split/sequence-oral-release-with-tongue-route.png",
+      "file": "split/sequence-oral-release-with-tongue-route-frame-04.webp",
+      "source": "split/sequence-oral-release-with-tongue-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-oral-release-with-tongue-route",
@@ -1689,12 +1802,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "혀 위치 변화 뒤 구강 방출로 이어지는 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-soft-stop-frame-01",
-      "file": "split/sequence-bilabial-soft-stop-frame-01.png",
-      "source": "split/sequence-bilabial-soft-stop.png",
+      "file": "split/sequence-bilabial-soft-stop-frame-01.webp",
+      "source": "split/sequence-bilabial-soft-stop.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-bilabial-soft-stop",
@@ -1702,12 +1816,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅂ 계열: 입술 닫힘 뒤 약한 방출 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-soft-stop-frame-02",
-      "file": "split/sequence-bilabial-soft-stop-frame-02.png",
-      "source": "split/sequence-bilabial-soft-stop.png",
+      "file": "split/sequence-bilabial-soft-stop-frame-02.webp",
+      "source": "split/sequence-bilabial-soft-stop.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-bilabial-soft-stop",
@@ -1715,12 +1830,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅂ 계열: 입술 닫힘 뒤 약한 방출 순서 - 2단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-soft-stop-frame-03",
-      "file": "split/sequence-bilabial-soft-stop-frame-03.png",
-      "source": "split/sequence-bilabial-soft-stop.png",
+      "file": "split/sequence-bilabial-soft-stop-frame-03.webp",
+      "source": "split/sequence-bilabial-soft-stop.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-bilabial-soft-stop",
@@ -1728,12 +1844,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅂ 계열: 입술 닫힘 뒤 약한 방출 순서 - 3단계 프레임",
       "width": 156,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-soft-stop-frame-04",
-      "file": "split/sequence-bilabial-soft-stop-frame-04.png",
-      "source": "split/sequence-bilabial-soft-stop.png",
+      "file": "split/sequence-bilabial-soft-stop-frame-04.webp",
+      "source": "split/sequence-bilabial-soft-stop.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-bilabial-soft-stop",
@@ -1741,12 +1858,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅂ 계열: 입술 닫힘 뒤 약한 방출 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-aspirated-stop-frame-01",
-      "file": "split/sequence-bilabial-aspirated-stop-frame-01.png",
-      "source": "split/sequence-bilabial-aspirated-stop.png",
+      "file": "split/sequence-bilabial-aspirated-stop-frame-01.webp",
+      "source": "split/sequence-bilabial-aspirated-stop.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-bilabial-aspirated-stop",
@@ -1754,12 +1872,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅍ 계열: 입술 닫힘 뒤 강한 숨 방출 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-aspirated-stop-frame-02",
-      "file": "split/sequence-bilabial-aspirated-stop-frame-02.png",
-      "source": "split/sequence-bilabial-aspirated-stop.png",
+      "file": "split/sequence-bilabial-aspirated-stop-frame-02.webp",
+      "source": "split/sequence-bilabial-aspirated-stop.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-bilabial-aspirated-stop",
@@ -1767,12 +1886,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅍ 계열: 입술 닫힘 뒤 강한 숨 방출 순서 - 2단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-aspirated-stop-frame-03",
-      "file": "split/sequence-bilabial-aspirated-stop-frame-03.png",
-      "source": "split/sequence-bilabial-aspirated-stop.png",
+      "file": "split/sequence-bilabial-aspirated-stop-frame-03.webp",
+      "source": "split/sequence-bilabial-aspirated-stop.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-bilabial-aspirated-stop",
@@ -1780,12 +1900,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅍ 계열: 입술 닫힘 뒤 강한 숨 방출 순서 - 3단계 프레임",
       "width": 156,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-aspirated-stop-frame-04",
-      "file": "split/sequence-bilabial-aspirated-stop-frame-04.png",
-      "source": "split/sequence-bilabial-aspirated-stop.png",
+      "file": "split/sequence-bilabial-aspirated-stop-frame-04.webp",
+      "source": "split/sequence-bilabial-aspirated-stop.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-bilabial-aspirated-stop",
@@ -1793,12 +1914,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅍ 계열: 입술 닫힘 뒤 강한 숨 방출 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-nasal-frame-01",
-      "file": "split/sequence-bilabial-nasal-frame-01.png",
-      "source": "split/sequence-bilabial-nasal.png",
+      "file": "split/sequence-bilabial-nasal-frame-01.webp",
+      "source": "split/sequence-bilabial-nasal.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-bilabial-nasal",
@@ -1806,12 +1928,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅁ 계열: 입술 닫힘 뒤 코로 흐르는 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-nasal-frame-02",
-      "file": "split/sequence-bilabial-nasal-frame-02.png",
-      "source": "split/sequence-bilabial-nasal.png",
+      "file": "split/sequence-bilabial-nasal-frame-02.webp",
+      "source": "split/sequence-bilabial-nasal.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-bilabial-nasal",
@@ -1819,12 +1942,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅁ 계열: 입술 닫힘 뒤 코로 흐르는 순서 - 2단계 프레임",
       "width": 157,
-      "height": 457
+      "height": 457,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-nasal-frame-03",
-      "file": "split/sequence-bilabial-nasal-frame-03.png",
-      "source": "split/sequence-bilabial-nasal.png",
+      "file": "split/sequence-bilabial-nasal-frame-03.webp",
+      "source": "split/sequence-bilabial-nasal.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-bilabial-nasal",
@@ -1832,12 +1956,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅁ 계열: 입술 닫힘 뒤 코로 흐르는 순서 - 3단계 프레임",
       "width": 156,
-      "height": 457
+      "height": 457,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-nasal-frame-04",
-      "file": "split/sequence-bilabial-nasal-frame-04.png",
-      "source": "split/sequence-bilabial-nasal.png",
+      "file": "split/sequence-bilabial-nasal-frame-04.webp",
+      "source": "split/sequence-bilabial-nasal.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-bilabial-nasal",
@@ -1845,12 +1970,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅁ 계열: 입술 닫힘 뒤 코로 흐르는 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-stop-release-frame-01",
-      "file": "split/sequence-front-stop-release-frame-01.png",
-      "source": "split/sequence-front-stop-release.png",
+      "file": "split/sequence-front-stop-release-frame-01.webp",
+      "source": "split/sequence-front-stop-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-stop-release",
@@ -1858,12 +1984,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㄷ 계열: 앞쪽 접촉 뒤 짧은 방출 순서 - 1단계 프레임",
       "width": 157,
-      "height": 574
+      "height": 574,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-stop-release-frame-02",
-      "file": "split/sequence-front-stop-release-frame-02.png",
-      "source": "split/sequence-front-stop-release.png",
+      "file": "split/sequence-front-stop-release-frame-02.webp",
+      "source": "split/sequence-front-stop-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-stop-release",
@@ -1871,12 +1998,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㄷ 계열: 앞쪽 접촉 뒤 짧은 방출 순서 - 2단계 프레임",
       "width": 157,
-      "height": 477
+      "height": 477,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-stop-release-frame-03",
-      "file": "split/sequence-front-stop-release-frame-03.png",
-      "source": "split/sequence-front-stop-release.png",
+      "file": "split/sequence-front-stop-release-frame-03.webp",
+      "source": "split/sequence-front-stop-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-stop-release",
@@ -1884,12 +2012,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㄷ 계열: 앞쪽 접촉 뒤 짧은 방출 순서 - 3단계 프레임",
       "width": 156,
-      "height": 476
+      "height": 476,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-stop-release-frame-04",
-      "file": "split/sequence-front-stop-release-frame-04.png",
-      "source": "split/sequence-front-stop-release.png",
+      "file": "split/sequence-front-stop-release-frame-04.webp",
+      "source": "split/sequence-front-stop-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-stop-release",
@@ -1897,12 +2026,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㄷ 계열: 앞쪽 접촉 뒤 짧은 방출 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-soft-release-frame-01",
-      "file": "split/sequence-front-soft-release-frame-01.png",
-      "source": "split/sequence-front-soft-release.png",
+      "file": "split/sequence-front-soft-release-frame-01.webp",
+      "source": "split/sequence-front-soft-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-soft-release",
@@ -1910,12 +2040,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 접촉 뒤 약한 방출 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-soft-release-frame-02",
-      "file": "split/sequence-front-soft-release-frame-02.png",
-      "source": "split/sequence-front-soft-release.png",
+      "file": "split/sequence-front-soft-release-frame-02.webp",
+      "source": "split/sequence-front-soft-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-soft-release",
@@ -1923,12 +2054,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 접촉 뒤 약한 방출 순서 - 2단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-soft-release-frame-03",
-      "file": "split/sequence-front-soft-release-frame-03.png",
-      "source": "split/sequence-front-soft-release.png",
+      "file": "split/sequence-front-soft-release-frame-03.webp",
+      "source": "split/sequence-front-soft-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-soft-release",
@@ -1936,12 +2068,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 접촉 뒤 약한 방출 순서 - 3단계 프레임",
       "width": 156,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-soft-release-frame-04",
-      "file": "split/sequence-front-soft-release-frame-04.png",
-      "source": "split/sequence-front-soft-release.png",
+      "file": "split/sequence-front-soft-release-frame-04.webp",
+      "source": "split/sequence-front-soft-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-soft-release",
@@ -1949,12 +2082,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 접촉 뒤 약한 방출 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-nasal-voice-route-frame-01",
-      "file": "split/sequence-front-nasal-voice-route-frame-01.png",
-      "source": "split/sequence-front-nasal-voice-route.png",
+      "file": "split/sequence-front-nasal-voice-route-frame-01.webp",
+      "source": "split/sequence-front-nasal-voice-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-nasal-voice-route",
@@ -1962,12 +2096,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 접촉과 비강/울림 경로 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-nasal-voice-route-frame-02",
-      "file": "split/sequence-front-nasal-voice-route-frame-02.png",
-      "source": "split/sequence-front-nasal-voice-route.png",
+      "file": "split/sequence-front-nasal-voice-route-frame-02.webp",
+      "source": "split/sequence-front-nasal-voice-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-nasal-voice-route",
@@ -1975,12 +2110,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 접촉과 비강/울림 경로 순서 - 2단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-nasal-voice-route-frame-03",
-      "file": "split/sequence-front-nasal-voice-route-frame-03.png",
-      "source": "split/sequence-front-nasal-voice-route.png",
+      "file": "split/sequence-front-nasal-voice-route-frame-03.webp",
+      "source": "split/sequence-front-nasal-voice-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-nasal-voice-route",
@@ -1988,12 +2124,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 접촉과 비강/울림 경로 순서 - 3단계 프레임",
       "width": 156,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-nasal-voice-route-frame-04",
-      "file": "split/sequence-front-nasal-voice-route-frame-04.png",
-      "source": "split/sequence-front-nasal-voice-route.png",
+      "file": "split/sequence-front-nasal-voice-route-frame-04.webp",
+      "source": "split/sequence-front-nasal-voice-route.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-nasal-voice-route",
@@ -2001,12 +2138,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 접촉과 비강/울림 경로 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-liquid-vibration-frame-01",
-      "file": "split/sequence-front-liquid-vibration-frame-01.png",
-      "source": "split/sequence-front-liquid-vibration.png",
+      "file": "split/sequence-front-liquid-vibration-frame-01.webp",
+      "source": "split/sequence-front-liquid-vibration.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-liquid-vibration",
@@ -2014,12 +2152,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㄹ 계열: 가벼운 접촉과 울림 표시 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-liquid-vibration-frame-02",
-      "file": "split/sequence-front-liquid-vibration-frame-02.png",
-      "source": "split/sequence-front-liquid-vibration.png",
+      "file": "split/sequence-front-liquid-vibration-frame-02.webp",
+      "source": "split/sequence-front-liquid-vibration.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-liquid-vibration",
@@ -2027,12 +2166,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㄹ 계열: 가벼운 접촉과 울림 표시 순서 - 2단계 프레임",
       "width": 157,
-      "height": 431
+      "height": 431,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-liquid-vibration-frame-03",
-      "file": "split/sequence-front-liquid-vibration-frame-03.png",
-      "source": "split/sequence-front-liquid-vibration.png",
+      "file": "split/sequence-front-liquid-vibration-frame-03.webp",
+      "source": "split/sequence-front-liquid-vibration.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-liquid-vibration",
@@ -2040,12 +2180,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㄹ 계열: 가벼운 접촉과 울림 표시 순서 - 3단계 프레임",
       "width": 156,
-      "height": 431
+      "height": 431,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-liquid-vibration-frame-04",
-      "file": "split/sequence-front-liquid-vibration-frame-04.png",
-      "source": "split/sequence-front-liquid-vibration.png",
+      "file": "split/sequence-front-liquid-vibration-frame-04.webp",
+      "source": "split/sequence-front-liquid-vibration.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-liquid-vibration",
@@ -2053,12 +2194,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㄹ 계열: 가벼운 접촉과 울림 표시 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-release-frame-01",
-      "file": "split/sequence-front-fricative-release-frame-01.png",
-      "source": "split/sequence-front-fricative-release.png",
+      "file": "split/sequence-front-fricative-release-frame-01.webp",
+      "source": "split/sequence-front-fricative-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-fricative-release",
@@ -2066,12 +2208,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅅ 계열: 좁힘 뒤 마찰 흐름 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-release-frame-02",
-      "file": "split/sequence-front-fricative-release-frame-02.png",
-      "source": "split/sequence-front-fricative-release.png",
+      "file": "split/sequence-front-fricative-release-frame-02.webp",
+      "source": "split/sequence-front-fricative-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-fricative-release",
@@ -2079,12 +2222,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅅ 계열: 좁힘 뒤 마찰 흐름 순서 - 2단계 프레임",
       "width": 157,
-      "height": 431
+      "height": 431,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-release-frame-03",
-      "file": "split/sequence-front-fricative-release-frame-03.png",
-      "source": "split/sequence-front-fricative-release.png",
+      "file": "split/sequence-front-fricative-release-frame-03.webp",
+      "source": "split/sequence-front-fricative-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-fricative-release",
@@ -2092,12 +2236,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅅ 계열: 좁힘 뒤 마찰 흐름 순서 - 3단계 프레임",
       "width": 156,
-      "height": 430
+      "height": 430,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-release-frame-04",
-      "file": "split/sequence-front-fricative-release-frame-04.png",
-      "source": "split/sequence-front-fricative-release.png",
+      "file": "split/sequence-front-fricative-release-frame-04.webp",
+      "source": "split/sequence-front-fricative-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-fricative-release",
@@ -2105,12 +2250,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅅ 계열: 좁힘 뒤 마찰 흐름 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-soft-frame-01",
-      "file": "split/sequence-front-fricative-soft-frame-01.png",
-      "source": "split/sequence-front-fricative-soft.png",
+      "file": "split/sequence-front-fricative-soft-frame-01.webp",
+      "source": "split/sequence-front-fricative-soft.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-fricative-soft",
@@ -2118,12 +2264,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 좁힘 뒤 약한 마찰 흐름 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-soft-frame-02",
-      "file": "split/sequence-front-fricative-soft-frame-02.png",
-      "source": "split/sequence-front-fricative-soft.png",
+      "file": "split/sequence-front-fricative-soft-frame-02.webp",
+      "source": "split/sequence-front-fricative-soft.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-fricative-soft",
@@ -2131,12 +2278,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 좁힘 뒤 약한 마찰 흐름 순서 - 2단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-soft-frame-03",
-      "file": "split/sequence-front-fricative-soft-frame-03.png",
-      "source": "split/sequence-front-fricative-soft.png",
+      "file": "split/sequence-front-fricative-soft-frame-03.webp",
+      "source": "split/sequence-front-fricative-soft.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-fricative-soft",
@@ -2144,12 +2292,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 좁힘 뒤 약한 마찰 흐름 순서 - 3단계 프레임",
       "width": 156,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-soft-frame-04",
-      "file": "split/sequence-front-fricative-soft-frame-04.png",
-      "source": "split/sequence-front-fricative-soft.png",
+      "file": "split/sequence-front-fricative-soft-frame-04.webp",
+      "source": "split/sequence-front-fricative-soft.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-fricative-soft",
@@ -2157,12 +2306,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 좁힘 뒤 약한 마찰 흐름 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-strong-frame-01",
-      "file": "split/sequence-front-fricative-strong-frame-01.png",
-      "source": "split/sequence-front-fricative-strong.png",
+      "file": "split/sequence-front-fricative-strong-frame-01.webp",
+      "source": "split/sequence-front-fricative-strong.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-fricative-strong",
@@ -2170,12 +2320,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 좁힘 뒤 강한 마찰/숨 흐름 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-strong-frame-02",
-      "file": "split/sequence-front-fricative-strong-frame-02.png",
-      "source": "split/sequence-front-fricative-strong.png",
+      "file": "split/sequence-front-fricative-strong-frame-02.webp",
+      "source": "split/sequence-front-fricative-strong.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-fricative-strong",
@@ -2183,12 +2334,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 좁힘 뒤 강한 마찰/숨 흐름 순서 - 2단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-strong-frame-03",
-      "file": "split/sequence-front-fricative-strong-frame-03.png",
-      "source": "split/sequence-front-fricative-strong.png",
+      "file": "split/sequence-front-fricative-strong-frame-03.webp",
+      "source": "split/sequence-front-fricative-strong.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-fricative-strong",
@@ -2196,12 +2348,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 좁힘 뒤 강한 마찰/숨 흐름 순서 - 3단계 프레임",
       "width": 156,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-fricative-strong-frame-04",
-      "file": "split/sequence-front-fricative-strong-frame-04.png",
-      "source": "split/sequence-front-fricative-strong.png",
+      "file": "split/sequence-front-fricative-strong-frame-04.webp",
+      "source": "split/sequence-front-fricative-strong.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-front-fricative-strong",
@@ -2209,12 +2362,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "앞쪽 좁힘 뒤 강한 마찰/숨 흐름 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-affricate-soft-frame-01",
-      "file": "split/sequence-palatal-affricate-soft-frame-01.png",
-      "source": "split/sequence-palatal-affricate-soft.png",
+      "file": "split/sequence-palatal-affricate-soft-frame-01.webp",
+      "source": "split/sequence-palatal-affricate-soft.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-palatal-affricate-soft",
@@ -2222,12 +2376,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅈ 계열: 앞쪽 막힘에서 파찰로 이어지는 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-affricate-soft-frame-02",
-      "file": "split/sequence-palatal-affricate-soft-frame-02.png",
-      "source": "split/sequence-palatal-affricate-soft.png",
+      "file": "split/sequence-palatal-affricate-soft-frame-02.webp",
+      "source": "split/sequence-palatal-affricate-soft.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-palatal-affricate-soft",
@@ -2235,12 +2390,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅈ 계열: 앞쪽 막힘에서 파찰로 이어지는 순서 - 2단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-affricate-soft-frame-03",
-      "file": "split/sequence-palatal-affricate-soft-frame-03.png",
-      "source": "split/sequence-palatal-affricate-soft.png",
+      "file": "split/sequence-palatal-affricate-soft-frame-03.webp",
+      "source": "split/sequence-palatal-affricate-soft.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-palatal-affricate-soft",
@@ -2248,12 +2404,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅈ 계열: 앞쪽 막힘에서 파찰로 이어지는 순서 - 3단계 프레임",
       "width": 156,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-affricate-soft-frame-04",
-      "file": "split/sequence-palatal-affricate-soft-frame-04.png",
-      "source": "split/sequence-palatal-affricate-soft.png",
+      "file": "split/sequence-palatal-affricate-soft-frame-04.webp",
+      "source": "split/sequence-palatal-affricate-soft.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-palatal-affricate-soft",
@@ -2261,12 +2418,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅈ 계열: 앞쪽 막힘에서 파찰로 이어지는 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-affricate-strong-frame-01",
-      "file": "split/sequence-palatal-affricate-strong-frame-01.png",
-      "source": "split/sequence-palatal-affricate-strong.png",
+      "file": "split/sequence-palatal-affricate-strong-frame-01.webp",
+      "source": "split/sequence-palatal-affricate-strong.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-palatal-affricate-strong",
@@ -2274,12 +2432,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅊ 계열: 앞쪽 막힘에서 강한 파찰로 이어지는 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-affricate-strong-frame-02",
-      "file": "split/sequence-palatal-affricate-strong-frame-02.png",
-      "source": "split/sequence-palatal-affricate-strong.png",
+      "file": "split/sequence-palatal-affricate-strong-frame-02.webp",
+      "source": "split/sequence-palatal-affricate-strong.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-palatal-affricate-strong",
@@ -2287,12 +2446,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅊ 계열: 앞쪽 막힘에서 강한 파찰로 이어지는 순서 - 2단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-affricate-strong-frame-03",
-      "file": "split/sequence-palatal-affricate-strong-frame-03.png",
-      "source": "split/sequence-palatal-affricate-strong.png",
+      "file": "split/sequence-palatal-affricate-strong-frame-03.webp",
+      "source": "split/sequence-palatal-affricate-strong.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-palatal-affricate-strong",
@@ -2300,12 +2460,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅊ 계열: 앞쪽 막힘에서 강한 파찰로 이어지는 순서 - 3단계 프레임",
       "width": 156,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-affricate-strong-frame-04",
-      "file": "split/sequence-palatal-affricate-strong-frame-04.png",
-      "source": "split/sequence-palatal-affricate-strong.png",
+      "file": "split/sequence-palatal-affricate-strong-frame-04.webp",
+      "source": "split/sequence-palatal-affricate-strong.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-palatal-affricate-strong",
@@ -2313,12 +2474,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "ㅊ 계열: 앞쪽 막힘에서 강한 파찰로 이어지는 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-contact-release-frame-01",
-      "file": "split/sequence-velar-contact-release-frame-01.png",
-      "source": "split/sequence-velar-contact-release.png",
+      "file": "split/sequence-velar-contact-release-frame-01.webp",
+      "source": "split/sequence-velar-contact-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-velar-contact-release",
@@ -2326,12 +2488,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "뒤혀 접촉에서 구강 방출로 이어지는 순서 - 1단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-contact-release-frame-02",
-      "file": "split/sequence-velar-contact-release-frame-02.png",
-      "source": "split/sequence-velar-contact-release.png",
+      "file": "split/sequence-velar-contact-release-frame-02.webp",
+      "source": "split/sequence-velar-contact-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-velar-contact-release",
@@ -2339,12 +2502,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "뒤혀 접촉에서 구강 방출로 이어지는 순서 - 2단계 프레임",
       "width": 157,
-      "height": 518
+      "height": 518,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-contact-release-frame-03",
-      "file": "split/sequence-velar-contact-release-frame-03.png",
-      "source": "split/sequence-velar-contact-release.png",
+      "file": "split/sequence-velar-contact-release-frame-03.webp",
+      "source": "split/sequence-velar-contact-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-velar-contact-release",
@@ -2352,12 +2516,13 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "뒤혀 접촉에서 구강 방출로 이어지는 순서 - 3단계 프레임",
       "width": 156,
-      "height": 521
+      "height": 521,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-contact-release-frame-04",
-      "file": "split/sequence-velar-contact-release-frame-04.png",
-      "source": "split/sequence-velar-contact-release.png",
+      "file": "split/sequence-velar-contact-release-frame-04.webp",
+      "source": "split/sequence-velar-contact-release.webp",
       "role": "frame",
       "category": "sequence",
       "parentSequence": "sequence-velar-contact-release",
@@ -2365,22 +2530,24 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "frameCount": 4,
       "description": "뒤혀 접촉에서 구강 방출로 이어지는 순서 - 4단계 프레임",
       "width": 157,
-      "height": 627
+      "height": 627,
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-soft-stop",
-      "file": "split/generated-remediation/sequence-velar-soft-stop.png",
+      "file": "split/generated-remediation/sequence-velar-soft-stop.webp",
       "source": "source/generated-remediation/sequence-velar-soft-stop.png",
       "category": "sequence",
       "role": "cue",
       "description": "ㄱ 예사 연구개 파열 4단계 보강 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-soft-stop-frame-01",
-      "file": "split/generated-remediation/sequence-velar-soft-stop-frame-01.png",
+      "file": "split/generated-remediation/sequence-velar-soft-stop-frame-01.webp",
       "source": "source/generated-remediation/sequence-velar-soft-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2389,11 +2556,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㄱ 예사 연구개 파열 4단계 보강 후보 프레임 1",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-soft-stop-frame-02",
-      "file": "split/generated-remediation/sequence-velar-soft-stop-frame-02.png",
+      "file": "split/generated-remediation/sequence-velar-soft-stop-frame-02.webp",
       "source": "source/generated-remediation/sequence-velar-soft-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2402,11 +2570,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㄱ 예사 연구개 파열 4단계 보강 후보 프레임 2",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-soft-stop-frame-03",
-      "file": "split/generated-remediation/sequence-velar-soft-stop-frame-03.png",
+      "file": "split/generated-remediation/sequence-velar-soft-stop-frame-03.webp",
       "source": "source/generated-remediation/sequence-velar-soft-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2415,11 +2584,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㄱ 예사 연구개 파열 4단계 보강 후보 프레임 3",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-soft-stop-frame-04",
-      "file": "split/generated-remediation/sequence-velar-soft-stop-frame-04.png",
+      "file": "split/generated-remediation/sequence-velar-soft-stop-frame-04.webp",
       "source": "source/generated-remediation/sequence-velar-soft-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2428,22 +2598,24 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㄱ 예사 연구개 파열 4단계 보강 후보 프레임 4",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-aspirated-stop",
-      "file": "split/generated-remediation/sequence-velar-aspirated-stop.png",
+      "file": "split/generated-remediation/sequence-velar-aspirated-stop.webp",
       "source": "source/generated-remediation/sequence-velar-aspirated-stop.png",
       "category": "sequence",
       "role": "cue",
       "description": "ㅋ 거센 연구개 파열 4단계 보강 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-aspirated-stop-frame-01",
-      "file": "split/generated-remediation/sequence-velar-aspirated-stop-frame-01.png",
+      "file": "split/generated-remediation/sequence-velar-aspirated-stop-frame-01.webp",
       "source": "source/generated-remediation/sequence-velar-aspirated-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2452,11 +2624,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㅋ 거센 연구개 파열 4단계 보강 후보 프레임 1",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-aspirated-stop-frame-02",
-      "file": "split/generated-remediation/sequence-velar-aspirated-stop-frame-02.png",
+      "file": "split/generated-remediation/sequence-velar-aspirated-stop-frame-02.webp",
       "source": "source/generated-remediation/sequence-velar-aspirated-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2465,11 +2638,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㅋ 거센 연구개 파열 4단계 보강 후보 프레임 2",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-aspirated-stop-frame-03",
-      "file": "split/generated-remediation/sequence-velar-aspirated-stop-frame-03.png",
+      "file": "split/generated-remediation/sequence-velar-aspirated-stop-frame-03.webp",
       "source": "source/generated-remediation/sequence-velar-aspirated-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2478,11 +2652,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㅋ 거센 연구개 파열 4단계 보강 후보 프레임 3",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-aspirated-stop-frame-04",
-      "file": "split/generated-remediation/sequence-velar-aspirated-stop-frame-04.png",
+      "file": "split/generated-remediation/sequence-velar-aspirated-stop-frame-04.webp",
       "source": "source/generated-remediation/sequence-velar-aspirated-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2491,22 +2666,24 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㅋ 거센 연구개 파열 4단계 보강 후보 프레임 4",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-tense-stop",
-      "file": "split/generated-remediation/sequence-velar-tense-stop.png",
+      "file": "split/generated-remediation/sequence-velar-tense-stop.webp",
       "source": "source/generated-remediation/sequence-velar-tense-stop.png",
       "category": "sequence",
       "role": "cue",
       "description": "ㄲ 된 연구개 파열 4단계 보강 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-tense-stop-frame-01",
-      "file": "split/generated-remediation/sequence-velar-tense-stop-frame-01.png",
+      "file": "split/generated-remediation/sequence-velar-tense-stop-frame-01.webp",
       "source": "source/generated-remediation/sequence-velar-tense-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2515,11 +2692,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㄲ 된 연구개 파열 4단계 보강 후보 프레임 1",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-tense-stop-frame-02",
-      "file": "split/generated-remediation/sequence-velar-tense-stop-frame-02.png",
+      "file": "split/generated-remediation/sequence-velar-tense-stop-frame-02.webp",
       "source": "source/generated-remediation/sequence-velar-tense-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2528,11 +2706,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㄲ 된 연구개 파열 4단계 보강 후보 프레임 2",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-tense-stop-frame-03",
-      "file": "split/generated-remediation/sequence-velar-tense-stop-frame-03.png",
+      "file": "split/generated-remediation/sequence-velar-tense-stop-frame-03.webp",
       "source": "source/generated-remediation/sequence-velar-tense-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2541,11 +2720,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㄲ 된 연구개 파열 4단계 보강 후보 프레임 3",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-tense-stop-frame-04",
-      "file": "split/generated-remediation/sequence-velar-tense-stop-frame-04.png",
+      "file": "split/generated-remediation/sequence-velar-tense-stop-frame-04.webp",
       "source": "source/generated-remediation/sequence-velar-tense-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2554,22 +2734,24 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㄲ 된 연구개 파열 4단계 보강 후보 프레임 4",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-nasal-coda",
-      "file": "split/generated-remediation/sequence-velar-nasal-coda.png",
+      "file": "split/generated-remediation/sequence-velar-nasal-coda.webp",
       "source": "source/generated-remediation/sequence-velar-nasal-coda.png",
       "category": "sequence",
       "role": "cue",
       "description": "받침 ㅇ 연구개 비음 4단계 보강 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-nasal-coda-frame-01",
-      "file": "split/generated-remediation/sequence-velar-nasal-coda-frame-01.png",
+      "file": "split/generated-remediation/sequence-velar-nasal-coda-frame-01.webp",
       "source": "source/generated-remediation/sequence-velar-nasal-coda.png",
       "category": "sequence",
       "role": "frame",
@@ -2578,11 +2760,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㅇ 연구개 비음 4단계 보강 후보 프레임 1",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-nasal-coda-frame-02",
-      "file": "split/generated-remediation/sequence-velar-nasal-coda-frame-02.png",
+      "file": "split/generated-remediation/sequence-velar-nasal-coda-frame-02.webp",
       "source": "source/generated-remediation/sequence-velar-nasal-coda.png",
       "category": "sequence",
       "role": "frame",
@@ -2591,11 +2774,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㅇ 연구개 비음 4단계 보강 후보 프레임 2",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-nasal-coda-frame-03",
-      "file": "split/generated-remediation/sequence-velar-nasal-coda-frame-03.png",
+      "file": "split/generated-remediation/sequence-velar-nasal-coda-frame-03.webp",
       "source": "source/generated-remediation/sequence-velar-nasal-coda.png",
       "category": "sequence",
       "role": "frame",
@@ -2604,11 +2788,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㅇ 연구개 비음 4단계 보강 후보 프레임 3",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-nasal-coda-frame-04",
-      "file": "split/generated-remediation/sequence-velar-nasal-coda-frame-04.png",
+      "file": "split/generated-remediation/sequence-velar-nasal-coda-frame-04.webp",
       "source": "source/generated-remediation/sequence-velar-nasal-coda.png",
       "category": "sequence",
       "role": "frame",
@@ -2617,22 +2802,24 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㅇ 연구개 비음 4단계 보강 후보 프레임 4",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-coda-stop",
-      "file": "split/generated-remediation/sequence-velar-coda-stop.png",
+      "file": "split/generated-remediation/sequence-velar-coda-stop.webp",
       "source": "source/generated-remediation/sequence-velar-coda-stop.png",
       "category": "sequence",
       "role": "cue",
       "description": "받침 ㄱ 연구개 불파 4단계 보강 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-coda-stop-frame-01",
-      "file": "split/generated-remediation/sequence-velar-coda-stop-frame-01.png",
+      "file": "split/generated-remediation/sequence-velar-coda-stop-frame-01.webp",
       "source": "source/generated-remediation/sequence-velar-coda-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2641,11 +2828,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㄱ 연구개 불파 4단계 보강 후보 프레임 1",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-coda-stop-frame-02",
-      "file": "split/generated-remediation/sequence-velar-coda-stop-frame-02.png",
+      "file": "split/generated-remediation/sequence-velar-coda-stop-frame-02.webp",
       "source": "source/generated-remediation/sequence-velar-coda-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2654,11 +2842,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㄱ 연구개 불파 4단계 보강 후보 프레임 2",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-coda-stop-frame-03",
-      "file": "split/generated-remediation/sequence-velar-coda-stop-frame-03.png",
+      "file": "split/generated-remediation/sequence-velar-coda-stop-frame-03.webp",
       "source": "source/generated-remediation/sequence-velar-coda-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2667,11 +2856,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㄱ 연구개 불파 4단계 보강 후보 프레임 3",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-velar-coda-stop-frame-04",
-      "file": "split/generated-remediation/sequence-velar-coda-stop-frame-04.png",
+      "file": "split/generated-remediation/sequence-velar-coda-stop-frame-04.webp",
       "source": "source/generated-remediation/sequence-velar-coda-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2680,22 +2870,24 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㄱ 연구개 불파 4단계 보강 후보 프레임 4",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-coda-stop",
-      "file": "split/generated-remediation/sequence-front-coda-stop.png",
+      "file": "split/generated-remediation/sequence-front-coda-stop.webp",
       "source": "source/generated-remediation/sequence-front-coda-stop.png",
       "category": "sequence",
       "role": "cue",
       "description": "받침 ㄷ 치조 불파 4단계 보강 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-coda-stop-frame-01",
-      "file": "split/generated-remediation/sequence-front-coda-stop-frame-01.png",
+      "file": "split/generated-remediation/sequence-front-coda-stop-frame-01.webp",
       "source": "source/generated-remediation/sequence-front-coda-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2704,11 +2896,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㄷ 치조 불파 4단계 보강 후보 프레임 1",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-coda-stop-frame-02",
-      "file": "split/generated-remediation/sequence-front-coda-stop-frame-02.png",
+      "file": "split/generated-remediation/sequence-front-coda-stop-frame-02.webp",
       "source": "source/generated-remediation/sequence-front-coda-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2717,11 +2910,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㄷ 치조 불파 4단계 보강 후보 프레임 2",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-coda-stop-frame-03",
-      "file": "split/generated-remediation/sequence-front-coda-stop-frame-03.png",
+      "file": "split/generated-remediation/sequence-front-coda-stop-frame-03.webp",
       "source": "source/generated-remediation/sequence-front-coda-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2730,11 +2924,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㄷ 치조 불파 4단계 보강 후보 프레임 3",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-coda-stop-frame-04",
-      "file": "split/generated-remediation/sequence-front-coda-stop-frame-04.png",
+      "file": "split/generated-remediation/sequence-front-coda-stop-frame-04.webp",
       "source": "source/generated-remediation/sequence-front-coda-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2743,22 +2938,24 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㄷ 치조 불파 4단계 보강 후보 프레임 4",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-coda-stop",
-      "file": "split/generated-remediation/sequence-bilabial-coda-stop.png",
+      "file": "split/generated-remediation/sequence-bilabial-coda-stop.webp",
       "source": "source/generated-remediation/sequence-bilabial-coda-stop.png",
       "category": "sequence",
       "role": "cue",
       "description": "받침 ㅂ 양순 불파 4단계 보강 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-coda-stop-frame-01",
-      "file": "split/generated-remediation/sequence-bilabial-coda-stop-frame-01.png",
+      "file": "split/generated-remediation/sequence-bilabial-coda-stop-frame-01.webp",
       "source": "source/generated-remediation/sequence-bilabial-coda-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2767,11 +2964,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㅂ 양순 불파 4단계 보강 후보 프레임 1",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-coda-stop-frame-02",
-      "file": "split/generated-remediation/sequence-bilabial-coda-stop-frame-02.png",
+      "file": "split/generated-remediation/sequence-bilabial-coda-stop-frame-02.webp",
       "source": "source/generated-remediation/sequence-bilabial-coda-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2780,11 +2978,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㅂ 양순 불파 4단계 보강 후보 프레임 2",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-coda-stop-frame-03",
-      "file": "split/generated-remediation/sequence-bilabial-coda-stop-frame-03.png",
+      "file": "split/generated-remediation/sequence-bilabial-coda-stop-frame-03.webp",
       "source": "source/generated-remediation/sequence-bilabial-coda-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2793,11 +2992,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㅂ 양순 불파 4단계 보강 후보 프레임 3",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-bilabial-coda-stop-frame-04",
-      "file": "split/generated-remediation/sequence-bilabial-coda-stop-frame-04.png",
+      "file": "split/generated-remediation/sequence-bilabial-coda-stop-frame-04.webp",
       "source": "source/generated-remediation/sequence-bilabial-coda-stop.png",
       "category": "sequence",
       "role": "frame",
@@ -2806,22 +3006,24 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "받침 ㅂ 양순 불파 4단계 보강 후보 프레임 4",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-tense-fricative",
-      "file": "split/generated-remediation/sequence-front-tense-fricative.png",
+      "file": "split/generated-remediation/sequence-front-tense-fricative.webp",
       "source": "source/generated-remediation/sequence-front-tense-fricative.png",
       "category": "sequence",
       "role": "cue",
       "description": "ㅆ 된마찰 4단계 보강 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-tense-fricative-frame-01",
-      "file": "split/generated-remediation/sequence-front-tense-fricative-frame-01.png",
+      "file": "split/generated-remediation/sequence-front-tense-fricative-frame-01.webp",
       "source": "source/generated-remediation/sequence-front-tense-fricative.png",
       "category": "sequence",
       "role": "frame",
@@ -2830,11 +3032,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㅆ 된마찰 4단계 보강 후보 프레임 1",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-tense-fricative-frame-02",
-      "file": "split/generated-remediation/sequence-front-tense-fricative-frame-02.png",
+      "file": "split/generated-remediation/sequence-front-tense-fricative-frame-02.webp",
       "source": "source/generated-remediation/sequence-front-tense-fricative.png",
       "category": "sequence",
       "role": "frame",
@@ -2843,11 +3046,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㅆ 된마찰 4단계 보강 후보 프레임 2",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-tense-fricative-frame-03",
-      "file": "split/generated-remediation/sequence-front-tense-fricative-frame-03.png",
+      "file": "split/generated-remediation/sequence-front-tense-fricative-frame-03.webp",
       "source": "source/generated-remediation/sequence-front-tense-fricative.png",
       "category": "sequence",
       "role": "frame",
@@ -2856,11 +3060,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㅆ 된마찰 4단계 보강 후보 프레임 3",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-front-tense-fricative-frame-04",
-      "file": "split/generated-remediation/sequence-front-tense-fricative-frame-04.png",
+      "file": "split/generated-remediation/sequence-front-tense-fricative-frame-04.webp",
       "source": "source/generated-remediation/sequence-front-tense-fricative.png",
       "category": "sequence",
       "role": "frame",
@@ -2869,22 +3074,24 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㅆ 된마찰 4단계 보강 후보 프레임 4",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-tense-affricate",
-      "file": "split/generated-remediation/sequence-palatal-tense-affricate.png",
+      "file": "split/generated-remediation/sequence-palatal-tense-affricate.webp",
       "source": "source/generated-remediation/sequence-palatal-tense-affricate.png",
       "category": "sequence",
       "role": "cue",
       "description": "ㅉ 된파찰 4단계 보강 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-tense-affricate-frame-01",
-      "file": "split/generated-remediation/sequence-palatal-tense-affricate-frame-01.png",
+      "file": "split/generated-remediation/sequence-palatal-tense-affricate-frame-01.webp",
       "source": "source/generated-remediation/sequence-palatal-tense-affricate.png",
       "category": "sequence",
       "role": "frame",
@@ -2893,11 +3100,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㅉ 된파찰 4단계 보강 후보 프레임 1",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-tense-affricate-frame-02",
-      "file": "split/generated-remediation/sequence-palatal-tense-affricate-frame-02.png",
+      "file": "split/generated-remediation/sequence-palatal-tense-affricate-frame-02.webp",
       "source": "source/generated-remediation/sequence-palatal-tense-affricate.png",
       "category": "sequence",
       "role": "frame",
@@ -2906,11 +3114,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㅉ 된파찰 4단계 보강 후보 프레임 2",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-tense-affricate-frame-03",
-      "file": "split/generated-remediation/sequence-palatal-tense-affricate-frame-03.png",
+      "file": "split/generated-remediation/sequence-palatal-tense-affricate-frame-03.webp",
       "source": "source/generated-remediation/sequence-palatal-tense-affricate.png",
       "category": "sequence",
       "role": "frame",
@@ -2919,11 +3128,12 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㅉ 된파찰 4단계 보강 후보 프레임 3",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "sequence-palatal-tense-affricate-frame-04",
-      "file": "split/generated-remediation/sequence-palatal-tense-affricate-frame-04.png",
+      "file": "split/generated-remediation/sequence-palatal-tense-affricate-frame-04.webp",
       "source": "source/generated-remediation/sequence-palatal-tense-affricate.png",
       "category": "sequence",
       "role": "frame",
@@ -2932,106 +3142,116 @@ window.ARTICULATION_ASSET_MANIFEST = {
       "description": "ㅉ 된파찰 4단계 보강 후보 프레임 4",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "tongue-back-approach-clean",
-      "file": "split/generated-remediation/tongue-back-approach-clean.png",
+      "file": "split/generated-remediation/tongue-back-approach-clean.webp",
       "source": "source/generated-remediation/tongue-back-approach-clean.png",
       "category": "single",
       "role": "cue",
       "description": "뒤혀가 연구개로 접근하는 단일 보강 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "place-velar-contact-clean",
-      "file": "split/generated-remediation/place-velar-contact-clean.png",
+      "file": "split/generated-remediation/place-velar-contact-clean.webp",
       "source": "source/generated-remediation/place-velar-contact-clean.png",
       "category": "single",
       "role": "cue",
       "description": "뒤혀-연구개 접촉 위치 단일 보강 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "airflow-no-release-stop",
-      "file": "split/generated-remediation/airflow-no-release-stop.png",
+      "file": "split/generated-remediation/airflow-no-release-stop.webp",
       "source": "source/generated-remediation/airflow-no-release-stop.png",
       "category": "single",
       "role": "cue",
       "description": "입 밖 방출이 없는 불파 단서 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "closure-held-final",
-      "file": "split/generated-remediation/closure-held-final.png",
+      "file": "split/generated-remediation/closure-held-final.webp",
       "source": "source/generated-remediation/closure-held-final.png",
       "category": "single",
       "role": "cue",
       "description": "받침 닫힘 유지 범용 단서 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "mouth-bilabial-tense-closure",
-      "file": "split/generated-remediation/mouth-bilabial-tense-closure.png",
+      "file": "split/generated-remediation/mouth-bilabial-tense-closure.webp",
       "source": "source/generated-remediation/mouth-bilabial-tense-closure.png",
       "category": "single",
       "role": "cue",
       "description": "ㅃ 양순 긴장 닫힘 단일 보강 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "zero-onset-vowel-start",
-      "file": "split/generated-remediation/zero-onset-vowel-start.png",
+      "file": "split/generated-remediation/zero-onset-vowel-start.webp",
       "source": "source/generated-remediation/zero-onset-vowel-start.png",
       "category": "single",
       "role": "cue",
       "description": "초성 ㅇ 열린 모음 시작 단서 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "zero-onset-open-vocal-tract",
-      "file": "split/generated-remediation/zero-onset-open-vocal-tract.png",
+      "file": "split/generated-remediation/zero-onset-open-vocal-tract.webp",
       "source": "source/generated-remediation/zero-onset-open-vocal-tract.png",
       "category": "single",
       "role": "cue",
       "description": "초성 ㅇ 폐쇄 없는 열린 성도 단서 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "glottis-neutral-lenis",
-      "file": "split/generated-remediation/glottis-neutral-lenis.png",
+      "file": "split/generated-remediation/glottis-neutral-lenis.webp",
       "source": "source/generated-remediation/glottis-neutral-lenis.png",
       "category": "single",
       "role": "cue",
       "description": "예사소리 중립 성문 단서 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     },
     {
       "id": "glottis-soft-breath",
-      "file": "split/generated-remediation/glottis-soft-breath.png",
+      "file": "split/generated-remediation/glottis-soft-breath.webp",
       "source": "source/generated-remediation/glottis-soft-breath.png",
       "category": "single",
       "role": "cue",
       "description": "예사소리 약한 기류 단서 후보",
       "candidate": true,
       "remediationCandidate": true,
-      "validatedFor": "consonant-method-guide"
+      "validatedFor": "consonant-method-guide",
+      "encoding": "webp-near-lossless-95"
     }
   ]
 };
