@@ -12,6 +12,17 @@
     compare: ["airflow-soft-out", "airflow-strong-out", "tongue-b-high-back-emphasis"],
   };
 
+  const categoryLabels = {
+    base: "기본",
+    tongue: "혀",
+    air: "숨",
+    voice: "목",
+    mouth: "입술",
+    nasal: "코",
+    place: "위치",
+    sequence: "순서",
+  };
+
   const state = {
     assets: [],
     layers: [],
@@ -54,9 +65,14 @@
   }
 
   function categoryFor(asset) {
+    if (asset.category && categoryLabels[asset.category]) return asset.category;
     if (asset.role === "base" || asset.id.includes("base")) return "base";
-    if (asset.id.includes("air") || asset.id.includes("aspiration")) return "air";
+    if (asset.id.includes("mouth") || asset.id.includes("lip")) return "mouth";
+    if (asset.id.includes("nasal")) return "nasal";
+    if (asset.id.includes("place") || asset.id.includes("palate") || asset.id.includes("velum")) return "place";
+    if (asset.id.includes("template") || asset.id.includes("sequence") || asset.id.includes("scale")) return "sequence";
     if (asset.id.includes("larynx") || asset.id.includes("vocal")) return "voice";
+    if (asset.id.includes("air") || asset.id.includes("aspiration")) return "air";
     return "tongue";
   }
 
@@ -173,7 +189,7 @@
     const term = state.search.trim().toLowerCase();
     const filtered = state.assets.filter((asset) => {
       const category = categoryFor(asset);
-      const text = `${asset.id} ${asset.description || ""}`.toLowerCase();
+      const text = `${asset.id} ${asset.description || ""} ${categoryLabels[category] || category}`.toLowerCase();
       return (state.filter === "all" || category === state.filter) && (!term || text.includes(term));
     });
 
@@ -241,7 +257,7 @@
 
     els.selectedPreview.src = assetUrl(asset);
     els.selectedTitle.textContent = labelFor(asset);
-    els.selectedMeta.textContent = categoryFor(asset);
+    els.selectedMeta.textContent = categoryLabels[categoryFor(asset)] || categoryFor(asset);
     els.xControl.value = String(Math.round(layer.x));
     els.yControl.value = String(Math.round(layer.y));
     els.scaleControl.value = String(Math.round(layer.scale));
@@ -458,9 +474,20 @@
     els.exportButton.addEventListener("click", exportPng);
   }
 
+  async function loadAssetManifest() {
+    if (window.ARTICULATION_ASSET_MANIFEST) {
+      return window.ARTICULATION_ASSET_MANIFEST;
+    }
+
+    const response = await fetch(MANIFEST_URL, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Failed to load articulation manifest: ${response.status}`);
+    }
+    return response.json();
+  }
+
   async function init() {
-    const response = await fetch(MANIFEST_URL);
-    const manifest = await response.json();
+    const manifest = await loadAssetManifest();
     state.assets = manifest.assets.map((asset) => ({
       ...asset,
       category: categoryFor(asset),

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>기본 자음 소리 지도</title>
+    <meta name="description" content="기본 자음의 조음 위치와 방법을 이미지 큐로 지도하는 시각 중심 페이지">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="guide-shell">
+      <header class="guide-topbar">
+        <a class="nav-link" href="../index.html">허브</a>
+        <div class="brand-lockup">
+          <span>시각 발음 지도</span>
+          <strong>기본 자음 소리 지도</strong>
+        </div>
+        <a class="nav-link nav-link--right" href="../articulation-asset-sandbox/index.html">샌드박스</a>
+      </header>
+
+      <section class="guide-layout">
+        <aside class="letter-panel" aria-label="기본 자음">
+          <div class="view-tabs" aria-label="발음 위치 모드">
+            <button class="view-button is-active" type="button" data-mode="onset">초성 기본</button>
+            <button class="view-button" type="button" data-mode="tense">된소리</button>
+            <button class="view-button" type="button" data-mode="coda">받침</button>
+          </div>
+          <div class="mode-tabs" aria-label="조음 위치 필터">
+            <button class="mode-button is-active" type="button" data-filter="all">전체</button>
+            <button class="mode-button" type="button" data-filter="lip">입술</button>
+            <button class="mode-button" type="button" data-filter="front">앞혀</button>
+            <button class="mode-button" type="button" data-filter="palatal">경구개</button>
+            <button class="mode-button" type="button" data-filter="back">뒤혀</button>
+            <button class="mode-button" type="button" data-filter="throat">목</button>
+            <button class="mode-button" type="button" data-filter="open">무음</button>
+          </div>
+          <div class="letter-grid" id="letterGrid" aria-label="자음 목록"></div>
+        </aside>
+
+        <section class="focus-panel" aria-live="polite">
+          <div class="focus-head">
+            <div class="focus-letter" id="focusLetter">ㄱ</div>
+            <div class="focus-text">
+              <span id="focusFamily">뒤혀 · 연구개</span>
+              <strong id="focusName">ㄱ</strong>
+              <p id="focusCue">혀 뒤쪽이 올라가 잠깐 막고, 숨을 작게 터뜨립니다.</p>
+            </div>
+          </div>
+
+          <div class="visual-board" id="visualBoard" aria-label="시각 조음 큐"></div>
+          <div class="channel-grid" id="channelGrid" aria-label="입술 혀 공기 목 상태"></div>
+          <div class="cue-strip" id="cueStrip" aria-label="단계 이미지 큐"></div>
+        </section>
+
+        <aside class="method-panel" aria-label="조음 정보">
+          <section class="metric-block">
+            <span>조음 위치</span>
+            <strong id="placeValue">뒤혀 · 연구개</strong>
+          </section>
+          <section class="metric-block">
+            <span>조음 방법</span>
+            <strong id="mannerValue">닫고 터짐</strong>
+          </section>
+          <section class="metric-block">
+            <span>숨·울림</span>
+            <strong id="energyValue">보통 숨</strong>
+          </section>
+          <section class="metric-block">
+            <span>구별 포인트</span>
+            <strong id="contrastValue">작은 터짐</strong>
+          </section>
+          <section class="tag-cloud" id="tagCloud" aria-label="지도 큐"></section>
+        </aside>
+      </section>
+
+      <section class="comparison-band" aria-label="자음 비교">
+        <div class="band-head">
+          <span>조음 위치 묶음</span>
+          <strong>입술 · 앞혀 · 뒤혀 · 목</strong>
+        </div>
+        <div class="family-grid" id="familyGrid"></div>
+      </section>
+    </main>
+
+    <div class="image-lightbox" id="imageLightbox" role="dialog" aria-modal="true" aria-label="발음 이미지 크게 보기" hidden>
+      <button class="lightbox-backdrop" id="lightboxBackdrop" type="button" aria-label="닫기"></button>
+      <figure class="lightbox-panel">
+        <button class="lightbox-close" id="lightboxClose" type="button" aria-label="닫기">×</button>
+        <img id="lightboxImage" alt="">
+        <figcaption id="lightboxCaption"></figcaption>
+      </figure>
+    </div>
+
+    <script src="../articulation-cue-lab/assets/articulation/manifest.js"></script>
+    <script src="src/app.js"></script>
+    <script src="../../shared/site-copyright.js"></script>
+    <script src="../../shared/page-qr.js"></script>
+  </body>
+</html>
