@@ -343,6 +343,156 @@ body.speaking-pro-page {
     font-weight: 900;
 }
 
+.sp-speaker-select {
+    overflow: hidden;
+}
+
+.sp-speaker-select__head {
+    display: grid;
+    gap: 8px;
+}
+
+.sp-speaker-select__title {
+    margin: 0;
+    color: #0f172a;
+    font-size: clamp(1.28rem, 3vw, 1.8rem);
+    line-height: 1.2;
+    font-weight: 950;
+}
+
+.sp-speaker-select__subtitle {
+    margin: 0;
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    font-weight: 700;
+}
+
+.sp-speaker-grid {
+    display: grid;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.sp-speaker-card {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 92px;
+    padding: 14px;
+    border-radius: 20px;
+    border: 2px solid rgba(148, 163, 184, 0.24);
+    background: #ffffff;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sp-speaker-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--sp-accent-border);
+    box-shadow: 0 16px 28px rgba(15, 23, 42, 0.08);
+}
+
+.sp-speaker-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 18px;
+    background: var(--sp-accent-soft-2);
+    color: var(--sp-accent-strong);
+    font-size: 1.7rem;
+}
+
+.sp-speaker-card__body {
+    min-width: 0;
+    display: grid;
+    gap: 5px;
+}
+
+.sp-speaker-card__label {
+    color: #0f172a;
+    font-size: 1.12rem;
+    line-height: 1.2;
+    font-weight: 950;
+}
+
+.sp-speaker-card__desc {
+    color: #475569;
+    font-size: 0.88rem;
+    line-height: 1.48;
+    font-weight: 700;
+}
+
+.sp-speaker-card__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: var(--sp-accent-soft);
+    color: var(--sp-accent-strong);
+    font-size: 0.8rem;
+    font-weight: 950;
+    white-space: nowrap;
+}
+
+.sp-role-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: rgba(255, 255, 255, 0.88);
+}
+
+.sp-role-bar__label,
+.sp-role-bar__count {
+    color: #64748b;
+    font-size: 0.76rem;
+    font-weight: 900;
+}
+
+.sp-role-bar__name {
+    margin: 0 6px;
+    color: var(--sp-accent-strong);
+    font-size: 0.98rem;
+    font-weight: 950;
+}
+
+@media (max-width: 520px) {
+    .sp-speaker-card {
+        grid-template-columns: 46px minmax(0, 1fr);
+    }
+
+    .sp-speaker-card__icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 15px;
+        font-size: 1.45rem;
+    }
+
+    .sp-speaker-card__badge {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .sp-role-bar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
 .sp-inline-btn,
 .sp-btn {
     border: 0;
@@ -626,56 +776,6 @@ body.speaking-pro-page {
     border-color: rgba(248, 113, 113, 0.22);
 }
 
-.sp-no-score {
-    display: grid;
-    gap: 10px;
-}
-
-.sp-no-score-head {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-}
-
-.sp-no-score-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    flex: 0 0 auto;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.86);
-    color: var(--sp-danger);
-    border: 1px solid rgba(248, 113, 113, 0.28);
-}
-
-.sp-no-score-title {
-    margin: 0;
-    color: #991b1b;
-    font-size: 14px;
-    font-weight: 950;
-}
-
-.sp-no-score-message {
-    margin: 5px 0 0;
-    color: #7f1d1d;
-    font-size: 13px;
-    line-height: 1.55;
-    font-weight: 800;
-}
-
-.sp-no-score-list {
-    display: grid;
-    gap: 6px;
-    margin: 0;
-    padding-left: 20px;
-    color: #7f1d1d;
-    font-size: 12px;
-    line-height: 1.55;
-    font-weight: 780;
-}
-
 .sp-compare-grid {
     display: grid;
     gap: 8px;
@@ -875,14 +975,6 @@ body.speaking-pro-page {
     box-shadow: 0 10px 22px rgba(234, 88, 12, 0.22);
     pointer-events: none;
     animation: spGuideButton 0.95s ease-in-out infinite;
-}
-
-.sp-record-button.is-recording.sp-guided-action {
-    animation: none;
-}
-
-.sp-record-button.is-recording.sp-guided-action::after {
-    animation: none;
 }
 
 @keyframes spWaveSweep {

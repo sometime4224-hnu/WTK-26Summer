@@ -12,6 +12,10 @@
         window.MediaRecorder
     );
     const storageKey = config.storageKey || 'c15-speaking-pro-v1';
+    const originalItems = Array.isArray(config.items) ? config.items.slice() : [];
+    const speakerChoices = (config.speakerSelect && Array.isArray(config.speakerSelect.choices))
+        ? config.speakerSelect.choices
+        : [];
 
     const refs = {
         pageEyebrow: document.getElementById('pageEyebrow'),
@@ -52,11 +56,12 @@
         recordingItemId: '',
         liveTranscript: '',
         finalTranscript: '',
-        recognitionIssue: '',
         hasHeardModel: false,
         speechRequestId: 0,
         guideStage: '',
         guideScrollTimer: 0,
+        selectedSpeaker: '',
+        selectedSpeakerLabel: '',
         sessionScores: [],
         sessionLog: []
     };
@@ -67,7 +72,11 @@
         renderHero();
         bindStaticEvents();
         renderWarnings();
-        render();
+        if (hasSpeakerSelect()) {
+            renderSpeakerSelect();
+        } else {
+            render();
+        }
         window.addEventListener('beforeunload', cleanupAll);
     }
 
@@ -137,6 +146,111 @@
         }
     }
 
+    function hasSpeakerSelect() {
+        return speakerChoices.length > 0;
+    }
+
+    function renderSpeakerSelect() {
+        cleanupTransientState();
+        config.items = originalItems;
+        state.idx = 0;
+        state.selectedSpeaker = '';
+        state.selectedSpeakerLabel = '';
+        state.sessionScores = [];
+        state.sessionLog = [];
+
+        refs.completeBadge.classList.add('hidden');
+        refs.sessionResult.classList.add('hidden');
+        if (refs.progressLabel) {
+            refs.progressLabel.textContent = '역할 선택';
+        }
+        if (refs.progressPct) {
+            refs.progressPct.textContent = '0%';
+        }
+        if (refs.progressBar) {
+            refs.progressBar.style.width = '0%';
+        }
+
+        refs.mainArea.innerHTML = buildSpeakerSelectMarkup();
+        bindSpeakerSelectEvents();
+    }
+
+    function buildSpeakerSelectMarkup() {
+        const speakerSelect = config.speakerSelect || {};
+        const choiceMarkup = speakerChoices.map(function (choice) {
+            return [
+                '<button class="sp-speaker-card" type="button" data-speaker-id="' + escapeHtml(choice.id || '') + '">',
+                '  <span class="sp-speaker-card__icon">' + escapeHtml(choice.icon || '🗣️') + '</span>',
+                '  <span class="sp-speaker-card__body">',
+                '    <span class="sp-speaker-card__label">' + escapeHtml(choice.label || choice.id || '') + '</span>',
+                '    <span class="sp-speaker-card__desc safe">' + escapeHtml(choice.description || '') + '</span>',
+                '  </span>',
+                '  <span class="sp-speaker-card__badge">' + escapeHtml(choice.badge || '') + '</span>',
+                '</button>'
+            ].join('');
+        }).join('');
+
+        return [
+            '<section class="sp-card sp-speaker-select p-5 mb-4">',
+            '  <div class="sp-speaker-select__head">',
+            '    <p class="sp-mini-badge">' + escapeHtml(speakerSelect.eyebrow || config.grammarLabel || '역할 선택') + '</p>',
+            '    <h2 class="sp-speaker-select__title safe">' + escapeHtml(speakerSelect.title || '연습할 인물을 선택하세요') + '</h2>',
+            '    <p class="sp-speaker-select__subtitle safe">' + escapeHtml(speakerSelect.subtitle || '선택한 인물의 대사만 순서대로 연습합니다.') + '</p>',
+            '  </div>',
+            '  <div class="sp-speaker-grid">',
+            choiceMarkup,
+            '  </div>',
+            '</section>'
+        ].join('');
+    }
+
+    function bindSpeakerSelectEvents() {
+        document.querySelectorAll('[data-speaker-id]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                selectSpeaker(button.dataset.speakerId || '');
+            });
+        });
+    }
+
+    function selectSpeaker(speakerId) {
+        const choice = speakerChoices.find(function (candidate) {
+            return candidate.id === speakerId;
+        });
+        const selectedItems = originalItems.filter(function (item) {
+            return item.speaker === speakerId;
+        });
+
+        if (!choice || !selectedItems.length) {
+            return;
+        }
+
+        cleanupAll();
+        state.idx = 0;
+        state.selectedSpeaker = speakerId;
+        state.selectedSpeakerLabel = choice.label || speakerId;
+        state.sessionScores = [];
+        state.sessionLog = [];
+        config.items = selectedItems;
+        render();
+    }
+
+    function buildSpeakerContextMarkup() {
+        if (!state.selectedSpeaker) {
+            return '';
+        }
+
+        return [
+            '<div class="sp-role-bar" id="speakerRoleBar">',
+            '  <div>',
+            '    <span class="sp-role-bar__label">현재 역할</span>',
+            '    <strong class="sp-role-bar__name">' + escapeHtml(state.selectedSpeakerLabel || state.selectedSpeaker) + '</strong>',
+            '    <span class="sp-role-bar__count">' + config.items.length + '문장</span>',
+            '  </div>',
+            hasSpeakerSelect() ? '  <button id="changeSpeakerBtn" class="sp-inline-btn" type="button">역할 바꾸기</button>' : '',
+            '</div>'
+        ].join('');
+    }
+
     function render() {
         cleanupTransientState();
         const total = config.items.length;
@@ -158,7 +272,7 @@
         refs.sessionResult.classList.add('hidden');
         state.hasHeardModel = false;
         const item = config.items[state.idx];
-        refs.mainArea.innerHTML = buildCompactItemMarkup(item, state.idx === total - 1);
+        refs.mainArea.innerHTML = buildSpeakerContextMarkup() + buildCompactItemMarkup(item, state.idx === total - 1);
         bindItemEvents();
         updateStatus('마이크를 눌러 문장을 끝까지 따라 말해 보세요.', false);
         window.setTimeout(function () {
@@ -316,6 +430,7 @@
         const retryBtn = document.getElementById('retryBtn');
         const nextBtn = document.getElementById('nextBtn');
         const toggleModelBtn = document.getElementById('toggleModelBtn');
+        const changeSpeakerBtn = document.getElementById('changeSpeakerBtn');
 
         listenBtn.addEventListener('click', function () {
             speakCurrent(1, '모범 답안을 표준 속도로 들려드릴게요.');
@@ -327,6 +442,9 @@
         retryBtn.addEventListener('click', resetAttemptUi);
         nextBtn.addEventListener('click', nextItem);
         toggleModelBtn.addEventListener('click', toggleModelAnswer);
+        if (changeSpeakerBtn) {
+            changeSpeakerBtn.addEventListener('click', renderSpeakerSelect);
+        }
     }
 
     function updateProgress(isDone) {
@@ -441,7 +559,6 @@
         state.recordingItemId = getCurrentItem() ? getCurrentItem().id : '';
         state.liveTranscript = '';
         state.finalTranscript = '';
-        state.recognitionIssue = '';
 
         try {
             const mimeType = chooseMimeType();
@@ -495,21 +612,11 @@
 
         const transcript = (state.finalTranscript || state.liveTranscript || '').trim();
         if (!transcript) {
-            const recognitionMessage = state.recognitionIssue
-                ? recognitionErrorMessage(state.recognitionIssue, true)
-                : '말한 내용이 잘 잡히지 않았어요. 마이크 가까이에서 천천히 다시 말해 보세요.';
-            const noTranscriptMessage = hasRecognition
-                ? recognitionMessage
-                : '녹음은 저장됐어요. 음성 인식이 없어 점수는 표시되지 않습니다.';
-
             updateStatus(hasRecognition
-                ? recognitionMessage
+                ? '말한 내용이 잘 잡히지 않았어요. 천천히 다시 말해 보세요.'
                 : '녹음은 저장됐어요. 음성 인식이 없어 점수는 표시되지 않습니다.',
             false);
-            updateTranscript(hasRecognition
-                ? '인식된 문장이 없습니다. 마이크 권한, 브라우저, 주변 소음을 확인해 주세요.'
-                : '이 브라우저는 음성 인식을 지원하지 않습니다. 녹음 다시 듣기만 사용할 수 있어요.');
-            renderNoTranscriptResult(noTranscriptMessage, hasRecognition);
+            focusGuideStage('record-ready');
             return;
         }
 
@@ -549,34 +656,15 @@
         };
 
         state.recognition.onerror = function (event) {
-            if (event.error === 'aborted') {
+            if (event.error === 'aborted' || event.error === 'no-speech') {
                 return;
             }
-            state.recognitionIssue = event.error || 'unknown';
-            if (event.error === 'no-speech') {
-                updateStatus('아직 음성이 감지되지 않았어요. 버튼이 정지로 보이는 동안 조금 더 또렷하게 말해 보세요.', true);
-                return;
-            }
-            updateStatus(recognitionErrorMessage(event.error, false), true);
             console.error(event);
-        };
-
-        state.recognition.onend = function () {
-            if (!state.isRecording || !shouldRestartRecognition(state.recognitionIssue)) {
-                return;
-            }
-            window.setTimeout(function () {
-                if (state.isRecording) {
-                    startRecognition();
-                }
-            }, 180);
         };
 
         try {
             state.recognition.start();
         } catch (error) {
-            state.recognitionIssue = 'start-failed';
-            updateStatus('음성 인식을 시작하지 못했어요. 마이크 권한을 허용한 뒤 다시 눌러 주세요.', true);
             console.error(error);
         }
     }
@@ -678,49 +766,6 @@
         window.setTimeout(function () {
             focusGuideStage('result', {
                 preferRetry: entry.score < 80
-            });
-        }, 60);
-    }
-
-    function renderNoTranscriptResult(message, recognitionAvailable) {
-        const resultWrap = document.getElementById('resultWrap');
-        if (!resultWrap) {
-            return;
-        }
-
-        const tips = recognitionAvailable
-            ? [
-                '녹음 파일은 남았어요. 아래 재생 버튼으로 내 음성을 먼저 확인해 보세요.',
-                '마이크 권한을 허용하고 Chrome, localhost 또는 HTTPS 주소에서 다시 시도해 주세요.',
-                '말하기 버튼이 정지로 바뀐 뒤 목표 문장을 끝까지 또박또박 말해 주세요.'
-            ]
-            : [
-                '녹음 파일은 남았어요. 아래 재생 버튼으로 내 음성을 확인할 수 있어요.',
-                '글자별 점수 피드백은 Chrome의 음성 인식 기능이 있는 환경에서 사용할 수 있습니다.'
-            ];
-
-        resultWrap.className = 'sp-result-box low sp-no-transcript';
-        resultWrap.classList.remove('hidden');
-        resultWrap.innerHTML = [
-            '<div class="sp-no-score">',
-            '  <div class="sp-no-score-head">',
-            '    <span class="sp-no-score-icon"><i class="fa-solid fa-microphone-slash"></i></span>',
-            '    <div>',
-            '      <p class="sp-no-score-title">점수 피드백을 만들지 못했어요</p>',
-            '      <p class="sp-no-score-message safe">' + escapeHtml(message) + '</p>',
-            '    </div>',
-            '  </div>',
-            '  <ul class="sp-no-score-list">',
-            tips.map(function (tip) {
-                return '    <li class="safe">' + escapeHtml(tip) + '</li>';
-            }).join(''),
-            '  </ul>',
-            '</div>'
-        ].join('');
-
-        window.setTimeout(function () {
-            focusGuideStage('result', {
-                preferRetry: true
             });
         }, 60);
     }
@@ -1233,35 +1278,6 @@
             return '핵심은 잡혔어요. 모범 답안을 다시 듣고 끊어 읽듯이 말해 보세요.';
         }
         return '한 번 더 해 볼까요? 문장을 짧게 끊어 들은 뒤 그대로 따라 말해 보세요.';
-    }
-
-    function shouldRestartRecognition(errorCode) {
-        return ![
-            'not-allowed',
-            'service-not-allowed',
-            'audio-capture',
-            'network',
-            'start-failed'
-        ].includes(errorCode);
-    }
-
-    function recognitionErrorMessage(errorCode, afterStop) {
-        const suffix = afterStop ? ' 녹음은 다시 들을 수 있지만 점수 피드백은 만들지 못했어요.' : '';
-        switch (errorCode) {
-        case 'not-allowed':
-        case 'service-not-allowed':
-            return '마이크 또는 음성 인식 권한이 허용되지 않았어요. 주소창의 권한 설정에서 마이크를 허용해 주세요.' + suffix;
-        case 'audio-capture':
-            return '마이크 입력을 찾지 못했어요. 기기의 마이크가 켜져 있는지 확인해 주세요.' + suffix;
-        case 'network':
-            return '브라우저 음성 인식 서비스 연결이 불안정해요. 인터넷 연결을 확인하고 다시 시도해 주세요.' + suffix;
-        case 'no-speech':
-            return '음성이 충분히 감지되지 않았어요. 마이크 가까이에서 한 문장을 끝까지 말해 보세요.' + suffix;
-        case 'start-failed':
-            return '음성 인식을 시작하지 못했어요. Chrome에서 마이크 권한을 허용한 뒤 다시 시도해 주세요.' + suffix;
-        default:
-            return '음성 인식이 안정적으로 동작하지 않았어요. Chrome, HTTPS 또는 localhost 환경에서 다시 시도해 주세요.' + suffix;
-        }
     }
 
     function chooseMimeType() {
