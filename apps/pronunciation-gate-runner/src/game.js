@@ -136,6 +136,9 @@
   const previewCtx = els.previewCanvas.getContext("2d");
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let activeRecognition = null;
+  let recognitionRunning = false;
+  let recognitionShouldRun = false;
+  let recognitionRestartTimer = 0;
 
   function setSetupStatus(text) {
     els.setupStatus.textContent = text;
@@ -349,24 +352,35 @@
   }
 
   function startGateRecognition() {
-    stopGateRecognition();
-    state.speechSession += 1;
-    const session = state.speechSession;
-    const gate = gates[state.gateIndex];
-
     if (!state.speechSupported || !Recognition) {
       els.fallbackForm.hidden = false;
       setSpeechStatus("입력 보조 대기", "음성 인식이 지원되지 않는 브라우저입니다.");
       return;
     }
 
+    ensureRecognition();
+    startRecognitionLoop();
+
+    if (recognitionRunning) {
+      setSpeechStatus("듣는 중", "목표 발음을 말해 보세요.");
+    } else {
+      setSpeechStatus("음성 인식 준비 중", "잠시 후 목표 발음을 말해 보세요.");
+    }
+  }
+
+  function ensureRecognition() {
+    if (activeRecognition || !state.speechSupported || !Recognition) return;
+
     activeRecognition = createRecognition();
     activeRecognition.onstart = () => {
-      if (session !== state.speechSession) return;
-      setSpeechStatus("듣는 중", "목표 발음을 말해 보세요.");
+      recognitionRunning = true;
+      if (state.phase === "waiting") {
+        setSpeechStatus("듣는 중", "목표 발음을 말해 보세요.");
+      }
     };
     activeRecognition.onresult = (event) => {
-      if (session !== state.speechSession || state.phase !== "waiting") return;
+      if (state.phase !== "waiting") return;
+      const gate = gates[state.gateIndex];
       const options = [];
       let finalText = "";
       let interimText = "";
@@ -402,38 +416,44 @@
       }
     };
     activeRecognition.onerror = (event) => {
-      if (session !== state.speechSession || state.phase !== "waiting") return;
       if (event.error === "not-allowed" || event.error === "service-not-allowed") {
         state.speechSupported = false;
         els.fallbackForm.hidden = false;
+        recognitionShouldRun = false;
         setSpeechStatus("입력 보조 대기", "음성 인식 권한이 꺼져 있습니다.");
         return;
       }
-      setSpeechStatus("다시 듣는 중", event.error || "음성 인식이 잠시 멈췄습니다.");
+
+      if (state.phase === "waiting") {
+        setSpeechStatus("다시 듣는 중", event.error || "음성 인식이 잠시 멈췄습니다.");
+      }
     };
     activeRecognition.onend = () => {
-      if (session !== state.speechSession || state.phase !== "waiting") return;
-      window.setTimeout(() => {
-        if (session === state.speechSession && state.phase === "waiting") {
-          try {
-            activeRecognition.start();
-          } catch (error) {
-            // Some browsers need a short pause before restarting.
-          }
-        }
-      }, 260);
+      recognitionRunning = false;
+      if (!recognitionShouldRun || state.phase === "result") return;
+      window.clearTimeout(recognitionRestartTimer);
+      recognitionRestartTimer = window.setTimeout(startRecognitionLoop, 320);
     };
+  }
 
+  function startRecognitionLoop() {
+    if (!recognitionShouldRun || recognitionRunning || !activeRecognition) return;
     try {
       activeRecognition.start();
     } catch (error) {
+      if (error && error.name === "InvalidStateError") {
+        recognitionRunning = true;
+        return;
+      }
       els.fallbackForm.hidden = false;
       setSpeechStatus("입력 보조 대기", "음성 인식 시작이 지연되었습니다.");
     }
   }
 
-  function stopGateRecognition() {
-    state.speechSession += 1;
+  function shutdownRecognition() {
+    recognitionShouldRun = false;
+    recognitionRunning = false;
+    window.clearTimeout(recognitionRestartTimer);
     if (!activeRecognition) return;
     activeRecognition.onstart = null;
     activeRecognition.onresult = null;
@@ -472,7 +492,10 @@
       mic.context.resume();
     }
 
-    stopGateRecognition();
+    shutdownRecognition();
+    recognitionShouldRun = true;
+    ensureRecognition();
+    startRecognitionLoop();
     state.phase = "playing";
     state.score = 0;
     state.streak = 0;
@@ -516,7 +539,6 @@
     if (state.phase !== "waiting") return;
     const gate = gates[state.gateIndex];
     const result = evaluateSpeech(gate, spoken);
-    stopGateRecognition();
     state.phase = "success";
     state.openAmount = 0;
     state.score += 100 + Math.max(0, MAX_ATTEMPTS - state.attempt) * 25 + state.streak * 10;
@@ -538,7 +560,6 @@
 
   function failAttempt(message, spoken) {
     if (state.phase !== "waiting") return;
-    stopGateRecognition();
     state.lastFeedback = message;
     state.currentFinal = spoken || "";
     state.streak = 0;
@@ -599,7 +620,7 @@
 
   function finishGame() {
     cancelAnimationFrame(state.raf);
-    stopGateRecognition();
+    shutdownRecognition();
     state.phase = "result";
     els.gameView.hidden = true;
     els.resultView.hidden = false;
@@ -922,8 +943,9 @@
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
-      stopGateRecognition();
+      shutdownRecognition();
     } else if (state.phase === "waiting") {
+      recognitionShouldRun = true;
       startGateRecognition();
     }
   });
