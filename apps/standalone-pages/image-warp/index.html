@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이미지 워프 스튜디오</title>
+<meta name="description" content="이미지의 일부를 잡아당기고 부풀리고 복원하는 캔버스 워프 도구입니다.">
+<link rel="stylesheet" href="styles.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="back-link" href="../../index.html" aria-label="앱 목록으로 이동">
+      <span data-lucide="chevron-left" aria-hidden="true"></span>
+      <span>Apps</span>
+    </a>
+    <div class="title-block">
+      <h1>이미지 워프 스튜디오</h1>
+      <span id="statusText" class="status-text">샘플 이미지</span>
+    </div>
+    <div class="quick-actions" aria-label="빠른 작업">
+      <button id="undoButton" class="icon-button" type="button" title="되돌리기" aria-label="되돌리기">
+        <span data-lucide="undo-2" aria-hidden="true"></span>
+      </button>
+      <button id="redoButton" class="icon-button" type="button" title="다시하기" aria-label="다시하기">
+        <span data-lucide="redo-2" aria-hidden="true"></span>
+      </button>
+      <button id="resetButton" class="icon-button" type="button" title="초기화" aria-label="초기화">
+        <span data-lucide="rotate-ccw" aria-hidden="true"></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="stage-panel" aria-label="워프 캔버스">
+      <div class="tool-strip" role="toolbar" aria-label="변형 도구">
+        <button class="tool-button is-active" type="button" data-tool="pull" title="당기기" aria-pressed="true">
+          <span data-lucide="move" aria-hidden="true"></span>
+          <span>당기기</span>
+        </button>
+        <button class="tool-button" type="button" data-tool="inflate" title="부풀리기" aria-pressed="false">
+          <span data-lucide="maximize-2" aria-hidden="true"></span>
+          <span>부풀리기</span>
+        </button>
+        <button class="tool-button" type="button" data-tool="pinch" title="오므리기" aria-pressed="false">
+          <span data-lucide="minimize-2" aria-hidden="true"></span>
+          <span>오므리기</span>
+        </button>
+        <button class="tool-button" type="button" data-tool="restore" title="복원" aria-pressed="false">
+          <span data-lucide="eraser" aria-hidden="true"></span>
+          <span>복원</span>
+        </button>
+        <button class="tool-button" type="button" data-tool="pair" title="2점 간격" aria-pressed="false">
+          <span data-lucide="move-horizontal" aria-hidden="true"></span>
+          <span>2점 간격</span>
+        </button>
+      </div>
+
+      <div id="dropZone" class="stage">
+        <canvas id="warpCanvas" width="1000" height="640" aria-label="이미지 워프 캔버스"></canvas>
+        <div id="brushCursor" class="brush-cursor" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <aside class="control-panel" aria-label="이미지 워프 설정">
+      <input id="imageInput" type="file" accept="image/*" hidden>
+
+      <div class="control-row split">
+        <button id="uploadButton" class="command-button primary" type="button">
+          <span data-lucide="upload" aria-hidden="true"></span>
+          <span>업로드</span>
+        </button>
+        <button id="sampleButton" class="command-button" type="button">
+          <span data-lucide="image" aria-hidden="true"></span>
+          <span>샘플</span>
+        </button>
+      </div>
+
+      <label class="range-control" for="radiusInput">
+        <span>반경</span>
+        <strong id="radiusValue">120</strong>
+        <input id="radiusInput" type="range" min="40" max="260" value="120" step="5">
+      </label>
+
+      <label class="range-control" for="strengthInput">
+        <span>강도</span>
+        <strong id="strengthValue">70</strong>
+        <input id="strengthInput" type="range" min="10" max="100" value="70" step="5">
+      </label>
+
+      <section id="pairPanel" class="pair-panel" aria-label="2점 간격 설정" hidden>
+        <div class="pair-readout">
+          <span>2점</span>
+          <strong id="pairCount">0/2</strong>
+        </div>
+        <label class="range-control" for="pairAmountInput">
+          <span>간격</span>
+          <strong id="pairAmountValue">0</strong>
+          <input id="pairAmountInput" type="range" min="-100" max="100" value="0" step="2" disabled>
+        </label>
+        <button id="pairClearButton" class="command-button" type="button" disabled>
+          <span data-lucide="x" aria-hidden="true"></span>
+          <span>해제</span>
+        </button>
+      </section>
+
+      <fieldset class="segmented">
+        <legend>메시</legend>
+        <button type="button" data-quality="36">거침</button>
+        <button class="is-active" type="button" data-quality="26">표준</button>
+        <button type="button" data-quality="18">섬세</button>
+      </fieldset>
+
+      <label class="toggle-row">
+        <input id="meshToggle" type="checkbox">
+        <span>메시 보기</span>
+      </label>
+
+      <button id="downloadButton" class="command-button save" type="button">
+        <span data-lucide="download" aria-hidden="true"></span>
+        <span>PNG 저장</span>
+      </button>
+    </aside>
+  </main>
+</div>
+</body>
+</html>
