@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>발음 에셋 샌드박스</title>
+    <meta name="description" content="조음 단면도와 발음 큐 이미지를 자유롭게 배치하고 내보내는 스탠드얼론 샌드박스">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="sandbox-shell">
+      <header class="sandbox-topbar">
+        <a class="hub-link" href="../index.html">허브</a>
+        <div class="brand-mark">
+          <span>스탠드얼론</span>
+          <strong>발음 에셋 샌드박스</strong>
+        </div>
+        <div class="top-actions">
+          <button class="tool-button" id="clearButton" type="button">초기화</button>
+          <button class="tool-button is-primary" id="exportButton" type="button">PNG</button>
+        </div>
+      </header>
+
+      <section class="sandbox-layout">
+        <aside class="library-panel" aria-label="발음 이미지 에셋">
+          <div class="search-row">
+            <input id="assetSearch" type="search" autocomplete="off" placeholder="검색">
+          </div>
+          <div class="filter-tabs" aria-label="에셋 필터">
+            <button class="filter-button is-active" type="button" data-filter="all">전체</button>
+            <button class="filter-button" type="button" data-filter="base">기본</button>
+            <button class="filter-button" type="button" data-filter="tongue">혀</button>
+            <button class="filter-button" type="button" data-filter="air">숨</button>
+            <button class="filter-button" type="button" data-filter="voice">목</button>
+          </div>
+          <div class="asset-grid" id="assetGrid" aria-label="에셋 목록"></div>
+        </aside>
+
+        <section class="workbench-panel" aria-label="이미지 작업대">
+          <div class="preset-strip" aria-label="프리셋">
+            <button class="preset-button" type="button" data-preset="plain">ㄱ</button>
+            <button class="preset-button" type="button" data-preset="aspirated">ㅋ</button>
+            <button class="preset-button" type="button" data-preset="tense">ㄲ</button>
+            <button class="preset-button" type="button" data-preset="compare">비교</button>
+          </div>
+          <div class="stage-wrap">
+            <div class="asset-stage" id="assetStage" aria-label="배치 영역"></div>
+          </div>
+        </section>
+
+        <aside class="control-panel" aria-label="선택 이미지 조정">
+          <section class="selected-card">
+            <img id="selectedPreview" alt="">
+            <div>
+              <strong id="selectedTitle">선택 없음</strong>
+              <span id="selectedMeta">에셋을 선택하세요</span>
+            </div>
+          </section>
+
+          <section class="control-stack">
+            <label>
+              <span>X</span>
+              <input id="xControl" type="range" min="0" max="100" value="50">
+            </label>
+            <label>
+              <span>Y</span>
+              <input id="yControl" type="range" min="0" max="100" value="50">
+            </label>
+            <label>
+              <span>크기</span>
+              <input id="scaleControl" type="range" min="18" max="105" value="44">
+            </label>
+            <label>
+              <span>회전</span>
+              <input id="rotateControl" type="range" min="-35" max="35" value="0">
+            </label>
+            <label>
+              <span>투명</span>
+              <input id="opacityControl" type="range" min="20" max="100" value="100">
+            </label>
+          </section>
+
+          <section class="layer-actions" aria-label="레이어 조작">
+            <button class="tool-button" id="bringForwardButton" type="button">앞</button>
+            <button class="tool-button" id="sendBackwardButton" type="button">뒤</button>
+            <button class="tool-button" id="duplicateButton" type="button">복제</button>
+            <button class="tool-button is-danger" id="deleteButton" type="button">삭제</button>
+          </section>
+
+          <section class="layer-list" id="layerList" aria-label="레이어 목록"></section>
+        </aside>
+      </section>
+    </main>
+
+    <script src="src/app.js"></script>
+    <script src="../../shared/site-copyright.js"></script>
+    <script src="../../shared/page-qr.js"></script>
+  </body>
+</html>

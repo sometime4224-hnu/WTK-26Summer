@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>소리모양 ㄱㅋㄲ</title>
+    <meta name="description" content="ㄱ, ㅋ, ㄲ의 조음 위치와 방법을 시각적으로 인지하고 녹음 파형으로 확인하는 프로토타입">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body data-sound="plain">
+    <main class="app-shell">
+      <header class="lab-topbar">
+        <a class="hub-link" href="../index.html">허브</a>
+        <div class="brand-mark" aria-label="소리모양 ㄱㅋㄲ">
+          <span>소리모양</span>
+          <strong>ㄱㅋㄲ</strong>
+        </div>
+        <span class="prototype-badge">Prototype</span>
+      </header>
+
+      <section class="lab-layout" aria-label="ㄱ ㅋ ㄲ 조음 큐 실험실">
+        <nav class="sound-rail" aria-label="소리 선택">
+          <button class="sound-button is-active" type="button" data-sound="plain" aria-label="ㄱ">
+            <span class="sound-glyph">ㄱ</span>
+            <span class="mini-meter" aria-hidden="true"><span style="--value: .38"></span></span>
+            <span class="mini-pressure" aria-hidden="true"><span style="--value: .32"></span></span>
+          </button>
+          <button class="sound-button" type="button" data-sound="aspirated" aria-label="ㅋ">
+            <span class="sound-glyph">ㅋ</span>
+            <span class="mini-meter" aria-hidden="true"><span style="--value: .92"></span></span>
+            <span class="mini-pressure" aria-hidden="true"><span style="--value: .45"></span></span>
+          </button>
+          <button class="sound-button" type="button" data-sound="tense" aria-label="ㄲ">
+            <span class="sound-glyph">ㄲ</span>
+            <span class="mini-meter" aria-hidden="true"><span style="--value: .22"></span></span>
+            <span class="mini-pressure" aria-hidden="true"><span style="--value: .92"></span></span>
+          </button>
+        </nav>
+
+        <section class="stage-panel" aria-label="조음 시각화">
+          <div class="stage-toolbar">
+            <div class="current-syllable" id="currentSyllable">가</div>
+            <div class="tool-group" aria-label="시각화 조작">
+              <button class="icon-button" id="playCueButton" type="button" aria-label="큐 소리 재생" title="큐 소리 재생">▶</button>
+              <button class="icon-button" id="replayButton" type="button" aria-label="애니메이션 다시 보기" title="애니메이션 다시 보기">↻</button>
+              <button class="toggle-button" id="slowButton" type="button" aria-pressed="false">0.5x</button>
+              <button class="toggle-button" id="compareButton" type="button" aria-pressed="false">비교</button>
+            </div>
+          </div>
+
+          <div class="visual-stage" id="visualStage" aria-label="입 단면 조음 이미지">
+            <section class="single-view" id="singleView" aria-label="현재 소리 조음 이미지">
+              <div class="asset-frame">
+                <img id="primaryCueImage" src="assets/articulation/split/base-neutral.png" alt="입 단면 기본 이미지">
+                <div class="asset-badge" id="primaryBadge">ㄱ</div>
+              </div>
+              <div class="step-strip" id="stepStrip" aria-label="조음 단계"></div>
+              <div class="visual-timeline" aria-hidden="true"><span id="visualTimeline"></span></div>
+            </section>
+
+            <section class="compare-view" id="compareView" aria-label="ㄱ ㅋ ㄲ 비교 이미지" hidden></section>
+          </div>
+        </section>
+
+        <aside class="cue-panel" aria-label="시각 큐와 말하기 확인">
+          <section class="cue-stack" aria-label="큐 게이지">
+            <div class="cue-row cue-row--air">
+              <span>숨</span>
+              <div class="cue-track"><span id="airGauge"></span></div>
+            </div>
+            <div class="cue-row cue-row--tension">
+              <span>힘</span>
+              <div class="cue-track"><span id="tensionGauge"></span></div>
+            </div>
+            <div class="cue-row cue-row--burst">
+              <span>터짐</span>
+              <div class="cue-track"><span id="burstGauge"></span></div>
+            </div>
+          </section>
+
+          <section class="syllable-bank" aria-label="음절 선택">
+            <button class="syllable-chip is-selected" type="button" data-vowel="0">가</button>
+            <button class="syllable-chip" type="button" data-vowel="1">고</button>
+            <button class="syllable-chip" type="button" data-vowel="2">구</button>
+            <button class="syllable-chip" type="button" data-vowel="3">기</button>
+            <button class="syllable-chip" type="button" data-vowel="4">개</button>
+          </section>
+
+          <section class="practice-panel" aria-label="녹음 확인">
+            <div class="practice-actions">
+              <button class="record-button" id="recordButton" type="button" aria-label="녹음">●</button>
+              <button class="icon-button" id="playRecordingButton" type="button" aria-label="녹음 재생" disabled>▶</button>
+              <button class="icon-button" id="clearRecordingButton" type="button" aria-label="녹음 지우기" disabled>×</button>
+            </div>
+            <canvas id="waveCanvas" width="560" height="170" aria-label="녹음 파형"></canvas>
+            <div class="voice-bars" aria-label="녹음 보조 지표">
+              <div>
+                <span>숨</span>
+                <b id="voiceAir"></b>
+              </div>
+              <div>
+                <span>강도</span>
+                <b id="voiceImpact"></b>
+              </div>
+              <div>
+                <span>길이</span>
+                <b id="voiceLength"></b>
+              </div>
+            </div>
+            <div class="feedback-strip" id="feedbackStrip" aria-live="polite">
+              <span>눈으로 맞추기</span>
+            </div>
+          </section>
+        </aside>
+      </section>
+
+      <details class="teacher-note">
+        <summary>교사용 메모</summary>
+        <p>학생 화면은 같은 연구개 위치를 고정하고, 공기 흐름·긴장도·파열 타이밍만 다르게 보여줍니다. 녹음 지표는 판정이 아니라 보조 힌트입니다.</p>
+      </details>
+    </main>
+
+    <script src="src/app.js"></script>
+    <script src="../../shared/site-copyright.js"></script>
+    <script src="../../shared/page-qr.js"></script>
+  </body>
+</html>
