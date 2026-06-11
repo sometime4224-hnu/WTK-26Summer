@@ -1,737 +1,1138 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-        <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
-    <!-- End Google Tag Manager -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-    <title>10과 복습 퀴즈</title>
-    <script src="https://cdn.tailwindcss.com" defer></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<style>
-        body { font-family: 'Noto Sans KR', sans-serif; margin: 0; -webkit-tap-highlight-color: transparent; }
-        .safe { word-break: keep-all; overflow-wrap: break-word; }
-        .nav {
-            position: sticky; top: 0; z-index: 20; height: 56px;
-            display: flex; align-items: center; gap: 12px; padding: 0 14px;
-            background: rgba(255,255,255,.94); backdrop-filter: blur(8px);
-            border-bottom: 1px solid #e2e8f0;
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10과 워크북 어휘·문법 재구성 문제</title>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <style>
+        :root {
+            --ink: #1f2937;
+            --muted: #64748b;
+            --paper: #fffdf8;
+            --bg: #f6f7fb;
+            --line: #d8dee9;
+            --accent: #d65a31;
+            --accent-dark: #9f3412;
+            --teal: #0f766e;
+            --plum: #6d28d9;
+            --ok: #047857;
+            --bad: #b91c1c;
         }
-        .nav a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #2563eb; font-size: 13px; font-weight: 800; }
-        .nav .d { color: #94a3b8; }
-        .op { min-height: 52px; }
-        .log { min-height: 56px; }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background:
+                linear-gradient(90deg, rgba(15, 118, 110, 0.08) 0 1px, transparent 1px 100%),
+                linear-gradient(180deg, #f8fafc 0%, var(--bg) 100%);
+            background-size: 28px 28px, auto;
+            font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+            word-break: keep-all;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar a {
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .topbar .divider {
+            color: #94a3b8;
+        }
+
+        .page {
+            width: min(1100px, calc(100% - 28px));
+            margin: 18px auto 42px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(220px, 0.75fr);
+            gap: 18px;
+            align-items: stretch;
+            margin-bottom: 18px;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--paper);
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+        }
+
+        .hero-copy {
+            padding: 26px;
+        }
+
+        .eyebrow {
+            margin: 0 0 10px;
+            color: var(--accent-dark);
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.9rem, 4vw, 3.2rem);
+            line-height: 1.08;
+            letter-spacing: 0;
+        }
+
+        .subtitle {
+            max-width: 700px;
+            margin: 14px 0 0;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            min-height: 30px;
+            padding: 5px 10px;
+            border: 1px solid rgba(214, 90, 49, 0.22);
+            border-radius: 999px;
+            background: #fff7ed;
+            color: #7c2d12;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .hero-media {
+            min-height: 250px;
+            background: #ede9fe;
+        }
+
+        .hero-media img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .summary-strip {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .summary-item {
+            padding: 13px 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .summary-item b {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--teal);
+            font-size: 0.95rem;
+        }
+
+        .summary-item span {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .toolbox {
+            position: sticky;
+            top: 48px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+            backdrop-filter: blur(10px);
+        }
+
+        .score {
+            min-height: 34px;
+            color: var(--muted);
+            font-weight: 800;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        button {
+            min-height: 36px;
+            padding: 8px 12px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font: inherit;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .primary {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .secondary {
+            border-color: var(--line);
+            background: #ffffff;
+            color: #334155;
+        }
+
+        .quiz-section {
+            margin-top: 18px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 14px;
+            margin: 0 0 10px;
+        }
+
+        .section-title h2 {
+            margin: 0;
+            font-size: clamp(1.35rem, 2vw, 1.8rem);
+        }
+
+        .section-title p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+            font-weight: 700;
+        }
+
+        .question-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .question {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        .question.correct {
+            border-color: rgba(4, 120, 87, 0.4);
+            background: #f0fdf4;
+        }
+
+        .question.wrong {
+            border-color: rgba(185, 28, 28, 0.35);
+            background: #fff7f7;
+        }
+
+        .q-head {
+            display: grid;
+            grid-template-columns: 52px 1fr auto;
+            gap: 12px;
+            align-items: start;
+            padding: 16px 16px 10px;
+        }
+
+        .q-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #0f172a;
+            font-weight: 900;
+        }
+
+        .q-area {
+            display: inline-flex;
+            align-items: center;
+            min-height: 26px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: var(--plum);
+            font-size: 12px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .prompt {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 850;
+            line-height: 1.65;
+        }
+
+        .prompt small {
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 800;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            padding: 0 16px 16px 80px;
+        }
+
+        .option {
+            display: grid;
+            grid-template-columns: 24px 1fr;
+            gap: 8px;
+            align-items: center;
+            min-height: 44px;
+            padding: 9px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            cursor: pointer;
+        }
+
+        .option input {
+            width: 17px;
+            height: 17px;
+            margin: 0;
+        }
+
+        .option span {
+            line-height: 1.45;
+        }
+
+        .short-answer {
+            padding: 0 16px 16px 80px;
+        }
+
+        .short-answer input {
+            width: min(520px, 100%);
+            min-height: 44px;
+            padding: 9px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: var(--ink);
+            font: inherit;
+        }
+
+        .feedback {
+            display: none;
+            margin: 0 16px 16px 80px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+
+        .checked .feedback,
+        .show-answers .feedback {
+            display: block;
+        }
+
+        .feedback b {
+            color: var(--accent-dark);
+        }
+
+        .answer-key {
+            margin-top: 20px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .bottom-check {
+            margin-top: 22px;
+            padding: 18px;
+            border: 1px solid rgba(214, 90, 49, 0.28);
+            border-radius: 8px;
+            background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+            text-align: center;
+        }
+
+        .bottom-check p {
+            margin: 0 0 12px;
+            color: #7c2d12;
+            font-weight: 850;
+        }
+
+        .bottom-check-button {
+            width: min(520px, 100%);
+            min-height: 62px;
+            padding: 14px 18px;
+            border-radius: 8px;
+            background: var(--accent);
+            color: #ffffff;
+            font-size: clamp(1.2rem, 3vw, 1.65rem);
+            box-shadow: 0 12px 24px rgba(214, 90, 49, 0.24);
+        }
+
+        .bottom-score {
+            margin-top: 12px;
+            min-height: 26px;
+            color: var(--accent-dark);
+            font-size: 1rem;
+            font-weight: 900;
+        }
+
+        .score-history {
+            margin-top: 14px;
+            padding: 14px 16px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .score-history-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .score-history h2 {
+            margin: 0;
+            font-size: 1.05rem;
+        }
+
+        .score-history button {
+            min-height: 32px;
+            padding: 6px 10px;
+            border-color: var(--line);
+            background: #f8fafc;
+            color: #475569;
+            font-size: 0.84rem;
+        }
+
+        .history-list {
+            display: grid;
+            gap: 7px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .history-list li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.92rem;
+        }
+
+        .history-score {
+            color: var(--teal);
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .answer-key summary {
+            padding: 14px 16px;
+            color: #0f172a;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .key-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            padding: 0 16px 16px;
+        }
+
+        .key-grid div {
+            padding: 9px 10px;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .print-note {
+            margin-top: 16px;
+            color: var(--muted);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        @media (max-width: 760px) {
+            .page {
+                width: min(100% - 20px, 680px);
+                margin-top: 12px;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-copy {
+                padding: 20px;
+            }
+
+            .hero-media {
+                min-height: 210px;
+            }
+
+            .summary-strip {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .toolbox {
+                position: static;
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .actions {
+                justify-content: stretch;
+            }
+
+            .actions button {
+                flex: 1 1 120px;
+            }
+
+            .section-title {
+                align-items: start;
+                flex-direction: column;
+            }
+
+            .q-head {
+                grid-template-columns: 44px 1fr;
+            }
+
+            .q-area {
+                grid-column: 2;
+                width: max-content;
+            }
+
+            .options,
+            .short-answer,
+            .feedback {
+                margin-left: 0;
+                padding-left: 16px;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+
+            .key-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            body {
+                background: #ffffff;
+            }
+
+            .topbar,
+            .toolbox,
+            .answer-key,
+            .bottom-check,
+            .score-history,
+            .print-note {
+                display: none;
+            }
+
+            .page {
+                width: 100%;
+                margin: 0;
+            }
+
+            .hero {
+                box-shadow: none;
+                break-inside: avoid;
+            }
+
+            .question {
+                box-shadow: none;
+                break-inside: avoid;
+            }
+        }
     </style>
-        <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
-<body class="bg-slate-50 min-h-screen max-w-md mx-auto shadow-xl">
-        <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-    <nav class="nav">
-        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인으로</a>
-        <span class="d">|</span>
-        <a href="index.html"><i class="fa-solid fa-folder-open"></i> 단원 홈</a>
+<body>
+    <nav class="topbar" aria-label="페이지 이동">
+        <a href="../index.html">메인으로</a>
+        <span class="divider">|</span>
+        <a href="index.html">10과 홈</a>
     </nav>
-    <main id="app" class="p-4 pb-10"></main>
 
+    <main class="page">
+        <header class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow">Workbook Rebuild</p>
+                <h1>10과 어휘·문법 문제</h1>
+                <p class="subtitle">연애와 결혼 관련 어휘, 과거 회상 표현, 상대가 아는 사실을 상기하는 표현, 미래 계획 표현, 아직 부족함을 나타내는 표현을 확인합니다.</p>
+                <div class="tag-row" aria-label="학습 항목">
+                    <span class="tag">연애·결혼 어휘</span>
+                    <span class="tag">A/V-던</span>
+                    <span class="tag">A/V-잖아(요)</span>
+                    <span class="tag">V-(으)ㄹ 생각/계획/예정이다</span>
+                    <span class="tag">V-(으)려면 멀었다</span>
+                </div>
+            </div>
+            <figure class="hero-media" aria-label="10과 어휘 이미지">
+                <img src="../assets/c10/vocabulary/images/split-hq/c10_vocab_23_love_marriage.webp" alt="결혼과 연애를 주제로 한 삽화">
+            </figure>
+        </header>
+
+        <section class="summary-strip" aria-label="문제 구성">
+            <div class="summary-item">
+                <b>객관식 12문항</b>
+                <span>정답 번호 ①~④ 각 3문항</span>
+            </div>
+            <div class="summary-item">
+                <b>주관식 8문항</b>
+                <span>형태 변환과 문장 완성</span>
+            </div>
+            <div class="summary-item">
+                <b>총 20문항</b>
+                <span>워크북 범위 재구성</span>
+            </div>
+            <div class="summary-item">
+                <b>단원 10</b>
+                <span>결혼하려면 아직 멀었어요</span>
+            </div>
+        </section>
+
+        <div class="toolbox" aria-label="채점 도구">
+            <div id="score" class="score" aria-live="polite">아직 채점하지 않았습니다.</div>
+            <div class="actions">
+                <button class="primary" type="button" id="checkButton">정답 확인</button>
+                <button class="secondary" type="button" id="showButton">해설 표시</button>
+                <button class="secondary" type="button" id="resetButton">다시 풀기</button>
+                <button class="secondary" type="button" id="printButton">인쇄</button>
+            </div>
+        </div>
+
+        <form id="quizForm" autocomplete="off">
+            <section class="quiz-section" aria-labelledby="mcq-title">
+                <div class="section-title">
+                    <h2 id="mcq-title">객관식</h2>
+                    <p>각 문항에서 알맞은 답을 하나 고르세요.</p>
+                </div>
+
+                <div class="question-list">
+                    <article class="question" data-type="mcq" data-answer="2">
+                        <div class="q-head">
+                            <span class="q-number">1</span>
+                            <p class="prompt">“처음 보는 순간 좋아하게 되다”의 뜻에 가장 가까운 말은?</p>
+                            <span class="q-area">어휘</span>
+                        </div>
+                        <div class="options">
+                            <label class="option"><input type="radio" name="q1" value="1"><span>① 소개팅하다</span></label>
+                            <label class="option"><input type="radio" name="q1" value="2"><span>② 첫눈에 반하다</span></label>
+                            <label class="option"><input type="radio" name="q1" value="3"><span>③ 청혼하다</span></label>
+                            <label class="option"><input type="radio" name="q1" value="4"><span>④ 조건이 맞다</span></label>
+                        </div>
+                        <p class="feedback"><b>정답 ②</b> 처음 본 순간 바로 호감을 느끼는 것은 “첫눈에 반하다”입니다.</p>
+                    </article>
+
+                    <article class="question" data-type="mcq" data-answer="4">
+                        <div class="q-head">
+                            <span class="q-number">2</span>
+                            <p class="prompt">좋아하는 사람에게 자신의 마음을 직접 말하는 것은?</p>
+                            <span class="q-area">어휘</span>
+                        </div>
+                        <div class="options">
+                            <label class="option"><input type="radio" name="q2" value="1"><span>① 사귀다</span></label>
+                            <label class="option"><input type="radio" name="q2" value="2"><span>② 반하다</span></label>
+                            <label class="option"><input type="radio" name="q2" value="3"><span>③ 연애하다</span></label>
+                            <label class="option"><input type="radio" name="q2" value="4"><span>④ 고백하다</span></label>
+                        </div>
+                        <p class="feedback"><b>정답 ④</b> 마음을 직접 말하는 행동은 “고백하다”입니다.</p>
+                    </article>
+
+                    <article class="question" data-type="mcq" data-answer="1">
+                        <div class="q-head">
+                            <span class="q-number">3</span>
+                            <p class="prompt">“두 사람이 연인 관계로 만나다”의 뜻은?</p>
+                            <span class="q-area">어휘</span>
+                        </div>
+                        <div class="options">
+                            <label class="option"><input type="radio" name="q3" value="1"><span>① 사귀다</span></label>
+                            <label class="option"><input type="radio" name="q3" value="2"><span>② 청혼하다</span></label>
+                            <label class="option"><input type="radio" name="q3" value="3"><span>③ 얼굴이 빨개지다</span></label>
+                            <label class="option"><input type="radio" name="q3" value="4"><span>④ 첫눈에 반하다</span></label>
+                        </div>
+                        <p class="feedback"><b>정답 ①</b> 연인 관계로 만나는 것은 “사귀다”입니다.</p>
+                    </article>
+
+                    <article class="question" data-type="mcq" data-answer="3">
+                        <div class="q-head">
+                            <span class="q-number">4</span>
+                            <p class="prompt">민수 씨는 웃는 모습이 좋고 이야기도 재미있어서 정말 _______.</p>
+                            <span class="q-area">어휘</span>
+                        </div>
+                        <div class="options">
+                            <label class="option"><input type="radio" name="q4" value="1"><span>① 조건이 맞아요</span></label>
+                            <label class="option"><input type="radio" name="q4" value="2"><span>② 고백했어요</span></label>
+                            <label class="option"><input type="radio" name="q4" value="3"><span>③ 매력이 있어요</span></label>
+                            <label class="option"><input type="radio" name="q4" value="4"><span>④ 예정이에요</span></label>
+                        </div>
+                        <p class="feedback"><b>정답 ③</b> 좋은 인상과 끌리는 점을 말할 때 “매력이 있다”가 자연스럽습니다.</p>
+                    </article>
+
+                    <article class="question" data-type="mcq" data-answer="2">
+                        <div class="q-head">
+                            <span class="q-number">5</span>
+                            <p class="prompt">다음 중 사람의 성격이나 인상을 칭찬하는 표현이 아닌 것은?</p>
+                            <span class="q-area">어휘</span>
+                        </div>
+                        <div class="options">
+                            <label class="option"><input type="radio" name="q5" value="1"><span>① 마음씨가 착하다</span></label>
+                            <label class="option"><input type="radio" name="q5" value="2"><span>② 버스가 출발하다</span></label>
+                            <label class="option"><input type="radio" name="q5" value="3"><span>③ 인상이 좋다</span></label>
+                            <label class="option"><input type="radio" name="q5" value="4"><span>④ 말이 잘 통하다</span></label>
+                        </div>
+                        <p class="feedback"><b>정답 ②</b> “버스가 출발하다”는 교통 상황 표현입니다.</p>
+                    </article>
+
+                    <article class="question" data-type="mcq" data-answer="1">
+                        <div class="q-head">
+                            <span class="q-number">6</span>
+                            <p class="prompt">예전에 자주 _______ 카페가 없어졌어요.</p>
+                            <span class="q-area">A/V-던</span>
+                        </div>
+                        <div class="options">
+                            <label class="option"><input type="radio" name="q6" value="1"><span>① 가던</span></label>
+                            <label class="option"><input type="radio" name="q6" value="2"><span>② 간</span></label>
+                            <label class="option"><input type="radio" name="q6" value="3"><span>③ 갈</span></label>
+                            <label class="option"><input type="radio" name="q6" value="4"><span>④ 가는</span></label>
+                        </div>
+                        <p class="feedback"><b>정답 ①</b> 과거에 반복해서 갔던 장소를 회상하므로 “가던”이 맞습니다.</p>
+                    </article>
+
+                    <article class="question" data-type="mcq" data-answer="4">
+                        <div class="q-head">
+                            <span class="q-number">7</span>
+                            <p class="prompt">어렸을 때 제가 _______ 동네가 많이 변했어요.</p>
+                            <span class="q-area">A/V-던</span>
+                        </div>
+                        <div class="options">
+                            <label class="option"><input type="radio" name="q7" value="1"><span>① 살</span></label>
+                            <label class="option"><input type="radio" name="q7" value="2"><span>② 사는</span></label>
+                            <label class="option"><input type="radio" name="q7" value="3"><span>③ 산</span></label>
+                            <label class="option"><input type="radio" name="q7" value="4"><span>④ 살던</span></label>
+                        </div>
+                        <p class="feedback"><b>정답 ④</b> 어린 시절에 살았던 곳을 떠올리는 문맥이므로 “살던”이 자연스럽습니다.</p>
+                    </article>
+
+                    <article class="question" data-type="mcq" data-answer="3">
+                        <div class="q-head">
+                            <span class="q-number">8</span>
+                            <p class="prompt">다음 중 가장 자연스러운 문장은?</p>
+                            <span class="q-area">A/V-던</span>
+                        </div>
+                        <div class="options">
+                            <label class="option"><input type="radio" name="q8" value="1"><span>① 내일 먹던 케이크를 살 거예요.</span></label>
+                            <label class="option"><input type="radio" name="q8" value="2"><span>② 지금 먹던 케이크를 새로 만들 거예요.</span></label>
+                            <label class="option"><input type="radio" name="q8" value="3"><span>③ 어제 먹던 케이크를 동생이 다 먹었어요.</span></label>
+                            <label class="option"><input type="radio" name="q8" value="4"><span>④ 매일 먹을 케이크가 어제 맛있었어요.</span></label>
+                        </div>
+                        <p class="feedback"><b>정답 ③</b> 먹다가 남아 있던 케이크를 떠올리는 문맥이라 “먹던”이 어울립니다.</p>
+                    </article>
+
+                    <article class="question" data-type="mcq" data-answer="1">
+                        <div class="q-head">
+                            <span class="q-number">9</span>
+                            <p class="prompt">A: 왜 우산을 안 가져왔어요?<br>B: 아침에는 비가 안 _______.</p>
+                            <span class="q-area">A/V-잖아(요)</span>
+                        </div>
+                        <div class="options">
+                            <label class="option"><input type="radio" name="q9" value="1"><span>① 왔잖아요</span></label>
+                            <label class="option"><input type="radio" name="q9" value="2"><span>② 올 예정이에요</span></label>
+                            <label class="option"><input type="radio" name="q9" value="3"><span>③ 오던데요</span></label>
+                            <label class="option"><input type="radio" name="q9" value="4"><span>④ 오려면 멀었어요</span></label>
+                        </div>
+                        <p class="feedback"><b>정답 ①</b> 상대도 알 수 있는 과거 사실을 근거로 말하므로 “왔잖아요”가 자연스럽습니다.</p>
+                    </article>
+
+                    <article class="question" data-type="mcq" data-answer="4">
+                        <div class="q-head">
+                            <span class="q-number">10</span>
+                            <p class="prompt">A: 오늘 사람이 정말 많네요.<br>B: 주말이_______.</p>
+                            <span class="q-area">A/V-잖아(요)</span>
+                        </div>
+                        <div class="options">
+                            <label class="option"><input type="radio" name="q10" value="1"><span>① 었어요</span></label>
+                            <label class="option"><input type="radio" name="q10" value="2"><span>② 려면 멀었어요</span></label>
+                            <label class="option"><input type="radio" name="q10" value="3"><span>③ 될 계획이에요</span></label>
+                            <label class="option"><input type="radio" name="q10" value="4"><span>④ 잖아요</span></label>
+                        </div>
+                        <p class="feedback"><b>정답 ④</b> “주말이잖아요”는 사람이 많은 이유를 상대에게 상기시키는 표현입니다.</p>
+                    </article>
+
+                    <article class="question" data-type="mcq" data-answer="3">
+                        <div class="q-head">
+                            <span class="q-number">11</span>
+                            <p class="prompt">다음 달에 이사할 _______입니다.</p>
+                            <span class="q-area">V-(으)ㄹ 예정</span>
+                        </div>
+                        <div class="options">
+                            <label class="option"><input type="radio" name="q11" value="1"><span>① 고백</span></label>
+                            <label class="option"><input type="radio" name="q11" value="2"><span>② 인상</span></label>
+                            <label class="option"><input type="radio" name="q11" value="3"><span>③ 예정</span></label>
+                            <label class="option"><input type="radio" name="q11" value="4"><span>④ 조건</span></label>
+                        </div>
+                        <p class="feedback"><b>정답 ③</b> 정해진 미래 일정을 말할 때 “이사할 예정입니다”라고 합니다.</p>
+                    </article>
+
+                    <article class="question" data-type="mcq" data-answer="2">
+                        <div class="q-head">
+                            <span class="q-number">12</span>
+                            <p class="prompt">한국어를 원어민처럼 말하려면 아직 _______.</p>
+                            <span class="q-area">V-(으)려면 멀었다</span>
+                        </div>
+                        <div class="options">
+                            <label class="option"><input type="radio" name="q12" value="1"><span>① 반했어요</span></label>
+                            <label class="option"><input type="radio" name="q12" value="2"><span>② 멀었어요</span></label>
+                            <label class="option"><input type="radio" name="q12" value="3"><span>③ 맞았어요</span></label>
+                            <label class="option"><input type="radio" name="q12" value="4"><span>④ 고백했어요</span></label>
+                        </div>
+                        <p class="feedback"><b>정답 ②</b> 목표에 도달하기까지 시간이 더 필요할 때 “아직 멀었어요”라고 합니다.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="quiz-section" aria-labelledby="short-title">
+                <div class="section-title">
+                    <h2 id="short-title">주관식</h2>
+                    <p>빈칸에 알맞은 말을 쓰세요.</p>
+                </div>
+
+                <div class="question-list">
+                    <article class="question" data-type="short" data-answers="사귀고">
+                        <div class="q-head">
+                            <span class="q-number">13</span>
+                            <p class="prompt">두 사람은 친구 소개로 만나서 지금 6개월째 _______ 있어요.</p>
+                            <span class="q-area">어휘</span>
+                        </div>
+                        <div class="short-answer">
+                            <input type="text" name="q13" aria-label="13번 답">
+                        </div>
+                        <p class="feedback"><b>예시 답</b> 사귀고</p>
+                    </article>
+
+                    <article class="question" data-type="short" data-answers="청혼했어요|청혼했습니다|고백했어요|고백했습니다">
+                        <div class="q-head">
+                            <span class="q-number">14</span>
+                            <p class="prompt">지훈 씨는 여자 친구에게 결혼하자고 _______.</p>
+                            <span class="q-area">어휘</span>
+                        </div>
+                        <div class="short-answer">
+                            <input type="text" name="q14" aria-label="14번 답">
+                        </div>
+                        <p class="feedback"><b>예시 답</b> 청혼했어요. “고백했어요”도 문맥상 가능합니다.</p>
+                    </article>
+
+                    <article class="question" data-type="short" data-answers="읽던">
+                        <div class="q-head">
+                            <span class="q-number">15</span>
+                            <p class="prompt">제가 어릴 때 자주 _______ 책입니다. <small>(읽다)</small></p>
+                            <span class="q-area">A/V-던</span>
+                        </div>
+                        <div class="short-answer">
+                            <input type="text" name="q15" aria-label="15번 답">
+                        </div>
+                        <p class="feedback"><b>예시 답</b> 읽던</p>
+                    </article>
+
+                    <article class="question" data-type="short" data-answers="살던">
+                        <div class="q-head">
+                            <span class="q-number">16</span>
+                            <p class="prompt">여기는 제가 예전에 _______ 동네예요. <small>(살다)</small></p>
+                            <span class="q-area">A/V-던</span>
+                        </div>
+                        <div class="short-answer">
+                            <input type="text" name="q16" aria-label="16번 답">
+                        </div>
+                        <p class="feedback"><b>예시 답</b> 살던</p>
+                    </article>
+
+                    <article class="question" data-type="short" data-answers="있잖아요|있잖아|있잖습니까">
+                        <div class="q-head">
+                            <span class="q-number">17</span>
+                            <p class="prompt">A: 왜 오늘 일찍 집에 가요?<br>B: 내일 시험이 _______.</p>
+                            <span class="q-area">A/V-잖아(요)</span>
+                        </div>
+                        <div class="short-answer">
+                            <input type="text" name="q17" aria-label="17번 답">
+                        </div>
+                        <p class="feedback"><b>예시 답</b> 있잖아요</p>
+                    </article>
+
+                    <article class="question" data-type="short" data-answers="졸업 후에 취직할 계획입니다|졸업 후에 취직할 계획이에요|졸업 후 취직할 계획입니다|졸업 후 취직할 계획이에요">
+                        <div class="q-head">
+                            <span class="q-number">18</span>
+                            <p class="prompt">`V-(으)ㄹ 계획이다`를 사용해 문장을 만드세요.<br><small>졸업 후 / 취직하다</small></p>
+                            <span class="q-area">V-(으)ㄹ 계획</span>
+                        </div>
+                        <div class="short-answer">
+                            <input type="text" name="q18" aria-label="18번 답">
+                        </div>
+                        <p class="feedback"><b>예시 답</b> 졸업 후에 취직할 계획입니다.</p>
+                    </article>
+
+                    <article class="question" data-type="short" data-answers="다음 주에 새 제품이 나올 예정입니다|다음 주에 새 제품이 나올 예정이에요|다음 주 새 제품이 나올 예정입니다|다음 주 새 제품이 나올 예정이에요">
+                        <div class="q-head">
+                            <span class="q-number">19</span>
+                            <p class="prompt">`V-(으)ㄹ 예정이다`를 사용해 문장을 만드세요.<br><small>다음 주 / 새 제품이 나오다</small></p>
+                            <span class="q-area">V-(으)ㄹ 예정</span>
+                        </div>
+                        <div class="short-answer">
+                            <input type="text" name="q19" aria-label="19번 답">
+                        </div>
+                        <p class="feedback"><b>예시 답</b> 다음 주에 새 제품이 나올 예정입니다.</p>
+                    </article>
+
+                    <article class="question" data-type="short" data-answers="멀었어요|아직 멀었어요|멀었습니다|아직 멀었습니다">
+                        <div class="q-head">
+                            <span class="q-number">20</span>
+                            <p class="prompt">운전을 잘하려면 아직 _______.</p>
+                            <span class="q-area">V-(으)려면 멀었다</span>
+                        </div>
+                        <div class="short-answer">
+                            <input type="text" name="q20" aria-label="20번 답">
+                        </div>
+                        <p class="feedback"><b>예시 답</b> 멀었어요</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="bottom-check" aria-label="최종 채점">
+                <p>모든 문제를 푼 뒤 아래 버튼을 눌러 점수를 확인하세요.</p>
+                <button class="bottom-check-button" type="button" id="bottomCheckButton">정답 확인</button>
+                <div id="bottomScore" class="bottom-score" aria-live="polite"></div>
+            </section>
+        </form>
+
+        <section class="score-history" aria-labelledby="history-title">
+            <div class="score-history-head">
+                <h2 id="history-title">점수 기록</h2>
+                <button type="button" id="clearHistoryButton">기록 지우기</button>
+            </div>
+            <ul id="historyList" class="history-list">
+                <li>아직 저장된 점수가 없습니다.</li>
+            </ul>
+        </section>
+
+        <details class="answer-key">
+            <summary>정답표</summary>
+            <div class="key-grid">
+                <div>1. ② 첫눈에 반하다</div>
+                <div>2. ④ 고백하다</div>
+                <div>3. ① 사귀다</div>
+                <div>4. ③ 매력이 있어요</div>
+                <div>5. ② 버스가 출발하다</div>
+                <div>6. ① 가던</div>
+                <div>7. ④ 살던</div>
+                <div>8. ③ 어제 먹던 케이크를 동생이 다 먹었어요.</div>
+                <div>9. ① 왔잖아요</div>
+                <div>10. ④ 잖아요</div>
+                <div>11. ③ 예정</div>
+                <div>12. ② 멀었어요</div>
+                <div>13. 사귀고</div>
+                <div>14. 청혼했어요</div>
+                <div>15. 읽던</div>
+                <div>16. 살던</div>
+                <div>17. 있잖아요</div>
+                <div>18. 졸업 후에 취직할 계획입니다.</div>
+                <div>19. 다음 주에 새 제품이 나올 예정입니다.</div>
+                <div>20. 멀었어요</div>
+            </div>
+        </details>
+
+        <p class="print-note">서울대 한국어 3B 워크북 10과 어휘·문법 학습 목표를 바탕으로 새로 구성한 보조 문제입니다.</p>
+    </main>
+
+    <script src="../shared/site-copyright.js"></script>
     <script>
-        const KEY = "c10.review.quiz.history.v2";
-        const NKEY = "c10.review.quiz.name.v1";
-        const MAX = 80;
+        const form = document.getElementById("quizForm");
+        const score = document.getElementById("score");
+        const checkButton = document.getElementById("checkButton");
+        const bottomCheckButton = document.getElementById("bottomCheckButton");
+        const bottomScore = document.getElementById("bottomScore");
+        const showButton = document.getElementById("showButton");
+        const resetButton = document.getElementById("resetButton");
+        const printButton = document.getElementById("printButton");
+        const historyList = document.getElementById("historyList");
+        const clearHistoryButton = document.getElementById("clearHistoryButton");
+        const HISTORY_KEY = "c10.review.wbVocabGrammar.scoreHistory.v1";
 
-        const Q = [
-            {
-                id: "v1", area: "어휘", type: "mcq",
-                prompt: "'고백하다' 의미는?",
-                promptVi: "Nghĩa của '고백하다' là gì?",
-                contextKo: "사랑하는 마음을 말로 표현하는 상황",
-                contextVi: "Tình huống bày tỏ tình cảm",
-                options: ["tỏ tình", "chào hỏi", "chia tay"],
-                answer: "tỏ tình",
-                explainKo: "'고백하다'는 사랑하는 마음을 말로 표현하는 행동이에요.",
-                explainVi: "'고백하다' là hành động bày tỏ tình cảm bằng lời nói."
-            },
-            {
-                id: "v2", area: "어휘", type: "mcq",
-                prompt: "'첫눈에 반하다'에 가까운 뜻은?",
-                promptVi: "Nghĩa gần nhất của '첫눈에 반하다' là gì?",
-                contextKo: "처음 보고 바로 호감을 느끼는 상황",
-                contextVi: "Vừa gặp đã có cảm tình",
-                options: ["yêu từ cái nhìn đầu tiên", "hợp điều kiện", "đỏ mặt"],
-                answer: "yêu từ cái nhìn đầu tiên",
-                explainKo: "처음 본 순간 바로 반하는 뜻이에요.",
-                explainVi: "Có nghĩa là thích ngay từ lần gặp đầu tiên."
-            },
-            {
-                id: "v3", area: "어휘", type: "short",
-                prompt: "'손을 잡다' 베트남어 뜻을 쓰세요.",
-                promptVi: "Viết nghĩa tiếng Việt của '손을 잡다'.",
-                contextKo: "핵심어가 맞으면 정답 처리",
-                contextVi: "Đúng từ khóa là được chấm đúng",
-                answers: ["nắm tay", "nam tay"],
-                placeholder: "정답 입력",
-                explainKo: "'손을 잡다'는 베트남어로 'nắm tay'예요.",
-                explainVi: "'손을 잡다' trong tiếng Việt là 'nắm tay'."
-            },
-            {
-                id: "v4", area: "어휘", type: "mcq",
-                prompt: "그림에 맞는 표현을 고르세요.",
-                promptVi: "Chọn biểu hiện đúng với hình ảnh.",
-        image: "../assets/c10/misc/images/review-quiz/v12_hold_hands.webp",
-                contextKo: "두 사람이 손을 맞잡는 장면",
-                contextVi: "Hai người đang nắm tay",
-                options: ["손을 잡다", "팔짱을 끼다", "소개팅하다"],
-                answer: "손을 잡다",
-                explainKo: "손을 맞잡는 장면이므로 '손을 잡다'가 맞아요.",
-                explainVi: "Vì hai người đang nắm tay nên đáp án đúng là '손을 잡다'."
-            },
-            {
-                id: "v5", area: "어휘", type: "mcq",
-                prompt: "그림에 맞는 표현을 고르세요.",
-                promptVi: "Chọn biểu hiện đúng với hình ảnh.",
-        image: "../assets/c10/misc/images/review-quiz/v14_blush.webp",
-                contextKo: "얼굴이 붉어지는 모습",
-                contextVi: "Khuôn mặt đỏ lên vì ngại",
-                options: ["얼굴이 빨개지다", "가슴이 두근거리다", "인상이 좋다"],
-                answer: "얼굴이 빨개지다",
-                explainKo: "얼굴이 붉어지는 장면이므로 '얼굴이 빨개지다'가 맞습니다.",
-                explainVi: "Cảnh mặt đỏ lên phù hợp với '얼굴이 빨개지다'."
-            },
-            {
-                id: "v6", area: "어휘", type: "mcq",
-                prompt: "그림에 맞는 표현을 고르세요.",
-                promptVi: "Chọn biểu hiện đúng với hình ảnh.",
-        image: "../assets/c10/misc/images/review-quiz/v18_love_at_first_sight.webp",
-                contextKo: "처음 보자마자 마음이 끌리는 장면",
-                contextVi: "Yêu từ cái nhìn đầu tiên",
-                options: ["첫눈에 반하다", "사귀다", "선보다"],
-                answer: "첫눈에 반하다",
-                explainKo: "처음 본 순간 반하는 의미는 '첫눈에 반하다'예요.",
-                explainVi: "Thích ngay từ lần gặp đầu là '첫눈에 반하다'."
-            },
-            {
-                id: "v7", area: "어휘", type: "mcq",
-                prompt: "그림에 맞는 표현을 고르세요.",
-                promptVi: "Chọn biểu hiện đúng với hình ảnh.",
-        image: "../assets/c10/misc/images/review-quiz/v03_sit_together.webp",
-                contextKo: "두 사람이 나란히 앉은 장면",
-                contextVi: "Hai người ngồi cạnh nhau",
-                options: ["나란히 앉다", "어깨에 기대다", "손을 잡다"],
-                answer: "나란히 앉다",
-                explainKo: "옆에 나란히 앉은 자세이므로 '나란히 앉다'가 맞아요.",
-                explainVi: "Ngồi cạnh nhau thì dùng '나란히 앉다'."
-            },
-            {
-                id: "v8", area: "어휘", type: "mcq",
-                prompt: "그림에 맞는 표현을 고르세요.",
-                promptVi: "Chọn biểu hiện đúng với hình ảnh.",
-        image: "../assets/c10/misc/images/review-quiz/v13_lean_on_shoulder.webp",
-                contextKo: "상대 어깨에 기대는 장면",
-                contextVi: "Tựa vào vai người kia",
-                options: ["어깨에 기대다", "팔짱을 끼다", "고백하다"],
-                answer: "어깨에 기대다",
-                explainKo: "어깨에 기대는 장면은 '어깨에 기대다'가 맞아요.",
-                explainVi: "Cảnh tựa vai dùng '어깨에 기대다'."
-            },
-            {
-                id: "d1", area: "문법 -던", type: "mcq",
-                prompt: "어릴 때 자주 ____ 공원이에요.",
-                promptVi: "Đây là công viên tôi hay ____ khi còn nhỏ.",
-                contextKo: "과거 반복 습관 회상",
-                contextVi: "Hồi tưởng thói quen lặp lại trong quá khứ",
-                options: ["가던", "간", "가는"],
-                answer: "가던",
-                explainKo: "과거 반복 습관을 회상하므로 '-던'이 맞아요.",
-                explainVi: "Hồi tưởng thói quen quá khứ nên dùng '-던'."
-            },
-            {
-                id: "d2", area: "문법 -던", type: "short",
-                prompt: "읽다가 만 ____ 책이에요. (읽다)",
-                promptVi: "Đây là cuốn sách tôi đọc dở. (읽다)",
-                contextKo: "미완료 과거 행동",
-                contextVi: "Hành động quá khứ chưa hoàn tất",
-                answers: ["읽던"],
-                placeholder: "정답 입력",
-                explainKo: "끝내지 못한 과거 행동이므로 '읽던'이 맞아요.",
-                explainVi: "Hành động quá khứ dang dở nên đáp án là '읽던'."
-            },
-            {
-                id: "d3", area: "문법 -던", type: "mcq",
-                prompt: "요즘 매일 ____ 뉴스예요.",
-                promptVi: "Đây là bản tin tôi xem mỗi ngày dạo này.",
-                contextKo: "현재 습관/과거 회상 구별",
-                contextVi: "Phân biệt thói quen hiện tại và hồi tưởng quá khứ",
-                options: ["보던", "보는", "봤던"],
-                answer: "보는",
-                explainKo: "'요즘 매일'은 현재 습관이라 '-는'이 맞아요.",
-                explainVi: "'Dạo này mỗi ngày' là thói quen hiện tại nên dùng '-는'."
-            },
+        function normalize(value) {
+            return value
+                .trim()
+                .replace(/\s+/g, " ")
+                .replace(/[.。!?！？]+$/g, "");
+        }
 
-            {
-                id: "j1", area: "문법 -잖아요", type: "mcq",
-                prompt: "오늘 일찍 가요. 내일 시험 ____.",
-                promptVi: "Hôm nay về sớm nhé. Ngày mai thi ____.",
-                contextKo: "서로 이미 아는 사실 상기",
-                contextVi: "Nhắc lại thông tin cả hai đều biết",
-                options: ["있잖아요", "있거든요", "있죠"],
-                answer: "있잖아요",
-                explainKo: "공유된 사실을 상기하는 문맥이라 '-잖아요'가 맞아요.",
-                explainVi: "Nhắc lại thông tin chung đã biết thì dùng '-잖아요'."
-            },
-            {
-                id: "j2", area: "문법 -잖아요", type: "mcq",
-                prompt: "오늘은 못 가요. 일이 많____.",
-                promptVi: "Hôm nay tôi không đi được. Vì công việc nhiều ____.",
-                contextKo: "상대가 모를 수 있는 새 이유 설명",
-                contextVi: "Giải thích lý do mới cho người nghe",
-                options: ["잖아요", "거든요", "죠"],
-                answer: "거든요",
-                explainKo: "새 이유를 제시할 때는 '-거든요'가 더 자연스러워요.",
-                explainVi: "Đưa lý do mới thì '-거든요' tự nhiên hơn.",
-                nonTargetKo: "학습범위 보충: 이 문맥은 '-잖아요'보다 '-거든요'가 더 정확합니다.",
-                nonTargetVi: "Bổ sung: Ngữ cảnh này phù hợp với '-거든요' hơn '-잖아요'."
-            },
-            {
-                id: "j3", area: "문법 -잖아요", type: "mcq",
-                prompt: "우리 내일 9시에 만나기로 했___?",
-                promptVi: "Ngày mai mình hẹn 9 giờ ___?",
-                contextKo: "상대 동의 확인 질문",
-                contextVi: "Câu hỏi xác nhận sự đồng ý",
-                options: ["잖아요", "거든요", "죠"],
-                answer: "죠",
-                explainKo: "확인 질문에는 보통 '-죠?' 형태를 써요.",
-                explainVi: "Câu hỏi xác nhận thường dùng '-죠?'.",
-                nonTargetKo: "보충: '-죠'는 보통 물음표와 함께 '-죠?' 형태로 사용합니다.",
-                nonTargetVi: "Bổ sung: '-죠' thường đi cùng dấu hỏi thành '-죠?'."
-            },
+        function checkQuestion(question) {
+            const type = question.dataset.type;
+            question.classList.remove("correct", "wrong");
 
-            {
-                id: "p1", area: "문법 -(으)ㄹ 생각/계획/예정", type: "mcq",
-                prompt: "다음 달에 새 매장을 ____ (회사 공지 완료)",
-                promptVi: "Tháng sau sẽ mở chi nhánh mới ____ (đã thông báo chính thức)",
-                contextKo: "공식적으로 정해진 일정",
-                contextVi: "Lịch trình đã được công bố",
-                options: ["열 예정입니다", "열 생각입니다", "열려고 해요"],
-                answer: "열 예정입니다",
-                explainKo: "공식 일정은 '-(으)ㄹ 예정이다'가 가장 자연스러워요.",
-                explainVi: "Lịch chính thức thường dùng '-(으)ㄹ 예정이다'."
-            },
-            {
-                id: "p2", area: "문법 -(으)ㄹ 생각/계획/예정", type: "short",
-                prompt: "방학 때 제주도에 ____ (가다)",
-                promptVi: "Kỳ nghỉ tôi định ____ Jeju (가다)",
-                contextKo: "개인 의향 표현",
-                contextVi: "Biểu thị ý định cá nhân",
-                answers: ["갈 생각이에요", "갈 생각입니다"],
-                placeholder: "정답 입력",
-                explainKo: "의향을 말할 때 '갈 생각이에요'가 자연스러워요.",
-                explainVi: "Nói ý định cá nhân thì '갈 생각이에요' tự nhiên."
-            },
-            {
-                id: "p3", area: "문법 -(으)ㄹ 생각/계획/예정", type: "mcq",
-                prompt: "지금 막 문을 나가려는 상황이면?",
-                promptVi: "Nếu ngay bây giờ sắp bước ra cửa thì dùng gì?",
-                contextKo: "즉시 의도/직전 행동",
-                contextVi: "Ý định ngay lúc nói",
-                options: ["나갈 예정이에요", "나가려고 해요", "나갈 계획이에요"],
-                answer: "나가려고 해요",
-                explainKo: "바로 직전 의도는 '-(으)려고 하다'가 더 자연스러워요.",
-                explainVi: "Ý định ngay lúc này thường dùng '-(으)려고 하다'."
-            },
-
-            {
-                id: "m1", area: "문법 -(으)려면 멀었다", type: "mcq",
-                prompt: "숙제를 다 끝내려면 아직 ____.",
-                promptVi: "Để làm xong hết bài tập thì vẫn ____.",
-                contextKo: "목표 달성까지 아직 멂",
-                contextVi: "Còn xa mới đạt mục tiêu",
-                options: ["멀었어요", "예정이에요", "생각이에요"],
-                answer: "멀었어요",
-                explainKo: "조건이 부족해 아직 멀 때 '-(으)려면 멀었다'를 써요.",
-                explainVi: "Khi chưa đủ điều kiện thì dùng '-(으)려면 멀었다'."
-            },
-            {
-                id: "m2", area: "문법 -(으)려면 멀었다", type: "mcq",
-                prompt: "받침 있는 동사 뒤 형태로 맞는 것은?",
-                promptVi: "Dạng đúng sau động từ có 받침 là?",
-                contextKo: "형태 규칙 확인",
-                contextVi: "Kiểm tra quy tắc biến đổi",
-                options: ["먹으려면", "먹려면", "먹을려면"],
-                answer: "먹으려면",
-                explainKo: "받침이 있으면 '으려면'을 붙여요.",
-                explainVi: "Có 받침 thì gắn '으려면'."
-            },
-            {
-                id: "m3", area: "문법 -(으)려면 멀었다", type: "short",
-                prompt: "원어민처럼 말(하다) ____ 아직 멀었어요.",
-                promptVi: "Để nói như người bản ngữ thì ____ vẫn còn xa.",
-                contextKo: "하다 축약 형태 확인",
-                contextVi: "Kiểm tra dạng rút gọn của 하다",
-                answers: ["하려면"],
-                placeholder: "정답 입력",
-                explainKo: "'하다'는 줄어서 '하려면'이 돼요.",
-                explainVi: "'하다' rút gọn thành '하려면'."
+            if (type === "mcq") {
+                const selected = question.querySelector("input[type='radio']:checked");
+                if (!selected) return false;
+                const isCorrect = selected.value === question.dataset.answer;
+                question.classList.add(isCorrect ? "correct" : "wrong");
+                return isCorrect;
             }
-        ];
 
-        const S = { view: "start", selectedId: null, name: "", qs: [], i: 0, submitted: false, fb: null, answers: [], startedAt: 0 };
-
-        function esc(v) {
-            return String(v == null ? "" : v)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/\"/g, "&quot;")
-                .replace(/'/g, "&#39;");
+            const input = question.querySelector("input[type='text']");
+            const value = normalize(input.value);
+            if (!value) return false;
+            const answers = question.dataset.answers.split("|").map(normalize);
+            const isCorrect = answers.includes(value);
+            question.classList.add(isCorrect ? "correct" : "wrong");
+            return isCorrect;
         }
 
-        function norm(v) {
-            return String(v || "")
-                .normalize("NFC")                      // 베트남어 성조 입력 문제 해결 (조합형/완성형 통일)
-                .replace(/[\s.,!?~"']/g, "")           // 공백 및 각종 기본 문장 부호 무시
-                .toLowerCase();
-        }
-        function shuffle(arr) {
-            const c = [...arr];
-            for (let i = c.length - 1; i > 0; i -= 1) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [c[i], c[j]] = [c[j], c[i]];
-            }
-            return c;
-        }
-
-        function loadHistory() {
-            try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : []; }
-            catch (e) { return []; }
-        }
-
-        function saveHistory(h) {
-            try { localStorage.setItem(KEY, JSON.stringify(h)); } catch (e) {}
-        }
-
-        function getLastName() {
-            try { return localStorage.getItem(NKEY) || ""; } catch (e) { return ""; }
-        }
-
-        function setLastName(n) {
-            try { localStorage.setItem(NKEY, n); } catch (e) {}
-        }
-
-        function currentQ() { return S.qs[S.i] || null; }
-
-        function fmt(iso) {
+        function readHistory() {
             try {
-                const d = new Date(iso);
-                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-            } catch (e) { return iso; }
+                const value = localStorage.getItem(HISTORY_KEY);
+                return value ? JSON.parse(value) : [];
+            } catch (error) {
+                return [];
+            }
         }
 
-        function best(h) {
-            if (!h.length) return null;
-            return h.reduce((b, c) => {
-                if (c.percent > b.percent) return c;
-                if (c.percent === b.percent && c.score > b.score) return c;
-                return b;
-            }, h[0]);
+        function writeHistory(history) {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 10)));
         }
 
-        function startQuiz() {
-            const ip = document.getElementById("name");
-            const name = (ip ? ip.value : "").trim();
-            if (!name) {
-                const warn = document.getElementById("nameWarn");
-                if (warn) warn.classList.remove("hidden");
-                if (ip) ip.focus();
+        function renderHistory() {
+            const history = readHistory();
+            historyList.innerHTML = "";
+
+            if (!history.length) {
+                const empty = document.createElement("li");
+                empty.textContent = "아직 저장된 점수가 없습니다.";
+                historyList.appendChild(empty);
                 return;
             }
 
-            setLastName(name);
-            S.name = name;
-            // 문제 순서를 섞으면서, 객관식 문제의 보기(options)도 함께 섞어줍니다.
-            S.qs = shuffle(Q).map(q => {
-                const newQ = { ...q };
-                if (newQ.type === "mcq" && newQ.options) {
-                    newQ.options = shuffle([...newQ.options]);
-                }
-                return newQ;
+            history.forEach((record) => {
+                const item = document.createElement("li");
+                const date = document.createElement("span");
+                const points = document.createElement("span");
+                date.textContent = new Date(record.time).toLocaleString("ko-KR", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+                points.className = "history-score";
+                points.textContent = `${record.correct}/${record.total}점 (${record.percent}%)`;
+                item.append(date, points);
+                historyList.appendChild(item);
             });
-            S.i = 0;
-            S.submitted = false;
-            S.fb = null;
-            S.answers = [];
-            S.startedAt = Date.now();
-            S.view = "quiz";
-            S.selectedId = null;
-            render();
-            focusShort();
         }
 
-        function openLog(id) { S.view = "result"; S.selectedId = id; render(); }
-        function toStart() { S.view = "start"; S.selectedId = null; render(); }
-        function byId(id) { return loadHistory().find((x) => x.id === id) || null; }
-
-        function evalQ(q, user) {
-            if (q.type === "mcq") return q.answer === user;
-            const u = norm(user);
-            return (q.answers || []).some((a) => norm(a) === u);
-        }
-
-        function submitMcq(i) {
-            const q = currentQ();
-            if (!q || q.type !== "mcq" || S.submitted) return;
-            submitAnswer(q.options[i]);
-        }
-
-        function submitShort() {
-            const q = currentQ();
-            if (!q || q.type !== "short" || S.submitted) return;
-            const ip = document.getElementById("short");
-            if (!ip) return;
-            const v = ip.value.trim();
-            if (!v) return;
-            submitAnswer(v);
-        }
-
-        function submitAnswer(user) {
-            const q = currentQ();
-            if (!q || S.submitted) return;
-
-            const ok = evalQ(q, user);
-            const rec = {
-                id: q.id,
-                area: q.area,
-                prompt: q.prompt,
-                promptVi: q.promptVi || "",
-                contextKo: q.contextKo || "",
-                contextVi: q.contextVi || "",
-                user: String(user || ""),
-                correct: q.type === "mcq" ? q.answer : (q.answers ? q.answers[0] : ""),
-                ok,
-                explainKo: q.explainKo || "",
-                explainVi: q.explainVi || "",
-                nonTargetKo: q.nonTargetKo || "",
-                nonTargetVi: q.nonTargetVi || ""
-            };
-
-            S.answers.push(rec);
-            S.fb = rec;
-            S.submitted = true;
-            render();
-        }
-
-        function nextQ() {
-            if (!S.submitted) return;
-            if (S.i < S.qs.length - 1) {
-                S.i += 1;
-                S.submitted = false;
-                S.fb = null;
-                render();
-                focusShort();
-            } else {
-                finishQuiz();
-            }
-        }
-
-        function finishQuiz() {
-            const total = S.answers.length;
-            const score = S.answers.filter((x) => x.ok).length;
-            const percent = total ? Math.round((score / total) * 100) : 0;
-            const dur = Math.max(1, Math.round((Date.now() - S.startedAt) / 1000));
-
-            const at = {
-                id: `rq-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-                time: new Date().toISOString(),
-                name: S.name,
-                score,
+        function saveScore(correct, total) {
+            const history = readHistory();
+            history.unshift({
+                correct,
                 total,
-                percent,
-                duration: dur,
-                answers: S.answers
-            };
-
-            const h = loadHistory();
-            h.unshift(at);
-            if (h.length > MAX) h.length = MAX;
-            saveHistory(h);
-
-            S.selectedId = at.id;
-            S.view = "result";
-            render();
+                percent: Math.round((correct / total) * 100),
+                time: Date.now()
+            });
+            writeHistory(history);
+            renderHistory();
         }
 
-        function focusShort() {
-            const q = currentQ();
-            if (!q || q.type !== "short" || S.submitted) return;
-            const ip = document.getElementById("short");
-            if (ip) ip.focus();
+        function checkAll() {
+            const questions = [...document.querySelectorAll(".question")];
+            let correct = 0;
+            questions.forEach((question) => {
+                if (checkQuestion(question)) correct += 1;
+                question.classList.add("checked");
+            });
+            score.textContent = `${correct} / ${questions.length}점`;
+            bottomScore.textContent = `이번 점수: ${correct} / ${questions.length}점`;
+            document.body.classList.add("show-answers");
+            saveScore(correct, questions.length);
         }
 
-        function clearLogs() {
-            if (!confirm("응시 기록을 모두 삭제할까요?")) return;
-            saveHistory([]);
-            render();
-        }
+        checkButton.addEventListener("click", checkAll);
+        bottomCheckButton.addEventListener("click", checkAll);
 
-        function saveJson() {
-            const at = byId(S.selectedId);
-            if (!at) return;
-            const blob = new Blob([JSON.stringify(at, null, 2)], { type: "application/json;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const dt = fmt(at.time).replace(/[: ]/g, "-");
-            const nm = (at.name || "student").replace(/[^a-zA-Z0-9가-힣_-]/g, "_");
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `c10-review-${nm}-${dt}.json`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            URL.revokeObjectURL(url);
-        }
-
-        async function captureResult() {
-            const t = document.getElementById("cap");
-            if (!t) return;
-
-            const b = document.getElementById("capBtn");
-            if (b) { b.disabled = true; b.textContent = "캡처 중..."; }
-
-            try {
-                const c = await html2canvas(t, { scale: 2, backgroundColor: "#f8fafc", useCORS: true });
-                const url = c.toDataURL("image/png");
-                const at = byId(S.selectedId);
-                const dt = at ? fmt(at.time).replace(/[: ]/g, "-") : Date.now();
-                const nm = at ? (at.name || "student").replace(/[^a-zA-Z0-9가-힣_-]/g, "_") : "student";
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `c10-review-${nm}-${dt}.png`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            } catch (e) {
-                alert("캡처에 실패했습니다.");
-            } finally {
-                if (b) { b.disabled = false; b.textContent = "결과창 캡처 (PNG)"; }
-            }
-        }
-
-        function renderStart() {
-            const h = loadHistory();
-            const b = best(h);
-            const areaCnt = {};
-            Q.forEach((q) => { areaCnt[q.area] = (areaCnt[q.area] || 0) + 1; });
-
-            const rows = Object.entries(areaCnt)
-                .map(([k, v]) => `<li class="text-xs text-slate-600">${esc(k)}: <b>${v}문항</b></li>`)
-                .join("");
-
-            const logs = h.length
-                ? h.map((x, i) => `
-                    <button class="log w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-left hover:border-blue-300" onclick="openLog('${x.id}')">
-                        <p class="text-[11px] text-slate-500">${i + 1}회차 · ${fmt(x.time)}</p>
-                        <p class="text-sm font-bold text-slate-800 mt-0.5 safe">${esc(x.name)} · ${x.score}/${x.total} (${x.percent}%)</p>
-                    </button>
-                `).join("")
-                : `<p class="text-sm text-slate-500">아직 응시 기록이 없습니다.</p>`;
-
-            return `
-                <section class="space-y-4">
-                    <div class="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-2xl p-5 shadow-sm">
-                        <h1 class="text-xl font-black text-blue-700 safe">10과 복습 퀴즈</h1>
-                        <p class="text-sm text-slate-700 mt-2">vocabulary-upgraded-v3 + grammar1~4 기반 복습</p>
-                        <p class="text-xs text-slate-500 mt-1">이름 입력 후 시작하면 결과가 자동 저장됩니다.</p>
-
-                        <div class="mt-4">
-                            <label for="name" class="text-xs font-bold text-slate-600">응시자 이름</label>
-                            <input id="name" type="text" maxlength="20" value="${esc(getLastName())}" placeholder="이름 입력"
-                                oninput="document.getElementById('nameWarn') && document.getElementById('nameWarn').classList.add('hidden')"
-                                class="mt-1 w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
-                            <p id="nameWarn" class="hidden text-xs text-rose-600 mt-1">이름을 입력하세요.</p>
-                        </div>
-
-                        <div class="mt-4 grid grid-cols-2 gap-2 text-xs">
-                            <div class="bg-white border border-blue-100 rounded-lg p-2">
-                                <p class="text-slate-500">총 문항</p>
-                                <p class="font-bold text-slate-800">${Q.length}문항</p>
-                            </div>
-                            <div class="bg-white border border-blue-100 rounded-lg p-2">
-                                <p class="text-slate-500">최고 기록</p>
-                                <p class="font-bold text-slate-800 safe">${b ? `${esc(b.name)} · ${b.score}/${b.total} (${b.percent}%)` : "없음"}</p>
-                            </div>
-                        </div>
-
-                        <ul class="mt-3 space-y-1">${rows}</ul>
-
-                        <button class="mt-4 w-full bg-blue-600 text-white py-3 rounded-xl text-sm font-bold hover:bg-blue-700" onclick="startQuiz()">퀴즈 시작</button>
-                    </div>
-
-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                        <div class="flex items-center justify-between mb-3">
-                            <h2 class="text-sm font-bold text-slate-800">과거 응시 기록</h2>
-                            <button class="text-[11px] px-2 py-1 border border-slate-300 rounded-lg text-slate-600" onclick="clearLogs()">전체 삭제</button>
-                        </div>
-                        <div class="space-y-2">${logs}</div>
-                    </div>
-                </section>
-            `;
-        }
-        function renderQuiz() {
-            const q = currentQ();
-            if (!q) return "";
-
-            const idx = S.i + 1;
-            const tot = S.qs.length;
-            const pg = Math.round((idx / tot) * 100);
-            const fb = S.fb;
-
-            const body = q.type === "mcq"
-                ? q.options.map((o, i) => {
-                    let c = "border-slate-300 bg-white text-slate-800 hover:border-blue-400 hover:bg-blue-50";
-                    if (S.submitted && fb) {
-                        if (o === fb.correct) c = "border-emerald-400 bg-emerald-50 text-emerald-800";
-                        else if (o === fb.user && !fb.ok) c = "border-rose-400 bg-rose-50 text-rose-800";
-                        else c = "border-slate-200 bg-slate-50 text-slate-400";
-                    }
-                    return `<button class="op w-full border rounded-xl px-4 py-3 text-left text-sm font-semibold safe ${c}" ${S.submitted ? "disabled" : ""} onclick="submitMcq(${i})">${esc(o)}</button>`;
-                }).join("")
-                : `
-                    <div class="space-y-2">
-                        <input id="short" type="text" ${S.submitted ? "disabled" : ""} placeholder="${esc(q.placeholder || "정답 입력")}" onkeydown="if(event.key==='Enter'){submitShort()}"
-                            class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 ${S.submitted ? "bg-slate-100 text-slate-500" : ""}">
-                        <button class="w-full py-3 rounded-xl text-sm font-bold ${S.submitted ? "bg-slate-300 text-slate-500" : "bg-blue-600 text-white hover:bg-blue-700"}" ${S.submitted ? "disabled" : ""} onclick="submitShort()">정답 확인</button>
-                    </div>
-                `;
-
-            const feedback = S.submitted && fb
-                ? `
-                    <div class="mt-4 rounded-xl border p-4 ${fb.ok ? "bg-emerald-50 border-emerald-200" : "bg-rose-50 border-rose-200"}">
-                        <p class="text-sm font-bold ${fb.ok ? "text-emerald-700" : "text-rose-700"}">${fb.ok ? "정답입니다." : "오답입니다."} <span class="text-xs ml-1">(${fb.ok ? "Đúng" : "Sai"})</span></p>
-                        <p class="text-xs text-slate-700 mt-2"><b>내 답:</b> ${esc(fb.user || "(무응답)")}</p>
-                        <p class="text-xs text-slate-700 mt-1"><b>정답:</b> ${esc(fb.correct)}</p>
-                        <p class="text-xs text-slate-700 mt-2 safe"><b>설명(KO):</b> ${esc(fb.explainKo)}</p>
-                        <p class="text-xs text-blue-700 mt-1 safe"><b>Giải thích (VI):</b> ${esc(fb.explainVi)}</p>
-                        ${fb.nonTargetKo ? `
-                            <div class="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                                <p class="text-xs font-bold text-amber-800">학습 범위 보충</p>
-                                <p class="text-xs text-slate-700 mt-1 safe"><b>KO:</b> ${esc(fb.nonTargetKo)}</p>
-                                <p class="text-xs text-blue-700 mt-1 safe"><b>VI:</b> ${esc(fb.nonTargetVi)}</p>
-                            </div>
-                        ` : ""}
-                    </div>
-                `
-                : "";
-
-            return `
-                <section class="space-y-4">
-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="font-bold text-blue-600">${idx} / ${tot}</span>
-                            <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-bold">${esc(q.area)}</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-1">응시자: <b>${esc(S.name)}</b></p>
-                        <div class="mt-2 h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-blue-500" style="width:${pg}%"></div></div>
-                    </div>
-
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                        <p class="text-xs font-bold text-slate-500">문제</p>
-                        <p class="text-base font-bold text-slate-800 mt-2 leading-relaxed safe">${esc(q.prompt)}</p>
-                        ${q.image ? `<div class="mt-3 rounded-lg overflow-hidden border border-slate-200"><img src="${esc(q.image)}" alt="quiz-image" class="w-full h-44 object-cover" loading="lazy" decoding="async"></div>` : ""}
-                        <div class="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
-                            <p class="text-[11px] text-slate-600 safe"><b>상황(KO):</b> ${esc(q.contextKo || "")}</p>
-                            <p class="text-[11px] text-blue-700 mt-1 safe"><b>Tình huống (VI):</b> ${esc(q.contextVi || "")}</p>
-                            <p class="text-[11px] text-blue-700 mt-1 safe"><b>Dịch câu hỏi:</b> ${esc(q.promptVi || "")}</p>
-                        </div>
-                        <div class="mt-4 space-y-2">${body}</div>
-                        ${feedback}
-                        ${S.submitted ? `<button class="mt-3 w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-blue-700" onclick="nextQ()">다음 문제</button>` : ""}
-                    </div>
-                </section>
-            `;
-        }
-
-        function renderResult() {
-            const at = byId(S.selectedId);
-            if (!at) {
-                return `<section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm"><p class="text-sm text-slate-700">기록을 찾을 수 없습니다.</p><button class="mt-3 w-full bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold" onclick="toStart()">시작 화면</button></section>`;
-            }
-
-            const cards = at.answers.map((x, i) => {
-                if (x.ok) {
-                    return `
-                        <article class="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
-                            <p class="text-xs text-emerald-700 font-bold">${i + 1}. ${esc(x.area)} · 정답</p>
-                            <p class="text-sm text-slate-800 mt-1 safe">${esc(x.prompt)}</p>
-                            <p class="text-xs text-slate-700 mt-2"><b>정답:</b> ${esc(x.correct)}</p>
-                            <p class="text-xs text-slate-700 mt-1 safe"><b>설명(KO):</b> ${esc(x.explainKo)}</p>
-                            <p class="text-xs text-blue-700 mt-1 safe"><b>Giải thích (VI):</b> ${esc(x.explainVi)}</p>
-                            ${x.nonTargetKo ? `<div class="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-2"><p class="text-xs font-bold text-amber-800">학습 범위 보충</p><p class="text-xs text-slate-700 mt-1 safe"><b>KO:</b> ${esc(x.nonTargetKo)}</p><p class="text-xs text-blue-700 mt-1 safe"><b>VI:</b> ${esc(x.nonTargetVi)}</p></div>` : ""}
-                        </article>
-                    `;
-                }
-                return `
-                    <article class="bg-rose-50 border border-rose-200 rounded-xl p-3">
-                        <p class="text-xs text-rose-700 font-bold">${i + 1}. ${esc(x.area)} · 오답</p>
-                        <p class="text-sm text-slate-800 mt-1 safe">${esc(x.prompt)}</p>
-                        <p class="text-xs text-slate-700 mt-2"><b>내 답:</b> ${esc(x.user || "(무응답)")}</p>
-                        <p class="text-xs text-slate-700 mt-1"><b>정답:</b> ${esc(x.correct)}</p>
-                        <p class="text-xs text-rose-700 mt-2 safe"><b>설명(KO):</b> ${esc(x.explainKo)}</p>
-                        <p class="text-xs text-blue-700 mt-1 safe"><b>Giải thích (VI):</b> ${esc(x.explainVi)}</p>
-                        ${x.nonTargetKo ? `<div class="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-2"><p class="text-xs font-bold text-amber-800">학습 범위 보충</p><p class="text-xs text-slate-700 mt-1 safe"><b>KO:</b> ${esc(x.nonTargetKo)}</p><p class="text-xs text-blue-700 mt-1 safe"><b>VI:</b> ${esc(x.nonTargetVi)}</p></div>` : ""}
-                    </article>
-                `;
-            }).join("");
-
-            return `
-                <section class="space-y-4">
-                    <div id="cap" class="space-y-4">
-                        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm text-center">
-                            <p class="text-xs text-slate-500">응시자: <b>${esc(at.name)}</b></p>
-                            <p class="text-xs text-slate-500 mt-1">응시 시각: ${fmt(at.time)}</p>
-                            <h1 class="text-2xl font-black text-slate-800 mt-2">${at.score} / ${at.total}</h1>
-                            <p class="text-sm text-slate-600 mt-1">정답률 ${at.percent}% · 소요 ${at.duration}초</p>
-                            <p class="text-xs text-emerald-700 mt-2">결과가 자동 저장되었습니다.</p>
-                        </div>
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                            <h2 class="text-sm font-bold text-slate-800 mb-3">정오답 피드백</h2>
-                            <div class="space-y-2">${cards}</div>
-                        </div>
-                    </div>
-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                        <div class="grid gap-2">
-                            <button id="capBtn" class="w-full bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700" onclick="captureResult()">결과창 캡처 (PNG)</button>
-                            <button class="w-full border border-blue-300 bg-blue-50 text-blue-700 py-2.5 rounded-xl text-sm font-bold" onclick="saveJson()">결과 저장 (JSON)</button>
-                            <button class="w-full border border-slate-300 text-slate-700 py-2.5 rounded-xl text-sm font-bold" onclick="toStart()">시작 화면으로</button>
-                        </div>
-                    </div>
-                </section>
-            `;
-        }
-
-        function render() {
-            const app = document.getElementById("app");
-            if (S.view === "start") app.innerHTML = renderStart();
-            else if (S.view === "quiz") app.innerHTML = renderQuiz();
-            else app.innerHTML = renderResult();
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            try {
-                render();
-            } catch (e) {
-                const app = document.getElementById("app");
-                app.innerHTML = `<div class="bg-white border border-rose-200 rounded-xl p-4 text-sm text-rose-700"><b>오류가 발생했습니다.</b><p class="mt-2 safe">${esc(String(e && e.message ? e.message : e))}</p></div>`;
-            }
+        showButton.addEventListener("click", () => {
+            document.body.classList.toggle("show-answers");
+            showButton.textContent = document.body.classList.contains("show-answers") ? "해설 숨기기" : "해설 표시";
         });
+
+        resetButton.addEventListener("click", () => {
+            form.reset();
+            document.querySelectorAll(".question").forEach((question) => {
+                question.classList.remove("correct", "wrong", "checked");
+            });
+            document.body.classList.remove("show-answers");
+            showButton.textContent = "해설 표시";
+            score.textContent = "아직 채점하지 않았습니다.";
+            bottomScore.textContent = "";
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        printButton.addEventListener("click", () => {
+            window.print();
+        });
+
+        clearHistoryButton.addEventListener("click", () => {
+            localStorage.removeItem(HISTORY_KEY);
+            renderHistory();
+        });
+
+        renderHistory();
     </script>
-    <script src="../shared/learning-enhancements.js"></script>
-    <script src="../shared/site-copyright.js"></script>
-    <script src="../shared/page-qr.js"></script>
 </body>
 </html>
