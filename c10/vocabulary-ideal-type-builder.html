@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10과 어휘 | 이상형 조건 만들기</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-soft: #f1f5f9;
+            --ink: #162033;
+            --muted: #667085;
+            --line: #dbe4f0;
+            --line-strong: #b9c7d9;
+            --orange: #e4582e;
+            --orange-dark: #9a3412;
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+            --teal: #0f766e;
+            --teal-soft: #ecfdf5;
+            --rose: #be123c;
+            --rose-soft: #fff1f2;
+            --amber: #b45309;
+            --amber-soft: #fffbeb;
+            --shadow: 0 16px 38px rgba(15, 23, 42, 0.1);
+            --shadow-sm: 0 8px 20px rgba(15, 23, 42, 0.07);
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                linear-gradient(180deg, #f8fafc 0%, #eef6ff 52%, #fff7ed 100%);
+            color: var(--ink);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button,
+        input,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 0 14px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+        }
+
+        .topbar a {
+            color: var(--orange-dark);
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .topbar__divider {
+            color: #cbd5e1;
+            font-weight: 900;
+        }
+
+        .shell {
+            width: min(1360px, calc(100vw - 28px));
+            margin: 16px auto 42px;
+        }
+
+        .activity-header {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(330px, 0.36fr);
+            gap: 12px;
+            align-items: stretch;
+            margin-bottom: 12px;
+        }
+
+        .title-panel,
+        .metric-panel,
+        .panel {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .title-panel {
+            display: grid;
+            align-content: center;
+            min-height: 94px;
+            padding: 17px 19px;
+        }
+
+        .eyebrow {
+            margin: 0 0 5px;
+            color: var(--orange);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 32px;
+            line-height: 1.16;
+        }
+
+        .subtitle {
+            margin: 7px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+
+        .metric-panel {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(86px, 1fr));
+            gap: 8px;
+            padding: 10px;
+        }
+
+        .metric {
+            display: grid;
+            align-content: center;
+            min-height: 72px;
+            padding: 10px;
+            border: 1px solid #e8eef6;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .metric strong {
+            font-size: 21px;
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .metric span {
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.84fr) minmax(380px, 1.04fr) minmax(360px, 0.95fr);
+            gap: 12px;
+            align-items: start;
+        }
+
+        .panel {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 52px;
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(248, 250, 252, 0.72);
+        }
+
+        .panel-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .panel-title i {
+            color: var(--orange);
+        }
+
+        .panel-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 34px;
+            height: 28px;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            background: #fff7ed;
+            color: var(--orange-dark);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .bank-tools {
+            display: grid;
+            gap: 9px;
+            padding: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 0 11px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .search i {
+            color: #94a3b8;
+        }
+
+        .search input {
+            width: 100%;
+            min-width: 0;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--ink);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .category-row,
+        .mode-row,
+        .sample-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .seg-btn,
+        .sample-btn,
+        .icon-btn,
+        .main-btn,
+        .text-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 38px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 900;
+            transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease, transform 0.14s ease, box-shadow 0.14s ease;
+        }
+
+        .seg-btn {
+            padding: 0 10px;
+        }
+
+        .seg-btn:hover,
+        .sample-btn:hover,
+        .icon-btn:hover,
+        .text-btn:hover {
+            transform: translateY(-1px);
+            border-color: #93c5fd;
+            color: var(--blue);
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.09);
+        }
+
+        .seg-btn.is-active {
+            border-color: rgba(228, 88, 46, 0.45);
+            background: #fff7ed;
+            color: var(--orange-dark);
+            box-shadow: inset 0 0 0 1px rgba(228, 88, 46, 0.08);
+        }
+
+        .sample-btn {
+            flex: 1 1 120px;
+            padding: 0 10px;
+            background: var(--blue-soft);
+            border-color: #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        .icon-btn {
+            width: 38px;
+            padding: 0;
+        }
+
+        .icon-btn:disabled,
+        .text-btn:disabled,
+        .main-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.42;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .main-btn {
+            width: 100%;
+            min-height: 46px;
+            padding: 0 15px;
+            border-color: #ea580c;
+            background: #ea580c;
+            color: #ffffff;
+            font-size: 14px;
+            box-shadow: 0 12px 24px rgba(234, 88, 12, 0.18);
+        }
+
+        .main-btn:hover {
+            transform: translateY(-1px);
+            background: #c2410c;
+            border-color: #c2410c;
+        }
+
+        .text-btn {
+            padding: 0 12px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+            gap: 9px;
+            max-height: calc(100vh - 268px);
+            min-height: 310px;
+            overflow: auto;
+            padding: 12px;
+        }
+
+        .vocab-card {
+            position: relative;
+            display: grid;
+            grid-template-rows: 94px auto;
+            gap: 8px;
+            min-width: 0;
+            min-height: 188px;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+            text-align: left;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.055);
+        }
+
+        .vocab-card:hover,
+        .vocab-card:focus-visible {
+            border-color: #fdba74;
+            outline: none;
+            box-shadow: 0 12px 24px rgba(234, 88, 12, 0.13);
+        }
+
+        .vocab-card.is-selected {
+            border-color: #14b8a6;
+            background: linear-gradient(180deg, #ffffff 0%, #ecfdf5 100%);
+        }
+
+        .vocab-card__image {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .vocab-card__image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .vocab-card__image--emoji,
+        .selected-thumb--emoji {
+            display: grid;
+            place-items: center;
+            background:
+                linear-gradient(135deg, #fff7ed 0%, #eff6ff 55%, #ecfdf5 100%);
+        }
+
+        .emoji-visual {
+            display: grid;
+            place-items: center;
+            width: 100%;
+            height: 100%;
+            font-size: 42px;
+            line-height: 1;
+            filter: drop-shadow(0 8px 12px rgba(15, 23, 42, 0.12));
+        }
+
+        .selected-mark {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            display: inline-grid;
+            place-items: center;
+            width: 26px;
+            height: 26px;
+            border: 1px solid rgba(15, 118, 110, 0.32);
+            border-radius: 8px;
+            background: rgba(236, 253, 245, 0.94);
+            color: var(--teal);
+            opacity: 0;
+            transform: scale(0.88);
+            transition: opacity 0.14s ease, transform 0.14s ease;
+        }
+
+        .vocab-card.is-selected .selected-mark {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .vocab-card__body {
+            display: grid;
+            gap: 5px;
+            min-width: 0;
+        }
+
+        .term-row {
+            display: flex;
+            align-items: start;
+            justify-content: space-between;
+            gap: 7px;
+        }
+
+        .term {
+            min-width: 0;
+            font-size: 15px;
+            font-weight: 900;
+            line-height: 1.3;
+            word-break: keep-all;
+        }
+
+        .tag {
+            flex: 0 0 auto;
+            max-width: 58px;
+            padding: 3px 5px;
+            border: 1px solid #e2e8f0;
+            border-radius: 7px;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 900;
+            line-height: 1.15;
+            text-align: center;
+        }
+
+        .condition {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.45;
+            word-break: keep-all;
+        }
+
+        .builder-body {
+            display: grid;
+            gap: 12px;
+            padding: 12px;
+        }
+
+        .control-block {
+            display: grid;
+            gap: 9px;
+            padding: 12px;
+            border: 1px solid #e8eef6;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .field-label {
+            color: #475569;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .topic-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .topic-input {
+            width: 100%;
+            min-height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 0 12px;
+            background: #ffffff;
+            color: var(--ink);
+            font-size: 14px;
+            font-weight: 900;
+            outline: none;
+        }
+
+        .topic-input:focus {
+            border-color: #fb923c;
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.15);
+        }
+
+        .selection-zone {
+            min-height: 276px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            transition: border-color 0.16s ease, background 0.16s ease;
+        }
+
+        .selection-zone.is-over {
+            border-color: #14b8a6;
+            background: #ecfdf5;
+        }
+
+        .selected-list {
+            display: grid;
+            gap: 8px;
+            padding: 10px;
+        }
+
+        .empty-state {
+            display: grid;
+            place-items: center;
+            min-height: 236px;
+            padding: 18px;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .empty-state strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #334155;
+            font-size: 15px;
+            font-weight: 900;
+        }
+
+        .empty-state span {
+            display: block;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.55;
+        }
+
+        .selected-item {
+            display: grid;
+            grid-template-columns: 68px minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            min-height: 82px;
+            padding: 8px;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.055);
+        }
+
+        .selected-thumb {
+            width: 68px;
+            height: 64px;
+            overflow: hidden;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            background: #eff6ff;
+        }
+
+        .selected-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .selected-thumb .emoji-visual {
+            font-size: 30px;
+        }
+
+        .selected-main {
+            min-width: 0;
+        }
+
+        .selected-main strong {
+            display: block;
+            font-size: 15px;
+            font-weight: 900;
+            line-height: 1.3;
+            word-break: keep-all;
+        }
+
+        .selected-main span {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.45;
+            word-break: keep-all;
+        }
+
+        .selected-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 34px);
+            gap: 5px;
+        }
+
+        .selected-actions .icon-btn {
+            width: 34px;
+            height: 34px;
+            min-height: 34px;
+        }
+
+        .build-actions {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 8px;
+        }
+
+        .output-body {
+            display: grid;
+            gap: 12px;
+            padding: 12px;
+        }
+
+        .result-block {
+            display: grid;
+            gap: 9px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 12px;
+        }
+
+        .result-block h2,
+        .frame-block h2 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .result-block h2 i,
+        .frame-block h2 i {
+            color: var(--blue);
+        }
+
+        .sentence-list {
+            display: grid;
+            gap: 7px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .sentence-list li,
+        .paragraph-text {
+            border: 1px solid #e8eef6;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: var(--ink);
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.78;
+        }
+
+        .sentence-list li {
+            padding: 9px 10px;
+        }
+
+        .paragraph-text {
+            min-height: 142px;
+            padding: 12px;
+            white-space: pre-wrap;
+        }
+
+        .frame-block {
+            display: grid;
+            gap: 8px;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            background: #fff7ed;
+            padding: 12px;
+        }
+
+        .frame-list {
+            display: grid;
+            gap: 7px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .frame-list li {
+            padding: 8px 10px;
+            border: 1px solid #ffedd5;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #7c2d12;
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1.55;
+        }
+
+        .copy-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .status-text {
+            min-height: 28px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1.5;
+        }
+
+        .status-text.is-good {
+            color: var(--teal);
+        }
+
+        .status-text.is-warn {
+            color: var(--rose);
+        }
+
+        .no-results {
+            display: grid;
+            place-items: center;
+            min-height: 470px;
+            padding: 20px;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .no-results strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #334155;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .no-results span {
+            display: block;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.55;
+        }
+
+        @media (max-width: 1180px) {
+            .activity-header {
+                grid-template-columns: 1fr;
+            }
+
+            .main-layout {
+                grid-template-columns: minmax(300px, 0.9fr) minmax(360px, 1.1fr);
+            }
+
+            .output-panel {
+                grid-column: 1 / -1;
+            }
+
+            .card-grid {
+                max-height: 560px;
+            }
+        }
+
+        @media (max-width: 780px) {
+            .shell {
+                width: min(100vw - 18px, 760px);
+                margin: 12px auto 30px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+            .metric-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                max-height: none;
+            }
+
+            .topic-row,
+            .build-actions,
+            .copy-row {
+                grid-template-columns: 1fr;
+            }
+
+            .selected-item {
+                grid-template-columns: 58px minmax(0, 1fr);
+            }
+
+            .selected-thumb {
+                width: 58px;
+                height: 58px;
+            }
+
+            .selected-actions {
+                grid-column: 1 / -1;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+
+            .selected-actions .icon-btn {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar" aria-label="페이지 이동">
+        <a href="../index.html"><i class="fa-solid fa-house" aria-hidden="true"></i> 전체 목차</a>
+        <span class="topbar__divider">/</span>
+        <a href="index.html">10과</a>
+        <span class="topbar__divider">/</span>
+        <a href="vocabulary.html">어휘</a>
+    </nav>
+
+    <main class="shell">
+        <header class="activity-header">
+            <section class="title-panel" aria-labelledby="page-title">
+                <p class="eyebrow">Chapter 10 Vocabulary Builder</p>
+                <h1 id="page-title">이상형 조건 만들기</h1>
+                <p class="subtitle">10과 어휘를 조건 표현으로 바꾸어 초급 문장과 중급 문단을 만듭니다.</p>
+            </section>
+            <section class="metric-panel" aria-label="활동 상태">
+                <div class="metric">
+                    <strong id="selectedMetric">0</strong>
+                    <span>선택한 조건</span>
+                </div>
+                <div class="metric">
+                    <strong id="cardMetric">33</strong>
+                    <span>어휘 카드</span>
+                </div>
+                <div class="metric">
+                    <strong id="levelMetric">초급</strong>
+                    <span>문장 수준</span>
+                </div>
+            </section>
+        </header>
+
+        <section class="main-layout">
+            <article class="panel bank-panel" aria-labelledby="bankTitle">
+                <div class="panel-head">
+                    <div class="panel-title" id="bankTitle"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> 어휘 카드</div>
+                    <span class="panel-count" id="visibleCardCount">33</span>
+                </div>
+                <div class="bank-tools">
+                    <label class="search" for="searchInput">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <input id="searchInput" type="search" autocomplete="off" placeholder="어휘 검색" />
+                    </label>
+                    <div class="category-row" id="categoryRow" role="tablist" aria-label="어휘 범주"></div>
+                    <div class="sample-row" aria-label="추천 조합">
+                        <button class="sample-btn" type="button" data-sample="warm"><i class="fa-solid fa-heart" aria-hidden="true"></i> 따뜻한 사람</button>
+                        <button class="sample-btn" type="button" data-sample="spark"><i class="fa-solid fa-bolt" aria-hidden="true"></i> 설레는 사람</button>
+                        <button class="sample-btn" type="button" data-sample="future"><i class="fa-solid fa-ring" aria-hidden="true"></i> 진지한 관계</button>
+                        <button class="sample-btn" type="button" data-sample="basic"><i class="fa-solid fa-star" aria-hidden="true"></i> 초급 형용사</button>
+                    </div>
+                </div>
+                <div class="card-grid" id="cardGrid" aria-live="polite"></div>
+            </article>
+
+            <article class="panel builder-panel" aria-labelledby="builderTitle">
+                <div class="panel-head">
+                    <div class="panel-title" id="builderTitle"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i> 선택한 조건</div>
+                    <span class="panel-count" id="selectedCount">0</span>
+                </div>
+                <div class="builder-body">
+                    <section class="control-block" aria-label="문장 설정">
+                        <label class="field-label" for="topicInput">문장 시작</label>
+                        <div class="topic-row">
+                            <input class="topic-input" id="topicInput" type="text" value="제 이상형은" />
+                            <button class="text-btn" id="topicResetBtn" type="button"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> 기본값</button>
+                        </div>
+                        <div class="mode-row" id="topicPresetRow" aria-label="문장 시작 예시">
+                            <button class="seg-btn" type="button" data-topic="제 이상형은">제 이상형은</button>
+                            <button class="seg-btn" type="button" data-topic="제가 만나고 싶은 사람은">제가 만나고 싶은 사람은</button>
+                            <button class="seg-btn" type="button" data-topic="좋은 연인은">좋은 연인은</button>
+                        </div>
+                    </section>
+
+                    <section class="control-block" aria-label="수준 선택">
+                        <span class="field-label">한국어 수준</span>
+                        <div class="mode-row" id="levelRow" role="tablist" aria-label="한국어 수준">
+                            <button class="seg-btn is-active" type="button" data-level="beginner" role="tab" aria-selected="true"><i class="fa-solid fa-seedling" aria-hidden="true"></i> 초급</button>
+                            <button class="seg-btn" type="button" data-level="intermediate" role="tab" aria-selected="false"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> 중급</button>
+                        </div>
+                    </section>
+
+                    <section class="selection-zone" id="selectionZone" aria-label="선택한 어휘 조건">
+                        <div class="selected-list" id="selectedList"></div>
+                    </section>
+
+                    <div class="build-actions">
+                        <button class="main-btn" id="generateBtn" type="button"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> 문장 만들기</button>
+                        <button class="text-btn" id="clearBtn" type="button"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> 비우기</button>
+                        <button class="text-btn" id="shuffleBtn" type="button"><i class="fa-solid fa-shuffle" aria-hidden="true"></i> 섞기</button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="panel output-panel" aria-labelledby="outputTitle">
+                <div class="panel-head">
+                    <div class="panel-title" id="outputTitle"><i class="fa-solid fa-file-lines" aria-hidden="true"></i> 문장 결과</div>
+                    <button class="icon-btn" id="copyBtn" type="button" title="결과 복사" aria-label="결과 복사" disabled><i class="fa-solid fa-copy" aria-hidden="true"></i></button>
+                </div>
+                <div class="output-body" id="outputBody"></div>
+            </article>
+        </section>
+    </main>
+
+    <script>
+    (function () {
+        "use strict";
+
+        const STORAGE_KEY = "c10-ideal-type-builder-v1";
+        const CATEGORIES = [
+            { id: "all", label: "전체" },
+            { id: "match", label: "조건·인상" },
+            { id: "basic", label: "기본 형용사" },
+            { id: "feeling", label: "호감·감정" },
+            { id: "relationship", label: "연애" },
+            { id: "action", label: "행동" },
+            { id: "meeting", label: "만남" },
+            { id: "marriage", label: "결혼" }
+        ];
+
+        const CARDS = [
+            {
+                id: "c10-vocab-01",
+                term: "고백하다",
+                category: "feeling",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_01_confess.webp",
+                descriptor: "진심으로 고백할 줄 아는",
+                chain: "진심으로 고백할 줄 알고",
+                beginnerSentence: "그 사람은 좋아하는 마음을 솔직하게 고백합니다.",
+                intermediateSentence: "좋아하는 마음을 숨기기보다 진심으로 고백할 줄 아는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-02",
+                term: "가슴이 두근거리다",
+                category: "feeling",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_02_heart_pounding.webp",
+                descriptor: "가슴이 두근거리게 하는",
+                chain: "가슴이 두근거리게 하고",
+                beginnerSentence: "그 사람을 만나면 가슴이 두근거립니다.",
+                intermediateSentence: "함께 있을 때 가슴이 두근거릴 만큼 좋은 느낌을 주는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-03",
+                term: "나란히 앉다",
+                category: "action",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_03_side_by_side.webp",
+                descriptor: "나란히 앉아 이야기하기 편한",
+                chain: "나란히 앉아 이야기하기 편하고",
+                beginnerSentence: "우리는 나란히 앉아 편하게 이야기할 수 있습니다.",
+                intermediateSentence: "카페나 공원에서 나란히 앉아 오래 이야기해도 어색하지 않은 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-04",
+                term: "마음씨가 착하다",
+                category: "match",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_04_kind_heart_v2.webp",
+                descriptor: "마음씨가 착한",
+                chain: "마음씨가 착하고",
+                beginnerSentence: "그 사람은 마음씨가 착합니다.",
+                intermediateSentence: "마음씨가 착해서 주변 사람을 잘 배려하는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-05",
+                term: "말(생각)이 잘 통하다",
+                category: "match",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_05_understand.webp",
+                descriptor: "말과 생각이 잘 통하는",
+                chain: "말과 생각이 잘 통하고",
+                beginnerSentence: "그 사람은 저와 말이 잘 통합니다.",
+                intermediateSentence: "서로의 생각이 잘 통해서 진지한 이야기도 편하게 나눌 수 있으면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-06",
+                term: "매력이 있다",
+                category: "feeling",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_06_charming.webp",
+                descriptor: "매력이 있는",
+                chain: "매력이 있고",
+                beginnerSentence: "그 사람은 자신만의 매력이 있습니다.",
+                intermediateSentence: "겉모습뿐만 아니라 말투와 태도에서도 자연스러운 매력이 느껴지는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-07",
+                term: "사랑에 빠지다",
+                category: "feeling",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_07_fall_in_love.webp",
+                descriptor: "사랑에 진지한",
+                chain: "사랑에 진지하고",
+                beginnerSentence: "저는 그런 사람과 사랑에 빠지고 싶습니다.",
+                intermediateSentence: "서로를 알아 가면서 천천히 사랑에 빠질 수 있는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-08",
+                term: "사귀다",
+                category: "relationship",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_08_date_v2.webp",
+                descriptor: "서로 존중하며 사귈 수 있는",
+                chain: "서로 존중하며 사귈 수 있고",
+                beginnerSentence: "우리는 서로 좋아하면 사귈 수 있습니다.",
+                intermediateSentence: "사귈 때 서로의 생활을 존중하고 약속을 잘 지키는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-09",
+                term: "성격(마음)이 잘 맞다",
+                category: "match",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_09_good_match.webp",
+                descriptor: "성격과 마음이 잘 맞는",
+                chain: "성격과 마음이 잘 맞고",
+                beginnerSentence: "그 사람은 저와 성격이 잘 맞습니다.",
+                intermediateSentence: "성격과 마음이 잘 맞아서 작은 문제도 대화로 풀 수 있는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-10",
+                term: "선보다",
+                category: "meeting",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_10_matchmaking_v2.webp",
+                descriptor: "선을 볼 때도 예의를 지키는",
+                chain: "선을 볼 때도 예의를 지키고",
+                beginnerSentence: "그 사람은 처음 만나는 자리에서도 예의가 있습니다.",
+                intermediateSentence: "선을 보는 자리처럼 조금 어색한 만남에서도 상대를 존중하는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-11",
+                term: "소개팅하다",
+                category: "meeting",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_11_blind_date.webp",
+                descriptor: "소개팅에서도 대화가 자연스러운",
+                chain: "소개팅에서도 대화가 자연스럽고",
+                beginnerSentence: "그 사람은 소개팅에서 편하게 이야기합니다.",
+                intermediateSentence: "소개팅처럼 처음 만나는 자리에서도 상대를 편하게 해 주는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-12",
+                term: "손을 잡다",
+                category: "action",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_12_hold_hands.webp",
+                descriptor: "손을 잡고 걸을 수 있는",
+                chain: "손을 잡고 걸을 수 있고",
+                beginnerSentence: "우리는 손을 잡고 걸을 수 있습니다.",
+                intermediateSentence: "길을 걸을 때 자연스럽게 손을 잡고 서로를 챙겨 주는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-13",
+                term: "어깨에 기대다",
+                category: "action",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_13_lean_shoulder.webp",
+                descriptor: "어깨에 기대도 편한",
+                chain: "어깨에 기대도 편하고",
+                beginnerSentence: "그 사람에게 어깨에 기대도 편합니다.",
+                intermediateSentence: "힘든 날에는 어깨에 기대어 쉴 수 있을 만큼 편안한 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-14",
+                term: "얼굴이 빨개지다",
+                category: "feeling",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_14_blush.webp",
+                descriptor: "부끄러워도 솔직한",
+                chain: "부끄러워도 솔직하고",
+                beginnerSentence: "부끄러울 때 얼굴이 빨개져도 솔직합니다.",
+                intermediateSentence: "부끄러워서 얼굴이 빨개져도 자기 마음을 솔직하게 표현하는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-15",
+                term: "연애하다",
+                category: "relationship",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_15_relationship_v2.webp",
+                descriptor: "따뜻하게 연애하는",
+                chain: "따뜻하게 연애하고",
+                beginnerSentence: "그 사람과 따뜻하게 연애하고 싶습니다.",
+                intermediateSentence: "연애할 때 서로에게 부담을 주지 않고 따뜻하게 표현하는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-16",
+                term: "인상이 좋다",
+                category: "match",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_16_good_impression_v2.webp",
+                descriptor: "인상이 좋은",
+                chain: "인상이 좋고",
+                beginnerSentence: "그 사람은 처음 만났을 때 인상이 좋습니다.",
+                intermediateSentence: "처음 만났을 때 밝고 안정적인 인상을 주는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-17",
+                term: "조건이 맞다",
+                category: "match",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_17_conditions_match.webp",
+                descriptor: "생활 조건이 잘 맞는",
+                chain: "생활 조건이 잘 맞고",
+                beginnerSentence: "그 사람은 저와 조건이 잘 맞습니다.",
+                intermediateSentence: "생활 방식과 미래 계획 같은 조건이 잘 맞는 사람이면 오래 만날 수 있을 것 같습니다."
+            },
+            {
+                id: "c10-vocab-18",
+                term: "첫눈에 반하다",
+                category: "feeling",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_18_love_at_first_sight_v2.webp",
+                descriptor: "첫눈에 반할 만큼 느낌이 좋은",
+                chain: "첫눈에 반할 만큼 느낌이 좋고",
+                beginnerSentence: "저는 그 사람에게 첫눈에 반할 수 있습니다.",
+                intermediateSentence: "처음 보는 순간에도 좋은 느낌이 들어 첫눈에 반할 수 있는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-19",
+                term: "팔짱을 끼다",
+                category: "action",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_19_arm_in_arm.webp",
+                descriptor: "팔짱을 끼고 걸어도 자연스러운",
+                chain: "팔짱을 끼고 걸어도 자연스럽고",
+                beginnerSentence: "우리는 팔짱을 끼고 걸어도 자연스럽습니다.",
+                intermediateSentence: "사람들 앞에서도 팔짱을 끼고 걸을 만큼 서로 편한 사이가 되면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-20",
+                term: "청혼하다",
+                category: "marriage",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_20_propose.webp",
+                descriptor: "결혼을 진지하게 생각하는",
+                chain: "결혼을 진지하게 생각하고",
+                beginnerSentence: "그 사람은 결혼을 진지하게 생각합니다.",
+                intermediateSentence: "청혼처럼 큰 결정을 가볍게 하지 않고 책임 있게 생각하는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-21",
+                term: "신혼여행",
+                category: "marriage",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_21_honeymoon.webp",
+                descriptor: "신혼여행 계획을 함께 세울 수 있는",
+                chain: "신혼여행 계획을 함께 세울 수 있고",
+                beginnerSentence: "우리는 신혼여행 계획을 같이 세울 수 있습니다.",
+                intermediateSentence: "나중에 신혼여행을 어디로 갈지 즐겁게 이야기할 수 있는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-22",
+                term: "중매결혼",
+                category: "marriage",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_22_arranged_marriage.webp",
+                descriptor: "서로의 마음을 먼저 보는",
+                chain: "서로의 마음을 먼저 보고",
+                beginnerSentence: "그 사람은 결혼에서 서로의 마음을 중요하게 생각합니다.",
+                intermediateSentence: "중매결혼이든 연애결혼이든 서로의 마음을 먼저 확인하는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-23",
+                term: "연애결혼",
+                category: "marriage",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_23_love_marriage.webp",
+                descriptor: "연애결혼을 꿈꿀 수 있는",
+                chain: "연애결혼을 꿈꿀 수 있고",
+                beginnerSentence: "저는 그 사람과 연애결혼을 생각할 수 있습니다.",
+                intermediateSentence: "충분히 연애하며 서로를 알아 간 뒤 연애결혼을 꿈꿀 수 있는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-24",
+                term: "청첩장",
+                category: "marriage",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_24_wedding_invitation.webp",
+                descriptor: "청첩장을 함께 준비할 수 있는",
+                chain: "청첩장을 함께 준비할 수 있고",
+                beginnerSentence: "우리는 결혼할 때 청첩장을 같이 준비할 수 있습니다.",
+                intermediateSentence: "결혼을 준비할 때 청첩장처럼 작은 일도 함께 의논하는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-vocab-25",
+                term: "예식장",
+                category: "marriage",
+                image: "../assets/c10/vocabulary/images/split-hq/c10_vocab_25_wedding_hall.webp",
+                descriptor: "예식장을 함께 알아볼 수 있는",
+                chain: "예식장을 함께 알아볼 수 있고",
+                beginnerSentence: "우리는 예식장을 같이 알아볼 수 있습니다.",
+                intermediateSentence: "결혼식 장소인 예식장도 서로의 의견을 듣고 함께 정하는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-basic-01",
+                term: "예쁘다",
+                category: "basic",
+                emoji: "🌸",
+                descriptor: "예쁜",
+                chain: "예쁘고",
+                beginnerSentence: "그 사람은 예쁩니다.",
+                intermediateSentence: "외모가 예쁠 뿐만 아니라 표정도 밝은 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-basic-02",
+                term: "잘생겼다",
+                category: "basic",
+                emoji: "✨",
+                descriptor: "잘생긴",
+                chain: "잘생기고",
+                beginnerSentence: "그 사람은 잘생겼습니다.",
+                intermediateSentence: "잘생긴 외모보다 자신감 있고 단정한 분위기를 가진 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-basic-03",
+                term: "똑똑하다",
+                category: "basic",
+                emoji: "🧠",
+                descriptor: "똑똑한",
+                chain: "똑똑하고",
+                beginnerSentence: "그 사람은 똑똑합니다.",
+                intermediateSentence: "똑똑해서 여러 가지 이야기를 함께 나눌 수 있는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-basic-04",
+                term: "친절하다",
+                category: "basic",
+                emoji: "🤝",
+                descriptor: "친절한",
+                chain: "친절하고",
+                beginnerSentence: "그 사람은 친절합니다.",
+                intermediateSentence: "처음 만나는 사람에게도 친절하게 말하는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-basic-05",
+                term: "성실하다",
+                category: "basic",
+                emoji: "📘",
+                descriptor: "성실한",
+                chain: "성실하고",
+                beginnerSentence: "그 사람은 성실합니다.",
+                intermediateSentence: "약속과 일을 성실하게 지키는 사람이면 믿음이 갈 것 같습니다."
+            },
+            {
+                id: "c10-basic-06",
+                term: "재미있다",
+                category: "basic",
+                emoji: "🎈",
+                descriptor: "재미있는",
+                chain: "재미있고",
+                beginnerSentence: "그 사람은 재미있습니다.",
+                intermediateSentence: "함께 있으면 대화가 재미있고 시간이 빨리 가는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-basic-07",
+                term: "키가 크다",
+                category: "basic",
+                emoji: "📏",
+                descriptor: "키가 큰",
+                chain: "키가 크고",
+                beginnerSentence: "그 사람은 키가 큽니다.",
+                intermediateSentence: "키가 크고 자세가 바른 사람에게 좋은 인상을 받을 것 같습니다."
+            },
+            {
+                id: "c10-basic-08",
+                term: "밝다",
+                category: "basic",
+                emoji: "☀️",
+                descriptor: "밝은",
+                chain: "밝고",
+                beginnerSentence: "그 사람은 밝습니다.",
+                intermediateSentence: "밝은 에너지로 주변 사람을 편하게 해 주는 사람이면 좋겠습니다."
+            }
+        ];
+
+        const SAMPLES = {
+            warm: ["c10-vocab-04", "c10-vocab-05", "c10-vocab-09", "c10-vocab-16"],
+            spark: ["c10-vocab-18", "c10-vocab-06", "c10-vocab-02", "c10-vocab-01"],
+            future: ["c10-vocab-15", "c10-vocab-17", "c10-vocab-20", "c10-vocab-23"],
+            basic: ["c10-basic-01", "c10-basic-02", "c10-basic-03", "c10-basic-04"]
+        };
+
+        const cardById = new Map(CARDS.map((card) => [card.id, card]));
+
+        const state = {
+            selectedIds: [],
+            category: "all",
+            query: "",
+            level: "beginner",
+            topic: "제 이상형은",
+            generated: false
+        };
+
+        const els = {
+            selectedMetric: document.getElementById("selectedMetric"),
+            cardMetric: document.getElementById("cardMetric"),
+            levelMetric: document.getElementById("levelMetric"),
+            visibleCardCount: document.getElementById("visibleCardCount"),
+            categoryRow: document.getElementById("categoryRow"),
+            cardGrid: document.getElementById("cardGrid"),
+            searchInput: document.getElementById("searchInput"),
+            topicInput: document.getElementById("topicInput"),
+            topicResetBtn: document.getElementById("topicResetBtn"),
+            topicPresetRow: document.getElementById("topicPresetRow"),
+            levelRow: document.getElementById("levelRow"),
+            selectionZone: document.getElementById("selectionZone"),
+            selectedList: document.getElementById("selectedList"),
+            selectedCount: document.getElementById("selectedCount"),
+            generateBtn: document.getElementById("generateBtn"),
+            clearBtn: document.getElementById("clearBtn"),
+            shuffleBtn: document.getElementById("shuffleBtn"),
+            outputBody: document.getElementById("outputBody"),
+            copyBtn: document.getElementById("copyBtn")
+        };
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function cardVisual(card, className, extraMarkup = "") {
+            const alt = card.imageAlt || `${card.term} 그림 카드`;
+            if (card.emoji) {
+                return `
+                    <span class="${className} ${className}--emoji" role="img" aria-label="${escapeHtml(alt)}">
+                        <span class="emoji-visual">${escapeHtml(card.emoji)}</span>
+                        ${extraMarkup}
+                    </span>
+                `;
+            }
+
+            return `
+                <span class="${className}">
+                    <img src="${escapeHtml(card.image)}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async" />
+                    ${extraMarkup}
+                </span>
+            `;
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    selectedIds: state.selectedIds,
+                    category: state.category,
+                    query: state.query,
+                    level: state.level,
+                    topic: state.topic,
+                    generated: state.generated
+                }));
+            } catch (error) {
+                return false;
+            }
+            return true;
+        }
+
+        function loadState() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+                if (Array.isArray(saved.selectedIds)) {
+                    state.selectedIds = saved.selectedIds.filter((id) => cardById.has(id));
+                }
+                if (CATEGORIES.some((category) => category.id === saved.category)) state.category = saved.category;
+                if (typeof saved.query === "string") state.query = saved.query;
+                if (saved.level === "beginner" || saved.level === "intermediate") state.level = saved.level;
+                if (typeof saved.topic === "string" && saved.topic.trim()) state.topic = saved.topic.trim();
+                state.generated = Boolean(saved.generated && state.selectedIds.length);
+            } catch (error) {
+                state.selectedIds = [];
+            }
+        }
+
+        function hasBatchim(text) {
+            const trimmed = text.trim();
+            if (!trimmed) return false;
+            const char = trimmed[trimmed.length - 1];
+            const code = char.charCodeAt(0);
+            if (code < 0xac00 || code > 0xd7a3) return false;
+            return (code - 0xac00) % 28 !== 0;
+        }
+
+        function topicWithParticle() {
+            const topic = state.topic.trim() || "제 이상형은";
+            if (/[은는]$/.test(topic)) return topic;
+            return `${topic}${hasBatchim(topic) ? "은" : "는"}`;
+        }
+
+        function selectedCards() {
+            return state.selectedIds.map((id) => cardById.get(id)).filter(Boolean);
+        }
+
+        function buildIntro(cards) {
+            const topic = topicWithParticle();
+            if (!cards.length) return `${topic} 아직 정하지 않았습니다.`;
+            if (cards.length === 1) return `${topic} ${cards[0].descriptor} 사람입니다.`;
+
+            const visible = cards.slice(0, 4);
+            const chains = visible.slice(0, -1).map((card) => card.chain);
+            const last = visible[visible.length - 1].descriptor;
+            const extra = cards.length > visible.length ? " 등 여러 조건을 가진" : "";
+            return `${topic} ${chains.join(" ")} ${last}${extra} 사람입니다.`;
+        }
+
+        function buildSentences(cards) {
+            const intro = buildIntro(cards);
+            const body = cards.map((card) => {
+                return state.level === "beginner" ? card.beginnerSentence : card.intermediateSentence;
+            });
+            const closing = state.level === "beginner"
+                ? "이런 사람과 함께 있으면 편하고 행복할 것 같습니다."
+                : "이런 조건이 잘 맞으면 서로를 존중하면서 오래 좋은 관계를 만들 수 있을 것 같습니다.";
+            return [intro, ...body, closing];
+        }
+
+        function buildParagraph(cards) {
+            const sentences = buildSentences(cards);
+            if (state.level === "beginner") return sentences.join(" ");
+            const [intro, ...rest] = sentences;
+            const linked = rest.map((sentence, index) => {
+                if (index === 0) return `특히 ${sentence}`;
+                if (index === 1) return `또 ${sentence}`;
+                if (index === rest.length - 1) return sentence;
+                return `그리고 ${sentence}`;
+            });
+            return [intro, ...linked].join(" ");
+        }
+
+        function renderCategories() {
+            els.categoryRow.innerHTML = CATEGORIES.map((category) => `
+                <button class="seg-btn${state.category === category.id ? " is-active" : ""}" type="button" data-category="${category.id}" role="tab" aria-selected="${state.category === category.id}">
+                    ${escapeHtml(category.label)}
+                </button>
+            `).join("");
+        }
+
+        function filteredCards() {
+            const query = state.query.trim().toLowerCase();
+            return CARDS.filter((card) => {
+                const categoryMatch = state.category === "all" || card.category === state.category;
+                const queryMatch = !query || `${card.term} ${card.descriptor}`.toLowerCase().includes(query);
+                return categoryMatch && queryMatch;
+            });
+        }
+
+        function categoryLabel(id) {
+            return CATEGORIES.find((category) => category.id === id)?.label || id;
+        }
+
+        function renderBank() {
+            const visible = filteredCards();
+            els.visibleCardCount.textContent = String(visible.length);
+            els.cardGrid.innerHTML = visible.map((card) => {
+                const selected = state.selectedIds.includes(card.id);
+                return `
+                    <button class="vocab-card${selected ? " is-selected" : ""}" type="button" data-id="${card.id}" draggable="true" aria-pressed="${selected}" aria-label="${escapeHtml(card.term)} 조건 ${selected ? "제거" : "추가"}">
+                        ${cardVisual(card, "vocab-card__image", `<span class="selected-mark" aria-hidden="true"><i class="fa-solid fa-check"></i></span>`)}
+                        <span class="vocab-card__body">
+                            <span class="term-row">
+                                <span class="term">${escapeHtml(card.term)}</span>
+                                <span class="tag">${escapeHtml(categoryLabel(card.category))}</span>
+                            </span>
+                            <span class="condition">${escapeHtml(card.descriptor)} 사람</span>
+                        </span>
+                    </button>
+                `;
+            }).join("");
+
+            if (!visible.length) {
+                els.cardGrid.innerHTML = `
+                    <div class="empty-state">
+                        <div>
+                            <strong>검색 결과 없음</strong>
+                            <span>다른 어휘나 범주로 다시 확인할 수 있습니다.</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderSelection() {
+            const cards = selectedCards();
+            els.selectedCount.textContent = String(cards.length);
+            els.selectedMetric.textContent = String(cards.length);
+            els.generateBtn.disabled = cards.length === 0;
+            els.clearBtn.disabled = cards.length === 0;
+            els.shuffleBtn.disabled = cards.length < 2;
+
+            if (!cards.length) {
+                els.selectedList.innerHTML = `
+                    <div class="empty-state">
+                        <div>
+                            <strong>조건 없음</strong>
+                            <span>이상형 조건으로 사용할 어휘가 여기에 모입니다.</span>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            els.selectedList.innerHTML = cards.map((card, index) => `
+                <article class="selected-item" data-id="${card.id}">
+                    ${cardVisual(card, "selected-thumb")}
+                    <span class="selected-main">
+                        <strong>${index + 1}. ${escapeHtml(card.term)}</strong>
+                        <span>${escapeHtml(card.descriptor)} 사람</span>
+                    </span>
+                    <span class="selected-actions">
+                        <button class="icon-btn" type="button" data-action="up" title="위로" aria-label="${escapeHtml(card.term)} 위로 이동" ${index === 0 ? "disabled" : ""}><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+                        <button class="icon-btn" type="button" data-action="down" title="아래로" aria-label="${escapeHtml(card.term)} 아래로 이동" ${index === cards.length - 1 ? "disabled" : ""}><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
+                        <button class="icon-btn" type="button" data-action="remove" title="삭제" aria-label="${escapeHtml(card.term)} 삭제"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+                        <button class="icon-btn" type="button" data-action="focus" title="강조" aria-label="${escapeHtml(card.term)} 카드 보기"><i class="fa-solid fa-eye" aria-hidden="true"></i></button>
+                    </span>
+                </article>
+            `).join("");
+        }
+
+        function renderModes() {
+            els.levelMetric.textContent = state.level === "beginner" ? "초급" : "중급";
+            els.levelRow.querySelectorAll("[data-level]").forEach((button) => {
+                const active = button.dataset.level === state.level;
+                button.classList.toggle("is-active", active);
+                button.setAttribute("aria-selected", String(active));
+            });
+            els.topicPresetRow.querySelectorAll("[data-topic]").forEach((button) => {
+                button.classList.toggle("is-active", button.dataset.topic === state.topic);
+            });
+        }
+
+        function renderOutput() {
+            const cards = selectedCards();
+            els.copyBtn.disabled = !state.generated || !cards.length;
+
+            if (!state.generated || !cards.length) {
+                els.outputBody.innerHTML = `
+                    <div class="no-results">
+                        <div>
+                            <strong>문장 결과 대기</strong>
+                            <span>선택한 조건으로 초급 문장과 중급 문단을 정리합니다.</span>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const sentences = buildSentences(cards);
+            const paragraph = buildParagraph(cards);
+            const frames = state.level === "beginner"
+                ? [
+                    `${topicWithParticle()} ... 사람입니다.`,
+                    `그 사람은 ...습니다/ㅂ니다.`,
+                    `이런 사람과 함께 있으면 ... 것 같습니다.`
+                ]
+                : [
+                    `${topicWithParticle()} ... 사람입니다.`,
+                    `...아서/어서 ... 사람이면 좋겠습니다.`,
+                    `이런 조건이 잘 맞으면 ... 좋은 관계를 만들 수 있을 것 같습니다.`
+                ];
+
+            els.outputBody.innerHTML = `
+                <section class="result-block" aria-label="짧은 문장">
+                    <h2><i class="fa-solid fa-list-ul" aria-hidden="true"></i> ${state.level === "beginner" ? "초급 문장" : "중급 문장"}</h2>
+                    <ol class="sentence-list">
+                        ${sentences.map((sentence) => `<li>${escapeHtml(sentence)}</li>`).join("")}
+                    </ol>
+                </section>
+                <section class="result-block" aria-label="문단">
+                    <h2><i class="fa-solid fa-align-left" aria-hidden="true"></i> ${state.level === "beginner" ? "초급 문단" : "중급 문단"}</h2>
+                    <div class="paragraph-text" id="paragraphText">${escapeHtml(paragraph)}</div>
+                </section>
+                <section class="frame-block" aria-label="문장 틀">
+                    <h2><i class="fa-solid fa-shapes" aria-hidden="true"></i> 문장 틀</h2>
+                    <ul class="frame-list">
+                        ${frames.map((frame) => `<li>${escapeHtml(frame)}</li>`).join("")}
+                    </ul>
+                </section>
+                <div class="copy-row">
+                    <span class="status-text" id="statusText" aria-live="polite">${cards.length}개 조건으로 결과를 만들었습니다.</span>
+                    <button class="text-btn" type="button" id="copyTextBtn"><i class="fa-solid fa-copy" aria-hidden="true"></i> 결과 복사</button>
+                </div>
+            `;
+        }
+
+        function renderAll() {
+            els.cardMetric.textContent = String(CARDS.length);
+            els.topicInput.value = state.topic;
+            renderCategories();
+            renderModes();
+            renderBank();
+            renderSelection();
+            renderOutput();
+            saveState();
+        }
+
+        function addCard(id) {
+            if (!cardById.has(id) || state.selectedIds.includes(id)) return;
+            state.selectedIds.push(id);
+            state.generated = false;
+            renderAll();
+        }
+
+        function removeCard(id) {
+            state.selectedIds = state.selectedIds.filter((selectedId) => selectedId !== id);
+            if (!state.selectedIds.length) state.generated = false;
+            renderAll();
+        }
+
+        function toggleCard(id) {
+            if (state.selectedIds.includes(id)) {
+                removeCard(id);
+            } else {
+                addCard(id);
+            }
+        }
+
+        function moveCard(id, direction) {
+            const index = state.selectedIds.indexOf(id);
+            const nextIndex = index + direction;
+            if (index < 0 || nextIndex < 0 || nextIndex >= state.selectedIds.length) return;
+            const next = state.selectedIds[index];
+            state.selectedIds[index] = state.selectedIds[nextIndex];
+            state.selectedIds[nextIndex] = next;
+            state.generated = false;
+            renderAll();
+        }
+
+        function shuffleSelected() {
+            const ids = [...state.selectedIds];
+            for (let index = ids.length - 1; index > 0; index -= 1) {
+                const randomIndex = Math.floor(Math.random() * (index + 1));
+                [ids[index], ids[randomIndex]] = [ids[randomIndex], ids[index]];
+            }
+            state.selectedIds = ids;
+            state.generated = false;
+            renderAll();
+        }
+
+        function setSample(sampleId) {
+            if (!SAMPLES[sampleId]) return;
+            state.selectedIds = [...SAMPLES[sampleId]];
+            state.generated = false;
+            renderAll();
+        }
+
+        function dragCardId(event) {
+            return event.dataTransfer?.getData("text/plain") || "";
+        }
+
+        function currentResultText() {
+            const cards = selectedCards();
+            if (!cards.length || !state.generated) return "";
+            const sentences = buildSentences(cards).map((sentence, index) => `${index + 1}. ${sentence}`).join("\n");
+            return `[문장]\n${sentences}\n\n[문단]\n${buildParagraph(cards)}`;
+        }
+
+        function setStatus(message, type) {
+            const status = document.getElementById("statusText");
+            if (!status) return;
+            status.textContent = message;
+            status.classList.toggle("is-good", type === "good");
+            status.classList.toggle("is-warn", type === "warn");
+        }
+
+        async function copyResult() {
+            const text = currentResultText();
+            if (!text) return;
+            try {
+                await navigator.clipboard.writeText(text);
+                setStatus("결과를 복사했습니다.", "good");
+            } catch (error) {
+                setStatus("복사 권한을 확인해 주세요.", "warn");
+            }
+        }
+
+        els.categoryRow.addEventListener("click", (event) => {
+            const button = event.target.closest("[data-category]");
+            if (!button) return;
+            state.category = button.dataset.category;
+            renderAll();
+        });
+
+        els.cardGrid.addEventListener("click", (event) => {
+            const card = event.target.closest(".vocab-card");
+            if (!card) return;
+            toggleCard(card.dataset.id);
+        });
+
+        els.cardGrid.addEventListener("dragstart", (event) => {
+            const card = event.target.closest(".vocab-card");
+            if (!card) return;
+            event.dataTransfer.setData("text/plain", card.dataset.id);
+            event.dataTransfer.effectAllowed = "copy";
+        });
+
+        els.searchInput.addEventListener("input", () => {
+            state.query = els.searchInput.value;
+            renderBank();
+            saveState();
+        });
+
+        document.querySelector(".sample-row").addEventListener("click", (event) => {
+            const button = event.target.closest("[data-sample]");
+            if (!button) return;
+            setSample(button.dataset.sample);
+        });
+
+        els.topicInput.addEventListener("input", () => {
+            state.topic = els.topicInput.value.trim();
+            if (state.generated) renderOutput();
+            renderModes();
+            saveState();
+        });
+
+        els.topicResetBtn.addEventListener("click", () => {
+            state.topic = "제 이상형은";
+            renderAll();
+        });
+
+        els.topicPresetRow.addEventListener("click", (event) => {
+            const button = event.target.closest("[data-topic]");
+            if (!button) return;
+            state.topic = button.dataset.topic;
+            renderAll();
+        });
+
+        els.levelRow.addEventListener("click", (event) => {
+            const button = event.target.closest("[data-level]");
+            if (!button) return;
+            state.level = button.dataset.level;
+            renderAll();
+        });
+
+        els.selectionZone.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            els.selectionZone.classList.add("is-over");
+        });
+
+        els.selectionZone.addEventListener("dragleave", () => {
+            els.selectionZone.classList.remove("is-over");
+        });
+
+        els.selectionZone.addEventListener("drop", (event) => {
+            event.preventDefault();
+            els.selectionZone.classList.remove("is-over");
+            addCard(dragCardId(event));
+        });
+
+        els.selectedList.addEventListener("click", (event) => {
+            const button = event.target.closest("[data-action]");
+            if (!button) return;
+            const item = event.target.closest(".selected-item");
+            if (!item) return;
+            const id = item.dataset.id;
+            const action = button.dataset.action;
+            if (action === "remove") removeCard(id);
+            if (action === "up") moveCard(id, -1);
+            if (action === "down") moveCard(id, 1);
+            if (action === "focus") {
+                state.query = cardById.get(id)?.term || "";
+                els.searchInput.value = state.query;
+                state.category = "all";
+                renderAll();
+            }
+        });
+
+        els.generateBtn.addEventListener("click", () => {
+            if (!state.selectedIds.length) return;
+            state.generated = true;
+            renderAll();
+        });
+
+        els.clearBtn.addEventListener("click", () => {
+            state.selectedIds = [];
+            state.generated = false;
+            renderAll();
+        });
+
+        els.shuffleBtn.addEventListener("click", shuffleSelected);
+
+        els.copyBtn.addEventListener("click", copyResult);
+
+        els.outputBody.addEventListener("click", (event) => {
+            if (!event.target.closest("#copyTextBtn")) return;
+            copyResult();
+        });
+
+        loadState();
+        els.searchInput.value = state.query;
+        renderAll();
+    }());
+    </script>
+</body>
+</html>
