@@ -41,17 +41,32 @@
             box-sizing: border-box;
         }
 
+        html {
+            height: 100%;
+            overscroll-behavior: none;
+            -webkit-text-size-adjust: 100%;
+        }
+
         body {
             margin: 0;
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
             min-height: 100vh;
+            min-height: 100dvh;
             color: var(--ink);
             font-family: "Noto Sans KR", system-ui, sans-serif;
             background:
                 radial-gradient(circle at 12% 10%, rgba(251, 113, 133, 0.18), transparent 28%),
                 radial-gradient(circle at 92% 16%, rgba(56, 189, 248, 0.18), transparent 26%),
                 linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+            overscroll-behavior: none;
+            touch-action: manipulation;
+        }
+
+        button {
+            font: inherit;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .safe {
@@ -67,7 +82,7 @@
             align-items: center;
             gap: 8px;
             min-height: 46px;
-            padding: 0 12px;
+            padding: 0 max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
             border-bottom: 1px solid rgba(225, 29, 72, 0.18);
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
@@ -99,7 +114,11 @@
             width: min(1100px, 100%);
             height: calc(100dvh - 46px);
             margin: 0 auto;
-            padding: 12px 16px;
+            padding:
+                12px
+                max(16px, env(safe-area-inset-right))
+                max(12px, env(safe-area-inset-bottom))
+                max(16px, env(safe-area-inset-left));
             display: grid;
             grid-template-rows: auto auto auto minmax(0, 1fr);
             gap: 12px;
@@ -284,9 +303,15 @@
             color: var(--blue);
         }
 
+        .status-pill.is-warn {
+            border-color: rgba(180, 83, 9, 0.24);
+            background: var(--warn-soft);
+            color: var(--warn);
+        }
+
         .control-grid {
             display: grid;
-            grid-template-columns: repeat(6, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 8px;
         }
 
@@ -627,6 +652,7 @@
             padding: 2px 4px 2px 0;
             scroll-behavior: smooth;
             overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
         }
 
         .script-line {
@@ -806,6 +832,12 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
+            .control-grid .pair-btn--primary {
+                grid-column: 1 / -1;
+                min-height: 50px;
+                font-size: 14px;
+            }
+
             .side-row {
                 grid-template-columns: 1fr;
             }
@@ -914,7 +946,7 @@
             }
 
             .pair-btn {
-                min-height: 42px;
+                min-height: 44px;
                 padding: 0 9px;
                 font-size: 12px;
             }
@@ -953,10 +985,7 @@
             </div>
 
             <div class="control-grid">
-                <button id="prepareMicBtn" class="pair-btn pair-btn--green" type="button">
-                    <i class="fa-solid fa-shield-halved"></i>마이크 준비
-                </button>
-                <button id="startBtn" class="pair-btn pair-btn--primary" type="button" disabled>
+                <button id="startBtn" class="pair-btn pair-btn--primary" type="button">
                     <i class="fa-solid fa-play"></i>말하기 시작
                 </button>
                 <button id="pauseBtn" class="pair-btn pair-btn--warn" type="button" disabled>
@@ -975,7 +1004,7 @@
 
             <div id="actionHint" class="action-hint" data-mode="prepare">
                 <i class="fa-solid fa-bolt"></i>
-                먼저 <strong>마이크 준비</strong>를 눌러 주세요.
+                <strong>말하기 시작</strong>을 누르면 마이크 권한을 확인하고 바로 시작합니다.
             </div>
 
             <div class="side-row" aria-label="태블릿 좌우 역할 배정">
@@ -1017,7 +1046,7 @@
             <div class="live-grid">
                 <div class="live-box">
                     <p class="live-label">실시간 인식</p>
-                    <p id="liveTranscript" class="live-text safe">마이크를 준비한 뒤 말하기 시작을 누르세요.</p>
+                    <p id="liveTranscript" class="live-text safe">말하기 시작을 누르면 마이크 권한을 요청합니다.</p>
                 </div>
                 <div class="meter">
                     <p class="live-label">자동 판정 점수</p>
@@ -1067,7 +1096,6 @@
 
             const refs = {
                 micState: document.getElementById('micState'),
-                prepareMicBtn: document.getElementById('prepareMicBtn'),
                 startBtn: document.getElementById('startBtn'),
                 pauseBtn: document.getElementById('pauseBtn'),
                 prevBtn: document.getElementById('prevBtn'),
@@ -1100,13 +1128,15 @@
             const state = {
                 current: 0,
                 running: false,
+                starting: false,
                 micReady: false,
                 mediaStream: null,
                 recognition: null,
                 recognitionSerial: 0,
                 restartTimer: 0,
-                resultCursor: 0,
-                latestResultLength: 0,
+                finalParts: [],
+                finalPartKeys: [],
+                ignoreResultsUntil: 0,
                 finalText: '',
                 interimText: '',
                 lastResultAt: 0,
@@ -1126,17 +1156,17 @@
                 render();
                 if (!RecognitionClass) {
                     setMicState('음성 인식 미지원', 'warn');
+                    refs.startBtn.disabled = true;
                     refs.liveTranscript.textContent = '이 브라우저는 자동 음성 인식을 지원하지 않습니다. 수동 다음 버튼으로 프로토타입 흐름을 확인할 수 있어요.';
                 }
                 if (!canUseMic) {
-                    refs.prepareMicBtn.disabled = true;
+                    refs.startBtn.disabled = true;
                     refs.liveTranscript.textContent = '이 환경에서는 마이크 권한을 요청할 수 없습니다. localhost 또는 HTTPS에서 열어 주세요.';
                 }
                 window.addEventListener('beforeunload', cleanup);
             }
 
             function bindEvents() {
-                refs.prepareMicBtn.addEventListener('click', prepareMicrophone);
                 refs.startBtn.addEventListener('click', startConversation);
                 refs.pauseBtn.addEventListener('click', pauseConversation);
                 refs.prevBtn.addEventListener('click', previousLine);
@@ -1153,60 +1183,99 @@
                 render();
             }
 
-            async function prepareMicrophone() {
-                if (!canUseMic) {
-                    setFeedback('마이크를 사용할 수 없는 환경입니다.', 0);
-                    return;
+            function streamTracks(stream) {
+                if (!stream) {
+                    return [];
                 }
-
-                refs.prepareMicBtn.disabled = true;
-                setMicState('권한 요청 중', 'ready');
-
-                try {
-                    state.mediaStream = await navigator.mediaDevices.getUserMedia({
-                        audio: {
-                            echoCancellation: true,
-                            noiseSuppression: true,
-                            autoGainControl: true,
-                            channelCount: 1
-                        }
-                    });
-                    state.micReady = true;
-                    refs.startBtn.disabled = !RecognitionClass;
-                    refs.prepareMicBtn.innerHTML = '<i class="fa-solid fa-check"></i>마이크 준비됨';
-                    setMicState('마이크 준비됨', 'ready');
-                    updateActionHint();
-                    setFeedback(RecognitionClass
-                        ? '말하기 시작을 누르면 현재 문장부터 자동 판정합니다.'
-                        : '음성 인식은 지원되지 않지만, 수동 버튼으로 흐름을 확인할 수 있습니다.',
-                    0);
-                } catch (error) {
-                    refs.prepareMicBtn.disabled = false;
-                    setMicState('권한 필요', 'warn');
-                    setFeedback('마이크 권한을 받지 못했습니다. 브라우저 권한을 허용한 뒤 다시 눌러 주세요.', 0);
-                    console.error(error);
+                if (typeof stream.getAudioTracks === 'function') {
+                    return stream.getAudioTracks();
                 }
+                if (typeof stream.getTracks === 'function') {
+                    return stream.getTracks();
+                }
+                return [];
             }
 
-            function startConversation() {
-                if (!state.micReady || !RecognitionClass) {
-                    setFeedback('먼저 마이크 준비를 완료해 주세요.', 0);
+            function hasLiveMicrophone() {
+                return streamTracks(state.mediaStream).some((track) => track.readyState !== 'ended');
+            }
+
+            async function ensureMicrophoneReady() {
+                if (hasLiveMicrophone()) {
+                    state.micReady = true;
+                    return true;
+                }
+                if (!canUseMic) {
+                    throw new Error('microphone unavailable');
+                }
+
+                releaseMicrophone();
+                state.mediaStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                        channelCount: 1
+                    }
+                });
+                state.micReady = true;
+                streamTracks(state.mediaStream).forEach((track) => {
+                    track.onended = handleMicrophoneEnded;
+                });
+                return true;
+            }
+
+            async function startConversation() {
+                if (state.running || state.starting) {
+                    return;
+                }
+                if (!RecognitionClass) {
+                    setFeedback('이 브라우저는 자동 음성 인식을 지원하지 않습니다.', 0);
+                    return;
+                }
+                if (!canUseMic) {
+                    setFeedback('마이크 권한을 요청할 수 없는 환경입니다. localhost 또는 HTTPS에서 열어 주세요.', 0);
+                    return;
+                }
+                if (state.current >= lines.length) {
                     return;
                 }
 
-                state.running = true;
+                state.starting = true;
                 refs.startBtn.disabled = true;
-                refs.pauseBtn.disabled = false;
-                clearLineCapture();
-                startRecognition();
-                setMicState('듣는 중', 'running');
-                setFeedback('현재 문장을 말하고 잠깐 쉬면 자동으로 다음 문장을 판단합니다.', 0);
-                render();
+                refs.pauseBtn.disabled = true;
+                setMicState(state.micReady ? '마이크 확인 중' : '권한 요청 중', 'ready');
+                setFeedback('브라우저의 마이크 권한을 확인한 뒤 바로 대화를 시작합니다.', 0);
+                updateActionHint();
+
+                try {
+                    await ensureMicrophoneReady();
+                    state.running = true;
+                    clearLineCapture();
+                    startRecognition();
+                    refs.pauseBtn.disabled = false;
+                    setMicState('듣는 중', 'running');
+                    setFeedback('현재 문장을 말하고 잠깐 쉬면 자동으로 다음 문장을 판단합니다.', 0);
+                } catch (error) {
+                    state.running = false;
+                    state.micReady = false;
+                    refs.startBtn.disabled = !RecognitionClass || !canUseMic || state.current >= lines.length;
+                    refs.pauseBtn.disabled = true;
+                    setMicState('권한 필요', 'warn');
+                    setFeedback('마이크 권한을 받지 못했습니다. 권한을 허용한 뒤 말하기 시작을 다시 눌러 주세요.', 0);
+                    console.error(error);
+                } finally {
+                    state.starting = false;
+                    if (state.running) {
+                        refs.startBtn.disabled = true;
+                    }
+                    render();
+                }
             }
 
             function pauseConversation() {
                 state.running = false;
-                refs.startBtn.disabled = !state.micReady || !RecognitionClass || state.current >= lines.length;
+                refs.startBtn.disabled = !RecognitionClass || !canUseMic || state.current >= lines.length;
                 refs.pauseBtn.disabled = true;
                 stopRecognition();
                 setMicState(state.micReady ? '일시정지' : '마이크 대기', state.micReady ? 'ready' : '');
@@ -1224,8 +1293,6 @@
 
                 window.clearTimeout(state.restartTimer);
                 state.restartTimer = 0;
-                state.resultCursor = 0;
-                state.latestResultLength = 0;
                 state.recognitionSerial += 1;
                 const serial = state.recognitionSerial;
                 const recognition = new RecognitionClass();
@@ -1310,27 +1377,33 @@
 
                 let interim = '';
                 let finalChunk = '';
-                state.latestResultLength = Math.max(state.latestResultLength, event.results.length);
-                for (let index = Math.max(event.resultIndex || 0, state.resultCursor); index < event.results.length; index += 1) {
+                let hasNewFinal = false;
+                if (Date.now() < state.ignoreResultsUntil) {
+                    return;
+                }
+
+                for (let index = Math.max(event.resultIndex || 0, 0); index < event.results.length; index += 1) {
                     const phrase = String(event.results[index][0].transcript || '').trim();
                     if (!phrase) {
                         continue;
                     }
                     if (event.results[index].isFinal) {
-                        finalChunk += ' ' + phrase;
-                        state.resultCursor = Math.max(state.resultCursor, index + 1);
+                        const key = normalize(phrase);
+                        if (key && !state.finalPartKeys.includes(key)) {
+                            state.finalPartKeys.push(key);
+                            state.finalParts.push(phrase);
+                            hasNewFinal = true;
+                        }
                     } else {
                         interim += ' ' + phrase;
                     }
                 }
 
-                if (!finalChunk.trim() && !interim.trim()) {
+                if (!hasNewFinal && !interim.trim()) {
                     return;
                 }
 
-                if (finalChunk.trim()) {
-                    state.finalText = (state.finalText + ' ' + finalChunk.trim()).trim();
-                }
+                state.finalText = state.finalParts.join(' ').trim();
                 state.interimText = interim.trim();
                 state.lastResultAt = Date.now();
                 updateLiveTranscript();
@@ -1372,7 +1445,7 @@
                 window.setTimeout(function () {
                     if (state.running && state.current === retryIndex && state.statuses[retryIndex] === 'retry') {
                         state.statuses[retryIndex] = 'waiting';
-                        clearLineCapture();
+                        clearLineCapture({ ignoreStale: true });
                         renderScript();
                     }
                 }, 950);
@@ -1385,7 +1458,7 @@
                 state.heard[completedIndex] = spoken;
                 setFeedback('좋아요. 다음 문장으로 넘어갑니다.', score);
                 state.current = completedIndex + 1;
-                clearLineCapture();
+                clearLineCapture({ ignoreStale: true });
 
                 if (state.current >= lines.length) {
                     finishConversation();
@@ -1409,7 +1482,7 @@
                 }
                 state.statuses[state.current] = state.statuses[state.current] === 'done' ? 'done' : 'waiting';
                 state.current = Math.min(lines.length, state.current + 1);
-                clearLineCapture();
+                clearLineCapture({ ignoreStale: true });
                 if (state.current >= lines.length) {
                     finishConversation();
                     return;
@@ -1427,7 +1500,7 @@
                 state.statuses[state.current] = 'waiting';
                 state.scores[state.current] = null;
                 state.heard[state.current] = '';
-                clearLineCapture();
+                clearLineCapture({ ignoreStale: true });
                 setFeedback('이전 문장으로 돌아왔습니다.', 0);
                 render();
                 scrollCurrentLine();
@@ -1438,6 +1511,7 @@
                 refs.startBtn.disabled = true;
                 refs.pauseBtn.disabled = true;
                 stopRecognition();
+                releaseMicrophone();
                 setMicState('완료', 'ready');
                 const completed = state.statuses.filter((status) => status === 'done').length;
                 const validScores = state.scores.filter((score) => typeof score === 'number');
@@ -1459,7 +1533,7 @@
                 clearLineCapture();
                 stopRecognition();
                 refs.summaryPanel.classList.remove('is-visible');
-                refs.startBtn.disabled = !state.micReady || !RecognitionClass;
+                refs.startBtn.disabled = !RecognitionClass || !canUseMic;
                 refs.pauseBtn.disabled = true;
                 setMicState(state.micReady ? '마이크 준비됨' : '마이크 대기', state.micReady ? 'ready' : '');
                 setFeedback('처음 문장으로 돌아왔습니다.', 0);
@@ -1561,7 +1635,6 @@
             }
 
             function updateActionHint() {
-                refs.prepareMicBtn.classList.remove('is-next-action');
                 refs.startBtn.classList.remove('is-next-action');
 
                 if (state.current >= lines.length) {
@@ -1570,16 +1643,29 @@
                     return;
                 }
 
-                if (!state.micReady) {
+                if (state.starting) {
                     refs.actionHint.dataset.mode = 'prepare';
-                    refs.actionHint.innerHTML = '<i class="fa-solid fa-bolt"></i>먼저 <strong>마이크 준비</strong>를 눌러 주세요.';
-                    refs.prepareMicBtn.classList.add('is-next-action');
+                    refs.actionHint.innerHTML = '<i class="fa-solid fa-microphone-lines"></i>마이크 권한과 입력을 확인하고 있습니다.';
+                    return;
+                }
+
+                if (!RecognitionClass) {
+                    refs.actionHint.dataset.mode = 'prepare';
+                    refs.actionHint.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>이 브라우저는 자동 음성 인식을 지원하지 않습니다.';
+                    return;
+                }
+
+                if (!canUseMic) {
+                    refs.actionHint.dataset.mode = 'prepare';
+                    refs.actionHint.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>마이크 권한 요청은 localhost 또는 HTTPS에서 사용할 수 있습니다.';
                     return;
                 }
 
                 if (!state.running) {
                     refs.actionHint.dataset.mode = 'prepare';
-                    refs.actionHint.innerHTML = '<i class="fa-solid fa-play"></i>이제 <strong>말하기 시작</strong>을 눌러 대화를 시작하세요.';
+                    refs.actionHint.innerHTML = state.micReady
+                        ? '<i class="fa-solid fa-play"></i><strong>말하기 시작</strong>을 눌러 이어서 말하세요.'
+                        : '<i class="fa-solid fa-bolt"></i><strong>말하기 시작</strong>을 누르면 마이크 권한을 확인하고 바로 시작합니다.';
                     refs.startBtn.classList.add('is-next-action');
                     return;
                 }
@@ -1620,14 +1706,17 @@
                 renderScript();
             }
 
-            function clearLineCapture() {
+            function clearLineCapture(options) {
+                const opts = options || {};
                 window.clearTimeout(state.silenceTimer);
-                state.resultCursor = Math.max(state.resultCursor, state.latestResultLength);
+                state.ignoreResultsUntil = opts.ignoreStale ? Date.now() + 220 : 0;
+                state.finalParts = [];
+                state.finalPartKeys = [];
                 state.finalText = '';
                 state.interimText = '';
                 state.lastEvaluatedText = '';
                 state.lastResultAt = 0;
-                refs.liveTranscript.textContent = state.running ? '듣고 있습니다...' : '마이크를 준비한 뒤 말하기 시작을 누르세요.';
+                refs.liveTranscript.textContent = state.running ? '듣고 있습니다...' : '말하기 시작을 누르면 마이크 권한을 요청합니다.';
                 refs.scoreFill.style.width = '0%';
                 refs.currentScore.textContent = state.running ? '듣는 중' : '대기';
             }
@@ -1638,12 +1727,15 @@
             }
 
             function setMicState(text, tone) {
-                refs.micState.classList.remove('is-ready', 'is-running');
+                refs.micState.classList.remove('is-ready', 'is-running', 'is-warn');
                 if (tone === 'ready') {
                     refs.micState.classList.add('is-ready');
                 }
                 if (tone === 'running') {
                     refs.micState.classList.add('is-running');
+                }
+                if (tone === 'warn') {
+                    refs.micState.classList.add('is-warn');
                 }
                 refs.micState.innerHTML = '<i class="fa-solid fa-microphone"></i>' + escapeHtml(text);
             }
@@ -1738,13 +1830,43 @@
                 }, 80);
             }
 
+            function handleMicrophoneEnded() {
+                if (hasLiveMicrophone()) {
+                    return;
+                }
+                state.micReady = false;
+                if (state.running || state.starting) {
+                    state.running = false;
+                    state.starting = false;
+                    stopRecognition();
+                    refs.startBtn.disabled = !RecognitionClass || !canUseMic || state.current >= lines.length;
+                    refs.pauseBtn.disabled = true;
+                    setMicState('마이크 끊김', 'warn');
+                    setFeedback('마이크 연결이 끊겼습니다. 다시 시작하려면 말하기 시작을 눌러 주세요.', currentScore());
+                    render();
+                }
+                state.mediaStream = null;
+            }
+
+            function releaseMicrophone() {
+                if (!state.mediaStream) {
+                    state.micReady = false;
+                    return;
+                }
+                streamTracks(state.mediaStream).forEach(function (track) {
+                    track.onended = null;
+                    if (typeof track.stop === 'function') {
+                        track.stop();
+                    }
+                });
+                state.mediaStream = null;
+                state.micReady = false;
+            }
+
             function cleanup() {
                 state.running = false;
                 stopRecognition();
-                if (state.mediaStream) {
-                    state.mediaStream.getTracks().forEach((track) => track.stop());
-                    state.mediaStream = null;
-                }
+                releaseMicrophone();
             }
 
             function escapeHtml(text) {

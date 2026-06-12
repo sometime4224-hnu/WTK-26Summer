@@ -48,6 +48,7 @@
     const state = {
         idx: 0,
         isRecording: false,
+        isStartingRecording: false,
         recognition: null,
         mediaRecorder: null,
         mediaStream: null,
@@ -151,7 +152,7 @@
     }
 
     function renderSpeakerSelect() {
-        cleanupTransientState();
+        cleanupAll();
         config.items = originalItems;
         state.idx = 0;
         state.selectedSpeaker = '';
@@ -261,6 +262,7 @@
         updateProgress(isDone);
 
         if (isDone) {
+            cleanupMediaStream();
             refs.mainArea.innerHTML = '';
             renderSessionSummary();
             window.setTimeout(function () {
@@ -274,7 +276,7 @@
         const item = config.items[state.idx];
         refs.mainArea.innerHTML = buildSpeakerContextMarkup() + buildCompactItemMarkup(item, state.idx === total - 1);
         bindItemEvents();
-        updateStatus('마이크를 눌러 문장을 끝까지 따라 말해 보세요.', false);
+        updateStatus('말하기 버튼을 눌러 문장을 끝까지 따라 말해 보세요.', false);
         window.setTimeout(function () {
             focusGuideStage('listen');
         }, 60);
@@ -325,7 +327,7 @@
             '    </div>',
             '    <div id="statusBox" class="sp-status-box">',
             '      <p class="sp-bubble-label">말하기 상태</p>',
-            '      <p id="statusText" class="text-sm font-semibold text-slate-700 safe m-0">마이크를 눌러 문장을 끝까지 따라 말해 보세요.</p>',
+            '      <p id="statusText" class="text-sm font-semibold text-slate-700 safe m-0">말하기 버튼을 눌러 문장을 끝까지 따라 말해 보세요.</p>',
             '    </div>',
             '    <div id="recordArea" class="rounded-[20px] border border-slate-200 bg-white p-4">',
             '      <div class="flex items-center gap-4">',
@@ -390,7 +392,7 @@
             '    <div id="recordArea" class="sp-record-area">',
             '      <div id="statusBox" class="sp-status-box">',
             '        <p class="sp-bubble-label">말하기 상태</p>',
-            '        <p id="statusText" class="sp-status-text safe m-0">마이크를 눌러 문장을 끝까지 따라 말해 보세요.</p>',
+            '        <p id="statusText" class="sp-status-text safe m-0">말하기 버튼을 눌러 문장을 끝까지 따라 말해 보세요.</p>',
             '      </div>',
             '      <div class="sp-record-main flex items-center gap-3">',
             '        <button id="recordBtn" class="sp-btn sp-record-button" type="button" aria-label="말하기 시작">',
@@ -523,11 +525,53 @@
     }
 
     function toggleRecording() {
+        if (state.isStartingRecording) {
+            return;
+        }
         if (state.isRecording) {
             stopRecording();
             return;
         }
         startRecording();
+    }
+
+    function streamTracks(stream) {
+        if (!stream) {
+            return [];
+        }
+        if (typeof stream.getAudioTracks === 'function') {
+            return stream.getAudioTracks();
+        }
+        if (typeof stream.getTracks === 'function') {
+            return stream.getTracks();
+        }
+        return [];
+    }
+
+    function hasLiveMicrophone() {
+        return streamTracks(state.mediaStream).some(function (track) {
+            return track.readyState !== 'ended';
+        });
+    }
+
+    async function ensureMediaStream() {
+        if (hasLiveMicrophone()) {
+            return state.mediaStream;
+        }
+
+        cleanupMediaStream();
+        state.mediaStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
+                channelCount: 1
+            }
+        });
+        streamTracks(state.mediaStream).forEach(function (track) {
+            track.onended = handleMicrophoneEnded;
+        });
+        return state.mediaStream;
     }
 
     async function startRecording() {
@@ -541,20 +585,24 @@
         window.speechSynthesis?.cancel();
 
         try {
-            state.mediaStream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    autoGainControl: true,
-                    channelCount: 1
-                }
-            });
+            state.isStartingRecording = true;
+            updateRecordButton(false, true);
+            updateStatus(
+                hasLiveMicrophone()
+                    ? '마이크 입력을 확인하고 있어요.'
+                    : '마이크 권한을 확인하고 있어요. 허용하면 바로 녹음이 시작됩니다.',
+                false
+            );
+            state.mediaStream = await ensureMediaStream();
         } catch (error) {
+            state.isStartingRecording = false;
+            updateRecordButton(false, false);
             updateStatus('마이크를 시작하지 못했어요. 브라우저 권한을 확인해 주세요.', false);
             console.error(error);
             return;
         }
 
+        state.isStartingRecording = false;
         state.audioChunks = [];
         state.recordingItemId = getCurrentItem() ? getCurrentItem().id : '';
         state.liveTranscript = '';
@@ -566,7 +614,8 @@
                 ? new MediaRecorder(state.mediaStream, { mimeType: mimeType })
                 : new MediaRecorder(state.mediaStream);
         } catch (error) {
-            cleanupMediaStream();
+            state.mediaRecorder = null;
+            updateRecordButton(false, false);
             updateStatus('이 브라우저에서는 녹음 형식을 준비하지 못했어요.', false);
             console.error(error);
             return;
@@ -607,8 +656,6 @@
                 console.error(error);
             }
         }
-
-        cleanupMediaStream();
 
         const transcript = (state.finalTranscript || state.liveTranscript || '').trim();
         if (!transcript) {
@@ -865,8 +912,9 @@
             return;
         }
         recordBtn.classList.toggle('is-recording', !!recording);
-        recordBtnText.textContent = recording ? '정지' : '말하기';
-        recordBtn.setAttribute('aria-label', recording ? '말하기 정지' : '말하기 시작');
+        recordBtn.disabled = !!state.isStartingRecording;
+        recordBtnText.textContent = state.isStartingRecording ? '준비' : (recording ? '정지' : '말하기');
+        recordBtn.setAttribute('aria-label', state.isStartingRecording ? '마이크 준비 중' : (recording ? '말하기 정지' : '말하기 시작'));
     }
 
     function applyRecordedAudio() {
@@ -914,7 +962,8 @@
 
     function cleanupMediaStream() {
         if (state.mediaStream) {
-            state.mediaStream.getTracks().forEach(function (track) {
+            streamTracks(state.mediaStream).forEach(function (track) {
+                track.onended = null;
                 track.stop();
             });
             state.mediaStream = null;
@@ -923,7 +972,6 @@
 
     function cleanupTransientState() {
         stopRecognition();
-        cleanupMediaStream();
         if (state.mediaRecorder && state.mediaRecorder.state !== 'inactive') {
             try {
                 state.mediaRecorder.stop();
@@ -933,14 +981,39 @@
         }
         state.mediaRecorder = null;
         state.isRecording = false;
+        state.isStartingRecording = false;
         state.recordingItemId = '';
         clearAudioPlayer();
     }
 
     function cleanupAll() {
         cleanupTransientState();
+        cleanupMediaStream();
         state.speechRequestId += 1;
         window.speechSynthesis?.cancel();
+    }
+
+    function handleMicrophoneEnded() {
+        if (hasLiveMicrophone()) {
+            return;
+        }
+        if (state.isRecording || state.isStartingRecording) {
+            state.isRecording = false;
+            state.isStartingRecording = false;
+            stopRecognition();
+            if (state.mediaRecorder && state.mediaRecorder.state !== 'inactive') {
+                try {
+                    state.mediaRecorder.stop();
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+            state.mediaRecorder = null;
+            updateRecordButton(false, false);
+            updateStatus('마이크 연결이 끊겼어요. 말하기 버튼을 다시 눌러 주세요.', false);
+            focusGuideStage('record-ready');
+        }
+        state.mediaStream = null;
     }
 
     function focusGuideStage(stageKey, options) {

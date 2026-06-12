@@ -27,15 +27,22 @@
     box-sizing: border-box;
 }
 
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
 body.speaking-pro-page {
     margin: 0;
     min-height: 100vh;
+    min-height: 100dvh;
     color: var(--sp-text);
     font-family: "Noto Sans KR", sans-serif;
     background:
         radial-gradient(circle at top left, rgba(125, 211, 252, 0.22), transparent 24%),
         radial-gradient(circle at top right, rgba(251, 191, 36, 0.18), transparent 24%),
         linear-gradient(180deg, var(--sp-bg-top) 0%, var(--sp-bg-bottom) 100%);
+    overscroll-behavior-y: contain;
+    touch-action: manipulation;
 }
 
 .safe {
@@ -51,7 +58,7 @@ body.speaking-pro-page {
     align-items: center;
     gap: 8px;
     min-height: 46px;
-    padding: 0 10px;
+    padding: 0 max(10px, env(safe-area-inset-right)) 0 max(10px, env(safe-area-inset-left));
     background: rgba(255, 255, 255, 0.9);
     border-bottom: 1px solid var(--sp-accent-border);
     backdrop-filter: blur(10px);
@@ -105,7 +112,7 @@ body.speaking-pro-page {
     .sp-nav {
         gap: 6px;
         min-height: 42px;
-        padding: 0 8px;
+        padding: 0 max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left));
     }
 
     .sp-nav a,
@@ -498,6 +505,7 @@ body.speaking-pro-page {
     border: 0;
     cursor: pointer;
     font: inherit;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .sp-inline-btn {
@@ -591,6 +599,12 @@ body.speaking-pro-page {
 .sp-record-button.is-recording {
     background: linear-gradient(135deg, #ef4444, #fb7185);
     box-shadow: 0 14px 26px rgba(244, 63, 94, 0.24);
+}
+
+.sp-record-button:disabled {
+    opacity: 0.78;
+    cursor: wait;
+    background: linear-gradient(135deg, #64748b, #475569);
 }
 
 .sp-record-button.is-recording::before {
@@ -1028,6 +1042,7 @@ body.speaking-pro-page {
     max-width: 480px;
     max-height: 80vh;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     border-radius: 24px;
     background: #ffffff;
     box-shadow: 0 22px 60px rgba(15, 23, 42, 0.24);
