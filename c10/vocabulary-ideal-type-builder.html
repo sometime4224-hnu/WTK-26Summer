@@ -170,9 +170,25 @@
 
         .main-layout {
             display: grid;
-            grid-template-columns: minmax(300px, 0.84fr) minmax(380px, 1.04fr) minmax(360px, 0.95fr);
+            grid-template-columns: minmax(320px, 0.92fr) minmax(430px, 1.08fr);
             gap: 12px;
             align-items: start;
+        }
+
+        .main-layout.is-generated {
+            grid-template-columns: minmax(430px, 0.96fr) minmax(430px, 1.04fr);
+        }
+
+        .main-layout.is-generated .bank-panel {
+            display: none;
+        }
+
+        .output-panel {
+            display: none;
+        }
+
+        .main-layout.is-generated .output-panel {
+            display: block;
         }
 
         .panel {
@@ -202,6 +218,14 @@
 
         .panel-title i {
             color: var(--orange);
+        }
+
+        .panel-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 7px;
+            flex-wrap: wrap;
         }
 
         .panel-count {
@@ -380,6 +404,11 @@
             background: linear-gradient(180deg, #ffffff 0%, #ecfdf5 100%);
         }
 
+        .vocab-card.is-not-important {
+            border-color: #fda4af;
+            background: linear-gradient(180deg, #ffffff 0%, #fff1f2 100%);
+        }
+
         .vocab-card__image {
             position: relative;
             overflow: hidden;
@@ -525,7 +554,7 @@
         }
 
         .selection-zone {
-            min-height: 276px;
+            min-height: 182px;
             border: 2px dashed #cbd5e1;
             border-radius: 8px;
             background: #ffffff;
@@ -537,6 +566,62 @@
             background: #ecfdf5;
         }
 
+        .selection-zone--not-important.is-over {
+            border-color: #fb7185;
+            background: #fff1f2;
+        }
+
+        .selection-board {
+            display: grid;
+            gap: 10px;
+        }
+
+        .zone-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            min-height: 42px;
+            padding: 8px 10px;
+            border-bottom: 1px solid #e8eef6;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .zone-head strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .zone-head i {
+            color: var(--teal);
+        }
+
+        .selection-zone--not-important .zone-head i {
+            color: var(--rose);
+        }
+
+        .zone-count {
+            display: inline-grid;
+            place-items: center;
+            min-width: 30px;
+            height: 26px;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .selection-zone--not-important .zone-count {
+            border-color: #fecdd3;
+            background: #fff1f2;
+            color: var(--rose);
+        }
+
         .selected-list {
             display: grid;
             gap: 8px;
@@ -546,7 +631,7 @@
         .empty-state {
             display: grid;
             place-items: center;
-            min-height: 236px;
+            min-height: 118px;
             padding: 18px;
             color: #64748b;
             text-align: center;
@@ -624,7 +709,7 @@
 
         .selected-actions {
             display: grid;
-            grid-template-columns: repeat(2, 34px);
+            grid-template-columns: repeat(5, 34px);
             gap: 5px;
         }
 
@@ -780,12 +865,9 @@
                 grid-template-columns: 1fr;
             }
 
-            .main-layout {
+            .main-layout,
+            .main-layout.is-generated {
                 grid-template-columns: minmax(300px, 0.9fr) minmax(360px, 1.1fr);
-            }
-
-            .output-panel {
-                grid-column: 1 / -1;
             }
 
             .card-grid {
@@ -811,7 +893,8 @@
                 grid-template-columns: 1fr;
             }
 
-            .main-layout {
+            .main-layout,
+            .main-layout.is-generated {
                 grid-template-columns: 1fr;
             }
 
@@ -837,7 +920,7 @@
 
             .selected-actions {
                 grid-column: 1 / -1;
-                grid-template-columns: repeat(4, minmax(0, 1fr));
+                grid-template-columns: repeat(5, minmax(0, 1fr));
             }
 
             .selected-actions .icon-btn {
@@ -878,7 +961,7 @@
                     <span>선택한 조건</span>
                 </div>
                 <div class="metric">
-                    <strong id="cardMetric">33</strong>
+                    <strong id="cardMetric">41</strong>
                     <span>어휘 카드</span>
                 </div>
                 <div class="metric">
@@ -888,11 +971,11 @@
             </section>
         </header>
 
-        <section class="main-layout">
+        <section class="main-layout" id="mainLayout">
             <article class="panel bank-panel" aria-labelledby="bankTitle">
                 <div class="panel-head">
                     <div class="panel-title" id="bankTitle"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> 어휘 카드</div>
-                    <span class="panel-count" id="visibleCardCount">33</span>
+                    <span class="panel-count" id="visibleCardCount">41</span>
                 </div>
                 <div class="bank-tools">
                     <label class="search" for="searchInput">
@@ -905,6 +988,7 @@
                         <button class="sample-btn" type="button" data-sample="spark"><i class="fa-solid fa-bolt" aria-hidden="true"></i> 설레는 사람</button>
                         <button class="sample-btn" type="button" data-sample="future"><i class="fa-solid fa-ring" aria-hidden="true"></i> 진지한 관계</button>
                         <button class="sample-btn" type="button" data-sample="basic"><i class="fa-solid fa-star" aria-hidden="true"></i> 초급 형용사</button>
+                        <button class="sample-btn" type="button" data-sample="condition"><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i> 조건 나누기</button>
                     </div>
                 </div>
                 <div class="card-grid" id="cardGrid" aria-live="polite"></div>
@@ -937,8 +1021,21 @@
                         </div>
                     </section>
 
-                    <section class="selection-zone" id="selectionZone" aria-label="선택한 어휘 조건">
-                        <div class="selected-list" id="selectedList"></div>
+                    <section class="selection-board" id="selectionBoard" aria-label="선택한 어휘 조건">
+                        <section class="selection-zone selection-zone--important" data-bucket="important" aria-label="중요한 조건">
+                            <div class="zone-head">
+                                <strong><i class="fa-solid fa-circle-check" aria-hidden="true"></i> 중요해요</strong>
+                                <span class="zone-count" id="importantCount">0</span>
+                            </div>
+                            <div class="selected-list" id="importantList"></div>
+                        </section>
+                        <section class="selection-zone selection-zone--not-important" data-bucket="notImportant" aria-label="중요하지 않은 조건">
+                            <div class="zone-head">
+                                <strong><i class="fa-solid fa-circle-minus" aria-hidden="true"></i> 안 중요해요</strong>
+                                <span class="zone-count" id="notImportantCount">0</span>
+                            </div>
+                            <div class="selected-list" id="notImportantList"></div>
+                        </section>
                     </section>
 
                     <div class="build-actions">
@@ -952,7 +1049,10 @@
             <article class="panel output-panel" aria-labelledby="outputTitle">
                 <div class="panel-head">
                     <div class="panel-title" id="outputTitle"><i class="fa-solid fa-file-lines" aria-hidden="true"></i> 문장 결과</div>
-                    <button class="icon-btn" id="copyBtn" type="button" title="결과 복사" aria-label="결과 복사" disabled><i class="fa-solid fa-copy" aria-hidden="true"></i></button>
+                    <div class="panel-actions">
+                        <button class="text-btn" id="editCardsBtn" type="button"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> 카드 더 고르기</button>
+                        <button class="icon-btn" id="copyBtn" type="button" title="결과 복사" aria-label="결과 복사" disabled><i class="fa-solid fa-copy" aria-hidden="true"></i></button>
+                    </div>
                 </div>
                 <div class="output-body" id="outputBody"></div>
             </article>
@@ -967,6 +1067,7 @@
         const CATEGORIES = [
             { id: "all", label: "전체" },
             { id: "match", label: "조건·인상" },
+            { id: "condition", label: "조건" },
             { id: "basic", label: "기본 형용사" },
             { id: "feeling", label: "호감·감정" },
             { id: "relationship", label: "연애" },
@@ -1305,6 +1406,94 @@
                 chain: "밝고",
                 beginnerSentence: "그 사람은 밝습니다.",
                 intermediateSentence: "밝은 에너지로 주변 사람을 편하게 해 주는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-condition-01",
+                term: "돈이 많다",
+                category: "condition",
+                emoji: "💰",
+                descriptor: "돈이 많은",
+                chain: "돈이 많고",
+                nominal: "돈이 많은 것",
+                beginnerSentence: "그 사람은 돈이 많습니다.",
+                intermediateSentence: "경제적으로 여유가 있는 사람이면 생활이 안정적일 것 같습니다."
+            },
+            {
+                id: "c10-condition-02",
+                term: "돈이 적다",
+                category: "condition",
+                emoji: "🪙",
+                descriptor: "돈이 적은",
+                chain: "돈이 적어도 괜찮고",
+                nominal: "돈이 적은 것",
+                beginnerSentence: "그 사람은 돈이 적습니다.",
+                intermediateSentence: "돈이 적어도 성실하게 생활하는 사람이라면 괜찮다고 생각합니다."
+            },
+            {
+                id: "c10-condition-03",
+                term: "집이 크다",
+                category: "condition",
+                emoji: "🏠",
+                descriptor: "집이 큰",
+                chain: "집이 크고",
+                nominal: "집이 큰 것",
+                beginnerSentence: "그 사람은 집이 큽니다.",
+                intermediateSentence: "집이 크면 편하겠지만 생활 태도가 더 중요할 수도 있습니다."
+            },
+            {
+                id: "c10-condition-04",
+                term: "집이 작다",
+                category: "condition",
+                emoji: "🏡",
+                descriptor: "집이 작은",
+                chain: "집이 작아도 괜찮고",
+                nominal: "집이 작은 것",
+                beginnerSentence: "그 사람은 집이 작습니다.",
+                intermediateSentence: "집이 작아도 서로 배려하며 살 수 있으면 괜찮다고 생각합니다."
+            },
+            {
+                id: "c10-condition-05",
+                term: "직업이 좋다",
+                category: "condition",
+                emoji: "💼",
+                descriptor: "직업이 좋은",
+                chain: "직업이 좋고",
+                nominal: "직업이 좋은 것",
+                beginnerSentence: "그 사람은 직업이 좋습니다.",
+                intermediateSentence: "직업이 안정적이고 자기 일을 좋아하는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-condition-06",
+                term: "직업이 나쁘다",
+                category: "condition",
+                emoji: "🧰",
+                descriptor: "직업이 나쁜",
+                chain: "직업이 나빠도 괜찮고",
+                nominal: "직업이 나쁜 것",
+                beginnerSentence: "그 사람은 직업이 나쁩니다.",
+                intermediateSentence: "직업이 좋아 보이지 않아도 책임감 있게 일하는 사람이라면 괜찮습니다."
+            },
+            {
+                id: "c10-condition-07",
+                term: "건강하다",
+                category: "condition",
+                emoji: "💪",
+                descriptor: "건강한",
+                chain: "건강하고",
+                nominal: "건강한 것",
+                beginnerSentence: "그 사람은 건강합니다.",
+                intermediateSentence: "건강해서 함께 여러 활동을 즐길 수 있는 사람이면 좋겠습니다."
+            },
+            {
+                id: "c10-condition-08",
+                term: "안 건강하다",
+                category: "condition",
+                emoji: "🩹",
+                descriptor: "건강하지 않은",
+                chain: "건강하지 않아도 괜찮고",
+                nominal: "건강하지 않은 것",
+                beginnerSentence: "그 사람은 건강하지 않습니다.",
+                intermediateSentence: "건강하지 않아도 서로를 이해하고 도와줄 수 있으면 괜찮다고 생각합니다."
             }
         ];
 
@@ -1312,13 +1501,18 @@
             warm: ["c10-vocab-04", "c10-vocab-05", "c10-vocab-09", "c10-vocab-16"],
             spark: ["c10-vocab-18", "c10-vocab-06", "c10-vocab-02", "c10-vocab-01"],
             future: ["c10-vocab-15", "c10-vocab-17", "c10-vocab-20", "c10-vocab-23"],
-            basic: ["c10-basic-01", "c10-basic-02", "c10-basic-03", "c10-basic-04"]
+            basic: ["c10-basic-01", "c10-basic-02", "c10-basic-03", "c10-basic-04"],
+            condition: {
+                important: ["c10-condition-01", "c10-condition-05", "c10-condition-07"],
+                notImportant: ["c10-condition-03", "c10-condition-04"]
+            }
         };
 
         const cardById = new Map(CARDS.map((card) => [card.id, card]));
 
         const state = {
-            selectedIds: [],
+            importantIds: [],
+            notImportantIds: [],
             category: "all",
             query: "",
             level: "beginner",
@@ -1327,6 +1521,7 @@
         };
 
         const els = {
+            mainLayout: document.getElementById("mainLayout"),
             selectedMetric: document.getElementById("selectedMetric"),
             cardMetric: document.getElementById("cardMetric"),
             levelMetric: document.getElementById("levelMetric"),
@@ -1338,13 +1533,17 @@
             topicResetBtn: document.getElementById("topicResetBtn"),
             topicPresetRow: document.getElementById("topicPresetRow"),
             levelRow: document.getElementById("levelRow"),
-            selectionZone: document.getElementById("selectionZone"),
-            selectedList: document.getElementById("selectedList"),
+            selectionBoard: document.getElementById("selectionBoard"),
+            importantList: document.getElementById("importantList"),
+            notImportantList: document.getElementById("notImportantList"),
+            importantCount: document.getElementById("importantCount"),
+            notImportantCount: document.getElementById("notImportantCount"),
             selectedCount: document.getElementById("selectedCount"),
             generateBtn: document.getElementById("generateBtn"),
             clearBtn: document.getElementById("clearBtn"),
             shuffleBtn: document.getElementById("shuffleBtn"),
             outputBody: document.getElementById("outputBody"),
+            editCardsBtn: document.getElementById("editCardsBtn"),
             copyBtn: document.getElementById("copyBtn")
         };
 
@@ -1379,7 +1578,8 @@
         function saveState() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({
-                    selectedIds: state.selectedIds,
+                    importantIds: state.importantIds,
+                    notImportantIds: state.notImportantIds,
                     category: state.category,
                     query: state.query,
                     level: state.level,
@@ -1395,16 +1595,20 @@
         function loadState() {
             try {
                 const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-                if (Array.isArray(saved.selectedIds)) {
-                    state.selectedIds = saved.selectedIds.filter((id) => cardById.has(id));
+                if (Array.isArray(saved.importantIds) || Array.isArray(saved.notImportantIds)) {
+                    state.importantIds = uniqueValidIds(saved.importantIds || []);
+                    state.notImportantIds = uniqueValidIds(saved.notImportantIds || []).filter((id) => !state.importantIds.includes(id));
+                } else if (Array.isArray(saved.selectedIds)) {
+                    state.importantIds = uniqueValidIds(saved.selectedIds);
                 }
                 if (CATEGORIES.some((category) => category.id === saved.category)) state.category = saved.category;
                 if (typeof saved.query === "string") state.query = saved.query;
                 if (saved.level === "beginner" || saved.level === "intermediate") state.level = saved.level;
                 if (typeof saved.topic === "string" && saved.topic.trim()) state.topic = saved.topic.trim();
-                state.generated = Boolean(saved.generated && state.selectedIds.length);
+                state.generated = Boolean(saved.generated && totalSelectedCount());
             } catch (error) {
-                state.selectedIds = [];
+                state.importantIds = [];
+                state.notImportantIds = [];
             }
         }
 
@@ -1423,8 +1627,63 @@
             return `${topic}${hasBatchim(topic) ? "은" : "는"}`;
         }
 
+        function subjectParticle(text) {
+            return hasBatchim(text) ? "은" : "는";
+        }
+
+        function objectParticle(text) {
+            return hasBatchim(text) ? "을" : "를";
+        }
+
+        function uniqueValidIds(ids) {
+            const seen = new Set();
+            return (Array.isArray(ids) ? ids : []).filter((id) => {
+                if (!cardById.has(id) || seen.has(id)) return false;
+                seen.add(id);
+                return true;
+            });
+        }
+
+        function bucketIds(bucket) {
+            return bucket === "notImportant" ? state.notImportantIds : state.importantIds;
+        }
+
+        function setBucketIds(bucket, ids) {
+            if (bucket === "notImportant") {
+                state.notImportantIds = uniqueValidIds(ids);
+            } else {
+                state.importantIds = uniqueValidIds(ids);
+            }
+        }
+
+        function cardBucket(id) {
+            if (state.importantIds.includes(id)) return "important";
+            if (state.notImportantIds.includes(id)) return "notImportant";
+            return "";
+        }
+
+        function totalSelectedCount() {
+            return state.importantIds.length + state.notImportantIds.length;
+        }
+
+        function cardsFromIds(ids) {
+            return ids.map((id) => cardById.get(id)).filter(Boolean);
+        }
+
+        function importantCards() {
+            return cardsFromIds(state.importantIds);
+        }
+
+        function notImportantCards() {
+            return cardsFromIds(state.notImportantIds);
+        }
+
         function selectedCards() {
-            return state.selectedIds.map((id) => cardById.get(id)).filter(Boolean);
+            return [...importantCards(), ...notImportantCards()];
+        }
+
+        function conditionNoun(card) {
+            return card.nominal || `${card.descriptor} 것`;
         }
 
         function buildIntro(cards) {
@@ -1439,24 +1698,68 @@
             return `${topic} ${chains.join(" ")} ${last}${extra} 사람입니다.`;
         }
 
-        function buildSentences(cards) {
-            const intro = buildIntro(cards);
-            const body = cards.map((card) => {
-                return state.level === "beginner" ? card.beginnerSentence : card.intermediateSentence;
-            });
-            const closing = state.level === "beginner"
-                ? "이런 사람과 함께 있으면 편하고 행복할 것 같습니다."
-                : "이런 조건이 잘 맞으면 서로를 존중하면서 오래 좋은 관계를 만들 수 있을 것 같습니다.";
-            return [intro, ...body, closing];
+        function buildImportanceSentence(card, isImportant) {
+            const noun = conditionNoun(card);
+            if (state.level === "beginner") {
+                return isImportant
+                    ? `저는 ${noun}${objectParticle(noun)} 중요하게 생각합니다.`
+                    : `저는 ${noun}${objectParticle(noun)} 중요하게 생각하지 않습니다.`;
+            }
+
+            return isImportant
+                ? `${noun}${subjectParticle(noun)} 제 이상형에서 중요한 조건입니다.`
+                : `${noun}${subjectParticle(noun)} 있으면 좋지만 꼭 중요하지는 않습니다.`;
         }
 
-        function buildParagraph(cards) {
-            const sentences = buildSentences(cards);
+        function buildNotImportantIntro(cards) {
+            if (!cards.length) return "";
+            if (cards.length === 1) {
+                const noun = conditionNoun(cards[0]);
+                return state.level === "beginner"
+                    ? `하지만 ${noun}${subjectParticle(noun)} 안 중요합니다.`
+                    : `반대로 ${noun}${subjectParticle(noun)} 크게 중요하게 보지 않습니다.`;
+            }
+
+            const nouns = cards.slice(0, 4).map(conditionNoun);
+            const last = nouns.pop();
+            const list = nouns.length ? `${nouns.join(", ")} 그리고 ${last}` : last;
+            const extra = cards.length > 4 ? " 같은 조건" : "";
+            return state.level === "beginner"
+                ? `하지만 ${list}${extra}${subjectParticle(`${list}${extra}`)} 안 중요합니다.`
+                : `반대로 ${list}${extra}${subjectParticle(`${list}${extra}`)} 크게 중요하게 보지 않습니다.`;
+        }
+
+        function buildSentences() {
+            const important = importantCards();
+            const notImportant = notImportantCards();
+            const sentences = [];
+
+            if (important.length) {
+                sentences.push(buildIntro(important));
+                sentences.push(...important.map((card) => buildImportanceSentence(card, true)));
+            } else {
+                sentences.push(`${topicWithParticle()} 꼭 정해진 조건이 많은 사람은 아닙니다.`);
+            }
+
+            if (notImportant.length) {
+                sentences.push(buildNotImportantIntro(notImportant));
+                sentences.push(...notImportant.map((card) => buildImportanceSentence(card, false)));
+            }
+
+            const closing = state.level === "beginner"
+                ? "중요한 조건은 보고, 중요하지 않은 조건은 너무 많이 따지지 않습니다."
+                : "중요한 조건은 분명히 보되, 중요하지 않은 조건은 너무 따지지 않고 서로를 존중하는 관계를 만들고 싶습니다.";
+            return [...sentences, closing];
+        }
+
+        function buildParagraph() {
+            const sentences = buildSentences();
             if (state.level === "beginner") return sentences.join(" ");
             const [intro, ...rest] = sentences;
             const linked = rest.map((sentence, index) => {
+                if (sentence.startsWith("반대로")) return sentence;
                 if (index === 0) return `특히 ${sentence}`;
-                if (index === 1) return `또 ${sentence}`;
+                if (sentence.includes("중요하지는 않습니다.")) return `한편 ${sentence}`;
                 if (index === rest.length - 1) return sentence;
                 return `그리고 ${sentence}`;
             });
@@ -1488,9 +1791,11 @@
             const visible = filteredCards();
             els.visibleCardCount.textContent = String(visible.length);
             els.cardGrid.innerHTML = visible.map((card) => {
-                const selected = state.selectedIds.includes(card.id);
+                const bucket = cardBucket(card.id);
+                const selected = Boolean(bucket);
+                const bucketClass = bucket === "notImportant" ? " is-not-important" : "";
                 return `
-                    <button class="vocab-card${selected ? " is-selected" : ""}" type="button" data-id="${card.id}" draggable="true" aria-pressed="${selected}" aria-label="${escapeHtml(card.term)} 조건 ${selected ? "제거" : "추가"}">
+                    <button class="vocab-card${selected ? " is-selected" : ""}${bucketClass}" type="button" data-id="${card.id}" draggable="true" aria-pressed="${selected}" aria-label="${escapeHtml(card.term)} 조건 ${selected ? "제거" : "중요해요에 추가"}">
                         ${cardVisual(card, "vocab-card__image", `<span class="selected-mark" aria-hidden="true"><i class="fa-solid fa-check"></i></span>`)}
                         <span class="vocab-card__body">
                             <span class="term-row">
@@ -1516,27 +1821,46 @@
         }
 
         function renderSelection() {
-            const cards = selectedCards();
-            els.selectedCount.textContent = String(cards.length);
-            els.selectedMetric.textContent = String(cards.length);
-            els.generateBtn.disabled = cards.length === 0;
-            els.clearBtn.disabled = cards.length === 0;
-            els.shuffleBtn.disabled = cards.length < 2;
+            const important = importantCards();
+            const notImportant = notImportantCards();
+            const total = important.length + notImportant.length;
+            els.selectedCount.textContent = String(total);
+            els.selectedMetric.textContent = String(total);
+            els.importantCount.textContent = String(important.length);
+            els.notImportantCount.textContent = String(notImportant.length);
+            els.generateBtn.disabled = total === 0;
+            els.clearBtn.disabled = total === 0;
+            els.shuffleBtn.disabled = total < 2;
+            els.generateBtn.innerHTML = state.generated
+                ? `<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> 다시 만들기`
+                : `<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> 문장 만들기`;
+
+            renderBucketList("important", important, els.importantList);
+            renderBucketList("notImportant", notImportant, els.notImportantList);
+        }
+
+        function renderBucketList(bucket, cards, target) {
+            const emptyTitle = bucket === "important" ? "중요한 조건 없음" : "안 중요한 조건 없음";
+            const emptyText = bucket === "important"
+                ? "이상형에서 꼭 보고 싶은 조건을 넣으세요."
+                : "크게 따지지 않을 조건을 넣으세요.";
+            const moveLabel = bucket === "important" ? "안 중요해요로 이동" : "중요해요로 이동";
+            const moveIcon = bucket === "important" ? "fa-circle-minus" : "fa-circle-check";
 
             if (!cards.length) {
-                els.selectedList.innerHTML = `
+                target.innerHTML = `
                     <div class="empty-state">
                         <div>
-                            <strong>조건 없음</strong>
-                            <span>이상형 조건으로 사용할 어휘가 여기에 모입니다.</span>
+                            <strong>${emptyTitle}</strong>
+                            <span>${emptyText}</span>
                         </div>
                     </div>
                 `;
                 return;
             }
 
-            els.selectedList.innerHTML = cards.map((card, index) => `
-                <article class="selected-item" data-id="${card.id}">
+            target.innerHTML = cards.map((card, index) => `
+                <article class="selected-item" data-id="${card.id}" data-bucket="${bucket}">
                     ${cardVisual(card, "selected-thumb")}
                     <span class="selected-main">
                         <strong>${index + 1}. ${escapeHtml(card.term)}</strong>
@@ -1545,6 +1869,7 @@
                     <span class="selected-actions">
                         <button class="icon-btn" type="button" data-action="up" title="위로" aria-label="${escapeHtml(card.term)} 위로 이동" ${index === 0 ? "disabled" : ""}><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
                         <button class="icon-btn" type="button" data-action="down" title="아래로" aria-label="${escapeHtml(card.term)} 아래로 이동" ${index === cards.length - 1 ? "disabled" : ""}><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
+                        <button class="icon-btn" type="button" data-action="move-bucket" title="${moveLabel}" aria-label="${escapeHtml(card.term)} ${moveLabel}"><i class="fa-solid ${moveIcon}" aria-hidden="true"></i></button>
                         <button class="icon-btn" type="button" data-action="remove" title="삭제" aria-label="${escapeHtml(card.term)} 삭제"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
                         <button class="icon-btn" type="button" data-action="focus" title="강조" aria-label="${escapeHtml(card.term)} 카드 보기"><i class="fa-solid fa-eye" aria-hidden="true"></i></button>
                     </span>
@@ -1566,6 +1891,8 @@
 
         function renderOutput() {
             const cards = selectedCards();
+            const important = importantCards();
+            const notImportant = notImportantCards();
             els.copyBtn.disabled = !state.generated || !cards.length;
 
             if (!state.generated || !cards.length) {
@@ -1580,18 +1907,18 @@
                 return;
             }
 
-            const sentences = buildSentences(cards);
-            const paragraph = buildParagraph(cards);
+            const sentences = buildSentences();
+            const paragraph = buildParagraph();
             const frames = state.level === "beginner"
                 ? [
                     `${topicWithParticle()} ... 사람입니다.`,
-                    `그 사람은 ...습니다/ㅂ니다.`,
-                    `이런 사람과 함께 있으면 ... 것 같습니다.`
+                    `저는 ...을/를 중요하게 생각합니다.`,
+                    `저는 ...을/를 중요하게 생각하지 않습니다.`
                 ]
                 : [
                     `${topicWithParticle()} ... 사람입니다.`,
-                    `...아서/어서 ... 사람이면 좋겠습니다.`,
-                    `이런 조건이 잘 맞으면 ... 좋은 관계를 만들 수 있을 것 같습니다.`
+                    `...은/는 제 이상형에서 중요한 조건입니다.`,
+                    `...은/는 있으면 좋지만 꼭 중요하지는 않습니다.`
                 ];
 
             els.outputBody.innerHTML = `
@@ -1612,7 +1939,7 @@
                     </ul>
                 </section>
                 <div class="copy-row">
-                    <span class="status-text" id="statusText" aria-live="polite">${cards.length}개 조건으로 결과를 만들었습니다.</span>
+                    <span class="status-text" id="statusText" aria-live="polite">중요 ${important.length}개, 안 중요 ${notImportant.length}개 조건으로 결과를 만들었습니다.</span>
                     <button class="text-btn" type="button" id="copyTextBtn"><i class="fa-solid fa-copy" aria-hidden="true"></i> 결과 복사</button>
                 </div>
             `;
@@ -1621,6 +1948,7 @@
         function renderAll() {
             els.cardMetric.textContent = String(CARDS.length);
             els.topicInput.value = state.topic;
+            els.mainLayout.classList.toggle("is-generated", state.generated && totalSelectedCount() > 0);
             renderCategories();
             renderModes();
             renderBank();
@@ -1629,52 +1957,70 @@
             saveState();
         }
 
-        function addCard(id) {
-            if (!cardById.has(id) || state.selectedIds.includes(id)) return;
-            state.selectedIds.push(id);
+        function addCard(id, bucket = "important") {
+            if (!cardById.has(id)) return;
+            removeCard(id, false);
+            bucketIds(bucket).push(id);
             state.generated = false;
             renderAll();
         }
 
-        function removeCard(id) {
-            state.selectedIds = state.selectedIds.filter((selectedId) => selectedId !== id);
-            if (!state.selectedIds.length) state.generated = false;
-            renderAll();
+        function removeCard(id, shouldRender = true) {
+            state.importantIds = state.importantIds.filter((selectedId) => selectedId !== id);
+            state.notImportantIds = state.notImportantIds.filter((selectedId) => selectedId !== id);
+            if (!totalSelectedCount()) state.generated = false;
+            if (shouldRender) renderAll();
         }
 
         function toggleCard(id) {
-            if (state.selectedIds.includes(id)) {
+            if (cardBucket(id)) {
                 removeCard(id);
             } else {
-                addCard(id);
+                addCard(id, "important");
             }
         }
 
-        function moveCard(id, direction) {
-            const index = state.selectedIds.indexOf(id);
+        function moveCard(id, bucket, direction) {
+            const ids = bucketIds(bucket);
+            const index = ids.indexOf(id);
             const nextIndex = index + direction;
-            if (index < 0 || nextIndex < 0 || nextIndex >= state.selectedIds.length) return;
-            const next = state.selectedIds[index];
-            state.selectedIds[index] = state.selectedIds[nextIndex];
-            state.selectedIds[nextIndex] = next;
+            if (index < 0 || nextIndex < 0 || nextIndex >= ids.length) return;
+            const next = ids[index];
+            ids[index] = ids[nextIndex];
+            ids[nextIndex] = next;
             state.generated = false;
             renderAll();
         }
 
+        function moveToOtherBucket(id) {
+            const bucket = cardBucket(id);
+            if (!bucket) return;
+            const target = bucket === "important" ? "notImportant" : "important";
+            addCard(id, target);
+        }
+
         function shuffleSelected() {
-            const ids = [...state.selectedIds];
-            for (let index = ids.length - 1; index > 0; index -= 1) {
-                const randomIndex = Math.floor(Math.random() * (index + 1));
-                [ids[index], ids[randomIndex]] = [ids[randomIndex], ids[index]];
+            for (const bucket of ["important", "notImportant"]) {
+                const ids = bucketIds(bucket);
+                for (let index = ids.length - 1; index > 0; index -= 1) {
+                    const randomIndex = Math.floor(Math.random() * (index + 1));
+                    [ids[index], ids[randomIndex]] = [ids[randomIndex], ids[index]];
+                }
             }
-            state.selectedIds = ids;
             state.generated = false;
             renderAll();
         }
 
         function setSample(sampleId) {
             if (!SAMPLES[sampleId]) return;
-            state.selectedIds = [...SAMPLES[sampleId]];
+            const sample = SAMPLES[sampleId];
+            if (Array.isArray(sample)) {
+                state.importantIds = uniqueValidIds(sample);
+                state.notImportantIds = [];
+            } else {
+                state.importantIds = uniqueValidIds(sample.important || []);
+                state.notImportantIds = uniqueValidIds(sample.notImportant || []).filter((id) => !state.importantIds.includes(id));
+            }
             state.generated = false;
             renderAll();
         }
@@ -1686,8 +2032,8 @@
         function currentResultText() {
             const cards = selectedCards();
             if (!cards.length || !state.generated) return "";
-            const sentences = buildSentences(cards).map((sentence, index) => `${index + 1}. ${sentence}`).join("\n");
-            return `[문장]\n${sentences}\n\n[문단]\n${buildParagraph(cards)}`;
+            const sentences = buildSentences().map((sentence, index) => `${index + 1}. ${sentence}`).join("\n");
+            return `[문장]\n${sentences}\n\n[문단]\n${buildParagraph()}`;
         }
 
         function setStatus(message, type) {
@@ -1767,31 +2113,38 @@
             renderAll();
         });
 
-        els.selectionZone.addEventListener("dragover", (event) => {
+        els.selectionBoard.addEventListener("dragover", (event) => {
+            const zone = event.target.closest(".selection-zone");
+            if (!zone) return;
             event.preventDefault();
-            els.selectionZone.classList.add("is-over");
+            zone.classList.add("is-over");
         });
 
-        els.selectionZone.addEventListener("dragleave", () => {
-            els.selectionZone.classList.remove("is-over");
+        els.selectionBoard.addEventListener("dragleave", (event) => {
+            const zone = event.target.closest(".selection-zone");
+            if (zone) zone.classList.remove("is-over");
         });
 
-        els.selectionZone.addEventListener("drop", (event) => {
+        els.selectionBoard.addEventListener("drop", (event) => {
+            const zone = event.target.closest(".selection-zone");
+            if (!zone) return;
             event.preventDefault();
-            els.selectionZone.classList.remove("is-over");
-            addCard(dragCardId(event));
+            zone.classList.remove("is-over");
+            addCard(dragCardId(event), zone.dataset.bucket || "important");
         });
 
-        els.selectedList.addEventListener("click", (event) => {
+        els.selectionBoard.addEventListener("click", (event) => {
             const button = event.target.closest("[data-action]");
             if (!button) return;
             const item = event.target.closest(".selected-item");
             if (!item) return;
             const id = item.dataset.id;
+            const bucket = item.dataset.bucket || cardBucket(id) || "important";
             const action = button.dataset.action;
             if (action === "remove") removeCard(id);
-            if (action === "up") moveCard(id, -1);
-            if (action === "down") moveCard(id, 1);
+            if (action === "up") moveCard(id, bucket, -1);
+            if (action === "down") moveCard(id, bucket, 1);
+            if (action === "move-bucket") moveToOtherBucket(id);
             if (action === "focus") {
                 state.query = cardById.get(id)?.term || "";
                 els.searchInput.value = state.query;
@@ -1801,18 +2154,24 @@
         });
 
         els.generateBtn.addEventListener("click", () => {
-            if (!state.selectedIds.length) return;
+            if (!totalSelectedCount()) return;
             state.generated = true;
             renderAll();
         });
 
         els.clearBtn.addEventListener("click", () => {
-            state.selectedIds = [];
+            state.importantIds = [];
+            state.notImportantIds = [];
             state.generated = false;
             renderAll();
         });
 
         els.shuffleBtn.addEventListener("click", shuffleSelected);
+
+        els.editCardsBtn.addEventListener("click", () => {
+            state.generated = false;
+            renderAll();
+        });
 
         els.copyBtn.addEventListener("click", copyResult);
 
