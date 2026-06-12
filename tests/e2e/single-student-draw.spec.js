@@ -28,6 +28,34 @@ const studentNames = [
   '원 티 응옥 린'
 ];
 
+const class8StudentNames = [
+  '칭 텐 김',
+  '찡 황 칸 후엔',
+  '응우엔 빈 빈',
+  '응웬 반 짭',
+  '응웬 티 홍 낫',
+  '레 띠에우 방',
+  '응웬 프엉 마이',
+  '팜 티 응옥 니',
+  '응우엔 티 후옌',
+  '르우 반 뒤',
+  '쯔엉 민 황안',
+  '장티김아잉',
+  '응웬 황 티 터',
+  '쩐 부 바오',
+  '응웬 반 팅',
+  '베갈리나 말리카',
+  '부티 탕 쭉',
+  '응우옌 티 화이',
+  '레 티 하이리',
+  '반 티 튀 항',
+  '팜 홍 타이',
+  '응우옌 티 투 후에',
+  '팜 쑤안 휘',
+  '부 티 응아',
+  '이잉잉'
+];
+
 async function drawOne(page) {
   await page.locator('#draw-button').click();
   return page.locator('#student-name').innerText();
@@ -75,4 +103,14 @@ test('draws every presentation student once before the pool resets', async ({ pa
 
   expect(studentNames).toContain(firstNameFromResetPool);
   expect(firstNameFromResetPool).not.toBe(lastNameFromFinishedPool);
+});
+
+test('draws exactly one student from the 3B-8 roster', async ({ page }) => {
+  await page.goto('/apps/standalone-pages/single-student-draw-3b8.html', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('.page-title')).toHaveText('3B-8반 한 명 뽑기');
+  await expect(page.locator('#draw-button')).toHaveText('뽑기');
+
+  const pickedName = await drawOne(page);
+  expect(class8StudentNames).toContain(pickedName);
 });
