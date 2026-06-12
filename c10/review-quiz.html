@@ -187,6 +187,17 @@
             font-weight: 800;
         }
 
+        .score-stack {
+            display: grid;
+            gap: 3px;
+        }
+
+        .autosave-status {
+            color: var(--teal);
+            font-size: 0.82rem;
+            font-weight: 850;
+        }
+
         .actions {
             display: flex;
             flex-wrap: wrap;
@@ -644,7 +655,10 @@
         </section>
 
         <div class="toolbox" aria-label="채점 도구">
-            <div id="score" class="score" aria-live="polite">아직 채점하지 않았습니다.</div>
+            <div class="score-stack">
+                <div id="score" class="score" aria-live="polite">아직 채점하지 않았습니다.</div>
+                <div id="autosaveStatus" class="autosave-status" aria-live="polite">자동 저장 준비됨</div>
+            </div>
             <div class="actions">
                 <button class="primary" type="button" id="checkButton">정답 확인</button>
                 <button class="secondary" type="button" id="showButton">해설 표시</button>
@@ -1006,7 +1020,14 @@
         const printButton = document.getElementById("printButton");
         const historyList = document.getElementById("historyList");
         const clearHistoryButton = document.getElementById("clearHistoryButton");
+        const autosaveStatus = document.getElementById("autosaveStatus");
         const HISTORY_KEY = "c10.review.wbVocabGrammar.scoreHistory.v1";
+        const PROGRESS_KEY = "c10.review.wbVocabGrammar.progress.v1";
+        let autosaveTimer;
+
+        function getQuestions() {
+            return [...document.querySelectorAll(".question")];
+        }
 
         function normalize(value) {
             return value
@@ -1090,8 +1111,106 @@
             renderHistory();
         }
 
+        function readProgress() {
+            try {
+                const value = localStorage.getItem(PROGRESS_KEY);
+                return value ? JSON.parse(value) : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function collectAnswers() {
+            const answers = {};
+            getQuestions().forEach((question) => {
+                const control = question.querySelector("input[type='radio']:checked, input[type='text']");
+                if (control && control.value) {
+                    answers[control.name] = control.value;
+                }
+            });
+            return answers;
+        }
+
+        function updateAutosaveStatus(savedAt) {
+            if (!savedAt) {
+                autosaveStatus.textContent = "자동 저장 준비됨";
+                return;
+            }
+
+            autosaveStatus.textContent = `자동 저장됨 ${new Date(savedAt).toLocaleTimeString("ko-KR", {
+                hour: "2-digit",
+                minute: "2-digit"
+            })}`;
+        }
+
+        function writeProgressNow() {
+            clearTimeout(autosaveTimer);
+            autosaveTimer = null;
+
+            const savedAt = Date.now();
+            try {
+                localStorage.setItem(PROGRESS_KEY, JSON.stringify({
+                    answers: collectAnswers(),
+                    scoreText: score.textContent,
+                    bottomScoreText: bottomScore.textContent,
+                    showAnswers: document.body.classList.contains("show-answers"),
+                    checked: getQuestions().some((question) => question.classList.contains("checked")),
+                    savedAt
+                }));
+                updateAutosaveStatus(savedAt);
+            } catch (error) {
+                autosaveStatus.textContent = "자동 저장 불가";
+            }
+        }
+
+        function saveProgress() {
+            clearTimeout(autosaveTimer);
+            autosaveStatus.textContent = "저장 중...";
+            autosaveTimer = setTimeout(writeProgressNow, 180);
+        }
+
+        function restoreProgress() {
+            const progress = readProgress();
+            if (!progress || !progress.answers) return;
+
+            Object.entries(progress.answers).forEach(([name, value]) => {
+                const field = form.elements[name];
+                if (!field) return;
+                const controls = typeof field.length === "number" && !field.type ? [...field] : [field];
+                controls.forEach((control) => {
+                    if (control.type === "radio") {
+                        control.checked = control.value === value;
+                    } else {
+                        control.value = value;
+                    }
+                });
+            });
+
+            if (progress.checked) {
+                getQuestions().forEach((question) => {
+                    checkQuestion(question);
+                    question.classList.add("checked");
+                });
+            }
+
+            if (progress.showAnswers) {
+                document.body.classList.add("show-answers");
+                showButton.textContent = "해설 숨기기";
+            }
+
+            if (progress.scoreText) score.textContent = progress.scoreText;
+            if (progress.bottomScoreText) bottomScore.textContent = progress.bottomScoreText;
+            updateAutosaveStatus(progress.savedAt);
+        }
+
+        function clearProgress() {
+            clearTimeout(autosaveTimer);
+            localStorage.removeItem(PROGRESS_KEY);
+            updateAutosaveStatus(null);
+        }
+
         function checkAll() {
-            const questions = [...document.querySelectorAll(".question")];
+            const questions = getQuestions();
             let correct = 0;
             questions.forEach((question) => {
                 if (checkQuestion(question)) correct += 1;
@@ -1101,6 +1220,7 @@
             bottomScore.textContent = `이번 점수: ${correct} / ${questions.length}점`;
             document.body.classList.add("show-answers");
             saveScore(correct, questions.length);
+            saveProgress();
         }
 
         checkButton.addEventListener("click", checkAll);
@@ -1109,18 +1229,27 @@
         showButton.addEventListener("click", () => {
             document.body.classList.toggle("show-answers");
             showButton.textContent = document.body.classList.contains("show-answers") ? "해설 숨기기" : "해설 표시";
+            saveProgress();
         });
 
         resetButton.addEventListener("click", () => {
             form.reset();
-            document.querySelectorAll(".question").forEach((question) => {
+            getQuestions().forEach((question) => {
                 question.classList.remove("correct", "wrong", "checked");
             });
             document.body.classList.remove("show-answers");
             showButton.textContent = "해설 표시";
             score.textContent = "아직 채점하지 않았습니다.";
             bottomScore.textContent = "";
+            clearProgress();
             window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        form.addEventListener("input", saveProgress);
+        form.addEventListener("change", saveProgress);
+
+        window.addEventListener("beforeunload", () => {
+            if (autosaveTimer) writeProgressNow();
         });
 
         printButton.addEventListener("click", () => {
@@ -1132,6 +1261,7 @@
             renderHistory();
         });
 
+        restoreProgress();
         renderHistory();
     </script>
 </body>
