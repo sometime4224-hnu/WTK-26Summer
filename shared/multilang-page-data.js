@@ -101,20 +101,20 @@ window.MULTILANG_PAGE_DATA = {
         "translations": {
             "en": {
                 "title": "English scaffold",
-                "summary": "Causative verbs describe making, letting, or causing another person to do an action or become a certain state.",
+                "summary": "Use causative verbs when you want to say not only who did an action, but who made, helped, allowed, or caused it to happen.",
                 "points": [
-                    "Some causatives are special verbs, such as 먹이다 or 입히다.",
-                    "The person who causes the action and the person who does the action are both important.",
-                    "Check whether the sentence means force, help, permission, or natural cause."
+                    "The focus is the causer plus the person, feeling, or state that is affected.",
+                    "The meaning may be instruction, care/help, permission, responsibility, or a natural cause.",
+                    "This is useful for explaining results clearly: who made the child sleep, who lowered the sound, or what made people laugh."
                 ]
             },
             "vi": {
                 "title": "Ho tro tieng Viet",
-                "summary": "Dong tu sai khien noi viec lam cho, cho phep, hoac khien nguoi khac lam mot hanh dong.",
+                "summary": "Dong tu sai khien khong chi noi ai lam hanh dong, ma con noi ai lam cho, giup, cho phep, hoac gay ra viec do.",
                 "points": [
-                    "Can thay ro ai gay ra hanh dong va ai truc tiep lam hanh dong.",
-                    "Co the la ep buoc, giup do, cho phep hoac nguyen nhan tu nhien.",
-                    "Hay doc ngu canh truoc khi chon dong tu."
+                    "Trong tam la nguoi tao ra tinh huong va doi tuong bi anh huong.",
+                    "Nghia co the la chi thi, cham soc/giup do, cho phep, trach nhiem, hoac nguyen nhan tu nhien.",
+                    "Cach noi nay huu ich khi muon noi ro ket qua: ai ru tre ngu, ai ha am thanh, hoac dieu gi lam moi nguoi cuoi."
                 ]
             }
         }

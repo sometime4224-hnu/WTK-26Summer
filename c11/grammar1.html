@@ -13,19 +13,469 @@
     <title>11과 문법1 업그레이드 | 사동사</title>
     <script src="https://cdn.tailwindcss.com" defer></script>
 <style>
-        body { margin: 0; font-family: 'Noto Sans KR', sans-serif; background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%); }
-        .c11-global-nav {
-            position: sticky; top: 0; z-index: 1000; height: 58px; width: 100%;
-            display: flex; align-items: center; gap: 12px; padding: 0 16px; box-sizing: border-box;
-            background: rgba(255, 255, 255, 0.92); border-bottom: 1px solid #dbeafe; backdrop-filter: blur(8px);
+        :root {
+            --c11-ink: #172033;
+            --c11-muted: #5f6f86;
+            --c11-line: #d9e2ee;
+            --c11-panel: #ffffff;
+            --c11-blue: #2563eb;
+            --c11-green: #059669;
+            --c11-amber: #b45309;
+            --c11-rose: #be123c;
+            --c11-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
         }
-        .c11-global-nav a { color: #4f46e5; text-decoration: none; font-weight: 700; font-size: 14px; }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Noto Sans KR', sans-serif;
+            color: var(--c11-ink);
+            background: linear-gradient(180deg, #f8fbff 0%, #f6fbf8 52%, #fffaf1 100%);
+        }
+
+        .c11-global-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            min-height: 56px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 18px;
+            background: rgba(255, 255, 255, 0.92);
+            border-bottom: 1px solid #dbeafe;
+            backdrop-filter: blur(8px);
+        }
+
+        .c11-global-nav a {
+            color: #1d4ed8;
+            text-decoration: none;
+            font-weight: 850;
+            font-size: 14px;
+        }
+
         .c11-divider { color: #cbd5e1; font-weight: 700; }
-        .safe { word-break: keep-all; overflow-wrap: break-word; }
-        .tab-btn.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
-        .vi-text { display: none; }
-        .vi-on .vi-text { display: block; }
+
+        .grammar-shell {
+            width: min(1120px, calc(100% - 32px));
+            margin: 18px auto 44px;
+        }
+
+        .hero-panel {
+            display: grid;
+            gap: 18px;
+            padding: clamp(18px, 3vw, 30px);
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: var(--c11-shadow);
+        }
+
+        .eyebrow {
+            margin: 0;
+            color: var(--c11-blue);
+            font-size: 0.78rem;
+            font-weight: 950;
+            letter-spacing: 0;
+        }
+
+        .hero-title {
+            margin: 8px 0 0;
+            font-size: clamp(2.1rem, 5vw, 4.1rem);
+            line-height: 1.02;
+            font-weight: 950;
+            letter-spacing: 0;
+        }
+
+        .hero-lead {
+            max-width: 680px;
+            margin: 14px 0 0;
+            color: #334155;
+            font-size: clamp(1rem, 1.7vw, 1.22rem);
+            font-weight: 800;
+            line-height: 1.72;
+        }
+
+        .meaning-strip {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .meaning-card {
+            min-width: 0;
+            padding: 14px;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            background: #f8fbff;
+        }
+
+        .meaning-card strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #1e3a8a;
+            font-size: 0.82rem;
+            font-weight: 950;
+        }
+
+        .meaning-card p {
+            margin: 0;
+            color: #172033;
+            font-size: 1rem;
+            font-weight: 850;
+            line-height: 1.52;
+        }
+
+        .arrow-sense {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            margin-inline: 4px;
+            border-radius: 999px;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-weight: 950;
+        }
+
+        .action-panel {
+            display: grid;
+            align-content: start;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .tab-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .tab-btn {
+            min-height: 44px;
+            border: 1.5px solid #d7e0ea;
+            border-radius: 14px;
+            background: #ffffff;
+            color: #64748b;
+            font-size: 0.95rem;
+            font-weight: 950;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .resource-grid {
+            display: grid;
+            gap: 9px;
+        }
+
+        .resource-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 52px;
+            padding: 12px 14px;
+            border: 1px solid var(--link-line);
+            border-radius: 14px;
+            background: var(--link-bg);
+            color: var(--link-text);
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 950;
+        }
+
+        .resource-link[data-tone="green"] {
+            --link-line: #bbf7d0;
+            --link-bg: #f0fdf4;
+            --link-text: #166534;
+        }
+
+        .resource-link[data-tone="orange"] {
+            --link-line: #fed7aa;
+            --link-bg: #fff7ed;
+            --link-text: #9a3412;
+        }
+
+        .resource-link[data-tone="blue"] {
+            --link-line: #bfdbfe;
+            --link-bg: #eff6ff;
+            --link-text: #1e40af;
+        }
+
+        .resource-link[data-tone="slate"] {
+            --link-line: #cbd5e1;
+            --link-bg: #f8fafc;
+            --link-text: #334155;
+        }
+
+        .learn-panel {
+            margin-top: 18px;
+        }
+
+        .learn-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .study-card {
+            min-width: 0;
+            padding: clamp(16px, 2.3vw, 22px);
+            border: 1px solid var(--c11-line);
+            border-radius: 20px;
+            background: var(--c11-panel);
+            box-shadow: 0 12px 26px rgba(15, 23, 42, 0.055);
+        }
+
+        .study-card h2 {
+            margin: 0;
+            color: #172033;
+            font-size: clamp(1.1rem, 1.8vw, 1.45rem);
+            font-weight: 950;
+            line-height: 1.28;
+        }
+
+        .study-card p {
+            margin: 10px 0 0;
+            color: #334155;
+            font-size: 0.98rem;
+            font-weight: 700;
+            line-height: 1.72;
+        }
+
+        .study-note {
+            border-color: #fde68a;
+            background: #fffbeb;
+        }
+
+        .purpose-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .purpose-item {
+            min-height: 116px;
+            padding: 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            background: #ffffff;
+        }
+
+        .purpose-item strong {
+            display: block;
+            color: var(--purpose-color);
+            font-size: 0.95rem;
+            font-weight: 950;
+            line-height: 1.35;
+        }
+
+        .purpose-item p {
+            margin-top: 7px;
+            color: #475569;
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        .purpose-translation {
+            margin-top: 9px;
+            padding-top: 9px;
+            border-top: 1px solid rgba(148, 163, 184, 0.28);
+            color: #334155;
+            font-size: 0.82rem;
+            font-weight: 800;
+            line-height: 1.58;
+        }
+
+        .purpose-translation[data-lang="ar"] {
+            direction: rtl;
+            text-align: right;
+        }
+
+        .purpose-item[data-tone="blue"] { --purpose-color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
+        .purpose-item[data-tone="green"] { --purpose-color: #047857; background: #ecfdf5; border-color: #a7f3d0; }
+        .purpose-item[data-tone="amber"] { --purpose-color: #b45309; background: #fffbeb; border-color: #fde68a; }
+        .purpose-item[data-tone="rose"] { --purpose-color: #be123c; background: #fff1f2; border-color: #fecdd3; }
+        .purpose-item[data-tone="violet"] { --purpose-color: #6d28d9; background: #f5f3ff; border-color: #ddd6fe; }
+
+        .structure-line {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .structure-step {
+            min-height: 88px;
+            padding: 12px;
+            border: 1px solid #dbeafe;
+            border-radius: 14px;
+            background: #f8fbff;
+        }
+
+        .structure-step span {
+            display: block;
+            color: #64748b;
+            font-size: 0.76rem;
+            font-weight: 950;
+        }
+
+        .structure-step b {
+            display: block;
+            margin-top: 6px;
+            color: #1e3a8a;
+            font-size: 1rem;
+            font-weight: 950;
+            line-height: 1.35;
+        }
+
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 580px;
+        }
+
+        .example-table th,
+        .example-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            vertical-align: top;
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+
+        .example-table th {
+            background: #f8fafc;
+            color: #334155;
+            font-weight: 950;
+        }
+
+        .suffix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .suffix-card {
+            padding: 14px;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            background: #f8fbff;
+        }
+
+        .suffix-card strong {
+            color: #1d4ed8;
+            font-size: 1.05rem;
+            font-weight: 950;
+        }
+
+        .suffix-card ul {
+            margin: 9px 0 0;
+            padding-left: 18px;
+            color: #334155;
+            font-size: 0.92rem;
+            font-weight: 750;
+            line-height: 1.65;
+        }
+
+        .compare-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .compare-box {
+            padding: 14px;
+            border: 1px solid #fed7aa;
+            border-radius: 16px;
+            background: #fff7ed;
+        }
+
+        .compare-box strong {
+            display: block;
+            color: #9a3412;
+            font-weight: 950;
+        }
+
+        .compare-box p {
+            margin-top: 7px;
+            font-size: 0.9rem;
+        }
+
+        .safe { word-break: keep-all; overflow-wrap: anywhere; }
+        .hidden { display: none !important; }
+        .overflow-x-auto { overflow-x: auto; }
         .choice-btn { min-height: 52px; }
+
+        @media (min-width: 860px) {
+            .hero-panel {
+                grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+                align-items: start;
+            }
+
+            .meaning-strip {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .learn-grid {
+                grid-template-columns: minmax(0, 1.05fr) minmax(300px, 0.95fr);
+                align-items: start;
+            }
+
+            .study-card--wide {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .grammar-shell {
+                width: min(100% - 20px, 1120px);
+                margin-top: 12px;
+            }
+
+            .c11-global-nav {
+                min-height: 52px;
+                padding: 0 14px;
+            }
+
+            .hero-panel,
+            .study-card {
+                border-radius: 18px;
+            }
+
+            .structure-line {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 460px) {
+            .hero-panel {
+                padding: 16px;
+            }
+
+            .resource-link {
+                font-size: 0.86rem;
+                padding: 11px 12px;
+            }
+
+            .structure-line {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
         <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
@@ -40,152 +490,259 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="index.html">11과 목록</a>
     </nav>
 
-    <main id="page" class="max-w-md mx-auto px-4 py-4 pb-10">
-        <section class="bg-white border border-blue-100 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <p class="text-xs font-bold text-blue-600">문법 1 업그레이드</p>
-                    <h1 class="text-2xl font-black text-slate-800 mt-1">사동사</h1>
-                    <p class="text-sm text-slate-600 mt-1 safe">누군가가 다른 사람에게 행동하게 할 때</p>
-                    <p class="vi-text text-xs text-blue-700 mt-1 safe">Dùng khi làm cho/ khiến người khác thực hiện hành động.</p>
+    <main id="page" class="grammar-shell">
+        <section class="hero-panel">
+            <div>
+                <p class="eyebrow">문법 1 | 사동 표현</p>
+                <h1 class="hero-title">사동사</h1>
+                <p class="hero-lead safe">사동사는 “누가 했어요?”보다 “누가 그렇게 되게 했어요?”를 말할 때 씁니다. 직접 행동한 사람과 그 일이 일어나게 만든 사람을 구분해서 더 정확하게 말할 수 있습니다.</p>
+                <div class="meaning-strip" aria-label="직접 행동과 사동 표현 비교">
+                    <div class="meaning-card">
+                        <strong>직접 행동</strong>
+                        <p class="safe">아이가 잤어요.</p>
+                    </div>
+                    <div class="meaning-card">
+                        <strong>사동 표현</strong>
+                        <p class="safe">엄마가 아이를 <b>재웠어요</b>.</p>
+                    </div>
+                    <div class="meaning-card">
+                        <strong>상태 설명</strong>
+                        <p class="safe">방이 시원해졌어요.</p>
+                    </div>
+                    <div class="meaning-card">
+                        <strong>원인/조절</strong>
+                        <p class="safe">제가 창문을 열어서 방을 <b>시원하게 했어요</b>.</p>
+                    </div>
                 </div>
-                <button id="viToggle" class="shrink-0 px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-700">Tiếng Việt OFF</button>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 mt-4">
-                <button id="tabLearn" class="tab-btn active border rounded-xl py-2.5 text-sm font-bold border-blue-200" type="button">학습</button>
-                <button id="tabPractice" class="tab-btn border rounded-xl py-2.5 text-sm font-bold border-slate-200 text-slate-600" type="button">연습</button>
+            <aside class="action-panel" aria-label="학습 이동">
+                <div class="tab-row">
+                    <button id="tabLearn" class="tab-btn active" type="button">학습</button>
+                    <button id="tabPractice" class="tab-btn" type="button">연습</button>
+                </div>
+                <div class="resource-grid">
+                    <a href="grammar1-causative-diagram.html" class="resource-link" data-tone="green">
+                        <span>사동 의미 구조 도식</span>
+                        <span aria-hidden="true">→</span>
+                    </a>
+                    <a href="grammar1-causative-slot-game.html" class="resource-link" data-tone="orange">
+                        <span>사동 문장 자리 맞추기</span>
+                        <span aria-hidden="true">→</span>
+                    </a>
+                    <a href="grammar1-support-material1.html" class="resource-link" data-tone="blue">
+                        <span>사동사 그림 짝 학습</span>
+                        <span aria-hidden="true">→</span>
+                    </a>
+                    <a href="grammar1-support-table.html" class="resource-link" data-tone="slate">
+                        <span>사동사 전체 표</span>
+                        <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+            </aside>
+        </section>
+
+        <section id="learnPanel" class="learn-panel">
+            <div class="learn-grid">
+                <article class="study-card study-card--wide">
+                    <h2>사동사를 왜 쓰나요?</h2>
+                    <p class="safe">사동 표현은 행동을 직접 한 사람만 말하는 것이 아니라, 그 행동이나 결과를 만든 사람·원인·상황을 함께 말하게 해 줍니다. 그래서 일상 대화, 수업 지시, 돌봄, 회사 업무, 감정 표현에서 매우 자주 필요합니다.</p>
+                    <div class="purpose-grid">
+                        <div class="purpose-item" data-tone="blue">
+                            <strong>지시하거나 요청할 때</strong>
+                            <p class="safe">선생님이 학생들에게 책을 <b>읽혔어요</b>. 누가 활동을 시작하게 했는지 분명해집니다.</p>
+                            <p class="purpose-translation safe" data-lang="en">Use this when someone directs or asks others to begin an activity.</p>
+                            <p class="purpose-translation safe" data-lang="vi">Dung khi ai do chi thi hoac yeu cau nguoi khac bat dau mot hoat dong.</p>
+                            <p class="purpose-translation safe" data-lang="ar">تستعمل عندما يوجه شخص الآخرين أو يطلب منهم بدء نشاط.</p>
+                            <p class="purpose-translation safe" data-lang="mn">Хэн нэгэн бусдыг үйл ажиллагаа эхлүүлэхээр чиглүүлэх эсвэл хүсэх үед хэрэглэнэ.</p>
+                            <p class="purpose-translation safe" data-lang="kk">Біреу басқаларға әрекетті бастатқанда немесе өтінгенде қолданылады.</p>
+                            <p class="purpose-translation safe" data-lang="th">ใช้เมื่อมีคนสั่งหรือขอให้คนอื่นเริ่มทำกิจกรรม</p>
+                        </div>
+                        <div class="purpose-item" data-tone="green">
+                            <strong>도와주거나 돌볼 때</strong>
+                            <p class="safe">엄마가 아기에게 밥을 <b>먹였어요</b>. 강제로 시킨 것이 아니라 도움의 의미일 수 있습니다.</p>
+                            <p class="purpose-translation safe" data-lang="en">Use this for care or help, when one person enables another person to do something.</p>
+                            <p class="purpose-translation safe" data-lang="vi">Dung cho cham soc hoac giup do, khi mot nguoi giup nguoi khac lam duoc viec do.</p>
+                            <p class="purpose-translation safe" data-lang="ar">تستعمل في الرعاية أو المساعدة، عندما يساعد شخص غيره على القيام بالفعل.</p>
+                            <p class="purpose-translation safe" data-lang="mn">Асрах эсвэл туслах үед, нэг хүн нөгөөдөө үйлдэл хийх боломж бүрдүүлэхэд хэрэглэнэ.</p>
+                            <p class="purpose-translation safe" data-lang="kk">Күтім немесе көмек жағдайында, бір адам басқаға істі орындауға мүмкіндік бергенде қолданылады.</p>
+                            <p class="purpose-translation safe" data-lang="th">ใช้กับการดูแลหรือช่วยให้คนอื่นทำสิ่งนั้นได้</p>
+                        </div>
+                        <div class="purpose-item" data-tone="amber">
+                            <strong>허락하거나 기회를 줄 때</strong>
+                            <p class="safe">부모님이 아이를 밖에서 <b>놀게 했어요</b>. 하도록 허락한 상황도 사동으로 말합니다.</p>
+                            <p class="purpose-translation safe" data-lang="en">Use this when someone lets another person do something or gives them a chance.</p>
+                            <p class="purpose-translation safe" data-lang="vi">Dung khi ai do cho phep hoac tao co hoi de nguoi khac lam mot viec.</p>
+                            <p class="purpose-translation safe" data-lang="ar">تستعمل عندما يسمح شخص لغيره بفعل شيء أو يعطيه فرصة.</p>
+                            <p class="purpose-translation safe" data-lang="mn">Хэн нэгэнд хийхийг зөвшөөрөх эсвэл боломж өгөх үед хэрэглэнэ.</p>
+                            <p class="purpose-translation safe" data-lang="kk">Біреуге бір істі істеуге рұқсат бергенде немесе мүмкіндік бергенде қолданылады.</p>
+                            <p class="purpose-translation safe" data-lang="th">ใช้เมื่ออนุญาตหรือเปิดโอกาสให้คนอื่นทำบางอย่าง</p>
+                        </div>
+                        <div class="purpose-item" data-tone="rose">
+                            <strong>원인이나 책임을 말할 때</strong>
+                            <p class="safe">오빠가 동생을 <b>울렸어요</b>. 누가 그 감정 변화를 만들었는지 보입니다.</p>
+                            <p class="purpose-translation safe" data-lang="en">Use this to show the cause or responsibility for a result, especially a feeling.</p>
+                            <p class="purpose-translation safe" data-lang="vi">Dung de noi nguyen nhan hoac trach nhiem cua ket qua, nhat la thay doi cam xuc.</p>
+                            <p class="purpose-translation safe" data-lang="ar">تستعمل لإظهار السبب أو المسؤولية عن نتيجة، وخصوصا عن تغير شعور.</p>
+                            <p class="purpose-translation safe" data-lang="mn">Үр дүнгийн шалтгаан эсвэл хариуцлагыг, ялангуяа мэдрэмжийн өөрчлөлтийг хэлэхэд хэрэглэнэ.</p>
+                            <p class="purpose-translation safe" data-lang="kk">Нәтиженің, әсіресе сезім өзгерісінің себебін немесе жауапкершілігін көрсетуге қолданылады.</p>
+                            <p class="purpose-translation safe" data-lang="th">ใช้บอกสาเหตุหรือความรับผิดชอบของผลลัพธ์ โดยเฉพาะการเปลี่ยนความรู้สึก</p>
+                        </div>
+                        <div class="purpose-item" data-tone="violet">
+                            <strong>상태를 바꾸거나 조절할 때</strong>
+                            <p class="safe">소리를 <b>낮췄어요</b>. 크기, 양, 온도, 분위기를 바꾸는 말에도 쓰입니다.</p>
+                            <p class="purpose-translation safe" data-lang="en">Use this when someone changes or controls a state, amount, sound, temperature, or mood.</p>
+                            <p class="purpose-translation safe" data-lang="vi">Dung khi ai do thay doi hoac dieu chinh trang thai, so luong, am thanh, nhiet do, hoac khong khi.</p>
+                            <p class="purpose-translation safe" data-lang="ar">تستعمل عندما يغير شخص حالة أو يتحكم في مقدار أو صوت أو حرارة أو جو.</p>
+                            <p class="purpose-translation safe" data-lang="mn">Байдал, хэмжээ, дуу, температур, уур амьсгалыг өөрчлөх эсвэл тохируулахад хэрэглэнэ.</p>
+                            <p class="purpose-translation safe" data-lang="kk">Күйді, мөлшерді, дыбысты, температураны немесе көңіл күйді өзгерткенде не реттегенде қолданылады.</p>
+                            <p class="purpose-translation safe" data-lang="th">ใช้เมื่อเปลี่ยนหรือปรับสภาพ ปริมาณ เสียง อุณหภูมิ หรือบรรยากาศ</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="study-card">
+                    <h2>문장 구조</h2>
+                    <p class="safe">사동 문장은 보통 “원인을 만든 사람 + 영향을 받은 대상 + 행동/상태”를 함께 보여 줍니다.</p>
+                    <div class="structure-line" aria-label="사동 문장 구조">
+                        <div class="structure-step">
+                            <span>원인 제공자</span>
+                            <b>선생님이</b>
+                        </div>
+                        <div class="structure-step">
+                            <span>대상</span>
+                            <b>학생에게</b>
+                        </div>
+                        <div class="structure-step">
+                            <span>행동</span>
+                            <b>책을 읽게</b>
+                        </div>
+                        <div class="structure-step">
+                            <span>결과</span>
+                            <b>했어요</b>
+                        </div>
+                    </div>
+                    <p class="safe">짧은 사동사로도 말할 수 있습니다. 예: 선생님이 학생에게 책을 <b>읽혔어요</b>.</p>
+                </article>
+
+                <article class="study-card">
+                    <h2>직접 행동과 사동 비교</h2>
+                    <div class="mt-3 overflow-x-auto rounded-xl border border-slate-200">
+                        <table class="example-table">
+                            <thead>
+                                <tr>
+                                    <th>보통 표현</th>
+                                    <th>사동 표현</th>
+                                    <th>초점</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>아이가 잤어요.</td>
+                                    <td>엄마가 아이를 <b>재웠어요</b>.</td>
+                                    <td>자게 만든 사람</td>
+                                </tr>
+                                <tr>
+                                    <td>학생이 책을 읽었어요.</td>
+                                    <td>선생님이 학생에게 책을 <b>읽혔어요</b>.</td>
+                                    <td>읽도록 한 사람</td>
+                                </tr>
+                                <tr>
+                                    <td>동생이 울었어요.</td>
+                                    <td>형이 동생을 <b>울렸어요</b>.</td>
+                                    <td>울게 한 원인</td>
+                                </tr>
+                                <tr>
+                                    <td>소리가 낮아졌어요.</td>
+                                    <td>제가 소리를 <b>낮췄어요</b>.</td>
+                                    <td>상태를 바꾼 사람</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="study-card study-card--wide">
+                    <h2>만드는 법</h2>
+                    <p class="safe">사동사는 접미사 <b>-이/-히/-리/-기/-우/-구/-추</b>가 동사마다 다르게 붙습니다. 규칙을 완벽히 계산하기보다 자주 쓰는 짝을 예문과 함께 기억하면 좋습니다.</p>
+                    <div class="suffix-grid">
+                        <div class="suffix-card">
+                            <strong>-이</strong>
+                            <ul>
+                                <li>먹다 → <b>먹이다</b></li>
+                                <li>끓다 → <b>끓이다</b></li>
+                                <li>줄다 → <b>줄이다</b></li>
+                                <li>높다 → <b>높이다</b></li>
+                            </ul>
+                        </div>
+                        <div class="suffix-card">
+                            <strong>-히</strong>
+                            <ul>
+                                <li>앉다 → <b>앉히다</b></li>
+                                <li>입다 → <b>입히다</b></li>
+                                <li>읽다 → <b>읽히다</b></li>
+                                <li>눕다 → <b>눕히다</b></li>
+                            </ul>
+                        </div>
+                        <div class="suffix-card">
+                            <strong>-리</strong>
+                            <ul>
+                                <li>울다 → <b>울리다</b></li>
+                                <li>알다 → <b>알리다</b></li>
+                                <li>살다 → <b>살리다</b></li>
+                                <li>돌다 → <b>돌리다</b></li>
+                            </ul>
+                        </div>
+                        <div class="suffix-card">
+                            <strong>-기</strong>
+                            <ul>
+                                <li>웃다 → <b>웃기다</b></li>
+                                <li>벗다 → <b>벗기다</b></li>
+                                <li>신다 → <b>신기다</b></li>
+                                <li>숨다 → <b>숨기다</b></li>
+                            </ul>
+                        </div>
+                        <div class="suffix-card">
+                            <strong>-우</strong>
+                            <ul>
+                                <li>자다 → <b>재우다</b></li>
+                                <li>타다 → <b>태우다</b></li>
+                                <li>깨다 → <b>깨우다</b></li>
+                                <li>서다 → <b>세우다</b></li>
+                            </ul>
+                        </div>
+                        <div class="suffix-card">
+                            <strong>-구 / -추</strong>
+                            <ul>
+                                <li>달다 → <b>달구다</b></li>
+                                <li>낮다 → <b>낮추다</b></li>
+                                <li>늦다 → <b>늦추다</b></li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="study-card study-note study-card--wide">
+                    <h2>헷갈림 비교</h2>
+                    <div class="compare-grid">
+                        <div class="compare-box">
+                            <strong>직접 행동 vs 사동</strong>
+                            <p class="safe">아이가 옷을 입어요. / 엄마가 아이에게 옷을 <b>입혀요</b>.</p>
+                        </div>
+                        <div class="compare-box">
+                            <strong>사동 vs 피동</strong>
+                            <p class="safe">선생님이 학생을 <b>앉혔어요</b>. / 학생이 <b>앉혀졌어요</b>.</p>
+                        </div>
+                        <div class="compare-box">
+                            <strong>형태 주의</strong>
+                            <p class="safe"><b>먹이다</b>는 사동, <b>먹히다</b>는 피동입니다.</p>
+                        </div>
+                    </div>
+                </article>
             </div>
         </section>
 
-        <section id="learnPanel" class="mt-4 space-y-3">
-            <article class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                <h2 class="text-base font-bold text-slate-800">핵심 개념</h2>
-                <p class="text-sm text-slate-700 mt-2 safe">사동사는 주어가 다른 대상에게 어떤 행동을 하게 만드는 표현입니다.</p>
-                <p class="text-sm text-slate-700 mt-1 safe">예) 엄마가 아이에게 밥을 <b>먹이다</b>.</p>
-                <p class="vi-text text-xs text-blue-700 mt-2 safe">Động từ sai khiến diễn tả chủ thể làm cho đối tượng khác thực hiện hành động.</p>
-            </article>
-
-            <article class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                <h2 class="text-base font-bold text-slate-800">만드는 법</h2>
-                <p class="mt-2 text-sm text-slate-700 safe">사동사는 접미사 <b>-이/-히/-리/-기/-우/-구/-추</b>가 동사마다 다르게 붙습니다. 아래 표처럼 짝으로 외우면 편합니다.</p>
-                <div class="mt-3 overflow-x-auto rounded-xl border border-slate-200">
-                    <table class="min-w-full text-sm text-slate-700">
-                        <thead class="bg-slate-50 text-slate-800">
-                            <tr>
-                                <th class="px-3 py-2 text-left font-bold">접미사</th>
-                                <th class="px-3 py-2 text-left font-bold">자주 쓰는 예</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-200">
-                            <tr>
-                                <td class="px-3 py-3 font-black text-blue-700 align-top">-이</td>
-                                <td class="px-3 py-3">
-                                    <div class="grid gap-1 safe">
-                                        <p>먹다 → <b class="text-blue-700">먹이다</b></p>
-                                        <p>끓다 → <b class="text-blue-700">끓이다</b></p>
-                                        <p>줄다 → <b class="text-blue-700">줄이다</b></p>
-                                        <p>붙다 → <b class="text-blue-700">붙이다</b></p>
-                                        <p>높다 → <b class="text-blue-700">높이다</b></p>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-3 py-3 font-black text-blue-700 align-top">-히</td>
-                                <td class="px-3 py-3">
-                                    <div class="grid gap-1 safe">
-                                        <p>앉다 → <b class="text-blue-700">앉히다</b></p>
-                                        <p>입다 → <b class="text-blue-700">입히다</b></p>
-                                        <p>읽다 → <b class="text-blue-700">읽히다</b></p>
-                                        <p>눕다 → <b class="text-blue-700">눕히다</b></p>
-                                        <p>익다 → <b class="text-blue-700">익히다</b></p>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-3 py-3 font-black text-blue-700 align-top">-리</td>
-                                <td class="px-3 py-3">
-                                    <div class="grid gap-1 safe">
-                                        <p>울다 → <b class="text-blue-700">울리다</b></p>
-                                        <p>알다 → <b class="text-blue-700">알리다</b></p>
-                                        <p>살다 → <b class="text-blue-700">살리다</b></p>
-                                        <p>날다 → <b class="text-blue-700">날리다</b></p>
-                                        <p>돌다 → <b class="text-blue-700">돌리다</b></p>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-3 py-3 font-black text-blue-700 align-top">-기</td>
-                                <td class="px-3 py-3">
-                                    <div class="grid gap-1 safe">
-                                        <p>웃다 → <b class="text-blue-700">웃기다</b></p>
-                                        <p>벗다 → <b class="text-blue-700">벗기다</b></p>
-                                        <p>신다 → <b class="text-blue-700">신기다</b></p>
-                                        <p>숨다 → <b class="text-blue-700">숨기다</b></p>
-                                        <p>씻다 → <b class="text-blue-700">씻기다</b></p>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-3 py-3 font-black text-blue-700 align-top">-우</td>
-                                <td class="px-3 py-3">
-                                    <div class="grid gap-1 safe">
-                                        <p>자다 → <b class="text-blue-700">재우다</b></p>
-                                        <p>타다 → <b class="text-blue-700">태우다</b></p>
-                                        <p>깨다 → <b class="text-blue-700">깨우다</b></p>
-                                        <p>서다 → <b class="text-blue-700">세우다</b></p>
-                                        <p>쓰다 → <b class="text-blue-700">씌우다</b></p>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-3 py-3 font-black text-blue-700 align-top">-구</td>
-                                <td class="px-3 py-3">
-                                    <div class="grid gap-1 safe">
-                                        <p>달다 → <b class="text-blue-700">달구다</b></p>
-                                        <p>솟다 → <b class="text-blue-700">솟구다</b></p>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-3 py-3 font-black text-blue-700 align-top">-추</td>
-                                <td class="px-3 py-3">
-                                    <div class="grid gap-1 safe">
-                                        <p>낮다 → <b class="text-blue-700">낮추다</b></p>
-                                        <p>늦다 → <b class="text-blue-700">늦추다</b></p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p class="mt-2 text-xs text-slate-500 safe">`-구`, `-추`는 흔한 말이 많지 않아서 자주 보는 예만 기억해도 충분합니다.</p>
-                <p class="vi-text text-xs text-blue-700 mt-1 safe">Hậu tố <b>-이/-히/-리/-기/-우/-구/-추</b> thay đổi theo từng động từ. Hãy học theo cặp; riêng <b>-구, -추</b> có ít ví dụ thông dụng hơn.</p>
-            </article>
-
-            <article class="bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-sm">
-                <h2 class="text-base font-bold text-amber-800">헷갈림 비교</h2>
-                <div class="mt-2 space-y-3">
-                    <div>
-                        <p class="text-sm font-bold text-slate-800">직접행동 vs 사동</p>
-                        <p class="text-sm text-slate-700 safe">아이가 옷을 입어요. / 엄마가 아이에게 옷을 입혀요.</p>
-                        <p class="vi-text text-xs text-blue-700 mt-1 safe">Hành động trực tiếp: đứa trẻ tự mặc. Sai khiến: mẹ mặc cho đứa trẻ.</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-bold text-slate-800">사동 vs 피동</p>
-                        <p class="text-sm text-slate-700 safe">선생님이 학생을 앉혔어요(사동) / 학생이 앉혀졌어요(피동).</p>
-                        <p class="vi-text text-xs text-blue-700 mt-1 safe">Sai khiến: chủ thể khiến người khác làm. Bị động: chủ thể bị tác động.</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-bold text-slate-800">형태 주의</p>
-                        <p class="text-sm text-slate-700 safe">*먹히다(피동)와 먹이다(사동)를 혼동하지 않기.</p>
-                        <p class="vi-text text-xs text-blue-700 mt-1 safe">Phân biệt rõ 먹히다 (bị ăn) và 먹이다 (cho ăn).</p>
-                    </div>
-                </div>
-            </article>
-        </section>
-
-        <section id="practicePanel" class="mt-4 hidden">
+        <section id="practicePanel" class="mt-4 hidden max-w-2xl mx-auto">
             <article class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
                 <div class="flex items-center justify-between text-xs">
                     <span id="progress" class="font-bold text-blue-600"></span>
@@ -197,7 +754,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <p id="qGrammar" class="mt-2 text-[11px] font-bold text-violet-700"></p>
                 <p id="qText" class="mt-2 text-base font-bold text-slate-800 safe"></p>
                 <p id="qHintKo" class="mt-2 text-xs text-slate-600 safe"></p>
-                <p id="qHintVi" class="vi-text text-xs text-blue-700 mt-1 safe"></p>
 
                 <div id="choices" class="mt-3 space-y-2"></div>
                 <div id="shortWrap" class="mt-3 hidden">
@@ -215,20 +771,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <script src="../shared/grammar-bilingual-layout.js"></script>
     <script>
-        const page = document.getElementById('page');
-        const viToggle = document.getElementById('viToggle');
         const tabLearn = document.getElementById('tabLearn');
         const tabPractice = document.getElementById('tabPractice');
         const learnPanel = document.getElementById('learnPanel');
         const practicePanel = document.getElementById('practicePanel');
-
-        let viOn = false;
-
-        viToggle.addEventListener('click', function () {
-            viOn = !viOn;
-            page.classList.toggle('vi-on', viOn);
-            viToggle.textContent = viOn ? 'Tiếng Việt ON' : 'Tiếng Việt OFF';
-        });
 
         function showTab(name) {
             const learn = name === 'learn';
@@ -337,7 +883,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const qGrammar = document.getElementById('qGrammar');
         const qText = document.getElementById('qText');
         const qHintKo = document.getElementById('qHintKo');
-        const qHintVi = document.getElementById('qHintVi');
         const choices = document.getElementById('choices');
         const shortWrap = document.getElementById('shortWrap');
         const shortInput = document.getElementById('shortInput');
@@ -384,11 +929,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         function feedbackHtml(ok, user, correct, q) {
             return '' +
-                '<p class="text-sm font-bold ' + (ok ? 'text-emerald-700' : 'text-rose-700') + '">' + (ok ? '정답입니다.' : '오답입니다.') + ' <span class="text-xs">(' + (ok ? 'Đúng' : 'Sai') + ')</span></p>' +
+                '<p class="text-sm font-bold ' + (ok ? 'text-emerald-700' : 'text-rose-700') + '">' + (ok ? '정답입니다.' : '오답입니다.') + '</p>' +
                 '<p class="text-xs text-slate-700 mt-2"><b>내 답:</b> ' + esc(user || '(무응답)') + '</p>' +
                 '<p class="text-xs text-slate-700 mt-1"><b>정답:</b> ' + esc(correct) + '</p>' +
-                '<p class="text-xs text-slate-700 mt-2 safe"><b>설명(KO):</b> ' + esc(q.explainKo) + '</p>' +
-                '<p class="text-xs text-blue-700 mt-1 safe"><b>Giải thích (VI):</b> ' + esc(q.explainVi) + '</p>';
+                '<p class="text-xs text-slate-700 mt-2 safe"><b>설명:</b> ' + esc(q.explainKo) + '</p>';
         }
 
         function answerQuestion(user) {
@@ -405,7 +949,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             state.answered = true;
             if (ok) state.score += 1;
-            state.logs.push({ ok: ok, user: user, correct: correct, q: q.q, explainKo: q.explainKo, explainVi: q.explainVi });
+            state.logs.push({ ok: ok, user: user, correct: correct, q: q.q, explainKo: q.explainKo });
 
             feedbackBox.classList.remove('hidden');
             feedbackBox.className = 'mt-3 rounded-xl border p-3 ' + (ok ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200');
@@ -428,7 +972,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             qGrammar.textContent = q.grammar;
             qText.textContent = q.q;
             qHintKo.textContent = '상황: ' + q.hintKo;
-            qHintVi.textContent = 'Tình huống: ' + q.hintVi;
 
             choices.innerHTML = '';
             feedbackBox.classList.add('hidden');
@@ -461,7 +1004,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             let detail = '';
 
             if (wrong.length === 0) {
-                detail = '<p class="text-sm text-emerald-700 mt-2">모든 문항을 정확히 풀었습니다.</p><p class="vi-text text-xs text-blue-700 mt-1">Bạn đã trả lời đúng toàn bộ câu hỏi.</p>';
+                detail = '<p class="text-sm text-emerald-700 mt-2">모든 문항을 정확히 풀었습니다.</p>';
             } else {
                 detail = state.logs.map(function (w, idx) {
                     if (w.ok) {
@@ -469,8 +1012,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             '<p class="text-xs font-bold text-emerald-700">정답 ' + (idx + 1) + '</p>' +
                             '<p class="text-sm text-slate-800 mt-1 safe">' + esc(w.q) + '</p>' +
                             '<p class="text-xs text-slate-700 mt-1"><b>정답:</b> ' + esc(w.correct) + '</p>' +
-                            '<p class="text-xs text-emerald-700 mt-1 safe"><b>설명(KO):</b> ' + esc(w.explainKo) + '</p>' +
-                            '<p class="text-xs text-blue-700 mt-1 safe vi-text"><b>Giải thích (VI):</b> ' + esc(w.explainVi) + '</p>' +
+                            '<p class="text-xs text-emerald-700 mt-1 safe"><b>설명:</b> ' + esc(w.explainKo) + '</p>' +
                             '</article>';
                     }
                     return '<article class="rounded-xl border border-rose-200 bg-rose-50 p-3">' +
@@ -478,8 +1020,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         '<p class="text-sm text-slate-800 mt-1 safe">' + esc(w.q) + '</p>' +
                         '<p class="text-xs text-slate-700 mt-2"><b>내 답:</b> ' + esc(w.user || '(무응답)') + '</p>' +
                         '<p class="text-xs text-slate-700 mt-1"><b>정답:</b> ' + esc(w.correct) + '</p>' +
-                        '<p class="text-xs text-rose-700 mt-2 safe"><b>설명(KO):</b> ' + esc(w.explainKo) + '</p>' +
-                        '<p class="text-xs text-blue-700 mt-1 safe"><b>Giải thích (VI):</b> ' + esc(w.explainVi) + '</p>' +
+                        '<p class="text-xs text-rose-700 mt-2 safe"><b>설명:</b> ' + esc(w.explainKo) + '</p>' +
                         '</article>';
                 }).join('');
             }
