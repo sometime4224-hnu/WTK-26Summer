@@ -2,18 +2,24 @@
   "use strict";
 
   const config = window.GE_HADA_CAFE_GAME;
-  const storageKey = "c15.grammar1.geHadaCafe.v1";
+  const storageKey = "c15.grammar1.geHadaCafe.v3";
   const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
   const walkDuration = 1600;
   const workerKeys = ["A", "B", "C"];
+  const actorKeys = ["boss", "manager", ...workerKeys];
   const taskOptions = buildTaskOptions();
+  const directMissionCount = Number(config.directMissionCount || 5);
+  const managerPracticeCount = Number(config.managerPracticeCount || 5);
 
   const state = {
     missionIndex: 0,
+    directMissions: [],
     completed: [],
     wrongCount: 0,
     running: false,
     finished: false,
+    sandboxMode: false,
+    zoneLabelsVisible: true,
     selectedWorker: "",
     managerSelection: {
       subject: "",
@@ -39,6 +45,8 @@
     feedback: document.getElementById("feedbackBox"),
     start: document.getElementById("startBtn"),
     hint: document.getElementById("hintBtn"),
+    sandbox: document.getElementById("sandboxBtn"),
+    zoneLabelToggle: document.getElementById("zoneLabelToggle"),
     reset: document.getElementById("resetBtn"),
     flow: document.getElementById("flowSteps"),
     speech: document.getElementById("speechPop"),
@@ -63,24 +71,119 @@
     }
   };
 
+  function missionPool() {
+    return Array.isArray(config.directMissionPool) ? config.directMissionPool : [];
+  }
+
+  function shuffle(items) {
+    const copy = [...items];
+    for (let index = copy.length - 1; index > 0; index -= 1) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [copy[index], copy[randomIndex]] = [copy[randomIndex], copy[index]];
+    }
+    return copy;
+  }
+
+  function shuffleAwayFromOriginal(items) {
+    if (items.length < 2) return [...items];
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      const shuffled = shuffle(items);
+      if (shuffled.every((item, index) => item !== items[index])) return shuffled;
+    }
+    return [...items.slice(1), items[0]];
+  }
+
+  function randomizeActorPortraits() {
+    const images = actorKeys
+      .map((actorKey) => refs.actors[actorKey]?.querySelector(".actor-face img"))
+      .filter(Boolean);
+    const sources = images.map((image) => image.getAttribute("src")).filter(Boolean);
+    if (images.length !== sources.length || sources.length < 2) return;
+
+    shuffleAwayFromOriginal(sources).forEach((source, index) => {
+      images[index].src = source;
+    });
+  }
+
+  function buildDirectMissionPlan() {
+    const pool = missionPool();
+    const selected = [];
+    const selectedIds = new Set();
+
+    workerKeys.forEach((workerKey) => {
+      const workerMissions = shuffle(pool.filter((mission) => mission.target === workerKey));
+      const mission = workerMissions[0];
+      if (!mission) return;
+      selected.push(mission);
+      selectedIds.add(mission.id);
+    });
+
+    shuffle(pool)
+      .filter((mission) => !selectedIds.has(mission.id))
+      .slice(0, Math.max(0, directMissionCount - selected.length))
+      .forEach((mission) => {
+        selected.push(mission);
+        selectedIds.add(mission.id);
+      });
+
+    return shuffle(selected).slice(0, directMissionCount);
+  }
+
+  function resolveMissionPlan(ids) {
+    const pool = missionPool();
+    const byId = new Map(pool.map((mission) => [mission.id, mission]));
+    const missions = Array.isArray(ids)
+      ? ids.map((id) => byId.get(id)).filter(Boolean)
+      : [];
+    if (missions.length === directMissionCount) return missions;
+    return buildDirectMissionPlan();
+  }
+
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey));
-      if (!saved) return;
+      if (!saved) {
+        state.directMissions = buildDirectMissionPlan();
+        return;
+      }
+      if (typeof saved.zoneLabelsVisible === "boolean") {
+        state.zoneLabelsVisible = saved.zoneLabelsVisible;
+      }
+      if (saved.actorPositions && typeof saved.actorPositions === "object") {
+        workerKeys.forEach((actorKey) => {
+          const position = saved.actorPositions[actorKey];
+          if (!position || !Number.isFinite(position.x) || !Number.isFinite(position.y)) return;
+          state.actorPositions[actorKey] = {
+            x: Number(position.x),
+            y: Number(position.y)
+          };
+        });
+      }
+      state.directMissions = resolveMissionPlan(saved.directMissionIds);
       state.completed = Array.isArray(saved.completed) ? saved.completed : [];
       state.wrongCount = Number(saved.wrongCount || 0);
-      state.missionIndex = Math.min(state.completed.length, config.missions.length - 1);
-      state.finished = state.completed.length >= config.missions.length;
+      state.completed = state.completed.slice(0, totalMissionCount());
+      state.missionIndex = Math.min(completedDirectCount(), Math.max(0, state.directMissions.length - 1));
+      state.finished = state.completed.length >= totalMissionCount();
     } catch (error) {
       // Local progress is optional.
+      state.directMissions = buildDirectMissionPlan();
     }
   }
 
   function saveState() {
     try {
       localStorage.setItem(storageKey, JSON.stringify({
+        directMissionIds: state.directMissions.map((mission) => mission.id),
         completed: state.completed,
         wrongCount: state.wrongCount,
+        zoneLabelsVisible: state.zoneLabelsVisible,
+        actorPositions: workerKeys.reduce((positions, actorKey) => {
+          if (state.actorPositions[actorKey]) {
+            positions[actorKey] = state.actorPositions[actorKey];
+          }
+          return positions;
+        }, {}),
         savedAt: new Date().toISOString()
       }));
     } catch (error) {
@@ -89,11 +192,31 @@
   }
 
   function currentMission() {
-    return config.missions[state.missionIndex];
+    return state.directMissions[state.missionIndex];
+  }
+
+  function totalMissionCount() {
+    return state.directMissions.length + managerPracticeCount;
+  }
+
+  function completedDirectCount() {
+    return state.completed.filter((record) => record.mode === "direct").length;
+  }
+
+  function completedManagerCount() {
+    return state.completed.filter((record) => record.mode === "manager").length;
+  }
+
+  function isDirectPhase() {
+    return !state.sandboxMode && !state.finished && completedDirectCount() < state.directMissions.length;
   }
 
   function isManagerPhase() {
-    return !state.finished && state.completed.length >= 1;
+    return !state.sandboxMode && !state.finished && completedDirectCount() >= state.directMissions.length;
+  }
+
+  function canUseManagerBuilder() {
+    return state.sandboxMode || isManagerPhase();
   }
 
   function partsFromBossOrder(order) {
@@ -110,7 +233,7 @@
 
   function buildTaskOptions() {
     const options = new Map();
-    config.missions.forEach((mission) => {
+    missionPool().forEach((mission) => {
       const parts = partsFromBossOrder(mission.bossOrder);
       if (!parts.object || !parts.action) return;
       const key = `${parts.object}|${parts.action}`;
@@ -133,6 +256,33 @@
     return taskOptions.find((task) => task.object === object && task.action === action);
   }
 
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\"": "&quot;",
+      "'": "&#39;"
+    })[char]);
+  }
+
+  function grammarHtml(value) {
+    const pattern = /(V-게 하다|-게 하다|-게 했어요|(?:닦|만들|쓸|버리|정리하|000)게(?:\s*(?:하다|하세요|했어요))?|게\s*(?:하다|하세요|했어요))/g;
+    return escapeHtml(value).replace(pattern, '<span class="grammar-focus">$1</span>');
+  }
+
+  function setGrammarText(element, value) {
+    if (!element) return;
+    element.innerHTML = grammarHtml(value);
+  }
+
+  function applyZoneLabelVisibility() {
+    refs.stage.classList.toggle("is-zone-labels-hidden", !state.zoneLabelsVisible);
+    if (!refs.zoneLabelToggle) return;
+    refs.zoneLabelToggle.checked = state.zoneLabelsVisible;
+    refs.zoneLabelToggle.setAttribute("aria-checked", String(state.zoneLabelsVisible));
+  }
+
   function managerOrderText(selection = state.managerSelection) {
     if (!selection.subject || !selection.object || !selection.action) return "";
     return `${selection.subject}가 ${selection.object} ${selection.action} 하세요.`;
@@ -142,11 +292,20 @@
     return Math.max(min, Math.min(max, value));
   }
 
+  function stageBaseSize() {
+    const size = config.stageSize || {};
+    return {
+      width: Number(size.width) || 720,
+      height: Number(size.height) || 590
+    };
+  }
+
   function scalePosition(position) {
-    const stageWidth = refs.stage.clientWidth || 720;
-    const stageHeight = refs.stage.clientHeight || 590;
-    const scaleX = stageWidth / 720;
-    const scaleY = stageHeight / 590;
+    const base = stageBaseSize();
+    const stageWidth = refs.stage.clientWidth || base.width;
+    const stageHeight = refs.stage.clientHeight || base.height;
+    const scaleX = stageWidth / base.width;
+    const scaleY = stageHeight / base.height;
     return {
       x: Math.round(position.x * scaleX),
       y: Math.round(position.y * scaleY)
@@ -168,6 +327,11 @@
     applyActorPosition(actorKey);
   }
 
+  function hasActorPosition(actorKey) {
+    const position = state.actorPositions[actorKey];
+    return Boolean(position && Number.isFinite(position.x) && Number.isFinite(position.y));
+  }
+
   async function moveActor(actorKey, position, duration = walkDuration) {
     const actor = refs.actors[actorKey];
     if (!actor || !position) return;
@@ -183,7 +347,7 @@
 
   function showSpeech(speaker, text) {
     refs.speechSpeaker.textContent = speaker;
-    refs.speechText.textContent = text;
+    setGrammarText(refs.speechText, text);
     refs.speech.hidden = false;
   }
 
@@ -202,7 +366,7 @@
   }
 
   function showSuccess(text) {
-    refs.successText.textContent = text;
+    setGrammarText(refs.successText, text);
     refs.success.hidden = false;
     refs.success.classList.remove("is-showing");
     refs.successEffect.hidden = false;
@@ -214,7 +378,7 @@
 
   function setFeedback(text, tone = "") {
     refs.feedback.className = tone ? `feedback ${tone}` : "feedback";
-    refs.feedback.textContent = text;
+    setGrammarText(refs.feedback, text);
   }
 
   function clearZoneStates() {
@@ -258,7 +422,7 @@
           "행동 후 -게 했어요 문장을 확인해요."
         ];
     Array.from(refs.flow.querySelectorAll("li")).forEach((item, index) => {
-      item.textContent = labels[index] || "";
+      setGrammarText(item, labels[index] || "");
     });
   }
 
@@ -269,14 +433,31 @@
   }
 
   function startPositionFor(actorKey) {
-    if (actorKey === "boss" && isManagerPhase()) {
+    if (actorKey === "boss" && (isManagerPhase() || state.sandboxMode)) {
       return config.positions.busyBoss || config.startPositions.boss;
     }
     return config.startPositions[actorKey];
   }
 
-  function resetActorsForMission() {
+  function resetSupportActorsForScene() {
+    ["boss", "manager"].forEach((actorKey) => {
+      setActorPosition(actorKey, startPositionFor(actorKey));
+      refs.actors[actorKey].classList.remove(
+        "is-active",
+        "is-choice-target",
+        "is-walking",
+        "is-working"
+      );
+    });
+  }
+
+  function resetActorsForMission(options = {}) {
+    const resetWorkers = Boolean(options.resetWorkers);
     Object.keys(config.startPositions).forEach((actorKey) => {
+      if (workerKeys.includes(actorKey) && !resetWorkers && hasActorPosition(actorKey)) {
+        applyActorPosition(actorKey);
+        return;
+      }
       setActorPosition(actorKey, startPositionFor(actorKey));
     });
     Object.values(refs.actors).forEach((actor) => {
@@ -303,6 +484,21 @@
     hideSuccess();
   }
 
+  function managerApproachPositionFor(actorKey) {
+    const position = state.actorPositions[actorKey] || config.positions[actorKey] || config.startPositions[actorKey];
+    const base = stageBaseSize();
+    const offsetX = position.x < base.width * 0.28
+      ? 84
+      : position.x > base.width * 0.74
+        ? -88
+        : -82;
+    const offsetY = position.y < base.height * 0.36 ? 58 : -18;
+    return {
+      x: Math.round(clamp(position.x + offsetX, 96, base.width - 128)),
+      y: Math.round(clamp(position.y + offsetY, 120, base.height - 170))
+    };
+  }
+
   function requestOptionsFor(mission) {
     if (Array.isArray(mission.requestOptions) && mission.requestOptions.length) {
       return mission.requestOptions;
@@ -316,24 +512,32 @@
     if (!actor || !position) return;
 
     const scaled = scalePosition(position);
-    const actorWidth = actor.offsetWidth || 78;
-    const stageWidth = refs.stage.clientWidth || 720;
-    const stageHeight = refs.stage.clientHeight || 590;
+    const base = stageBaseSize();
+    const actorWidth = actor.offsetWidth || 64;
+    const stageWidth = refs.stage.clientWidth || base.width;
+    const stageHeight = refs.stage.clientHeight || base.height;
     const isBuilder = refs.stageChoice.classList.contains("is-builder");
-    const x = clamp(scaled.x + actorWidth / 2, 126, stageWidth - 126);
+    const menuWidth = refs.stageChoice.offsetWidth || (isBuilder ? 500 : 268);
+    const minX = menuWidth / 2 + 12;
+    const maxX = Math.max(minX, stageWidth - menuWidth / 2 - 12);
+    const x = clamp(scaled.x + actorWidth / 2, minX, maxX);
     const menuHeight = refs.stageChoice.offsetHeight || 260;
+    const menuMargin = 18;
     const y = isBuilder
-      ? clamp(scaled.y + (actor.offsetHeight || 120) + 12, 24, stageHeight - menuHeight - 24)
-      : Math.max(24, scaled.y - 10);
+      ? clamp(scaled.y + (actor.offsetHeight || 102) + 12, 24, stageHeight - menuHeight - 24)
+      : clamp(scaled.y - 10, menuHeight + menuMargin, stageHeight - menuMargin);
     refs.stageChoice.style.setProperty("--choice-x", `${Math.round(x)}px`);
     refs.stageChoice.style.setProperty("--choice-y", `${Math.round(y)}px`);
   }
 
   function renderStageChoice(actorKey) {
-    if (state.running || state.finished || !workerKeys.includes(actorKey)) return;
-    if (isManagerPhase()) {
-      setFeedback("지금은 매니저에게 직원 관리를 부탁하세요.", "");
-      showSpeech("나(사장)", "너무 바빠요! 매니저에게 직원 관리를 부탁하세요!");
+    if (state.running || !workerKeys.includes(actorKey)) return;
+    if (!isDirectPhase()) {
+      const text = state.sandboxMode
+        ? "샌드박스에서는 매니저에게 자유롭게 지시해 보세요."
+        : "지금은 매니저에게 직원 관리를 부탁하세요.";
+      setFeedback(text, "");
+      showSpeech("나(사장)", text);
       return;
     }
     const mission = currentMission();
@@ -347,7 +551,7 @@
     updateFlow(0);
     refs.actors.boss.classList.add("is-active");
     setFeedback(`나(사장)이 ${worker.name}에게 어떤 부탁을 할까요?`, "");
-    refs.instruction.textContent = "나(사장) 위 선택지에서 알맞은 부탁을 고르세요.";
+    setGrammarText(refs.instruction, "나(사장) 위 선택지에서 알맞은 부탁을 고르세요.");
 
     refs.stageChoice.innerHTML = "";
     refs.stageChoice.className = "stage-choice-pop";
@@ -360,7 +564,7 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = "stage-choice-button";
-      button.textContent = request;
+      setGrammarText(button, request);
       button.addEventListener("click", () => handleRequestChoice(request, button));
       refs.stageChoice.appendChild(button);
     });
@@ -387,12 +591,12 @@
     const subject = state.managerSelection.subject ? `${state.managerSelection.subject}가` : "00가";
     const object = state.managerSelection.object || "000을";
     const action = state.managerSelection.action || "000게";
-    preview.textContent = `매니저 님 ${subject} ${object} ${action} 하세요.`;
+    setGrammarText(preview, `매니저 님 ${subject} ${object} ${action} 하세요.`);
     submit.disabled = !(state.managerSelection.subject && state.managerSelection.object && state.managerSelection.action);
   }
 
   function selectManagerSlot(slot, value, button) {
-    if (state.running || state.finished || !isManagerPhase()) return;
+    if (state.running || !canUseManagerBuilder()) return;
     refs.stageChoice.querySelectorAll(`[data-manager-slot="${slot}"]`).forEach((item) => {
       item.classList.remove("is-selected", "wrong", "correct");
     });
@@ -417,7 +621,7 @@
       button.type = "button";
       button.className = "manager-choice";
       button.dataset.managerSlot = slot;
-      button.textContent = labelFor(option);
+      setGrammarText(button, labelFor(option));
       button.addEventListener("click", () => selectManagerSlot(slot, option, button));
       column.appendChild(button);
     });
@@ -426,14 +630,14 @@
   }
 
   function renderManagerBuilder() {
-    if (state.running || state.finished || !isManagerPhase()) return;
+    if (state.running || !canUseManagerBuilder()) return;
     resetActorHighlights();
     hideSpeech();
     hideSuccess();
     updateFlow(0);
     refs.actors.boss.classList.add("is-active");
     refs.actors.manager.classList.add("is-active", "is-choice-target");
-    refs.instruction.textContent = "매니저에게 시킬 일을 조합하세요.";
+    setGrammarText(refs.instruction, "매니저에게 시킬 일을 조합하세요.");
     setFeedback("00가 / 000을 / 000게 하세요 구조를 완성하세요.", "");
 
     state.managerSelection = {
@@ -463,7 +667,7 @@
     preview.className = "manager-preview";
     preview.innerHTML = `
       <span>완성 문장</span>
-      <strong data-manager-preview>매니저 님 00가 000을 000게 하세요.</strong>
+      <strong data-manager-preview>${grammarHtml("매니저 님 00가 000을 000게 하세요.")}</strong>
     `;
 
     const submit = document.createElement("button");
@@ -483,7 +687,7 @@
   }
 
   async function handleManagerOrder() {
-    if (state.running || state.finished || !isManagerPhase()) return;
+    if (state.running || !canUseManagerBuilder()) return;
     const { subject, object, action } = state.managerSelection;
     const task = findTask(object, action);
 
@@ -500,6 +704,7 @@
     state.running = true;
     refs.start.disabled = true;
     refs.hint.disabled = true;
+    refs.sandbox.disabled = true;
     setFeedback("좋아요. 매니저가 지시를 전달합니다.", "good");
     await wait(360);
     hideStageChoice();
@@ -507,9 +712,16 @@
   }
 
   function renderMission() {
-    const total = config.missions.length;
+    if (state.sandboxMode) {
+      renderSandbox();
+      return;
+    }
+
+    const total = totalMissionCount();
     const mission = currentMission();
     const completedCount = state.completed.length;
+    const directCount = completedDirectCount();
+    const managerCount = completedManagerCount();
     const managerPhase = isManagerPhase();
 
     clearZoneStates();
@@ -518,8 +730,15 @@
     hideSpeech();
     updateFlow(-1);
     updateFlowLabels(managerPhase);
+    refs.summary.hidden = !state.finished;
+    refs.sandbox.classList.remove("is-active");
+    refs.sandbox.textContent = "샌드박스";
 
-    refs.badge.textContent = state.finished ? "Complete" : `Mission ${Math.min(state.missionIndex + 1, total)} / ${total}`;
+    refs.badge.textContent = state.finished
+      ? "Complete"
+      : managerPhase
+        ? `간접 ${Math.min(managerCount + 1, managerPracticeCount)} / ${managerPracticeCount}`
+        : `직접 ${Math.min(directCount + 1, state.directMissions.length)} / ${state.directMissions.length}`;
     refs.progress.style.width = `${Math.round((completedCount / total) * 100)}%`;
     refs.score.textContent = `완료 ${completedCount} / ${total}`;
     refs.dialogueTitle.textContent = managerPhase ? "매니저에게 지시하기" : "직원에게 부탁하기";
@@ -527,22 +746,51 @@
       ? "모든 지시 완료"
       : managerPhase
         ? "매니저에게 지시하세요"
-        : mission.title;
-    refs.situation.textContent = state.finished
+        : mission?.title || "직접 지시 준비";
+    setGrammarText(refs.situation, state.finished
       ? "카페 업무 지시를 모두 끝냈습니다."
       : managerPhase
-        ? "너무 바빠요! 매니저에게 직원 관리를 부탁하세요!"
-        : mission.situation;
+        ? "직접 지시 5개를 마쳤어요. 너무 바빠요! 매니저에게 직원 관리를 부탁하세요!"
+        : mission?.situation || "직원에게 직접 부탁할 상황을 준비하고 있어요.");
     refs.start.disabled = state.running || state.finished;
     refs.hint.disabled = state.running || state.finished;
-    refs.instruction.textContent = state.finished
+    refs.sandbox.disabled = state.running;
+    setGrammarText(refs.instruction, state.finished
       ? "아래 구조 정리를 확인하세요."
       : managerPhase
         ? "매니저를 클릭해 지시문을 조합하세요."
-        : "상황을 보고 알맞은 직원을 클릭하세요.";
+        : "상황을 보고 알맞은 직원을 클릭하세요.");
     refs.choices.innerHTML = "";
 
     if (state.finished) renderSummary();
+  }
+
+  function renderSandbox() {
+    const total = totalMissionCount();
+    const completedCount = state.completed.length;
+
+    clearZoneStates();
+    hideStageChoice();
+    hideSuccess();
+    hideSpeech();
+    updateFlow(-1);
+    updateFlowLabels(true);
+    refs.summary.hidden = true;
+
+    refs.badge.textContent = "Sandbox";
+    refs.progress.style.width = `${Math.round((completedCount / total) * 100)}%`;
+    refs.score.textContent = "자유 연습";
+    refs.dialogueTitle.textContent = "샌드박스";
+    refs.title.textContent = "샌드박스 모드";
+    setGrammarText(refs.situation, "진행도와 상관없이 매니저에게 지시문을 자유롭게 만들어 보세요.");
+    refs.start.disabled = state.running;
+    refs.hint.disabled = state.running;
+    refs.sandbox.disabled = state.running;
+    refs.sandbox.classList.add("is-active");
+    refs.sandbox.textContent = "게임으로 돌아가기";
+    setGrammarText(refs.instruction, "매니저를 클릭해 지시문을 조합하세요.");
+    refs.choices.innerHTML = "";
+    setFeedback("샌드박스에서는 성공해도 진행도가 변하지 않습니다.");
   }
 
   function renderSummary() {
@@ -552,20 +800,31 @@
       const card = document.createElement("article");
       card.className = "summary-card";
       const orderLine = record.mode === "manager"
-        ? `<p>사장 -> 매니저: ${record.bossOrder}</p><p>매니저 -> ${record.target}: ${record.target} 씨, ${record.directRequest}</p>`
-        : `<p>직접 부탁: ${record.target} 씨, ${record.directRequest}</p>`;
+        ? `<p>사장 -> 매니저: ${grammarHtml(record.bossOrder)}</p><p>매니저 -> ${escapeHtml(record.target)}: ${escapeHtml(record.target)} 씨, ${grammarHtml(record.directRequest)}</p>`
+        : `<p>직접 부탁: ${escapeHtml(record.target)} 씨, ${grammarHtml(record.directRequest)}</p>`;
       card.innerHTML = `
-        <strong>${index + 1}. ${record.title}</strong>
+        <strong>${index + 1}. ${escapeHtml(record.title)}</strong>
         ${orderLine}
-        <p>결과 문장: ${record.successText}</p>
-        <p>행동: ${record.completion}</p>
+        <p>결과 문장: ${grammarHtml(record.successText)}</p>
+        <p>행동: ${grammarHtml(record.completion)}</p>
       `;
       refs.summaryGrid.appendChild(card);
     });
   }
 
   function focusMission() {
-    if (state.running || state.finished) return;
+    if (state.running) return;
+    if (state.sandboxMode) {
+      resetActorHighlights();
+      hideStageChoice();
+      hideSpeech();
+      hideSuccess();
+      updateFlow(-1);
+      setGrammarText(refs.instruction, "매니저를 클릭해 지시문을 조합하세요.");
+      setFeedback("샌드박스: 매니저를 클릭하고 자유롭게 문장을 조합하세요.", "");
+      return;
+    }
+    if (state.finished) return;
     const mission = currentMission();
     const managerPhase = isManagerPhase();
     resetActorHighlights();
@@ -573,16 +832,16 @@
     hideSpeech();
     hideSuccess();
     updateFlow(-1);
-    refs.instruction.textContent = managerPhase
+    setGrammarText(refs.instruction, managerPhase
       ? "매니저를 클릭해 지시문을 조합하세요."
-      : "상황을 보고 알맞은 직원을 클릭하세요.";
+      : "상황을 보고 알맞은 직원을 클릭하세요.");
     setFeedback(managerPhase
       ? "너무 바빠요! 매니저에게 직원 관리를 부탁하세요!"
       : `상황: ${mission.situation}`, "");
   }
 
   async function handleRequestChoice(request, button) {
-    if (state.running || state.finished) return;
+    if (state.running || !isDirectPhase()) return;
     const mission = currentMission();
     const isCorrect = state.selectedWorker === mission.target && request === mission.directRequest;
 
@@ -600,6 +859,7 @@
     state.running = true;
     refs.start.disabled = true;
     refs.hint.disabled = true;
+    refs.sandbox.disabled = true;
     setFeedback("좋아요. 직원이 부탁을 듣고 행동합니다.", "good");
     await wait(360);
     hideStageChoice();
@@ -668,7 +928,7 @@
 
     updateFlow(1);
     setFeedback(`매니저가 ${subject}에게 이동합니다.`);
-    await moveActor("manager", config.positions[`managerTo${subject}`] || config.positions[subject]);
+    await moveActor("manager", managerApproachPositionFor(subject));
     showSpeech("매니저", `${subject} 씨, ${task.directRequest}`);
     await wait(1000);
 
@@ -694,6 +954,18 @@
     setFeedback(successText, "good");
     await wait(1700);
 
+    if (state.sandboxMode) {
+      state.running = false;
+      refs.start.disabled = false;
+      refs.hint.disabled = false;
+      refs.sandbox.disabled = false;
+      resetSupportActorsForScene();
+      saveState();
+      setFeedback("샌드박스 성공! 매니저를 클릭해 다른 조합도 만들어 보세요.", "good");
+      setGrammarText(refs.instruction, "매니저를 클릭해 지시문을 조합하세요.");
+      return;
+    }
+
     completeMission({
       id: `manager-${state.completed.length + 1}`,
       title: "매니저에게 지시하세요",
@@ -709,55 +981,101 @@
   function completeMission(record) {
     state.completed.push(record);
 
-    if (state.completed.length >= config.missions.length) {
+    if (state.completed.length >= totalMissionCount()) {
       state.finished = true;
       state.running = false;
+      resetActorsForMission();
       saveState();
       renderMission();
       setFeedback("모든 업무 지시가 끝났습니다. 아래에서 -게 하다 구조를 정리해 보세요.", "good");
       return;
     }
 
-    state.missionIndex += 1;
+    state.missionIndex = Math.min(completedDirectCount(), Math.max(0, state.directMissions.length - 1));
     state.running = false;
     saveState();
     resetActorsForMission();
     renderMission();
     if (isManagerPhase()) {
-      setFeedback(state.completed.length === 1
-        ? "너무 바빠요! 매니저에게 직원 관리를 부탁하세요!"
-        : "성공! 매니저에게 다음 지시를 해 보세요.", "good");
+      setFeedback(completedManagerCount() === 0
+        ? "직접 지시 5개를 마쳤습니다. 이제 매니저에게 직원 관리를 부탁하세요!"
+        : "성공! 매니저에게 다음 간접 지시를 해 보세요.", "good");
     } else {
-      setFeedback("성공! 다음 상황을 보고 직원을 클릭하세요.", "good");
+      setFeedback("성공! 다음 직접 지시 상황을 보고 직원을 클릭하세요.", "good");
     }
   }
 
   function resetGame() {
     state.missionIndex = 0;
+    state.directMissions = buildDirectMissionPlan();
     state.completed = [];
     state.wrongCount = 0;
     state.running = false;
     state.finished = false;
+    state.sandboxMode = false;
     state.selectedWorker = "";
+    state.actorPositions = {};
     refs.summary.hidden = true;
     refs.summaryGrid.innerHTML = "";
-    resetActorsForMission();
+    resetActorsForMission({ resetWorkers: true });
     saveState();
     renderMission();
     setFeedback("처음부터 다시 시작합니다.");
   }
 
+  function enterSandbox() {
+    if (state.running) return;
+    state.sandboxMode = true;
+    state.selectedWorker = "";
+    resetActorsForMission();
+    renderMission();
+  }
+
+  function exitSandbox() {
+    if (state.running) return;
+    state.sandboxMode = false;
+    state.selectedWorker = "";
+    resetActorsForMission();
+    renderMission();
+    setFeedback(state.finished
+      ? "게임 결과 화면으로 돌아왔습니다."
+      : "게임 진행 화면으로 돌아왔습니다.", "");
+  }
+
   refs.start.addEventListener("click", focusMission);
   refs.hint.addEventListener("click", () => {
-    if (state.running || state.finished) return;
+    if (state.running) return;
+    if (state.sandboxMode) {
+      setFeedback("힌트: 'B가 + 커피를 + 만들게'처럼 직원, 일, 행동을 조합해 보세요.", "");
+      return;
+    }
+    if (state.finished) return;
     const mission = currentMission();
     setFeedback(isManagerPhase()
       ? "힌트: A가 + 테이블을 + 닦게 + 하세요 처럼 조합하세요."
       : `힌트: ${mission.target}에게 "${mission.directRequest}"`, "");
   });
+  refs.sandbox.addEventListener("click", () => {
+    if (state.sandboxMode) {
+      exitSandbox();
+    } else {
+      enterSandbox();
+    }
+  });
+  refs.zoneLabelToggle.addEventListener("change", () => {
+    state.zoneLabelsVisible = refs.zoneLabelToggle.checked;
+    applyZoneLabelVisibility();
+    saveState();
+  });
   refs.reset.addEventListener("click", resetGame);
   refs.actors.boss.addEventListener("click", () => {
-    if (state.running || state.finished) return;
+    if (state.running) return;
+    if (state.sandboxMode) {
+      showSpeech("나(사장)", "샌드박스에서는 매니저에게 자유롭게 지시해 보세요.");
+      setFeedback("매니저를 클릭해 지시문을 조합하세요.");
+      return;
+    }
+    if (state.finished) return;
     if (isManagerPhase()) {
       showSpeech("나(사장)", "너무 바빠요! 매니저에게 직원 관리를 부탁하세요!");
       setFeedback("매니저를 클릭해 지시문을 조합하세요.");
@@ -767,11 +1085,12 @@
     setFeedback("A, B, C 중 알맞은 직원을 클릭하세요.");
   });
   refs.actors.manager.addEventListener("click", () => {
-    if (state.running || state.finished) return;
-    if (isManagerPhase()) {
+    if (state.running) return;
+    if (canUseManagerBuilder()) {
       renderManagerBuilder();
       return;
     }
+    if (state.finished) return;
     showSpeech("매니저", "나중에는 제가 대신 전달하는 표현도 연습할 수 있어요.");
     setFeedback("이번 미션은 나(사장)이 직원에게 직접 부탁합니다.");
   });
@@ -780,12 +1099,14 @@
   });
   window.addEventListener("resize", () => {
     Object.keys(state.actorPositions).forEach(applyActorPosition);
-    if (state.selectedWorker && !refs.stageChoice.hidden) {
+    if (!refs.stageChoice.hidden) {
       placeChoiceMenu();
     }
   });
 
   loadState();
+  randomizeActorPortraits();
+  applyZoneLabelVisibility();
   resetActorsForMission();
   renderMission();
 })();
