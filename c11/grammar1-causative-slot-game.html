@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>11과 문법 1 보조 | 사동 문장 자리 맞추기</title>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #d9e2ee;
+            --bg: #f6f8fb;
+            --panel: #ffffff;
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+            --green: #0f766e;
+            --green-soft: #ecfdf5;
+            --orange: #ea580c;
+            --orange-soft: #fff7ed;
+            --rose: #be123c;
+            --rose-soft: #fff1f2;
+            --shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif;
+            background: linear-gradient(180deg, #fff 0%, var(--bg) 100%);
+        }
+
+        button { font: inherit; }
+
+        .global-nav {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 54px;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+        }
+
+        .global-nav a {
+            color: #334155;
+            font-size: 14px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .nav-divider {
+            color: #cbd5e1;
+            font-weight: 900;
+        }
+
+        .page {
+            width: min(1120px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 22px 0 46px;
+        }
+
+        .top {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 16px;
+            align-items: end;
+            margin-bottom: 16px;
+        }
+
+        .eyebrow {
+            margin: 0 0 7px;
+            color: var(--orange);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.85rem, 3.5vw, 3.2rem);
+            line-height: 1.08;
+            letter-spacing: 0;
+        }
+
+        .lead {
+            margin: 10px 0 0;
+            max-width: 720px;
+            color: #475569;
+            line-height: 1.65;
+            word-break: keep-all;
+        }
+
+        .switch,
+        .cases,
+        .formula-row,
+        .workspace,
+        .slot-row,
+        .nouns,
+        .actions {
+            display: grid;
+            gap: 8px;
+        }
+
+        .switch {
+            grid-template-columns: repeat(2, minmax(96px, 1fr));
+            min-width: 250px;
+        }
+
+        .cases {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            margin-bottom: 10px;
+        }
+
+        .chooser-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .formula-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            margin-bottom: 14px;
+        }
+
+        .workspace {
+            grid-template-columns: minmax(0, 1fr) 320px;
+            gap: 14px;
+            align-items: start;
+        }
+
+        .slot-row {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            padding: 0 16px 16px;
+        }
+
+        .nouns {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .actions {
+            grid-template-columns: 1fr 1fr;
+            margin-top: 12px;
+        }
+
+        .stage-btn,
+        .case-btn,
+        .slot,
+        .noun,
+        .tool,
+        .list-btn,
+        .modal-close,
+        .modal-choice {
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .stage-btn,
+        .case-btn,
+        .tool,
+        .noun,
+        .list-btn {
+            min-height: 46px;
+            padding: 9px 10px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+            color: #334155;
+            font-weight: 900;
+        }
+
+        .stage-btn[aria-pressed="true"] {
+            border-color: var(--orange);
+            background: var(--orange-soft);
+            color: #9a3412;
+        }
+
+        .case-btn[aria-pressed="true"] {
+            border-color: var(--green);
+            background: var(--green-soft);
+            color: #115e59;
+        }
+
+        .list-btn {
+            min-width: 190px;
+            border-color: #fed7aa;
+            background: var(--orange-soft);
+            color: #9a3412;
+        }
+
+        .status {
+            color: var(--muted);
+            font-size: 0.86rem;
+            font-weight: 800;
+            word-break: keep-all;
+        }
+
+        .tool.primary {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .formula,
+        .board,
+        .tray {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: var(--shadow);
+        }
+
+        .formula {
+            min-height: 88px;
+            padding: 13px 14px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .formula.active {
+            border-color: var(--orange);
+            background: var(--orange-soft);
+        }
+
+        .formula small {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--muted);
+            font-size: 0.77rem;
+            font-weight: 900;
+        }
+
+        .formula strong {
+            display: block;
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            line-height: 1.45;
+            word-break: keep-all;
+        }
+
+        .head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            min-height: 54px;
+            padding: 13px 16px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .head h2 {
+            margin: 0;
+            font-size: 1.03rem;
+        }
+
+        .scene {
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 800;
+            word-break: keep-all;
+        }
+
+        .sentence {
+            min-height: 78px;
+            margin: 16px;
+            padding: 14px 16px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .sentence > span {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .line {
+            min-height: 34px;
+            font-size: clamp(1.18rem, 2.4vw, 1.55rem);
+            font-weight: 900;
+            line-height: 1.45;
+            word-break: keep-all;
+        }
+
+        .blank { color: #94a3b8; }
+        .particle { color: var(--orange); }
+
+        .slot {
+            display: grid;
+            gap: 8px;
+            min-height: 154px;
+            width: 100%;
+            padding: 13px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+            text-align: left;
+        }
+
+        .slot.filled {
+            border-color: var(--blue);
+            background: var(--blue-soft);
+        }
+
+        .slot.correct {
+            border-color: var(--green);
+            background: var(--green-soft);
+        }
+
+        .slot.error {
+            border-color: var(--rose);
+            background: var(--rose-soft);
+        }
+
+        .role {
+            font-size: 0.88rem;
+            font-weight: 900;
+        }
+
+        .badge {
+            float: right;
+            padding: 3px 6px;
+            border-radius: 999px;
+            background: var(--orange-soft);
+            color: #9a3412;
+            font-size: 0.68rem;
+            font-weight: 900;
+        }
+
+        .question {
+            min-height: 38px;
+            color: var(--muted);
+            font-size: 0.82rem;
+            line-height: 1.45;
+            word-break: keep-all;
+        }
+
+        .fill {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            min-height: 54px;
+            margin-top: auto;
+            padding: 10px;
+            border: 1px dashed #b6c3d4;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 1.05rem;
+            font-weight: 900;
+        }
+
+        .tray-body { padding: 14px 16px 16px; }
+
+        .noun.selected {
+            border-color: var(--blue);
+            background: var(--blue-soft);
+            color: #1d4ed8;
+        }
+
+        .noun.used {
+            opacity: 0.42;
+            cursor: default;
+        }
+
+        .feedback {
+            min-height: 74px;
+            margin-top: 12px;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 0.92rem;
+            font-weight: 800;
+            line-height: 1.55;
+            word-break: keep-all;
+        }
+
+        .feedback.good {
+            border-color: #99f6e4;
+            background: var(--green-soft);
+            color: #115e59;
+        }
+
+        .feedback.bad {
+            border-color: #fecdd3;
+            background: var(--rose-soft);
+            color: #9f1239;
+        }
+
+        .feedback.wait {
+            border-color: #fed7aa;
+            background: var(--orange-soft);
+            color: #9a3412;
+        }
+
+        .takeaway {
+            margin-top: 14px;
+            padding: 13px 14px;
+            border-left: 4px solid var(--orange);
+            background: #fffaf5;
+            color: #334155;
+            font-weight: 800;
+            line-height: 1.6;
+            word-break: keep-all;
+        }
+
+        .modal-backdrop[hidden] { display: none; }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            background: rgba(15, 23, 42, 0.44);
+        }
+
+        .modal {
+            width: min(760px, 100%);
+            max-height: min(760px, calc(100vh - 36px));
+            display: grid;
+            grid-template-rows: auto 1fr;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 28px 80px rgba(15, 23, 42, 0.26);
+        }
+
+        .modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-head h2 {
+            margin: 0;
+            font-size: 1.05rem;
+        }
+
+        .modal-close {
+            width: 42px;
+            min-height: 38px;
+            border: 1px solid var(--line);
+            background: #f8fafc;
+            color: #334155;
+            font-weight: 900;
+        }
+
+        .modal-body {
+            overflow: auto;
+            padding: 14px 16px 16px;
+        }
+
+        .group {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .group h3 {
+            margin: 0;
+            color: #334155;
+            font-size: 0.92rem;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+        }
+
+        .modal-choice {
+            min-height: 44px;
+            padding: 9px 10px;
+            border: 1px solid var(--line);
+            background: #fff;
+            color: #334155;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .modal-choice.active {
+            border-color: var(--green);
+            background: var(--green-soft);
+            color: #115e59;
+        }
+
+        @media(max-width: 900px) {
+            .top,
+            .workspace { grid-template-columns: 1fr; }
+            .switch { width: 100%; min-width: 0; }
+        }
+
+        @media(max-width: 720px) {
+            .page {
+                width: min(100% - 24px, 1120px);
+                padding-top: 16px;
+            }
+            .cases,
+            .formula-row,
+            .slot-row { grid-template-columns: 1fr; }
+            .slot { min-height: 138px; }
+            .nouns { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .modal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media(max-width: 430px) {
+            .nouns,
+            .modal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .head { align-items: flex-start; flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="global-nav" aria-label="상단 이동">
+        <a href="../index.html">메인</a>
+        <span class="nav-divider">|</span>
+        <a href="index.html">11과 목록</a>
+        <span class="nav-divider">|</span>
+        <a href="grammar1.html">문법 1</a>
+    </nav>
+
+    <main class="page">
+        <section class="top" aria-labelledby="pageTitle">
+            <div>
+                <p class="eyebrow">Causative Structure</p>
+                <h1 id="pageTitle">사동 문장 자리 맞추기</h1>
+                <p class="lead">동사가 사동사로 바뀌면 문장에 필요한 자리가 달라집니다. 빈자리에 명사 카드를 놓으며 구조 변화를 확인합니다.</p>
+            </div>
+            <div class="switch" role="group" aria-label="동사 단계">
+                <button class="stage-btn" type="button" data-stage="base" aria-pressed="true">기본 동사</button>
+                <button class="stage-btn" type="button" data-stage="causative" aria-pressed="false">사동사</button>
+            </div>
+        </section>
+
+        <div class="cases" id="caseRow" role="group" aria-label="대표 동사 선택"></div>
+        <div class="chooser-line">
+            <button class="list-btn" id="openListBtn" type="button">전체 사동사 목록에서 고르기</button>
+            <span class="status" id="caseStatus"></span>
+        </div>
+
+        <section class="formula-row" aria-label="문장 구조 비교">
+            <div class="formula active" id="baseFormula">
+                <small>기본 동사 구조</small>
+                <strong id="baseFormulaText"></strong>
+            </div>
+            <div class="formula" id="causativeFormula">
+                <small>사동사 구조</small>
+                <strong id="causativeFormulaText"></strong>
+            </div>
+        </section>
+
+        <div class="workspace">
+            <section class="board" aria-labelledby="boardTitle">
+                <div class="head">
+                    <h2 id="boardTitle">문장 슬롯</h2>
+                    <span class="scene" id="sceneText"></span>
+                </div>
+                <div class="sentence" aria-live="polite">
+                    <span id="sentenceLabel">완성 문장</span>
+                    <div class="line" id="sentenceLine"></div>
+                </div>
+                <div class="slot-row" id="slotBoard"></div>
+            </section>
+
+            <aside class="tray" aria-labelledby="trayTitle">
+                <div class="head">
+                    <h2 id="trayTitle">명사 카드</h2>
+                    <span class="scene" id="selectedText">선택 없음</span>
+                </div>
+                <div class="tray-body">
+                    <div class="nouns" id="nounGrid"></div>
+                    <div class="actions">
+                        <button class="tool primary" id="checkBtn" type="button">확인</button>
+                        <button class="tool" id="resetBtn" type="button">다시 놓기</button>
+                    </div>
+                    <div class="feedback" id="feedback" aria-live="polite"></div>
+                    <div class="takeaway" id="takeaway"></div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <div class="modal-backdrop" id="listModal" hidden>
+        <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-head">
+                <h2 id="modalTitle">사동사 전체 목록</h2>
+                <button class="modal-close" id="closeListBtn" type="button" aria-label="닫기">X</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </section>
+    </div>
+
+    <script>
+        const defaultCaseIds = ["sleep", "laugh", "eat", "read"];
+
+        function one(o) {
+            const targetParticle = o.targetParticle || "를";
+            const causerParticle = o.causerParticle || "가";
+            return {
+                id: o.id,
+                suffix: o.suffix,
+                label: o.base + " → " + o.causative,
+                nouns: [["causer", o.causer], ["target", o.target]],
+                baseFormula: "[" + o.baseRole + "] + " + o.base,
+                causativeFormula: "[" + o.causerRole + "] + [" + o.baseRole + "] + " + o.causative,
+                base: {
+                    scene: o.baseScene,
+                    name: "기본 문장",
+                    verb: o.baseVerb,
+                    slots: [["target", o.baseRole, o.baseQuestion, o.baseParticle || "가", "target"]],
+                    takeaway: "기본 동사 '" + o.base + "'에는 " + o.baseRole + " 자리가 필요합니다."
+                },
+                causative: {
+                    scene: o.causativeScene,
+                    name: "사동 문장",
+                    verb: o.causativeVerb,
+                    slots: [
+                        ["causer", o.causerRole, o.causerQuestion || "누가 그렇게 하나요?", causerParticle, "causer", "새 자리"],
+                        ["target", o.baseRole, o.baseQuestion, targetParticle, "target", o.badge || "자리 변화"]
+                    ],
+                    takeaway: "사동사 '" + o.causative + "'가 되면 " + o.causerRole + " 자리가 생기고, " + o.baseRole + "의 문장 자리가 바뀝니다."
+                }
+            };
+        }
+
+        function two(o) {
+            const causerParticle = o.causerParticle || "가";
+            const actorCausativeParticle = o.actorCausativeParticle || "에게";
+            const causativeObjectParticle = o.causativeObjectParticle || o.objectParticle || "을";
+            return {
+                id: o.id,
+                suffix: o.suffix,
+                label: o.base + " → " + o.causative,
+                nouns: [["causer", o.causer], ["actor", o.actor], ["object", o.object]],
+                baseFormula: "[" + o.actorRole + "] + [" + o.objectRole + "] + " + o.base,
+                causativeFormula: "[" + o.causerRole + "] + [" + o.actorRole + "] + [" + o.objectRole + "] + " + o.causative,
+                base: {
+                    scene: o.baseScene,
+                    name: "기본 문장",
+                    verb: o.baseVerb,
+                    slots: [
+                        ["actor", o.actorRole, o.actorQuestion, o.actorParticle || "가", "actor"],
+                        ["object", o.objectRole, o.objectQuestion, o.objectParticle || "을", "object"]
+                    ],
+                    takeaway: "기본 동사 '" + o.base + "'에는 " + o.actorRole + "와 " + o.objectRole + " 자리가 필요합니다."
+                },
+                causative: {
+                    scene: o.causativeScene,
+                    name: "사동 문장",
+                    verb: o.causativeVerb,
+                    slots: [
+                        ["causer", o.causerRole, o.causerQuestion || "누가 그렇게 하나요?", causerParticle, "causer", "새 자리"],
+                        ["actor", o.actorRole, o.actorQuestion, actorCausativeParticle, "actor", "조사 변화"],
+                        ["object", o.objectRole, o.objectQuestion, causativeObjectParticle, "object"]
+                    ],
+                    takeaway: "사동사 '" + o.causative + "'가 되면 " + o.causerRole + ", " + o.actorRole + ", " + o.objectRole + "을 모두 확인해야 합니다."
+                }
+            };
+        }
+
+        const cases = [
+            two({ id: "eat", suffix: "-이", base: "먹다", causative: "먹이다", actor: "아이", object: "밥", causer: "엄마", actorRole: "먹는 사람", objectRole: "먹는 것", causerRole: "먹이는 사람", actorQuestion: "누가 먹나요?", objectQuestion: "무엇을 먹나요?", baseScene: "아이가 밥을 먹는 상황", causativeScene: "엄마가 아이에게 밥을 먹이는 상황", baseVerb: "먹는다", causativeVerb: "먹인다" }),
+            one({ id: "boil", suffix: "-이", base: "끓다", causative: "끓이다", target: "물", causer: "엄마", baseRole: "끓는 것", causerRole: "끓이는 사람", baseQuestion: "무엇이 끓나요?", baseParticle: "이", targetParticle: "을", baseScene: "물이 끓는 상황", causativeScene: "엄마가 물을 끓이는 상황", baseVerb: "끓는다", causativeVerb: "끓인다" }),
+            one({ id: "reduce", suffix: "-이", base: "줄다", causative: "줄이다", target: "비용", causer: "회사", baseRole: "줄어드는 것", causerRole: "줄이는 사람/단체", baseQuestion: "무엇이 줄어드나요?", baseParticle: "이", targetParticle: "을", baseScene: "비용이 줄어드는 상황", causativeScene: "회사가 비용을 줄이는 상황", baseVerb: "준다", causativeVerb: "줄인다" }),
+            one({ id: "attach", suffix: "-이", base: "붙다", causative: "붙이다", target: "스티커", causer: "아이", baseRole: "붙는 것", causerRole: "붙이는 사람", baseQuestion: "무엇이 붙나요?", baseParticle: "가", targetParticle: "를", baseScene: "스티커가 붙는 상황", causativeScene: "아이가 스티커를 붙이는 상황", baseVerb: "붙는다", causativeVerb: "붙인다" }),
+            one({ id: "heighten", suffix: "-이", base: "높다", causative: "높이다", target: "온도", causer: "직원", baseRole: "높은 것", causerRole: "높이는 사람", baseQuestion: "무엇이 높나요?", baseParticle: "가", targetParticle: "를", baseScene: "온도가 높은 상황", causativeScene: "직원이 온도를 높이는 상황", baseVerb: "높다", causativeVerb: "높인다" }),
+
+            one({ id: "sit", suffix: "-히", base: "앉다", causative: "앉히다", target: "학생", causer: "선생님", baseRole: "앉는 사람", causerRole: "앉히는 사람", baseQuestion: "누가 앉나요?", baseParticle: "이", targetParticle: "을", causerParticle: "이", baseScene: "학생이 앉는 상황", causativeScene: "선생님이 학생을 앉히는 상황", baseVerb: "앉는다", causativeVerb: "앉힌다" }),
+            two({ id: "wear", suffix: "-히", base: "입다", causative: "입히다", actor: "아이", object: "옷", causer: "엄마", actorRole: "입는 사람", objectRole: "입는 것", causerRole: "입히는 사람", actorQuestion: "누가 입나요?", objectQuestion: "무엇을 입나요?", baseScene: "아이가 옷을 입는 상황", causativeScene: "엄마가 아이에게 옷을 입히는 상황", baseVerb: "입는다", causativeVerb: "입힌다" }),
+            two({ id: "read", suffix: "-히", base: "읽다", causative: "읽히다", actor: "학생", object: "책", causer: "선생님", actorRole: "읽는 사람", objectRole: "읽는 것", causerRole: "읽게 하는 사람", actorQuestion: "누가 읽나요?", objectQuestion: "무엇을 읽나요?", actorParticle: "이", causerParticle: "이", baseScene: "학생이 책을 읽는 상황", causativeScene: "선생님이 학생에게 책을 읽히는 상황", baseVerb: "읽는다", causativeVerb: "읽힌다" }),
+            one({ id: "lie", suffix: "-히", base: "눕다", causative: "눕히다", target: "아기", causer: "엄마", baseRole: "눕는 사람", causerRole: "눕히는 사람", baseQuestion: "누가 눕나요?", baseParticle: "가", targetParticle: "를", baseScene: "아기가 눕는 상황", causativeScene: "엄마가 아기를 눕히는 상황", baseVerb: "눕는다", causativeVerb: "눕힌다" }),
+            one({ id: "cook", suffix: "-히", base: "익다", causative: "익히다", target: "고기", causer: "요리사", baseRole: "익는 것", causerRole: "익히는 사람", baseQuestion: "무엇이 익나요?", baseParticle: "가", targetParticle: "를", baseScene: "고기가 익는 상황", causativeScene: "요리사가 고기를 익히는 상황", baseVerb: "익는다", causativeVerb: "익힌다" }),
+
+            one({ id: "cry", suffix: "-리", base: "울다", causative: "울리다", target: "동생", causer: "형", baseRole: "우는 사람", causerRole: "울리는 사람", baseQuestion: "누가 우나요?", baseParticle: "이", targetParticle: "을", baseScene: "동생이 우는 상황", causativeScene: "형이 동생을 울리는 상황", baseVerb: "운다", causativeVerb: "울린다" }),
+            two({ id: "know", suffix: "-리", base: "알다", causative: "알리다", actor: "친구", object: "소식", causer: "민지", actorRole: "아는 사람", objectRole: "아는 내용", causerRole: "알리는 사람", actorQuestion: "누가 아나요?", objectQuestion: "무엇을 아나요?", baseScene: "친구가 소식을 아는 상황", causativeScene: "민지가 친구에게 소식을 알리는 상황", baseVerb: "안다", causativeVerb: "알린다" }),
+            one({ id: "save", suffix: "-리", base: "살다", causative: "살리다", target: "환자", causer: "의사", baseRole: "사는 사람", causerRole: "살리는 사람", baseQuestion: "누가 사나요?", baseParticle: "가", targetParticle: "를", baseScene: "환자가 사는 상황", causativeScene: "의사가 환자를 살리는 상황", baseVerb: "산다", causativeVerb: "살린다" }),
+            one({ id: "fly", suffix: "-리", base: "날다", causative: "날리다", target: "연", causer: "아이", baseRole: "나는 것", causerRole: "날리는 사람", baseQuestion: "무엇이 나나요?", baseParticle: "이", targetParticle: "을", baseScene: "연이 나는 상황", causativeScene: "아이가 연을 날리는 상황", baseVerb: "난다", causativeVerb: "날린다" }),
+            one({ id: "turn", suffix: "-리", base: "돌다", causative: "돌리다", target: "바퀴", causer: "아이", baseRole: "도는 것", causerRole: "돌리는 사람", baseQuestion: "무엇이 도나요?", baseParticle: "가", targetParticle: "를", baseScene: "바퀴가 도는 상황", causativeScene: "아이가 바퀴를 돌리는 상황", baseVerb: "돈다", causativeVerb: "돌린다" }),
+
+            one({ id: "laugh", suffix: "-기", base: "웃다", causative: "웃기다", target: "민수", causer: "친구", baseRole: "웃는 사람", causerRole: "웃기는 사람", baseQuestion: "누가 웃나요?", baseParticle: "가", targetParticle: "를", baseScene: "민수가 웃는 상황", causativeScene: "친구가 민수를 웃기는 상황", baseVerb: "웃는다", causativeVerb: "웃긴다" }),
+            two({ id: "undress", suffix: "-기", base: "벗다", causative: "벗기다", actor: "아이", object: "외투", causer: "엄마", actorRole: "벗는 사람", objectRole: "벗는 것", causerRole: "벗기는 사람", actorQuestion: "누가 벗나요?", objectQuestion: "무엇을 벗나요?", baseScene: "아이가 외투를 벗는 상황", causativeScene: "엄마가 아이에게 외투를 벗기는 상황", baseVerb: "벗는다", causativeVerb: "벗긴다" }),
+            two({ id: "putshoes", suffix: "-기", base: "신다", causative: "신기다", actor: "아이", object: "신발", causer: "엄마", actorRole: "신는 사람", objectRole: "신는 것", causerRole: "신기는 사람", actorQuestion: "누가 신나요?", objectQuestion: "무엇을 신나요?", objectParticle: "을", baseScene: "아이가 신발을 신는 상황", causativeScene: "엄마가 아이에게 신발을 신기는 상황", baseVerb: "신는다", causativeVerb: "신긴다" }),
+            one({ id: "hide", suffix: "-기", base: "숨다", causative: "숨기다", target: "고양이", causer: "아이", baseRole: "숨는 대상", causerRole: "숨기는 사람", baseQuestion: "누가 숨나요?", baseParticle: "가", targetParticle: "를", baseScene: "고양이가 숨는 상황", causativeScene: "아이가 고양이를 숨기는 상황", baseVerb: "숨는다", causativeVerb: "숨긴다" }),
+            one({ id: "wash", suffix: "-기", base: "씻다", causative: "씻기다", target: "아이", causer: "엄마", baseRole: "씻는 사람", causerRole: "씻기는 사람", baseQuestion: "누가 씻나요?", baseParticle: "가", targetParticle: "를", baseScene: "아이가 씻는 상황", causativeScene: "엄마가 아이를 씻기는 상황", baseVerb: "씻는다", causativeVerb: "씻긴다" }),
+
+            one({ id: "sleep", suffix: "-우", base: "자다", causative: "재우다", target: "아기", causer: "엄마", baseRole: "자는 사람", causerRole: "재우는 사람", baseQuestion: "누가 자나요?", baseParticle: "가", targetParticle: "를", baseScene: "아기가 자는 상황", causativeScene: "엄마가 아기를 재우는 상황", baseVerb: "잔다", causativeVerb: "재운다" }),
+            two({ id: "ride", suffix: "-우", base: "타다", causative: "태우다", actor: "아이", object: "차", causer: "아빠", actorRole: "타는 사람", objectRole: "타는 것", causerRole: "태우는 사람", actorQuestion: "누가 타나요?", objectQuestion: "무엇에 타나요?", objectParticle: "를", causativeObjectParticle: "에", actorCausativeParticle: "를", baseScene: "아이가 차를 타는 상황", causativeScene: "아빠가 아이를 차에 태우는 상황", baseVerb: "탄다", causativeVerb: "태운다" }),
+            one({ id: "wake", suffix: "-우", base: "깨다", causative: "깨우다", target: "동생", causer: "누나", baseRole: "깨는 사람", causerRole: "깨우는 사람", baseQuestion: "누가 깨나요?", baseParticle: "이", targetParticle: "을", baseScene: "동생이 깨는 상황", causativeScene: "누나가 동생을 깨우는 상황", baseVerb: "깬다", causativeVerb: "깨운다" }),
+            one({ id: "stand", suffix: "-우", base: "서다", causative: "세우다", target: "학생", causer: "선생님", baseRole: "서는 사람", causerRole: "세우는 사람", baseQuestion: "누가 서나요?", baseParticle: "이", targetParticle: "을", causerParticle: "이", baseScene: "학생이 서는 상황", causativeScene: "선생님이 학생을 세우는 상황", baseVerb: "선다", causativeVerb: "세운다" }),
+            two({ id: "cover", suffix: "-우", base: "쓰다", causative: "씌우다", actor: "아이", object: "모자", causer: "엄마", actorRole: "쓰는 사람", objectRole: "쓰는 것", causerRole: "씌우는 사람", actorQuestion: "누가 쓰나요?", objectQuestion: "무엇을 쓰나요?", baseScene: "아이가 모자를 쓰는 상황", causativeScene: "엄마가 아이에게 모자를 씌우는 상황", baseVerb: "쓴다", causativeVerb: "씌운다" }),
+
+            one({ id: "heat", suffix: "-구", base: "달다", causative: "달구다", target: "팬", causer: "요리사", baseRole: "뜨거워지는 것", causerRole: "달구는 사람", baseQuestion: "무엇이 달아 있나요?", baseParticle: "이", targetParticle: "을", baseScene: "팬이 단 상태", causativeScene: "요리사가 팬을 달구는 상황", baseVerb: "달다", causativeVerb: "달군다" }),
+            one({ id: "surge", suffix: "-구", base: "솟다", causative: "솟구다", target: "물", causer: "분수", baseRole: "솟는 것", causerRole: "솟구게 하는 것", baseQuestion: "무엇이 솟나요?", baseParticle: "이", targetParticle: "을", baseScene: "물이 솟는 상황", causativeScene: "분수가 물을 솟구게 하는 상황", baseVerb: "솟는다", causativeVerb: "솟군다" }),
+
+            one({ id: "lower", suffix: "-추", base: "낮다", causative: "낮추다", target: "소리", causer: "학생", baseRole: "낮은 것", causerRole: "낮추는 사람", baseQuestion: "무엇이 낮나요?", baseParticle: "가", targetParticle: "를", baseScene: "소리가 낮은 상황", causativeScene: "학생이 소리를 낮추는 상황", baseVerb: "낮다", causativeVerb: "낮춘다" }),
+            one({ id: "delay", suffix: "-추", base: "늦다", causative: "늦추다", target: "시간", causer: "회사", baseRole: "늦은 것", causerRole: "늦추는 사람/단체", baseQuestion: "무엇이 늦나요?", baseParticle: "이", targetParticle: "을", baseScene: "시간이 늦은 상황", causativeScene: "회사가 시간을 늦추는 상황", baseVerb: "늦다", causativeVerb: "늦춘다" })
+        ];
+
+        const suffixGroups = ["-이", "-히", "-리", "-기", "-우", "-구", "-추"];
+        const $ = (id) => document.getElementById(id);
+        let caseId = "sleep";
+        let stage = "base";
+        let selected = null;
+        let filled = {};
+        let status = {};
+
+        function item() {
+            return cases.find((x) => x.id === caseId);
+        }
+
+        function data() {
+            return item()[stage];
+        }
+
+        function noun(id) {
+            return (item().nouns.find((x) => x[0] === id) || [])[1];
+        }
+
+        function resetSlots() {
+            selected = null;
+            filled = {};
+            status = {};
+        }
+
+        function line() {
+            return data().slots.map((slot) => {
+                if (filled[slot[0]]) {
+                    return noun(filled[slot[0]]) + '<span class="particle">' + slot[3] + '</span>';
+                }
+                return '<span class="blank">[' + slot[1] + ']' + slot[3] + '</span>';
+            }).join(" ") + " " + data().verb;
+        }
+
+        function msg(text, tone = "") {
+            $("feedback").textContent = text;
+            $("feedback").className = "feedback" + (tone ? " " + tone : "");
+        }
+
+        function renderCases() {
+            $("caseRow").innerHTML = defaultCaseIds.map((id) => {
+                const c = cases.find((x) => x.id === id);
+                return '<button class="case-btn" type="button" data-id="' + c.id + '" aria-pressed="' + (c.id === caseId) + '">' + c.label + '</button>';
+            }).join("");
+
+            document.querySelectorAll(".case-btn").forEach((button) => {
+                button.onclick = () => {
+                    caseId = button.dataset.id;
+                    resetSlots();
+                    render();
+                    msg("대표 동사를 불러왔습니다. 기본 동사와 사동사의 슬롯 수를 비교해 보세요.");
+                };
+            });
+        }
+
+        function renderModalList() {
+            $("modalBody").innerHTML = suffixGroups.map((suffix) => {
+                const list = cases.filter((c) => c.suffix === suffix);
+                return '<section class="group"><h3>' + suffix + '</h3><div class="modal-grid">' + list.map((c) => {
+                    return '<button class="modal-choice ' + (c.id === caseId ? 'active' : '') + '" type="button" data-id="' + c.id + '">' + c.label + '</button>';
+                }).join("") + '</div></section>';
+            }).join("");
+
+            document.querySelectorAll(".modal-choice").forEach((button) => {
+                button.onclick = () => {
+                    caseId = button.dataset.id;
+                    stage = "base";
+                    resetSlots();
+                    closeModal();
+                    render();
+                    msg(item().label + "을/를 불러왔습니다. 기본 동사와 사동사 구조를 비교해 보세요.");
+                };
+            });
+        }
+
+        function render() {
+            const current = item();
+            const currentData = data();
+            renderCases();
+            renderModalList();
+
+            document.querySelectorAll(".stage-btn").forEach((button) => {
+                button.setAttribute("aria-pressed", button.dataset.stage === stage);
+            });
+
+            $("baseFormulaText").textContent = current.baseFormula;
+            $("causativeFormulaText").textContent = current.causativeFormula;
+            $("baseFormula").classList.toggle("active", stage === "base");
+            $("causativeFormula").classList.toggle("active", stage === "causative");
+            $("sceneText").textContent = currentData.scene;
+            $("sentenceLabel").textContent = currentData.name;
+            $("sentenceLine").innerHTML = line();
+            $("takeaway").textContent = currentData.takeaway;
+            $("selectedText").textContent = selected ? noun(selected) + " 선택" : "선택 없음";
+            $("caseStatus").textContent = defaultCaseIds.includes(caseId)
+                ? "대표 4종: " + current.label
+                : "목록에서 선택: " + current.label;
+
+            $("slotBoard").innerHTML = currentData.slots.map((slot) => {
+                const filledClass = filled[slot[0]] ? "filled" : "";
+                const stateClass = status[slot[0]] || "";
+                const badge = slot[5] ? '<span class="badge">' + slot[5] + '</span>' : "";
+                const fillText = filled[slot[0]]
+                    ? noun(filled[slot[0]]) + '<span class="particle">' + slot[3] + '</span>'
+                    : '<span class="blank">빈자리</span><span class="particle">' + slot[3] + '</span>';
+                return '<button class="slot ' + filledClass + ' ' + stateClass + '" type="button" data-slot="' + slot[0] + '"><span class="role">' + slot[1] + ' ' + badge + '</span><span class="question">' + slot[2] + '</span><span class="fill">' + fillText + '</span></button>';
+            }).join("");
+
+            document.querySelectorAll(".slot").forEach((button) => {
+                button.onclick = () => place(button.dataset.slot);
+            });
+
+            const used = Object.values(filled);
+            $("nounGrid").innerHTML = current.nouns.map((n) => {
+                const selectedClass = selected === n[0] ? "selected" : "";
+                const usedClass = used.includes(n[0]) ? "used" : "";
+                const disabled = used.includes(n[0]) ? 'aria-disabled="true"' : "";
+                return '<button class="noun ' + selectedClass + ' ' + usedClass + '" type="button" data-noun="' + n[0] + '" ' + disabled + '>' + n[1] + '</button>';
+            }).join("");
+
+            document.querySelectorAll(".noun").forEach((button) => {
+                button.onclick = () => {
+                    if (button.getAttribute("aria-disabled") === "true") return;
+                    selected = button.dataset.noun;
+                    render();
+                };
+            });
+        }
+
+        function place(slotId) {
+            if (!selected) {
+                if (filled[slotId]) {
+                    delete filled[slotId];
+                    delete status[slotId];
+                    msg("자리를 비웠습니다.");
+                    render();
+                }
+                return;
+            }
+
+            Object.keys(filled).forEach((key) => {
+                if (filled[key] === selected) {
+                    delete filled[key];
+                    delete status[key];
+                }
+            });
+
+            filled[slotId] = selected;
+            const slot = data().slots.find((x) => x[0] === slotId);
+            const ok = slot[4] === selected;
+            const name = noun(selected);
+            status[slotId] = ok ? "correct" : "error";
+            selected = null;
+            msg(
+                ok
+                    ? slot[1] + ": " + name + " 카드가 맞습니다. 문장에서는 '" + name + slot[3] + "'로 보입니다."
+                    : slot[1] + ' 자리는 "' + slot[2] + '"에 답하는 자리입니다.',
+                ok ? "good" : "bad"
+            );
+            render();
+        }
+
+        function check() {
+            const empty = data().slots.find((slot) => !filled[slot[0]]);
+            if (empty) {
+                msg(empty[1] + " 자리가 비어 있습니다.", "wait");
+                return;
+            }
+
+            const wrong = data().slots.find((slot) => filled[slot[0]] !== slot[4]);
+            if (wrong) {
+                status[wrong[0]] = "error";
+                msg(wrong[1] + " 자리를 다시 보세요. " + wrong[2], "bad");
+                render();
+                return;
+            }
+
+            data().slots.forEach((slot) => {
+                status[slot[0]] = "correct";
+            });
+            msg("구조가 완성됐습니다. " + $("sentenceLine").textContent, "good");
+            render();
+        }
+
+        function openModal() {
+            $("listModal").hidden = false;
+            renderModalList();
+            $("closeListBtn").focus();
+        }
+
+        function closeModal() {
+            $("listModal").hidden = true;
+        }
+
+        document.querySelectorAll(".stage-btn").forEach((button) => {
+            button.onclick = () => {
+                stage = button.dataset.stage;
+                resetSlots();
+                msg("기본 동사와 사동사의 슬롯 수를 비교해 보세요.");
+                render();
+            };
+        });
+
+        $("checkBtn").onclick = check;
+        $("resetBtn").onclick = () => {
+            resetSlots();
+            msg("기본 동사와 사동사의 슬롯 수를 비교해 보세요.");
+            render();
+        };
+        $("openListBtn").onclick = openModal;
+        $("closeListBtn").onclick = closeModal;
+        $("listModal").onclick = (event) => {
+            if (event.target === $("listModal")) closeModal();
+        };
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && !$("listModal").hidden) closeModal();
+        });
+
+        msg("기본 동사와 사동사의 슬롯 수를 비교해 보세요.");
+        render();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>
