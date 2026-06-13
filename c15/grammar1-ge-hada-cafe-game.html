@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>15과 문법 1 보조 활동 | -게 하다 카페 업무 지시</title>
+  <link rel="stylesheet" href="grammar1-ge-hada-cafe-game.css" />
+</head>
+<body>
+  <main class="lab-shell">
+    <nav class="lab-topbar" aria-label="15과 학습 이동">
+      <a href="index.html">15과 목록으로</a>
+      <a href="grammar1.html">문법 1로</a>
+    </nav>
+
+    <section class="lab-titleband">
+      <p class="lab-eyebrow">15과 문법 1 보조 활동</p>
+      <h1>-게 하다 카페 업무 지시</h1>
+      <p>처음에는 나(사장)이 직원에게 직접 부탁하고, 이후에는 매니저에게 간접 지시를 하며 <strong>V-게 하다</strong>의 기능을 장면으로 익힙니다.</p>
+    </section>
+
+    <section class="cafe-layout">
+      <div class="cafe-stage-wrap">
+        <div class="cafe-toolbar" aria-label="게임 진행 상태">
+          <span class="pill" id="missionBadge">Mission 1</span>
+          <div class="progress-track">
+            <div class="progress-fill" id="missionProgress"></div>
+          </div>
+          <span class="cafe-score" id="scoreText">완료 0 / 5</span>
+        </div>
+
+        <div class="cafe-stage" id="cafeStage" aria-live="polite">
+          <div class="zone zone-counter" data-zone-label="카운터">
+            <span>카운터</span>
+          </div>
+          <div class="zone zone-coffee" data-zone-label="커피머신">
+            <img class="zone-object zone-object-cup" src="../assets/c15/grammar/images/ge-hada-cafe-game/obj-cup.webp" alt="" aria-hidden="true" />
+            <span>커피머신</span>
+          </div>
+          <div class="zone zone-table" data-zone-label="테이블">
+            <img class="zone-object zone-object-table" src="../assets/c15/grammar/images/ge-hada-cafe-game/obj-table.webp" alt="" aria-hidden="true" />
+            <img class="zone-object zone-object-towel" src="../assets/c15/grammar/images/ge-hada-cafe-game/obj-towel.webp" alt="" aria-hidden="true" />
+            <span>테이블</span>
+            <i class="table-mark table-mark-1"></i>
+            <i class="table-mark table-mark-2"></i>
+          </div>
+          <div class="zone zone-floor" data-zone-label="바닥">
+            <img class="zone-object zone-object-broom" src="../assets/c15/grammar/images/ge-hada-cafe-game/obj-broom.png" alt="" aria-hidden="true" />
+            <img class="zone-object zone-object-dustpan" src="../assets/c15/grammar/images/ge-hada-cafe-game/obj-dustpan.png" alt="" aria-hidden="true" />
+            <span>바닥</span>
+          </div>
+          <div class="zone zone-trash" data-zone-label="쓰레기통">
+            <img class="zone-object zone-object-trash" src="../assets/c15/grammar/images/ge-hada-cafe-game/obj-trash-bin.webp" alt="" aria-hidden="true" />
+            <span>쓰레기통</span>
+          </div>
+          <div class="zone zone-shelf" data-zone-label="컵 진열대">
+            <img class="zone-object zone-object-bookshelf" src="../assets/c15/grammar/images/ge-hada-cafe-game/obj-bookshelf.png" alt="" aria-hidden="true" />
+            <img class="zone-object zone-object-shelf-cup" src="../assets/c15/grammar/images/ge-hada-cafe-game/obj-cup.webp" alt="" aria-hidden="true" />
+            <span>컵 진열대</span>
+          </div>
+
+          <div class="speech-pop" id="speechPop" hidden>
+            <strong id="speechSpeaker"></strong>
+            <span id="speechText"></span>
+          </div>
+          <div class="stage-choice-pop" id="stageChoicePop" hidden></div>
+          <div class="success-banner" id="successBanner" hidden>
+            <span id="successText"></span>
+          </div>
+          <div class="success-effect" id="successEffect" aria-hidden="true" hidden>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+          </div>
+
+          <button class="actor actor-boss" id="boss" type="button" aria-label="나, 사장">
+            <span class="actor-face">
+              <img src="../assets/c15/grammar/images/ge-hada-cafe-game/char-boss.webp" alt="" aria-hidden="true" />
+              <span class="actor-initial">나</span>
+            </span>
+            <span class="actor-name">나(사장)</span>
+          </button>
+          <button class="actor actor-manager" id="manager" type="button" aria-label="매니저">
+            <span class="actor-face">
+              <img src="../assets/c15/grammar/images/ge-hada-cafe-game/char-manager.webp" alt="" aria-hidden="true" />
+              <span class="actor-initial">M</span>
+            </span>
+            <span class="actor-name">매니저</span>
+          </button>
+          <button class="actor actor-a" id="workerA" type="button" aria-label="아르바이트생 A">
+            <span class="actor-face">
+              <img src="../assets/c15/grammar/images/ge-hada-cafe-game/char-worker-a.webp" alt="" aria-hidden="true" />
+              <span class="actor-initial">A</span>
+            </span>
+            <span class="actor-name">A</span>
+          </button>
+          <button class="actor actor-b" id="workerB" type="button" aria-label="아르바이트생 B">
+            <span class="actor-face">
+              <img src="../assets/c15/grammar/images/ge-hada-cafe-game/char-worker-b.webp" alt="" aria-hidden="true" />
+              <span class="actor-initial">B</span>
+            </span>
+            <span class="actor-name">B</span>
+          </button>
+          <button class="actor actor-c" id="workerC" type="button" aria-label="아르바이트생 C">
+            <span class="actor-face">
+              <img src="../assets/c15/grammar/images/ge-hada-cafe-game/char-worker-c.webp" alt="" aria-hidden="true" />
+              <span class="actor-initial">C</span>
+            </span>
+            <span class="actor-name">C</span>
+          </button>
+        </div>
+      </div>
+
+      <aside class="control-panel cafe-panel">
+        <section class="mission-card">
+          <p class="mission-kicker">현재 상황</p>
+          <h2 id="missionTitle">미션 준비 중</h2>
+          <p id="missionSituation" class="mission-situation"></p>
+        </section>
+
+        <section class="dialogue-card">
+          <h3 id="dialogueTitle">직원에게 부탁하기</h3>
+          <p class="status-line" id="instructionText">상황을 보고 알맞은 직원을 클릭하세요.</p>
+          <div class="choice-grid" id="choiceGrid"></div>
+          <div class="feedback" id="feedbackBox" aria-live="polite">상황을 보고 알맞은 직원을 클릭하세요.</div>
+        </section>
+
+        <section class="flow-card">
+          <h3>문법 흐름</h3>
+          <ol class="flow-steps" id="flowSteps">
+            <li>직원을 고르고 부탁을 선택해요.</li>
+            <li>직원이 부탁을 듣고 움직여요.</li>
+            <li>행동 후 -게 했어요 문장을 확인해요.</li>
+          </ol>
+        </section>
+
+        <div class="control-actions" aria-label="게임 조작">
+          <button class="btn" id="startBtn" type="button">상황 다시 보기</button>
+          <button class="btn secondary" id="hintBtn" type="button">힌트</button>
+          <button class="btn danger" id="resetBtn" type="button">처음부터</button>
+        </div>
+      </aside>
+    </section>
+
+    <section class="lab-panel summary-panel" id="summaryPanel" hidden>
+      <h2>오늘의 구조 정리</h2>
+      <p><strong>V-게 하다</strong>는 내가 직접 행동하지 않고, 다른 사람이 어떤 행동을 하도록 만드는 표현입니다. 직접 부탁과 매니저를 통한 간접 지시를 비교하며 확인합니다.</p>
+      <div class="summary-grid" id="summaryGrid"></div>
+    </section>
+  </main>
+
+  <script src="grammar1-ge-hada-cafe-game-data.js"></script>
+  <script src="grammar1-ge-hada-cafe-game.js"></script>
+</body>
+</html>
