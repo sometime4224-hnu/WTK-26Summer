@@ -445,6 +445,14 @@
             line-height: 1.4;
             word-break: keep-all;
         }
+        .word-card__note,
+        .list-item__note {
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.4;
+            word-break: keep-all;
+        }
         .word-card__category {
             display: inline-flex;
             align-items: center;
@@ -539,143 +547,58 @@
             font-weight: 900;
         }
 
-        .quiz-layout {
-            max-width: 640px;
-            margin: 0 auto;
-            border: 1px solid var(--line, #dbe4f0);
-            border-radius: var(--radius-lg, 16px);
-            background: #fff;
-            box-shadow: var(--shadow, 0 18px 48px rgba(30, 41, 59, 0.11));
-            padding: 18px;
-        }
-        .quiz-mode-selector {
+
+        .quiz-link-panel {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-            gap: 4px;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 10px;
             margin-bottom: 14px;
-            border-radius: 8px;
-            padding: 4px;
-            background: #f1f5f9;
         }
-        .quiz-mode-btn {
+        .quiz-link-card {
+            display: grid;
+            grid-template-columns: 42px 1fr;
+            align-items: center;
+            gap: 10px;
+            min-height: 74px;
+            border: 1px solid var(--line, #dbe4f0);
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+            color: var(--ink, #172033);
+            text-decoration: none;
+            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
+            transition: transform 0.14s, border-color 0.14s, box-shadow 0.14s;
+        }
+        .quiz-link-card:hover {
+            border-color: #bfdbfe;
+            box-shadow: var(--shadow, 0 18px 48px rgba(30, 41, 59, 0.11));
+            transform: translateY(-1px);
+        }
+        .quiz-link-card__icon {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 7px;
-            min-height: 38px;
-            border: 0;
+            width: 42px;
+            height: 42px;
             border-radius: 8px;
-            padding: 0 10px;
-            background: transparent;
-            color: var(--muted, #64748b);
-            font-size: 12px;
-            font-weight: 900;
-            cursor: pointer;
+            background: var(--accent-soft, #eff6ff);
+            color: var(--accent-dark, #1d4ed8);
+            font-size: 18px;
         }
-        .quiz-mode-btn.active {
-            background: #fff;
-            color: var(--ink, #172033);
-            box-shadow: var(--shadow-sm, 0 8px 22px rgba(30, 41, 59, 0.08));
-        }
-        .quiz-meta {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 12px;
-            color: var(--muted, #64748b);
-            font-size: 12px;
-            font-weight: 900;
-        }
-        .quiz-question {
-            display: grid;
-            gap: 12px;
-            min-height: 90px;
-            margin-bottom: 14px;
-        }
-        .quiz-visual {
-            position: relative;
-            width: min(100%, 260px);
-            aspect-ratio: 1;
-            margin: 0 auto;
-            border: 1px solid var(--line, #dbe4f0);
-            border-radius: 8px;
-            overflow: hidden;
-            background: #fff;
-        }
-        .quiz-image {
+        .quiz-link-card__title {
             display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            background: #fff;
-        }
-        .quiz-visual__fallback {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            padding: 14px;
-            color: var(--muted, #64748b);
+            margin-bottom: 3px;
             font-size: 14px;
             font-weight: 900;
-            text-align: center;
-            word-break: keep-all;
         }
-        .quiz-choseong-overlay {
-            position: absolute;
-            left: 12px;
-            right: 12px;
-            bottom: 12px;
-            z-index: 2;
+        .quiz-link-card__desc {
             display: block;
-            border: 1px solid rgba(255, 255, 255, 0.78);
-            border-radius: 8px;
-            padding: 8px 10px;
-            background: rgba(255, 255, 255, 0.92);
-            color: var(--ink, #172033);
-            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.16);
-            font-size: clamp(20px, 5vw, 30px);
-            font-weight: 900;
-            line-height: 1.15;
-            text-align: center;
-            overflow-wrap: anywhere;
-            backdrop-filter: blur(8px);
-        }
-        .quiz-prompt {
-            margin: 0;
-            text-align: center;
-            color: var(--ink, #172033);
-            font-size: 21px;
-            font-weight: 900;
+            color: var(--muted, #64748b);
+            font-size: 12px;
+            font-weight: 800;
             line-height: 1.35;
             word-break: keep-all;
         }
-        .quiz-options { display: grid; gap: 8px; }
-        .quiz-option {
-            width: 100%;
-            min-height: 46px;
-            border: 1px solid var(--line, #dbe4f0);
-            border-radius: 8px;
-            padding: 10px 14px;
-            background: #fff;
-            color: var(--ink, #172033);
-            font-size: 14px;
-            font-weight: 800;
-            text-align: left;
-            cursor: pointer;
-        }
-        .quiz-option:hover { border-color: #bfdbfe; background: var(--accent-soft, #eff6ff); }
-        .quiz-option.correct { border-color: var(--ok-line, #86efac); background: var(--ok-bg, #dcfce7); color: var(--ok, #15803d); }
-        .quiz-option.wrong { border-color: var(--bad-line, #fca5a5); background: var(--bad-bg, #fee2e2); color: var(--bad, #b91c1c); }
-        .feedback {
-            min-height: 28px;
-            color: var(--muted, #64748b);
-            font-size: 14px;
-            font-weight: 900;
-            text-align: center;
-        }
-        .quiz-actions { display: flex; justify-content: center; margin-top: 12px; }
         .text-panel {
             display: grid;
             gap: 12px;
@@ -777,8 +700,6 @@
             .list-item__thumb-placeholder { width: 54px; height: 54px; }
             .list-item__info { grid-column: 1 / -1; }
             .translation-grid { grid-template-columns: 1fr; }
-            .quiz-layout { padding: 14px; }
-            .quiz-prompt { font-size: 18px; }
             .text-panel { padding: 12px; }
             .vocab-textbox { min-height: 360px; font-size: 14px; }
         }
@@ -816,7 +737,6 @@
                 <button class="active" data-view="cards" type="button" role="tab"><i class="fa-solid fa-table-cells-large"></i> 카드</button>
                 <button data-view="list" type="button" role="tab"><i class="fa-solid fa-list"></i> 정리</button>
                 <button data-view="text" type="button" role="tab"><i class="fa-solid fa-align-left"></i> 텍스트</button>
-                <button data-view="quiz" type="button" role="tab"><i class="fa-solid fa-circle-question"></i> 퀴즈</button>
             </div>
             <label class="search" for="search-input">
                 <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
@@ -844,6 +764,20 @@
         </section>
 
         <section id="cards-view" class="view active" aria-label="어휘 카드">
+            <div class="quiz-link-panel" aria-label="어휘 퀴즈 바로가기">
+                <a class="quiz-link-card" href="vocabulary-quiz-meaning.html">
+                    <span class="quiz-link-card__icon" aria-hidden="true"><i class="fa-solid fa-language"></i></span>
+                    <span><span class="quiz-link-card__title">뜻 퀴즈</span><span class="quiz-link-card__desc">어휘를 보고 알맞은 뜻을 고릅니다.</span></span>
+                </a>
+                <a class="quiz-link-card" href="vocabulary-quiz-choseong.html">
+                    <span class="quiz-link-card__icon" aria-hidden="true"><i class="fa-solid fa-spell-check"></i></span>
+                    <span><span class="quiz-link-card__title">초성 퀴즈</span><span class="quiz-link-card__desc">초성을 보고 어휘를 찾습니다.</span></span>
+                </a>
+                <a class="quiz-link-card" href="vocabulary-quiz-image.html">
+                    <span class="quiz-link-card__icon" aria-hidden="true"><i class="fa-solid fa-image"></i></span>
+                    <span><span class="quiz-link-card__title">그림 퀴즈</span><span class="quiz-link-card__desc">그림에 맞는 어휘를 고릅니다.</span></span>
+                </a>
+            </div>
             <div id="word-grid" class="word-grid"></div>
             <div id="cards-empty" class="empty-state" hidden>검색 결과가 없습니다.</div>
         </section>
@@ -867,502 +801,13 @@
             <div id="text-empty" class="empty-state" hidden>검색 결과가 없습니다.</div>
         </section>
 
-        <section id="quiz-view" class="view" aria-label="어휘 퀴즈">
-            <div class="quiz-layout">
-                <div id="quiz-mode-selector" class="quiz-mode-selector" role="tablist" aria-label="퀴즈 유형"></div>
-                <div class="quiz-meta">
-                    <span id="quiz-progress">문제 1 / ?</span>
-                    <span id="quiz-type">뜻 맞히기</span>
-                </div>
-                <div id="quiz-question" class="quiz-question"></div>
-                <div id="quiz-options" class="quiz-options"></div>
-                <div id="quiz-feedback" class="feedback" aria-live="polite"></div>
-                <div class="quiz-actions">
-                    <button id="next-question-btn" class="btn primary" type="button" hidden>
-                        <i class="fa-solid fa-arrow-right"></i> 다음
-                    </button>
-                </div>
-            </div>
-        </section>
-
         <nav class="footer-nav" aria-label="페이지 이동">
             <a class="btn" href="index.html"><i class="fa-solid fa-house"></i> 11과 목록</a>
             <a class="btn" href="../index.html"><i class="fa-solid fa-layer-group"></i> 전체 목록</a>
         </nav>
     </main>
 
-    <!-- 어휘 데이터: 필요 시 이 블록을 vocabulary-data.js 로 분리 -->
-    <script>
-    window.VOCABULARY_CONFIG = {
-        chapter: "11",
-        title: "11과 어휘 학습",
-        subtitle: "일과 직장 생활에 필요한 어휘를 익힙니다.",
-        languages: [
-                "en",
-                "vi",
-                "mn",
-                "ar",
-                "kk",
-                "th"
-        ],
-        defaultLang: "none",
-        quizModes: [
-                "meaning",
-                "choseong",
-                "image"
-        ],
-        storageKey: "c11-vocabulary-standard",
-        categories: [
-                {
-                        id: "all",
-                        label: "전체"
-                },
-                {
-                        id: "work",
-                        label: "근무 조건"
-                },
-                {
-                        id: "profile",
-                        label: "지원 조건"
-                },
-                {
-                        id: "ability",
-                        label: "역량·태도"
-                },
-                {
-                        id: "people",
-                        label: "직장 사람들"
-                },
-                {
-                        id: "company",
-                        label: "회사·복지"
-                }
-        ],
-        words: [
-                {
-                        id: "c11-vocab-01",
-                        ko: "아르바이트",
-                        meaning: "정해진 시간 동안 임시로 하는 일.",
-                        pos: "명사",
-                        category: "work",
-                        example: "",
-                        vi: "việc làm thêm",
-                        ja: "アルバイト",
-                        zh: "兼职 / 打工",
-                        image: "../assets/c11/vocabulary/images/split/c11_02_TL.webp",
-                        imageAlt: "아르바이트 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_02_TL_masked.webp",
-                        quizImageAlt: "아르바이트 그림 카드"
-                },
-                {
-                        id: "c11-vocab-02",
-                        ko: "근무 시간",
-                        meaning: "일을 하는 정해진 시간.",
-                        pos: "명사",
-                        category: "work",
-                        example: "",
-                        vi: "thời gian làm việc",
-                        ja: "勤務時間",
-                        zh: "工作时间",
-                        image: "../assets/c11/vocabulary/images/split/c11_02_TR.webp",
-                        imageAlt: "근무 시간 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_02_TR_masked.webp",
-                        quizImageAlt: "근무 시간 그림 카드"
-                },
-                {
-                        id: "c11-vocab-03",
-                        ko: "업무",
-                        meaning: "직장에서 맡아서 하는 일.",
-                        pos: "명사",
-                        category: "work",
-                        example: "",
-                        vi: "nhiệm vụ, công việc",
-                        ja: "業務",
-                        zh: "业务",
-                        image: "../assets/c11/vocabulary/images/split/c11_02_BL.webp",
-                        imageAlt: "업무 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_02_BL_masked.webp",
-                        quizImageAlt: "업무 그림 카드"
-                },
-                {
-                        id: "c11-vocab-04",
-                        ko: "시급",
-                        meaning: "한 시간 일하고 받는 돈.",
-                        pos: "명사",
-                        category: "work",
-                        example: "",
-                        vi: "lương theo giờ",
-                        ja: "時給",
-                        zh: "时薪",
-                        image: "../assets/c11/vocabulary/images/split/c11_02_BR.webp",
-                        imageAlt: "시급 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_02_BR_masked.webp",
-                        quizImageAlt: "시급 그림 카드"
-                },
-                {
-                        id: "c11-vocab-05",
-                        ko: "성별",
-                        meaning: "남자와 여자의 구분.",
-                        pos: "명사",
-                        category: "profile",
-                        example: "",
-                        vi: "giới tính",
-                        ja: "性別",
-                        zh: "性别",
-                        image: "../assets/c11/vocabulary/images/split/c11_03_TL.webp",
-                        imageAlt: "성별 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_03_TL_masked.webp",
-                        quizImageAlt: "성별 그림 카드"
-                },
-                {
-                        id: "c11-vocab-06",
-                        ko: "연령",
-                        meaning: "나이.",
-                        pos: "명사",
-                        category: "profile",
-                        example: "",
-                        vi: "tuổi tác",
-                        ja: "年齢",
-                        zh: "年龄",
-                        image: "../assets/c11/vocabulary/images/split/c11_03_TR.webp",
-                        imageAlt: "연령 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_03_TR_masked.webp",
-                        quizImageAlt: "연령 그림 카드"
-                },
-                {
-                        id: "c11-vocab-07",
-                        ko: "성실하다",
-                        meaning: "정성스럽고 참된 태도로 일하는 것.",
-                        pos: "형용사",
-                        category: "profile",
-                        example: "",
-                        vi: "thành thật, chăm chỉ",
-                        ja: "誠実だ",
-                        zh: "诚实",
-                        image: "../assets/c11/vocabulary/images/split/c11_03_BL.webp",
-                        imageAlt: "성실하다 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_03_BL_masked.webp",
-                        quizImageAlt: "성실하다 그림 카드"
-                },
-                {
-                        id: "c11-vocab-08",
-                        ko: "꼼꼼하다",
-                        meaning: "빈틈이 없이 자세하고 차분한 것.",
-                        pos: "형용사",
-                        category: "profile",
-                        example: "",
-                        vi: "tỉ mỉ, cẩn thận",
-                        ja: "几帳面だ",
-                        zh: "仔细",
-                        image: "../assets/c11/vocabulary/images/split/c11_03_BR.webp",
-                        imageAlt: "꼼꼼하다 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_03_BR_masked.webp",
-                        quizImageAlt: "꼼꼼하다 그림 카드"
-                },
-                {
-                        id: "c11-vocab-09",
-                        ko: "경험이 많다",
-                        meaning: "어떤 일을 많이 해 본 것.",
-                        pos: "표현",
-                        category: "ability",
-                        example: "",
-                        vi: "có nhiều kinh nghiệm",
-                        ja: "経験が多い",
-                        zh: "经验丰富",
-                        image: "../assets/c11/vocabulary/images/split/c11_04_TL.webp",
-                        imageAlt: "경험이 많다 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_04_TL_masked.webp",
-                        quizImageAlt: "경험이 많다 그림 카드"
-                },
-                {
-                        id: "c11-vocab-10",
-                        ko: "실력이 있다",
-                        meaning: "어떤 일을 잘 할 수 있는 능력이 있는 것.",
-                        pos: "표현",
-                        category: "ability",
-                        example: "",
-                        vi: "có thực lực",
-                        ja: "実力がある",
-                        zh: "有实力",
-                        image: "../assets/c11/vocabulary/images/split/c11_04_TR.webp",
-                        imageAlt: "실력이 있다 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_04_TR_masked.webp",
-                        quizImageAlt: "실력이 있다 그림 카드"
-                },
-                {
-                        id: "c11-vocab-11",
-                        ko: "이해가 빠르다",
-                        meaning: "다른 사람의 말이나 상황을 빨리 알아듣는 것.",
-                        pos: "표현",
-                        category: "ability",
-                        example: "",
-                        vi: "hiểu nhanh",
-                        ja: "理解が速い",
-                        zh: "理解快",
-                        image: "../assets/c11/vocabulary/images/split/c11_04_BL.webp",
-                        imageAlt: "이해가 빠르다 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_04_BL_masked.webp",
-                        quizImageAlt: "이해가 빠르다 그림 카드"
-                },
-                {
-                        id: "c11-vocab-12",
-                        ko: "최선을 다하다",
-                        meaning: "자신의 모든 힘과 노력을 다하는 것.",
-                        pos: "표현",
-                        category: "ability",
-                        example: "",
-                        vi: "cố gắng hết sức",
-                        ja: "最善を尽くす",
-                        zh: "尽力而为",
-                        image: "../assets/c11/vocabulary/images/split/c11_04_BR.webp",
-                        imageAlt: "최선을 다하다 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_04_BR_masked.webp",
-                        quizImageAlt: "최선을 다하다 그림 카드"
-                },
-                {
-                        id: "c11-vocab-13",
-                        ko: "보고서 작성을 잘하다",
-                        meaning: "보고 문서를 잘 만드는 것.",
-                        pos: "표현",
-                        category: "ability",
-                        example: "",
-                        vi: "viết báo cáo giỏi",
-                        ja: "報告書の作成が上手だ",
-                        zh: "报告写得好",
-                        image: "../assets/c11/vocabulary/images/split/c11_05_TL.webp",
-                        imageAlt: "보고서 작성을 잘하다 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_05_TL_masked.webp",
-                        quizImageAlt: "보고서 작성을 잘하다 그림 카드"
-                },
-                {
-                        id: "c11-vocab-14",
-                        ko: "대인 관계가 원만하다",
-                        meaning: "다른 사람들과 사이좋게 잘 지내는 것.",
-                        pos: "표현",
-                        category: "ability",
-                        example: "",
-                        vi: "quan hệ xã hội tốt",
-                        ja: "対人関係が円満だ",
-                        zh: "人际关系圆满",
-                        image: "../assets/c11/vocabulary/images/split/c11_05_TR.webp",
-                        imageAlt: "대인 관계가 원만하다 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_05_TR_masked.webp",
-                        quizImageAlt: "대인 관계가 원만하다 그림 카드"
-                },
-                {
-                        id: "c11-vocab-15",
-                        ko: "신입 사원",
-                        meaning: "회사에 새로 들어온 직원.",
-                        pos: "명사",
-                        category: "people",
-                        example: "",
-                        vi: "nhân viên mới",
-                        ja: "新入社員",
-                        zh: "新职员",
-                        image: "../assets/c11/vocabulary/images/split/c11_05_BL.webp",
-                        imageAlt: "신입 사원 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_05_BL_masked.webp",
-                        quizImageAlt: "신입 사원 그림 카드"
-                },
-                {
-                        id: "c11-vocab-16",
-                        ko: "동료",
-                        meaning: "직장에서 직급이 비슷하거나 같은 사람.",
-                        pos: "명사",
-                        category: "people",
-                        example: "",
-                        vi: "đồng nghiệp",
-                        ja: "同僚",
-                        zh: "同事",
-                        image: "../assets/c11/vocabulary/images/split/c11_05_BR.webp",
-                        imageAlt: "동료 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_05_BR_masked.webp",
-                        quizImageAlt: "동료 그림 카드"
-                },
-                {
-                        id: "c11-vocab-17",
-                        ko: "직장 상사",
-                        meaning: "직장에서 자기보다 직급이 높은 사람.",
-                        pos: "명사",
-                        category: "people",
-                        example: "",
-                        vi: "cấp trên",
-                        ja: "職場の上司",
-                        zh: "职场上司",
-                        image: "../assets/c11/vocabulary/images/split/c11_06_TL.webp",
-                        imageAlt: "직장 상사 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_06_TL_masked.webp",
-                        quizImageAlt: "직장 상사 그림 카드"
-                },
-                {
-                        id: "c11-vocab-18",
-                        ko: "부하 직원",
-                        meaning: "직장에서 자기보다 직급이 낮은 사람.",
-                        pos: "명사",
-                        category: "people",
-                        example: "",
-                        vi: "cấp dưới",
-                        ja: "部下の職員",
-                        zh: "部下职员",
-                        image: "../assets/c11/vocabulary/images/split/c11_06_TR.webp",
-                        imageAlt: "부하 직원 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_06_TR_masked.webp",
-                        quizImageAlt: "부하 직원 그림 카드"
-                },
-                {
-                        id: "c11-vocab-19",
-                        ko: "대리",
-                        meaning: "과장 아래의 직급.",
-                        pos: "명사",
-                        category: "people",
-                        example: "",
-                        vi: "trợ lý giám đốc",
-                        ja: "代理",
-                        zh: "代理",
-                        image: "../assets/c11/vocabulary/images/split/c11_06_BL.webp",
-                        imageAlt: "대리 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_06_BL_masked.webp",
-                        quizImageAlt: "대리 그림 카드"
-                },
-                {
-                        id: "c11-vocab-20",
-                        ko: "과장",
-                        meaning: "부장 아래, 대리 위의 직급.",
-                        pos: "명사",
-                        category: "people",
-                        example: "",
-                        vi: "trưởng khoa, quản đốc",
-                        ja: "課長",
-                        zh: "科长",
-                        image: "../assets/c11/vocabulary/images/split/c11_06_BR.webp",
-                        imageAlt: "과장 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_06_BR_masked.webp",
-                        quizImageAlt: "과장 그림 카드"
-                },
-                {
-                        id: "c11-vocab-21",
-                        ko: "부장",
-                        meaning: "회사의 한 부서를 책임지는 사람.",
-                        pos: "명사",
-                        category: "people",
-                        example: "",
-                        vi: "trưởng phòng",
-                        ja: "部長",
-                        zh: "部长",
-                        image: "../assets/c11/vocabulary/images/split/c11_01_TL.webp",
-                        imageAlt: "부장 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_01_TL_masked.webp",
-                        quizImageAlt: "부장 그림 카드"
-                },
-                {
-                        id: "c11-vocab-22",
-                        ko: "대기업",
-                        meaning: "규모가 아주 큰 회사.",
-                        pos: "명사",
-                        category: "company",
-                        example: "",
-                        vi: "công ty lớn, tập đoàn",
-                        ja: "大企業",
-                        zh: "大企业",
-                        image: "../assets/c11/vocabulary/images/split/c11_01_TR.webp",
-                        imageAlt: "대기업 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_01_TR_masked.webp",
-                        quizImageAlt: "대기업 그림 카드"
-                },
-                {
-                        id: "c11-vocab-23",
-                        ko: "중소기업",
-                        meaning: "규모가 크지 않은 회사.",
-                        pos: "명사",
-                        category: "company",
-                        example: "",
-                        vi: "doanh nghiệp vừa và nhỏ",
-                        ja: "中小企業",
-                        zh: "中小企业",
-                        image: "../assets/c11/vocabulary/images/split/c11_01_BL.webp",
-                        imageAlt: "중소기업 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_01_BL_masked.webp",
-                        quizImageAlt: "중소기업 그림 카드"
-                },
-                {
-                        id: "c11-vocab-24",
-                        ko: "연봉이 높다",
-                        meaning: "일 년 동안 받는 월급이 많은 것.",
-                        pos: "표현",
-                        category: "company",
-                        example: "",
-                        vi: "lương năm cao",
-                        ja: "年俸が高い",
-                        zh: "年薪高",
-                        image: "../assets/c11/vocabulary/images/split/c11_01_BR.webp",
-                        imageAlt: "연봉이 높다 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_01_BR_masked.webp",
-                        quizImageAlt: "연봉이 높다 그림 카드"
-                },
-                {
-                        id: "c11-vocab-25",
-                        ko: "출퇴근 시간이 자유롭다",
-                        meaning: "회사에 오고 가는 시간이 자유로운 것.",
-                        pos: "표현",
-                        category: "company",
-                        example: "",
-                        vi: "thời gian đi làm và tan làm tự do",
-                        ja: "出退勤時間が自由だ",
-                        zh: "上下班时间自由",
-                        image: "../assets/c11/vocabulary/images/split/c11_07_TL.webp",
-                        imageAlt: "출퇴근 시간이 자유롭다 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_07_TL_masked.webp",
-                        quizImageAlt: "출퇴근 시간이 자유롭다 그림 카드"
-                },
-                {
-                        id: "c11-vocab-26",
-                        ko: "승진 기회가 많다",
-                        meaning: "직급이 올라갈 기회가 많은 것.",
-                        pos: "표현",
-                        category: "company",
-                        example: "",
-                        vi: "có nhiều cơ hội thăng tiến",
-                        ja: "昇進の機会が多い",
-                        zh: "晋升机会多",
-                        image: "../assets/c11/vocabulary/images/split/c11_07_TR.webp",
-                        imageAlt: "승진 기회가 많다 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_07_TR_masked.webp",
-                        quizImageAlt: "승진 기회가 많다 그림 카드"
-                },
-                {
-                        id: "c11-vocab-27",
-                        ko: "휴가가 길다",
-                        meaning: "쉴 수 있는 날이 긴 것.",
-                        pos: "표현",
-                        category: "company",
-                        example: "",
-                        vi: "kỳ nghỉ dài",
-                        ja: "休暇が長い",
-                        zh: "假期长",
-                        image: "../assets/c11/vocabulary/images/split/c11_07_BL.webp",
-                        imageAlt: "휴가가 길다 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_07_BL_masked.webp",
-                        quizImageAlt: "휴가가 길다 그림 카드"
-                },
-                {
-                        id: "c11-vocab-28",
-                        ko: "직급",
-                        meaning: "(교재에 없음. 5급 어휘)",
-                        pos: "명사",
-                        category: "people",
-                        example: "",
-                        image: "../assets/c11/vocabulary/images/split/c11_08_TL.webp",
-                        imageAlt: "직급 피라미드 그림 카드",
-                        quizImage: "../assets/c11/vocabulary/images/masked/c11_08_TL_masked.webp",
-                        quizImageAlt: "직급 피라미드 그림 카드"
-                }
-        ]
-};
-    window.MULTILANG_CONFIG = {
-        langs: window.VOCABULARY_CONFIG.languages || ["en", "vi", "mn", "ar", "kk", "th"],
-        defaultLang: window.VOCABULARY_CONFIG.defaultLang || "none"
-    };
-    </script>
+    <script src="vocabulary-data.js"></script>
 
     <script src="../shared/vocabulary-multilang-data.js"></script>
 
@@ -1382,11 +827,6 @@
             kk: { label: "카자흐어", answerLabel: "Қазақша", speech: "kk-KZ" },
             th: { label: "태국어", answerLabel: "ไทย", speech: "th-TH" }
         };
-        const QUIZ_MODE_META = {
-            meaning: { label: "뜻", icon: "fa-language" },
-            choseong: { label: "초성", icon: "fa-spell-check" },
-            image: { label: "그림", icon: "fa-image" }
-        };
         const PALETTES = [
             { bg: "#fff7ed", ink: "#c2410c", line: "#fed7aa" },
             { bg: "#eff6ff", ink: "#1d4ed8", line: "#bfdbfe" },
@@ -1394,14 +834,11 @@
             { bg: "#fdf2f8", ink: "#be185d", line: "#fbcfe8" },
             { bg: "#f5f3ff", ink: "#6d28d9", line: "#ddd6fe" }
         ];
-        const CHOSEONG = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
 
         const storagePrefix = cfg.storageKey || `vocabulary-${cfg.chapter || "standard"}`;
         const categories = normalizeCategories(cfg.categories || []);
         const words = normalizeWords(cfg.words || []);
         const imageCount = words.filter((word) => Boolean(word.image)).length;
-        const quizImageCount = words.filter((word) => Boolean(word.quizImage || word.image)).length;
-        const availableQuizModes = normalizeQuizModes(cfg.quizModes || ["meaning", "choseong", "image"]);
         const FRONT_HEADWORD_SIZES = [13, 16, 19, 22];
         const DEFAULT_FRONT_HEADWORD_SIZE_INDEX = 0;
 
@@ -1418,11 +855,7 @@
         if (!Number.isInteger(frontHeadwordSizeIndex) || frontHeadwordSizeIndex < 0 || frontHeadwordSizeIndex >= FRONT_HEADWORD_SIZES.length) {
             frontHeadwordSizeIndex = DEFAULT_FRONT_HEADWORD_SIZE_INDEX;
         }
-        let quizMode = readStored(`${storagePrefix}-quiz-mode`, availableQuizModes[0] || "meaning");
-        if (!availableQuizModes.includes(quizMode)) quizMode = availableQuizModes[0] || "meaning";
         let cardOrder = words.map((_, index) => index);
-        let quizQueue = [];
-        let quizIndex = 0;
 
         const els = {
             vocabCount: document.getElementById("vocab-count"),
@@ -1444,13 +877,6 @@
             textCount: document.getElementById("text-count"),
             textEmpty: document.getElementById("text-empty"),
             copyTextBtn: document.getElementById("copy-text-btn"),
-            quizModeSelector: document.getElementById("quiz-mode-selector"),
-            quizProgress: document.getElementById("quiz-progress"),
-            quizType: document.getElementById("quiz-type"),
-            quizQuestion: document.getElementById("quiz-question"),
-            quizOptions: document.getElementById("quiz-options"),
-            quizFeedback: document.getElementById("quiz-feedback"),
-            nextQuestionBtn: document.getElementById("next-question-btn")
         };
 
         function readStored(key, fallback) {
@@ -1485,10 +911,6 @@
             })).filter((word) => word.ko);
         }
 
-        function normalizeQuizModes(source) {
-            const modes = source.filter((mode) => mode !== "image" || quizImageCount > 0);
-            return modes.length ? modes : ["meaning", "choseong"];
-        }
 
         function categoryFor(id) {
             return categories.find((category) => category.id === id) || categories[0];
@@ -1513,30 +935,6 @@
             return LANGS[lang]?.dir || "ltr";
         }
 
-        function quizTypeLabel() {
-            if (quizMode === "choseong") return "초성 퀴즈";
-            if (quizMode === "image") return "그림 퀴즈";
-            return `${answerLabel()} 맞히기`;
-        }
-
-        function quizAnswerFor(word) {
-            if (quizMode === "meaning") return answerFor(word);
-            return word.ko;
-        }
-
-        function quizPromptFor(word) {
-            if (quizMode === "choseong") return "초성을 보고 어휘를 고르세요.";
-            if (quizMode === "image") return "그림에 맞는 어휘를 고르세요.";
-            return word.ko;
-        }
-
-        function choseongFor(value) {
-            return String(value || "").split("").map((char) => {
-                const code = char.charCodeAt(0) - 0xac00;
-                if (code >= 0 && code <= 11171) return CHOSEONG[Math.floor(code / 588)];
-                return char;
-            }).join("").replace(/\s+/g, " ").trim();
-        }
 
         function escapeHtml(value) {
             return String(value || "").replace(/[&<>"']/g, (char) => ({
@@ -1585,14 +983,6 @@
             return `<span class="${className === "word-card__image" ? "word-card__placeholder" : "quiz-visual__fallback"}">${escapeHtml(fallbackText || word.ko)}</span>`;
         }
 
-        function quizVisualFor(word, overlay = "") {
-            const quizImage = word.quizImage || word.image;
-            const quizImageAlt = word.quizImageAlt || word.imageAlt || "어휘 그림";
-            const visual = quizImage
-                ? `<img class="quiz-image" src="${escapeHtml(quizImage)}" alt="${escapeHtml(quizImageAlt)}" loading="lazy" decoding="async" />`
-                : `<span class="quiz-visual__fallback">${escapeHtml(word.ko)}</span>`;
-            return `<div class="quiz-visual">${visual}${overlay}</div>`;
-        }
 
         function buildCategoryFilter() {
             els.categoryFilter.innerHTML = "";
@@ -1612,25 +1002,6 @@
             });
         }
 
-        function buildQuizModeSelector() {
-            els.quizModeSelector.innerHTML = "";
-            availableQuizModes.forEach((mode) => {
-                const meta = QUIZ_MODE_META[mode] || QUIZ_MODE_META.meaning;
-                const button = document.createElement("button");
-                button.className = "quiz-mode-btn";
-                button.type = "button";
-                button.dataset.quizMode = mode;
-                button.setAttribute("role", "tab");
-                button.innerHTML = `<i class="fa-solid ${meta.icon}"></i> ${escapeHtml(meta.label)}`;
-                button.addEventListener("click", () => {
-                    quizMode = mode;
-                    writeStored(`${storagePrefix}-quiz-mode`, quizMode);
-                    updateQuizModeButtons();
-                    if (currentView === "quiz") startQuiz();
-                });
-                els.quizModeSelector.appendChild(button);
-            });
-        }
 
         function updateFrontHeadwordToggle() {
             els.frontToggle.setAttribute("aria-checked", String(showFrontHeadword));
@@ -1650,13 +1021,6 @@
             updateFrontHeadwordToggle();
         }
 
-        function updateQuizModeButtons() {
-            document.querySelectorAll("[data-quiz-mode]").forEach((button) => {
-                const active = button.dataset.quizMode === quizMode;
-                button.classList.toggle("active", active);
-                button.setAttribute("aria-selected", String(active));
-            });
-        }
 
         function renderCards() {
             const list = filteredWords();
@@ -1687,6 +1051,7 @@
                             <span class="word-card__translation" dir="${escapeHtml(langDir(activeLang))}">
                                 <span class="word-card__lang">${escapeHtml(answerLabel())}</span>
                                 <span class="word-card__translation-text">${escapeHtml(answerFor(word))}</span>
+                                ${word.note ? `<span class="word-card__note">${escapeHtml(word.note)}</span>` : ""}
                             </span>
                             <span class="word-card__category">${escapeHtml(category.label)}</span>
                         </span>
@@ -1734,6 +1099,7 @@
                     </div>
                     <div class="list-item__info">
                         <div><strong>뜻</strong> ${escapeHtml(word.meaning || word.example || "")}</div>
+                        ${word.note ? `<div class="list-item__note">${escapeHtml(word.note)}</div>` : ""}
                         ${word.example ? `<div><strong>예문</strong> ${escapeHtml(word.example)}</div>` : ""}
                         <div class="translation-grid">
                             ${translationLangs.filter((lang) => word[lang]).map((lang) => `
@@ -1806,77 +1172,6 @@
             render();
         }
 
-        function quizSourceWords() {
-            const filtered = filteredWords();
-            if (quizMode === "image") return filtered.filter((word) => Boolean(word.quizImage || word.image));
-            return filtered;
-        }
-
-        function startQuiz() {
-            quizQueue = quizSourceWords().sort(() => Math.random() - 0.5);
-            quizIndex = 0;
-            renderQuizQuestion();
-        }
-
-        function renderQuizQuestion() {
-            const current = quizQueue[quizIndex];
-            els.quizOptions.innerHTML = "";
-            els.quizFeedback.textContent = "";
-            els.nextQuestionBtn.hidden = true;
-            if (!current) {
-                els.quizProgress.textContent = "문제 0 / 0";
-                els.quizType.textContent = quizTypeLabel();
-                els.quizQuestion.innerHTML = `<p class="quiz-prompt">${quizMode === "image" ? "이미지가 있는 검색 결과가 없습니다." : "검색 결과가 없습니다."}</p>`;
-                return;
-            }
-            els.quizProgress.textContent = `문제 ${quizIndex + 1} / ${quizQueue.length}`;
-            els.quizType.textContent = quizTypeLabel();
-            const choseongOverlay = quizMode === "choseong"
-                ? `<span class="quiz-choseong-overlay">${escapeHtml(choseongFor(current.ko))}</span>`
-                : "";
-            els.quizQuestion.innerHTML = `
-                ${quizVisualFor(current, choseongOverlay)}
-                <p class="quiz-prompt">${escapeHtml(quizPromptFor(current))}</p>
-            `;
-            const pool = words.filter((word) => word !== current);
-            const wrong = pool.sort(() => Math.random() - 0.5).slice(0, 3);
-            const choices = [current, ...wrong].sort(() => Math.random() - 0.5);
-            const correctAnswer = quizAnswerFor(current);
-            els.quizFeedback.dir = quizMode === "meaning" ? langDir(activeLang) : "ltr";
-            choices.forEach((choice) => {
-                const option = document.createElement("button");
-                option.className = "quiz-option";
-                option.type = "button";
-                option.textContent = quizAnswerFor(choice);
-                option.dir = quizMode === "meaning" ? langDir(activeLang) : "ltr";
-                option.dataset.correct = String(choice === current);
-                option.addEventListener("click", () => {
-                    const ok = choice === current;
-                    document.querySelectorAll(".quiz-option").forEach((button) => {
-                        button.disabled = true;
-                        if (button === option) button.classList.add(ok ? "correct" : "wrong");
-                        if (!ok && button.dataset.correct === "true") button.classList.add("correct");
-                    });
-                    els.quizFeedback.textContent = ok ? "정답!" : `오답 - 정답: ${correctAnswer}`;
-                    els.nextQuestionBtn.hidden = false;
-                });
-                els.quizOptions.appendChild(option);
-            });
-        }
-
-        function nextQuizQuestion() {
-            quizIndex += 1;
-            if (quizIndex < quizQueue.length) {
-                renderQuizQuestion();
-                return;
-            }
-            els.quizProgress.textContent = `완료 / ${quizQueue.length}`;
-            els.quizType.textContent = "퀴즈 완료";
-            els.quizQuestion.innerHTML = '<p class="quiz-prompt">퀴즈 완료!</p>';
-            els.quizOptions.innerHTML = "";
-            els.quizFeedback.textContent = "완료되었습니다.";
-            els.nextQuestionBtn.hidden = true;
-        }
 
         function switchView(view) {
             currentView = view;
@@ -1893,11 +1188,9 @@
             activeLang = window.MultilangToggle?.getLang?.() || readStored("preferred-lang", cfg.defaultLang || "none");
             if (!LANGS[activeLang] || (activeLang !== "none" && !cfg.languages?.includes(activeLang))) activeLang = "none";
             updateFrontHeadwordToggle();
-            updateQuizModeButtons();
             if (currentView === "cards") renderCards();
             else if (currentView === "list") renderList();
             else if (currentView === "text") renderTextList();
-            else startQuiz();
         }
 
         els.vocabCount.textContent = `어휘 ${words.length}개`;
@@ -1917,14 +1210,12 @@
         els.frontSizeUp.addEventListener("click", () => setFrontHeadwordSize(frontHeadwordSizeIndex + 1));
         els.shuffleBtn.addEventListener("click", shuffleCards);
         els.copyTextBtn.addEventListener("click", copyTextList);
-        els.nextQuestionBtn.addEventListener("click", nextQuizQuestion);
         document.addEventListener("click", (event) => {
             if (!event.target.closest("[data-multilang-btn]")) return;
             setTimeout(render, 50);
         });
 
         buildCategoryFilter();
-        buildQuizModeSelector();
         switchView("cards");
     })();
     </script>
