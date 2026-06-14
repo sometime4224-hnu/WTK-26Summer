@@ -38,6 +38,7 @@ test('c11 index links to causative influence lab', async ({ page }) => {
   await blockExternalRequests(page);
   await page.goto('/c11/index.html', { waitUntil: 'domcontentloaded' });
 
+  await page.locator('summary.support-drawer__summary').click();
   await page.getByRole('link', { name: /사동 영향력 실험실/ }).click();
 
   await expect(page).toHaveURL(/grammar1-causative-influence-lab\.html$/);
