@@ -12,6 +12,11 @@ SOURCE_DIR = Path(r"C:\Users\somet\Downloads")
 OUTPUT_BASE = ROOT / "assets" / "c11" / "vocabulary" / "images"
 RANK_SOURCE = ROOT / "backup" / "asset-sources" / "c11" / "vocabulary" / "rank-hierarchy-source.png"
 NEW_EMPLOYEE_SOURCE = ROOT / "backup" / "asset-sources" / "c11" / "vocabulary" / "new-employee-first-day-source.png"
+WORK_DUTIES_SOURCE = ROOT / "backup" / "asset-sources" / "c11" / "vocabulary" / "work-duties-source.png"
+DILIGENT_SOURCE = ROOT / "backup" / "asset-sources" / "c11" / "vocabulary" / "diligent-source.png"
+REPORT_WRITING_SOURCE = ROOT / "backup" / "asset-sources" / "c11" / "vocabulary" / "report-writing-source.png"
+COWORKER_SOURCE = ROOT / "backup" / "asset-sources" / "c11" / "vocabulary" / "coworker-source.png"
+FLEXIBLE_COMMUTE_SOURCE = ROOT / "backup" / "asset-sources" / "c11" / "vocabulary" / "flexible-commute-source.png"
 TARGET_SIZE = 512
 WEBP_QUALITY = 72
 POSITIONS = ("TL", "TR", "BL", "BR")
@@ -55,7 +60,12 @@ RANK_REPLACEMENTS = {
 }
 
 FULL_IMAGE_REPLACEMENTS = {
+    (2, "BL"): (WORK_DUTIES_SOURCE, "업무"),
+    (3, "BL"): (DILIGENT_SOURCE, "성실하다"),
+    (5, "TL"): (REPORT_WRITING_SOURCE, "보고서 작성을 잘하다"),
     (5, "BL"): (NEW_EMPLOYEE_SOURCE, "신입 사원"),
+    (5, "BR"): (COWORKER_SOURCE, "동료"),
+    (7, "TL"): (FLEXIBLE_COMMUTE_SOURCE, "출퇴근 시간이 자유롭다"),
 }
 
 EXTRA_CARDS = [
