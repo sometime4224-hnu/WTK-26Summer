@@ -594,6 +594,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="./vocab-support-common.css">
 </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
@@ -649,6 +650,7 @@
     </div>
 
     <script src="../shared/vocabulary-multilang-data.js"></script>
+    <script src="./vocab-support-common.js"></script>
     <script>
         (() => {
             const jobs = [
@@ -1074,7 +1076,7 @@
                     const strengthsHtml = cand.strengths ? `
                         <div class="candidate-strengths">
                             ${cand.strengths.map(s => {
-                                return `<span class="strength-badge"><img src="${s.img}" alt="${s.ko}" class="strength-icon" decoding="async" loading="lazy"> ${s.ko}</span>`;
+                                return `<span class="strength-badge">${window.C11VocabSupport.imageTag(s.img, s.ko, { size: 160, className: "strength-icon" })}<span>${s.ko}</span></span>`;
                             }).join('')}
                         </div>
                     ` : '';
@@ -1133,7 +1135,7 @@
 
                 // Render Jobs
                 els.jobList.innerHTML = "";
-                jobs.forEach(job => {
+                jobs.forEach((job, jobIndex) => {
                     const matchedCandId = matches[job.id];
                     const isMatched = !!matchedCandId;
                     const card = document.createElement("div");
@@ -1170,7 +1172,7 @@
 
                     card.innerHTML = `
                         <div class="job-card-header">
-                            <img src="${job.image}" class="job-company-img" alt="${badge}" decoding="async" loading="lazy">
+                            ${window.C11VocabSupport.imageTag(job.image, badge, { size: 320, className: "job-company-img", loading: jobIndex === 0 ? "eager" : "lazy", priority: jobIndex === 0 })}
                             <div>
                                 <span class="job-badge">${badge}</span>
                                 <h3 class="job-title">${title}</h3>

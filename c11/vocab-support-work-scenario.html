@@ -464,6 +464,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="./vocab-support-common.css">
 </head>
 <body>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
@@ -523,7 +524,7 @@
                 <div class="radar-box">
                     <!-- Diligence -->
                     <div class="radar-bar-item">
-                        <img src="../assets/c11/vocabulary/images/split/c11_03_BL.webp" class="radar-bar-icon" alt="성실성" decoding="async" loading="lazy">
+                        <img src="../assets/c11/vocabulary/images/support-160/c11_03_BL.webp" class="radar-bar-icon" alt="성실성" width="160" height="160" decoding="async" loading="lazy">
                         <div class="radar-bar-body">
                             <div class="radar-bar-header">
                                 <span>성실성 (성실하다)</span>
@@ -534,7 +535,7 @@
                     </div>
                     <!-- Meticulousness -->
                     <div class="radar-bar-item">
-                        <img src="../assets/c11/vocabulary/images/split/c11_03_BR.webp" class="radar-bar-icon" alt="꼼꼼함" decoding="async" loading="lazy">
+                        <img src="../assets/c11/vocabulary/images/support-160/c11_03_BR.webp" class="radar-bar-icon" alt="꼼꼼함" width="160" height="160" decoding="async" loading="lazy">
                         <div class="radar-bar-body">
                             <div class="radar-bar-header">
                                 <span>꼼꼼함 (꼼꼼하다)</span>
@@ -545,7 +546,7 @@
                     </div>
                     <!-- Understanding -->
                     <div class="radar-bar-item">
-                        <img src="../assets/c11/vocabulary/images/split/c11_04_BL.webp" class="radar-bar-icon" alt="이해력" decoding="async" loading="lazy">
+                        <img src="../assets/c11/vocabulary/images/support-160/c11_04_BL.webp" class="radar-bar-icon" alt="이해력" width="160" height="160" decoding="async" loading="lazy">
                         <div class="radar-bar-body">
                             <div class="radar-bar-header">
                                 <span>이해력 (이해가 빠르다)</span>
@@ -556,7 +557,7 @@
                     </div>
                     <!-- Relations -->
                     <div class="radar-bar-item">
-                        <img src="../assets/c11/vocabulary/images/split/c11_05_TR.webp" class="radar-bar-icon" alt="대인관계" decoding="async" loading="lazy">
+                        <img src="../assets/c11/vocabulary/images/support-160/c11_05_TR.webp" class="radar-bar-icon" alt="대인관계" width="160" height="160" decoding="async" loading="lazy">
                         <div class="radar-bar-body">
                             <div class="radar-bar-header">
                              <span>대인관계 (대인 관계가 원만하다)</span>
@@ -577,6 +578,7 @@
         </section>
     </main>
 
+    <script src="./vocab-support-common.js"></script>
     <script>
         (() => {
             const scenes = [
@@ -846,7 +848,7 @@
 
             function initMultilang() {
                 if (window.MULTILANG_CONFIG && window.MultilangToggle) {
-                    activeLang = window.MULTILANG_CONFIG.defaultLang || "none";
+                    activeLang = window.MultilangToggle.getLang() || window.MULTILANG_CONFIG.defaultLang || "none";
                 }
                 setupDropzone();
                 renderScene();
@@ -881,8 +883,7 @@
                 const scene = scenes[currentSceneIndex];
                 
                 // Set Header
-                const timeStr = activeLang === "none" ? scene.time : (scene[activeLang]?.time || scene.time);
-                els.sceneTime.innerHTML = `<i class="fa-solid fa-clock"></i> ${timeStr}`;
+                els.sceneTime.innerHTML = `<i class="fa-solid fa-clock"></i> ${scene.time}`;
                 els.sceneProgress.textContent = `${currentSceneIndex + 1} / ${scenes.length} 단계`;
 
                 // Set Story Copy (always Korean — reading/comprehension practice)
@@ -890,7 +891,7 @@
                 
                 // Set dynamic scene character illustration
                 const avatarEl = document.getElementById("char-avatar");
-                avatarEl.innerHTML = `<img src="${sceneImages[scene.id]}" alt="Scene character" decoding="async" loading="lazy">`;
+                avatarEl.innerHTML = window.C11VocabSupport.imageTag(sceneImages[scene.id], "Scene character", { size: 320, className: "support-visual-img", loading: currentSceneIndex === 0 ? "eager" : "lazy", priority: currentSceneIndex === 0 });
 
                 const decisionLabels = {
                     vi: "Kéo thẻ lựa chọn thả vào đây",

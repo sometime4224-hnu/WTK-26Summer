@@ -538,6 +538,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="./vocab-support-common.css">
 </head>
 <body>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
@@ -601,16 +602,16 @@
 
                     <div class="chips-pool" id="chips-pool">
                         <div class="rank-chip" data-rank="부장" role="button" tabindex="0">
-                            <img src="../assets/c11/vocabulary/images/split/c11_01_TL.webp" class="chip-img" alt="부장" decoding="async" loading="lazy">부장
+                            <img src="../assets/c11/vocabulary/images/support-160/c11_01_TL.webp" class="chip-img" alt="부장" width="160" height="160" decoding="async" loading="eager" fetchpriority="high">부장
                         </div>
                         <div class="rank-chip" data-rank="대리" role="button" tabindex="0">
-                            <img src="../assets/c11/vocabulary/images/split/c11_06_BL.webp" class="chip-img" alt="대리" decoding="async" loading="lazy">대리
+                            <img src="../assets/c11/vocabulary/images/support-160/c11_06_BL.webp" class="chip-img" alt="대리" width="160" height="160" decoding="async" loading="eager">대리
                         </div>
                         <div class="rank-chip" data-rank="신입 사원" role="button" tabindex="0">
-                            <img src="../assets/c11/vocabulary/images/split/c11_05_BL.webp" class="chip-img" alt="신입 사원" decoding="async" loading="lazy">신입 사원
+                            <img src="../assets/c11/vocabulary/images/support-160/c11_05_BL.webp" class="chip-img" alt="신입 사원" width="160" height="160" decoding="async" loading="eager">신입 사원
                         </div>
                         <div class="rank-chip" data-rank="과장" role="button" tabindex="0">
-                            <img src="../assets/c11/vocabulary/images/split/c11_06_BR.webp" class="chip-img" alt="과장" decoding="async" loading="lazy">과장
+                            <img src="../assets/c11/vocabulary/images/support-160/c11_06_BR.webp" class="chip-img" alt="과장" width="160" height="160" decoding="async" loading="eager">과장
                         </div>
                     </div>
                 </div>
@@ -620,6 +621,13 @@
                 <div class="panel" style="min-height: 100%;">
                     <h2 class="section-title" id="dialogue-title"><i class="fa-solid fa-comments"></i> 상황별 호칭 대화 (Rank Dialogues)</h2>
                     <div class="dialogue-box" id="dialogue-box">
+                        <div class="rank-dialogue-preview" id="rank-dialogue-preview" aria-live="polite">
+                            <img src="../assets/c11/vocabulary/images/support-320/c11_05_BL.webp" alt="직급 대화 장면" width="320" height="320" decoding="async" loading="lazy">
+                            <div>
+                                <strong id="rank-dialogue-preview-title">직급 대화 단서</strong>
+                                <span id="rank-dialogue-preview-desc">조직도를 완성하면 대화 장면에 맞는 직급 이미지를 크게 확인합니다.</span>
+                            </div>
+                        </div>
                         <p id="dialogue-locked-desc" style="color: var(--muted); font-weight: 800; text-align: center; padding: 40px 10px;">
                             <i class="fa-solid fa-lock" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
                             조직도를 먼저 완성하면<br>직급별 대화 퀴즈가 잠금 해제됩니다.
@@ -669,6 +677,7 @@
         </div>
     </div>
 
+    <script src="./vocab-support-common.js"></script>
     <script>
         (() => {
             let selectedRank = null;
@@ -689,48 +698,54 @@
                 "신입 사원": "../assets/c11/vocabulary/images/split/c11_05_BL.webp"
             };
 
-            const rankTranslations = {
-                vi: {
-                    "부장": "Trưởng phòng",
-                    "과장": "Trưởng khoa",
-                    "대리": "Trợ lý",
-                    "신입 사원": "Nhân viên mới"
+            const scenarioPreview = {
+                1: {
+                    rank: "부장",
+                    img: rankImages["부장"],
+                    title: "부장에게 보고하기",
+                    desc: "신입 사원이 직장 상사에게 보고서를 제출하는 장면입니다."
                 },
-                en: {
-                    "부장": "Department Head",
-                    "과장": "Manager",
-                    "대리": "Assistant Manager",
-                    "신입 사원": "New Recruit"
+                2: {
+                    rank: "과장",
+                    img: rankImages["과장"],
+                    title: "과장이 업무를 지시하기",
+                    desc: "상급자가 부하 직원에게 회의 준비를 확인하는 장면입니다."
                 },
-                mn: {
-                    "부장": "Хэлтсийн дарга",
-                    "과장": "Менежер",
-                    "대리": "Туслах менежер",
-                    "신입 사원": "Шинэ ажилтан"
-                },
-                ar: {
-                    "부장": "رئيس القسم",
-                    "과장": "المدير",
-                    "대리": "مساعد المدير",
-                    "신입 사원": "موظف جديد"
-                },
-                kk: {
-                    "부장": "Бөлім басшысы",
-                    "과장": "Менеджер",
-                    "대리": "Көмекші менеджер",
-                    "신입 사원": "Жаңа қызметкер"
-                },
-                th: {
-                    "부장": "หัวหน้าแผนก",
-                    "과장": "ผู้จัดการ",
-                    "대리": "ผู้ช่วยผู้จัดการ",
-                    "신입 사원": "พนักงานใหม่"
+                3: {
+                    rank: "대리",
+                    img: rankImages["대리"],
+                    title: "동료 대리와 대화하기",
+                    desc: "같은 직급의 동료에게 자연스럽게 점심을 제안하는 장면입니다."
                 }
             };
 
-            function translateRank(rank, lang) {
-                if (lang === "none" || !rankTranslations[lang]) return rank;
-                return rankTranslations[lang][rank] || rank;
+            const scenarioPrompts = {
+                1: "1. [신입 사원]이 [직장 상사]인 [부장]에게 보고서를 다 작성해서 드릴 때 어색한 표현은 무엇일까요?",
+                2: "2. [과장]이 [부하 직원]인 [김 대리]에게 회의 준비를 다 했는지 물어볼 때 가장 알맞은 표현은 무엇일까요?",
+                3: "3. [대리]가 [동료]인 [박 대리]에게 점심을 같이 먹자고 말할 때 가장 알맞은 대화는 무엇일까요?"
+            };
+
+            function escapeHtml(value) {
+                return String(value || "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;");
+            }
+
+            function renderScenarioPrompt(num, hint) {
+                const promptEl = document.getElementById(`prompt-scen-${num}`);
+                if (!promptEl) return;
+                promptEl.innerHTML = escapeHtml(scenarioPrompts[num]);
+                if (hint) {
+                    promptEl.insertAdjacentHTML("beforeend", `<span class="scenario-prompt-hint">${escapeHtml(hint)}</span>`);
+                }
+            }
+
+            function renderScenarioPrompts(t) {
+                renderScenarioPrompt(1, t?.scen1Prompt);
+                renderScenarioPrompt(2, t?.scen2Prompt);
+                renderScenarioPrompt(3, t?.scen3Prompt);
             }
 
             function getLabelForSlot(slotId) {
@@ -752,6 +767,9 @@
                 chipsPool: document.getElementById("chips-pool"),
                 slots: document.querySelectorAll(".org-slot"),
                 dialogueLockedDesc: document.getElementById("dialogue-locked-desc"),
+                rankPreview: document.getElementById("rank-dialogue-preview"),
+                rankPreviewTitle: document.getElementById("rank-dialogue-preview-title"),
+                rankPreviewDesc: document.getElementById("rank-dialogue-preview-desc"),
                 successOverlay: document.getElementById("success-overlay"),
                 btnRestart: document.getElementById("btn-restart"),
                 instruct: document.getElementById("activity-instruct")
@@ -894,13 +912,12 @@
                         const rank = slotsState[slot.id];
                         const valId = slot.id.replace("slot-", "val-");
                         if (rank) {
-                            const translatedRank = translateRank(rank, activeLang);
                             slot.innerHTML = `
                                 <div class="slot-success-card">
-                                    <img src="${rankImages[rank]}" class="slot-success-img" alt="${translatedRank}" decoding="async" loading="lazy">
+                                    ${window.C11VocabSupport.imageTag(rankImages[rank], rank, { size: 160, className: "slot-success-img" })}
                                     <div class="slot-success-text">
                                         <span class="slot-success-label">${labels[slot.id]}</span>
-                                        <span class="slot-success-val" id="${valId}">${translatedRank}</span>
+                                        <span class="slot-success-val" id="${valId}">${rank}</span>
                                     </div>
                                 </div>
                             `;
@@ -912,10 +929,8 @@
                         }
                     });
 
-                    // Scenario prompts (translated); dialogue options stay Korean always
-                    document.getElementById("prompt-scen-1").textContent = t.scen1Prompt;
-                    document.getElementById("prompt-scen-2").textContent = t.scen2Prompt;
-                    document.getElementById("prompt-scen-3").textContent = t.scen3Prompt;
+                    // Dialogue prompts stay Korean; translations are shown as small hints.
+                    renderScenarioPrompts(t);
                 } else {
                     els.instruct.textContent = "직급 카드를 드래그하여 알맞은 조직도 슬롯에 놓거나, 클릭해서 놓아 보세요.";
                     if (els.dialogueLockedDesc) {
@@ -939,7 +954,7 @@
                         if (rank) {
                             slot.innerHTML = `
                                 <div class="slot-success-card">
-                                    <img src="${rankImages[rank]}" class="slot-success-img" alt="${rank}" decoding="async" loading="lazy">
+                                    ${window.C11VocabSupport.imageTag(rankImages[rank], rank, { size: 160, className: "slot-success-img" })}
                                     <div class="slot-success-text">
                                         <span class="slot-success-label">${labels[slot.id]}</span>
                                         <span class="slot-success-val" id="${valId}">${rank}</span>
@@ -954,19 +969,17 @@
                         }
                     });
 
-                    document.getElementById("prompt-scen-1").textContent = "1. [신입 사원]이 [직장 상사]인 [부장]에게 보고서를 다 작성해서 드릴 때 어색한 표현은 무엇일까요?";
+                    renderScenarioPrompts(null);
                     const opts1 = document.getElementById("scen-1").querySelectorAll(".dialogue-option");
                     opts1[0].textContent = "부장님, 지시하신 보고서를 다 썼습니다. 읽어 주십시오.";
                     opts1[1].textContent = "부장님, 여기 보고서 다 만들었습니다. 읽어 보세요.";
                     opts1[2].textContent = "부장, 내가 보고서를 작성했으니 확인해 줘.";
 
-                    document.getElementById("prompt-scen-2").textContent = "2. [과장]이 [부하 직원]인 [김 대리]에게 회의 준비를 다 했는지 물어볼 때 가장 알맞은 표현은 무엇일까요?";
                     const opts2 = document.getElementById("scen-2").querySelectorAll(".dialogue-option");
                     opts2[0].textContent = "김 대리, 오늘 오후 회의 준비는 다 끝났는가? 자료 좀 가져오게.";
                     opts2[1].textContent = "김 대리님, 오늘 회의 자료를 저에게 시켜 주시면 감사하겠습니다.";
                     opts2[2].textContent = "김 대리, 오늘 회의가 있으니 나한테 자료를 올리십시오.";
 
-                    document.getElementById("prompt-scen-3").textContent = "3. [대리]가 [동료]인 [박 대리]에게 점심을 같이 먹자고 말할 때 가장 알맞은 대화는 무엇일까요?";
                     const opts3 = document.getElementById("scen-3").querySelectorAll(".dialogue-option");
                     opts3[0].textContent = "박 대리, 오늘 점심으로 무엇을 먹을지 아래 직원에게 시키십시오.";
                     opts3[1].textContent = "박 대리, 오늘 점심은 같이 먹을래요? 새로 오픈한 식당에 가 봐요.";
@@ -1059,14 +1072,13 @@
                     slotsState[slot.id] = rank;
                     
                     const labelText = getLabelForSlot(slot.id);
-                    const translatedRank = translateRank(rank, activeLang);
                     const valId = slot.id.replace("slot-", "val-");
                     slot.innerHTML = `
                         <div class="slot-success-card">
-                            <img src="${rankImages[rank]}" class="slot-success-img" alt="${translatedRank}" decoding="async" loading="lazy">
+                            ${window.C11VocabSupport.imageTag(rankImages[rank], rank, { size: 160, className: "slot-success-img" })}
                             <div class="slot-success-text">
                                 <span class="slot-success-label">${labelText}</span>
-                                <span class="slot-success-val" id="${valId}">${translatedRank}</span>
+                                <span class="slot-success-val" id="${valId}">${rank}</span>
                             </div>
                         </div>
                     `;
@@ -1105,6 +1117,17 @@
 
             function activateScenario(num) {
                 currentActiveScenario = num;
+                const previewData = scenarioPreview[num];
+                if (els.rankPreview && previewData) {
+                    const previewImg = els.rankPreview.querySelector("img");
+                    previewImg.src = window.C11VocabSupport.supportImage(previewData.img, 320);
+                    previewImg.alt = previewData.rank;
+                    previewImg.width = 320;
+                    previewImg.height = 320;
+                    els.rankPreviewTitle.textContent = previewData.title;
+                    els.rankPreviewDesc.textContent = previewData.desc;
+                    els.rankPreview.classList.add("is-visible");
+                }
                 document.querySelectorAll(".scenario-card").forEach((card, idx) => {
                     if (idx + 1 === num) {
                         card.classList.add("active-scenario");
@@ -1175,6 +1198,9 @@
                 // Reset Scenarios UI
                 if (els.dialogueLockedDesc) {
                     els.dialogueLockedDesc.style.display = "block";
+                }
+                if (els.rankPreview) {
+                    els.rankPreview.classList.remove("is-visible");
                 }
                 document.querySelectorAll(".scenario-card").forEach(card => {
                     card.classList.remove("active-scenario");
