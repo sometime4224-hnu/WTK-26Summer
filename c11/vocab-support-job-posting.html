@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>11과 어휘 보조1 | 구인 공고와 지원 조건 매칭</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <link rel="stylesheet" href="../shared/multilang-toggle.css">
+    <style>
+        :root {
+            --ink: #1e293b;
+            --muted: #64748b;
+            --paper: #ffffff;
+            --page: #f8fafc;
+            --line: #e2e8f0;
+            --brand: #0f766e;
+            --brand-light: #ccfbf1;
+            --accent: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --topbar-height: 48px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--ink);
+            background: linear-gradient(180deg, #f0fdfa 0%, #f8fafc 40%, #eff6ff 100%);
+            font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+            line-height: 1.5;
+            padding-bottom: 40px;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            min-height: var(--topbar-height);
+            display: grid;
+            grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 12px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar__links {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .topbar__links::-webkit-scrollbar {
+            display: none;
+        }
+
+        .topbar a {
+            min-height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid rgba(30, 41, 59, 0.1);
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.04);
+            color: var(--ink);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar a.active {
+            border-color: var(--brand);
+            background: var(--brand-light);
+            color: var(--brand);
+        }
+
+        .topbar__title {
+            text-align: right;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .shell {
+            width: min(1200px, 100% - 24px);
+            margin: 14px auto 0;
+        }
+
+        header.hero {
+            text-align: center;
+            margin-bottom: 18px;
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: var(--shadow);
+        }
+
+        .eyebrow {
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--brand);
+            margin-bottom: 4px;
+        }
+
+        header.hero h1 {
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .instructions {
+            font-size: 0.9rem;
+            color: var(--muted);
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+            gap: 16px;
+        }
+
+        .jobs-section, .candidates-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid var(--line);
+        }
+
+        .job-card {
+            background: var(--paper);
+            border: 2px dashed var(--line);
+            border-radius: 14px;
+            padding: 16px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+        }
+
+        /* Drag affordance classes */
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(37, 99, 235, 0.4); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.2); }
+            50% { border-color: rgba(37, 99, 235, 0.8); box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); }
+        }
+
+        .job-card.pulse-target {
+            animation: pulse-border 1.5s infinite;
+            border-color: var(--accent);
+        }
+
+        .job-card.drag-over {
+            border-color: var(--accent) !important;
+            background: var(--accent-light) !important;
+            transform: scale(1.01);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .job-card.shake-error {
+            animation: shake 0.4s ease-in-out;
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #ef4444;
+        }
+
+        .job-card.active-target {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .job-card.matched {
+            border-style: solid;
+            border-color: var(--success);
+            background: var(--success-light);
+            transform: scale(1.02);
+        }
+
+        .job-card-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .job-company-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: #fff;
+        }
+
+        .job-badge {
+            display: inline-flex;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            background: #f1f5f9;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+
+        .job-card.matched .job-badge {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .job-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .candidate-strengths {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .label-note {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--muted);
+            margin-left: 2px;
+        }
+
+        .strength-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            padding: 3px 6px;
+            border-radius: 6px;
+        }
+
+        .strength-icon {
+            width: 16px;
+            height: 16px;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+
+        .job-details {
+            font-size: 0.85rem;
+            color: #475569;
+            display: grid;
+            gap: 4px;
+        }
+
+        .job-details div {
+            display: flex;
+            gap: 6px;
+        }
+
+        .job-details strong {
+            color: #1e293b;
+            min-width: 65px;
+        }
+
+        .job-keywords {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .keyword-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: #f1f5f9;
+            color: #64748b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--line);
+        }
+
+        .candidate-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .candidate-card {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: var(--shadow);
+            cursor: grab;
+            transition: all 0.2s ease;
+            user-select: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .candidate-card * {
+            pointer-events: none;
+        }
+
+        .candidate-card:active {
+            cursor: grabbing;
+        }
+
+        .candidate-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+            border-color: var(--accent);
+        }
+
+        .candidate-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -5px rgba(0,0,0,0.08);
+            border-color: var(--brand);
+        }
+
+        .candidate-card.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+            transform: scale(1.02);
+        }
+
+        .candidate-card.placed {
+            opacity: 0.4;
+            pointer-events: none;
+            border-style: dotted;
+            cursor: default;
+        }
+
+        .candidate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .candidate-name {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .candidate-meta {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .candidate-desc {
+            font-size: 0.82rem;
+            color: #475569;
+            line-height: 1.45;
+        }
+
+        .match-slot {
+            margin-top: 12px;
+            border: 2px dashed rgba(37, 99, 235, 0.4);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--accent);
+            background: rgba(37, 99, 235, 0.02);
+            transition: all 0.2s ease;
+        }
+
+        .job-card.matched .match-slot {
+            border-style: solid;
+            border-color: var(--success);
+            background: var(--success-light);
+            color: var(--success);
+            font-weight: 900;
+        }
+
+        .matched-applicant {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            border: 1px solid var(--success);
+            border-radius: 6px;
+            padding: 6px 10px;
+            margin-top: 8px;
+        }
+
+        .matched-applicant span {
+            font-weight: 900;
+            color: var(--success);
+        }
+
+        .matched-applicant button {
+            background: transparent;
+            border: 0;
+            color: #ef4444;
+            font-weight: 900;
+            cursor: pointer;
+            padding: 2px 6px;
+        }
+
+        /* Success Overlay */
+        .success-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .success-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .success-card {
+            background: #fff;
+            border-radius: 20px;
+            width: min(460px, 100%);
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .success-overlay.show .success-card {
+            transform: scale(1);
+        }
+
+        .success-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--success-light);
+            color: var(--success);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 16px;
+            animation: bounce 1s infinite;
+        }
+
+        .success-card h2 {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .success-card p {
+            color: var(--muted);
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn-restart {
+            width: 100%;
+            min-height: 46px;
+            border: 0;
+            border-radius: 10px;
+            background: var(--brand);
+            color: #fff;
+            font-weight: 900;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .btn-restart:hover {
+            background: #115e59;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @media (max-width: 760px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .candidates-section {
+                order: -1;
+            }
+
+            .candidate-list {
+                display: flex;
+                flex-direction: row;
+                gap: 10px;
+                overflow-x: auto;
+                padding: 4px 0 12px;
+                scrollbar-width: none;
+            }
+
+            .candidate-list::-webkit-scrollbar {
+                display: none;
+            }
+
+            .candidate-card {
+                flex: 0 0 260px;
+                min-height: 120px;
+                width: auto;
+            }
+
+            .topbar__title {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .job-card {
+                padding: 12px;
+            }
+            .job-card-header {
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+            .job-company-img {
+                width: 40px;
+                height: 40px;
+            }
+            .job-title {
+                font-size: 1rem;
+            }
+            .job-details {
+                font-size: 0.8rem;
+            }
+            .candidate-card {
+                flex: 0 0 240px;
+                padding: 10px;
+            }
+            .candidate-name {
+                font-size: 0.95rem;
+            }
+            .candidate-desc {
+                font-size: 0.78rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar">
+        <div class="topbar__links">
+            <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+            <a href="index.html"><i class="fa-solid fa-folder-open"></i> 11과</a>
+            <a href="vocabulary.html"><i class="fa-solid fa-layer-group"></i> 어휘</a>
+            <a href="vocab-support-job-posting.html" class="active"><i class="fa-solid fa-address-card"></i> 보조1</a>
+            <a href="vocab-support-org-chart.html"><i class="fa-solid fa-sitemap"></i> 보조2</a>
+            <a href="vocab-support-welfare-balance.html"><i class="fa-solid fa-sliders"></i> 보조3</a>
+            <a href="vocab-support-work-scenario.html"><i class="fa-solid fa-building"></i> 보조4</a>
+        </div>
+        <div class="topbar__title">11과 어휘 보조1 | 구인 공고와 지원 조건 매칭</div>
+    </nav>
+
+    <main class="shell">
+        <header class="hero">
+            <p class="eyebrow">Chapter 11 Vocabulary Activity 1</p>
+            <h1 id="page-title">구인 공고와 지원 조건 매칭</h1>
+            <p class="instructions" id="page-instruct">지원자를 드래그하여 알맞은 구인 공고 카드에 놓거나, 클릭해서 선택한 후에 놓아 보세요.</p>
+            <div data-multilang-bar></div>
+        </header>
+
+        <div class="main-grid">
+            <section class="jobs-section">
+                <h2 class="section-title" id="jobs-title"><i class="fa-solid fa-briefcase"></i> 구인 공고 (Job Postings)</h2>
+                <div class="job-list" id="job-list">
+                    <!-- Dynamic rendering of jobs -->
+                </div>
+            </section>
+
+            <section class="candidates-section">
+                <h2 class="section-title" id="candidates-title"><i class="fa-solid fa-users"></i> 지원자 목록 (Applicants)</h2>
+                <div class="candidate-list" id="candidate-list">
+                    <!-- Dynamic rendering of candidates -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div class="success-overlay" id="success-overlay">
+        <div class="success-card">
+            <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+            <h2 id="success-title">연습 완료!</h2>
+            <p id="success-desc">모든 지원자를 알맞은 회사에 보냈습니다.<br>회사 생활 관련 어휘를 잘 공부했습니다!</p>
+            <button class="btn-restart" id="btn-restart">다시 시작하기</button>
+        </div>
+    </div>
+
+    <script src="../shared/vocabulary-multilang-data.js"></script>
+    <script>
+        (() => {
+            const jobs = [
+                {
+                    id: "job-1",
+                    badge: "대기업",
+                    image: "../assets/c11/vocabulary/images/split/c11_01_TR.webp",
+                    title: "대기업 신입 사원 채용",
+                    hours: "09:00 ~ 18:00 (근무 시간)",
+                    salary: "연봉이 높음 (연봉이 높다)",
+                    task: "기획 돕기 및 보고서 작성 (업무)",
+                    pref: "실력이 있고 이해가 빠르며, 보고서 작성을 잘하는 사람",
+                    keywords: ["업무", "근무 시간", "연봉이 높다", "보고서 작성을 잘하다", "실력이 있다", "이해가 빠르다"],
+                    correctCandidate: "cand-2",
+                    vi: {
+                        badge: "Tập đoàn",
+                        title: "Tuyển dụng nhân viên mới tập đoàn lớn",
+                        hours: "09:00 ~ 18:00 (thời gian làm việc)",
+                        salary: "Lương năm cao (lương năm cao)",
+                        task: "Hỗ trợ lập kế hoạch và viết báo cáo (nhiệm vụ)",
+                        pref: "Người có thực lực, hiểu nhanh và viết báo cáo giỏi"
+                    },
+                    en: {
+                        badge: "Large Enterprise",
+                        title: "Large Enterprise New Recruit",
+                        hours: "09:00 ~ 18:00 (Working Hours)",
+                        salary: "High Annual Salary (high annual salary)",
+                        task: "Planning support and writing reports (business/task)",
+                        pref: "Someone capable, quick to understand, and good at report writing"
+                    },
+                    mn: {
+                        badge: "Том компани",
+                        title: "Том компанийн шинэ ажилтан элсэлт",
+                        hours: "09:00 ~ 18:00 (ажлын цаг)",
+                        salary: "Жилийн цалин өндөр",
+                        task: "Төлөвлөлтөд туслах ба тайлан бичих (ажлын үүрэг)",
+                        pref: "Чадвартай, хурдан ойлгодог, тайлан сайн бичдэг хүн"
+                    },
+                    ar: {
+                        badge: "شركة كبيرة",
+                        title: "توظيف موظف جديد في شركة كبيرة",
+                        hours: "09:00 ~ 18:00 (ساعات العمل)",
+                        salary: "راتب سنوي مرتفع",
+                        task: "دعم التخطيط وكتابة التقارير (المهام)",
+                        pref: "شخص ماهر وسريع الفهم وجيد في كتابة التقارير"
+                    },
+                    kk: {
+                        badge: "Ірі компания",
+                        title: "Ірі компанияға жаңа қызметкер жалдау",
+                        hours: "09:00 ~ 18:00 (жұмыс уақыты)",
+                        salary: "Жылдық жалақысы жоғары",
+                        task: "Жоспарлауға көмек және есеп жазу (қызметтік міндет)",
+                        pref: "Қабілетті, тез түсінетін және есеп жазуды жақсы білетін адам"
+                    },
+                    th: {
+                        badge: "บริษัทใหญ่",
+                        title: "รับสมัครพนักงานใหม่บริษัทใหญ่",
+                        hours: "09:00 ~ 18:00 (เวลาทำงาน)",
+                        salary: "รายได้ต่อปีสูง",
+                        task: "ช่วยวางแผนและเขียนรายงาน (หน้าที่งาน)",
+                        pref: "ผู้มีความสามารถ เข้าใจเร็ว และเขียนรายงานได้ดี"
+                    }
+                },
+                {
+                    id: "job-2",
+                    badge: "중소기업",
+                    image: "../assets/c11/vocabulary/images/split/c11_01_BL.webp",
+                    title: "중소기업 마케팅 기획자 채용",
+                    hours: "출퇴근 시간이 자유롭다",
+                    salary: "회사와 이야기해서 정함 (연봉 협의)",
+                    task: "새로운 제품 홍보 기획 및 같이 일하기 (업무)",
+                    pref: "대인 관계가 원만하고 꼼꼼하며 최선을 다하는 사람",
+                    keywords: ["업무", "출퇴근 시간이 자유롭다", "대인 관계가 원만하다", "꼼꼼하다", "최선을 다하다"],
+                    correctCandidate: "cand-3",
+                    vi: {
+                        badge: "Doanh nghiệp vừa và nhỏ",
+                        title: "Tuyển dụng nhân viên kế hoạch marketing doanh nghiệp vừa và nhỏ",
+                        hours: "Thời gian đi làm và tan làm tự do",
+                        salary: "Thương lượng lương năm",
+                        task: "Lập kế hoạch chiến dịch marketing và hợp tác (nhiệm vụ)",
+                        pref: "Người có quan hệ xã hội tốt, tỉ mỉ và cố gắng hết sức"
+                    },
+                    en: {
+                        badge: "SME",
+                        title: "SME Marketing Planner Recruit",
+                        hours: "Flexible working hours",
+                        salary: "Salary negotiable",
+                        task: "Marketing campaign planning & cooperation (business)",
+                        pref: "Someone with smooth interpersonal relations, meticulous, and doing their best"
+                    },
+                    mn: {
+                        badge: "Жижиг дунд компани",
+                        title: "ЖДК маркетингийн төлөвлөгч элсэлт",
+                        hours: "Ирэх буцах цаг чөлөөтэй",
+                        salary: "Цалин тохиролцоно",
+                        task: "Шинэ бүтээгдэхүүн сурталчлах ба хамтран ажиллах (ажлын үүрэг)",
+                        pref: "Хүмүүстэй сайн харилцдаг, нямбай, хамгийн сайнаараа хичээдэг хүн"
+                    },
+                    ar: {
+                        badge: "شركة صغيرة ومتوسطة",
+                        title: "توظيف مخطط تسويق في شركة صغيرة ومتوسطة",
+                        hours: "مواعيد عمل مرنة",
+                        salary: "الراتب قابل للتفاوض",
+                        task: "التخطيط للترويج للمنتجات الجديدة والتعاون (المهام)",
+                        pref: "شخص لديه علاقات جيدة مع الناس ودقيق ويبذل قصارى جهده"
+                    },
+                    kk: {
+                        badge: "Шағын және орта компания",
+                        title: "ШОК маркетинг жоспарлаушысын жалдау",
+                        hours: "Жұмысқа келу-кету уақыты еркін",
+                        salary: "Жалақы келіссөз арқылы",
+                        task: "Жаңа өнімді жарнамалауды жоспарлау және бірге жұмыс істеу (қызметтік міндет)",
+                        pref: "Адамдармен қарым-қатынасы жақсы, ұқыпты және бар күшін салатын адам"
+                    },
+                    th: {
+                        badge: "SME",
+                        title: "รับสมัครนักวางแผนการตลาด SME",
+                        hours: "เวลาเข้าออกงานยืดหยุ่น",
+                        salary: "เจรจาเงินเดือน",
+                        task: "วางแผนโปรโมทสินค้าใหม่และทำงานร่วมกัน (หน้าที่งาน)",
+                        pref: "ผู้มีมนุษยสัมพันธ์ดี ละเอียดรอบคอบ และทำงานเต็มที่"
+                    }
+                },
+                {
+                    id: "job-3",
+                    badge: "아르바이트",
+                    image: "../assets/c11/vocabulary/images/split/c11_02_TL.webp",
+                    title: "동네 카페 주말 아르바이트 구인",
+                    hours: "토, 일요일 10:00 ~ 16:00 (근무 시간)",
+                    salary: "시급제 (시급)",
+                    task: "커피 만들기 및 가게 청소 (업무)",
+                    pref: "성실하고 꼼꼼하며 관련 경험이 많은 사람",
+                    keywords: ["아르바이트", "근무 시간", "시급", "성실하다", "꼼꼼하다", "경험이 많다"],
+                    correctCandidate: "cand-1",
+                    vi: {
+                        badge: "Việc làm thêm",
+                        title: "Tuyển việc làm thêm cuối tuần quán cà phê",
+                        hours: "Thứ bảy, chủ nhật 10:00 ~ 16:00 (thời gian làm việc)",
+                        salary: "Lương theo giờ",
+                        task: "Pha chế đồ uống và quản lý cửa hàng (nhiệm vụ)",
+                        pref: "Người thành thật, tỉ mỉ và có nhiều kinh nghiệm liên quan"
+                    },
+                    en: {
+                        badge: "Part-time Job",
+                        title: "Local Cafe Weekend Part-time Job",
+                        hours: "Sat, Sun 10:00 ~ 16:00 (Working Hours)",
+                        salary: "Hourly wage system",
+                        task: "Beverage preparation and shop management (duties)",
+                        pref: "Someone diligent, meticulous, and with a lot of experience"
+                    },
+                    mn: {
+                        badge: "Цагийн ажил",
+                        title: "Орон нутгийн кафед амралтын өдрийн цагийн ажил",
+                        hours: "Бямба, ням 10:00 ~ 16:00 (ажлын цаг)",
+                        salary: "Цагийн үнэлгээгээр",
+                        task: "Ундаа бэлтгэх, дэлгүүр цэвэрлэх (ажлын үүрэг)",
+                        pref: "Чин сэтгэлтэй, нямбай, холбогдох туршлага ихтэй хүн"
+                    },
+                    ar: {
+                        badge: "عمل جزئي",
+                        title: "وظيفة عمل جزئي نهاية الأسبوع في مقهى محلي",
+                        hours: "السبت والأحد 10:00 ~ 16:00 (ساعات العمل)",
+                        salary: "نظام الأجر بالساعة",
+                        task: "إعداد المشروبات وتنظيف المتجر (المهام)",
+                        pref: "شخص مجتهد ودقيق ولديه خبرة كافية في المجال"
+                    },
+                    kk: {
+                        badge: "Уақытша жұмыс",
+                        title: "Жергілікті кафеде демалыс күндері уақытша жұмыс",
+                        hours: "Сенбі, жексенбі 10:00 ~ 16:00 (жұмыс уақыты)",
+                        salary: "Сағаттық жалақы жүйесі",
+                        task: "Сусын дайындау және дүкенді тазалау (қызметтік міндет)",
+                        pref: "Адал, ұқыпты және тиісті тәжірибесі мол адам"
+                    },
+                    th: {
+                        badge: "งานพาร์ทไทม์",
+                        title: "งานพาร์ทไทม์วันหยุดสุดสัปดาห์ที่คาเฟ่ในย่าน",
+                        hours: "เสาร์-อาทิตย์ 10:00 ~ 16:00 (เวลาทำงาน)",
+                        salary: "ระบบรายชั่วโมง",
+                        task: "เตรียมเครื่องดื่มและทำความสะอาดร้าน (หน้าที่งาน)",
+                        pref: "ผู้ขยันหมั่นเพียร ละเอียดรอบคอบ และมีประสบการณ์ที่เกี่ยวข้องมาก"
+                    }
+                }
+            ];
+
+            const candidates = [
+                {
+                    id: "cand-1",
+                    name: "김지우 (여, 22세)",
+                    desc: "가게와 식당에서 오랫동안 일해서 관련 <strong>경험이 많습니다</strong>. 약속 시간을 잘 지키며 항상 <strong>성실하고</strong> <strong>꼼꼼하게</strong> 일합니다.",
+                    strengths: [
+                        { ko: "경험이 많다", vi: "Có nhiều kinh nghiệm", en: "Experienced", mn: "Туршлага ихтэй", ar: "ذو خبرة واسعة", kk: "Тәжірибелі", th: "มีประสบการณ์มาก", img: "../assets/c11/vocabulary/images/split/c11_04_TL.webp" },
+                        { ko: "성실하다", vi: "Chăm chỉ", en: "Diligent", mn: "Чин сэтгэлтэй", ar: "مجتهد", kk: "Адал", th: "ขยันหมั่นเพียร", img: "../assets/c11/vocabulary/images/split/c11_03_BL.webp" },
+                        { ko: "꼼꼼하다", vi: "Tỉ mỉ", en: "Meticulous", mn: "Нямбай", ar: "دقيق", kk: "Ұқыпты", th: "ละเอียดรอบคอบ", img: "../assets/c11/vocabulary/images/split/c11_03_BR.webp" }
+                    ],
+                    vi: {
+                        name: "Kim Ji-woo (Nữ, 22 tuổi)",
+                        desc: "Có <strong>nhiều kinh nghiệm</strong> làm việc lâu năm tại cửa hàng tiện lợi và nhà hàng nhượng quyền. Tuân thủ nghiêm ngặt giờ giấc, luôn làm việc <strong>thành thật</strong> 및 <strong>tỉ mỉ</strong>."
+                    },
+                    en: {
+                        name: "Kim Ji-woo (F, 22)",
+                        desc: "Has <strong>rich experience</strong> working at convenience stores and franchise restaurants. Keeps promises on time, and always works <strong>diligently</strong> and <strong>meticulously</strong>."
+                    },
+                    mn: {
+                        name: "Ким Жи-у (эм, 22 нас)",
+                        desc: "Дэлгүүр болон ресторанд удаан хугацаагаар ажилласнаар <strong>туршлага ихтэй</strong> болсон. Цагаа сайн баримталж, үргэлж <strong>чин сэтгэлтэй</strong>, <strong>нямбайгаар</strong> ажилладаг."
+                    },
+                    ar: {
+                        name: "كيم جي-وو (أنثى، 22 عامًا)",
+                        desc: "اكتسبت <strong>خبرة واسعة</strong> من العمل لفترة طويلة في متاجر ومطاعم. تلتزم بالمواعيد دائمًا وتعمل بشكل <strong>مجتهد</strong> و<strong>دقيق</strong>."
+                    },
+                    kk: {
+                        name: "Ким Джи-у (әйел, 22 жаста)",
+                        desc: "Дүкен мен мейрамханада ұзақ уақыт жұмыс істеп <strong>тәжірибе жинаған</strong>. Уақытты дәл сақтайды, әрдайым <strong>адал</strong> және <strong>ұқыпты</strong> жұмыс істейді."
+                    },
+                    th: {
+                        name: "คิม จีอู (หญิง, 22 ปี)",
+                        desc: "ทำงานที่ร้านค้าและร้านอาหารมานาน จึง<strong>มีประสบการณ์มาก</strong> รักษาเวลาเสมอ ทำงาน<strong>ขยันหมั่นเพียร</strong>และ<strong>ละเอียดรอบคอบ</strong>"
+                    }
+                },
+                {
+                    id: "cand-2",
+                    name: "박민수 (남, 28세)",
+                    desc: "회사에서 여러 가지 일을 잘해서 <strong>실력이 있습니다</strong>. 새로운 일도 금방 배울 만큼 <strong>이해가 빠르고</strong>, 문서와 <strong>보고서 작성을 잘합니다</strong>.",
+                    strengths: [
+                        { ko: "실력이 있다", vi: "Có thực lực", en: "Capable", mn: "Чадвартай", ar: "ماهر", kk: "Қабілетті", th: "มีความสามารถ", img: "../assets/c11/vocabulary/images/split/c11_04_TR.webp" },
+                        { ko: "이해가 빠르다", vi: "Hiểu nhanh", en: "Quick to understand", mn: "Хурдан ойлгодог", ar: "سريع الفهم", kk: "Тез түсінеді", th: "เข้าใจเร็ว", img: "../assets/c11/vocabulary/images/split/c11_04_BL.webp" },
+                        { ko: "보고서 작성을 잘하다", vi: "Viết báo cáo giỏi", en: "Good at writing reports", mn: "Тайлан сайн бичдэг", ar: "جيد في كتابة التقارير", kk: "Есеп жазуды жақсы біледі", th: "เขียนรายงานได้ดี", img: "../assets/c11/vocabulary/images/split/c11_05_TL.webp" }
+                    ],
+                    vi: {
+                        name: "Park Min-su (Nam, 28 tuổi)",
+                        desc: "Có <strong>thực lực</strong> tốt khi tham gia lập kế hoạch nhiều dự án 및 đạt thành tích xuất sắc. <strong>Hiểu nhanh</strong> các chỉ thị 및 <strong>viết báo cáo giỏi</strong>."
+                    },
+                    en: {
+                        name: "Park Min-su (M, 28)",
+                        desc: "Very <strong>capable</strong>, having participated in and achieved great results in various project designs. <strong>Quick to understand</strong> instructions and <strong>good at writing reports</strong>."
+                    },
+                    mn: {
+                        name: "Пак Мин-су (эр, 28 нас)",
+                        desc: "Янз бүрийн төслийн дизайнд оролцож, гайхалтай үр дүн гаргаснаар <strong>чадвартай</strong> болсон. Заавлыг <strong>хурдан ойлгож</strong>, <strong>тайлан сайн бичдэг</strong>."
+                    },
+                    ar: {
+                        name: "بارك مين-سو (ذكر، 28 عامًا)",
+                        desc: "<strong>ماهر</strong> جدًا في تصميم المشاريع المتنوعة وتحقيق نتائج ممتازة. <strong>سريع الفهم</strong> للتوجيهات و<strong>جيد في كتابة التقارير</strong>."
+                    },
+                    kk: {
+                        name: "Пак Мин-су (ер, 28 жаста)",
+                        desc: "Түрлі жоба жобалауларына қатысып, тамаша нәтиже көрсеткен <strong>қабілетті</strong> маман. Нұсқауларды <strong>тез түсінеді</strong> және <strong>есеп жазуды жақсы біледі</strong>."
+                    },
+                    th: {
+                        name: "ปาร์ค มินซู (ชาย, 28 ปี)",
+                        desc: "<strong>มีความสามารถ</strong>สูงจากการมีส่วนร่วมและทำผลงานโดดเด่นในการออกแบบโครงการต่างๆ <strong>เข้าใจเร็ว</strong>และ<strong>เขียนรายงานได้ดี</strong>"
+                    }
+                },
+                {
+                    id: "cand-3",
+                    name: "이지원 (여, 27세)",
+                    desc: "다른 사람들과 친하게 잘 지내서 <strong>대인 관계가 원만합니다</strong>. 무슨 일이든 끝까지 열심히 <strong>최선을 다하는</strong> 사람입니다.",
+                    strengths: [
+                        { ko: "대인 관계가 원만하다", vi: "Quan hệ xã hội tốt", en: "Good interpersonal relations", mn: "Хүмүүстэй сайн харилцдаг", ar: "علاقات جيدة مع الناس", kk: "Адамдармен қарым-қатынасы жақсы", th: "มีมนุษยสัมพันธ์ดี", img: "../assets/c11/vocabulary/images/split/c11_05_TR.webp" },
+                        { ko: "최선을 다하다", vi: "Cố gắng hết sức", en: "Doing one's best", mn: "Хамгийн сайнаараа хичээдэг", ar: "يبذل قصارى جهده", kk: "Бар күшін салады", th: "ทำงานเต็มที่", img: "../assets/c11/vocabulary/images/split/c11_04_BR.webp" }
+                    ],
+                    vi: {
+                        name: "Lee Ji-won (Nữ, 27 tuổi)",
+                        desc: "Duy trì mối quan hệ tốt đẹp với các thành viên trong đội nên <strong>quan hệ xã hội tốt</strong>. Luôn <strong>cố gắng hết sức</strong> không bỏ cuộc cho đến cùng dù đảm nhận vai trò gì."
+                    },
+                    en: {
+                        name: "Lee Ji-won (F, 27)",
+                        desc: "Maintains smooth relationships with team members, so <strong>interpersonal relations are smooth</strong>. Characterized by <strong>doing her best</strong> to the end without giving up."
+                    },
+                    mn: {
+                        name: "Ли Жи-вон (эм, 27 нас)",
+                        desc: "Багийн гишүүдтэй сайхан харилцдаг тул <strong>хүмүүстэй харилцаа нь тогтвортой</strong>. Ямар ч үүрэг гүйцэтгэлтэй байсан ч дуустал <strong>хамгийн сайнаараа хичээдэг</strong> онцлогтой."
+                    },
+                    ar: {
+                        name: "لي جي-وون (أنثى، 27 عامًا)",
+                        desc: "تحافظ على علاقات طيبة مع أعضاء الفريق مما يجعل <strong>علاقاتها مع الناس جيدة</strong>. تتميز <strong>ببذل قصارى جهدها</strong> حتى النهاية دون استسلام."
+                    },
+                    kk: {
+                        name: "Ли Джи-вон (әйел, 27 жаста)",
+                        desc: "Топ мүшелерімен тегіс қарым-қатынас жасайды, сондықтан <strong>адамдармен байланысы жақсы</strong>. Қандай рөлде болса да соңына дейін <strong>бар күшін салумен</strong> ерекшеленеді."
+                    },
+                    th: {
+                        name: "ลี จีวอน (หญิง, 27 ปี)",
+                        desc: "รักษาความสัมพันธ์ที่ดีกับสมาชิกในทีม จึง<strong>มีมนุษยสัมพันธ์ที่ดี</strong> มีลักษณะเด่นคือ<strong>ทำงานเต็มที่</strong>จนสุดโดยไม่ยอมแพ้"
+                    }
+                }
+            ];
+
+            let selectedCandidateId = null;
+            let matches = {}; // jobId: candidateId
+            let activeLang = "none";
+
+            const els = {
+                jobList: document.getElementById("job-list"),
+                candidateList: document.getElementById("candidate-list"),
+                successOverlay: document.getElementById("success-overlay"),
+                btnRestart: document.getElementById("btn-restart")
+            };
+
+            // 번역 대상: 안내문·완료 메시지·버튼·슬롯 UX 텍스트·어려운 레이블 보조 주석
+            // 번역 제외: 어휘 표현(대기업, 연봉이 높다 등), 직무 내용, 지원자 소개문, 강점 배지
+            const uiTranslations = {
+                vi: {
+                    instruct: "Kéo ứng viên thả vào thẻ tin tuyển dụng phù hợp, hoặc click để chọn rồi click để đặt.",
+                    successTitle: "Hoàn thành luyện tập!",
+                    successDesc: "Bạn đã gửi tất cả ứng viên đến đúng công ty.<br>Học tốt các từ vựng liên quan đến đời sống công sở!",
+                    btnRestart: "Bắt đầu lại",
+                    labelTaskNote: "nhiệm vụ được giao",
+                    labelPrefNote: "ưu tiên tuyển dụng",
+                    slotEmpty: "Nhấp vào đây hoặc thả ứng viên để bố trí",
+                    placed: "Đã bố trí",
+                    available: "Có thể ứng tuyển"
+                },
+                en: {
+                    instruct: "Drag and drop the applicant into the correct job posting card, or click to select and place.",
+                    successTitle: "Practice Completed!",
+                    successDesc: "You have sent all applicants to the correct companies.<br>Great job studying workplace vocabulary!",
+                    btnRestart: "Restart",
+                    labelTaskNote: "assigned duties",
+                    labelPrefNote: "preferred qualifications",
+                    slotEmpty: "Click here or drop candidate to place",
+                    placed: "Placed",
+                    available: "Available"
+                },
+                mn: {
+                    instruct: "Өргөдөл гаргагчийг зохих ажлын зарны картруу чирж тавих эсвэл сонгоод тавина уу.",
+                    successTitle: "Дасгал дуусгасан!",
+                    successDesc: "Та бүх өргөдөл гаргагчийг зохих компани руу илгээсэн байна.<br>Ажлын орчинтой холбоотой үгийг сайн сурлаа!",
+                    btnRestart: "Дахин эхлэх",
+                    labelTaskNote: "хариуцсан ажил",
+                    labelPrefNote: "давуу болзол",
+                    slotEmpty: "Энд дарах эсвэл өргөдөл гаргагчийг тавих",
+                    placed: "Байрлуулсан",
+                    available: "Өргөдөл гаргах боломжтой"
+                },
+                ar: {
+                    instruct: "اسحب المتقدمين وضعهم في بطاقة الوظيفة المناسبة، أو انقر للاختيار ثم الوضع.",
+                    successTitle: "اكتملت الممارسة!",
+                    successDesc: "لقد أرسلت جميع المتقدمين إلى الشركة المناسبة.<br>أحسنت في دراسة مفردات حياة العمل!",
+                    btnRestart: "ابدأ من جديد",
+                    labelTaskNote: "المهام الموكلة",
+                    labelPrefNote: "المؤهلات المفضلة",
+                    slotEmpty: "انقر هنا أو أسقط المتقدم للتعيين",
+                    placed: "تم التعيين",
+                    available: "متاح للتقديم"
+                },
+                kk: {
+                    instruct: "Өтінімшілерді сәйкес жұмыс картасына сүйреп апарыңыз немесе таңдап орналастырыңыз.",
+                    successTitle: "Жаттығу аяқталды!",
+                    successDesc: "Барлық өтінімшілерді сәйкес компанияға жібердіңіз.<br>Жұмыс өміріне қатысты сөздікті жақсы үйрендіңіз!",
+                    btnRestart: "Қайта бастау",
+                    labelTaskNote: "тапсырылған міндеттер",
+                    labelPrefNote: "қалаулы талаптар",
+                    slotEmpty: "Мұнда басыңыз немесе өтінімшіні орналастырыңыз",
+                    placed: "Орналастырылды",
+                    available: "Өтінім беруге болады"
+                },
+                th: {
+                    instruct: "ลากผู้สมัครไปวางที่การ์ดประกาศรับสมัครงานที่เหมาะสม หรือคลิกเลือกแล้ววาง",
+                    successTitle: "ฝึกเสร็จสมบูรณ์!",
+                    successDesc: "คุณส่งผู้สมัครทุกคนไปยังบริษัทที่เหมาะสมแล้ว<br>เรียนคำศัพท์เกี่ยวกับชีวิตการทำงานได้ดีมาก!",
+                    btnRestart: "เริ่มใหม่",
+                    labelTaskNote: "งานที่รับผิดชอบ",
+                    labelPrefNote: "คุณสมบัติที่ต้องการ",
+                    slotEmpty: "คลิกหรือวางผู้สมัครที่นี่",
+                    placed: "จัดวางแล้ว",
+                    available: "สามารถสมัครได้"
+                }
+            };
+
+            function initMultilang() {
+                if (window.MULTILANG_CONFIG && window.MultilangToggle) {
+                    activeLang = window.MultilangToggle.getLang() || "none";
+                }
+                render();
+            }
+
+            function render() {
+                // Update static text based on language
+                const pageInstructEl = document.getElementById("page-instruct");
+                const jobsTitleEl = document.getElementById("jobs-title");
+                const candidatesTitleEl = document.getElementById("candidates-title");
+                const successTitleEl = document.getElementById("success-title");
+                const successDescEl = document.getElementById("success-desc");
+                const btnRestartEl = document.getElementById("btn-restart");
+
+                // 섹션 타이틀은 항상 한국어(기존 이중언어) 유지
+                jobsTitleEl.innerHTML = '<i class="fa-solid fa-briefcase"></i> 구인 공고 (Job Postings)';
+                candidatesTitleEl.innerHTML = '<i class="fa-solid fa-users"></i> 지원자 목록 (Applicants)';
+
+                if (activeLang !== "none" && uiTranslations[activeLang]) {
+                    const t = uiTranslations[activeLang];
+                    pageInstructEl.textContent = t.instruct;
+                    successTitleEl.textContent = t.successTitle;
+                    successDescEl.innerHTML = t.successDesc;
+                    btnRestartEl.textContent = t.btnRestart;
+                } else {
+                    pageInstructEl.textContent = "지원자를 드래그하여 알맞은 구인 공고 카드에 놓거나, 클릭해서 선택한 후에 놓아 보세요.";
+                    successTitleEl.textContent = "연습 완료!";
+                    successDescEl.innerHTML = "모든 지원자를 알맞은 회사에 보냈습니다.<br>회사 생활 관련 어휘를 잘 공부했습니다!";
+                    btnRestartEl.textContent = "다시 시작하기";
+                }
+
+                // Render Candidates
+                els.candidateList.innerHTML = "";
+                candidates.forEach(cand => {
+                    const isPlaced = Object.values(matches).includes(cand.id);
+                    const isSelected = selectedCandidateId === cand.id;
+                    const card = document.createElement("div");
+                    card.className = `candidate-card ${isSelected ? 'selected' : ''} ${isPlaced ? 'placed' : ''}`;
+                    card.dataset.id = cand.id;
+                    card.setAttribute("role", "button");
+                    if (!isPlaced) {
+                        card.setAttribute("tabindex", "0");
+                        card.setAttribute("draggable", "true");
+                    }
+
+                    // 이름·소개문·강점 배지는 항상 한국어 (어휘 학습 대상)
+                    const name = cand.name;
+                    const desc = cand.desc;
+
+                    const strengthsHtml = cand.strengths ? `
+                        <div class="candidate-strengths">
+                            ${cand.strengths.map(s => {
+                                return `<span class="strength-badge"><img src="${s.img}" alt="${s.ko}" class="strength-icon" decoding="async" loading="lazy"> ${s.ko}</span>`;
+                            }).join('')}
+                        </div>
+                    ` : '';
+
+                    let statusText = isPlaced ? '배치됨' : '지원 가능';
+                    if (activeLang !== "none" && uiTranslations[activeLang]) {
+                        statusText = isPlaced ? uiTranslations[activeLang].placed : uiTranslations[activeLang].available;
+                    }
+
+                    card.innerHTML = `
+                        <div class="candidate-header">
+                            <span class="candidate-name">${name}</span>
+                            <span class="candidate-meta">${statusText}</span>
+                        </div>
+                        <p class="candidate-desc">${desc}</p>
+                        ${strengthsHtml}
+                    `;
+
+                    // Drag Event Handlers
+                    card.addEventListener("dragstart", (e) => {
+                        console.log("JOB_POSTING PAGE LOG: dragstart, cand:", cand.id);
+                        selectedCandidateId = cand.id;
+                        card.classList.add("dragging");
+                        e.dataTransfer.setData("text/plain", cand.id);
+                        
+                        // Add pulse targets to unmatched jobs
+                        document.querySelectorAll(".job-card").forEach(jc => {
+                            if (!matches[jc.dataset.id]) {
+                                jc.classList.add("pulse-target");
+                            }
+                        });
+                    });
+
+                    card.addEventListener("dragend", () => {
+                        console.log("JOB_POSTING PAGE LOG: dragend, cand:", cand.id);
+                        card.classList.remove("dragging");
+                        document.querySelectorAll(".job-card").forEach(jc => {
+                            jc.classList.remove("pulse-target", "drag-over");
+                        });
+                    });
+
+                    // Click handler (Fallback / Mobile)
+                    card.addEventListener("click", () => {
+                        console.log("JOB_POSTING PAGE LOG: click cand:", cand.id, "selectedCandidateId:", selectedCandidateId, "isPlaced:", isPlaced);
+                        if (isPlaced) return;
+                        if (selectedCandidateId === cand.id) {
+                            selectedCandidateId = null;
+                        } else {
+                            selectedCandidateId = cand.id;
+                        }
+                        render();
+                    });
+
+                    els.candidateList.appendChild(card);
+                });
+
+                // Render Jobs
+                els.jobList.innerHTML = "";
+                jobs.forEach(job => {
+                    const matchedCandId = matches[job.id];
+                    const isMatched = !!matchedCandId;
+                    const card = document.createElement("div");
+                    card.className = `job-card ${isMatched ? 'matched' : ''} ${selectedCandidateId && !isMatched ? 'active-target' : ''}`;
+                    card.dataset.id = job.id;
+
+                    // 잡 내용은 항상 한국어 (어휘 학습 대상)
+                    const badge = job.badge;
+                    const title = job.title;
+                    const hours = job.hours;
+                    const salary = job.salary;
+                    const task = job.task;
+                    const pref = job.pref;
+
+                    // 레이블은 한국어 고정, 어려운 레이블에만 보조 주석 추가
+                    const _t = (activeLang !== "none") ? uiTranslations[activeLang] : null;
+                    const taskNote = _t?.labelTaskNote ? ` <small class="label-note">(${_t.labelTaskNote})</small>` : '';
+                    const prefNote = _t?.labelPrefNote ? ` <small class="label-note">(${_t.labelPrefNote})</small>` : '';
+                    const emptySlotText = _t?.slotEmpty || "이곳을 클릭하거나 지원자를 놓아 배치";
+
+                    let slotContent = "";
+                    if (isMatched) {
+                        const cand = candidates.find(c => c.id === matchedCandId);
+                        const candName = cand.name;
+                        slotContent = `
+                            <div class="matched-applicant">
+                                <span><i class="fa-solid fa-circle-check"></i> ${candName}</span>
+                                <button type="button" class="btn-remove-match" data-job-id="${job.id}"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        `;
+                    } else {
+                        slotContent = `<div class="match-slot">${emptySlotText}</div>`;
+                    }
+
+                    card.innerHTML = `
+                        <div class="job-card-header">
+                            <img src="${job.image}" class="job-company-img" alt="${badge}" decoding="async" loading="lazy">
+                            <div>
+                                <span class="job-badge">${badge}</span>
+                                <h3 class="job-title">${title}</h3>
+                            </div>
+                        </div>
+                        <div class="job-details">
+                            <div><strong>근무 시간:</strong> <span>${hours}</span></div>
+                            <div><strong>급여 조건:</strong> <span>${salary}</span></div>
+                            <div><strong>담당 업무:${taskNote}</strong> <span>${task}</span></div>
+                            <div><strong>우대 사항:${prefNote}</strong> <span>${pref}</span></div>
+                        </div>
+                        <div class="job-keywords">
+                            ${job.keywords.map(kw => `<span class="keyword-tag">${kw}</span>`).join('')}
+                        </div>
+                        ${slotContent}
+                    `;
+
+                    // Drag Over Handlers
+                    card.addEventListener("dragover", (e) => {
+                        if (isMatched) return;
+                        e.preventDefault();
+                    });
+
+                    card.addEventListener("dragenter", (e) => {
+                        if (isMatched) return;
+                        card.classList.add("drag-over");
+                    });
+
+                    card.addEventListener("dragleave", () => {
+                        card.classList.remove("drag-over");
+                    });
+
+                    card.addEventListener("drop", (e) => {
+                        console.log("JOB_POSTING PAGE LOG: drop, job:", job.id);
+                        if (isMatched) return;
+                        e.preventDefault();
+                        card.classList.remove("drag-over");
+                        
+                        const rawData = e.dataTransfer.getData("text/plain");
+                        const candId = (rawData && rawData.startsWith("cand-")) ? rawData : selectedCandidateId;
+                        console.log("JOB_POSTING PAGE LOG: drop candId resolved:", candId, "rawData:", rawData, "selectedCandidateId:", selectedCandidateId);
+                        if (candId) {
+                            attemptMatch(job, candId, card);
+                        }
+                    });
+
+                    // Click Match Handle (Fallback)
+                    card.addEventListener("click", (e) => {
+                        console.log("JOB_POSTING PAGE LOG: click job:", job.id, "selectedCandidateId:", selectedCandidateId);
+                        if (e.target.closest(".btn-remove-match")) {
+                            const jobId = e.target.closest(".btn-remove-match").dataset.jobId;
+                            delete matches[jobId];
+                            render();
+                            return;
+                        }
+
+                        if (isMatched) return;
+
+                        if (selectedCandidateId) {
+                            attemptMatch(job, selectedCandidateId, card);
+                        }
+                    });
+
+                    els.jobList.appendChild(card);
+                });
+            }
+
+            function attemptMatch(job, candId, cardElement) {
+                if (job.correctCandidate === candId) {
+                    matches[job.id] = candId;
+                    selectedCandidateId = null;
+                    render();
+                    checkCompletion();
+                } else {
+                    // Mismatch Visual Feedback: Shake and flash red
+                    cardElement.classList.add("shake-error");
+                    setTimeout(() => {
+                        cardElement.classList.remove("shake-error");
+                    }, 500);
+                }
+            }
+
+            function checkCompletion() {
+                if (Object.keys(matches).length === jobs.length) {
+                    setTimeout(() => {
+                        els.successOverlay.classList.add("show");
+                    }, 500);
+                }
+            }
+
+            els.btnRestart.addEventListener("click", () => {
+                matches = {};
+                selectedCandidateId = null;
+                els.successOverlay.classList.remove("show");
+                render();
+            });
+
+            // Listen for multilingual toggle changes
+            document.addEventListener("click", (e) => {
+                if (e.target.closest("[data-multilang-btn]")) {
+                    setTimeout(() => {
+                        if (window.MultilangToggle) {
+                            activeLang = window.MultilangToggle.getLang();
+                        }
+                        render();
+                    }, 50);
+                }
+            });
+
+            setTimeout(initMultilang, 100);
+        })();
+    </script>
+    <script>window.MULTILANG_CONFIG = { langs: ["vi", "mn", "ar", "kk", "th", "en"] };</script>
+    <script src="../shared/multilang-toggle.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>

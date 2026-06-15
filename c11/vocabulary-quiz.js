@@ -20,8 +20,8 @@
         },
         choseong: {
             title: "초성 퀴즈",
-            type: "초성 퀴즈",
-            subtitle: "초성을 보고 알맞은 어휘를 고릅니다.",
+            type: "초성 주관식",
+            subtitle: "초성을 보고 알맞은 어휘를 입력합니다.",
             empty: "초성 퀴즈에 사용할 어휘가 없습니다."
         },
         image: {
@@ -79,6 +79,11 @@
             els.question.innerHTML = questionMarkup(current, mode);
             els.feedback.dir = mode === "meaning" ? langDir(activeLang) : "ltr";
 
+            if (mode === "choseong") {
+                renderSubjectiveAnswer(current, answerFor(current, mode, activeLang));
+                return;
+            }
+
             const wrongPool = sourceWords.filter((word) => word !== current);
             const choices = shuffle([current, ...shuffle(wrongPool).slice(0, 3)]);
             const correctAnswer = answerFor(current, mode, activeLang);
@@ -103,6 +108,48 @@
                 });
                 els.options.appendChild(option);
             });
+        }
+
+        function renderSubjectiveAnswer(current, correctAnswer) {
+            const form = document.createElement("form");
+            form.className = "quiz-answer-form";
+            form.noValidate = true;
+
+            const input = document.createElement("input");
+            input.id = "quiz-answer-input";
+            input.className = "quiz-answer-input";
+            input.type = "text";
+            input.autocomplete = "off";
+            input.spellcheck = false;
+            input.placeholder = "정답 입력";
+            input.setAttribute("aria-label", "정답 입력");
+
+            const submit = document.createElement("button");
+            submit.className = "btn primary quiz-submit-btn";
+            submit.type = "submit";
+            submit.innerHTML = '<i class="fa-solid fa-check"></i> 확인';
+
+            form.addEventListener("submit", (event) => {
+                event.preventDefault();
+                const answer = input.value.trim();
+                if (!answer) {
+                    els.feedback.textContent = "정답을 입력하세요.";
+                    input.focus();
+                    return;
+                }
+
+                const ok = normalizeAnswer(answer) === normalizeAnswer(correctAnswer);
+                if (ok) correctCount += 1;
+                input.disabled = true;
+                submit.disabled = true;
+                input.classList.add(ok ? "correct" : "wrong");
+                els.feedback.textContent = ok ? "정답!" : `오답 - 정답: ${correctAnswer}`;
+                els.nextBtn.hidden = false;
+            });
+
+            form.append(input, submit);
+            els.options.appendChild(form);
+            requestAnimationFrame(() => input.focus());
         }
 
         function nextQuestion() {
@@ -198,7 +245,7 @@
         if (mode === "choseong") {
             return `
                 ${visualMarkup(word, `<span class="quiz-choseong-overlay">${escapeHtml(choseongFor(word.ko))}</span>`)}
-                <p class="quiz-prompt">초성을 보고 어휘를 고르세요.</p>
+                <p class="quiz-prompt">초성을 보고 어휘를 입력하세요.</p>
             `;
         }
 
@@ -223,6 +270,10 @@
             if (code >= 0 && code <= 11171) return CHOSEONG[Math.floor(code / 588)];
             return char;
         }).join("").replace(/\s+/g, " ").trim();
+    }
+
+    function normalizeAnswer(value) {
+        return String(value || "").normalize("NFC").replace(/\s+/g, "");
     }
 
     function shuffle(source) {
