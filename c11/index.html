@@ -11,10 +11,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>11과 학습 허브</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <style>
         :root {
             --bg-start: #fffdf3;
@@ -163,7 +160,6 @@
             line-height: 1.7;
         }
 
-
         .hero__chips {
             display: flex;
             flex-wrap: wrap;
@@ -215,7 +211,6 @@
             margin: 0;
             font-size: clamp(1.4rem, 2vw, 1.95rem);
         }
-
 
         .path-grid {
             display: grid;
@@ -294,7 +289,6 @@
             line-height: 1.35;
         }
 
-
         .lesson-list {
             display: grid;
             grid-column: 1 / -1;
@@ -325,6 +319,62 @@
         .lesson-link--main {
             background: linear-gradient(135deg, #ffffff 0%, var(--tone-soft) 100%);
             border-color: var(--tone-strong);
+        }
+
+        .support-drawer {
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.84);
+            overflow: hidden;
+        }
+
+        .support-drawer[open] {
+            background: #f8fafc;
+            box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.08);
+        }
+
+        .support-drawer__summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 56px;
+            padding: 12px 14px;
+            cursor: pointer;
+            color: #334155;
+            font-weight: 900;
+            list-style: none;
+        }
+
+        .support-drawer__summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .support-drawer__summary > span {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .support-drawer__summary small {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .support-drawer__summary i:last-child {
+            color: #64748b;
+            transition: transform 0.18s ease;
+        }
+
+        .support-drawer[open] .support-drawer__summary i:last-child {
+            transform: rotate(180deg);
+        }
+
+        .support-drawer__links {
+            display: grid;
+            gap: 8px;
+            padding: 0 10px 10px;
         }
 
         .lesson-link > div {
@@ -371,7 +421,6 @@
             font-weight: 800;
             line-height: 1.35;
         }
-
 
         .lesson-arrow {
             flex: 0 0 auto;
@@ -475,7 +524,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="path-grid">
                 <article class="path-card" data-tone="vocab">
                     <span class="path-card__badge"><i class="fa-solid fa-book-open"></i> 어휘 묶음</span>
-                    <h3>어휘 카드에서 문맥 확장까지</h3>
+                    <h3>어휘 카드에서 보조 활동까지</h3>
                     <div class="lesson-list">
                         <a class="lesson-link lesson-link--main" href="vocabulary.html">
                             <div>
@@ -484,20 +533,64 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </div>
                             <i class="fa-solid fa-chevron-right lesson-arrow"></i>
                         </a>
-                        <a class="lesson-link" href="vocabulary-context.html">
-                            <div>
-                                <span class="lesson-kind lesson-kind--extend">보조</span>
-                                <span class="lesson-title">문맥형 어휘</span>
+                        <details class="support-drawer">
+                            <summary class="support-drawer__summary">
+                                <span><i class="fa-solid fa-layer-group"></i> 어휘 보조 활동 및 자료</span>
+                                <small>7개</small>
+                                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                            </summary>
+                            <div class="support-drawer__links">
+                                <a class="lesson-link" href="vocab-support-job-posting.html">
+                                    <div>
+                                        <span class="lesson-kind lesson-kind--extend">보조1</span>
+                                        <span class="lesson-title">구인 공고와 지원 조건 매칭</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
+                                <a class="lesson-link" href="vocab-support-org-chart.html">
+                                    <div>
+                                        <span class="lesson-kind lesson-kind--extend">보조2</span>
+                                        <span class="lesson-title">회사 조직도와 직급별 대화</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
+                                <a class="lesson-link" href="vocab-support-welfare-balance.html">
+                                    <div>
+                                        <span class="lesson-kind lesson-kind--extend">보조3</span>
+                                        <span class="lesson-title">회사 복지와 근무 조건 밸런서</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
+                                <a class="lesson-link" href="vocab-support-work-scenario.html">
+                                    <div>
+                                        <span class="lesson-kind lesson-kind--extend">보조4</span>
+                                        <span class="lesson-title">신입 사원의 하루 시뮬레이션</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
+                                <a class="lesson-link" href="vocabulary-context.html">
+                                    <div>
+                                        <span class="lesson-kind">보조</span>
+                                        <span class="lesson-title">문맥형 어휘</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
+                                <a class="lesson-link" href="vocabulary-paragraph-builder.html">
+                                    <div>
+                                        <span class="lesson-kind">게임</span>
+                                        <span class="lesson-title">그림 문장 조립</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
+                                <a class="lesson-link" href="writing-cut.html">
+                                    <div>
+                                        <span class="lesson-kind">활동</span>
+                                        <span class="lesson-title">컷 쓰기 활동</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
                             </div>
-                            <i class="fa-solid fa-chevron-right lesson-arrow"></i>
-                        </a>
-                        <a class="lesson-link" href="writing-cut.html">
-                            <div>
-                                <span class="lesson-kind">활동</span>
-                                <span class="lesson-title">컷 쓰기 활동</span>
-                            </div>
-                            <i class="fa-solid fa-chevron-right lesson-arrow"></i>
-                        </a>
+                        </details>
                     </div>
                 </article>
             </div>
@@ -522,6 +615,57 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </div>
                             <i class="fa-solid fa-chevron-right lesson-arrow"></i>
                         </a>
+                        <details class="support-drawer">
+                            <summary class="support-drawer__summary">
+                                <span><i class="fa-solid fa-layer-group"></i> 문법 1 보조 자료</span>
+                                <small>6개</small>
+                                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                            </summary>
+                            <div class="support-drawer__links">
+                                <a class="lesson-link" href="grammar1-causative-diagram.html">
+                                    <div>
+                                        <span class="lesson-kind lesson-kind--extend">도식</span>
+                                        <span class="lesson-title">사동 의미 구조</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
+                                <a class="lesson-link" href="grammar1-causative-influence-lab.html">
+                                    <div>
+                                        <span class="lesson-kind lesson-kind--extend">실험</span>
+                                        <span class="lesson-title">사동 영향력 실험실</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
+                                <a class="lesson-link" href="grammar1-causative-slot-game.html">
+                                    <div>
+                                        <span class="lesson-kind">활동</span>
+                                        <span class="lesson-title">사동 문장 자리 맞추기</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
+                                <a class="lesson-link" href="grammar1-support-material1.html">
+                                    <div>
+                                        <span class="lesson-kind lesson-kind--extend">보조</span>
+                                        <span class="lesson-title">사동사 그림 짝 학습</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
+                                <a class="lesson-link" href="grammar1-support-table.html">
+                                    <div>
+                                        <span class="lesson-kind lesson-kind--extend">표</span>
+                                        <span class="lesson-title">사동사 전체 표</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
+                                <a class="lesson-link" href="../c15/grammar1-ge-hada-cafe-game.html">
+                                    <div>
+                                        <span class="lesson-kind lesson-kind--extend">확장</span>
+                                        <span class="lesson-title">-게 하다 보조 활동</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                                </a>
+                            </div>
+                        </details>
                     </div>
                 </article>
 

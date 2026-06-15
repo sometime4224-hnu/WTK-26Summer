@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>11과 어휘 보조2 | 회사 조직도와 직급별 대화</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <link rel="stylesheet" href="../shared/multilang-toggle.css">
+    <style>
+        :root {
+            --ink: #1e293b;
+            --muted: #64748b;
+            --paper: #ffffff;
+            --page: #f8fafc;
+            --line: #e2e8f0;
+            --brand: #0f766e;
+            --brand-light: #ccfbf1;
+            --accent: #6366f1;
+            --accent-light: #e0e7ff;
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --topbar-height: 48px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--ink);
+            background: linear-gradient(180deg, #f5f3ff 0%, #f8fafc 40%, #f0fdfa 100%);
+            font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+            line-height: 1.5;
+            padding-bottom: 40px;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            min-height: var(--topbar-height);
+            display: grid;
+            grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 12px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar__links {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .topbar__links::-webkit-scrollbar {
+            display: none;
+        }
+
+        .topbar a {
+            min-height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid rgba(30, 41, 59, 0.1);
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.04);
+            color: var(--ink);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar a.active {
+            border-color: var(--brand);
+            background: var(--brand-light);
+            color: var(--brand);
+        }
+
+        .topbar__title {
+            text-align: right;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .shell {
+            width: min(1200px, 100% - 24px);
+            margin: 14px auto 0;
+        }
+
+        header.hero {
+            text-align: center;
+            margin-bottom: 18px;
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: var(--shadow);
+        }
+
+        .eyebrow {
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--brand);
+            margin-bottom: 4px;
+        }
+
+        header.hero h1 {
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .instructions {
+            font-size: 0.9rem;
+            color: var(--muted);
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+            gap: 16px;
+        }
+
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid var(--line);
+            margin-bottom: 12px;
+        }
+
+        .panel {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Org Chart styling */
+        .org-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            margin: 12px 0;
+            position: relative;
+        }
+
+        .org-level {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Connector lines */
+        .org-level:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            width: 2px;
+            height: 24px;
+            background: #cbd5e1;
+            z-index: 1;
+        }
+
+        .org-slot {
+            width: 180px;
+            min-height: 54px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            color: var(--muted);
+            font-weight: 800;
+            font-size: 0.9rem;
+            padding: 6px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+        }
+
+        @keyframes pulse-slot {
+            0%, 100% { border-color: rgba(99, 102, 241, 0.4); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.2); }
+            50% { border-color: rgba(99, 102, 241, 0.8); box-shadow: 0 0 0 6px rgba(99, 102, 241, 0); }
+        }
+
+        .org-slot.pulse-target {
+            animation: pulse-slot 1.5s infinite;
+            border-color: var(--accent);
+        }
+
+        .org-slot.drag-over {
+            border-color: var(--brand) !important;
+            background: var(--brand-light) !important;
+            transform: scale(1.02);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .org-slot.shake-error {
+            animation: shake 0.4s ease-in-out;
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #ef4444;
+        }
+
+        @keyframes spark-glow {
+            0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); transform: scale(1); }
+            50% { box-shadow: 0 0 0 12px rgba(22, 163, 74, 0); transform: scale(1.04); }
+            100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); transform: scale(1); }
+        }
+
+        .org-slot.success-glow {
+            animation: spark-glow 0.6s ease-out;
+        }
+
+        .org-slot.active-target {
+            border-color: var(--brand);
+            background: var(--brand-light);
+            color: var(--brand);
+        }
+
+        .org-slot.filled {
+            border-style: solid;
+            border-color: var(--brand);
+            background: var(--brand);
+            color: #fff;
+        }
+
+        .org-slot-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-bottom: 2px;
+            font-weight: 700;
+        }
+
+        .org-slot-val {
+            font-size: 1.05rem;
+            font-weight: 900;
+        }
+
+        /* Chips pool */
+        .chips-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 14px;
+        }
+
+        .rank-chip {
+            padding: 6px 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: #1e293b;
+            font-weight: 900;
+            font-size: 0.95rem;
+            cursor: grab;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.15s ease;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rank-chip * {
+            pointer-events: none;
+        }
+
+        .chip-img {
+            width: 24px;
+            height: 24px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid var(--line);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .slot-success-card {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            gap: 12px;
+            padding: 4px 8px;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .slot-success-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .slot-success-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .slot-success-label {
+            font-size: 0.65rem;
+            opacity: 0.9;
+            font-weight: 700;
+        }
+
+        .slot-success-val {
+            font-size: 1rem;
+            font-weight: 900;
+        }
+
+        .rank-chip:active {
+            cursor: grabbing;
+        }
+
+        .rank-chip:hover {
+            border-color: var(--brand);
+            transform: translateY(-1px);
+        }
+
+        .rank-chip.selected {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .rank-chip.placed {
+            opacity: 0.4;
+            pointer-events: none;
+            cursor: default;
+        }
+
+        /* Dialogue Box styles */
+        .dialogue-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .scenario-card {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px;
+            background: #f8fafc;
+            display: none;
+        }
+
+        .scenario-card.active-scenario {
+            display: block;
+            border-color: var(--accent);
+        }
+
+        .scenario-prompt {
+            font-weight: 900;
+            font-size: 0.95rem;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .dialogue-options {
+            display: grid;
+            gap: 8px;
+        }
+
+        .dialogue-option {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dialogue-option:hover {
+            border-color: var(--accent);
+            background: #fafafa;
+        }
+
+        .dialogue-option.correct {
+            border-color: var(--success);
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .dialogue-option.wrong {
+            border-color: #ef4444;
+            background: #fef2f2;
+            color: #ef4444;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* Success overlays */
+        .success-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .success-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .success-card {
+            background: #fff;
+            border-radius: 20px;
+            width: min(460px, 100%);
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .success-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--success-light);
+            color: var(--success);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .success-card h2 {
+            font-size: 1.6rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .success-card p {
+            color: var(--muted);
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn-restart {
+            width: 100%;
+            min-height: 46px;
+            border: 0;
+            border-radius: 10px;
+            background: var(--brand);
+            color: #fff;
+            font-weight: 900;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 760px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .org-tree {
+                gap: 16px;
+            }
+
+            .org-level:not(:last-child)::after {
+                height: 16px;
+                bottom: -16px;
+            }
+
+            .org-slot {
+                width: min(220px, 85vw);
+                min-height: 52px;
+                font-size: 0.82rem;
+                padding: 6px 8px;
+            }
+
+            .org-slot-val {
+                font-size: 0.95rem;
+            }
+
+            .topbar__title {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <nav class="topbar">
+        <div class="topbar__links">
+            <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+            <a href="index.html"><i class="fa-solid fa-folder-open"></i> 11과</a>
+            <a href="vocabulary.html"><i class="fa-solid fa-layer-group"></i> 어휘</a>
+            <a href="vocab-support-job-posting.html"><i class="fa-solid fa-address-card"></i> 보조1</a>
+            <a href="vocab-support-org-chart.html" class="active"><i class="fa-solid fa-sitemap"></i> 보조2</a>
+            <a href="vocab-support-welfare-balance.html"><i class="fa-solid fa-sliders"></i> 보조3</a>
+            <a href="vocab-support-work-scenario.html"><i class="fa-solid fa-building"></i> 보조4</a>
+        </div>
+        <div class="topbar__title">11과 어휘 보조2 | 회사 조직도와 직급별 대화</div>
+    </nav>
+
+    <main class="shell">
+        <header class="hero">
+            <p class="eyebrow">Chapter 11 Vocabulary Activity 2</p>
+            <h1 id="page-title">회사 조직도와 직급별 대화</h1>
+            <p class="instructions" id="activity-instruct">직급 카드를 드래그하여 알맞은 조직도 슬롯에 놓거나, 클릭하여 배치해 보세요.</p>
+            <div data-multilang-bar></div>
+        </header>
+
+        <div class="main-grid">
+            <section class="org-section">
+                <div class="panel">
+                    <h2 class="section-title" id="org-title"><i class="fa-solid fa-network-wired"></i> 회사 조직도 (Company Hierarchy)</h2>
+                    <div class="org-tree">
+                        <!-- Level 4: 부장 -->
+                        <div class="org-level">
+                            <div class="org-slot" id="slot-manager" data-correct-rank="부장">
+                                <span class="org-slot-label">부서에서 가장 높은 책임자</span>
+                                <span class="org-slot-val" id="val-manager">비어 있음</span>
+                            </div>
+                        </div>
+                        <!-- Level 3: 과장 -->
+                        <div class="org-level">
+                            <div class="org-slot" id="slot-section" data-correct-rank="과장">
+                                <span class="org-slot-label">대리보다 높고 부장보다 낮은 관리자</span>
+                                <span class="org-slot-val" id="val-section">비어 있음</span>
+                            </div>
+                        </div>
+                        <!-- Level 2: 대리 -->
+                        <div class="org-level">
+                            <div class="org-slot" id="slot-assistant" data-correct-rank="대리">
+                                <span class="org-slot-label">과장보다 낮은 중간 관리자</span>
+                                <span class="org-slot-val" id="val-assistant">비어 있음</span>
+                            </div>
+                        </div>
+                        <!-- Level 1: 신입 사원 -->
+                        <div class="org-level">
+                            <div class="org-slot" id="slot-recruit" data-correct-rank="신입 사원">
+                                <span class="org-slot-label">회사에 새로 들어와서 일을 배우는 사람</span>
+                                <span class="org-slot-val" id="val-recruit">비어 있음</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chips-pool" id="chips-pool">
+                        <div class="rank-chip" data-rank="부장" role="button" tabindex="0">
+                            <img src="../assets/c11/vocabulary/images/split/c11_01_TL.webp" class="chip-img" alt="부장" decoding="async" loading="lazy">부장
+                        </div>
+                        <div class="rank-chip" data-rank="대리" role="button" tabindex="0">
+                            <img src="../assets/c11/vocabulary/images/split/c11_06_BL.webp" class="chip-img" alt="대리" decoding="async" loading="lazy">대리
+                        </div>
+                        <div class="rank-chip" data-rank="신입 사원" role="button" tabindex="0">
+                            <img src="../assets/c11/vocabulary/images/split/c11_05_BL.webp" class="chip-img" alt="신입 사원" decoding="async" loading="lazy">신입 사원
+                        </div>
+                        <div class="rank-chip" data-rank="과장" role="button" tabindex="0">
+                            <img src="../assets/c11/vocabulary/images/split/c11_06_BR.webp" class="chip-img" alt="과장" decoding="async" loading="lazy">과장
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dialogue-section">
+                <div class="panel" style="min-height: 100%;">
+                    <h2 class="section-title" id="dialogue-title"><i class="fa-solid fa-comments"></i> 상황별 호칭 대화 (Rank Dialogues)</h2>
+                    <div class="dialogue-box" id="dialogue-box">
+                        <p id="dialogue-locked-desc" style="color: var(--muted); font-weight: 800; text-align: center; padding: 40px 10px;">
+                            <i class="fa-solid fa-lock" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                            조직도를 먼저 완성하면<br>직급별 대화 퀴즈가 잠금 해제됩니다.
+                        </p>
+
+                        <!-- Scenario 1: 신입 사원이 부장에게 -->
+                        <div class="scenario-card" id="scen-1">
+                            <div class="scenario-prompt" id="prompt-scen-1">1. [신입 사원]이 [직장 상사]인 [부장]에게 업무 보고서를 완료하고 제출할 때 어색한 표현은 무엇일까요?</div>
+                            <div class="dialogue-options">
+                                <div class="dialogue-option" data-correct="false">부장님, 지시하신 보고서 작성을 완료했습니다. 검토해 주십시오.</div>
+                                <div class="dialogue-option" data-correct="false">부장님, 여기 보고서 다 만들었습니다. 읽어 보세요.</div>
+                                <div class="dialogue-option" data-correct="true">부장, 내가 보고서를 작성했으니 확인해 줘.</div>
+                            </div>
+                        </div>
+
+                        <!-- Scenario 2: 과장이 대리에게 -->
+                        <div class="scenario-card" id="scen-2">
+                            <div class="scenario-prompt" id="prompt-scen-2">2. [과장]이 [부하 직원]인 [김 대리]에게 회의 준비 상태를 물어볼 때 가장 어울리는 표현은 무엇일까요?</div>
+                            <div class="dialogue-options">
+                                <div class="dialogue-option" data-correct="true">김 대리, 오늘 오후 회의 준비는 다 끝났는가? 자료 좀 가져오게.</div>
+                                <div class="dialogue-option" data-correct="false">김 대리님, 오늘 회의 자료를 제게 분부해 주시면 감사하겠습니다.</div>
+                                <div class="dialogue-option" data-correct="false">김 대리, 오늘 회의가 있으니 나한테 자료를 올리십시오.</div>
+                            </div>
+                        </div>
+
+                        <!-- Scenario 3: 대리가 동료 대리에게 -->
+                        <div class="scenario-card" id="scen-3">
+                            <div class="scenario-prompt" id="prompt-scen-3">3. [대리]가 [동료]인 [박 대리]에게 점심 식사를 제안하는 알맞은 대화는 무엇일까요?</div>
+                            <div class="dialogue-options">
+                                <div class="dialogue-option" data-correct="false">박 대리, 오늘 점심으로 무엇을 드실지 부하 직원에게 지시하십시오.</div>
+                                <div class="dialogue-option" data-correct="true">박 대리, 오늘 점심은 같이 먹을래요? 새로 오픈한 식당에 가 봐요.</div>
+                                <div class="dialogue-option" data-correct="false">박 대리님, 제가 오늘 점심을 살 터이니 저와 대동하셔야 합니다.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div class="success-overlay" id="success-overlay">
+        <div class="success-card">
+            <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+            <h2 id="success-title">연습 완료!</h2>
+            <p id="success-desc">회사 사람들과 나누는 올바른 대화 방법을 공부했습니다.<br>회사 생활의 기본적인 예의를 모두 배웠습니다!</p>
+            <button class="btn-restart" id="btn-restart">다시 시작하기</button>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            let selectedRank = null;
+            let slotsState = {
+                "slot-manager": null,
+                "slot-section": null,
+                "slot-assistant": null,
+                "slot-recruit": null
+            };
+            let solvedScenariosCount = 0;
+            let currentActiveScenario = 1;
+            let activeLang = "none";
+
+            const rankImages = {
+                "부장": "../assets/c11/vocabulary/images/split/c11_01_TL.webp",
+                "과장": "../assets/c11/vocabulary/images/split/c11_06_BR.webp",
+                "대리": "../assets/c11/vocabulary/images/split/c11_06_BL.webp",
+                "신입 사원": "../assets/c11/vocabulary/images/split/c11_05_BL.webp"
+            };
+
+            const rankTranslations = {
+                vi: {
+                    "부장": "Trưởng phòng",
+                    "과장": "Trưởng khoa",
+                    "대리": "Trợ lý",
+                    "신입 사원": "Nhân viên mới"
+                },
+                en: {
+                    "부장": "Department Head",
+                    "과장": "Manager",
+                    "대리": "Assistant Manager",
+                    "신입 사원": "New Recruit"
+                },
+                mn: {
+                    "부장": "Хэлтсийн дарга",
+                    "과장": "Менежер",
+                    "대리": "Туслах менежер",
+                    "신입 사원": "Шинэ ажилтан"
+                },
+                ar: {
+                    "부장": "رئيس القسم",
+                    "과장": "المدير",
+                    "대리": "مساعد المدير",
+                    "신입 사원": "موظف جديد"
+                },
+                kk: {
+                    "부장": "Бөлім басшысы",
+                    "과장": "Менеджер",
+                    "대리": "Көмекші менеджер",
+                    "신입 사원": "Жаңа қызметкер"
+                },
+                th: {
+                    "부장": "หัวหน้าแผนก",
+                    "과장": "ผู้จัดการ",
+                    "대리": "ผู้ช่วยผู้จัดการ",
+                    "신입 사원": "พนักงานใหม่"
+                }
+            };
+
+            function translateRank(rank, lang) {
+                if (lang === "none" || !rankTranslations[lang]) return rank;
+                return rankTranslations[lang][rank] || rank;
+            }
+
+            function getLabelForSlot(slotId) {
+                if (activeLang !== "none" && translations[activeLang]) {
+                    const t = translations[activeLang];
+                    if (slotId === "slot-manager") return t.managerLabel;
+                    if (slotId === "slot-section") return t.sectionLabel;
+                    if (slotId === "slot-assistant") return t.assistantLabel;
+                    if (slotId === "slot-recruit") return t.recruitLabel;
+                }
+                if (slotId === "slot-manager") return "부서에서 가장 높은 책임자";
+                if (slotId === "slot-section") return "대리보다 높고 부장보다 낮은 관리자";
+                if (slotId === "slot-assistant") return "과장보다 낮은 중간 관리자";
+                if (slotId === "slot-recruit") return "회사에 새로 들어와서 일을 배우는 사람";
+                return "";
+            }
+
+            const els = {
+                chipsPool: document.getElementById("chips-pool"),
+                slots: document.querySelectorAll(".org-slot"),
+                dialogueLockedDesc: document.getElementById("dialogue-locked-desc"),
+                successOverlay: document.getElementById("success-overlay"),
+                btnRestart: document.getElementById("btn-restart"),
+                instruct: document.getElementById("activity-instruct")
+            };
+
+            const translations = {
+                vi: {
+                    instruct: "Kéo thẻ cấp bậc đặt vào sơ đồ tổ chức, hoặc click để đặt.",
+                    dialogueLockedDesc: "<i class=\"fa-solid fa-lock\" style=\"font-size: 24px; margin-bottom: 10px; display: block;\"></i>Hoàn thành sơ đồ tổ chức trước<br>để mở khóa câu hỏi hội thoại theo cấp bậc.",
+                    managerLabel: "Trưởng phòng (Cấp cao nhất)",
+                    sectionLabel: "Trưởng khoa (Dưới Trưởng phòng, trên Trợ lý)",
+                    assistantLabel: "Trợ lý giám đốc (Dưới Trưởng khoa)",
+                    recruitLabel: "Nhân viên mới (Thực tập/Mới vào)",
+                    lockedText: "비어 있음",
+                    emptyText: "Trống",
+                    lockedTextVi: "Trống",
+                    scen1Prompt: "1. Câu nào sau đây là KHÔNG LỊCH SỰ/SAI khi [Nhân viên mới] báo cáo hoàn thành công việc cho [Cấp trên] là [Trưởng phòng]?",
+                    scen2Prompt: "2. Câu nào sau đây PHÙ HỢP NHẤT khi [Trưởng khoa] hỏi [Cấp dưới] là [Trợ lý Kim] về sự chuẩn bị cho cuộc họp?",
+                    scen3Prompt: "3. Câu nào là LỊCH SỰ & TỰ NHIÊN NHẤT khi [Trợ lý] mời [Đồng nghiệp] cùng cấp [Trợ lý Park] đi ăn trưa?",
+                    successTitle: "Hoàn thành luyện tập!",
+                    successDesc: "Bạn đã học cách đối thoại chính xác với mọi người trong công sở.<br>Bạn đã học được tất cả các phép lịch sự cơ bản trong cuộc sống công sở!",
+                    btnRestart: "Bắt đầu lại"
+                },
+                en: {
+                    instruct: "Drag and drop the rank card into the correct slot, or click to place it.",
+                    dialogueLockedDesc: "<i class=\"fa-solid fa-lock\" style=\"font-size: 24px; margin-bottom: 10px; display: block;\"></i>Complete the organization chart first<br>to unlock rank-specific dialogue questions.",
+                    managerLabel: "Department Head (Top Head)",
+                    sectionLabel: "Manager (Below Dept Head, above Assistant)",
+                    assistantLabel: "Assistant Manager (Below Manager)",
+                    recruitLabel: "New Recruit (Practitioner/Entry-level)",
+                    lockedText: "비어 있음",
+                    emptyText: "Empty",
+                    lockedTextEn: "Empty",
+                    scen1Prompt: "1. Which expression is INAPPROPRIATE/UNNATURAL when a [New Recruit] reports a finished document to the [Boss] ([Department Head])?",
+                    scen2Prompt: "2. Which expression is MOST APPROPRIATE when a [Manager] asks a [Subordinate] ([Assistant Manager Kim]) about meeting prep?",
+                    scen3Prompt: "3. Which expression is MOST SUITABLE when an [Assistant Manager] invites their [Colleague] ([Assistant Manager Park]) for lunch?",
+                    successTitle: "Practice Completed!",
+                    successDesc: "You have studied correct communication with workplace people.<br>You have learned all the basic etiquette for company life!",
+                    btnRestart: "Restart"
+                },
+                mn: {
+                    instruct: "Цол зэрэглэлийн картыг зөв байранд нь чирж тавих эсвэл дарж байрлуул.",
+                    dialogueLockedDesc: "<i class=\"fa-solid fa-lock\" style=\"font-size: 24px; margin-bottom: 10px; display: block;\"></i>Байгууллагын бүтцийг эхлээд дуусга<br>цол зэрэглэлийн яриа асуулгыг нээнэ.",
+                    managerLabel: "Хэлтсийн дарга (Хамгийн өндөр)",
+                    sectionLabel: "Менежер (Даргаас доогуур, туслахаас дээгүүр)",
+                    assistantLabel: "Туслах менежер (Менежерээс доогуур)",
+                    recruitLabel: "Шинэ ажилтан (Туршилтын/Шинэ)",
+                    lockedText: "비어 있음",
+                    emptyText: "Хоосон",
+                    scen1Prompt: "1. [Шинэ ажилтан] [Хэлтсийн дарга]т тайлан бичиж дуусгасны дараа хамгийн ТОХИРОМЖГҮЙ хэллэг аль нь вэ?",
+                    scen2Prompt: "2. [Менежер] [Туслах менежер Ким]д хурлын бэлтгэл хийсэн эсэхийг асуухдаа хамгийн ТОХИРОМЖТОЙ хэллэг аль нь вэ?",
+                    scen3Prompt: "3. [Туслах менежер] [Хамт олон] [Туслах менежер Пак]т үдийн хоол идэхийг урихдаа хамгийн ТОХИРОМЖТОЙ хэллэг аль нь вэ?",
+                    successTitle: "Дасгал дуусгасан!",
+                    successDesc: "Ажлын байрны хүмүүстэй зөв харилцах аргыг судалсан байна.<br>Компанийн амьдралын үндсэн ёс зүйг бүгдийг нь сурсан байна!",
+                    btnRestart: "Дахин эхлэх"
+                },
+                ar: {
+                    instruct: "اسحب بطاقة الرتبة وضعها في الخانة الصحيحة، أو انقر لتحديد الموضع.",
+                    dialogueLockedDesc: "<i class=\"fa-solid fa-lock\" style=\"font-size: 24px; margin-bottom: 10px; display: block;\"></i>أكمل المخطط التنظيمي أولاً<br>لفتح أسئلة الحوار حسب الرتبة.",
+                    managerLabel: "رئيس القسم (الأعلى مرتبةً)",
+                    sectionLabel: "المدير (أقل من رئيس القسم، أعلى من المساعد)",
+                    assistantLabel: "مساعد المدير (أقل من المدير)",
+                    recruitLabel: "موظف جديد (مبتدئ/حديث التعيين)",
+                    lockedText: "비어 있음",
+                    emptyText: "فارغ",
+                    scen1Prompt: "1. أي عبارة غير لائقة عندما يرفع [موظف جديد] تقريراً مكتملاً إلى [رئيسه] [رئيس القسم]؟",
+                    scen2Prompt: "2. أي عبارة هي الأنسب عندما يسأل [المدير] [مرؤوسه] [مساعد المدير كيم] عن التحضيرات للاجتماع؟",
+                    scen3Prompt: "3. أي عبارة هي الأنسب عندما يدعو [مساعد المدير] [زميله من نفس الرتبة] [مساعد المدير بارك] لتناول الغداء؟",
+                    successTitle: "اكتملت الممارسة!",
+                    successDesc: "لقد درست طرق التواصل الصحيح مع زملاء العمل.<br>لقد تعلمت جميع آداب الحياة المهنية الأساسية!",
+                    btnRestart: "ابدأ من جديد"
+                },
+                kk: {
+                    instruct: "Лауазым картасын дұрыс ұяшыққа сүйреп апарыңыз немесе басып орналастырыңыз.",
+                    dialogueLockedDesc: "<i class=\"fa-solid fa-lock\" style=\"font-size: 24px; margin-bottom: 10px; display: block;\"></i>Алдымен ұйым схемасын аяқтаңыз<br>лауазым бойынша диалог сұрақтарын ашу үшін.",
+                    managerLabel: "Бөлім басшысы (Ең жоғары)",
+                    sectionLabel: "Менеджер (Басшыдан төмен, көмекшіден жоғары)",
+                    assistantLabel: "Көмекші менеджер (Менеджерден төмен)",
+                    recruitLabel: "Жаңа қызметкер (Тәжірибелі/Жаңадан кірген)",
+                    lockedText: "비어 있음",
+                    emptyText: "Бос",
+                    scen1Prompt: "1. [Жаңа қызметкер] [Басшысы] [Бөлім басшысына] есепті дайын болғанда ең СӘЙКЕС ЕМЕС сөз тіркесі қайсы?",
+                    scen2Prompt: "2. [Менеджер] [Бағынышты] [Көмекші менеджер Кимге] кеңес жиналысына дайындықты сұрағанда ең СӘЙКЕС сөз тіркесі қайсы?",
+                    scen3Prompt: "3. [Көмекші менеджер] [Бірдей лауазымдағы әріптесі] [Көмекші менеджер Пакты] түскі асқа шақырғанда ең СӘЙКЕС сөз тіркесі қайсы?",
+                    successTitle: "Жаттығу аяқталды!",
+                    successDesc: "Жұмыс орнындағы адамдармен дұрыс сөйлесу жолдарын зерттедіңіз.<br>Компания өміріндегі барлық негізгі этиканы үйрендіңіз!",
+                    btnRestart: "Қайта бастау"
+                },
+                th: {
+                    instruct: "ลากการ์ดตำแหน่งไปวางในช่องที่ถูกต้อง หรือคลิกเพื่อวาง",
+                    dialogueLockedDesc: "<i class=\"fa-solid fa-lock\" style=\"font-size: 24px; margin-bottom: 10px; display: block;\"></i>กรุณาทำแผนผังองค์กรให้สำเร็จก่อน<br>เพื่อปลดล็อกคำถามบทสนทนาตามตำแหน่ง",
+                    managerLabel: "หัวหน้าแผนก (ระดับสูงสุด)",
+                    sectionLabel: "ผู้จัดการ (ต่ำกว่าหัวหน้าแผนก สูงกว่าผู้ช่วย)",
+                    assistantLabel: "ผู้ช่วยผู้จัดการ (ต่ำกว่าผู้จัดการ)",
+                    recruitLabel: "พนักงานใหม่ (ฝึกงาน/เพิ่งเข้าทำงาน)",
+                    lockedText: "비어 있음",
+                    emptyText: "ว่าง",
+                    scen1Prompt: "1. ประโยคใดที่ไม่เหมาะสมเมื่อ [พนักงานใหม่] ส่งรายงานที่เสร็จแล้วให้ [หัวหน้า] คือ [หัวหน้าแผนก]?",
+                    scen2Prompt: "2. ประโยคใดที่เหมาะสมที่สุดเมื่อ [ผู้จัดการ] ถาม [ผู้ใต้บังคับบัญชา] คือ [ผู้ช่วยผู้จัดการคิม] เกี่ยวกับการเตรียมประชุม?",
+                    scen3Prompt: "3. ประโยคใดที่เหมาะสมที่สุดเมื่อ [ผู้ช่วยผู้จัดการ] ชวน [เพื่อนร่วมงานระดับเดียวกัน] คือ [ผู้ช่วยผู้จัดการพาร์ค] ไปทานอาหารกลางวัน?",
+                    successTitle: "ฝึกเสร็จสมบูรณ์!",
+                    successDesc: "คุณได้ศึกษาวิธีการสื่อสารที่ถูกต้องกับผู้คนในที่ทำงานแล้ว<br>คุณได้เรียนรู้มารยาทพื้นฐานสำหรับชีวิตในบริษัทครบแล้ว!",
+                    btnRestart: "เริ่มใหม่"
+                }
+            };
+
+            function initMultilang() {
+                if (window.MULTILANG_CONFIG && window.MultilangToggle) {
+                    activeLang = window.MultilangToggle.getLang() || "none";
+                }
+                render();
+            }
+
+            function render() {
+                // Select DOM elements for heading translations
+                const successTitleEl = document.getElementById("success-title");
+                const successDescEl = document.getElementById("success-desc");
+                const btnRestartEl = document.getElementById("btn-restart");
+
+                // Update text based on language
+                if (activeLang !== "none" && translations[activeLang]) {
+                    const t = translations[activeLang];
+                    els.instruct.textContent = t.instruct;
+                    if (els.dialogueLockedDesc) {
+                        els.dialogueLockedDesc.innerHTML = t.dialogueLockedDesc;
+                    }
+
+                    if (successTitleEl) successTitleEl.textContent = t.successTitle;
+                    if (successDescEl) successDescEl.innerHTML = t.successDesc;
+                    if (btnRestartEl) btnRestartEl.textContent = t.btnRestart;
+                    
+                    const labels = {
+                        "slot-manager": t.managerLabel,
+                        "slot-section": t.sectionLabel,
+                        "slot-assistant": t.assistantLabel,
+                        "slot-recruit": t.recruitLabel
+                    };
+
+                    document.querySelectorAll(".org-slot").forEach(slot => {
+                        const rank = slotsState[slot.id];
+                        const valId = slot.id.replace("slot-", "val-");
+                        if (rank) {
+                            const translatedRank = translateRank(rank, activeLang);
+                            slot.innerHTML = `
+                                <div class="slot-success-card">
+                                    <img src="${rankImages[rank]}" class="slot-success-img" alt="${translatedRank}" decoding="async" loading="lazy">
+                                    <div class="slot-success-text">
+                                        <span class="slot-success-label">${labels[slot.id]}</span>
+                                        <span class="slot-success-val" id="${valId}">${translatedRank}</span>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            slot.innerHTML = `
+                                <span class="org-slot-label">${labels[slot.id]}</span>
+                                <span class="org-slot-val" id="${valId}">${t.emptyText || "Empty"}</span>
+                            `;
+                        }
+                    });
+
+                    // Scenario prompts (translated); dialogue options stay Korean always
+                    document.getElementById("prompt-scen-1").textContent = t.scen1Prompt;
+                    document.getElementById("prompt-scen-2").textContent = t.scen2Prompt;
+                    document.getElementById("prompt-scen-3").textContent = t.scen3Prompt;
+                } else {
+                    els.instruct.textContent = "직급 카드를 드래그하여 알맞은 조직도 슬롯에 놓거나, 클릭해서 놓아 보세요.";
+                    if (els.dialogueLockedDesc) {
+                        els.dialogueLockedDesc.innerHTML = `<i class="fa-solid fa-lock" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>조직도를 먼저 완성하면<br>직급별 대화 퀴즈가 풀립니다.`;
+                    }
+
+                    if (successTitleEl) successTitleEl.textContent = "연습 완료!";
+                    if (successDescEl) successDescEl.innerHTML = "회사 사람들과 나누는 올바른 대화 방법을 공부했습니다.<br>회사 생활의 기본적인 예의를 모두 배웠습니다!";
+                    if (btnRestartEl) btnRestartEl.textContent = "다시 시작하기";
+                    
+                    const labels = {
+                        "slot-manager": "부서에서 가장 높은 책임자",
+                        "slot-section": "대리보다 높고 부장보다 낮은 관리자",
+                        "slot-assistant": "과장보다 낮은 중간 관리자",
+                        "slot-recruit": "회사에 새로 들어와서 일을 배우는 사람"
+                    };
+
+                    document.querySelectorAll(".org-slot").forEach(slot => {
+                        const rank = slotsState[slot.id];
+                        const valId = slot.id.replace("slot-", "val-");
+                        if (rank) {
+                            slot.innerHTML = `
+                                <div class="slot-success-card">
+                                    <img src="${rankImages[rank]}" class="slot-success-img" alt="${rank}" decoding="async" loading="lazy">
+                                    <div class="slot-success-text">
+                                        <span class="slot-success-label">${labels[slot.id]}</span>
+                                        <span class="slot-success-val" id="${valId}">${rank}</span>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            slot.innerHTML = `
+                                <span class="org-slot-label">${labels[slot.id]}</span>
+                                <span class="org-slot-val" id="${valId}">비어 있음</span>
+                            `;
+                        }
+                    });
+
+                    document.getElementById("prompt-scen-1").textContent = "1. [신입 사원]이 [직장 상사]인 [부장]에게 보고서를 다 작성해서 드릴 때 어색한 표현은 무엇일까요?";
+                    const opts1 = document.getElementById("scen-1").querySelectorAll(".dialogue-option");
+                    opts1[0].textContent = "부장님, 지시하신 보고서를 다 썼습니다. 읽어 주십시오.";
+                    opts1[1].textContent = "부장님, 여기 보고서 다 만들었습니다. 읽어 보세요.";
+                    opts1[2].textContent = "부장, 내가 보고서를 작성했으니 확인해 줘.";
+
+                    document.getElementById("prompt-scen-2").textContent = "2. [과장]이 [부하 직원]인 [김 대리]에게 회의 준비를 다 했는지 물어볼 때 가장 알맞은 표현은 무엇일까요?";
+                    const opts2 = document.getElementById("scen-2").querySelectorAll(".dialogue-option");
+                    opts2[0].textContent = "김 대리, 오늘 오후 회의 준비는 다 끝났는가? 자료 좀 가져오게.";
+                    opts2[1].textContent = "김 대리님, 오늘 회의 자료를 저에게 시켜 주시면 감사하겠습니다.";
+                    opts2[2].textContent = "김 대리, 오늘 회의가 있으니 나한테 자료를 올리십시오.";
+
+                    document.getElementById("prompt-scen-3").textContent = "3. [대리]가 [동료]인 [박 대리]에게 점심을 같이 먹자고 말할 때 가장 알맞은 대화는 무엇일까요?";
+                    const opts3 = document.getElementById("scen-3").querySelectorAll(".dialogue-option");
+                    opts3[0].textContent = "박 대리, 오늘 점심으로 무엇을 먹을지 아래 직원에게 시키십시오.";
+                    opts3[1].textContent = "박 대리, 오늘 점심은 같이 먹을래요? 새로 오픈한 식당에 가 봐요.";
+                    opts3[2].textContent = "박 대리님, 제가 오늘 점심을 살 테니까 저와 같이 가셔야 합니다.";
+                }
+            }
+
+            // Chips interaction (Drag Setup)
+            document.querySelectorAll(".rank-chip").forEach(chip => {
+                chip.setAttribute("draggable", "true");
+
+                chip.addEventListener("dragstart", (e) => {
+                    console.log("ORG CHIP DRAGSTART:", chip.dataset.rank);
+                    selectedRank = chip.dataset.rank;
+                    chip.classList.add("selected");
+                    e.dataTransfer.setData("text/plain", selectedRank);
+
+                    // Add pulse targets to unmatched slots
+                    document.querySelectorAll(".org-slot").forEach(s => {
+                        if (!slotsState[s.id]) {
+                            s.classList.add("pulse-target");
+                        }
+                    });
+                });
+
+                chip.addEventListener("dragend", () => {
+                    console.log("ORG CHIP DRAGEND:", chip.dataset.rank);
+                    chip.classList.remove("selected");
+                    document.querySelectorAll(".org-slot").forEach(s => {
+                        s.classList.remove("pulse-target", "drag-over");
+                    });
+                });
+
+                chip.addEventListener("click", () => {
+                    console.log("ORG CHIP CLICK:", chip.dataset.rank, "selectedRank before:", selectedRank);
+                    if (chip.classList.contains("placed")) return;
+
+                    document.querySelectorAll(".rank-chip").forEach(c => c.classList.remove("selected"));
+                    selectedRank = chip.dataset.rank;
+                    chip.classList.add("selected");
+
+                    document.querySelectorAll(".org-slot").forEach(slot => {
+                        if (!slotsState[slot.id]) {
+                            slot.classList.add("active-target");
+                        }
+                    });
+                });
+            });
+
+            // Slot interaction (Dropzones)
+            els.slots.forEach(slot => {
+                slot.addEventListener("dragover", (e) => {
+                    if (slotsState[slot.id]) return;
+                    e.preventDefault();
+                });
+
+                slot.addEventListener("dragenter", (e) => {
+                    if (slotsState[slot.id]) return;
+                    slot.classList.add("drag-over");
+                });
+
+                slot.addEventListener("dragleave", () => {
+                    slot.classList.remove("drag-over");
+                });
+
+                slot.addEventListener("drop", (e) => {
+                    console.log("ORG SLOT DROP:", slot.id);
+                    if (slotsState[slot.id]) return;
+                    e.preventDefault();
+                    slot.classList.remove("drag-over");
+
+                    const rankVal = e.dataTransfer.getData("text/plain") || selectedRank;
+                    console.log("ORG SLOT DROP RANK:", rankVal);
+                    if (rankVal) {
+                        attemptPlaceRank(slot, rankVal);
+                    }
+                });
+
+                // Tap handler
+                slot.addEventListener("click", () => {
+                    console.log("ORG SLOT CLICK:", slot.id, "selectedRank:", selectedRank);
+                    if (!selectedRank || slotsState[slot.id]) return;
+                    attemptPlaceRank(slot, selectedRank);
+                });
+            });
+
+            function attemptPlaceRank(slot, rank) {
+                const correctRank = slot.dataset.correctRank;
+                if (rank === correctRank) {
+                    slotsState[slot.id] = rank;
+                    
+                    const labelText = getLabelForSlot(slot.id);
+                    const translatedRank = translateRank(rank, activeLang);
+                    const valId = slot.id.replace("slot-", "val-");
+                    slot.innerHTML = `
+                        <div class="slot-success-card">
+                            <img src="${rankImages[rank]}" class="slot-success-img" alt="${translatedRank}" decoding="async" loading="lazy">
+                            <div class="slot-success-text">
+                                <span class="slot-success-label">${labelText}</span>
+                                <span class="slot-success-val" id="${valId}">${translatedRank}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    slot.classList.remove("active-target", "pulse-target");
+                    slot.classList.add("filled", "success-glow");
+                    
+                    setTimeout(() => slot.classList.remove("success-glow"), 600);
+
+                    // Disable chip
+                    const chip = Array.from(document.querySelectorAll(".rank-chip")).find(c => c.dataset.rank === rank);
+                    chip.classList.remove("selected");
+                    chip.classList.add("placed");
+                    
+                    selectedRank = null;
+                    document.querySelectorAll(".org-slot").forEach(s => s.classList.remove("active-target"));
+
+                    checkOrgChartCompletion();
+                } else {
+                    // Shake slot error feedback
+                    slot.classList.add("shake-error");
+                    setTimeout(() => slot.classList.remove("shake-error"), 500);
+                }
+            }
+
+            function checkOrgChartCompletion() {
+                const allFilled = Object.values(slotsState).every(val => val !== null);
+                if (allFilled) {
+                    els.chipsPool.style.display = "none";
+                    if (els.dialogueLockedDesc) {
+                        els.dialogueLockedDesc.style.display = "none";
+                    }
+                    activateScenario(1);
+                }
+            }
+
+            function activateScenario(num) {
+                currentActiveScenario = num;
+                document.querySelectorAll(".scenario-card").forEach((card, idx) => {
+                    if (idx + 1 === num) {
+                        card.classList.add("active-scenario");
+                    } else {
+                        card.classList.remove("active-scenario");
+                    }
+                });
+            }
+
+            // Option selection
+            document.querySelectorAll(".dialogue-option").forEach(opt => {
+                opt.addEventListener("click", () => {
+                    const parentCard = opt.closest(".scenario-card");
+                    if (parentCard.dataset.solved === "true") return;
+
+                    const isCorrect = opt.dataset.correct === "true";
+                    if (isCorrect) {
+                        opt.classList.add("correct");
+                        parentCard.dataset.solved = "true";
+                        parentCard.querySelectorAll(".dialogue-option").forEach(o => {
+                            if (o !== opt) o.style.opacity = "0.5";
+                        });
+                        solvedScenariosCount++;
+
+                        setTimeout(() => {
+                            if (currentActiveScenario < 3) {
+                                activateScenario(currentActiveScenario + 1);
+                            } else {
+                                checkDialogueCompletion();
+                            }
+                        }, 1000);
+                    } else {
+                        // Shake dialogue option feedback on wrong answer
+                        opt.classList.add("wrong");
+                        setTimeout(() => opt.classList.remove("wrong"), 500);
+                    }
+                });
+            });
+
+            function checkDialogueCompletion() {
+                if (solvedScenariosCount === 3) {
+                    els.successOverlay.classList.add("show");
+                }
+            }
+
+            els.btnRestart.addEventListener("click", () => {
+                slotsState = {
+                    "slot-manager": null,
+                    "slot-section": null,
+                    "slot-assistant": null,
+                    "slot-recruit": null
+                };
+                selectedRank = null;
+                solvedScenariosCount = 0;
+                currentActiveScenario = 1;
+
+                // Reset Slots UI
+                document.querySelectorAll(".org-slot").forEach(slot => {
+                    slot.classList.remove("filled", "success-glow", "shake-error");
+                });
+
+                // Reset Chips UI
+                document.querySelectorAll(".rank-chip").forEach(chip => {
+                    chip.classList.remove("placed", "selected");
+                });
+                els.chipsPool.style.display = "flex";
+
+                // Reset Scenarios UI
+                if (els.dialogueLockedDesc) {
+                    els.dialogueLockedDesc.style.display = "block";
+                }
+                document.querySelectorAll(".scenario-card").forEach(card => {
+                    card.classList.remove("active-scenario");
+                    card.removeAttribute("data-solved");
+                    card.querySelectorAll(".dialogue-option").forEach(opt => {
+                        opt.classList.remove("correct", "wrong");
+                        opt.style.opacity = "1";
+                    });
+                });
+
+                els.successOverlay.classList.remove("show");
+                render();
+            });
+
+            // Listen for multilingual toggle changes
+            document.addEventListener("click", (e) => {
+                if (e.target.closest("[data-multilang-btn]")) {
+                    setTimeout(() => {
+                        if (window.MultilangToggle) {
+                            activeLang = window.MultilangToggle.getLang();
+                        }
+                        render();
+                    }, 50);
+                }
+            });
+
+            setTimeout(initMultilang, 100);
+        })();
+    </script>
+    <script>window.MULTILANG_CONFIG = { langs: ["vi", "mn", "ar", "kk", "th", "en"] };</script>
+    <script src="../shared/multilang-toggle.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>

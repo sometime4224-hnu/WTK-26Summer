@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>11과 어휘 보조3 | 회사 복지와 근무 조건 밸런서</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <link rel="stylesheet" href="../shared/multilang-toggle.css">
+    <style>
+        :root {
+            --ink: #1e293b;
+            --muted: #64748b;
+            --paper: #ffffff;
+            --page: #f8fafc;
+            --line: #e2e8f0;
+            --brand: #0f766e;
+            --brand-light: #ccfbf1;
+            --accent: #f59e0b;
+            --accent-light: #fef3c7;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --topbar-height: 48px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--ink);
+            background: linear-gradient(180deg, #fffbeb 0%, #f8fafc 40%, #f0fdfa 100%);
+            font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+            line-height: 1.5;
+            padding-bottom: 40px;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            min-height: var(--topbar-height);
+            display: grid;
+            grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 12px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar__links {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .topbar__links::-webkit-scrollbar {
+            display: none;
+        }
+
+        .topbar a {
+            min-height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid rgba(30, 41, 59, 0.1);
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.04);
+            color: var(--ink);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar a.active {
+            border-color: var(--brand);
+            background: var(--brand-light);
+            color: var(--brand);
+        }
+
+        .topbar__title {
+            text-align: right;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .shell {
+            width: min(1200px, 100% - 24px);
+            margin: 14px auto 0;
+        }
+
+        header.hero {
+            text-align: center;
+            margin-bottom: 18px;
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: var(--shadow);
+        }
+
+        .eyebrow {
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--brand);
+            margin-bottom: 4px;
+        }
+
+        header.hero h1 {
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .instructions {
+            font-size: 0.9rem;
+            color: var(--muted);
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 16px;
+        }
+
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid var(--line);
+            margin-bottom: 16px;
+        }
+
+        .panel {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Sliders / Balance Game styling */
+        .balancer-group {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .balancer-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .balancer-headers {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-weight: 900;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .balancer-label-wrapper {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 140px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .balancer-label-wrapper.highlight {
+            color: var(--brand);
+            transform: scale(1.05);
+        }
+
+        .balancer-label-wrapper.highlight .balancer-icon {
+            border-color: var(--brand);
+            box-shadow: 0 4px 10px rgba(15, 118, 110, 0.25);
+        }
+
+        .balancer-icon {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid var(--line);
+            background: #fff;
+            transition: all 0.25s ease;
+        }
+
+        .label-text {
+            font-size: 0.82rem;
+            text-align: center;
+            font-weight: 800;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            appearance: none;
+            border-radius: 999px;
+            background: #e2e8f0;
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            background: var(--brand);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transition: all 0.15s ease;
+        }
+
+        input[type="range"]:focus::-webkit-slider-thumb {
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.25);
+            transform: scale(1.1);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        /* Result profile card */
+        .profile-card {
+            background: linear-gradient(135deg, #fff 0%, #f0fdfa 100%);
+            border: 1px solid rgba(15, 118, 110, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes pop-card {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); box-shadow: 0 20px 30px rgba(15, 118, 110, 0.2); }
+            100% { transform: scale(1); }
+        }
+
+        .profile-card.pop-effect {
+            animation: pop-card 0.5s ease-out;
+            border-color: var(--brand) !important;
+            background: linear-gradient(135deg, #e6fffa 0%, #fff 100%) !important;
+        }
+
+        .profile-images {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .profile-val-badge {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--brand);
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .profile-val-badge:hover {
+            transform: scale(1.1);
+        }
+
+        .profile-badge {
+            display: inline-flex;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: var(--brand);
+            color: #fff;
+            font-weight: 900;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+
+        .profile-title {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .profile-desc {
+            font-size: 0.85rem;
+            color: #475569;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        /* Dynamic Paragraph Builder */
+        .paragraph-builder {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .paragraph-textbox {
+            width: 100%;
+            min-height: 120px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            background: #f8fafc;
+            color: var(--ink);
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+        }
+
+        .btn-copy {
+            min-height: 42px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--brand);
+            color: #fff;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.15s ease;
+        }
+
+        .btn-copy:hover {
+            background: #115e59;
+        }
+
+        @media (max-width: 760px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .topbar__title {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .balancer-label-wrapper {
+                width: auto;
+                max-width: 46%;
+            }
+            .label-text {
+                font-size: 0.75rem;
+            }
+            .balancer-icon {
+                width: 36px;
+                height: 36px;
+            }
+            .paragraph-textbox {
+                min-height: 100px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <nav class="topbar">
+        <div class="topbar__links">
+            <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+            <a href="index.html"><i class="fa-solid fa-folder-open"></i> 11과</a>
+            <a href="vocabulary.html"><i class="fa-solid fa-layer-group"></i> 어휘</a>
+            <a href="vocab-support-job-posting.html"><i class="fa-solid fa-address-card"></i> 보조1</a>
+            <a href="vocab-support-org-chart.html"><i class="fa-solid fa-sitemap"></i> 보조2</a>
+            <a href="vocab-support-welfare-balance.html" class="active"><i class="fa-solid fa-sliders"></i> 보조3</a>
+            <a href="vocab-support-work-scenario.html"><i class="fa-solid fa-building"></i> 보조4</a>
+        </div>
+        <div class="topbar__title">11과 어휘 보조3 | 회사 복지와 근무 조건 밸런서</div>
+    </nav>
+
+    <main class="shell">
+        <header class="hero">
+            <p class="eyebrow">Chapter 11 Vocabulary Activity 3</p>
+            <h1 id="page-title">회사 복지와 근무 조건 밸런서</h1>
+            <p class="instructions" id="page-instruct">슬라이더를 움직여 보세요. 여러분에게 잘 어울리는 회사 프로필과 자기소개 글이 자동으로 만들어집니다.</p>
+            <div data-multilang-bar></div>
+        </header>
+
+        <div class="main-grid">
+            <section class="balancer-section">
+                <div class="panel">
+                    <h2 class="section-title" id="balancer-title"><i class="fa-solid fa-sliders"></i> 가치관 밸런스 설정 (Value Balancer)</h2>
+                    <div class="balancer-group">
+                        <!-- Scale -->
+                        <div class="balancer-item">
+                            <div class="balancer-headers">
+                                <span id="lbl-chaebol" class="balancer-label-wrapper">
+                                    <img src="../assets/c11/vocabulary/images/split/c11_01_TR.webp" class="balancer-icon" alt="대기업" decoding="async" loading="lazy">
+                                    <span class="label-text" id="txt-chaebol">대기업</span>
+                                </span>
+                                <span id="lbl-sme" class="balancer-label-wrapper">
+                                    <img src="../assets/c11/vocabulary/images/split/c11_01_BL.webp" class="balancer-icon" alt="중소기업" decoding="async" loading="lazy">
+                                    <span class="label-text" id="txt-sme">중소기업</span>
+                                </span>
+                            </div>
+                            <div class="slider-wrapper">
+                                <input type="range" id="slide-scale" min="0" max="100" value="50" aria-label="회사 규모 조절">
+                            </div>
+                        </div>
+
+                        <!-- Pay vs Time -->
+                        <div class="balancer-item">
+                            <div class="balancer-headers">
+                                <span id="lbl-pay" class="balancer-label-wrapper">
+                                    <img src="../assets/c11/vocabulary/images/split/c11_01_BR.webp" class="balancer-icon" alt="연봉이 높다" decoding="async" loading="lazy">
+                                    <span class="label-text" id="txt-pay">연봉이 높다</span>
+                                </span>
+                                <span id="lbl-time" class="balancer-label-wrapper">
+                                    <img src="../assets/c11/vocabulary/images/split/c11_07_TL.webp" class="balancer-icon" alt="출퇴근 시간이 자유롭다" decoding="async" loading="lazy">
+                                    <span class="label-text" id="txt-time">출퇴근 시간이 자유롭다</span>
+                                </span>
+                            </div>
+                            <div class="slider-wrapper">
+                                <input type="range" id="slide-pay-time" min="0" max="100" value="50" aria-label="급여와 근무 시간 조절">
+                            </div>
+                        </div>
+
+                        <!-- Promotion vs Vacation -->
+                        <div class="balancer-item">
+                            <div class="balancer-headers">
+                                <span id="lbl-promo" class="balancer-label-wrapper">
+                                    <img src="../assets/c11/vocabulary/images/split/c11_07_TR.webp" class="balancer-icon" alt="승진 기회가 많다" decoding="async" loading="lazy">
+                                    <span class="label-text" id="txt-promo">승진 기회가 많다</span>
+                                </span>
+                                <span id="lbl-vacation" class="balancer-label-wrapper">
+                                    <img src="../assets/c11/vocabulary/images/split/c11_07_BL.webp" class="balancer-icon" alt="휴가가 길다" decoding="async" loading="lazy">
+                                    <span class="label-text" id="txt-vacation">휴가가 길다</span>
+                                </span>
+                            </div>
+                            <div class="slider-wrapper">
+                                <input type="range" id="slide-promo-vacation" min="0" max="100" value="50" aria-label="성장과 휴식 조절">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="profile-section">
+                <div class="panel">
+                    <h2 class="section-title" id="profile-title-header"><i class="fa-solid fa-id-card"></i> 나의 이상적인 회사 프로필</h2>
+                    
+                    <div class="profile-card" id="profile-card">
+                        <div class="profile-images" id="profile-images"></div>
+                        <div class="profile-badge" id="profile-badge">밸런스형</div>
+                        <h3 class="profile-title" id="profile-title">중용을 지키는 밸런스 인재</h3>
+                        <p class="profile-desc" id="profile-desc">급여와 복지, 회사의 규모와 개인의 삶 속에서 중용의 밸런스를 찾습니다.</p>
+                    </div>
+
+                    <div class="paragraph-builder">
+                        <h3 id="essay-heading" style="font-size: 0.95rem; font-weight: 900; color: #475569;">자동 생성된 소개글 (Korean Essay)</h3>
+                        <textarea class="paragraph-textbox" id="paragraph-textbox" readonly aria-label="생성된 자기소개 한 문단"></textarea>
+                        <button class="btn-copy" id="btn-copy"><i class="fa-solid fa-copy"></i> 복사하기</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        (() => {
+            let activeLang = "none";
+            let lastProfileType = null;
+
+            const uiTranslations = {
+                vi: {
+                    instruct: "Di chuyển thanh trượt. Bản lý lịch công ty lý tưởng và một đoạn văn tự giới thiệu bản thân bằng tiếng Hàn sẽ tự động được tạo ra.",
+                    btnCopy: "Sao chép",
+                    copySuccess: "Đoạn văn giới thiệu bản thân đã được sao chép vào bộ nhớ tạm!"
+                },
+                en: {
+                    instruct: "Move the sliders. Your ideal company profile and auto-generated Korean self-introduction essay will be built automatically.",
+                    btnCopy: "Copy text",
+                    copySuccess: "The self-introduction paragraph has been copied to your clipboard!"
+                },
+                mn: {
+                    instruct: "Гулгуурыг хөдөлгөнө үү. Таны хамгийн тохирох компанийн профайл болон Солонгос хэл дээрх өөрийгөө танилцуулах текст автоматаар үүснэ.",
+                    btnCopy: "Хуулах",
+                    copySuccess: "Өөрийгөө танилцуулах хэсэг хуулбар дахь санах ойд хадгалагдлаа!"
+                },
+                ar: {
+                    instruct: "حرك الأشرطة. سيتم إنشاء ملف تعريف الشركة المثالية وفقرة التعريف بالنفس باللغة الكورية تلقائياً.",
+                    btnCopy: "نسخ",
+                    copySuccess: "تم نسخ فقرة التعريف بالنفس إلى الحافظة!"
+                },
+                kk: {
+                    instruct: "Жылжытқышты жылжытыңыз. Сізге ең қолайлы компания профилі және Корей тіліндегі өзіндік таныстырылым мәтіні автоматты түрде жасалады.",
+                    btnCopy: "Көшіру",
+                    copySuccess: "Өзіндік таныстырылым буфер жадына сақталды!"
+                },
+                th: {
+                    instruct: "เลื่อนแถบ ระบบจะสร้างโปรไฟล์บริษัทในอุดมคติและบทแนะนำตัวภาษาเกาหลีโดยอัตโนมัติ",
+                    btnCopy: "คัดลอก",
+                    copySuccess: "คัดลอกบทแนะนำตัวไปยังคลิปบอร์ดแล้ว!"
+                }
+            };
+
+            const sliders = {
+                scale: document.getElementById("slide-scale"),
+                payTime: document.getElementById("slide-pay-time"),
+                promoVacation: document.getElementById("slide-promo-vacation")
+            };
+
+            const labels = {
+                chaebol: document.getElementById("lbl-chaebol"),
+                sme: document.getElementById("lbl-sme"),
+                pay: document.getElementById("lbl-pay"),
+                time: document.getElementById("lbl-time"),
+                promo: document.getElementById("lbl-promo"),
+                vacation: document.getElementById("lbl-vacation")
+            };
+
+            const els = {
+                card: document.getElementById("profile-card"),
+                badge: document.getElementById("profile-badge"),
+                title: document.getElementById("profile-title"),
+                desc: document.getElementById("profile-desc"),
+                textbox: document.getElementById("paragraph-textbox"),
+                btnCopy: document.getElementById("btn-copy")
+            };
+
+            // Profiles always show Korean (vocabulary learning targets)
+            const profiles = {
+                chaebol_growth: {
+                    badge: "대기업 성장형",
+                    title: "대기업에서 성장하고 싶은 사람",
+                    desc: "월급이 많고 승진 기회가 많은 대기업에서 빠르게 성장하고 싶어합니다."
+                },
+                chaebol_wabal: {
+                    badge: "대기업 워라밸형",
+                    title: "안정과 개인 생활을 지키고 싶은 일잘러",
+                    desc: "규모가 크고 연봉이 높은 대기업에서 일하며, 긴 휴가와 개인의 생활도 중요하게 생각합니다."
+                },
+                sme_flexible: {
+                    badge: "자유로운 중소기업형",
+                    title: "출퇴근이 자유롭고 스스로 일하는 인재",
+                    desc: "출퇴근 시간이 자유롭고 휴가가 긴 중소기업에서 자기만의 편안한 삶을 살고 싶어합니다."
+                },
+                sme_challenge: {
+                    badge: "중소기업 성장형",
+                    title: "회사와 함께 빠르게 성장하고 싶은 사람",
+                    desc: "출퇴근이 자유로운 중소기업에서 열심히 일해서 빨리 승진하고 싶어합니다."
+                },
+                balanced: {
+                    badge: "균형형",
+                    title: "일과 생활의 균형을 찾는 사람",
+                    desc: "연봉, 근무 시간, 회사 규모가 모두 적당히 균형을 이루는 직장을 원합니다."
+                }
+            };
+
+            function initMultilang() {
+                if (window.MULTILANG_CONFIG && window.MultilangToggle) {
+                    activeLang = window.MultilangToggle.getLang() || "none";
+                }
+                updateProfile();
+            }
+
+            function updateProfile() {
+                // Update UX text based on language (vocabulary/slider labels always stay Korean)
+                const pageInstructEl = document.getElementById("page-instruct");
+                const btnCopyEl = document.getElementById("btn-copy");
+
+                if (activeLang !== "none" && uiTranslations[activeLang]) {
+                    const t = uiTranslations[activeLang];
+                    if (pageInstructEl) pageInstructEl.textContent = t.instruct;
+                    if (btnCopyEl) btnCopyEl.innerHTML = `<i class="fa-solid fa-copy"></i> ${t.btnCopy}`;
+                } else {
+                    if (pageInstructEl) pageInstructEl.textContent = "슬라이더를 움직여 보세요. 여러분에게 잘 어울리는 회사 프로필과 자기소개 글이 자동으로 만들어집니다.";
+                    if (btnCopyEl) btnCopyEl.innerHTML = '<i class="fa-solid fa-copy"></i> 복사하기';
+                }
+
+                const scaleVal = parseInt(sliders.scale.value);
+                const payTimeVal = parseInt(sliders.payTime.value);
+                const promoVacVal = parseInt(sliders.promoVacation.value);
+
+                // Highlight active labels with scale wave transition
+                labels.chaebol.className = scaleVal < 45 ? "highlight" : "";
+                labels.sme.className = scaleVal > 55 ? "highlight" : "";
+                labels.pay.className = payTimeVal < 45 ? "highlight" : "";
+                labels.time.className = payTimeVal > 55 ? "highlight" : "";
+                labels.promo.className = promoVacVal < 45 ? "highlight" : "";
+                labels.vacation.className = promoVacVal > 55 ? "highlight" : "";
+
+                // Determine profile type
+                let pType = "balanced";
+                if (Math.abs(50 - scaleVal) <= 15 && Math.abs(50 - payTimeVal) <= 15 && Math.abs(50 - promoVacVal) <= 15) {
+                    pType = "balanced";
+                } else {
+                    if (scaleVal < 50) { // Large Enterprise
+                        pType = promoVacVal < 50 ? "chaebol_growth" : "chaebol_wabal";
+                    } else { // SME
+                        pType = promoVacVal < 50 ? "sme_challenge" : "sme_flexible";
+                    }
+                }
+
+                // Trigger celebratory pop on change
+                if (lastProfileType && lastProfileType !== pType) {
+                    els.card.classList.add("pop-effect");
+                    setTimeout(() => {
+                        els.card.classList.remove("pop-effect");
+                    }, 500);
+                }
+                lastProfileType = pType;
+
+                // Render Profile details (always Korean — vocabulary targets)
+                const meta = profiles[pType];
+
+                els.badge.textContent = meta.badge;
+                els.title.textContent = meta.title;
+                els.desc.textContent = meta.desc;
+
+                // Update dynamic value badges
+                const profileImagesEl = document.getElementById("profile-images");
+                profileImagesEl.innerHTML = "";
+                const activeBadges = [];
+                if (scaleVal < 45) activeBadges.push({ img: "../assets/c11/vocabulary/images/split/c11_01_TR.webp", text: "대기업" });
+                if (scaleVal > 55) activeBadges.push({ img: "../assets/c11/vocabulary/images/split/c11_01_BL.webp", text: "중소기업" });
+                if (payTimeVal < 45) activeBadges.push({ img: "../assets/c11/vocabulary/images/split/c11_01_BR.webp", text: "연봉이 높다" });
+                if (payTimeVal > 55) activeBadges.push({ img: "../assets/c11/vocabulary/images/split/c11_07_TL.webp", text: "출퇴근 시간이 자유롭다" });
+                if (promoVacVal < 45) activeBadges.push({ img: "../assets/c11/vocabulary/images/split/c11_07_TR.webp", text: "승진 기회가 많다" });
+                if (promoVacVal > 55) activeBadges.push({ img: "../assets/c11/vocabulary/images/split/c11_07_BL.webp", text: "휴가가 길다" });
+
+                if (activeBadges.length > 0) {
+                    activeBadges.forEach(b => {
+                        const img = document.createElement("img");
+                        img.src = b.img;
+                        img.className = "profile-val-badge";
+                        img.title = b.text;
+                        img.alt = b.text;
+                        profileImagesEl.appendChild(img);
+                    });
+                }
+
+                // Build Paragraph
+                const scaleText = scaleVal < 50 ? "대기업" : "중소기업";
+                const payTimeText = payTimeVal < 50 ? "연봉이 높고" : "출퇴근 시간이 자유롭고";
+                const promoVacText = promoVacVal < 50 ? "승진 기회가 많은" : "휴가가 긴";
+
+                // Generate Korean paragraph with target grammar -(ㄴ/는)다면 or -든지
+                let paragraph = "";
+                if (pType === "balanced") {
+                    paragraph = "나는 취업을 한다면, 회사 규모보다는 모든 조건이 적당히 어울리는 곳이기를 원합니다. 대기업이든지 중소기업이든지 상관없이, 연봉이 적당하고 휴가도 길며 근무 조건이 좋은 직장에서 성실하게 일하고 싶습니다.";
+                } else {
+                    paragraph = `만약 내가 취업을 한다면, 나는 무엇보다도 ${payTimeText} ${promoVacText} ${scaleText}에 들어가고 싶습니다. 대기업이든지 중소기업이든지 각자의 장점이 있겠지만, 내가 좋아하는 회사 생활 방식에 맞추어 최선을 다해 일하고 싶습니다.`;
+                }
+
+                // Append supplementary translation of the Korean paragraph
+                if (activeLang === "vi") {
+                    const viType = scaleVal < 50 ? "tập đoàn lớn" : "doanh nghiệp vừa và nhỏ";
+                    const viPayTime = payTimeVal < 50 ? "lương cao" : "thời gian đi làm tự do";
+                    const viPromoVac = promoVacVal < 50 ? "nhiều cơ hội thăng tiến" : "kỳ nghỉ dài";
+                    paragraph += `\n\n(Dịch: Nếu tôi xin việc, tôi muốn vào một ${viType} có ${viPayTime} và ${viPromoVac}. Dù là tập đoàn hay doanh nghiệp vừa và nhỏ, tôi muốn cố gắng hết sức làm việc theo lối sống công sở ưa thích.)`;
+                } else if (activeLang === "en") {
+                    const enType = scaleVal < 50 ? "large enterprise" : "SME";
+                    const enPayTime = payTimeVal < 50 ? "high annual salary" : "flexible working hours";
+                    const enPromoVac = promoVacVal < 50 ? "many promotion opportunities" : "long vacation";
+                    paragraph += `\n\n(Translation: If I get a job, I want to join a ${enType} that has a ${enPayTime} and ${enPromoVac}. Whether it is a large enterprise or an SME, I want to do my best in my work according to my preferred work life style.)`;
+                } else if (activeLang === "mn") {
+                    const mnType = scaleVal < 50 ? "том компани" : "жижиг дунд компани";
+                    const mnPayTime = payTimeVal < 50 ? "цалин өндөр" : "ирэх буцах цаг чөлөөтэй";
+                    const mnPromoVac = promoVacVal < 50 ? "дэвших боломж их" : "амралт урт";
+                    paragraph += `\n\n(Орчуулга: Хэрэв би ажилд орвол, ${mnType}д ${mnPayTime}, ${mnPromoVac} компанид орохыг хүсч байна. Том компани эсвэл жижиг дунд компани байхаас үл хамааран, дуртай ажлын хэв маягийнхаа дагуу чин зүтгэж ажиллахыг хүсч байна.)`;
+                } else if (activeLang === "ar") {
+                    const arType = scaleVal < 50 ? "شركة كبيرة" : "شركة صغيرة ومتوسطة";
+                    const arPayTime = payTimeVal < 50 ? "راتب مرتفع" : "ساعات عمل مرنة";
+                    const arPromoVac = promoVacVal < 50 ? "فرص ترقية وفيرة" : "إجازة طويلة";
+                    paragraph += `\n\n(ترجمة: إذا حصلت على وظيفة، أريد الانضمام إلى ${arType} توفر ${arPayTime} و${arPromoVac}. سواء كانت شركة كبيرة أو صغيرة، أريد أن أبذل قصارى جهدي وفق أسلوب العمل الذي أفضله.)`;
+                } else if (activeLang === "kk") {
+                    const kkType = scaleVal < 50 ? "ірі компания" : "шағын компания";
+                    const kkPayTime = payTimeVal < 50 ? "жалақысы жоғары" : "жұмысқа келу-кету уақыты еркін";
+                    const kkPromoVac = promoVacVal < 50 ? "жоғарылау мүмкіндігі мол" : "демалысы ұзақ";
+                    paragraph += `\n\n(Аударма: Егер мен жұмысқа орналассам, ${kkPayTime} және ${kkPromoVac} ${kkType}ға кіргім келеді. Ірі компания немесе шағын компания болсын, өзім ұнататын жұмыс стиліне сай барынша жақсы жұмыс істегім келеді.)`;
+                } else if (activeLang === "th") {
+                    const thType = scaleVal < 50 ? "บริษัทใหญ่" : "SME";
+                    const thPayTime = payTimeVal < 50 ? "เงินเดือนสูง" : "เวลาเข้าออกงานยืดหยุ่น";
+                    const thPromoVac = promoVacVal < 50 ? "โอกาสเลื่อนตำแหน่งมาก" : "วันหยุดยาว";
+                    paragraph += `\n\n(แปล: ถ้าฉันได้งาน ฉันอยากเข้าทำงานใน${thType}ที่มี${thPayTime}และ${thPromoVac} ไม่ว่าจะเป็นบริษัทใหญ่หรือ SME ฉันอยากทำงานอย่างเต็มที่ตามสไตล์การทำงานที่ตัวเองชอบ)`;
+                }
+
+                els.textbox.value = paragraph;
+            }
+
+            // Sliders listener
+            sliders.scale.addEventListener("input", updateProfile);
+            sliders.payTime.addEventListener("input", updateProfile);
+            sliders.promoVacation.addEventListener("input", updateProfile);
+
+            // Copy button listener
+            els.btnCopy.addEventListener("click", () => {
+                els.textbox.select();
+                document.execCommand("copy");
+                let msg = "설계된 자기소개 한 문단이 클립보드에 복사되었습니다!";
+                if (activeLang !== "none" && uiTranslations[activeLang]) {
+                    msg = uiTranslations[activeLang].copySuccess;
+                }
+                alert(msg);
+            });
+
+            // Listen for multilingual toggle changes
+            document.addEventListener("click", (e) => {
+                if (e.target.closest("[data-multilang-btn]")) {
+                    setTimeout(() => {
+                        if (window.MultilangToggle) {
+                            activeLang = window.MultilangToggle.getLang();
+                        }
+                        updateProfile();
+                    }, 50);
+                }
+            });
+
+            setTimeout(initMultilang, 100);
+        })();
+    </script>
+    <script>window.MULTILANG_CONFIG = { langs: ["vi", "mn", "ar", "kk", "th", "en"] };</script>
+    <script src="../shared/multilang-toggle.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>

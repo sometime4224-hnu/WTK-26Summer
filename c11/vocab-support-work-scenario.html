@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>11과 어휘 보조4 | 가상 업무 시뮬레이션</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <link rel="stylesheet" href="../shared/multilang-toggle.css">
+    <style>
+        :root {
+            --ink: #1e293b;
+            --muted: #64748b;
+            --paper: #ffffff;
+            --page: #f8fafc;
+            --line: #e2e8f0;
+            --brand: #0f766e;
+            --brand-light: #ccfbf1;
+            --accent: #ec4899;
+            --accent-light: #fce7f3;
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --topbar-height: 48px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--ink);
+            background: linear-gradient(180deg, #fdf2f8 0%, #f8fafc 40%, #f0fdfa 100%);
+            font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+            line-height: 1.5;
+            padding-bottom: 40px;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            min-height: var(--topbar-height);
+            display: grid;
+            grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 12px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar__links {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .topbar__links::-webkit-scrollbar {
+            display: none;
+        }
+
+        .topbar a {
+            min-height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid rgba(30, 41, 59, 0.1);
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.04);
+            color: var(--ink);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar a.active {
+            border-color: var(--brand);
+            background: var(--brand-light);
+            color: var(--brand);
+        }
+
+        .topbar__title {
+            text-align: right;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .shell {
+            width: min(800px, 100% - 24px);
+            margin: 14px auto 0;
+        }
+
+        header.hero {
+            text-align: center;
+            margin-bottom: 18px;
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: var(--shadow);
+        }
+
+        .eyebrow {
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--brand);
+            margin-bottom: 4px;
+        }
+
+        header.hero h1 {
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .instructions {
+            font-size: 0.9rem;
+            color: var(--muted);
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .panel {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        /* Floating point animation container */
+        .floating-text-container {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 60;
+            pointer-events: none;
+            width: 80%;
+            text-align: center;
+        }
+
+        .floating-text-item {
+            display: inline-block;
+            color: var(--brand);
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid var(--brand);
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-weight: 900;
+            font-size: 1rem;
+            margin: 4px;
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.18);
+            animation: float-up-fade 1.3s forwards cubic-bezier(0.1, 0.8, 0.3, 1);
+        }
+
+        @keyframes float-up-fade {
+            0% { transform: translateY(30px) scale(0.9); opacity: 0; }
+            15% { transform: translateY(0) scale(1); opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(-40px) scale(0.95); opacity: 0; }
+        }
+
+        /* Simulation Story Box */
+        .story-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .scene-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: var(--brand);
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--line);
+        }
+
+        .story-box {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid var(--line);
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .char-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #fff;
+        }
+
+        .char-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .story-text {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        /* Decision zone */
+        .decision-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            font-weight: 800;
+            color: var(--muted);
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes pulse-decision {
+            0%, 100% { border-color: rgba(15, 118, 110, 0.4); box-shadow: 0 0 0 0 rgba(15, 118, 110, 0.2); }
+            50% { border-color: rgba(15, 118, 110, 0.8); box-shadow: 0 0 0 8px rgba(15, 118, 110, 0); }
+        }
+
+        .decision-zone.pulse-target {
+            animation: pulse-decision 1.5s infinite;
+        }
+
+        .decision-zone.drag-over {
+            border-color: var(--brand) !important;
+            background: var(--brand-light) !important;
+            color: var(--brand) !important;
+            transform: scale(1.02);
+        }
+
+        .decision-icon {
+            font-size: 22px;
+        }
+
+        .options-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .option-card {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px 16px;
+            cursor: grab;
+            transition: all 0.2s ease;
+            text-align: left;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            user-select: none;
+        }
+
+        .option-card:active {
+            cursor: grabbing;
+        }
+
+        .option-card.dragging {
+            opacity: 0.5;
+            border-color: var(--brand);
+        }
+
+        .option-card:hover {
+            border-color: var(--brand);
+            background: var(--brand-light);
+            color: var(--brand);
+            transform: translateY(-1px);
+        }
+
+        .option-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .option-card:hover .option-num {
+            background: var(--brand);
+            color: #fff;
+        }
+
+        /* Result summary styling */
+        .result-panel {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .radar-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radar-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .radar-bar-icon {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: #fff;
+            flex-shrink: 0;
+        }
+
+        .radar-bar-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .radar-bar-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            font-weight: 900;
+            color: #334155;
+        }
+
+        .radar-bar-track {
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .radar-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--brand), var(--accent));
+            width: 0%;
+            transition: width 1.2s cubic-bezier(0.1, 0.8, 0.3, 1);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #fdf2f8 0%, #fff 100%);
+            border: 1px solid var(--accent-light);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-title {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .result-desc {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.6;
+            font-weight: 700;
+        }
+
+        .btn-restart {
+            min-height: 46px;
+            border: 0;
+            border-radius: 10px;
+            background: var(--brand);
+            color: #fff;
+            font-weight: 900;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background 0.15s ease;
+        }
+
+        .btn-restart:hover {
+            background: #115e59;
+        }
+
+        @media (max-width: 640px) {
+            .story-box {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .topbar__title {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .radar-bar-header {
+                font-size: 0.78rem;
+                flex-wrap: wrap;
+            }
+            .story-text {
+                font-size: 0.9rem;
+            }
+            .option-card {
+                padding: 10px 12px;
+                font-size: 0.82rem;
+            }
+            .decision-zone {
+                padding: 12px;
+                font-size: 0.85rem;
+            }
+            .result-title {
+                font-size: 1.15rem;
+            }
+            .result-desc {
+                font-size: 0.82rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <nav class="topbar">
+        <div class="topbar__links">
+            <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+            <a href="index.html"><i class="fa-solid fa-folder-open"></i> 11과</a>
+            <a href="vocabulary.html"><i class="fa-solid fa-layer-group"></i> 어휘</a>
+            <a href="vocab-support-job-posting.html"><i class="fa-solid fa-address-card"></i> 보조1</a>
+            <a href="vocab-support-org-chart.html"><i class="fa-solid fa-sitemap"></i> 보조2</a>
+            <a href="vocab-support-welfare-balance.html"><i class="fa-solid fa-sliders"></i> 보조3</a>
+            <a href="vocab-support-work-scenario.html" class="active"><i class="fa-solid fa-building"></i> 보조4</a>
+        </div>
+        <div class="topbar__title">11과 어휘 보조4 | 가상 업무 시뮬레이션</div>
+    </nav>
+
+    <main class="shell">
+        <header class="hero">
+            <p class="eyebrow">Chapter 11 Vocabulary Activity 4</p>
+            <h1>신입 사원의 하루 시뮬레이션</h1>
+            <p class="instructions">선택지 카드를 드래그하여 아래 생각 상자에 넣거나 클릭하여 결정해 보세요.</p>
+            <div data-multilang-bar></div>
+        </header>
+
+        <section class="panel">
+            <!-- Floating Text Overlay Container -->
+            <div class="floating-text-container" id="floating-container"></div>
+
+            <!-- Active Story View -->
+            <div class="story-container" id="story-container">
+                <div class="scene-header">
+                    <span id="scene-time"><i class="fa-solid fa-clock"></i> 오전 09:00</span>
+                    <span id="scene-progress">1 / 3 단계</span>
+                </div>
+                
+                <div class="story-box">
+                    <div class="char-avatar" id="char-avatar"><i class="fa-solid fa-user-tie"></i></div>
+                    <p class="story-text" id="story-text">회사에 처음으로 출근했습니다! 부장님이 오늘 해야 하는 일의 규칙과 설명서를 빠르게 설명해 줍니다. 모르는 단어가 많은데 어떻게 하겠습니까?</p>
+                </div>
+
+                <div class="decision-zone" id="decision-zone">
+                    <span class="decision-icon"><i class="fa-solid fa-lightbulb"></i></span>
+                    <span class="decision-label" id="decision-label">이곳으로 선택지 카드를 드래그해 놓으세요</span>
+                </div>
+
+                <div class="options-list" id="options-list">
+                    <!-- Options will render dynamically -->
+                </div>
+            </div>
+
+            <!-- Result Summary View -->
+            <div class="result-panel" id="result-panel">
+                <h2 class="section-title"><i class="fa-solid fa-chart-line"></i> 나의 업무 역량 진단 결과</h2>
+                
+                <div class="radar-box">
+                    <!-- Diligence -->
+                    <div class="radar-bar-item">
+                        <img src="../assets/c11/vocabulary/images/split/c11_03_BL.webp" class="radar-bar-icon" alt="성실성" decoding="async" loading="lazy">
+                        <div class="radar-bar-body">
+                            <div class="radar-bar-header">
+                                <span>성실성 (성실하다)</span>
+                                <span id="score-dil">0%</span>
+                            </div>
+                            <div class="radar-bar-track"><div class="radar-bar-fill" id="fill-dil"></div></div>
+                        </div>
+                    </div>
+                    <!-- Meticulousness -->
+                    <div class="radar-bar-item">
+                        <img src="../assets/c11/vocabulary/images/split/c11_03_BR.webp" class="radar-bar-icon" alt="꼼꼼함" decoding="async" loading="lazy">
+                        <div class="radar-bar-body">
+                            <div class="radar-bar-header">
+                                <span>꼼꼼함 (꼼꼼하다)</span>
+                                <span id="score-met">0%</span>
+                            </div>
+                            <div class="radar-bar-track"><div class="radar-bar-fill" id="fill-met"></div></div>
+                        </div>
+                    </div>
+                    <!-- Understanding -->
+                    <div class="radar-bar-item">
+                        <img src="../assets/c11/vocabulary/images/split/c11_04_BL.webp" class="radar-bar-icon" alt="이해력" decoding="async" loading="lazy">
+                        <div class="radar-bar-body">
+                            <div class="radar-bar-header">
+                                <span>이해력 (이해가 빠르다)</span>
+                                <span id="score-und">0%</span>
+                            </div>
+                            <div class="radar-bar-track"><div class="radar-bar-fill" id="fill-und"></div></div>
+                        </div>
+                    </div>
+                    <!-- Relations -->
+                    <div class="radar-bar-item">
+                        <img src="../assets/c11/vocabulary/images/split/c11_05_TR.webp" class="radar-bar-icon" alt="대인관계" decoding="async" loading="lazy">
+                        <div class="radar-bar-body">
+                            <div class="radar-bar-header">
+                             <span>대인관계 (대인 관계가 원만하다)</span>
+                                <span id="score-rel">0%</span>
+                            </div>
+                            <div class="radar-bar-track"><div class="radar-bar-fill" id="fill-rel"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <h3 class="result-title" id="result-title">평가 분석 중</h3>
+                    <p class="result-desc" id="result-desc">회사 생활에서의 다양한 선택을 바탕으로 당신의 직무 능력을 평가하고 분석합니다.</p>
+                </div>
+
+                <button class="btn-restart" id="btn-restart">시뮬레이션 다시 하기</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        (() => {
+            const scenes = [
+                {
+                    id: 1,
+                    time: "오전 09:00 (첫 업무 지시)",
+                    text: "회사에 처음으로 출근했습니다! 부장님이 오늘 해야 하는 일의 규칙과 설명서를 빠르게 설명해 줍니다. 모르는 단어가 많은데 어떻게 하겠습니까?",
+                    vi: {
+                        time: "09:00 Sáng (Chỉ thị công việc đầu tiên)",
+                        text: "Ngày đầu tiên đi làm! Trưởng phòng giải thích nhanh toàn bộ tài liệu hướng dẫn và quy định về nhiệm vụ quảng bá hàng tuần bạn phải xử lý hôm nay. Có nhiều từ vựng lạ lẫm, bạn sẽ làm thế nào?"
+                    },
+                    en: {
+                        time: "09:00 AM (First Job Assignment)",
+                        text: "It is your first day at work! The department head quickly explains the overall guidelines and regulations for the weekly public relations duties you need to process today. There are many unfamiliar terms; what will you do?"
+                    },
+                    mn: {
+                        time: "09:00 (Анхны ажлын даалгавар)",
+                        text: "Компанид анх удаа ирлээ! Хэлтсийн дарга өнөөдөр хийх ажлын дүрэм, заавар болон долоо хоног бүрийн PR үүргийг хурдан тайлбарлав. Мэдэхгүй үг их байна, яах вэ?"
+                    },
+                    ar: {
+                        time: "09:00 صباحاً (أول تكليف عمل)",
+                        text: "يومك الأول في العمل! يشرح رئيس القسم بسرعة الإرشادات العامة واللوائح لمهام العلاقات العامة الأسبوعية التي تحتاج لمعالجتها اليوم. هناك مصطلحات كثيرة غير مألوفة؛ ماذا ستفعل؟"
+                    },
+                    kk: {
+                        time: "09:00 (Бірінші жұмыс тапсырмасы)",
+                        text: "Компанияға бірінші күн келдіңіз! Бөлім басшысы бүгін орындауыңыз қажет апталық PR міндеттер бойынша жалпы нұсқаулар мен ережелерді жылдам түсіндіреді. Таныс емес сөздер көп, не істейсіз?"
+                    },
+                    th: {
+                        time: "09:00 น. (การมอบหมายงานครั้งแรก)",
+                        text: "วันแรกที่มาทำงาน! หัวหน้าแผนกอธิบายอย่างรวดเร็วเกี่ยวกับแนวทางทั่วไปและกฎระเบียบสำหรับงาน PR รายสัปดาห์ที่ต้องดำเนินการวันนี้ มีคำศัพท์ที่ไม่คุ้นเคยมากมาย คุณจะทำอะไร?"
+                    },
+                    options: [
+                        {
+                            text: "부장님의 설명을 잘 듣고 설명서를 끝까지 조용히 읽어서, 선배들에게 '이해가 빠르다'는 칭찬을 받는다.",
+                            scores: { und: 100, met: 50, dil: 30, rel: 10 },
+                            vi: "Lắng nghe thật kỹ chỉ thị và đọc kỹ hướng dẫn để được cấp trên khen ngợi là 'hiểu nhanh'.",
+                            en: "Listen carefully to the instructions and read the guidelines calmly to be praised as 'quick to understand'.",
+                            mn: "Даргын тайлбарыг сайтар сонсоод заавар барийг эцэс хүртэл тайван уншиж, ахмадуудаас 'хурдан ойлгодог' гэсэн магтаал авдаг.",
+                            ar: "الاستماع بعناية للتعليمات وقراءة الإرشادات بهدوء للحصول على ثناء 'سريع الفهم' من الأقدمين.",
+                            kk: "Басшының нұсқауын мұқият тыңдап, нұсқаулықты соңына дейін тыныш оқып, ағаларынан 'тез түсінеді' деген мақтауды алады.",
+                            th: "ฟังคำอธิบายอย่างตั้งใจและอ่านคู่มือจนจบอย่างสงบ เพื่อรับคำชมว่า 'เข้าใจเร็ว' จากรุ่นพี่"
+                        },
+                        {
+                            text: "모르는 내용이 나오면 혼자 힘들어하지 않고, 동료들에게 예의 바르게 도움을 부탁해서 '대인 관계가 원만하다'는 모습을 보여준다.",
+                            scores: { rel: 100, und: 30, dil: 30, met: 10 },
+                            vi: "Khi gặp nội dung không biết thì hỏi han đồng nghiệp xung quanh lịch sự để xây dựng 'quan hệ xã hội tốt'.",
+                            en: "If there's something you don't know, politely request cooperation from colleagues to show 'smooth interpersonal relations'.",
+                            mn: "Мэдэхгүй зүйл гарвал ганцаараа зовохгүйгээр хамт ажилладаг хүмүүсээсээ эелдгээр тусламж гуйж, 'хүмүүстэй харилцаа тогтвортой' гэдгийг харуулдаг.",
+                            ar: "عند مواجهة محتوى غير مفهوم، طلب التعاون من الزملاء بأدب لإظهار 'علاقات جيدة مع الناس'.",
+                            kk: "Білмейтін мазмұн кездессе жалғыз қиналмай, әріптестерінен сыпайы түрде көмек сұрап, 'адамдармен қарым-қатынасы жақсы' екенін көрсетеді.",
+                            th: "เมื่อพบเนื้อหาที่ไม่รู้จัก ไม่ลำบากคนเดียว แต่ขอความช่วยเหลือจากเพื่อนร่วมงานอย่างสุภาพ แสดงให้เห็นว่า 'มีมนุษยสัมพันธ์ดี'"
+                        },
+                        {
+                            text: "부장님이 주신 서류를 실수 없이 꼼꼼하게 메모하면서, 성실하게 회사의 첫 규칙을 정리한다.",
+                            scores: { met: 100, dil: 80, und: 20, rel: 10 },
+                            vi: "Ghi chép tỉ mỉ không sót một chữ nào tài liệu Trưởng phòng đưa, sắp xếp các quy định một cách thành thật.",
+                            en: "Take meticulous notes without any typos on the documents given by the boss, organizing the rules diligently.",
+                            mn: "Даргаас авсан баримт бичгийг алдаагүйгээр нямбай тэмдэглэж, компанийн анхны дүрмийг чин сэтгэлтэйгээр цэгцэлдэг.",
+                            ar: "تدوين ملاحظات دقيقة بلا أخطاء على الوثائق المُعطاة، وتنظيم القواعد الأولى للشركة بجدية.",
+                            kk: "Басшыдан алынған құжаттарды қатесіз нымбай жазып, компанияның алғашқы ережелерін адал жүйелейді.",
+                            th: "จดบันทึกอย่างละเอียดโดยไม่มีข้อผิดพลาดในเอกสารที่ผู้บังคับบัญชามอบให้ และจัดระเบียบกฎเกณฑ์แรกของบริษัทอย่างขยันหมั่นเพียร"
+                        }
+                    ]
+                },
+                {
+                    id: 2,
+                    time: "오후 02:00 (보고서 작성)",
+                    text: "오후 회의 전까지 부서의 보고서를 다 쓰라는 지시를 받았습니다. 여러 자료를 모으고 글을 잘 정리해야 합니다. 어떻게 하겠습니까?",
+                    vi: {
+                        time: "02:00 Chiều (Viết báo cáo)",
+                        text: "Nhiệm vụ hoàn thành báo cáo kết quả trước buổi họp chiều được giao. Bạn phải thu thập số liệu và chau chuốt câu từ. Hành động của bạn?"
+                    },
+                    en: {
+                        time: "02:00 PM (Report Writing)",
+                        text: "An assignment to complete the department performance report before the afternoon meeting has been given. You need to compile data and polish sentences. Your action?"
+                    },
+                    mn: {
+                        time: "14:00 (Тайлан бичих)",
+                        text: "Өдрийн хурлаас өмнө хэлтсийн тайланг дуусгах даалгавар өгчээ. Мэдээлэл цуглуулж, өгүүлбэр эмхэтгэх шаардлагатай. Та юу хийх вэ?"
+                    },
+                    ar: {
+                        time: "02:00 مساءً (كتابة التقرير)",
+                        text: "تم إسناد مهمة إكمال تقرير أداء القسم قبل اجتماع بعد الظهر. عليك جمع البيانات وصقل الجمل. ما الذي ستفعله؟"
+                    },
+                    kk: {
+                        time: "14:00 (Есеп жазу)",
+                        text: "Түстен кейінгі кеңес жиналысына дейін бөлім тайланын аяқтау тапсырмасы берілді. Деректерді жинақтап, сөйлемдерді жетілдіру керек. Не істейсіз?"
+                    },
+                    th: {
+                        time: "14:00 น. (การเขียนรายงาน)",
+                        text: "ได้รับมอบหมายให้เขียนรายงานผลการปฏิบัติงานของแผนกให้เสร็จก่อนการประชุมช่วงบ่าย ต้องรวบรวมข้อมูลและปรับปรุงเนื้อหา คุณจะทำอย่างไร?"
+                    },
+                    options: [
+                        {
+                            text: "틀린 부분이 없도록 숫자를 여러 번 확인하고 보고서 모양을 정리해서 '보고서 작성을 잘하다'의 실력을 보여준다.",
+                            scores: { met: 80, und: 30, dil: 50, rel: 10 },
+                            vi: "Kiểm tra chéo các chỉ số nhiều lần để tránh lỗi chính tả, thể hiện năng lực 'viết báo cáo giỏi'.",
+                            en: "Cross-check indexes multiple times to avoid errors and polish the layout, showing capability to 'write reports well'.",
+                            mn: "Алдаагүй байхын тулд тоог хэд хэдэн удаа шалгаж, тайлангийн бүтцийг эмхэтгэж, 'тайлан сайн бичдэг' чадвараа харуулдаг.",
+                            ar: "التحقق المتقاطع من المؤشرات عدة مرات لتجنب الأخطاء وتنظيم التخطيط، مما يُظهر قدرة 'كتابة التقارير الجيدة'.",
+                            kk: "Қате болмасын деп сандарды бірнеше рет тексеріп, тайлан пішінін реттеп, 'есеп жазуды жақсы білетін' шеберлігін көрсетеді.",
+                            th: "ตรวจสอบตัวเลขหลายครั้งเพื่อไม่ให้มีข้อผิดพลาด และจัดรูปแบบรายงาน แสดงความสามารถ 'เขียนรายงานได้ดี'"
+                        },
+                        {
+                            text: "바쁘지만 일하는 방법을 잘 지키며, 회사를 위해 포기하지 않고 최선을 다한다.",
+                            scores: { dil: 100, met: 50, und: 10, rel: 10 },
+                            vi: "Dù bận rộn vẫn thực hiện đúng hướng dẫn công việc, không bỏ cuộc và 'cố gắng hết sức' vì lợi ích chung.",
+                            en: "Faithfully implement the guide even while busy, doing your best without giving up for the company.",
+                            mn: "Завгүй ч гэсэн ажлын дэг журмыг сайн баримталж, компанийн төлөө хамгийн сайнаараа хичээж, бууж өгдөггүй.",
+                            ar: "الالتزام بإرشادات العمل بجدية حتى في وقت الانشغال، وبذل قصارى الجهد للشركة دون استسلام.",
+                            kk: "Бос болмаса да жұмыс ережесін жақсы сақтап, компания үшін бар күшін салып, бас тартпайды.",
+                            th: "แม้จะยุ่งแต่ยังปฏิบัติตามแนวทางการทำงานอย่างเคร่งครัด ทำงานเต็มที่เพื่อบริษัทโดยไม่ยอมแพ้"
+                        },
+                        {
+                            text: "보고서를 많이 써 본 경험을 생각하며, 다른 좋은 보고서들을 참고해서 완벽하게 보고서를 완성한다.",
+                            scores: { und: 50, met: 100, dil: 20, rel: 10 },
+                            vi: "Tận dụng việc có nhiều kinh nghiệm lập kế hoạch, tham khảo kỹ báo cáo mẫu của các tập đoàn lớn để tạo bản hoàn hảo.",
+                            en: "Utilize your experience in planning to reference top-tier reports from large companies, creating a perfect version.",
+                            mn: "Тайлан их бичсэн туршлагаа бодсоор сайн тайлануудыг лавлаж, тайланг нямбайгаар дуусгадаг.",
+                            ar: "استخدام الخبرة في كتابة التقارير والاستفادة من تقارير مرجعية ممتازة لإنشاء نسخة مثالية.",
+                            kk: "Тайлан жазудың тәжірибесін ескере отырып, жақсы тайланды үлгі ретінде пайдаланып, тайланды мінсіз аяқтайды.",
+                            th: "นึกถึงประสบการณ์การเขียนรายงานที่มีมาก อ้างอิงรายงานที่ดีอื่นๆ และเขียนรายงานให้สมบูรณ์แบบ"
+                        }
+                    ]
+                },
+                {
+                    id: 3,
+                    time: "오후 05:30 (퇴근 직전 업무 마무리)",
+                    text: "퇴근하기 30분 전, 동료가 컴퓨터 프로그램 문제로 힘들어하며 오늘 밤늦게까지 일해야 한다고 말합니다. 어떻게 하겠습니까?",
+                    vi: {
+                        time: "05:30 Chiều (Hoàn thành công việc trước khi về)",
+                        text: "30 phút trước khi tan làm, một đồng nghiệp thở dài nói rằng có lẽ phải ở lại muộn do lỗi phần mềm. Bạn sẽ làm thế nào?"
+                    },
+                    en: {
+                        time: "05:30 PM (Wrapping Up Work)",
+                        text: "30 minutes before leaving work, a colleague sighs, saying they might have to stay late due to a software error. What will you do?"
+                    },
+                    mn: {
+                        time: "17:30 (Ажлыг дуусгах)",
+                        text: "Гарахаас 30 минутын өмнө, хамт ажилладаг хүн программ хангамжийн алдаанаас болж шөнө оройтох болно гэж хэлж байна. Та юу хийх вэ?"
+                    },
+                    ar: {
+                        time: "05:30 مساءً (إنهاء العمل)",
+                        text: "قبل 30 دقيقة من المغادرة، يتنهد زميل ويقول إنه ربما يجب البقاء حتى وقت متأخر بسبب خطأ في البرنامج. ماذا ستفعل؟"
+                    },
+                    kk: {
+                        time: "17:30 (Жұмысты аяқтау)",
+                        text: "Кетуден 30 минут бұрын, бір әріптесіңіз бағдарламалық қателіктен кешке кеш отыру керек болатынын айтып күрсінді. Не істейсіз?"
+                    },
+                    th: {
+                        time: "17:30 น. (การปิดงาน)",
+                        text: "30 นาทีก่อนเลิกงาน เพื่อนร่วมงานถอนหายใจบอกว่าอาจต้องอยู่ดึกเพราะมีข้อผิดพลาดในซอฟต์แวร์ คุณจะทำอะไร?"
+                    },
+                    options: [
+                        {
+                            text: "일찍 퇴근하는 것보다 동료와 함께 일하는 것이 중요하므로 밤늦게까지 남아서 도와주고, '대인 관계가 원만하다'는 모습을 보여준다.",
+                            scores: { rel: 100, dil: 50, und: 10, met: 10 },
+                            vi: "Coi trọng hợp tác hơn việc về đúng giờ, ở lại giúp đồng nghiệp muộn để thực hiện giá trị 'quan hệ xã hội tốt'.",
+                            en: "Value collaboration over leaving on time; stay late to help them, practicing 'smooth interpersonal relations'.",
+                            mn: "Эрт гарахаас хамтрагчтайгаа хамт ажиллах нь чухал тул шөнө оройтох хүртэл тусалж, 'хүмүүстэй харилцаа тогтвортой' гэдгийг харуулдаг.",
+                            ar: "تقدير التعاون على الانتهاء في الوقت المحدد؛ البقاء لمساعدتهم، مما يُجسد 'العلاقات الجيدة مع الناس'.",
+                            kk: "Ерте кетуден гөрі әріптесімен бірге жұмыс істеу маңызды болғандықтан, кеш кешке дейін қалып көмектеседі, 'адамдармен қарым-қатынасы жақсы' екенін көрсетеді.",
+                            th: "ให้ความสำคัญกับการร่วมมือมากกว่าการออกตรงเวลา อยู่ดึกช่วยเหลือ แสดงให้เห็น 'มีมนุษยสัมพันธ์ดี'"
+                        },
+                        {
+                            text: "동료의 애로사항을 빠르게 듣고 컴퓨터 관련 전문 지식을 동원해 실용적으로 해결책을 짚어주어 '실력이 있다'는 평가를 받는다.",
+                            scores: { und: 80, met: 40, dil: 30, rel: 50 },
+                            vi: "Lắng nghe nhanh khó khăn của bạn và dùng kiến thức chuyên môn giải quyết nhanh gọn, được đánh giá là 'có thực lực'.",
+                            en: "Listen to the issue and apply your computer knowledge to solve it, showing that you are 'capable/talented'.",
+                            mn: "Хамт ажилладаг хүний бэрхшээлийг хурдан сонсоод компьютерийн мэдлэгээр практик шийдэл олж, 'чадвартай' гэсэн үнэлгээ авдаг.",
+                            ar: "الاستماع بسرعة للمشكلة واستخدام المعرفة التقنية لإيجاد حل عملي، مما يجعلك تُقيَّم بأنك 'ماهر'.",
+                            kk: "Әріптесінің қиындығын тез тыңдап, компьютерлік білімін пайдаланып практикалық шешім ұсынады да, 'қабілетті' деп бағаланады.",
+                            th: "รับฟังปัญหาของเพื่อนร่วมงานอย่างรวดเร็วและใช้ความรู้ด้านคอมพิวเตอร์แก้ปัญหาได้จริง ได้รับการประเมินว่า 'มีความสามารถ'"
+                        },
+                        {
+                            text: "내 할 일을 성실하게 모두 매듭짓고, 오늘 새롭게 알게 된 업무 요령들을 개인 업무 일지에 꼼꼼하게 기록한 뒤 퇴근한다.",
+                            scores: { dil: 100, met: 80, und: 20, rel: 10 },
+                            vi: "Hoàn thành thành thật công việc của mình, ghi chép kỹ các mẹo làm việc học được hôm nay vào nhật ký rồi mới về.",
+                            en: "Finish your duties diligently, take meticulous notes of today's learnings in your personal work log, then head home.",
+                            mn: "Хийх ажлаа бүгдийг нь чин сэтгэлтэйгээр дуусгаж, өнөөдөр шинээр мэдсэн ажлын аргуудыг хувийн ажлын тэмдэглэлд нямбайгаар тэмдэглээд гардаг.",
+                            ar: "إنهاء واجباتك بجدية، وتدوين ملاحظات دقيقة حول ما تعلمته اليوم في سجل العمل الشخصي، ثم المغادرة.",
+                            kk: "Жасайтын жұмысын бәрін адал аяқтап, бүгін жаңа білген жұмыс тәсілдерін жеке жұмыс күнделігіне нымбай жазып, кетеді.",
+                            th: "ทำงานทุกอย่างให้เสร็จด้วยความขยันหมั่นเพียร บันทึกเคล็ดลับการทำงานที่เรียนรู้ใหม่วันนี้อย่างละเอียดในบันทึกงานส่วนตัว แล้วกลับบ้าน"
+                        }
+                    ]
+                }
+            ];
+
+            const resultAnalysis = {
+                standard: {
+                    dil: { title: "성실의 아이콘", desc: "당신은 어떤 상황에서도 규칙을 잘 지키며 조용히 자기 일을 다하는 성실한 회사원입니다. 회사에서 큰 신뢰를 받는 든든한 신입 사원입니다!" },
+                    met: { title: "완벽주의 꼼꼼러", desc: "틀린 글자나 작은 실수도 하지 않고 완벽하게 일하려고 노력합니다. 보고서를 쓰거나 다른 사람의 기획을 돕는 일에 아주 잘 어울립니다." },
+                    und: { title: "스마트한 인재", desc: "생각이 깊고 이해가 빠르며 새로운 지식을 잘 배우는 실력이 있습니다. 어려운 일도 금방 배우는 똑똑한 사람입니다!" },
+                    rel: { title: "마당발 소통왕", desc: "직장 상사, 동료들과 친하게 지내며 대인 관계가 아주 원만합니다. 다른 사람과 같이 일하는 부서에서 잘 일할 수 있습니다." }
+                },
+                vi: {
+                    dil: { title: "Biểu tượng Chăm chỉ", desc: "Bạn là một nhân viên thành thật luôn tuân thủ hướng dẫn và lặng lẽ hoàn thành tốt vai trò của mình trong mọi tình huống. Một nhân viên mới đáng tin cậy!" },
+                    met: { title: "Người theo chủ nghĩa Hoàn hảo", desc: "Không chấp nhận dù chỉ một lỗi chính tả nhỏ, luôn cố gắng xử lý công việc hoàn hảo. Rất tối ưu cho việc viết báo cáo hay hỗ trợ kế hoạch." },
+                    und: { title: "Nhân tài Thông minh", desc: "Khả năng đánh giá tình huống và thấu hiểu xuất sắc, có thực lực tiếp thu kiến thức mới. Bộ óc học quy trình công việc phức tạp cực nhanh!" },
+                    rel: { title: "Vua Giao tiếp mạng lưới rộng", desc: "Xây dựng mối quan hệ tích cực với cấp trên, đồng nghiệp và có quan hệ xã hội tốt. Có ưu thế lớn trong công việc marketing và kế hoạch cần hợp tác." }
+                },
+                en: {
+                    dil: { title: "Icon of Diligence", desc: "You are a diligent worker who follows guidelines and quietly does your part under any circumstances. A reliable employee who gets full trust!" },
+                    met: { title: "Perfectionist Meticulous Type", desc: "You don't tolerate even minor typos and try to perform work perfectly. Extremely optimized for writing reports and support duties." },
+                    und: { title: "Smart Brain", desc: "Outstanding in understanding situations and quick to learn new things. A clever worker who quickly masters complex operational procedures." },
+                    rel: { title: "Networking & Communication King", desc: "Establishes positive relationships with bosses and colleagues, displaying smooth interpersonal relations. Great strength in collaborative marketing." }
+                },
+                mn: {
+                    dil: { title: "Чин сэтгэлийн дүр", desc: "Та ямар ч нөхцөлд дүрмийг сайн баримталж, чимээгүйхэн өөрийн үүргээ биелүүлдэг чин сэтгэлтэй ажилтан. Компанид итгэл хүлээсэн найдвартай шинэ ажилтан!" },
+                    met: { title: "Нямбай перфекционист", desc: "Алдаа, жижиг буруу үг ч гаргахгүйгээр ажлыг дүүрэн гүйцэтгэхийг хичээдэг. Тайлан бичих, бусдын төлөвлөлтийг туслахад маш тохиромжтой." },
+                    und: { title: "Ухаалаг авъяастан", desc: "Нөхцөл байдлыг гүнзгий ойлгодог, хурдан суралцдаг. Хэцүү процедурыг хурдан эзэмшдэг ухаантай хүн!" },
+                    rel: { title: "Харилцааны хаан", desc: "Ажлын байрны ахмад, хамт олонтойгоо дотно харилцаатай, хүмүүстэй харилцаа нь маш тогтвортой. Хамтарч ажилладаг хэлтэст маш тохиромжтой!" }
+                },
+                ar: {
+                    dil: { title: "رمز الاجتهاد", desc: "أنت موظف مجتهد يلتزم بالإرشادات ويؤدي دوره بهدوء في أي ظرف. موظف جديد موثوق يحظى بثقة كاملة!" },
+                    met: { title: "النوع الكمالي الدقيق", desc: "لا تتسامح حتى مع أخطاء الكتابة البسيطة وتحاول أداء العمل بشكل مثالي. مناسب جداً لكتابة التقارير ومهام الدعم." },
+                    und: { title: "العقل الذكي", desc: "متميز في فهم المواقف وسريع في تعلم أشياء جديدة. موظف ذكي يتقن الإجراءات المعقدة بسرعة!" },
+                    rel: { title: "ملك التواصل والشبكات", desc: "يُقيم علاقات إيجابية مع الرؤساء والزملاء، ويُظهر علاقات اجتماعية سلسة. قوة كبيرة في التسويق التعاوني!" }
+                },
+                kk: {
+                    dil: { title: "Адалдық символы", desc: "Сіз кез келген жағдайда ережені жақсы сақтап, тыныш өз міндетін атқаратын адал қызметкерсіз. Компанияда толық сенімге ие болатын сенімді жаңа қызметкер!" },
+                    met: { title: "Ұқыпты перфекционист", desc: "Ұсақ қате, теріп жазу қателіктерін де жіберместен жұмысты мінсіз орындауға тырысады. Есеп жазуға және басқалардың жоспарларын қолдауға өте қолайлы." },
+                    und: { title: "Зерек дарын", desc: "Жағдайды терең түсінеді, жаңа нәрселерді тез үйренеді. Күрделі процедураларды жылдам меңгеретін ақылды адам!" },
+                    rel: { title: "Байланыс патшасы", desc: "Жұмыс орнындағы ағалармен, әріптестерімен жақын қарым-қатынаста болады. Бірлесіп жұмыс істейтін бөлімде өте тиімді!" }
+                },
+                th: {
+                    dil: { title: "ไอคอนแห่งความขยัน", desc: "คุณเป็นพนักงานขยันที่ปฏิบัติตามแนวทางและทำหน้าที่อย่างเงียบๆ ในทุกสถานการณ์ พนักงานใหม่ที่เชื่อถือได้และได้รับความไว้วางใจอย่างเต็มที่!" },
+                    met: { title: "ประเภทละเอียดรอบคอบสมบูรณ์แบบ", desc: "ไม่ยอมรับแม้แต่การพิมพ์ผิดเล็กน้อย และพยายามทำงานอย่างสมบูรณ์แบบ เหมาะอย่างยิ่งสำหรับการเขียนรายงานและงานสนับสนุน" },
+                    und: { title: "สมองอัจฉริยะ", desc: "โดดเด่นในการเข้าใจสถานการณ์และเรียนรู้สิ่งใหม่อย่างรวดเร็ว พนักงานฉลาดที่เชี่ยวชาญขั้นตอนที่ซับซ้อนได้รวดเร็ว!" },
+                    rel: { title: "ราชาแห่งการสื่อสารและเครือข่าย", desc: "สร้างความสัมพันธ์ที่ดีกับผู้บังคับบัญชาและเพื่อนร่วมงาน แสดงมนุษยสัมพันธ์ที่ดีเยี่ยม จุดแข็งในงานการตลาดแบบร่วมมือ!" }
+                }
+            };
+
+            let currentSceneIndex = 0;
+            let userScores = { dil: 0, met: 0, und: 0, rel: 0 };
+            let activeLang = "none";
+            let draggedOptionIdx = null;
+
+            const sceneImages = {
+                1: "../assets/c11/vocabulary/images/split/c11_01_TL.webp",
+                2: "../assets/c11/vocabulary/images/split/c11_05_TL.webp",
+                3: "../assets/c11/vocabulary/images/split/c11_05_BR.webp"
+            };
+
+            const els = {
+                sceneTime: document.getElementById("scene-time"),
+                sceneProgress: document.getElementById("scene-progress"),
+                storyText: document.getElementById("story-text"),
+                optionsList: document.getElementById("options-list"),
+                storyContainer: document.getElementById("story-container"),
+                resultPanel: document.getElementById("result-panel"),
+                scoreDil: document.getElementById("score-dil"),
+                scoreMet: document.getElementById("score-met"),
+                scoreUnd: document.getElementById("score-und"),
+                scoreRel: document.getElementById("score-rel"),
+                fillDil: document.getElementById("fill-dil"),
+                fillMet: document.getElementById("fill-met"),
+                fillUnd: document.getElementById("fill-und"),
+                fillRel: document.getElementById("fill-rel"),
+                resultTitle: document.getElementById("result-title"),
+                resultDesc: document.getElementById("result-desc"),
+                btnRestart: document.getElementById("btn-restart"),
+                decisionZone: document.getElementById("decision-zone"),
+                decisionLabel: document.getElementById("decision-label"),
+                floatingContainer: document.getElementById("floating-container")
+            };
+
+            function initMultilang() {
+                if (window.MULTILANG_CONFIG && window.MultilangToggle) {
+                    activeLang = window.MULTILANG_CONFIG.defaultLang || "none";
+                }
+                setupDropzone();
+                renderScene();
+            }
+
+            function setupDropzone() {
+                // Drag & Drop event bindings for decision area
+                els.decisionZone.addEventListener("dragover", (e) => {
+                    e.preventDefault();
+                });
+
+                els.decisionZone.addEventListener("dragenter", () => {
+                    els.decisionZone.classList.add("pulse-target");
+                });
+
+                els.decisionZone.addEventListener("dragleave", () => {
+                    els.decisionZone.classList.remove("pulse-target", "drag-over");
+                });
+
+                els.decisionZone.addEventListener("drop", (e) => {
+                    e.preventDefault();
+                    els.decisionZone.classList.remove("pulse-target", "drag-over");
+                    
+                    const idx = e.dataTransfer.getData("text/plain") || draggedOptionIdx;
+                    if (idx !== null && idx !== "") {
+                        selectOption(parseInt(idx));
+                    }
+                });
+            }
+
+            function renderScene() {
+                const scene = scenes[currentSceneIndex];
+                
+                // Set Header
+                const timeStr = activeLang === "none" ? scene.time : (scene[activeLang]?.time || scene.time);
+                els.sceneTime.innerHTML = `<i class="fa-solid fa-clock"></i> ${timeStr}`;
+                els.sceneProgress.textContent = `${currentSceneIndex + 1} / ${scenes.length} 단계`;
+
+                // Set Story Copy (always Korean — reading/comprehension practice)
+                els.storyText.innerHTML = scene.text;
+                
+                // Set dynamic scene character illustration
+                const avatarEl = document.getElementById("char-avatar");
+                avatarEl.innerHTML = `<img src="${sceneImages[scene.id]}" alt="Scene character" decoding="async" loading="lazy">`;
+
+                const decisionLabels = {
+                    vi: "Kéo thẻ lựa chọn thả vào đây",
+                    en: "Drag your choice card here",
+                    mn: "Сонголтын картыг энд чирж тавина уу",
+                    ar: "اسحب بطاقة اختيارك وضعها هنا",
+                    kk: "Таңдау картасын осында сүйреп апарыңыз",
+                    th: "ลากการ์ดตัวเลือกมาวางที่นี่"
+                };
+                els.decisionLabel.textContent = decisionLabels[activeLang] || "이곳으로 선택지 카드를 드래그해 놓으세요";
+
+                // Set Options
+                els.optionsList.innerHTML = "";
+                scene.options.forEach((opt, idx) => {
+                    const card = document.createElement("button");
+                    card.className = "option-card";
+                    card.type = "button";
+                    card.setAttribute("draggable", "true");
+                    
+                    const optText = opt.text; // Always Korean — vocabulary/comprehension practice
+                    card.innerHTML = `
+                        <span class="option-num">${idx + 1}</span>
+                        <span>${optText}</span>
+                    `;
+
+                    // Drag handles
+                    card.addEventListener("dragstart", (e) => {
+                        draggedOptionIdx = idx;
+                        card.classList.add("dragging");
+                        e.dataTransfer.setData("text/plain", String(idx));
+                        els.decisionZone.classList.add("pulse-target");
+                    });
+
+                    card.addEventListener("dragend", () => {
+                        card.classList.remove("dragging");
+                        els.decisionZone.classList.remove("pulse-target", "drag-over");
+                        draggedOptionIdx = null;
+                    });
+
+                    // Click handler (Mobile / Fallback)
+                    card.addEventListener("click", () => selectOption(idx));
+                    els.optionsList.appendChild(card);
+                });
+            }
+
+            function selectOption(idx) {
+                const option = scenes[currentSceneIndex].options[idx];
+                
+                // Display floating text rewards
+                triggerFloatingRewards(option.scores);
+
+                // Add scores
+                Object.keys(option.scores).forEach(key => {
+                    userScores[key] += option.scores[key];
+                });
+
+                if (currentSceneIndex < scenes.length - 1) {
+                    currentSceneIndex++;
+                    setTimeout(renderScene, 1200); // Small delay so students see the floating rewards
+                } else {
+                    setTimeout(showResults, 1200);
+                }
+            }
+
+            function triggerFloatingRewards(scores) {
+                els.floatingContainer.innerHTML = "";
+                const map = {
+                    dil: "성실성",
+                    met: "꼼꼼함",
+                    und: "이해력",
+                    rel: "대인관계"
+                };
+
+                // Floating reward labels stay Korean (vocabulary targets: 성실성, 꼼꼼함, etc.)
+                Object.keys(scores).forEach(key => {
+                    const points = scores[key];
+                    if (points >= 30) {
+                        const div = document.createElement("div");
+                        div.className = "floating-text-item";
+
+                        div.textContent = `+${points} ${map[key]}!`;
+                        els.floatingContainer.appendChild(div);
+                    }
+                });
+            }
+
+            function showResults() {
+                els.storyContainer.style.display = "none";
+                els.resultPanel.style.display = "flex";
+
+                // Average scores over 3 scenes
+                const avgDil = Math.min(100, Math.round(userScores.dil / 2));
+                const avgMet = Math.min(100, Math.round(userScores.met / 2));
+                const avgUnd = Math.min(100, Math.round(userScores.und / 2));
+                const avgRel = Math.min(100, Math.round(userScores.rel / 2));
+
+                // Set text values
+                els.scoreDil.textContent = `${avgDil}%`;
+                els.scoreMet.textContent = `${avgMet}%`;
+                els.scoreUnd.textContent = `${avgUnd}%`;
+                els.scoreRel.textContent = `${avgRel}%`;
+
+                // Animate bars
+                setTimeout(() => {
+                    els.fillDil.style.width = `${avgDil}%`;
+                    els.fillMet.style.width = `${avgMet}%`;
+                    els.fillUnd.style.width = `${avgUnd}%`;
+                    els.fillRel.style.width = `${avgRel}%`;
+                }, 100);
+
+                // Determine strongest trait
+                let strongest = "dil";
+                let maxScore = avgDil;
+                if (avgMet > maxScore) { strongest = "met"; maxScore = avgMet; }
+                if (avgUnd > maxScore) { strongest = "und"; maxScore = avgUnd; }
+                if (avgRel > maxScore) { strongest = "rel"; maxScore = avgRel; }
+
+                const currentAnalysis = activeLang === "none" ? resultAnalysis.standard : (resultAnalysis[activeLang] || resultAnalysis.standard);
+                els.resultTitle.textContent = currentAnalysis[strongest].title;
+                els.resultDesc.textContent = currentAnalysis[strongest].desc;
+            }
+
+            els.btnRestart.addEventListener("click", () => {
+                currentSceneIndex = 0;
+                userScores = { dil: 0, met: 0, und: 0, rel: 0 };
+                els.storyContainer.style.display = "flex";
+                els.resultPanel.style.display = "none";
+                els.floatingContainer.innerHTML = "";
+
+                // Reset bar animation widths
+                els.fillDil.style.width = "0%";
+                els.fillMet.style.width = "0%";
+                els.fillUnd.style.width = "0%";
+                els.fillRel.style.width = "0%";
+
+                renderScene();
+            });
+
+            // Listen for multilingual toggle changes
+            document.addEventListener("click", (e) => {
+                if (e.target.closest("[data-multilang-btn]")) {
+                    setTimeout(() => {
+                        if (window.MultilangToggle) {
+                            activeLang = window.MultilangToggle.getLang();
+                        }
+                        if (els.storyContainer.style.display !== "none") {
+                            renderScene();
+                        } else {
+                            showResults();
+                        }
+                    }, 50);
+                }
+            });
+
+            setTimeout(initMultilang, 100);
+        })();
+    </script>
+    <script>window.MULTILANG_CONFIG = { langs: ["vi", "mn", "ar", "kk", "th", "en"] };</script>
+    <script src="../shared/multilang-toggle.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>
