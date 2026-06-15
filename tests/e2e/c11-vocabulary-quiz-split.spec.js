@@ -5,9 +5,9 @@ async function blockExternalRequests(page) {
 }
 
 const quizPages = [
-  { path: '/c11/vocabulary-quiz-meaning.html', h1: '뜻 퀴즈', overlay: false, image: false, term: true },
-  { path: '/c11/vocabulary-quiz-choseong.html', h1: '초성 퀴즈', overlay: true, image: true, term: false },
-  { path: '/c11/vocabulary-quiz-image.html', h1: '그림 퀴즈', overlay: false, image: true, term: false }
+  { path: '/c11/vocabulary-quiz-meaning.html', h1: '뜻 퀴즈', overlay: false, image: false, term: true, subjective: false },
+  { path: '/c11/vocabulary-quiz-choseong.html', h1: '초성 퀴즈', overlay: true, image: true, term: false, subjective: true },
+  { path: '/c11/vocabulary-quiz-image.html', h1: '그림 퀴즈', overlay: false, image: true, term: false, subjective: false }
 ];
 
 test.describe('c11 vocabulary separated quiz pages', () => {
@@ -33,8 +33,10 @@ test.describe('c11 vocabulary separated quiz pages', () => {
       await page.goto(quizPage.path, { waitUntil: 'load' });
 
       await expect(page.locator('h1')).toHaveText(quizPage.h1);
-      await expect(page.locator('.quiz-option')).toHaveCount(4);
-      await expect(page.locator('.quiz-option', { hasText: '직급' })).toHaveCount(0);
+      await expect(page.locator('.quiz-option')).toHaveCount(quizPage.subjective ? 0 : 4);
+      await expect(page.locator('.quiz-option', { hasText: /^직급$/ })).toHaveCount(0);
+      await expect(page.locator('#quiz-answer-input')).toHaveCount(quizPage.subjective ? 1 : 0);
+      await expect(page.locator('.quiz-submit-btn')).toHaveCount(quizPage.subjective ? 1 : 0);
       await expect(page.locator('.quiz-choseong-overlay')).toHaveCount(quizPage.overlay ? 1 : 0);
       await expect(page.locator('.quiz-term')).toHaveCount(quizPage.term ? 1 : 0);
       await expect(page.locator('.quiz-image')).toHaveCount(quizPage.image ? 1 : 0);
@@ -51,7 +53,25 @@ test.describe('c11 vocabulary separated quiz pages', () => {
         expect(loaded).toBe(true);
       }
 
-      await page.locator('.quiz-option').first().click();
+      if (quizPage.subjective) {
+        const correctAnswer = await page.evaluate(() => {
+          const image = document.querySelector('.quiz-image');
+          const imagePath = image ? new URL(image.getAttribute('src'), location.href).pathname : '';
+          const currentWord = window.VOCABULARY_CONFIG.words.find((word) => {
+            const src = word.quizImage || word.image;
+            return src && new URL(src, location.href).pathname === imagePath;
+          });
+          return currentWord?.ko || '';
+        });
+
+        expect(correctAnswer).toBeTruthy();
+        await page.locator('#quiz-answer-input').fill(correctAnswer.replace(/\s+/g, ''));
+        await page.locator('.quiz-submit-btn').click();
+        await expect(page.locator('#quiz-feedback')).toHaveText('정답!');
+      } else {
+        await page.locator('.quiz-option').first().click();
+      }
+
       await expect(page.locator('#next-question-btn')).toBeVisible();
     }
   });

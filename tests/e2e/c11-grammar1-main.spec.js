@@ -28,7 +28,7 @@ test('c11 grammar1 main page is responsive and explains causative purpose', asyn
     await expect(page.locator('h1')).toContainText('사동사');
     await expect(page.locator('body')).toContainText('사동사를 왜 쓰나요?');
     await expect(page.locator('body')).toContainText('누가 그렇게 되게 했어요?');
-    await expect(page.locator('.resource-link')).toHaveCount(4);
+    await expect(page.locator('.resource-link')).toHaveCount(5);
     await expectNoHorizontalOverflow(page);
   }
 });

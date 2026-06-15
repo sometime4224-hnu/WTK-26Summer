@@ -72,6 +72,7 @@ test.describe('c11 vocabulary paragraph builder', () => {
     await blockExternalRequests(page);
     await page.goto('/c11/index.html', { waitUntil: 'domcontentloaded' });
 
+    await page.locator('summary.support-drawer__summary').first().click();
     await page.getByRole('link', { name: /그림 문장 조립/ }).click();
 
     await expect(page).toHaveURL(/\/c11\/vocabulary-paragraph-builder\.html$/);
