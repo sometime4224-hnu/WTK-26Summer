@@ -143,6 +143,54 @@ window.MULTILANG_PAGE_DATA = {
             }
         }
     },
+    "c11/grammar2-if-balance-game.html": {
+        "title": "다국어 보조 활동 도움말",
+        "grammar": "만약(IF) 밸런스 게임 연구소",
+        "translations": {
+            "en": {
+                "title": "English Scaffold",
+                "summary": "Play the 'Would You Rather' game and build hypothetical sentences using -(ㄴ/는)다면 and -(이)라면.",
+                "points": [
+                    "Adjectives/Verbs: Choose between -(ㄴ)다면 or -는다면.",
+                    "Nouns: Choose between -라면 or -이라면.",
+                    "Arrange the word chips in the correct sentence order."
+                ]
+            },
+            "vi": {
+                "title": "Hỗ trợ Tiếng Việt",
+                "summary": "Chơi trò chơi 'Lựa chọn cân não' và xây dựng các câu giả định bằng -(ㄴ/는)다면 và -(이)라면.",
+                "points": [
+                    "Tính từ/Động từ: Chọn -(ㄴ)다면 hoặc -는다면.",
+                    "Danh từ: Chọn -라면 hoặc -이라면.",
+                    "Sắp xếp các thẻ từ theo đúng trật tự câu tiếng Hàn."
+                ]
+            }
+        }
+    },
+    "c11/grammar2-visual-examples.html": {
+        "title": "다국어 보조 활동 도움말",
+        "grammar": "이미지 예시 (Visual Examples)",
+        "translations": {
+            "en": {
+                "title": "Visual Examples Help",
+                "summary": "Compare ordinary conditions using -(으)면 with hypothetical/imagined conditions using -(ㄴ/는)다면/-(이)라면 through visual scenes.",
+                "points": [
+                    "Observe the difference in probability (e.g. rain vs lottery win).",
+                    "Practice forming conditional and hypothetical sentences.",
+                    "Review grammar rules and test yourself with the quiz."
+                ]
+            },
+            "vi": {
+                "title": "Hỗ trợ Hình ảnh Minh họa",
+                "summary": "So sánh điều kiện thông thường dùng -(으)면 và giả định thực tế dùng -(ㄴ/는)다면/-(이)라면 qua các hình ảnh trực quan.",
+                "points": [
+                    "Quan sát sự khác biệt về khả năng xảy ra (ví dụ: trời mưa vs trúng vé số).",
+                    "Luyện tập xây dựng câu điều kiện và câu giả định.",
+                    "Ôn tập quy tắc ngữ pháp và tự kiểm tra bằng bài trắc nghiệm."
+                ]
+            }
+        }
+    },
     "c11/grammar3.html": {
         "title": "다국어 문법 도움말",
         "grammar": "-든지 / -도",

@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>11과 문법2 보조 활동 | 만약(IF) 밸런스 게임 연구소</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+
+    <style>
+        body {
+            --grammar-page-max: 1180px;
+            --grammar-page-gutter: 16px;
+            --grammar-nav-height: 58px;
+            --grammar-header-height: 76px;
+            margin: 0;
+            font-family: 'Noto Sans KR', sans-serif !important;
+            background: linear-gradient(180deg, #f0f7ff 0%, #fbfdff 100%);
+        }
+        .injected-global-nav {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #e0e7ff;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 999999;
+            box-sizing: border-box;
+            gap: 15px;
+            padding-left: max(16px, calc((100vw - var(--grammar-page-max)) / 2 + var(--grammar-page-gutter)));
+            padding-right: max(16px, calc((100vw - var(--grammar-page-max)) / 2 + var(--grammar-page-gutter)));
+        }
+        .injected-global-nav a {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .injected-global-nav a:hover {
+            color: #3730a3;
+        }
+        .injected-global-nav .divider {
+            color: #cbd5e1;
+        }
+        .grammar-page {
+            width: 100%;
+            overflow-x: hidden;
+        }
+        .grammar-header {
+            top: var(--grammar-nav-height) !important;
+        }
+        .grammar-header > div,
+        .grammar-main {
+            width: min(100%, var(--grammar-page-max));
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        .grammar-practice-grid {
+            display: grid;
+            gap: 16px;
+        }
+        .grammar-practice-grid > * {
+            min-width: 0;
+        }
+        .safe { word-break: keep-all; overflow-wrap: break-word; }
+        .hidden { display: none !important; }
+
+        /* Interactive Card Styles */
+        .choice-card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .choice-card:hover {
+            transform: translateY(-4px);
+        }
+        .word-chip {
+            transition: all 0.15s ease-in-out;
+            user-select: none;
+        }
+        .word-chip:active {
+            transform: scale(0.95);
+        }
+
+        /* Success Confetti Animation */
+        @keyframes successPop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .success-banner {
+            animation: successPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @media (min-width: 700px) {
+            body {
+                --grammar-page-gutter: 24px;
+            }
+            .grammar-main {
+                padding: 24px var(--grammar-page-gutter) 56px !important;
+            }
+            .grammar-practice-grid {
+                grid-template-columns: minmax(240px, 0.75fr) minmax(420px, 1.25fr);
+                align-items: start;
+            }
+        }
+        @media (min-width: 1024px) {
+            body {
+                --grammar-page-gutter: 32px;
+            }
+            .grammar-practice-grid {
+                grid-template-columns: minmax(320px, 0.8fr) minmax(620px, 1.2fr);
+            }
+        }
+        @media (min-width: 1280px) {
+            body {
+                --grammar-page-max: 1240px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+</head>
+<body class="grammar-page bg-slate-50 min-h-screen flex flex-col">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Navigation Bar -->
+    <nav id="injected-global-nav" class="injected-global-nav">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인으로</a>
+        <span class="divider">|</span>
+        <a href="index.html"><i class="fa-solid fa-folder-open"></i> 단원 홈</a>
+        <span class="divider">|</span>
+        <a href="grammar2.html"><i class="fa-solid fa-book-open"></i> 문법 2 본문</a>
+        <span class="divider">|</span>
+        <a href="javascript:void(0)" onclick="goBackToRoundSelect()"><i class="fa-solid fa-gamepad"></i> 라운드 선택</a>
+    </nav>
+
+    <!-- Header -->
+    <header class="grammar-header bg-white px-5 py-4 border-b border-slate-200 sticky z-20">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold text-slate-900 flex items-center">
+                    만약(IF) 밸런스 게임 연구소
+                </h1>
+                <p class="text-xs text-slate-500 mt-1">11과 문법 2 보조 활동: 극단적 상황에서 나의 선택과 올바른 가정문 조립</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="grammar-main flex-1 p-4 pb-12">
+        <div class="grammar-practice-grid">
+
+            <!-- 왼쪽 진행 및 요약 패널 -->
+            <section class="space-y-4">
+                <article class="bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 rounded-2xl p-5 shadow-sm">
+                    <h2 class="text-sm font-bold text-indigo-700 flex items-center mb-3">
+                        <i data-lucide="compass" class="w-4 h-4 mr-2"></i>
+                        연구소 진행도 <span id="activeRoundBadge" class="text-[10px] bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded ml-2">1라운드</span>
+                    </h2>
+
+                    <div class="flex items-center justify-between text-xs mb-1">
+                        <span class="text-slate-500">라운드 진행 상황</span>
+                        <span id="progressText" class="font-bold text-indigo-600">질문 1 / 5</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 mb-4 overflow-hidden">
+                        <div id="progressBar" class="bg-indigo-500 h-full rounded-full transition-all duration-300" style="width:20%"></div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-white border border-indigo-100 rounded-xl">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">라운드 스코어</p>
+                        <p class="text-2xl font-black text-slate-800 mt-0.5"><span id="scoreVal">0</span> / 5</p>
+                    </div>
+                </article>
+
+                <article class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <h2 class="text-sm font-bold text-slate-800 flex items-center mb-3">
+                        <i data-lucide="archive" class="w-4 h-4 mr-2 text-slate-500"></i>
+                        나의 밸런스 기록
+                    </h2>
+                    <div id="choiceSummary" class="space-y-2.5 text-xs text-slate-600">
+                        <p class="text-slate-400 text-center py-4">선택을 시작하면 여기에 기록됩니다.</p>
+                    </div>
+                </article>
+            </section>
+
+            <!-- 오른쪽 메인 게임 플레이 패널 -->
+            <section class="space-y-4">
+
+                <!-- 콤팩트 라운드 선택기 -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
+                    <span class="text-xs font-bold text-slate-700 shrink-0">연구 라운드 선택:</span>
+                    <div class="flex gap-1.5 overflow-x-auto w-full sm:w-auto">
+                        <button onclick="selectRound(1)" id="roundTab1" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm cursor-pointer whitespace-nowrap" type="button">1라운드 (일상)</button>
+                        <button onclick="selectRound(2)" id="roundTab2" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 cursor-pointer whitespace-nowrap" type="button">2라운드 (초능력)</button>
+                        <button onclick="selectRound(3)" id="roundTab3" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 cursor-pointer whitespace-nowrap" type="button">3라운드 (인생관)</button>
+                    </div>
+                </div>
+
+                <!-- 밸런스 선택 화면 -->
+                <article id="selectBoard" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <span class="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-1 rounded-md tracking-wide uppercase">Dilemma Card</span>
+                    <h2 id="dilemmaTitle" class="text-lg font-black text-slate-800 mt-2.5 leading-relaxed safe"></h2>
+                    <p id="dilemmaSituation" class="text-xs text-slate-500 mt-1 safe"></p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                        <!-- Option A Card -->
+                        <div id="optACard" class="choice-card bg-rose-50/50 hover:bg-rose-50 border-2 border-rose-200/60 rounded-2xl p-5 flex flex-col justify-between min-h-[140px] shadow-sm">
+                            <div>
+                                <span class="text-xs font-bold text-rose-500 bg-rose-100/80 px-2.5 py-1 rounded-lg">A 선택</span>
+                                <h3 id="optAText" class="text-base font-extrabold text-slate-800 mt-3 leading-snug safe"></h3>
+                            </div>
+                            <button onclick="pickOption('A')" class="mt-4 w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-sm transition-colors duration-150" type="button">선택하기</button>
+                        </div>
+
+                        <!-- Option B Card -->
+                        <div id="optBCard" class="choice-card bg-blue-50/50 hover:bg-blue-50 border-2 border-blue-200/60 rounded-2xl p-5 flex flex-col justify-between min-h-[140px] shadow-sm">
+                            <div>
+                                <span class="text-xs font-bold text-blue-500 bg-blue-100/80 px-2.5 py-1 rounded-lg">B 선택</span>
+                                <h3 id="optBText" class="text-base font-extrabold text-slate-800 mt-3 leading-snug safe"></h3>
+                            </div>
+                            <button onclick="pickOption('B')" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-sm transition-colors duration-150" type="button">선택하기</button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 문장 조립기 화면 -->
+                <article id="builderBoard" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded-md tracking-wide uppercase">Sentence Builder</span>
+                        <button onclick="goBackToSelect()" class="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1" type="button">
+                            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> 다시 선택
+                        </button>
+                    </div>
+
+                    <div class="mt-3 bg-slate-50 border border-slate-100 rounded-xl p-4">
+                        <p class="text-[10px] font-bold text-slate-400">내가 선택한 입장</p>
+                        <p id="pickedSummary" class="text-sm font-bold text-slate-800 mt-1 safe"></p>
+                    </div>
+
+                    <!-- 조립된 문장 노출 슬롯 -->
+                    <div class="mt-4 border-2 border-dashed border-slate-200 rounded-xl p-4 bg-slate-50/30 min-h-[72px] flex flex-wrap items-center gap-2">
+                        <p id="emptyPrompt" class="text-xs text-slate-400 w-full text-center">아래 단어 카드를 순서대로 탭하여 조립하세요.</p>
+                        <div id="assembledSlots" class="flex flex-wrap gap-2 w-full"></div>
+                    </div>
+
+                    <!-- 단어 카드 풀 -->
+                    <div class="mt-5">
+                        <p class="text-xs font-bold text-slate-500 mb-2">선택 카드 (오답 방해 카드 포함)</p>
+                        <div id="wordPool" class="flex flex-wrap gap-2 p-3 bg-slate-100 rounded-xl"></div>
+                    </div>
+
+                    <!-- 액션 버튼 -->
+                    <div class="grid grid-cols-2 gap-3 mt-6">
+                        <button onclick="resetBuilder()" class="py-3 rounded-xl border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 transition-colors" type="button">초기화</button>
+                        <button id="checkBtn" onclick="checkAssembly()" class="py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition-colors" type="button">정답 확인</button>
+                    </div>
+
+                    <!-- 피드백 박스 -->
+                    <div id="feedbackBox" class="hidden mt-5 rounded-xl border p-4"></div>
+
+                    <button id="nextBtn" onclick="nextDilemma()" class="hidden mt-5 w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl text-xs font-bold shadow-sm transition-colors" type="button">다음 단계로 이동 →</button>
+                </article>
+
+                <!-- 중간 휴식 및 피드백 화면 -->
+                <article id="roundBreakBoard" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hidden text-center">
+                    <div class="w-16 h-16 rounded-full bg-amber-100 mx-auto flex items-center justify-center text-amber-600 mb-4">
+                        <i data-lucide="coffee" class="w-8 h-8"></i>
+                    </div>
+                    <span id="breakRoundBadge" class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded-md tracking-wide uppercase">1라운드 완료</span>
+                    <h2 class="text-xl font-black text-slate-800 mt-3">잠시 쉬어가세요!</h2>
+                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">훌륭합니다! 이번 라운드의 밸런스 게임 연구를 마쳤습니다. 중간 성적을 확인하고 머리를 식히세요.</p>
+
+                    <div class="mt-5 max-w-sm mx-auto bg-slate-50 border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div class="text-center">
+                            <span class="text-xs text-slate-400">이번 라운드 정답률</span>
+                            <span class="block text-3xl font-black text-indigo-600 mt-1"><span id="breakScoreVal">0</span> / 5</span>
+                        </div>
+                        <p id="breakFeedbackText" class="text-xs font-bold text-slate-600 mt-3 bg-white border border-slate-100 rounded-xl px-4 py-3 leading-relaxed safe"></p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+                        <button onclick="goBackToRoundSelect()" class="py-3 rounded-xl border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 transition-colors" type="button">라운드 선택으로</button>
+                        <button id="breakNextBtn" onclick="startNextRound()" class="py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition-colors" type="button">다음 라운드 계속하기 →</button>
+                    </div>
+                </article>
+
+                <!-- 최종 결과 화면 -->
+                <article id="resultBoard" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hidden text-center">
+                    <div class="w-16 h-16 rounded-full bg-indigo-100 mx-auto flex items-center justify-center text-indigo-600 mb-4">
+                        <i data-lucide="trophy" class="w-8 h-8"></i>
+                    </div>
+                    <h2 class="text-xl font-black text-slate-800 mt-2">연구 완료!</h2>
+                    <p class="text-sm text-slate-600 mt-1">훌륭합니다! 만약(IF) 밸런스 게임 연구를 성공적으로 마쳤습니다.</p>
+
+                    <div class="mt-5 max-w-sm mx-auto bg-slate-50 border border-slate-200 rounded-2xl p-4 grid grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-xs text-slate-400">선택 횟수</span>
+                            <span class="block text-2xl font-black text-slate-800 mt-0.5">15 / 15</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400">문장 정답</span>
+                            <span class="block text-2xl font-black text-indigo-600 mt-0.5"><span id="finalScore">0</span> / 15</span>
+                        </div>
+                    </div>
+
+                    <button onclick="restartGame()" class="mt-6 w-full max-w-xs mx-auto bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl text-xs font-bold shadow-sm transition-colors cursor-pointer" type="button">다시 시작하기</button>
+                </article>
+
+            </section>
+        </div>
+    </main>
+
+    <script src="../shared/grammar-bilingual-layout.js"></script>
+    <script>
+        // ── 게임 데이터 ──────────────────────────────────────────
+        const dilemmas = [
+            {
+                situation: "상황: 로또 1등에 당첨되다 (가정 상황)",
+                title: "만약 내가 로또 1등에 당첨된다면?",
+                optionA: "바로 회사를 그만두고 세계 여행을 가겠다",
+                optionB: "아무에게도 알리지 않고 회사를 계속 다니겠다",
+                targetA: ["내가", "로또에", "당첨된다면", "회사를", "그만두겠어요"],
+                targetB: ["내가", "로또에", "당첨된다면", "회사를", "계속", "다니겠어요"],
+                distractors: ["당첨되면", "당첨되라면", "그만두겠고", "다니겠고"],
+                explain: "동사 '당첨되다'는 받침이 없으므로 '-(ㄴ)다면'이 결합하여 '당첨된다면'이 됩니다.",
+                explainVi: "'당첨되다' là động từ không có 받침 nên thêm '-ㄴ다면' thành '당첨된다면'."
+            },
+            {
+                situation: "상황: 10년 전 과거로 돌아가다 (가정 상황)",
+                title: "만약 내가 10년 전 과거로 돌아갈 수 있다면?",
+                optionA: "비트코인이나 주식을 많이 사겠다",
+                optionB: "더 열심히 공부해서 다른 꿈을 이루겠다",
+                targetA: ["내가", "과거로", "돌아간다면", "비트코인을", "많이", "사겠어요"],
+                targetB: ["내가", "과거로", "돌아간다면", "더", "열심히", "공부하겠어요"],
+                distractors: ["돌아가면", "돌아간다고", "사겠고", "공부하겠고"],
+                explain: "동사 '돌아가다'는 받침이 없으므로 '-(ㄴ)다면'이 결합하여 '돌아간다면'이 됩니다.",
+                explainVi: "'돌아가다' là động từ không có 받침 nên thêm '-ㄴ다면' thành '돌아간다면'."
+            },
+            {
+                situation: "상황: 하루 동안 투명인간이 되다 (가정 상황)",
+                title: "만약 내가 하루 동안 투명인간이 된다면?",
+                optionA: "좋아하는 가수 콘서트를 무료로 보겠다",
+                optionB: "하루 종일 침대에서 잠만 자겠다",
+                targetA: ["내가", "투명인간이", "된다면", "가수", "콘서트를", "보겠어요"],
+                targetB: ["내가", "투명인간이", "된다면", "하루", "종일", "자겠어요"],
+                distractors: ["되면", "되라면", "보겠고", "자겠고"],
+                explain: "동사 '되다'는 받침이 없으므로 '-(ㄴ)다면'이 결합하여 '된다면'이 됩니다.",
+                explainVi: "'되다' là động từ không có 받침 nên thêm '-ㄴ다면' thành '된다면'."
+            },
+            {
+                situation: "상황: 평생 한 음식만 먹다 (가정 상황)",
+                title: "만약 내가 평생 한 가지 음식만 먹어야 한다면?",
+                optionA: "평생 라면만 먹고 살겠다",
+                optionB: "평생 삼겹살만 먹고 살겠다",
+                targetA: ["내가", "평생", "라면만", "먹는다면", "슬플", "것", "같아요"],
+                targetB: ["내가", "평생", "삼겹살만", "먹는다면", "질릴", "것", "같아요"],
+                distractors: ["먹으면", "먹으라면", "슬프겠고", "질리겠고"],
+                explain: "동사 '먹다'는 받침이 있으므로 '-는다면'이 결합하여 '먹는다면'이 됩니다.",
+                explainVi: "'먹다' là động từ có 받침 nên thêm '-는다면' thành '먹는다면'."
+            },
+            {
+                situation: "상황: 직업을 바로 바꿀 수 있다 (가정 상황)",
+                title: "만약 내가 직업을 바꿀 수 있다면?",
+                optionA: "사람을 치료하는 의사가 되겠다",
+                optionB: "나라를 다스리는 대통령이 되겠다",
+                targetA: ["내가", "의사라면", "아픈", "사람을", "치료하고", "싶어요"],
+                targetB: ["내가", "대통령이라면", "더", "좋은", "나라를", "만들겠어요"],
+                distractors: ["의사이라면", "대통령라면", "치료하겠고", "만들겠고"],
+                explain: "명사 '의사'는 받침이 없으므로 '-라면', '대통령'은 받침이 있으므로 '-이라면'이 결합합니다.",
+                explainVi: "Danh từ '의사' không có 받침 nên kết hợp với '-라면', còn '대통령' có 받침 nên kết hợp với '-이라면'."
+            },
+            {
+                situation: "상황: 초능력(날기 vs 순간이동)을 얻다 (가정 상황)",
+                title: "만약 내가 초능력을 하나 얻는다면?",
+                optionA: "하늘을 자유롭게 날 수 있는 능력을 선택하겠다",
+                optionB: "원하는 곳으로 순간이동하는 능력을 선택하겠다",
+                targetA: ["내가", "하늘을", "난다면", "자유롭게", "여행하겠어요"],
+                targetB: ["내가", "순간이동을", "한다면", "매일", "지각하지", "않겠어요"],
+                distractors: ["날면", "날라면", "하면", "하라면"],
+                explain: "동사 '날다'는 ㄹ 받침이므로 ㄹ이 탈락하고 '-(ㄴ)다면'이 결합하여 '난다면'이 되며, '하다'는 받침이 없으므로 '-(ㄴ)다면'이 결합하여 '한다면'이 됩니다.",
+                explainVi: "Động từ '날다' có 받침 ㄹ nên ㄹ rụng rồi thêm '-ㄴ다면' thành '난다면'. '하다' không có 받침 nên thêm '-ㄴ다면' thành '한다면'."
+            },
+            {
+                situation: "상황: 반려동물과 대화하다 (가정 상황)",
+                title: "만약 내가 반려동물과 대화할 수 있다면?",
+                optionA: "반려동물에게 나의 깊은 고민과 비밀을 털어놓겠다",
+                optionB: "가장 먹고 싶은 간식이 무엇인지 물어보겠다",
+                targetA: ["내가", "반려동물과", "대화한다면", "내", "비밀을", "말하겠어요"],
+                targetB: ["내가", "반려동물과", "대화한다면", "좋아하는", "간식을", "물어보겠어요"],
+                distractors: ["대화하면", "대화하라면", "말하겠고", "물어보겠고"],
+                explain: "동사 '대화하다'는 받침이 없으므로 '-(ㄴ)다면'이 결합하여 '대화한다면'이 됩니다.",
+                explainVi: "Động từ '대화하다' không có 받침 nên kết hợp với '-ㄴ다면' thành '대화한다면'."
+            },
+            {
+                situation: "상황: 무인도에 갇히다 (가정 상황)",
+                title: "만약 내가 무인도에 홀로 갇힌다면?",
+                optionA: "인터넷은 안 되지만 음악이 가득 찬 스마트폰을 가져가겠다",
+                optionB: "평생 무제한으로 제공되는 맛있는 음식을 선택하겠다",
+                targetA: ["내가", "무인도에", "갇힌다면", "스마트폰을", "꼭", "챙기겠어요"],
+                targetB: ["내가", "무인도에", "갇힌다면", "맛있는", "음식을", "선택하겠어요"],
+                distractors: ["갇히면", "갇히라면", "챙기겠고", "선택하겠고"],
+                explain: "동사 '갇히다'는 받침이 없으므로 '-(ㄴ)다면'이 결합하여 '갇힌다면'이 됩니다.",
+                explainVi: "Động từ '갇히다' không có 받침 nên kết hợp với '-ㄴ다면' thành '갇힌다면'."
+            },
+            {
+                situation: "상황: 동물로 태어나다 (가정 상황)",
+                title: "만약 내가 다시 태어날 때 동물이 된다면?",
+                optionA: "하늘을 높이 날아다니는 독수리가 되겠다",
+                optionB: "사람들의 사랑을 듬뿍 받는 강아지가 되겠다",
+                targetA: ["내가", "독수리라면", "하늘을", "자유롭게", "날아다니고", "싶어요"],
+                targetB: ["내가", "강아지라면", "사람들에게", "귀여움을", "많이", "받겠어요"],
+                distractors: ["독수리이라면", "강아지이라면", "날아다니겠고", "받겠고"],
+                explain: "명사 '독수리'와 '강아지'는 모두 받침이 없으므로 '-라면'이 결합합니다.",
+                explainVi: "Danh từ '독수리' và '강아지' đều không có 받침 nên kết hợp với '-라면'."
+            },
+            {
+                situation: "상황: 복권 대신 지혜를 얻다 (가정 상황)",
+                title: "만약 내가 특별한 지혜를 선물받는다면?",
+                optionA: "세상 모든 나라의 언어를 바로 통달하는 능력을 얻겠다",
+                optionB: "다른 사람의 마음을 읽고 공감하는 능력을 얻겠다",
+                targetA: ["내가", "외국어를", "잘한다면", "세계", "여행을", "다니겠어요"],
+                targetB: ["내가", "마음을", "읽는다면", "오해를", "쉽게", "풀", "수", "있어요"],
+                distractors: ["잘하면", "읽으면", "다니겠고", "풀겠고"],
+                explain: "동사 '잘하다'는 받침이 없으므로 '-ㄴ다면', '읽다'는 받침이 있으므로 '-는다면'이 결합합니다.",
+                explainVi: "Động từ '잘하다' không có 받침 nên thêm '-ㄴ다면' thành '잘한다면'. '읽다' có 받침 nên thêm '-는다면' thành '읽는다면'."
+            },
+            {
+                situation: "상황: 사계절 중 하나만 지속되다 (가정 상황)",
+                title: "만약 1년 내내 한 계절만 지속된다면?",
+                optionA: "꽃이 피고 따뜻한 봄날만 계속되길 원한다",
+                optionB: "하얀 눈이 내리고 시원한 겨울만 계속되길 원한다",
+                targetA: ["날씨가", "항상", "따뜻하다면", "매일", "소풍을", "가고", "싶어요"],
+                targetB: ["날씨가", "항상", "춥다면", "매일", "스키를", "탈", "수", "있어요"],
+                distractors: ["따뜻하면", "추우면", "가겠고", "타겠고"],
+                explain: "형용사 '따뜻하다'와 '춥다'는 모두 형용사이므로 받침 여부와 관계없이 '-다면'이 결합하여 '따뜻하다면', '춥다면'이 됩니다.",
+                explainVi: "'따뜻하다' và '춥다' đều là tính từ nên kết hợp với '-다면' thành '따뜻하다면', '춥다면' (không chia theo 받침)."
+            },
+            {
+                situation: "상황: 역사 속 인물을 만나다 (가정 상황)",
+                title: "만약 내가 역사 속 위인을 직접 만난다면?",
+                optionA: "세종대왕을 만나 한글을 만든 배경을 여쭤보겠다",
+                optionB: "이순신 장군을 만나 용기와 리더십을 배우겠다",
+                targetA: ["내가", "세종대왕을", "만난다면", "한글에", "대해", "질문하겠어요"],
+                targetB: ["내가", "이순신", "장군을", "만난다면", "용기를", "배우고", "싶어요"],
+                distractors: ["만나면", "만나라면", "질문하겠고", "배우겠고"],
+                explain: "동사 '만나다'는 받침이 없으므로 '-(ㄴ)다면'이 결합하여 '만난다면'이 됩니다.",
+                explainVi: "Động từ '만나다' không có 받침 nên kết hợp với '-ㄴ다면' thành '만난다면'."
+            },
+            {
+                situation: "상황: 시간 여행을 하되 미래로 가다 (가정 상황)",
+                title: "만약 내가 미래로 시간 여행을 간다면?",
+                optionA: "50년 후의 가까운 미래로 가서 나의 노후 모습을 보겠다",
+                optionB: "500년 후의 먼 미래로 가서 우주 과학 기술을 보겠다",
+                targetA: ["내가", "미래로", "간다면", "내", "늙은", "모습이", "궁금해요"],
+                targetB: ["내가", "미래로", "간다면", "우주선이", "날아다니는", "모습을", "보겠어요"],
+                distractors: ["가면", "가라면", "궁금하겠고", "보겠고"],
+                explain: "동사 '가다'는 받침이 없으므로 '-(ㄴ)다면'이 결합하여 '간다면'이 됩니다.",
+                explainVi: "Động từ '가다' không có 받침 nên kết hợp với '-ㄴ다면' thành '간다면'."
+            },
+            {
+                situation: "상황: 부자가 되어 기부하다 (가정 상황)",
+                title: "만약 내가 억만장자 부자가 된다면?",
+                optionA: "모교에 나의 이름이 적힌 큰 도서관을 지어주겠다",
+                optionB: "가난한 아이들을 돕는 아동 재단을 직접 설립하겠다",
+                targetA: ["내가", "부자라면", "학교에", "멋진", "도서관을", "지어주겠어요"],
+                targetB: ["내가", "부자라면", "어려운", "아이들을", "위해", "기부하겠어요"],
+                distractors: ["부자이라면", "부자라면은", "지어주겠고", "기부하겠고"],
+                explain: "명사 '부자'는 받침이 없으므로 '-라면'이 결합하여 '부자라면'이 됩니다.",
+                explainVi: "Danh từ '부자' không có 받침 nên kết hợp với '-라면' thành '부자라면'."
+            },
+            {
+                situation: "상황: 매일 용돈이 생기다 (가정 상황)",
+                title: "만약 평생 매일 용돈이 통장에 입금된다면?",
+                optionA: "매일 아침 5만 원씩 평생 들어오는 소박한 안정을 택하겠다",
+                optionB: "한 번에 목돈 10억 원을 받아 사업을 시작하겠다",
+                targetA: ["매일", "돈을", "받는다면", "적금부터", "열심히", "넣겠어요"],
+                targetB: ["목돈이", "생긴다면", "바로", "멋진", "사업을", "시작하고", "싶어요"],
+                distractors: ["받으면", "받으라면", "생기면", "생기라면"],
+                explain: "동사 '받다'는 받침이 있으므로 '-는다면'이 결합하여 '받는다면'이 되고, '생기다'는 받침이 없으므로 '-ㄴ다면'이 결합하여 '생긴다면'이 됩니다.",
+                explainVi: "Động từ '받다' có 받침 nên thêm '-는다면' thành '받는다면'. '생기다' không có 받침 nên thêm '-ㄴ다면' thành '생긴다면'."
+            }
+        ];
+
+        // ── 게임 상태 ──────────────────────────────────────────
+        const gameState = {
+            activeRound: 1,
+            currentIdx: 0,
+            roundScore: 0,
+            score: 0,
+            picked: null, // 'A' or 'B'
+            assembled: [], // array of string tokens
+            history: [] // array of { title, choiceText }
+        };
+
+        const progressTextEl    = document.getElementById('progressText');
+        const progressBarEl     = document.getElementById('progressBar');
+        const scoreValEl        = document.getElementById('scoreVal');
+        const choiceSummaryEl   = document.getElementById('choiceSummary');
+
+        const activeRoundBadgeEl= document.getElementById('activeRoundBadge');
+        const roundBreakBoardEl = document.getElementById('roundBreakBoard');
+        const breakRoundBadgeEl = document.getElementById('breakRoundBadge');
+        const breakScoreValEl   = document.getElementById('breakScoreVal');
+        const breakFeedbackTextEl= document.getElementById('breakFeedbackText');
+        const breakNextBtnEl    = document.getElementById('breakNextBtn');
+
+        const selectBoardEl     = document.getElementById('selectBoard');
+        const dilemmaTitleEl    = document.getElementById('dilemmaTitle');
+        const dilemmaSituationEl= document.getElementById('dilemmaSituation');
+        const optATextEl        = document.getElementById('optAText');
+        const optBTextEl        = document.getElementById('optBText');
+
+        const builderBoardEl    = document.getElementById('builderBoard');
+        const pickedSummaryEl   = document.getElementById('pickedSummary');
+        const emptyPromptEl     = document.getElementById('emptyPrompt');
+        const assembledSlotsEl  = document.getElementById('assembledSlots');
+        const wordPoolEl        = document.getElementById('wordPool');
+        const checkBtnEl        = document.getElementById('checkBtn');
+        const feedbackBoxEl     = document.getElementById('feedbackBox');
+        const nextBtnEl         = document.getElementById('nextBtn');
+
+        const resultBoardEl     = document.getElementById('resultBoard');
+        const finalScoreEl      = document.getElementById('finalScore');
+
+        function esc(t) {
+            return String(t == null ? '' : t)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function norm(t) { return String(t || '').replace(/[\s.,!?~]/g, ''); }
+        function shuffle(arr) {
+            const c = arr.slice();
+            for (var i = c.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = c[i]; c[i] = c[j]; c[j] = tmp; }
+            return c;
+        }
+        function syncMultilangBlocks() {
+            if (!window.MultilangToggle || typeof window.MultilangToggle.getLang !== "function" || typeof window.MultilangToggle.setLang !== "function") return;
+            window.MultilangToggle.setLang(window.MultilangToggle.getLang());
+        }
+
+        // ── 라운드 선택 및 제어 로직 ──────────────────────────────
+        function selectRound(roundNum) {
+            gameState.activeRound = roundNum;
+            gameState.currentIdx = (roundNum - 1) * 5;
+            gameState.roundScore = 0;
+            gameState.history = [];
+
+            scoreValEl.textContent = "0";
+            activeRoundBadgeEl.textContent = `${roundNum}라운드`;
+            choiceSummaryEl.innerHTML = '<p class="text-slate-400 text-center py-4">선택을 시작하면 여기에 기록됩니다.</p>';
+
+            // Update compact tabs styling
+            for (let i = 1; i <= 3; i++) {
+                const tab = document.getElementById(`roundTab${i}`);
+                if (tab) {
+                    if (i === roundNum) {
+                        tab.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm cursor-pointer whitespace-nowrap";
+                    } else {
+                        tab.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 cursor-pointer whitespace-nowrap";
+                    }
+                }
+            }
+
+            roundBreakBoardEl.classList.add('hidden');
+            resultBoardEl.classList.add('hidden');
+
+            loadDilemma();
+        }
+
+        function goBackToRoundSelect() {
+            selectRound(gameState.activeRound);
+        }
+
+        function showRoundBreak() {
+            selectBoardEl.classList.add('hidden');
+            builderBoardEl.classList.add('hidden');
+            resultBoardEl.classList.add('hidden');
+            roundBreakBoardEl.classList.remove('hidden');
+
+            breakRoundBadgeEl.textContent = `${gameState.activeRound}라운드 완료`;
+            breakScoreValEl.textContent = gameState.roundScore;
+
+            let feedback = "";
+            const score = gameState.roundScore;
+            if (score === 5) {
+                feedback = "완벽합니다! 연구원님은 한국어 가정문 마스터이십니다. 🌟 (Tuyệt vời! Bạn là bậc thầy câu giả định tiếng Hàn.)";
+            } else if (score >= 3) {
+                feedback = "아주 좋습니다! 조금만 더 신중하게 단어를 조립하면 만점도 문제없어요. 👍 (Rất tốt! Chỉ cần cẩn thận ghép từ một chút nữa là đạt điểm tối đa.)";
+            } else if (score >= 1) {
+                feedback = "좋은 시도였습니다! 다음 라운드에서 문법 규칙(받침 유무)을 다시 한번 생각하며 풀어봐요. 💪 (Cố gắng tốt! Ở vòng sau hãy chú ý kỹ quy tắc ngữ pháp.)";
+            } else {
+                feedback = "아직 익숙하지 않군요! 다국어 문법 도움말을 참고하여 규칙을 다시 복습해 보시길 권장합니다. (Bạn chưa quen lắm! Hãy xem trợ giúp để ôn lại quy tắc nhé.)";
+            }
+            breakFeedbackTextEl.innerHTML = feedback;
+
+            if (gameState.activeRound < 3) {
+                breakNextBtnEl.textContent = "다음 라운드 계속하기 →";
+            } else {
+                breakNextBtnEl.textContent = "최종 결과 보기 →";
+            }
+
+            if (window.lucide) window.lucide.createIcons();
+            syncMultilangBlocks();
+        }
+
+        function startNextRound() {
+            if (gameState.activeRound < 3) {
+                selectRound(gameState.activeRound + 1);
+            } else {
+                showFinalResults();
+            }
+        }
+
+        // ── 밸런스 선택 로직 ──────────────────────────────────────
+        function loadDilemma() {
+            const roundStartIdx = (gameState.activeRound - 1) * 5;
+            if (gameState.currentIdx >= roundStartIdx + 5) {
+                showRoundBreak();
+                return;
+            }
+
+            const d = dilemmas[gameState.currentIdx];
+            dilemmaTitleEl.textContent = d.title;
+            dilemmaSituationEl.textContent = d.situation;
+            optATextEl.textContent = d.optionA;
+            optBTextEl.textContent = d.optionB;
+
+            const currentInRound = (gameState.currentIdx % 5) + 1;
+            progressTextEl.textContent = `질문 ${currentInRound} / 5`;
+            progressBarEl.style.width = (((currentInRound - 1) / 5) * 100) + '%';
+
+            selectBoardEl.classList.remove('hidden');
+            builderBoardEl.classList.add('hidden');
+            resultBoardEl.classList.add('hidden');
+            roundBreakBoardEl.classList.add('hidden');
+        }
+
+        function pickOption(option) {
+            gameState.picked = option;
+            const d = dilemmas[gameState.currentIdx];
+            pickedSummaryEl.textContent = option === 'A' ? d.optionA : d.optionB;
+
+            selectBoardEl.classList.add('hidden');
+            builderBoardEl.classList.remove('hidden');
+
+            initSentenceBuilder();
+        }
+
+        function goBackToSelect() {
+            selectBoardEl.classList.remove('hidden');
+            builderBoardEl.classList.add('hidden');
+        }
+
+        // ── 문장 조립기 로직 ──────────────────────────────────────
+        function initSentenceBuilder() {
+            gameState.assembled = [];
+            feedbackBoxEl.classList.add('hidden');
+            feedbackBoxEl.innerHTML = '';
+            nextBtnEl.classList.add('hidden');
+            checkBtnEl.disabled = false;
+
+            const d = dilemmas[gameState.currentIdx];
+            const targets = gameState.picked === 'A' ? d.targetA : d.targetB;
+
+            const allTokens = targets.concat(d.distractors);
+            const uniqueTokens = Array.from(new Set(allTokens));
+
+            renderWordPool(shuffle(uniqueTokens));
+            renderAssembledSentence();
+        }
+
+        function renderWordPool(tokens) {
+            wordPoolEl.innerHTML = '';
+            tokens.forEach(tok => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'word-chip bg-white border border-slate-300 hover:border-indigo-400 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm cursor-pointer';
+                btn.textContent = tok;
+                btn.onclick = () => addToken(tok, btn);
+                wordPoolEl.appendChild(btn);
+            });
+        }
+
+        function addToken(tok, btn) {
+            if (btn.disabled) return;
+            gameState.assembled.push(tok);
+            btn.disabled = true;
+            btn.classList.add('opacity-40', 'cursor-not-allowed', 'border-slate-200');
+            btn.classList.remove('hover:border-indigo-400');
+
+            renderAssembledSentence();
+        }
+
+        function removeToken(index, tok) {
+            if (nextBtnEl.classList.contains('hidden') === false) return;
+
+            gameState.assembled.splice(index, 1);
+
+            Array.from(wordPoolEl.children).forEach(btn => {
+                if (btn.textContent === tok && btn.disabled) {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-40', 'cursor-not-allowed', 'border-slate-200');
+                    btn.classList.add('hover:border-indigo-400');
+                }
+            });
+
+            renderAssembledSentence();
+        }
+
+        function renderAssembledSentence() {
+            assembledSlotsEl.innerHTML = '';
+            if (gameState.assembled.length === 0) {
+                emptyPromptEl.classList.remove('hidden');
+            } else {
+                emptyPromptEl.classList.add('hidden');
+                gameState.assembled.forEach((tok, idx) => {
+                    const span = document.createElement('span');
+                    span.className = 'word-chip bg-indigo-50 border border-indigo-200 hover:bg-rose-50 hover:border-rose-300 rounded-xl px-4 py-2.5 text-sm font-bold text-indigo-700 hover:text-rose-700 cursor-pointer shadow-sm';
+                    span.textContent = tok;
+                    span.onclick = () => removeToken(idx, tok);
+                    assembledSlotsEl.appendChild(span);
+                });
+            }
+        }
+
+        function resetBuilder() {
+            initSentenceBuilder();
+        }
+
+        function checkAssembly() {
+            const d = dilemmas[gameState.currentIdx];
+            const targets = gameState.picked === 'A' ? d.targetA : d.targetB;
+
+            if (gameState.assembled.length === 0) return;
+
+            const isCorrectLength = gameState.assembled.length === targets.length;
+            let isCorrectSequence = isCorrectLength;
+            if (isCorrectLength) {
+                for (let i = 0; i < targets.length; i++) {
+                    if (norm(gameState.assembled[i]) !== norm(targets[i])) {
+                        isCorrectSequence = false;
+                        break;
+                    }
+                }
+            }
+
+            checkBtnEl.disabled = true;
+            feedbackBoxEl.classList.remove('hidden');
+            nextBtnEl.classList.remove('hidden');
+
+            const assembledText = gameState.assembled.join(' ');
+            const correctText = targets.join(' ');
+
+            if (isCorrectSequence) {
+                gameState.roundScore += 1;
+                gameState.score += 1;
+                scoreValEl.textContent = gameState.roundScore;
+
+                feedbackBoxEl.className = 'success-banner mt-5 rounded-xl border p-4 bg-emerald-50 border-emerald-200';
+                feedbackBoxEl.innerHTML = `
+                    <p class="text-sm font-bold text-emerald-700 flex items-center gap-1"><i data-lucide="check-circle" class="w-4 h-4"></i> 정답입니다! (Đúng)</p>
+                    <p class="text-xs text-slate-700 mt-2"><b>조립된 문장:</b> ${esc(assembledText)}</p>
+                    <p class="text-xs text-slate-700 mt-2.5 pt-2 border-t border-emerald-100 safe"><b>문법 포인트:</b> ${esc(d.explain)}</p>
+                    <p data-lang="vi" class="text-xs text-blue-700 mt-1.5 safe"><b>Giải thích (VI):</b> ${esc(d.explainVi)}</p>
+                `;
+
+                gameState.history.push({
+                    title: d.title,
+                    choiceText: gameState.picked === 'A' ? d.optionA : d.optionB,
+                    correct: true
+                });
+            } else {
+                feedbackBoxEl.className = 'mt-5 rounded-xl border p-4 bg-rose-50 border-rose-200';
+                feedbackBoxEl.innerHTML = `
+                    <p class="text-sm font-bold text-rose-700 flex items-center gap-1"><i data-lucide="alert-circle" class="w-4 h-4"></i> 오답입니다. (Sai)</p>
+                    <p class="text-xs text-slate-700 mt-2"><b>내가 조립한 문장:</b> ${esc(assembledText || '(비어 있음)')}</p>
+                    <p class="text-xs text-slate-700 mt-1"><b>올바른 문장 순서:</b> <span class="text-emerald-700 font-bold">${esc(correctText)}</span></p>
+                    <p class="text-xs text-slate-700 mt-2.5 pt-2 border-t border-rose-100 safe"><b>문법 포인트:</b> ${esc(d.explain)}</p>
+                    <p data-lang="vi" class="text-xs text-blue-700 mt-1.5 safe"><b>Giải thích (VI):</b> ${esc(d.explainVi)}</p>
+                `;
+
+                gameState.history.push({
+                    title: d.title,
+                    choiceText: gameState.picked === 'A' ? d.optionA : d.optionB,
+                    correct: false
+                });
+            }
+
+            renderHistorySummary();
+            syncMultilangBlocks();
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function renderHistorySummary() {
+            choiceSummaryEl.innerHTML = '';
+            gameState.history.forEach((h, i) => {
+                const item = document.createElement('div');
+                item.className = 'p-3 rounded-xl border flex items-start gap-2.5 shadow-sm ' + (h.correct ? 'bg-emerald-50/30 border-emerald-100' : 'bg-rose-50/30 border-rose-100');
+
+                const icon = h.correct
+                    ? '<i class="fa-solid fa-circle-check text-emerald-600 mt-0.5"></i>'
+                    : '<i class="fa-solid fa-circle-xmark text-rose-500 mt-0.5"></i>';
+
+                item.innerHTML = `
+                    <div class="shrink-0">${icon}</div>
+                    <div>
+                        <p class="font-bold text-slate-800 leading-tight">${i+1}. ${esc(h.title)}</p>
+                        <p class="text-[11px] text-slate-500 mt-1">선택: ${esc(h.choiceText)}</p>
+                    </div>
+                `;
+                choiceSummaryEl.appendChild(item);
+            });
+        }
+
+        function nextDilemma() {
+            gameState.currentIdx += 1;
+            loadDilemma();
+        }
+
+        // ── 최종 결과 화면 로직 ────────────────────────────────────
+        function showFinalResults() {
+            selectBoardEl.classList.add('hidden');
+            builderBoardEl.classList.add('hidden');
+            roundBreakBoardEl.classList.add('hidden');
+            resultBoardEl.classList.remove('hidden');
+
+            finalScoreEl.textContent = gameState.score;
+            progressBarEl.style.width = '100%';
+            progressTextEl.textContent = '연구 완료';
+        }
+
+        function restartGame() {
+            gameState.score = 0;
+            selectRound(1);
+        }
+
+        // ── 레이아웃 오프셋 계산 ─────────────────────────────────────
+        function updateResponsiveOffsets() {
+            const nav = document.getElementById("injected-global-nav");
+            const header = document.querySelector(".grammar-header");
+            const navHeight = nav ? nav.offsetHeight : 58;
+            const headerHeight = header ? header.offsetHeight : 76;
+            document.body.style.setProperty("--grammar-nav-height", `${navHeight}px`);
+            document.body.style.setProperty("--grammar-header-height", `${headerHeight}px`);
+        }
+
+        // ── 초기화 ────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function () {
+            loadDilemma();
+            updateResponsiveOffsets();
+            window.addEventListener('resize', updateResponsiveOffsets);
+
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        });
+    </script>
+    <script src="../shared/learning-enhancements.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/multilang-page-data.js"></script>
+    <script src="../shared/multilang-page-data-ar.js"></script>
+    <script src="../shared/multilang-page-data-mn.js"></script>
+    <script src="../shared/multilang-page-data-kk.js"></script>
+    <script src="../shared/multilang-page-data-th.js"></script>
+    <script src="../shared/multilang-page-scaffold.js"></script>
+    <script src="../shared/multilang-toggle.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>

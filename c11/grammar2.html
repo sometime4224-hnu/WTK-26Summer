@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-        <!-- Google Tag Manager -->
+    <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -11,69 +11,187 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>11과 문법2 업그레이드 | -(ㄴ/는)다면</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com" defer></script>
-<style>
-        body { margin: 0; font-family: 'Noto Sans KR', sans-serif; background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%); }
-        .c11-global-nav {
-            position: sticky; top: 0; z-index: 1000; height: 58px; width: 100%;
-            display: flex; align-items: center; gap: 12px; padding: 0 16px; box-sizing: border-box;
-            background: rgba(255, 255, 255, 0.92); border-bottom: 1px solid #dbeafe; backdrop-filter: blur(8px);
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+
+    <style>
+        body {
+            --grammar-page-max: 1180px;
+            --grammar-page-gutter: 16px;
+            --grammar-nav-height: 58px;
+            --grammar-header-height: 76px;
+            margin: 0;
+            font-family: 'Noto Sans KR', sans-serif !important;
+            background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
         }
-        .c11-global-nav a { color: #4f46e5; text-decoration: none; font-weight: 700; font-size: 14px; }
-        .c11-divider { color: #cbd5e1; font-weight: 700; }
+        .injected-global-nav {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #e0e7ff;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 999999;
+            box-sizing: border-box;
+            gap: 15px;
+            padding-left: max(16px, calc((100vw - var(--grammar-page-max)) / 2 + var(--grammar-page-gutter)));
+            padding-right: max(16px, calc((100vw - var(--grammar-page-max)) / 2 + var(--grammar-page-gutter)));
+        }
+        .injected-global-nav a {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .injected-global-nav a:hover {
+            color: #3730a3;
+        }
+        .injected-global-nav .divider {
+            color: #cbd5e1;
+        }
+        .grammar-page {
+            width: 100%;
+            overflow-x: hidden;
+        }
+        .grammar-header {
+            top: var(--grammar-nav-height) !important;
+        }
+        .grammar-header > div,
+        .grammar-main {
+            width: min(100%, var(--grammar-page-max));
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        .grammar-tabs {
+            top: calc(var(--grammar-nav-height) + var(--grammar-header-height)) !important;
+            width: min(100%, var(--grammar-page-max));
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .grammar-learn-grid,
+        .grammar-practice-grid {
+            display: grid;
+            gap: 16px;
+        }
+        .grammar-learn-grid > *,
+        .grammar-practice-grid > * {
+            min-width: 0;
+        }
         .safe { word-break: keep-all; overflow-wrap: break-word; }
-        .tab-btn.active       { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
-        .tab-btn.active-drill { background: #ede9fe; color: #6d28d9; border-color: #c4b5fd; }
-        .vi-text { display: none; }
-        .vi-on .vi-text { display: block; }
+        .hidden { display: none !important; }
         .choice-btn { min-height: 52px; }
         #cardFront { transition: opacity .15s; }
         #cardFront:active { opacity: .7; }
+
+        @media (min-width: 700px) {
+            body {
+                --grammar-page-gutter: 24px;
+            }
+            .grammar-main {
+                padding: 24px var(--grammar-page-gutter) 56px !important;
+            }
+            .grammar-learn-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .grammar-rule {
+                grid-column: 1 / -1;
+            }
+            .grammar-practice-grid {
+                grid-template-columns: minmax(220px, 0.7fr) minmax(420px, 1.35fr);
+                align-items: start;
+            }
+        }
+        @media (min-width: 1024px) {
+            body {
+                --grammar-page-gutter: 32px;
+            }
+            .grammar-learn-grid {
+                grid-template-columns: minmax(220px, 0.75fr) minmax(280px, 1fr) minmax(280px, 1fr);
+                align-items: start;
+            }
+            .grammar-rule {
+                grid-column: auto;
+            }
+            .grammar-practice-grid {
+                grid-template-columns: minmax(300px, 0.8fr) minmax(560px, 1.4fr);
+            }
+        }
+        @media (min-width: 1280px) {
+            body {
+                --grammar-page-max: 1240px;
+            }
+        }
     </style>
-        <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
-<body>
-        <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<body class="grammar-page bg-slate-50 min-h-screen flex flex-col">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <nav class="c11-global-nav" aria-label="상단 이동">
-        <a href="../index.html">메인</a>
-        <span class="c11-divider">|</span>
-        <a href="index.html">11과 목록</a>
+
+    <!-- Navigation Bar -->
+    <nav id="injected-global-nav" class="injected-global-nav">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인으로</a>
+        <span class="divider">|</span>
+        <a href="index.html"><i class="fa-solid fa-folder-open"></i> 단원 홈</a>
     </nav>
 
-    <main id="page" class="max-w-md mx-auto px-4 py-4 pb-10">
+    <!-- Header -->
+    <header class="grammar-header bg-white px-5 py-4 border-b border-slate-200 sticky z-20">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold text-slate-900 flex items-center">
+                    A/V-(ㄴ/는)다면, N(이)라면
+                </h1>
+                <p class="text-xs text-slate-500 mt-1">11과: 문법 2 업그레이드 (가정, 상상, 가능성이 낮은 조건)</p>
+            </div>
+        </div>
+    </header>
 
-        <!-- 헤더 -->
-        <section class="bg-white border border-blue-100 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <p class="text-xs font-bold text-blue-600">문법 2 업그레이드</p>
-                    <h1 class="text-2xl font-black text-slate-800 mt-1">A/V-(ㄴ/는)다면, N(이)라면</h1>
-                    <p class="text-sm text-slate-600 mt-1 safe">가정, 상상, 가능성이 낮은 조건을 말할 때</p>
-                    <p class="vi-text text-xs text-blue-700 mt-1 safe">Dùng cho giả định, tưởng tượng hoặc điều kiện khó xảy ra.</p>
-                </div>
-                <button id="viToggle" class="shrink-0 px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-700">Tiếng Việt OFF</button>
-            </div>
-            <div class="grid grid-cols-3 gap-2 mt-4">
-                <button id="tabLearn" class="tab-btn active border rounded-xl py-2.5 text-sm font-bold border-blue-200"   type="button">학습</button>
-                <button id="tabDrill" class="tab-btn border rounded-xl py-2.5 text-sm font-bold border-slate-200 text-slate-600" type="button">형태 드릴</button>
-                <button id="tabQuiz"  class="tab-btn border rounded-xl py-2.5 text-sm font-bold border-slate-200 text-slate-600" type="button">퀴즈</button>
-            </div>
-        </section>
+    <!-- Navigation Tabs -->
+    <div class="grammar-tabs flex border-b border-slate-200 bg-white sticky z-10">
+        <button id="tabLearn" class="flex items-center justify-center flex-1 py-3 text-sm font-semibold transition-all duration-200 cursor-pointer" type="button">
+            <i data-lucide="book" class="w-4 h-4 mr-2"></i>
+            학습
+        </button>
+        <button id="tabDrill" class="flex items-center justify-center flex-1 py-3 text-sm font-semibold transition-all duration-200 cursor-pointer" type="button">
+            <i data-lucide="layers" class="w-4 h-4 mr-2"></i>
+            형태 드릴
+        </button>
+        <button id="tabQuiz" class="flex items-center justify-center flex-1 py-3 text-sm font-semibold transition-all duration-200 cursor-pointer" type="button">
+            <i data-lucide="graduation-cap" class="w-4 h-4 mr-2"></i>
+            퀴즈
+        </button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="grammar-main flex-1 p-4 pb-12">
 
         <!-- ── 학습 패널 ───────────────────────────────────────── -->
-        <section id="learnPanel" class="mt-4 space-y-3">
+        <div id="learnPanel" class="grammar-learn-grid">
 
-            <article class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <article class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <h2 class="text-base font-bold text-slate-800">핵심 개념</h2>
                 <p class="text-sm text-slate-700 mt-2 safe">'-(ㄴ/는)다면'은 실제가 아닌 상황을 가정할 때 씁니다.</p>
                 <p class="text-sm text-slate-700 mt-1 safe">예) 제가 면접관이라면, 그 답변을 더 듣고 싶어요.</p>
-                <p class="vi-text text-xs text-blue-700 mt-2 safe">'-(ㄴ/는)다면' thường dùng khi đặt giả định chưa chắc xảy ra.</p>
+                <p data-lang="vi" class="text-xs text-blue-700 mt-2 safe">'-(ㄴ/는)다면' thường dùng khi đặt giả định chưa chắc xảy ra.</p>
             </article>
 
-            <article class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <article class="grammar-rule bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <h2 class="text-base font-bold text-slate-800">형태 규칙</h2>
                 <div class="mt-3 rounded-xl overflow-hidden border border-slate-200 text-sm">
                     <div class="grid grid-cols-3 bg-slate-100 text-xs font-bold text-slate-600">
@@ -111,103 +229,157 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     ⚠ <b>ㄹ 받침 동사 주의:</b> ㄹ이 탈락하고 -ㄴ다면이 붙습니다.<br>
                     만들다 → 만든다면 / 알다 → 안다면 / 살다 → 산다면
                 </p>
-                <p class="vi-text text-xs text-blue-700 mt-2 safe">Động từ đuôi ㄹ: ㄹ rụng rồi thêm -ㄴ다면. Ví dụ: 만들다→만든다면, 알다→안다면.</p>
+                <p data-lang="vi" class="text-xs text-blue-700 mt-2 safe">Động từ đuôi ㄹ: ㄹ rụng rồi thêm -ㄴ다면. Ví dụ: 만들다→만든다면, 알다→안다면.</p>
             </article>
 
-            <article class="bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-sm">
-                <h2 class="text-base font-bold text-amber-800">헷갈림 비교</h2>
+            <article class="bg-amber-50 border border-amber-200 rounded-2xl p-5 shadow-sm">
+                <h2 class="text-base font-bold text-slate-800">헷갈림 비교</h2>
                 <div class="mt-2 space-y-3">
                     <div>
                         <p class="text-sm font-bold text-slate-800">-(으)면 vs -다면</p>
                         <p class="text-sm text-slate-700 safe">비가 오면 우산을 써요 (일반 조건) / 비가 온다면 야외 수업은 취소예요 (가정 강조).</p>
-                        <p class="vi-text text-xs text-blue-700 mt-1 safe">-(으)면: điều kiện thực tế. -다면: giả định, nhấn mạnh tính giả thiết.</p>
+                        <p data-lang="vi" class="text-xs text-blue-700 mt-1 safe">-(으)면: điều kiện thực tế. -다면: giả định, nhấn mạnh tính giả thiết.</p>
                     </div>
                     <div>
                         <p class="text-sm font-bold text-slate-800">-다면 vs -았/었더라면</p>
                         <p class="text-sm text-slate-700 safe">지금 가정: 시간이 많다면 / 과거 후회: 시간이 많았더라면 합격했을 텐데.</p>
-                        <p class="vi-text text-xs text-blue-700 mt-1 safe">-다면 cho hiện tại/tương lai. -았/었더라면 cho tiếc nuối quá khứ.</p>
+                        <p data-lang="vi" class="text-xs text-blue-700 mt-1 safe">-다면 cho hiện tại/tương lai. -았/었더라면 cho tiếc nuối quá khứ.</p>
                     </div>
                     <div>
                         <p class="text-sm font-bold text-slate-800">명사 받침 구별</p>
                         <p class="text-sm text-slate-700 safe">학생이라면 (받침 O) / 의사라면 (받침 X)</p>
-                        <p class="vi-text text-xs text-blue-700 mt-1 safe">Danh từ có 받침 → 이라면 / không có 받침 → 라면.</p>
+                        <p data-lang="vi" class="text-xs text-blue-700 mt-1 safe">Danh từ có 받침 → 이라면 / không có 받침 → 라면.</p>
                     </div>
                 </div>
             </article>
-        </section>
+
+            <article class="bg-blue-50 border border-blue-200 rounded-2xl p-5 shadow-sm col-span-full">
+                <div class="flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
+                    <div>
+                        <h3 class="text-xs font-bold text-blue-800 uppercase tracking-wide">보조 활동 (Support Activity)</h3>
+                        <h4 class="text-base font-black text-slate-800 mt-1">만약(IF) 밸런스 게임 연구소</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">로또 당첨, 시간 여행 등 다양한 밸런스 게임을 선택하고 가설을 나타내는 한국어 문장을 조립해 보세요.</p>
+                    </div>
+                    <div class="shrink-0 grid gap-2 w-full sm:w-auto">
+                        <a href="grammar2-if-balance-game.html" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-colors duration-150 text-center">연구소 입장하기 →</a>
+                        <a href="grammar2-explanation-photo-gallery.html#visualExamples" class="px-4 py-2.5 rounded-xl border border-blue-300 bg-white hover:bg-blue-50 text-blue-700 text-xs font-bold shadow-sm transition-colors duration-150 text-center">설명 사진 보기 →</a>
+                    </div>
+                </div>
+            </article>
+        </div>
 
         <!-- ── 형태 드릴 패널 ──────────────────────────────────── -->
-        <section id="drillPanel" class="mt-4 hidden">
-            <article class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                <div class="flex items-center justify-between text-xs mb-1">
-                    <span id="drillProgress" class="font-bold text-violet-600"></span>
-                    <span class="text-slate-500">탭해서 정답 확인</span>
-                </div>
-                <div class="w-full bg-slate-100 rounded-full h-1.5 mb-4">
-                    <div id="drillBar" class="bg-violet-500 h-1.5 rounded-full transition-all duration-300" style="width:0%"></div>
-                </div>
-
-                <!-- 카드 앞면 -->
-                <div id="cardFront" class="rounded-2xl border-2 border-violet-200 bg-violet-50 p-6 text-center cursor-pointer select-none">
-                    <p id="cardTag" class="text-xs font-bold text-violet-500 mb-3"></p>
-                    <p id="cardFrontText" class="text-3xl font-black text-slate-800"></p>
-                    <p id="cardFrontSub" class="text-sm text-slate-500 mt-2 safe"></p>
-                    <p class="text-xs text-slate-400 mt-5">탭해서 확인 →</p>
-                </div>
-
-                <!-- 카드 뒷면 -->
-                <div id="cardBack" class="hidden rounded-2xl border-2 border-blue-300 bg-blue-50 p-5 text-center">
-                    <p class="text-xs font-bold text-blue-500 mb-2">정답</p>
-                    <p id="cardBackText" class="text-3xl font-black text-blue-800"></p>
-                    <p id="cardRule" class="text-xs text-slate-600 mt-3 safe"></p>
-                    <p id="cardRuleVi" class="vi-text text-xs text-blue-700 mt-1 safe"></p>
-                    <div class="grid grid-cols-2 gap-3 mt-5">
-                        <button id="drillKnowBtn" class="py-3 rounded-xl bg-emerald-100 border border-emerald-300 text-sm font-bold text-emerald-700" type="button">알아요 ✓</button>
-                        <button id="drillRetryBtn" class="py-3 rounded-xl bg-rose-100 border border-rose-300 text-sm font-bold text-rose-700" type="button">다시 볼게요</button>
+        <div id="drillPanel" class="grammar-practice-grid hidden">
+            <!-- 드릴 안내 (좌측) -->
+            <section>
+                <article class="bg-violet-50 border border-violet-100 rounded-2xl p-5 shadow-sm">
+                    <h2 class="text-base font-bold text-violet-700 flex items-center mb-2">
+                        <i data-lucide="play-circle" class="w-5 h-5 mr-2"></i>
+                        형태 드릴 가이드
+                    </h2>
+                    <p class="text-xs text-slate-600 leading-relaxed">카드의 기본형 단어를 <b>'-(ㄴ/는)다면'</b> 형태로 바꾸어 보세요.</p>
+                    <div class="mt-4 bg-white border border-violet-100 rounded-xl p-4">
+                        <p class="text-xs font-bold text-slate-500">조작 방법</p>
+                        <ul class="mt-2 text-xs text-slate-600 list-disc pl-4 space-y-1">
+                            <li>카드를 탭하여 정답과 문법 규칙을 확인합니다.</li>
+                            <li>알고 있는 형태면 <b>[알아요 ✓]</b>, 헷갈리면 <b>[다시 볼게요]</b>를 선택하세요.</li>
+                            <li>틀린 단어는 완료 후 <b>[오답만 복습]</b>으로 다시 연습할 수 있습니다.</li>
+                        </ul>
                     </div>
-                </div>
-            </article>
+                </article>
+            </section>
 
-            <article id="drillResult" class="hidden mt-3 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm"></article>
-        </section>
+            <!-- 드릴 카드 (우측) -->
+            <section class="space-y-4">
+                <article class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between text-xs mb-1">
+                        <span id="drillProgress" class="font-bold text-violet-600"></span>
+                        <span class="text-slate-500">탭해서 정답 확인</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 mb-4 overflow-hidden">
+                        <div id="drillBar" class="bg-violet-500 h-full rounded-full transition-all duration-300" style="width:0%"></div>
+                    </div>
+
+                    <!-- 카드 앞면 -->
+                    <div id="cardFront" class="rounded-2xl border-2 border-violet-200 bg-violet-50/50 p-8 text-center cursor-pointer select-none hover:bg-violet-50 transition-colors duration-200">
+                        <p id="cardTag" class="text-xs font-bold text-violet-500 mb-3 tracking-wider uppercase"></p>
+                        <p id="cardFrontText" class="text-3xl font-black text-slate-800"></p>
+                        <p id="cardFrontSub" class="text-sm text-slate-500 mt-2 safe"></p>
+                        <p class="text-xs text-slate-400 mt-6 flex items-center justify-center gap-1"><i data-lucide="help-circle" class="w-3.5 h-3.5"></i> 탭해서 확인</p>
+                    </div>
+
+                    <!-- 카드 뒷면 -->
+                    <div id="cardBack" class="hidden rounded-2xl border-2 border-blue-200 bg-blue-50/50 p-6 text-center">
+                        <p class="text-xs font-bold text-blue-500 mb-2 uppercase tracking-wider">정답</p>
+                        <p id="cardBackText" class="text-3xl font-black text-blue-800"></p>
+                        <p id="cardRule" class="text-xs text-slate-600 mt-4 bg-white px-3 py-2 rounded-lg border border-slate-100 safe"></p>
+                        <p id="cardRuleVi" data-lang="vi" class="text-xs text-blue-700 mt-2 bg-blue-100/60 px-3 py-2 rounded-lg border border-blue-200/60 safe"></p>
+                        <div class="grid grid-cols-2 gap-3 mt-6">
+                            <button id="drillKnowBtn" class="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-sm transition-colors duration-150 cursor-pointer" type="button">알아요 ✓</button>
+                            <button id="drillRetryBtn" class="py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-sm font-bold shadow-sm transition-colors duration-150 cursor-pointer" type="button">다시 볼게요</button>
+                        </div>
+                    </div>
+                </article>
+
+                <article id="drillResult" class="hidden bg-white border border-slate-200 rounded-2xl p-5 shadow-sm"></article>
+            </section>
+        </div>
 
         <!-- ── 퀴즈 패널 ───────────────────────────────────────── -->
-        <section id="quizPanel" class="mt-4 hidden">
-            <article class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                <div class="flex items-center justify-between text-xs">
-                    <span id="progress" class="font-bold text-blue-600"></span>
-                    <span class="text-slate-500">즉시 피드백</span>
-                </div>
-                <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2">
-                    <div id="progressBar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-300" style="width:0%"></div>
-                </div>
-                <p id="qGrammar" class="mt-3 text-[11px] font-bold text-violet-700"></p>
-                <p id="qText" class="mt-2 text-base font-bold text-slate-800 safe"></p>
-                <p id="qHintKo" class="mt-2 text-xs text-slate-600 safe"></p>
-                <p id="qHintVi" class="vi-text text-xs text-blue-700 mt-1 safe"></p>
-                <div id="choices" class="mt-3 space-y-2"></div>
-                <div id="shortWrap" class="mt-3 hidden">
-                    <input id="shortInput" type="text" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm" placeholder="정답 입력" />
-                    <button id="checkShortBtn" class="mt-2 w-full bg-blue-600 text-white py-3 rounded-xl text-sm font-bold" type="button">정답 확인</button>
-                </div>
-                <div id="feedbackBox" class="hidden mt-3 rounded-xl border p-3"></div>
-                <button id="nextBtn" class="hidden mt-3 w-full bg-slate-800 text-white py-3 rounded-xl text-sm font-bold" type="button">다음 문제</button>
-            </article>
-            <article id="resultPanel" class="hidden mt-3 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm"></article>
-        </section>
+        <div id="quizPanel" class="grammar-practice-grid hidden">
+            <!-- 퀴즈 안내 (좌측) -->
+            <section>
+                <article class="bg-blue-50 border border-blue-100 rounded-2xl p-5 shadow-sm">
+                    <h2 class="text-base font-bold text-blue-700 flex items-center mb-2">
+                        <i data-lucide="help-circle" class="w-5 h-5 mr-2"></i>
+                        실전 퀴즈
+                    </h2>
+                    <p class="text-xs text-slate-600 leading-relaxed">다양한 문장 맥락 속에서 정확한 표현을 선택하거나 직접 입력해 보세요.</p>
+                    <div class="mt-4 bg-white border border-blue-100 rounded-xl p-4">
+                        <p class="text-xs font-bold text-slate-500">퀴즈 구성</p>
+                        <ul class="mt-2 text-xs text-slate-600 list-disc pl-4 space-y-1">
+                            <li>객관식 문항과 주관식 빈칸 채우기 문항이 제공됩니다.</li>
+                            <li>각 문제별로 정답 및 근거 설명(한국어/베트남어)이 제공됩니다.</li>
+                        </ul>
+                    </div>
+                </article>
+            </section>
+
+            <!-- 퀴즈 내용 (우측) -->
+            <section class="space-y-4">
+                <article class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between text-xs mb-1">
+                        <span id="progress" class="font-bold text-blue-600"></span>
+                        <span class="text-slate-500">즉시 피드백</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 mb-4 overflow-hidden">
+                        <div id="progressBar" class="bg-blue-500 h-full rounded-full transition-all duration-300" style="width:0%"></div>
+                    </div>
+                    <p id="qGrammar" class="text-[11px] font-bold text-violet-600 tracking-wide uppercase"></p>
+
+                    <div class="mt-2 bg-slate-50 border border-slate-200 rounded-xl p-4">
+                        <p id="qText" class="text-base font-bold text-slate-800 leading-relaxed safe"></p>
+                        <p id="qHintKo" class="mt-2 text-xs text-slate-600 safe"></p>
+                        <p id="qHintVi" data-lang="vi" class="text-xs text-blue-700 mt-1 leading-relaxed safe"></p>
+                    </div>
+
+                    <div id="choices" class="mt-4 space-y-2.5"></div>
+                    <div id="shortWrap" class="mt-4 hidden">
+                        <input id="shortInput" type="text" autocomplete="off" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="정답 입력" />
+                        <button id="checkShortBtn" class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl text-sm font-bold shadow-sm transition-colors duration-150 cursor-pointer" type="button">정답 확인</button>
+                    </div>
+                    <div id="feedbackBox" class="hidden mt-4 rounded-xl border p-4"></div>
+                    <button id="nextBtn" class="hidden mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl text-sm font-bold shadow-sm transition-colors duration-150 cursor-pointer" type="button">다음 문제</button>
+                </article>
+
+                <article id="resultPanel" class="hidden bg-white border border-slate-200 rounded-2xl p-5 shadow-sm"></article>
+            </section>
+        </div>
     </main>
 
     <script src="../shared/grammar-bilingual-layout.js"></script>
     <script>
         // ── 공통 ────────────────────────────────────────────────
-        const page = document.getElementById('page');
-        let viOn = false;
-        document.getElementById('viToggle').addEventListener('click', function () {
-            viOn = !viOn;
-            page.classList.toggle('vi-on', viOn);
-            document.getElementById('viToggle').textContent = viOn ? 'Tiếng Việt ON' : 'Tiếng Việt OFF';
-        });
-
         function esc(t) {
             return String(t == null ? '' : t)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -218,6 +390,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             const c = arr.slice();
             for (var i = c.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = c[i]; c[i] = c[j]; c[j] = tmp; }
             return c;
+        }
+        function syncMultilangBlocks() {
+            if (!window.MultilangToggle || typeof window.MultilangToggle.getLang !== "function" || typeof window.MultilangToggle.setLang !== "function") return;
+            window.MultilangToggle.setLang(window.MultilangToggle.getLang());
         }
 
         // ── 탭 ──────────────────────────────────────────────────
@@ -236,16 +412,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         function showTab(name) {
             Object.keys(panels).forEach(function (k) {
                 panels[k].classList.toggle('hidden', k !== name);
-                btns[k].classList.remove('active', 'active-drill', 'text-slate-600');
+
+                // Reset to baseline classes
+                btns[k].className = "flex items-center justify-center flex-1 py-3 text-sm font-semibold transition-all duration-200 cursor-pointer";
+
                 if (k === name) {
-                    btns[k].classList.add(k === 'drill' ? 'active-drill' : 'active');
+                    if (k === 'drill') {
+                        btns[k].classList.add('text-violet-600', 'border-b-2', 'border-violet-600', 'bg-violet-50');
+                    } else {
+                        btns[k].classList.add('text-blue-600', 'border-b-2', 'border-blue-600', 'bg-blue-50');
+                    }
                 } else {
-                    btns[k].classList.add('text-slate-600');
+                    btns[k].classList.add('text-gray-500', 'hover:text-slate-800');
                 }
             });
             if (name === 'drill' && !tabStarted.drill) { tabStarted.drill = true; initDrill(); }
             if (name === 'quiz'  && !tabStarted.quiz)  { tabStarted.quiz  = true; renderQuestion(); }
+
+            syncMultilangBlocks();
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
         }
+
         btns.learn.addEventListener('click', function () { showTab('learn'); });
         btns.drill.addEventListener('click', function () { showTab('drill'); });
         btns.quiz.addEventListener('click',  function () { showTab('quiz');  });
@@ -284,12 +473,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             const c = ds.cards[ds.idx];
             const total = ds.cards.length;
             document.getElementById('drillProgress').textContent = (ds.idx + 1) + ' / ' + total;
-            document.getElementById('drillBar').style.width = (ds.idx / total * 100) + '%';
+            document.getElementById('drillBar').style.width = ((ds.idx) / total * 100) + '%';
             document.getElementById('cardTag').textContent = c.tag;
             document.getElementById('cardFrontText').textContent = c.front;
             document.getElementById('cardFrontSub').textContent = c.sub || '';
             document.getElementById('cardFront').classList.remove('hidden');
             document.getElementById('cardBack').classList.add('hidden');
+            syncMultilangBlocks();
         }
 
         document.getElementById('cardFront').addEventListener('click', function () {
@@ -299,6 +489,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             document.getElementById('cardRuleVi').textContent = c.ruleVi;
             document.getElementById('cardFront').classList.add('hidden');
             document.getElementById('cardBack').classList.remove('hidden');
+            syncMultilangBlocks();
         });
 
         function rateDrill(knew) {
@@ -318,7 +509,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             var missedHtml = '';
             if (ds.missed.length > 0) {
-                missedHtml = '<div class="mt-3"><p class="text-xs font-bold text-rose-700 mb-2">다시 볼 카드</p><div class="space-y-2">' +
+                missedHtml = '<div class="mt-4"><p class="text-xs font-bold text-rose-700 mb-2">다시 볼 카드</p><div class="space-y-2">' +
                     ds.missed.map(function (c) {
                         return '<div class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 flex justify-between items-center">' +
                             '<span class="text-sm font-bold text-slate-800">' + esc(c.front) + '</span>' +
@@ -328,17 +519,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
 
             document.getElementById('drillResult').innerHTML =
-                '<div class="rounded-xl border border-violet-200 bg-violet-50 p-4 text-center">' +
+                '<div class="rounded-xl border border-violet-200 bg-violet-50 p-5 text-center">' +
                 '<p class="text-xs text-violet-700 font-bold">드릴 완료</p>' +
                 '<h3 class="text-2xl font-black text-slate-800 mt-1">' + ds.score + ' / ' + total + '</h3>' +
                 '<p class="text-sm text-slate-600 mt-1">즉시 인지 ' + Math.round(ds.score / total * 100) + '%</p>' +
-                '<div class="grid grid-cols-2 gap-2 mt-3">' +
-                '<button class="px-3 py-2 rounded-lg bg-violet-600 text-white text-sm font-bold" onclick="initDrill()" type="button">다시 드릴</button>' +
+                '<div class="grid grid-cols-2 gap-2 mt-4">' +
+                '<button class="px-3 py-2.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold transition-colors cursor-pointer" onclick="initDrill()" type="button">다시 드릴</button>' +
                 (ds.missed.length > 0
-                    ? '<button class="px-3 py-2 rounded-lg border border-rose-300 bg-rose-50 text-rose-700 text-sm font-bold" onclick="reviewMissed()" type="button">오답만 복습</button>'
+                    ? '<button class="px-3 py-2.5 rounded-lg border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-700 text-sm font-bold transition-colors cursor-pointer" onclick="reviewMissed()" type="button">오답만 복습</button>'
                     : '<div></div>') +
                 '</div></div>' + missedHtml;
             document.getElementById('drillResult').classList.remove('hidden');
+            syncMultilangBlocks();
         }
 
         function reviewMissed() {
@@ -407,7 +599,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 q: '시간이 ____ 같이 공부해요. (많다)',
                 hintKo: '형용사 연결', hintVi: 'Nối với tính từ "많다".',
                 answers: ['많다면'],
-                explainKo: '많다는 형용사이므로 많다면이 맞습니다.',
+                explainKo: '많다는 형용사이므로 많이 공부해요의 조건문은 많다면이 맞습니다.',
                 explainVi: 'Vì 많다 là tính từ nên dùng 많다면.'
             },
             {
@@ -476,7 +668,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 '<p class="text-xs text-slate-700 mt-2"><b>내 답:</b> ' + esc(user || '(무응답)') + '</p>' +
                 '<p class="text-xs text-slate-700 mt-1"><b>정답:</b> ' + esc(correct) + '</p>' +
                 '<p class="text-xs text-slate-700 mt-2 safe"><b>설명(KO):</b> ' + esc(q.explainKo) + '</p>' +
-                '<p class="text-xs text-blue-700 mt-1 safe"><b>Giải thích (VI):</b> ' + esc(q.explainVi) + '</p>';
+                '<p data-lang="vi" class="text-xs text-blue-700 mt-1 safe"><b>Giải thích (VI):</b> ' + esc(q.explainVi) + '</p>';
         }
 
         function answerQuestion(user) {
@@ -488,10 +680,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             if (ok) qState.score += 1;
             qState.logs.push({ ok: ok, user: user, correct: correct, q: q.q, explainKo: q.explainKo, explainVi: q.explainVi });
             feedbackEl.classList.remove('hidden');
-            feedbackEl.className = 'mt-3 rounded-xl border p-3 ' + (ok ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200');
+            feedbackEl.className = 'mt-4 rounded-xl border p-4 ' + (ok ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200');
             feedbackEl.innerHTML = feedbackHtml(ok, user, correct, q);
             nextBtnEl.classList.remove('hidden');
             lockInputs(q, user);
+            syncMultilangBlocks();
         }
 
         function renderQuestion() {
@@ -499,7 +692,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             const q = quiz[qState.idx];
             qState.answered = false;
             progressEl.textContent = (qState.idx + 1) + ' / ' + quiz.length;
-            document.getElementById('progressBar').style.width = (qState.idx / quiz.length * 100) + '%';
+            document.getElementById('progressBar').style.width = ((qState.idx) / quiz.length * 100) + '%';
             qGrammarEl.textContent = q.grammar;
             qTextEl.textContent = q.q;
             qHintKoEl.textContent = '상황: ' + q.hintKo;
@@ -513,7 +706,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 q.options.forEach(function (opt) {
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = 'choice-btn w-full border border-slate-300 rounded-xl px-4 py-3 text-left text-sm font-semibold text-slate-800';
+                    btn.className = 'choice-btn w-full border border-slate-300 rounded-xl px-4 py-3 text-left text-sm font-semibold text-slate-800 hover:border-blue-400 hover:bg-blue-50/50 transition-colors duration-150 cursor-pointer';
                     btn.textContent = opt;
                     btn.addEventListener('click', function () { answerQuestion(opt); });
                     choicesEl.appendChild(btn);
@@ -522,6 +715,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 shortWrapEl.classList.remove('hidden');
             }
             resultEl.classList.add('hidden');
+            syncMultilangBlocks();
         }
 
         function renderResult() {
@@ -529,25 +723,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             const wrong = qState.logs.filter(function (x) { return !x.ok; });
             let detail = '';
             if (wrong.length === 0) {
-                detail = '<p class="text-sm text-emerald-700 mt-2">모든 문항을 정확히 풀었습니다.</p><p class="vi-text text-xs text-blue-700 mt-1">Bạn đã trả lời đúng toàn bộ câu hỏi.</p>';
+                detail = '<p class="text-sm text-emerald-700 mt-2">모든 문항을 정확히 풀었습니다.</p><p data-lang="vi" class="text-xs text-blue-700 mt-1">Bạn đã trả lời đúng toàn bộ câu hỏi.</p>';
             } else {
                 detail = qState.logs.map(function (w, i) {
                     if (w.ok) {
-                        return '<article class="rounded-xl border border-emerald-200 bg-emerald-50 p-3">' +
+                        return '<article class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">' +
                             '<p class="text-xs font-bold text-emerald-700">정답 ' + (i + 1) + '</p>' +
-                            '<p class="text-sm text-slate-800 mt-1 safe">' + esc(w.q) + '</p>' +
-                            '<p class="text-xs text-slate-700 mt-1"><b>정답:</b> ' + esc(w.correct) + '</p>' +
-                            '<p class="text-xs text-emerald-700 mt-1 safe"><b>설명(KO):</b> ' + esc(w.explainKo) + '</p>' +
-                            '<p class="vi-text text-xs text-blue-700 mt-1 safe"><b>Giải thích (VI):</b> ' + esc(w.explainVi) + '</p>' +
+                            '<p class="text-sm text-slate-800 mt-1.5 safe">' + esc(w.q) + '</p>' +
+                            '<p class="text-xs text-slate-700 mt-1.5"><b>정답:</b> ' + esc(w.correct) + '</p>' +
+                            '<p class="text-xs text-emerald-700 mt-1.5 safe"><b>설명(KO):</b> ' + esc(w.explainKo) + '</p>' +
+                            '<p data-lang="vi" class="text-xs text-blue-700 mt-1 safe"><b>Giải thích (VI):</b> ' + esc(w.explainVi) + '</p>' +
                             '</article>';
                     }
-                    return '<article class="rounded-xl border border-rose-200 bg-rose-50 p-3">' +
+                    return '<article class="rounded-xl border border-rose-200 bg-rose-50 p-4 shadow-sm">' +
                         '<p class="text-xs font-bold text-rose-700">오답 ' + (i + 1) + '</p>' +
-                        '<p class="text-sm text-slate-800 mt-1 safe">' + esc(w.q) + '</p>' +
+                        '<p class="text-sm text-slate-800 mt-1.5 safe">' + esc(w.q) + '</p>' +
                         '<p class="text-xs text-slate-700 mt-2"><b>내 답:</b> ' + esc(w.user || '(무응답)') + '</p>' +
                         '<p class="text-xs text-slate-700 mt-1"><b>정답:</b> ' + esc(w.correct) + '</p>' +
                         '<p class="text-xs text-rose-700 mt-2 safe"><b>설명(KO):</b> ' + esc(w.explainKo) + '</p>' +
-                        '<p class="text-xs text-blue-700 mt-1 safe"><b>Giải thích (VI):</b> ' + esc(w.explainVi) + '</p>' +
+                        '<p data-lang="vi" class="text-xs text-blue-700 mt-1.5 safe"><b>Giải thích (VI):</b> ' + esc(w.explainVi) + '</p>' +
                         '</article>';
                 }).join('');
             }
@@ -556,9 +750,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 '<p class="text-xs text-blue-700 font-bold">퀴즈 완료</p>' +
                 '<h3 class="text-2xl font-black text-slate-800 mt-1">' + qState.score + ' / ' + quiz.length + '</h3>' +
                 '<p class="text-sm text-slate-600 mt-1">정답률 ' + pct + '%</p>' +
-                '<button id="restartBtn" class="mt-3 px-4 py-2 rounded-lg bg-slate-800 text-white text-sm font-bold" type="button">다시 풀기</button>' +
-                '</div><div class="mt-3 space-y-2">' + detail + '</div>';
+                '<button id="restartBtn" class="mt-3 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold transition-colors cursor-pointer" type="button">다시 풀기</button>' +
+                '</div><div class="mt-4 space-y-3">' + detail + '</div>';
             resultEl.classList.remove('hidden');
+            syncMultilangBlocks();
             document.getElementById('restartBtn').addEventListener('click', function () {
                 qState.idx = 0; qState.score = 0; qState.logs = [];
                 for (var i = quiz.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = quiz[i]; quiz[i] = quiz[j]; quiz[j] = t; }
@@ -575,7 +770,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         });
         nextBtnEl.addEventListener('click', function () { qState.idx += 1; renderQuestion(); });
 
-        showTab('learn');
+        // ── 레이아웃 오프셋 계산 ─────────────────────────────────────
+        function updateResponsiveOffsets() {
+            const nav = document.getElementById("injected-global-nav");
+            const header = document.querySelector(".grammar-header");
+            const navHeight = nav ? nav.offsetHeight : 58;
+            const headerHeight = header ? header.offsetHeight : 76;
+            document.body.style.setProperty("--grammar-nav-height", `${navHeight}px`);
+            document.body.style.setProperty("--grammar-header-height", `${headerHeight}px`);
+        }
+
+        // ── 초기화 ────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set initial active tab
+            showTab('learn');
+
+            updateResponsiveOffsets();
+            window.addEventListener('resize', updateResponsiveOffsets);
+        });
     </script>
     <script src="../shared/learning-enhancements.js"></script>
     <script src="../shared/site-copyright.js"></script>

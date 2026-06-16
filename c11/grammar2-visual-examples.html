@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>11과 문법2 이미지 예시 | 조건 vs 가정</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --ink: #111827;
+            --muted: #64748b;
+            --line: #dbe3ee;
+            --panel: #ffffff;
+            --soft: #f8fafc;
+            --brand: #0f766e;
+            --brand-dark: #115e59;
+            --accent: #b45309;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--ink);
+            background: #eef6f7;
+            font-family: "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 58px;
+            padding: 10px max(14px, calc((100vw - 1320px) / 2 + 14px));
+            background: rgba(255, 255, 255, 0.93);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar__links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .topbar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 36px;
+            padding: 0 10px;
+            border-radius: 8px;
+            color: var(--brand-dark);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .topbar a:hover {
+            background: #ecfdf5;
+        }
+
+        .topbar__title {
+            color: #475569;
+            font-size: 13px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .shell {
+            width: min(1320px, calc(100% - 24px));
+            margin: 16px auto 40px;
+        }
+
+        .viewer {
+            display: grid;
+            grid-template-columns: 308px minmax(0, 1fr);
+            gap: 16px;
+            align-items: start;
+        }
+
+        .rail,
+        .stage {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        .rail {
+            position: sticky;
+            top: 74px;
+            padding: 14px;
+        }
+
+        .rail__header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .eyebrow {
+            margin: 0 0 4px;
+            color: var(--brand);
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        p {
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+
+        h1 {
+            margin: 0;
+            color: #0f172a;
+            font-size: clamp(1.34rem, 2.2vw, 2rem);
+            line-height: 1.2;
+            letter-spacing: 0;
+        }
+
+        .count {
+            flex: 0 0 auto;
+            padding: 5px 8px;
+            border-radius: 8px;
+            background: #fffbeb;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .thumb-list {
+            display: grid;
+            gap: 8px;
+            max-height: calc(100vh - 188px);
+            margin-top: 12px;
+            overflow: auto;
+            padding-right: 2px;
+        }
+
+        .thumb-button {
+            display: grid;
+            grid-template-columns: 58px minmax(0, 1fr);
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 86px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #1f2937;
+            cursor: pointer;
+            padding: 8px;
+            text-align: left;
+            transition: border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
+        }
+
+        .thumb-button:hover,
+        .thumb-button[aria-current="true"] {
+            border-color: #14b8a6;
+            background: #f0fdfa;
+            box-shadow: 0 10px 22px rgba(20, 184, 166, 0.12);
+        }
+
+        .thumb-button img {
+            display: block;
+            width: 58px;
+            height: auto;
+            aspect-ratio: 1408 / 768;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            object-fit: cover;
+            background: var(--soft);
+        }
+
+        .thumb-title {
+            display: block;
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+
+        .thumb-meta {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .stage {
+            padding: 10px;
+        }
+
+        .stage__bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 0 2px 6px;
+            border-bottom: 0;
+        }
+
+        .stage__bar > div:first-child {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .stage h2 {
+            margin: 0;
+            color: #0f172a;
+            font-size: clamp(1rem, 1.35vw, 1.16rem);
+            line-height: 1.25;
+            letter-spacing: 0;
+        }
+
+        .stage p {
+            margin: 0;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        #visualDescription {
+            display: none;
+        }
+
+        .hint-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 2px 4px 8px;
+        }
+
+        .hint-chip {
+            min-width: 0;
+            padding: 6px 9px;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 900;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            padding: 0 9px;
+            border-radius: 8px;
+            background: #ecfdf5;
+            color: var(--brand-dark);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 0 0 auto;
+        }
+
+        .icon-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            cursor: pointer;
+            text-decoration: none;
+            transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease;
+        }
+
+        .icon-button:hover {
+            border-color: #0f766e;
+            background: #f0fdfa;
+            color: var(--brand-dark);
+        }
+
+        .photo-frame {
+            margin: 8px 0 0;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .image-stack {
+            position: relative;
+            width: min(100%, 980px);
+            margin: 0 auto;
+        }
+
+        .photo-frame img {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin: 0;
+            border-radius: 6px;
+            background: #ffffff;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .caption {
+            margin: 10px 4px 2px;
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.55;
+            text-align: center;
+        }
+
+        .reveal-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            margin: 10px 4px 0;
+            padding: 10px 14px;
+            border: 0;
+            border-radius: 8px;
+            background: #0f766e;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .reveal-button:hover {
+            background: #115e59;
+        }
+
+        .answer-panel {
+            position: absolute;
+            top: 14px;
+            left: 18px;
+            right: 18px;
+            z-index: 2;
+            max-height: min(54%, 360px);
+            overflow: auto;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 16px 34px rgba(15, 23, 42, 0.22);
+            backdrop-filter: blur(8px);
+        }
+
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .answer-card {
+            min-width: 0;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .answer-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .pattern-chip {
+            flex: 0 0 auto;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .answer-sentence {
+            margin: 8px 0 0;
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 900;
+            line-height: 1.45;
+        }
+
+        .answer-nuance,
+        .answer-note {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        .answer-note {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 640px) {
+            .answer-panel {
+                top: 12px;
+                left: 12px;
+                right: 12px;
+                max-height: 62%;
+                padding: 10px;
+            }
+
+            .answer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .answer-card {
+                padding: 10px;
+            }
+
+            .answer-sentence {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 860px) {
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .topbar__title {
+                white-space: normal;
+            }
+
+            .shell {
+                width: min(100% - 16px, 760px);
+                margin-top: 10px;
+            }
+
+            .viewer {
+                grid-template-columns: 1fr;
+            }
+
+            .rail {
+                position: static;
+            }
+
+            .thumb-list {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                max-height: none;
+                overflow: visible;
+                padding-right: 0;
+            }
+
+            .thumb-button {
+                grid-template-columns: 1fr;
+                min-height: 0;
+                padding: 6px;
+            }
+
+            .thumb-button img {
+                width: 100%;
+            }
+
+            .thumb-copy {
+                display: none;
+            }
+
+            .stage__bar {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .controls {
+                align-self: auto;
+                justify-content: flex-end;
+                margin-left: auto;
+            }
+        }
+
+        @media (max-width: 460px) {
+            .thumb-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .stage,
+            .rail {
+                padding: 10px;
+            }
+
+            .photo-frame {
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="상단 이동">
+        <div class="topbar__links">
+            <a href="../index.html"><i class="fa-solid fa-house" aria-hidden="true"></i><span>메인</span></a>
+            <a href="index.html"><i class="fa-solid fa-folder-open" aria-hidden="true"></i><span>11과</span></a>
+            <a href="grammar2.html"><i class="fa-solid fa-book-open" aria-hidden="true"></i><span>문법 2</span></a>
+        </div>
+        <span class="topbar__title">A/V-(ㄴ/는)다면, N(이)라면</span>
+    </nav>
+
+    <main id="visualExamples" class="shell">
+        <section class="viewer" aria-labelledby="visualExamplesTitle">
+            <aside class="rail" aria-label="예시 목록">
+                <div class="rail__header">
+                    <div>
+                        <p class="eyebrow">C11 Grammar 2</p>
+                        <h1 id="visualExamplesTitle">조건 vs 가정 이미지 예시</h1>
+                    </div>
+                    <span id="photoCount" class="count">1 / 15</span>
+                </div>
+                <div id="thumbList" class="thumb-list"></div>
+            </aside>
+
+            <section class="stage" aria-live="polite">
+                <div class="stage__bar">
+                    <div>
+                        <span id="visualTag" class="tag">기본 비교</span>
+                        <h2 id="visualTitle">비 오는 날과 복권 상상</h2>
+                        <p id="visualDescription">두 장면 중 어느 쪽이 실제로 자주 일어나는 조건이고, 어느 쪽이 상상에 가까울까요?</p>
+                    </div>
+                    <div class="controls">
+                        <button id="prevPhoto" class="icon-button" type="button" aria-label="이전 예시" title="이전 예시">
+                            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+                        </button>
+                        <button id="nextPhoto" class="icon-button" type="button" aria-label="다음 예시" title="다음 예시">
+                            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                        </button>
+                        <a id="openPhoto" class="icon-button" href="../assets/c11/grammar/images/grammar2-neundamyeon/illustrations/09-if-rain-lottery.webp" target="_blank" rel="noopener" aria-label="새 탭에서 열기" title="새 탭에서 열기">
+                            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                <div id="hintList" class="hint-list" aria-label="관찰 힌트"></div>
+
+                <figure class="photo-frame">
+                    <div class="image-stack">
+                        <img
+                            id="visualImage"
+                            data-testid="visual-main-image"
+                            src="../assets/c11/grammar/images/grammar2-neundamyeon/illustrations/09-if-rain-lottery.webp"
+                            alt="비 오는 거리의 학생과 복권 당첨을 상상하는 학생이 나란히 있는 무문자 삽화"
+                            width="1408"
+                            height="768"
+                            fetchpriority="high"
+                            decoding="async"
+                        />
+                        <section id="visualAnswerPanel" class="answer-panel">
+                            <div id="visualAnswerExamples" class="answer-grid"></div>
+                            <p id="visualNote" class="answer-note"></p>
+                        </section>
+                    </div>
+                    <figcaption id="visualCaption" class="caption">이미지 안에는 문장이 없습니다. 먼저 장면을 보고 어떤 조건문을 만들 수 있을지 떠올려 보세요.</figcaption>
+                </figure>
+                <button id="visualRevealBtn" class="reveal-button" type="button" aria-expanded="true" aria-controls="visualAnswerPanel">
+                    <i class="fa-solid fa-eye-slash" aria-hidden="true"></i>
+                    예문 숨기기
+                </button>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        const PHOTO_BASE = "../assets/c11/grammar/images/grammar2-neundamyeon/illustrations/";
+        const THUMB_BASE = "../assets/c11/grammar/images/grammar2-neundamyeon/illustrations/";
+        const photos = [
+            {
+                id: "rain-lottery",
+                tag: "기본 비교",
+                title: "비 오는 날과 복권 상상",
+                description: "두 장면 중 어느 쪽이 실제로 자주 일어나는 조건이고, 어느 쪽이 상상에 가까울까요?",
+                file: "09-if-rain-lottery.webp",
+                thumb: "09-if-rain-lottery.webp",
+                alt: "비 오는 거리의 학생과 복권 당첨을 상상하는 학생이 나란히 있는 무문자 삽화",
+                hintChips: ["비", "우산", "복권", "집", "가능성 낮은 가정"],
+                examples: [
+                    { label: "현실 조건", pattern: "-(으)면", sentence: "비가 오면 우산을 써요.", nuance: "자주 일어날 수 있는 실제 조건입니다." },
+                    { label: "가정", pattern: "-다면", sentence: "복권에 당첨된다면 집을 살 거예요.", nuance: "가능성이 낮은 일을 상상합니다." }
+                ],
+                note: "-(으)면은 실제 조건, -다면은 가능성이 낮거나 상상하는 상황에 초점을 둡니다."
+            },
+            {
+                id: "traffic-bird",
+                tag: "기본 비교",
+                title: "교통 체증과 새가 되는 상상",
+                description: "교통 체증을 피하는 현실적인 방법과 불가능에 가까운 상상을 나누어 보세요.",
+                file: "10-if-traffic-bird.webp",
+                thumb: "10-if-traffic-bird.webp",
+                alt: "막힌 도로와 하늘을 나는 사람이 대비된 무문자 삽화",
+                hintChips: ["교통 체증", "지하철", "새", "하늘", "명사 가정"],
+                examples: [
+                    { label: "현실 조건", pattern: "-(으)면", sentence: "길이 막히면 지하철을 타요.", nuance: "실제로 선택할 수 있는 해결 방법입니다." },
+                    { label: "명사 가정", pattern: "N-라면", sentence: "내가 새라면 하늘을 날 거예요.", nuance: "명사에 붙여 상상 속 역할을 말합니다." }
+                ],
+                note: "명사 가정에서는 받침이 있으면 -이라면, 받침이 없으면 -라면을 씁니다."
+            },
+            {
+                id: "homework-king",
+                tag: "상상 가정",
+                title: "숙제 후 게임과 왕의 하루",
+                description: "숙제를 끝낸 뒤 할 수 있는 일과 왕이 된다는 상상을 구분해 보세요.",
+                file: "04-imagined-homework-game.webp",
+                thumb: "04-imagined-homework-game.webp",
+                alt: "숙제하는 학생과 왕이 된 학생이 대비된 무문자 삽화",
+                hintChips: ["숙제", "게임", "왕", "매일 놀기", "상상 역할"],
+                examples: [
+                    { label: "현실 조건", pattern: "-(으)면", sentence: "숙제를 다 하면 게임을 해요.", nuance: "조건이 충족되면 실제로 할 수 있는 일입니다." },
+                    { label: "상상 가정", pattern: "N-이라면", sentence: "내가 왕이라면 매일 놀고 싶어요.", nuance: "현실과 거리가 있는 역할을 상상합니다." }
+                ],
+                note: "상상 속 역할을 세우면 -다면 계열의 가정적 느낌이 더 선명해집니다."
+            },
+            {
+                id: "eat-giant",
+                tag: "상상 가정",
+                title: "많이 먹기와 거인 상상",
+                description: "현실에서 가능한 성장 이야기와 불가능에 가까운 상상을 나누어 말해 보세요.",
+                file: "05-imagined-eat-tall.webp",
+                thumb: "05-imagined-eat-tall.webp",
+                alt: "식사하는 학생과 거인이 되어 바위를 옮기는 상상이 대비된 무문자 삽화",
+                hintChips: ["밥", "키", "거인", "바위", "상상 가정"],
+                examples: [
+                    { label: "현실 조건", pattern: "-(으)면", sentence: "밥을 많이 먹으면 키가 커요.", nuance: "일반적으로 기대할 수 있는 조건과 결과입니다." },
+                    { label: "상상 가정", pattern: "N-이라면", sentence: "내가 거인이라면 산을 옮길 거예요.", nuance: "현실성이 낮은 상황을 가정합니다." }
+                ],
+                note: "현실 조건과 불가능에 가까운 상상을 대비하면 의미 차이가 또렷해집니다."
+            },
+            {
+                id: "sale-lamp",
+                tag: "상상 가정",
+                title: "세일 쇼핑과 램프의 요정",
+                description: "가게에서 일어나는 실제 조건과 동화 같은 사건을 비교해 보세요.",
+                file: "06-imagined-sale-shopping.webp",
+                thumb: "06-imagined-sale-shopping.webp",
+                alt: "옷가게에서 쇼핑하는 학생과 램프의 요정을 만나는 상상이 대비된 무문자 삽화",
+                hintChips: ["세일", "옷", "램프", "요정", "소원"],
+                examples: [
+                    { label: "현실 조건", pattern: "-(으)면", sentence: "세일을 하면 옷을 살 거예요.", nuance: "실제 상황이 생기면 이어질 행동입니다." },
+                    { label: "상상 가정", pattern: "-ㄴ다면", sentence: "램프의 요정을 만난다면 세 가지 소원을 빌 거예요.", nuance: "동화 같은 사건을 조건처럼 놓습니다." }
+                ],
+                note: "만난다면처럼 동사 어간에 받침이 없으면 -ㄴ다면을 붙입니다."
+            },
+            {
+                id: "snow-invisible",
+                tag: "상상 가정",
+                title: "눈사람과 투명 인간 여행",
+                description: "날씨가 바뀌면 할 수 있는 일과 몸이 사라진다는 상상을 구분해 보세요.",
+                file: "07-imagined-snow-invisible.webp",
+                thumb: "07-imagined-snow-invisible.webp",
+                alt: "눈사람을 만드는 학생과 투명 인간이 되어 여행하는 상상이 대비된 무문자 삽화",
+                hintChips: ["눈", "눈사람", "투명 인간", "여행", "된다면"],
+                examples: [
+                    { label: "현실 조건", pattern: "-(으)면", sentence: "눈이 오면 눈사람을 만들어요.", nuance: "날씨 조건에 따른 자연스러운 행동입니다." },
+                    { label: "상상 가정", pattern: "-ㄴ다면", sentence: "투명 인간이 된다면 여행을 갈 거예요.", nuance: "상상 속 변화가 일어난다고 가정합니다." }
+                ],
+                note: "된다면은 되다의 가정 형태로, 가정 속 바람을 말할 때 자연스럽습니다."
+            },
+            {
+                id: "tired-time",
+                tag: "상상 가정",
+                title: "피곤한 밤과 시간 여행",
+                description: "몸 상태에 따른 현실적 선택과 시간을 되돌리는 상상을 나누어 보세요.",
+                file: "08-imagined-tired-time-rewind.webp",
+                thumb: "08-imagined-tired-time-rewind.webp",
+                alt: "피곤해서 쉬는 학생과 시간을 되돌리는 상상이 대비된 무문자 삽화",
+                hintChips: ["피곤함", "휴식", "시간", "어린 시절", "가능성"],
+                examples: [
+                    { label: "현실 조건", pattern: "-(으)면", sentence: "피곤하면 좀 쉬세요.", nuance: "현재 상태에 맞춘 실제 조언입니다." },
+                    { label: "상상 가정", pattern: "-다면", sentence: "시간을 돌릴 수 있다면 어린 시절로 돌아가고 싶어요.", nuance: "현재 사실이 아닌 가능성을 가정합니다." }
+                ],
+                note: "있다면은 현재 사실이 아니라 가정한 가능성을 앞에 세웁니다."
+            },
+            {
+                id: "health-exercise",
+                tag: "장기 목표",
+                title: "운동 습관과 오래 사는 목표",
+                description: "지금 할 수 있는 습관과 그 습관이 이어진 미래 목표를 연결해 보세요.",
+                file: "01-long-term-health-exercise.webp",
+                thumb: "01-long-term-health-exercise.webp",
+                alt: "운동하는 학생과 건강하게 나이 든 미래를 상상하는 무문자 삽화",
+                hintChips: ["운동", "건강", "미래", "가족", "장기 목표"],
+                examples: [
+                    { label: "현실 조건", pattern: "-(으)면", sentence: "운동을 하면 건강해져요.", nuance: "현재 행동과 일반적인 결과를 말합니다." },
+                    { label: "미래 가정", pattern: "-ㄴ다면", sentence: "건강 관리를 잘한다면 오래 살고 싶어요.", nuance: "아직 오지 않은 미래를 가정합니다." }
+                ],
+                note: "장기 목표를 말할 때 -다면은 아직 오지 않은 미래를 상상하는 느낌을 줍니다."
+            },
+            {
+                id: "money-travel",
+                tag: "장기 목표",
+                title: "저금과 세계 여행 목표",
+                description: "오늘의 저금 습관과 돈을 충분히 모은 미래 계획을 이어 말해 보세요.",
+                file: "02-long-term-money-travel.webp",
+                thumb: "02-long-term-money-travel.webp",
+                alt: "돈을 저금하는 학생과 세계 여행을 상상하는 무문자 삽화",
+                hintChips: ["돈", "저금", "여행", "미래 계획", "목표"],
+                examples: [
+                    { label: "현실 조건", pattern: "-(으)면", sentence: "돈이 생기면 저금해요.", nuance: "반복 가능한 실제 행동입니다." },
+                    { label: "미래 가정", pattern: "-ㄴ다면", sentence: "돈을 많이 모은다면 세계 여행을 갈 거예요.", nuance: "목표 달성을 가정하고 계획을 말합니다." }
+                ],
+                note: "모은다면처럼 목표 달성을 상정하고 뒤의 계획을 이어 말할 수 있습니다."
+            },
+            {
+                id: "korean-interpreter",
+                tag: "장기 목표",
+                title: "한국어 공부와 통역사 꿈",
+                description: "현재의 공부 장면과 미래 직업 목표를 어떤 조건문으로 연결할 수 있을까요?",
+                file: "03-long-term-korean-study-goal.webp",
+                thumb: "03-long-term-korean-study-goal.webp",
+                alt: "한국어를 공부하는 학생과 통역사가 된 미래를 상상하는 무문자 삽화",
+                hintChips: ["한국어", "공부", "시험", "통역사", "장래 희망"],
+                examples: [
+                    { label: "현실 조건", pattern: "-(으)면", sentence: "한국어를 열심히 공부하면 시험을 잘 봐요.", nuance: "노력과 결과의 일반 조건입니다." },
+                    { label: "미래 가정", pattern: "-ㄴ다면", sentence: "한국어 능력이 고급이 된다면 통역사가 되고 싶어요.", nuance: "목표 수준에 도달한 미래를 가정합니다." }
+                ],
+                note: "미래 목표를 말할 때 현재의 노력과 가정한 결과를 함께 보여 줄 수 있습니다."
+            },
+            {
+                id: "noun-forms",
+                tag: "형태 정리",
+                title: "명사로 만드는 가정",
+                description: "각 장면에서 사람이 어떤 명사가 되었다고 상상하는지 말해 보세요.",
+                file: "11-noun-if-rich-superman-cat.webp",
+                thumb: "11-noun-if-rich-superman-cat.webp",
+                alt: "부자, 슈퍼 영웅, 고양이 생활을 상상하는 세 장면의 무문자 삽화",
+                hintChips: ["부자", "슈퍼맨", "고양이", "명사", "받침"],
+                examples: [
+                    { label: "받침 없음", pattern: "N-라면", sentence: "내가 부자라면 기부할 거예요.", nuance: "부자는 받침이 없어 -라면을 씁니다." },
+                    { label: "받침 있음", pattern: "N-이라면", sentence: "내가 슈퍼맨이라면 날아다닐 거예요.", nuance: "슈퍼맨은 받침이 있어 -이라면을 씁니다." },
+                    { label: "받침 있음", pattern: "N-이라면", sentence: "내가 고양이라면 하루 종일 잘 거예요.", nuance: "고양이는 받침이 있어 -이라면을 씁니다." }
+                ],
+                note: "명사는 받침이 있으면 -이라면, 받침이 없으면 -라면을 씁니다."
+            },
+            {
+                id: "verb-forms",
+                tag: "형태 정리",
+                title: "동사로 만드는 가정",
+                description: "네 장면의 동사를 찾아 보고 받침이 있는지 없는지 나누어 보세요.",
+                file: "12-verb-if-study-party-korea-taxi.webp",
+                thumb: "12-verb-if-study-party-korea-taxi.webp",
+                alt: "영화, 합격 축하, 여행, 버스 놓침을 상상하는 네 장면의 무문자 삽화",
+                hintChips: ["되다", "합격하다", "가다", "놓치다", "동사"],
+                examples: [
+                    { label: "받침 없음", pattern: "V-ㄴ다면", sentence: "시간이 된다면 영화를 볼 거예요.", nuance: "되다처럼 받침이 없으면 -ㄴ다면을 씁니다." },
+                    { label: "받침 없음", pattern: "V-ㄴ다면", sentence: "시험에 합격한다면 파티를 할 거예요.", nuance: "하다 동사는 한다면으로 이어집니다." },
+                    { label: "받침 없음", pattern: "V-ㄴ다면", sentence: "한국에 간다면 택시를 탈 거예요.", nuance: "가다는 간다면으로 바뀝니다." },
+                    { label: "받침 없음", pattern: "V-ㄴ다면", sentence: "버스를 놓친다면 택시를 탈 거예요.", nuance: "놓치다는 놓친다면으로 이어집니다." }
+                ],
+                note: "동사는 받침이 없으면 -ㄴ다면으로 연결합니다. 받침이 있는 동사는 -는다면을 씁니다."
+            },
+            {
+                id: "adjective-forms",
+                tag: "형태 정리",
+                title: "형용사로 만드는 가정",
+                description: "각 장면의 상태를 나타내는 형용사를 떠올리고 -다면으로 연결해 보세요.",
+                file: "13-adjective-if-tired-hungry-money.webp",
+                thumb: "13-adjective-if-tired-hungry-money.webp",
+                alt: "피곤함, 배고픔, 돈이 많은 상황을 보여 주는 세 장면의 무문자 삽화",
+                hintChips: ["피곤하다", "배고프다", "많다", "상태", "형용사"],
+                examples: [
+                    { label: "상태 가정", pattern: "A-다면", sentence: "피곤하다면 좀 쉬세요.", nuance: "상태가 그렇다고 가정해 조언합니다." },
+                    { label: "상태 가정", pattern: "A-다면", sentence: "배고프다면 밥을 먹어요.", nuance: "형용사는 받침 유무와 관계없이 -다면을 씁니다." },
+                    { label: "상태 가정", pattern: "A-다면", sentence: "돈이 많다면 기부할 거예요.", nuance: "상태를 가정하고 뒤의 행동을 말합니다." }
+                ],
+                note: "형용사는 받침 유무와 관계없이 -다면으로 연결합니다."
+            },
+            {
+                id: "mixed-forms",
+                tag: "형태 정리",
+                title: "품사별 가정 형태 비교",
+                description: "각 장면의 핵심 단어가 형용사인지 동사인지 명사인지 구분해 보세요.",
+                file: "14-mixed-if-cold-travel-king.webp",
+                thumb: "14-mixed-if-cold-travel-king.webp",
+                alt: "추운 날씨, 복권 당첨 상상, 왕이 된 상상을 비교하는 무문자 삽화",
+                hintChips: ["춥다", "당첨되다", "왕", "품사", "형태 비교"],
+                examples: [
+                    { label: "형용사", pattern: "A-다면", sentence: "날씨가 춥다면 난방을 켤 거예요.", nuance: "춥다는 형용사라 -다면을 씁니다." },
+                    { label: "동사", pattern: "V-ㄴ다면", sentence: "복권에 당첨된다면 세계 여행을 갈 거예요.", nuance: "당첨되다는 동사라 -ㄴ다면으로 연결합니다." },
+                    { label: "명사", pattern: "N-이라면", sentence: "내가 왕이라면 백성을 도울 거예요.", nuance: "왕은 받침이 있어 -이라면을 씁니다." }
+                ],
+                note: "품사에 따라 -다면, -ㄴ다면/-는다면, -(이)라면으로 갈라집니다."
+            },
+            {
+                id: "summary-forms",
+                tag: "형태 정리",
+                title: "가정 표현 한 장 요약",
+                description: "세 장면을 보고 형용사, 동사, 명사 가정 형태를 각각 떠올려 보세요.",
+                file: "15-summary-weather-lottery-king.webp",
+                thumb: "15-summary-weather-lottery-king.webp",
+                alt: "추운 날, 복권 당첨, 왕이 된 상상을 한 장에 모은 무문자 삽화",
+                hintChips: ["춥다", "당첨되다", "왕", "요약", "바꿔 말하기"],
+                examples: [
+                    { label: "형용사", pattern: "A-다면", sentence: "춥다면 따뜻한 음식을 먹어요.", nuance: "상태를 가정합니다." },
+                    { label: "동사", pattern: "V-ㄴ다면", sentence: "당첨된다면 집을 살 거예요.", nuance: "사건이 일어난다고 가정합니다." },
+                    { label: "명사", pattern: "N-이라면", sentence: "왕이라면 사람들을 도울 거예요.", nuance: "명사 역할을 가정합니다." }
+                ],
+                note: "형태 정리 후 예문을 직접 바꿔 말하는 활동으로 이어가기 좋습니다."
+            }
+        ];
+
+        const state = { index: 0 };
+        const thumbList = document.getElementById("thumbList");
+        const visualImage = document.getElementById("visualImage");
+        const visualTitle = document.getElementById("visualTitle");
+        const visualTag = document.getElementById("visualTag");
+        const visualDescription = document.getElementById("visualDescription");
+        const visualCaption = document.getElementById("visualCaption");
+        const photoCount = document.getElementById("photoCount");
+        const openPhoto = document.getElementById("openPhoto");
+        const hintList = document.getElementById("hintList");
+        const visualRevealBtn = document.getElementById("visualRevealBtn");
+        const visualAnswerPanel = document.getElementById("visualAnswerPanel");
+        const visualAnswerExamples = document.getElementById("visualAnswerExamples");
+        const visualNote = document.getElementById("visualNote");
+
+        function esc(text) {
+            return String(text == null ? "" : text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function renderThumbs() {
+            thumbList.innerHTML = photos.map(function (photo, index) {
+                return '<button class="thumb-button" type="button" data-index="' + index + '" aria-label="' + photo.title + '" aria-current="' + (index === state.index ? "true" : "false") + '">' +
+                    '<img src="' + THUMB_BASE + photo.thumb + '" alt="" width="320" height="175" loading="lazy" decoding="async" />' +
+                    '<span class="thumb-copy"><span class="thumb-title">' + esc(photo.title) + '</span><span class="thumb-meta">' + esc(photo.tag) + '</span></span>' +
+                '</button>';
+            }).join("");
+
+            thumbList.querySelectorAll("[data-index]").forEach(function (button) {
+                button.addEventListener("click", function () {
+                    setActive(Number(button.dataset.index), true);
+                });
+            });
+        }
+
+        function setActive(index, updateHash) {
+            state.index = (index + photos.length) % photos.length;
+            const photo = photos[state.index];
+            visualImage.src = PHOTO_BASE + photo.file;
+            visualImage.alt = photo.alt;
+            visualTitle.textContent = photo.title;
+            visualTag.textContent = photo.tag;
+            visualDescription.textContent = photo.description;
+            visualCaption.textContent = "이미지 안에는 문장이 없습니다. 먼저 장면을 보고 어떤 조건문을 만들 수 있을지 떠올려 보세요.";
+            photoCount.textContent = (state.index + 1) + " / " + photos.length;
+            openPhoto.href = PHOTO_BASE + photo.file;
+            renderHints(photo);
+            renderAnswers(photo);
+            setAnswerVisible(true);
+
+            thumbList.querySelectorAll("[data-index]").forEach(function (button) {
+                const current = Number(button.dataset.index) === state.index;
+                button.setAttribute("aria-current", current ? "true" : "false");
+            });
+
+            if (updateHash && history.replaceState) {
+                history.replaceState(null, "", "#" + photo.id);
+            }
+        }
+
+        function renderHints(photo) {
+            hintList.innerHTML = photo.hintChips.map(function (hint) {
+                return '<span class="hint-chip">' + esc(hint) + '</span>';
+            }).join("");
+        }
+
+        function renderAnswers(photo) {
+            visualAnswerExamples.innerHTML = photo.examples.map(function (example) {
+                return '<article class="answer-card">' +
+                    '<div class="answer-label"><span>' + esc(example.label) + '</span><span class="pattern-chip">' + esc(example.pattern) + '</span></div>' +
+                    '<p class="answer-sentence">' + esc(example.sentence) + '</p>' +
+                    '<p class="answer-nuance">' + esc(example.nuance) + '</p>' +
+                '</article>';
+            }).join("");
+            visualNote.textContent = photo.note;
+        }
+
+        function setAnswerVisible(isVisible) {
+            visualAnswerPanel.hidden = !isVisible;
+            visualRevealBtn.setAttribute("aria-expanded", isVisible ? "true" : "false");
+            visualRevealBtn.innerHTML = '<i class="fa-solid ' + (isVisible ? "fa-eye-slash" : "fa-eye") + '" aria-hidden="true"></i>' + (isVisible ? "예문 숨기기" : "예문 보기");
+        }
+
+        function activeFromHash() {
+            const hash = decodeURIComponent(window.location.hash.replace("#", ""));
+            if (!hash || hash === "visualExamples") return 0;
+            const matched = photos.findIndex(function (photo) { return photo.id === hash; });
+            return matched >= 0 ? matched : 0;
+        }
+
+        document.getElementById("prevPhoto").addEventListener("click", function () {
+            setActive(state.index - 1, true);
+        });
+        document.getElementById("nextPhoto").addEventListener("click", function () {
+            setActive(state.index + 1, true);
+        });
+        visualRevealBtn.addEventListener("click", function () {
+            setAnswerVisible(visualAnswerPanel.hidden);
+        });
+        window.addEventListener("hashchange", function () {
+            setActive(activeFromHash(), false);
+        });
+
+        renderThumbs();
+        setActive(activeFromHash(), false);
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>
