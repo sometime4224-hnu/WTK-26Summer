@@ -17,6 +17,6 @@ test('c11 hub keeps grammar1 support materials collapsed until opened', async ({
   await drawer.locator('summary.support-drawer__summary').click();
 
   await expect(drawer).toHaveAttribute('open', '');
-  await expect(drawer.locator('.support-drawer__links .lesson-link')).toHaveCount(6);
+  await expect(drawer.locator('.support-drawer__links .lesson-link')).toHaveCount(7);
   await expect(page.locator('a[href="grammar1-causative-influence-lab.html"]')).toBeVisible();
 });
