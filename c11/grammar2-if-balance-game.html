@@ -65,8 +65,17 @@
             width: 100%;
             overflow-x: hidden;
         }
+        #injected-global-nav {
+            order: 0;
+        }
         .grammar-header {
-            top: var(--grammar-nav-height) !important;
+            order: 30;
+            position: static !important;
+            top: auto !important;
+            background: transparent !important;
+            border-bottom: 0 !important;
+            padding-top: 8px !important;
+            padding-bottom: 32px !important;
         }
         .grammar-header > div,
         .grammar-main {
@@ -74,6 +83,38 @@
             margin-left: auto;
             margin-right: auto;
             box-sizing: border-box;
+        }
+        .grammar-header > div {
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.82);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+        }
+        .grammar-header h1 {
+            font-size: 15px !important;
+        }
+        .grammar-header p {
+            margin-top: 2px !important;
+            font-size: 11px !important;
+        }
+        .grammar-main {
+            order: 10;
+            min-height: calc(100vh - var(--grammar-nav-height));
+        }
+        .multilang-scaffold {
+            order: 31;
+            width: min(calc(100% - 32px), var(--grammar-page-max)) !important;
+            margin: 0 auto 32px !important;
+            max-height: 74px;
+            overflow: hidden;
+            opacity: .86;
+            transition: max-height .24s ease, opacity .18s ease;
+        }
+        .multilang-scaffold:hover,
+        .multilang-scaffold:focus-within {
+            max-height: 520px;
+            opacity: 1;
         }
         .grammar-practice-grid {
             display: grid;
@@ -624,7 +665,7 @@
                 display: none;
             }
             .multilang-scaffold {
-                display: none !important;
+                max-height: 56px;
             }
             .grammar-main {
                 padding-top: 12px !important;
@@ -1616,7 +1657,8 @@
             const nav = document.getElementById("injected-global-nav");
             const header = document.querySelector(".grammar-header");
             const navHeight = nav ? nav.offsetHeight : 58;
-            const headerHeight = header ? header.offsetHeight : 76;
+            const headerIsTopBar = header && window.getComputedStyle(header).position === "sticky";
+            const headerHeight = headerIsTopBar ? header.offsetHeight : 0;
             document.body.style.setProperty("--grammar-nav-height", `${navHeight}px`);
             document.body.style.setProperty("--grammar-header-height", `${headerHeight}px`);
         }
