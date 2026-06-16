@@ -78,12 +78,214 @@
         .grammar-practice-grid {
             display: grid;
             gap: 16px;
+            grid-template-columns: minmax(0, 1fr);
         }
         .grammar-practice-grid > * {
             min-width: 0;
         }
+        .game-stage {
+            width: 100%;
+        }
         .safe { word-break: keep-all; overflow-wrap: break-word; }
         .hidden { display: none !important; }
+
+        /* Collapsible progress drawer */
+        .progress-drawer {
+            position: fixed;
+            top: calc(var(--grammar-nav-height) + var(--grammar-header-height) + 14px);
+            right: max(12px, calc((100vw - var(--grammar-page-max)) / 2 + var(--grammar-page-gutter)));
+            z-index: 60;
+            width: min(360px, calc(100vw - 24px));
+            max-height: calc(100vh - var(--grammar-nav-height) - var(--grammar-header-height) - 28px);
+            overflow-y: auto;
+            padding: 0;
+            transform: translateX(calc(100% + 24px));
+            opacity: 0;
+            pointer-events: none;
+            transition: transform .24s ease, opacity .2s ease;
+        }
+        .progress-drawer.is-open {
+            transform: translateX(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .progress-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: rgba(15, 23, 42, 0.22);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s ease;
+        }
+        .progress-backdrop.is-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .compact-score-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            height: 32px;
+            padding: 0 11px;
+            border: 1px solid #c7d2fe;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #3730a3;
+            font-size: 12px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .progress-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 32px;
+            padding: 0 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 999px;
+            background: #fff;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 800;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+            transition: border-color .15s ease, color .15s ease, background .15s ease;
+        }
+        .progress-toggle-btn:hover {
+            border-color: #c7d2fe;
+            color: #3730a3;
+            background: #f8fafc;
+        }
+
+        /* Portrait recommendation */
+        .orientation-hint {
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(8px);
+        }
+        .orientation-hint.is-visible {
+            display: flex;
+        }
+        .orientation-hint-card {
+            width: min(440px, 100%);
+            border: 1px solid rgba(199, 210, 254, 0.75);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 24px 64px rgba(15, 23, 42, 0.28);
+            padding: 22px;
+            text-align: center;
+        }
+        .orientation-hint-visual {
+            width: 112px;
+            height: 112px;
+            margin: 0 auto 16px;
+            border-radius: 28px;
+            background: linear-gradient(180deg, #eef2ff 0%, #e0f2fe 100%);
+            color: #4f46e5;
+            display: grid;
+            place-items: center;
+            position: relative;
+        }
+        .orientation-hint-visual::before {
+            content: "";
+            position: absolute;
+            width: 42px;
+            height: 64px;
+            border: 2px dashed rgba(79, 70, 229, 0.32);
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.34);
+        }
+        .orientation-hint-visual .phone-icon {
+            width: 44px;
+            height: 44px;
+            transform: rotate(90deg);
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: phoneToPortrait 2.4s cubic-bezier(.45, 0, .25, 1) infinite;
+            filter: drop-shadow(0 8px 10px rgba(79, 70, 229, 0.18));
+        }
+        .orientation-hint-visual .rotate-icon {
+            position: absolute;
+            right: 20px;
+            bottom: 18px;
+            width: 26px;
+            height: 26px;
+            color: #0284c7;
+            animation: rotateCue 2.4s ease-in-out infinite;
+        }
+        @keyframes phoneToPortrait {
+            0%, 18% {
+                transform: rotate(90deg) scale(1);
+            }
+            48%, 68% {
+                transform: rotate(0deg) scale(1.08);
+            }
+            100% {
+                transform: rotate(90deg) scale(1);
+            }
+        }
+        @keyframes rotateCue {
+            0%, 18% {
+                opacity: .72;
+                transform: rotate(0deg) scale(.92);
+            }
+            48%, 68% {
+                opacity: 1;
+                transform: rotate(90deg) scale(1.08);
+            }
+            100% {
+                opacity: .72;
+                transform: rotate(180deg) scale(.92);
+            }
+        }
+        .orientation-hint-card h2 {
+            font-size: 20px;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1.35;
+        }
+        .orientation-hint-card p {
+            margin-top: 8px;
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+        .orientation-hint-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+        .orientation-hint-actions button {
+            min-height: 40px;
+            border-radius: 12px;
+            padding: 0 16px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+        .orientation-hint-primary {
+            background: #4f46e5;
+            color: #fff;
+        }
+        .orientation-hint-secondary {
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #475569;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .orientation-hint-visual .phone-icon,
+            .orientation-hint-visual .rotate-icon {
+                animation: none;
+            }
+        }
 
         /* Interactive Card Styles */
         .choice-card {
@@ -99,6 +301,276 @@
         }
         .word-chip:active {
             transform: scale(0.95);
+        }
+
+        /* Visual balance-game stage */
+        .balance-visual-layout {
+            display: grid;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .balance-visual-frame {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            background: #0f172a;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+        }
+        .balance-visual-frame img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+        .balance-question-frame {
+            aspect-ratio: 1248 / 582;
+            min-height: 210px;
+        }
+        .balance-choice-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .balance-choice-frame {
+            width: 100%;
+            padding: 0;
+            color: #fff;
+            text-align: left;
+            aspect-ratio: 618 / 655;
+            min-height: 260px;
+        }
+        .balance-choice-frame::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            opacity: 0;
+            pointer-events: none;
+            background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.38) 48%, transparent 100%);
+            transform: translateX(-120%);
+        }
+        .balance-choice-frame::after {
+            content: "";
+            position: absolute;
+            inset: 9px;
+            z-index: 2;
+            border: 2px solid rgba(255, 255, 255, 0.72);
+            border-radius: 13px;
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.34);
+        }
+        .balance-choice-frame:focus-visible {
+            outline: 3px solid #818cf8;
+            outline-offset: 3px;
+        }
+        .balance-caption {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            padding: 12px 14px;
+            color: #fff;
+            background: rgba(15, 23, 42, 0.76);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.28);
+            backdrop-filter: blur(10px);
+            z-index: 3;
+        }
+        .choice-tap-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 9px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.16);
+            color: rgba(255, 255, 255, 0.92);
+            font-size: 11px;
+            font-weight: 900;
+        }
+        .choice-picked-badge {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 4;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-radius: 999px;
+            color: #fff;
+            background: rgba(16, 185, 129, 0.94);
+            box-shadow: 0 18px 36px rgba(6, 95, 70, 0.34);
+            font-size: 14px;
+            font-weight: 900;
+            opacity: 0;
+            transform: translate(-50%, -44%) scale(.9);
+            pointer-events: none;
+        }
+        .balance-choice-frame.is-selected {
+            border-color: rgba(16, 185, 129, 0.9);
+            box-shadow: 0 20px 42px rgba(16, 185, 129, 0.24);
+            transform: translateY(-2px) scale(1.015);
+        }
+        .balance-choice-frame.is-selected .choice-picked-badge {
+            animation: choicePickedPop .42s cubic-bezier(.2, .8, .2, 1) forwards;
+        }
+        .balance-choice-frame.is-dimmed {
+            opacity: .54;
+            filter: saturate(.75);
+        }
+        #selectBoard.is-picking .balance-choice-frame {
+            pointer-events: none;
+        }
+        #selectBoard.is-picking .balance-choice-frame.is-dimmed {
+            transform: scale(.985);
+        }
+        .balance-caption-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 5px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+            color: #c7d2fe;
+        }
+        .balance-choice-caption-a .balance-caption-label { color: #fecdd3; }
+        .balance-choice-caption-b .balance-caption-label { color: #bfdbfe; }
+        .balance-caption h2,
+        .balance-caption h3,
+        .balance-caption p {
+            color: inherit;
+            text-shadow: 0 1px 2px rgba(15, 23, 42, 0.45);
+        }
+        #optAText,
+        #optBText {
+            line-height: 1.32;
+        }
+        @keyframes balancePanelReveal {
+            0% { opacity: 0; transform: translateY(14px) scale(.985); filter: blur(8px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        @keyframes balanceTextReveal {
+            0% { opacity: 0; transform: translateY(18px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes choiceShine {
+            0% { opacity: 0; transform: translateX(-120%); }
+            20% { opacity: .75; }
+            55%, 100% { opacity: 0; transform: translateX(120%); }
+        }
+        @keyframes choicePulseRing {
+            0% { opacity: 0; box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.24); }
+            20% { opacity: .95; }
+            70% { opacity: .35; box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
+            100% { opacity: 0; box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        @keyframes choiceHintFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        @keyframes choicePickedPop {
+            0% { opacity: 0; transform: translate(-50%, -44%) scale(.9); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        @keyframes builderVisualIn {
+            0% { opacity: 0; transform: translateY(18px); filter: blur(8px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        #selectBoard.is-revealing .balance-visual-frame {
+            opacity: 0;
+            animation: balancePanelReveal .5s cubic-bezier(.2, .8, .2, 1) forwards;
+        }
+        #selectBoard.is-revealing .balance-caption {
+            opacity: 0;
+            animation: balanceTextReveal .42s cubic-bezier(.2, .8, .2, 1) 1.62s forwards;
+        }
+        #selectBoard.is-revealing .balance-question-frame { animation-delay: .05s; }
+        #selectBoard.is-revealing .balance-choice-a { animation-delay: .55s; }
+        #selectBoard.is-revealing .balance-choice-b { animation-delay: 1.05s; }
+        #selectBoard.is-revealing .balance-choice-frame::before {
+            animation: choiceShine 1.45s ease 2.04s infinite;
+        }
+        #selectBoard.is-revealing .balance-choice-frame::after {
+            animation: choicePulseRing 1.45s ease 2.04s infinite;
+        }
+        #selectBoard.is-revealing .choice-tap-hint {
+            animation: choiceHintFloat 1.4s ease-in-out 2.04s infinite;
+        }
+        .builder-visual-card {
+            display: grid;
+            grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
+            gap: 14px;
+            align-items: stretch;
+            margin-top: 14px;
+            padding: 12px;
+            border: 1px solid #e0e7ff;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #eef2ff 0%, #fff 58%, #ecfeff 100%);
+            animation: builderVisualIn .45s cubic-bezier(.2, .8, .2, 1) both;
+        }
+        .builder-visual-card img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+            border-radius: 13px;
+            border: 1px solid rgba(148, 163, 184, 0.34);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+        }
+        .builder-visual-card h3 {
+            color: #1e293b;
+            font-size: 16px;
+            font-weight: 900;
+            line-height: 1.4;
+        }
+        .builder-visual-card p {
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+        .builder-visual-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            margin-bottom: 8px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #e0e7ff;
+            color: #3730a3;
+            font-size: 11px;
+            font-weight: 900;
+        }
+        @media (max-width: 699px) {
+            .builder-visual-card {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .builder-visual-card img {
+                height: auto;
+                aspect-ratio: 618 / 655;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #selectBoard.is-revealing .balance-visual-frame,
+            #selectBoard.is-revealing .balance-caption,
+            #selectBoard.is-revealing .choice-tap-hint,
+            .builder-visual-card,
+            .balance-choice-frame.is-selected .choice-picked-badge {
+                opacity: 1;
+                animation: none;
+                transform: none;
+                filter: none;
+            }
+            #selectBoard.is-revealing .balance-choice-frame::before,
+            #selectBoard.is-revealing .balance-choice-frame::after {
+                opacity: 0;
+                animation: none;
+            }
         }
 
         /* Success Confetti Animation */
@@ -118,8 +590,17 @@
                 padding: 24px var(--grammar-page-gutter) 56px !important;
             }
             .grammar-practice-grid {
-                grid-template-columns: minmax(240px, 0.75fr) minmax(420px, 1.25fr);
+                grid-template-columns: minmax(0, 1fr);
                 align-items: start;
+            }
+            .balance-choice-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .balance-question-frame {
+                min-height: 240px;
+            }
+            .balance-choice-frame {
+                min-height: 300px;
             }
         }
         @media (min-width: 1024px) {
@@ -127,12 +608,94 @@
                 --grammar-page-gutter: 32px;
             }
             .grammar-practice-grid {
-                grid-template-columns: minmax(320px, 0.8fr) minmax(620px, 1.2fr);
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+        @media (min-width: 900px) and (max-width: 1199px) and (max-height: 850px) and (orientation: landscape) {
+            body {
+                --grammar-page-gutter: 16px;
+                --grammar-page-max: 1120px;
+            }
+            .grammar-header {
+                padding-top: 10px !important;
+                padding-bottom: 10px !important;
+            }
+            .grammar-header p {
+                display: none;
+            }
+            .multilang-scaffold {
+                display: none !important;
+            }
+            .grammar-main {
+                padding-top: 12px !important;
+                padding-bottom: 28px !important;
+            }
+            .game-stage {
+                gap: 10px;
+            }
+            .game-stage > div:first-child {
+                padding: 10px 12px;
+            }
+            #selectBoard {
+                padding: 12px;
+                border-radius: 14px;
+            }
+            #selectBoard > .flex:first-child {
+                display: none;
+            }
+            .balance-visual-layout {
+                grid-template-columns: minmax(0, 1.18fr) minmax(300px, .82fr);
+                align-items: stretch;
+                gap: 10px;
+                margin-top: 0;
+            }
+            .balance-question-frame {
+                aspect-ratio: auto;
+                min-height: 0;
+                height: clamp(360px, calc(100vh - var(--grammar-nav-height) - var(--grammar-header-height) - 150px), 455px);
+            }
+            .balance-choice-grid {
+                grid-template-columns: minmax(0, 1fr);
+                grid-template-rows: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                height: clamp(360px, calc(100vh - var(--grammar-nav-height) - var(--grammar-header-height) - 150px), 455px);
+            }
+            .balance-choice-frame {
+                aspect-ratio: auto;
+                min-height: 0;
+                height: auto;
+            }
+            .balance-caption {
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                padding: 10px 12px;
+                border-radius: 12px;
+            }
+            .balance-caption-label {
+                margin-bottom: 3px;
+                font-size: 9px;
+            }
+            #dilemmaTitle {
+                font-size: 18px !important;
+                line-height: 1.35;
+            }
+            #dilemmaSituation {
+                font-size: 11px;
+            }
+            #optAText,
+            #optBText {
+                font-size: 14px;
+                line-height: 1.32;
+            }
+            .balance-choice-caption-a > span:last-child,
+            .balance-choice-caption-b > span:last-child {
+                display: none;
             }
         }
         @media (min-width: 1280px) {
             body {
-                --grammar-page-max: 1240px;
+                --grammar-page-max: 1360px;
             }
         }
     </style>
@@ -167,12 +730,39 @@
         </div>
     </header>
 
+    <div id="orientationHint" class="orientation-hint" role="dialog" aria-modal="true" aria-labelledby="orientationHintTitle" aria-describedby="orientationHintDesc">
+        <div class="orientation-hint-card">
+            <div class="orientation-hint-visual" aria-hidden="true">
+                <i data-lucide="smartphone" class="phone-icon"></i>
+                <i data-lucide="rotate-cw" class="rotate-icon"></i>
+            </div>
+            <h2 id="orientationHintTitle">세로모드로 보면 더 잘 보여요</h2>
+            <p id="orientationHintDesc">이 밸런스 게임 이미지는 정방형 구성이라 태블릿을 세로로 돌리면 문제와 선택지가 더 크게 보입니다.</p>
+            <div class="orientation-hint-actions">
+                <button class="orientation-hint-primary" type="button" onclick="dismissOrientationHint()">가로로 계속하기</button>
+                <button class="orientation-hint-secondary" type="button" onclick="dismissOrientationHint()">알겠습니다</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="progressBackdrop" class="progress-backdrop" onclick="closeProgressPanel()" aria-hidden="true"></div>
+
     <!-- Main Content Area -->
     <main class="grammar-main flex-1 p-4 pb-12">
         <div class="grammar-practice-grid">
 
-            <!-- 왼쪽 진행 및 요약 패널 -->
-            <section class="space-y-4">
+            <!-- 접이식 진행 및 요약 패널 -->
+            <section id="progressDrawer" class="progress-drawer space-y-4" aria-hidden="true">
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-sm font-black text-slate-800">진행 및 기록</p>
+                        <p class="text-[11px] text-slate-500 mt-0.5">점수와 선택 기록을 확인합니다.</p>
+                    </div>
+                    <button onclick="closeProgressPanel()" class="progress-toggle-btn !h-8 !px-2.5" type="button" aria-label="진행 및 기록 닫기">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
                 <article class="bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 rounded-2xl p-5 shadow-sm">
                     <h2 class="text-sm font-bold text-indigo-700 flex items-center mb-3">
                         <i data-lucide="compass" class="w-4 h-4 mr-2"></i>
@@ -204,44 +794,71 @@
                 </article>
             </section>
 
-            <!-- 오른쪽 메인 게임 플레이 패널 -->
-            <section class="space-y-4">
+            <!-- 메인 게임 플레이 패널 -->
+            <section class="game-stage space-y-4">
 
                 <!-- 콤팩트 라운드 선택기 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
-                    <span class="text-xs font-bold text-slate-700 shrink-0">연구 라운드 선택:</span>
-                    <div class="flex gap-1.5 overflow-x-auto w-full sm:w-auto">
-                        <button onclick="selectRound(1)" id="roundTab1" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm cursor-pointer whitespace-nowrap" type="button">1라운드 (일상)</button>
-                        <button onclick="selectRound(2)" id="roundTab2" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 cursor-pointer whitespace-nowrap" type="button">2라운드 (초능력)</button>
-                        <button onclick="selectRound(3)" id="roundTab3" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 cursor-pointer whitespace-nowrap" type="button">3라운드 (인생관)</button>
+                <div class="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm flex items-center justify-between gap-3 flex-wrap">
+                    <div class="flex items-center gap-2 flex-wrap min-w-0">
+                        <span class="text-xs font-bold text-slate-700 shrink-0">연구 라운드 선택:</span>
+                        <div class="flex gap-1.5 overflow-x-auto max-w-full">
+                            <button onclick="selectRound(1)" id="roundTab1" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm cursor-pointer whitespace-nowrap" type="button">1라운드 (일상)</button>
+                            <button onclick="selectRound(2)" id="roundTab2" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 cursor-pointer whitespace-nowrap" type="button">2라운드 (초능력)</button>
+                            <button onclick="selectRound(3)" id="roundTab3" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 cursor-pointer whitespace-nowrap" type="button">3라운드 (인생관)</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="compact-score-pill" aria-label="현재 라운드 점수">
+                            <i data-lucide="star" class="w-3.5 h-3.5"></i>
+                            <span><span id="compactScoreVal">0</span>/5</span>
+                        </span>
+                        <button id="progressToggleBtn" onclick="toggleProgressPanel()" class="progress-toggle-btn" type="button" aria-expanded="false" aria-controls="progressDrawer">
+                            <i data-lucide="panel-right-open" class="w-3.5 h-3.5"></i>
+                            진행/기록
+                        </button>
                     </div>
                 </div>
 
                 <!-- 밸런스 선택 화면 -->
                 <article id="selectBoard" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <span class="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-1 rounded-md tracking-wide uppercase">Dilemma Card</span>
-                    <h2 id="dilemmaTitle" class="text-lg font-black text-slate-800 mt-2.5 leading-relaxed safe"></h2>
-                    <p id="dilemmaSituation" class="text-xs text-slate-500 mt-1 safe"></p>
+                    <div class="flex items-center justify-between gap-3 flex-wrap">
+                        <span class="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-1 rounded-md tracking-wide uppercase">Dilemma Card</span>
+                        <span class="text-[11px] font-bold text-slate-400">이미지를 보고 더 끌리는 선택지를 고르세요.</span>
+                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                        <!-- Option A Card -->
-                        <div id="optACard" class="choice-card bg-rose-50/50 hover:bg-rose-50 border-2 border-rose-200/60 rounded-2xl p-5 flex flex-col justify-between min-h-[140px] shadow-sm">
-                            <div>
-                                <span class="text-xs font-bold text-rose-500 bg-rose-100/80 px-2.5 py-1 rounded-lg">A 선택</span>
-                                <h3 id="optAText" class="text-base font-extrabold text-slate-800 mt-3 leading-snug safe"></h3>
+                    <div class="balance-visual-layout" aria-live="polite">
+                        <div class="balance-visual-frame balance-question-frame">
+                            <img id="dilemmaImage" src="" alt="" decoding="async" fetchpriority="high">
+                            <div class="balance-caption balance-question-caption">
+                                <span class="balance-caption-label">Question</span>
+                                <h2 id="dilemmaTitle" class="text-lg sm:text-xl font-black leading-relaxed safe"></h2>
+                                <p id="dilemmaSituation" class="text-xs mt-1 text-slate-100 safe"></p>
                             </div>
-                            <button onclick="pickOption('A')" class="mt-4 w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-sm transition-colors duration-150" type="button">선택하기</button>
                         </div>
 
-                        <!-- Option B Card -->
-                        <div id="optBCard" class="choice-card bg-blue-50/50 hover:bg-blue-50 border-2 border-blue-200/60 rounded-2xl p-5 flex flex-col justify-between min-h-[140px] shadow-sm">
-                            <div>
-                                <span class="text-xs font-bold text-blue-500 bg-blue-100/80 px-2.5 py-1 rounded-lg">B 선택</span>
-                                <h3 id="optBText" class="text-base font-extrabold text-slate-800 mt-3 leading-snug safe"></h3>
-                            </div>
-                            <button onclick="pickOption('B')" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-sm transition-colors duration-150" type="button">선택하기</button>
+                        <div class="balance-choice-grid">
+                            <button id="optACard" onclick="pickOption('A')" class="choice-card balance-visual-frame balance-choice-frame balance-choice-a" type="button">
+                                <img id="optAImage" src="" alt="" decoding="async">
+                                <span class="balance-caption balance-choice-caption-a">
+                                    <span class="balance-caption-label">A 선택</span>
+                                    <span id="optAText" class="block text-base font-extrabold leading-snug safe"></span>
+                                    <span class="choice-tap-hint"><i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> 탭해서 선택</span>
+                                </span>
+                                <span class="choice-picked-badge"><i data-lucide="check-circle" class="w-4 h-4"></i> 선택 완료</span>
+                            </button>
+
+                            <button id="optBCard" onclick="pickOption('B')" class="choice-card balance-visual-frame balance-choice-frame balance-choice-b" type="button">
+                                <img id="optBImage" src="" alt="" decoding="async">
+                                <span class="balance-caption balance-choice-caption-b">
+                                    <span class="balance-caption-label">B 선택</span>
+                                    <span id="optBText" class="block text-base font-extrabold leading-snug safe"></span>
+                                    <span class="choice-tap-hint"><i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> 탭해서 선택</span>
+                                </span>
+                                <span class="choice-picked-badge"><i data-lucide="check-circle" class="w-4 h-4"></i> 선택 완료</span>
+                            </button>
                         </div>
                     </div>
+                    <div id="selectionFeedback" class="hidden mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800"></div>
                 </article>
 
                 <!-- 문장 조립기 화면 -->
@@ -256,6 +873,18 @@
                     <div class="mt-3 bg-slate-50 border border-slate-100 rounded-xl p-4">
                         <p class="text-[10px] font-bold text-slate-400">내가 선택한 입장</p>
                         <p id="pickedSummary" class="text-sm font-bold text-slate-800 mt-1 safe"></p>
+                    </div>
+
+                    <div id="builderVisualCard" class="builder-visual-card">
+                        <img id="builderChoiceImage" src="" alt="" decoding="async">
+                        <div class="flex flex-col justify-center">
+                            <span id="builderChoiceBadge" class="builder-visual-badge">
+                                <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                                선택 이미지
+                            </span>
+                            <h3 id="builderChoiceTitle" class="safe"></h3>
+                            <p class="mt-2 safe">그림 속 상황을 떠올리며 아래 단어 카드를 순서대로 조립하세요.</p>
+                        </div>
                     </div>
 
                     <!-- 조립된 문장 노출 슬롯 -->
@@ -516,7 +1145,13 @@
         const progressTextEl    = document.getElementById('progressText');
         const progressBarEl     = document.getElementById('progressBar');
         const scoreValEl        = document.getElementById('scoreVal');
+        const compactScoreValEl = document.getElementById('compactScoreVal');
         const choiceSummaryEl   = document.getElementById('choiceSummary');
+        const progressDrawerEl  = document.getElementById('progressDrawer');
+        const progressBackdropEl= document.getElementById('progressBackdrop');
+        const progressToggleBtnEl= document.getElementById('progressToggleBtn');
+        const orientationHintEl = document.getElementById('orientationHint');
+        const ORIENTATION_HINT_DISMISS_KEY = 'ifBalancePortraitHintDismissedV2';
 
         const activeRoundBadgeEl= document.getElementById('activeRoundBadge');
         const roundBreakBoardEl = document.getElementById('roundBreakBoard');
@@ -526,12 +1161,21 @@
         const breakNextBtnEl    = document.getElementById('breakNextBtn');
 
         const selectBoardEl     = document.getElementById('selectBoard');
+        const selectionFeedbackEl= document.getElementById('selectionFeedback');
         const dilemmaTitleEl    = document.getElementById('dilemmaTitle');
         const dilemmaSituationEl= document.getElementById('dilemmaSituation');
+        const dilemmaImageEl    = document.getElementById('dilemmaImage');
+        const optACardEl        = document.getElementById('optACard');
+        const optBCardEl        = document.getElementById('optBCard');
+        const optAImageEl       = document.getElementById('optAImage');
+        const optBImageEl       = document.getElementById('optBImage');
         const optATextEl        = document.getElementById('optAText');
         const optBTextEl        = document.getElementById('optBText');
 
         const builderBoardEl    = document.getElementById('builderBoard');
+        const builderChoiceImageEl= document.getElementById('builderChoiceImage');
+        const builderChoiceBadgeEl= document.getElementById('builderChoiceBadge');
+        const builderChoiceTitleEl= document.getElementById('builderChoiceTitle');
         const pickedSummaryEl   = document.getElementById('pickedSummary');
         const emptyPromptEl     = document.getElementById('emptyPrompt');
         const assembledSlotsEl  = document.getElementById('assembledSlots');
@@ -542,6 +1186,7 @@
 
         const resultBoardEl     = document.getElementById('resultBoard');
         const finalScoreEl      = document.getElementById('finalScore');
+        let selectionTransitionTimer = null;
 
         function esc(t) {
             return String(t == null ? '' : t)
@@ -558,6 +1203,88 @@
             if (!window.MultilangToggle || typeof window.MultilangToggle.getLang !== "function" || typeof window.MultilangToggle.setLang !== "function") return;
             window.MultilangToggle.setLang(window.MultilangToggle.getLang());
         }
+        function dilemmaAssetPath(index, kind) {
+            const qNum = String(index + 1).padStart(2, '0');
+            return `../assets/c11/grammar/images/if-balance-game/q${qNum}-${kind}.webp`;
+        }
+        function restartSelectAnimation() {
+            selectBoardEl.classList.remove('is-revealing');
+            void selectBoardEl.offsetWidth;
+            selectBoardEl.classList.add('is-revealing');
+        }
+        function resetChoiceFeedback() {
+            if (selectionTransitionTimer) {
+                clearTimeout(selectionTransitionTimer);
+                selectionTransitionTimer = null;
+            }
+            selectBoardEl.classList.remove('is-picking');
+            optACardEl.classList.remove('is-selected', 'is-dimmed');
+            optBCardEl.classList.remove('is-selected', 'is-dimmed');
+            optACardEl.disabled = false;
+            optBCardEl.disabled = false;
+            selectionFeedbackEl.classList.add('hidden');
+            selectionFeedbackEl.innerHTML = '';
+        }
+        function syncBuilderVisual(option, d) {
+            const choiceText = option === 'A' ? d.optionA : d.optionB;
+            builderChoiceImageEl.src = dilemmaAssetPath(gameState.currentIdx, option === 'A' ? 'choice-a' : 'choice-b');
+            builderChoiceImageEl.alt = `${option} 선택 이미지: ${choiceText}`;
+            builderChoiceBadgeEl.innerHTML = `<i data-lucide="image" class="w-3.5 h-3.5"></i> ${option} 선택 이미지`;
+            builderChoiceTitleEl.textContent = choiceText;
+        }
+        function setRoundScore(value) {
+            scoreValEl.textContent = value;
+            compactScoreValEl.textContent = value;
+        }
+        function openProgressPanel() {
+            progressDrawerEl.classList.add('is-open');
+            progressBackdropEl.classList.add('is-open');
+            progressDrawerEl.setAttribute('aria-hidden', 'false');
+            progressToggleBtnEl.setAttribute('aria-expanded', 'true');
+        }
+        function closeProgressPanel() {
+            progressDrawerEl.classList.remove('is-open');
+            progressBackdropEl.classList.remove('is-open');
+            progressDrawerEl.setAttribute('aria-hidden', 'true');
+            progressToggleBtnEl.setAttribute('aria-expanded', 'false');
+        }
+        function toggleProgressPanel() {
+            if (progressDrawerEl.classList.contains('is-open')) {
+                closeProgressPanel();
+            } else {
+                openProgressPanel();
+            }
+        }
+        function hasDismissedOrientationHint() {
+            try {
+                return sessionStorage.getItem(ORIENTATION_HINT_DISMISS_KEY) === '1';
+            } catch (e) {
+                return false;
+            }
+        }
+        function setOrientationHintDismissed() {
+            try {
+                sessionStorage.setItem(ORIENTATION_HINT_DISMISS_KEY, '1');
+            } catch (e) {}
+        }
+        function isLikelyTabletLandscape() {
+            const w = window.innerWidth || document.documentElement.clientWidth;
+            const h = window.innerHeight || document.documentElement.clientHeight;
+            return w > h && w >= 760 && w <= 1199 && h <= 1024;
+        }
+        function updateOrientationHint() {
+            if (!orientationHintEl) return;
+            const shouldShow = isLikelyTabletLandscape() && !hasDismissedOrientationHint();
+            orientationHintEl.classList.toggle('is-visible', shouldShow);
+            orientationHintEl.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+            if (shouldShow && window.lucide) window.lucide.createIcons();
+        }
+        function dismissOrientationHint() {
+            setOrientationHintDismissed();
+            if (!orientationHintEl) return;
+            orientationHintEl.classList.remove('is-visible');
+            orientationHintEl.setAttribute('aria-hidden', 'true');
+        }
 
         // ── 라운드 선택 및 제어 로직 ──────────────────────────────
         function selectRound(roundNum) {
@@ -566,7 +1293,7 @@
             gameState.roundScore = 0;
             gameState.history = [];
 
-            scoreValEl.textContent = "0";
+            setRoundScore(0);
             activeRoundBadgeEl.textContent = `${roundNum}라운드`;
             choiceSummaryEl.innerHTML = '<p class="text-slate-400 text-center py-4">선택을 시작하면 여기에 기록됩니다.</p>';
 
@@ -645,6 +1372,13 @@
             dilemmaSituationEl.textContent = d.situation;
             optATextEl.textContent = d.optionA;
             optBTextEl.textContent = d.optionB;
+            dilemmaImageEl.src = dilemmaAssetPath(gameState.currentIdx, 'question');
+            dilemmaImageEl.alt = `${d.title} 문제 이미지`;
+            optAImageEl.src = dilemmaAssetPath(gameState.currentIdx, 'choice-a');
+            optAImageEl.alt = `A 선택 이미지: ${d.optionA}`;
+            optBImageEl.src = dilemmaAssetPath(gameState.currentIdx, 'choice-b');
+            optBImageEl.alt = `B 선택 이미지: ${d.optionB}`;
+            resetChoiceFeedback();
 
             const currentInRound = (gameState.currentIdx % 5) + 1;
             progressTextEl.textContent = `질문 ${currentInRound} / 5`;
@@ -654,22 +1388,44 @@
             builderBoardEl.classList.add('hidden');
             resultBoardEl.classList.add('hidden');
             roundBreakBoardEl.classList.add('hidden');
+            restartSelectAnimation();
         }
 
         function pickOption(option) {
+            if (selectBoardEl.classList.contains('is-picking')) return;
+
             gameState.picked = option;
             const d = dilemmas[gameState.currentIdx];
-            pickedSummaryEl.textContent = option === 'A' ? d.optionA : d.optionB;
+            const choiceText = option === 'A' ? d.optionA : d.optionB;
+            pickedSummaryEl.textContent = choiceText;
+            syncBuilderVisual(option, d);
 
-            selectBoardEl.classList.add('hidden');
-            builderBoardEl.classList.remove('hidden');
+            const selectedCard = option === 'A' ? optACardEl : optBCardEl;
+            const otherCard = option === 'A' ? optBCardEl : optACardEl;
+            selectBoardEl.classList.add('is-picking');
+            selectedCard.classList.add('is-selected');
+            otherCard.classList.add('is-dimmed');
+            optACardEl.disabled = true;
+            optBCardEl.disabled = true;
+            selectionFeedbackEl.classList.remove('hidden');
+            selectionFeedbackEl.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 inline-block mr-1"></i> ${option} 선택을 저장했습니다. 이제 선택한 상황으로 문장을 조립합니다.`;
 
-            initSentenceBuilder();
+            if (window.lucide) window.lucide.createIcons();
+
+            selectionTransitionTimer = window.setTimeout(function () {
+                selectionTransitionTimer = null;
+                selectBoardEl.classList.add('hidden');
+                builderBoardEl.classList.remove('hidden');
+                initSentenceBuilder();
+                if (window.lucide) window.lucide.createIcons();
+            }, 1150);
         }
 
         function goBackToSelect() {
+            resetChoiceFeedback();
             selectBoardEl.classList.remove('hidden');
             builderBoardEl.classList.add('hidden');
+            restartSelectAnimation();
         }
 
         // ── 문장 조립기 로직 ──────────────────────────────────────
@@ -775,7 +1531,7 @@
             if (isCorrectSequence) {
                 gameState.roundScore += 1;
                 gameState.score += 1;
-                scoreValEl.textContent = gameState.roundScore;
+                setRoundScore(gameState.roundScore);
 
                 feedbackBoxEl.className = 'success-banner mt-5 rounded-xl border p-4 bg-emerald-50 border-emerald-200';
                 feedbackBoxEl.innerHTML = `
@@ -869,7 +1625,14 @@
         document.addEventListener('DOMContentLoaded', function () {
             loadDilemma();
             updateResponsiveOffsets();
+            updateOrientationHint();
             window.addEventListener('resize', updateResponsiveOffsets);
+            window.addEventListener('resize', updateOrientationHint);
+            window.addEventListener('orientationchange', updateOrientationHint);
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') dismissOrientationHint();
+                if (event.key === 'Escape') closeProgressPanel();
+            });
 
             if (window.lucide) {
                 window.lucide.createIcons();
