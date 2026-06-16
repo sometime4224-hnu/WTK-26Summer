@@ -587,6 +587,70 @@
             font-size: 11px;
             font-weight: 900;
         }
+        #builderBoard {
+            scroll-margin-top: calc(var(--grammar-nav-height) + 12px);
+        }
+        .builder-clause-hint {
+            display: grid;
+            grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+            margin-top: 12px;
+            padding: 12px 14px;
+            border: 1px solid #fde68a;
+            border-left-width: 4px;
+            border-radius: 8px;
+            background: #fffbeb;
+        }
+        .builder-clause-hint-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 11px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .builder-clause-hint-main {
+            min-width: 0;
+        }
+        .builder-clause-hint-line {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 28px;
+            min-width: 0;
+        }
+        .builder-clause-hint-text {
+            flex: 1 1 auto;
+            min-width: 0;
+            color: #1e293b;
+            font-size: 15px;
+            font-weight: 900;
+            line-height: 1.45;
+        }
+        .builder-grammar-target-label {
+            flex: 0 0 auto;
+            margin-left: auto;
+            padding: 5px 9px;
+            border: 1px solid #fed7aa;
+            border-radius: 999px;
+            background: #fff7ed;
+            color: #9a3412;
+            font-size: 11px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .builder-clause-hint-note {
+            margin-top: 2px;
+            color: #64748b;
+            font-size: 11px;
+            line-height: 1.45;
+        }
         @media (max-width: 699px) {
             .builder-visual-card {
                 grid-template-columns: minmax(0, 1fr);
@@ -594,6 +658,12 @@
             .builder-visual-card img {
                 height: auto;
                 aspect-ratio: 618 / 655;
+            }
+            .builder-clause-hint {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .builder-clause-hint-line {
+                gap: 6px 28px;
             }
         }
         @media (prefers-reduced-motion: reduce) {
@@ -911,6 +981,21 @@
                         </button>
                     </div>
 
+                    <div id="clauseHint" class="builder-clause-hint" aria-live="polite">
+                        <span class="builder-clause-hint-label">
+                            <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i>
+                            앞 절 참고
+                        </span>
+                        <div class="builder-clause-hint-main">
+                            <div class="builder-clause-hint-line">
+                                <p id="clauseHintText" class="builder-clause-hint-text safe"></p>
+                                <span class="builder-grammar-target-label">목표 문법 · -(ㄴ/는)다면 / -(이)라면</span>
+                            </div>
+                            <p class="builder-clause-hint-note safe">이 문장을 조건 표현으로 바꾸면 문장 앞부분을 잡기 쉬워요.</p>
+                            <p data-lang="vi" class="builder-clause-hint-note safe">Gợi ý: đổi câu này sang dạng điều kiện để bắt đầu câu.</p>
+                        </div>
+                    </div>
+
                     <div class="mt-3 bg-slate-50 border border-slate-100 rounded-xl p-4">
                         <p class="text-[10px] font-bold text-slate-400">내가 선택한 입장</p>
                         <p id="pickedSummary" class="text-sm font-bold text-slate-800 mt-1 safe"></p>
@@ -1218,6 +1303,7 @@
         const builderChoiceBadgeEl= document.getElementById('builderChoiceBadge');
         const builderChoiceTitleEl= document.getElementById('builderChoiceTitle');
         const pickedSummaryEl   = document.getElementById('pickedSummary');
+        const clauseHintTextEl  = document.getElementById('clauseHintText');
         const emptyPromptEl     = document.getElementById('emptyPrompt');
         const assembledSlotsEl  = document.getElementById('assembledSlots');
         const wordPoolEl        = document.getElementById('wordPool');
@@ -1239,6 +1325,25 @@
             const c = arr.slice();
             for (var i = c.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = c[i]; c[i] = c[j]; c[j] = tmp; }
             return c;
+        }
+        function conditionTokenIndex(tokens) {
+            return tokens.findIndex(tok => /(라면|다면)$/.test(tok));
+        }
+        function conditionTokenToPlainEnding(token) {
+            return String(token || '')
+                .replace(/라면$/, '다.')
+                .replace(/다면$/, '다.');
+        }
+        function buildFrontClauseHint(tokens) {
+            const endIdx = conditionTokenIndex(tokens);
+            if (endIdx < 0) return '';
+            const frontClause = tokens.slice(0, endIdx + 1);
+            frontClause[frontClause.length - 1] = conditionTokenToPlainEnding(frontClause[frontClause.length - 1]);
+            return frontClause.join(' ');
+        }
+        function syncFrontClauseHint(targets) {
+            const hint = buildFrontClauseHint(targets);
+            clauseHintTextEl.textContent = hint || '앞 절 상황을 먼저 떠올려 보세요.';
         }
         function syncMultilangBlocks() {
             if (!window.MultilangToggle || typeof window.MultilangToggle.getLang !== "function" || typeof window.MultilangToggle.setLang !== "function") return;
@@ -1272,6 +1377,11 @@
             builderChoiceImageEl.alt = `${option} 선택 이미지: ${choiceText}`;
             builderChoiceBadgeEl.innerHTML = `<i data-lucide="image" class="w-3.5 h-3.5"></i> ${option} 선택 이미지`;
             builderChoiceTitleEl.textContent = choiceText;
+        }
+        function scrollPanelIntoView(panelEl) {
+            if (!panelEl || typeof panelEl.scrollIntoView !== 'function') return;
+            const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            panelEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
         }
         function setRoundScore(value) {
             scoreValEl.textContent = value;
@@ -1459,6 +1569,7 @@
                 builderBoardEl.classList.remove('hidden');
                 initSentenceBuilder();
                 if (window.lucide) window.lucide.createIcons();
+                scrollPanelIntoView(builderBoardEl);
             }, 1150);
         }
 
@@ -1483,6 +1594,7 @@
             const allTokens = targets.concat(d.distractors);
             const uniqueTokens = Array.from(new Set(allTokens));
 
+            syncFrontClauseHint(targets);
             renderWordPool(shuffle(uniqueTokens));
             renderAssembledSentence();
         }
