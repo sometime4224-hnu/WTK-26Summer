@@ -797,6 +797,11 @@
                 causativeHeight: item[6]
             };
         });
+        const orderedPairs = suffixOrder.slice(1).reduce(function (result, suffix) {
+            return result.concat(pairs.filter(function (pair) {
+                return pair.suffix === suffix;
+            }));
+        }, []);
 
         const refs = {
             suffixBar: document.getElementById("suffixBar"),
@@ -838,7 +843,7 @@
 
         function bySuffix() {
             if (state.suffix === "전체") {
-                return pairs;
+                return orderedPairs;
             }
             return pairs.filter(function (pair) {
                 return pair.suffix === state.suffix;
