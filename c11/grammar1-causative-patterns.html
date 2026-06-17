@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({
+    'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>11과 문법 1 보조자료 | 단형 사동 형태 규칙성</title>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --bg: #f7f9fc;
+            --surface: #ffffff;
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #d9e2ef;
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+            --green: #0f766e;
+            --green-soft: #ecfdf5;
+            --amber: #b45309;
+            --amber-soft: #fff7ed;
+            --rose: #be123c;
+            --rose-soft: #fff1f2;
+            --violet: #6d28d9;
+            --violet-soft: #f5f3ff;
+            --shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif;
+            background: linear-gradient(180deg, #ffffff 0%, var(--bg) 54%, #eef7f4 100%);
+        }
+
+        a {
+            color: inherit;
+        }
+
+        .page {
+            width: min(1120px, calc(100% - 28px));
+            margin: 0 auto;
+            padding: 14px 0 44px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+            gap: 18px;
+            align-items: stretch;
+            margin-bottom: 16px;
+        }
+
+        .hero-main,
+        .summary-card,
+        .pattern-card,
+        .teacher-note,
+        .board-summary {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: var(--shadow);
+        }
+
+        .hero-main {
+            padding: clamp(20px, 4vw, 34px);
+        }
+
+        .eyebrow {
+            margin: 0 0 8px;
+            color: var(--blue);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            line-height: 1.12;
+            letter-spacing: 0;
+        }
+
+        .lead {
+            max-width: 680px;
+            margin: 14px 0 0;
+            color: #334155;
+            font-size: clamp(1rem, 1.8vw, 1.18rem);
+            font-weight: 850;
+            line-height: 1.7;
+        }
+
+        .hero-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .link-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 0 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            font-size: 0.88rem;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .summary-card {
+            display: grid;
+            align-content: start;
+            gap: 12px;
+            padding: 18px;
+        }
+
+        .summary-card strong {
+            color: var(--green);
+            font-size: 1.02rem;
+            font-weight: 950;
+        }
+
+        .formula-stack {
+            display: grid;
+            gap: 8px;
+        }
+
+        .formula-line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 46px;
+            padding: 10px 12px;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            background: var(--blue-soft);
+            color: #1e3a8a;
+            font-weight: 900;
+        }
+
+        .formula-line span:last-child {
+            color: #1d4ed8;
+        }
+
+        .section-title {
+            margin: 28px 0 12px;
+            font-size: clamp(1.3rem, 2.4vw, 1.75rem);
+            line-height: 1.2;
+            letter-spacing: 0;
+        }
+
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .pattern-card {
+            display: grid;
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .pattern-card[data-tone="blue"] {
+            border-color: #bfdbfe;
+            background: linear-gradient(180deg, #ffffff 0%, var(--blue-soft) 100%);
+        }
+
+        .pattern-card[data-tone="green"] {
+            border-color: #99f6e4;
+            background: linear-gradient(180deg, #ffffff 0%, var(--green-soft) 100%);
+        }
+
+        .pattern-card[data-tone="amber"] {
+            border-color: #fed7aa;
+            background: linear-gradient(180deg, #ffffff 0%, var(--amber-soft) 100%);
+        }
+
+        .pattern-card[data-tone="rose"] {
+            border-color: #fecdd3;
+            background: linear-gradient(180deg, #ffffff 0%, var(--rose-soft) 100%);
+        }
+
+        .pattern-card[data-tone="violet"] {
+            border-color: #ddd6fe;
+            background: linear-gradient(180deg, #ffffff 0%, var(--violet-soft) 100%);
+        }
+
+        .pattern-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .pattern-head h3 {
+            margin: 0;
+            font-size: 1.18rem;
+            line-height: 1.28;
+            letter-spacing: 0;
+        }
+
+        .pattern-badge {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 72px;
+            min-height: 34px;
+            padding: 0 10px;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #1d4ed8;
+            font-weight: 950;
+            box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.18);
+        }
+
+        .pattern-card p {
+            margin: 0;
+            color: #475569;
+            font-size: 0.95rem;
+            font-weight: 800;
+            line-height: 1.58;
+        }
+
+        .example-list {
+            display: grid;
+            gap: 8px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .example-list li {
+            display: grid;
+            grid-template-columns: minmax(74px, 0.7fr) auto minmax(92px, 1fr);
+            gap: 8px;
+            align-items: center;
+            min-height: 40px;
+            padding: 8px 10px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.78);
+            font-weight: 900;
+        }
+
+        .example-list .arrow {
+            color: #94a3b8;
+            font-weight: 950;
+        }
+
+        .example-list .result {
+            color: #1d4ed8;
+        }
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .board-summary,
+        .teacher-note {
+            padding: 16px;
+        }
+
+        .board-summary h2,
+        .teacher-note h2 {
+            margin: 0 0 12px;
+            font-size: 1.18rem;
+            letter-spacing: 0;
+        }
+
+        .board-lines,
+        .teacher-note ul {
+            display: grid;
+            gap: 8px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .board-lines li,
+        .teacher-note li {
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.96rem;
+            font-weight: 850;
+            line-height: 1.55;
+        }
+
+        .teacher-note {
+            border-color: #fed7aa;
+            background: #fffaf2;
+        }
+
+        .teacher-note b {
+            color: var(--amber);
+        }
+
+        @media (max-width: 860px) {
+            .hero,
+            .pattern-grid,
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .page {
+                width: min(100% - 16px, 1120px);
+                padding-top: 8px;
+            }
+
+            .hero-main,
+            .summary-card,
+            .pattern-card,
+            .board-summary,
+            .teacher-note {
+                padding: 14px;
+            }
+
+            .pattern-head {
+                display: grid;
+            }
+
+            .pattern-badge {
+                justify-self: start;
+            }
+
+            .example-list li {
+                grid-template-columns: minmax(64px, 0.8fr) auto minmax(82px, 1fr);
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html">메인</a>
+        <span>|</span>
+        <a href="index.html">11과 목록</a>
+        <span>|</span>
+        <a href="grammar1.html">문법 1</a>
+        <span>|</span>
+        <strong>규칙성</strong>
+    </nav>
+
+    <main class="page">
+        <section class="hero" aria-labelledby="pageTitle">
+            <div class="hero-main">
+                <p class="eyebrow">Causative Pattern Guide</p>
+                <h1 id="pageTitle">단형 사동 형태 규칙성</h1>
+                <p class="lead">단형 사동은 100% 공식은 아니지만, 소리와 의미에 따른 강한 경향이 있다. 학생들은 먼저 경향으로 예측하고, 마지막에는 자주 쓰는 단어쌍으로 확인하면 됩니다.</p>
+                <div class="hero-links" aria-label="관련 자료">
+                    <a class="link-pill" href="grammar1-causative-suffix-quiz.html">접미사 퀴즈</a>
+                    <a class="link-pill" href="grammar1-support-table.html">전체 표</a>
+                    <a class="link-pill" href="grammar1-support-material1.html">그림 짝 학습</a>
+                </div>
+            </div>
+
+            <aside class="summary-card" aria-label="핵심 요약">
+                <strong>학생용 한 문장</strong>
+                <div class="formula-stack">
+                    <div class="formula-line"><span>ㄹ 받침</span><span>-리다</span></div>
+                    <div class="formula-line"><span>모음 끝</span><span>-우다</span></div>
+                    <div class="formula-line"><span>몸/상태</span><span>-히다</span></div>
+                    <div class="formula-line"><span>반응/동작</span><span>-기다</span></div>
+                </div>
+            </aside>
+        </section>
+
+        <h2 class="section-title">대표 패턴</h2>
+        <section class="pattern-grid" aria-label="단형 사동 형태 패턴">
+            <article class="pattern-card" data-tone="blue">
+                <div class="pattern-head">
+                    <h3>ㄹ 받침</h3>
+                    <span class="pattern-badge">-리다</span>
+                </div>
+                <p>ㄹ 받침 동사는 사동형에서 -리다로 굳어진 짝이 많습니다.</p>
+                <ul class="example-list">
+                    <li><span>울다</span><span class="arrow">→</span><span class="result">울리다</span></li>
+                    <li><span>알다</span><span class="arrow">→</span><span class="result">알리다</span></li>
+                    <li><span>살다</span><span class="arrow">→</span><span class="result">살리다</span></li>
+                    <li><span>돌다</span><span class="arrow">→</span><span class="result">돌리다</span></li>
+                </ul>
+            </article>
+
+            <article class="pattern-card" data-tone="green">
+                <div class="pattern-head">
+                    <h3>모음 끝</h3>
+                    <span class="pattern-badge">-우다</span>
+                </div>
+                <p>모음으로 끝나는 짧은 동사는 소리가 바뀌며 -우다 계열로 외우면 편합니다.</p>
+                <ul class="example-list">
+                    <li><span>자다</span><span class="arrow">→</span><span class="result">재우다</span></li>
+                    <li><span>타다</span><span class="arrow">→</span><span class="result">태우다</span></li>
+                    <li><span>서다</span><span class="arrow">→</span><span class="result">세우다</span></li>
+                    <li><span>깨다</span><span class="arrow">→</span><span class="result">깨우다</span></li>
+                </ul>
+            </article>
+
+            <article class="pattern-card" data-tone="amber">
+                <div class="pattern-head">
+                    <h3>몸/상태 변화</h3>
+                    <span class="pattern-badge">-히다</span>
+                </div>
+                <p>자세, 착용, 익는 상태처럼 몸이나 상태가 바뀌는 장면에서 자주 보입니다.</p>
+                <ul class="example-list">
+                    <li><span>앉다</span><span class="arrow">→</span><span class="result">앉히다</span></li>
+                    <li><span>눕다</span><span class="arrow">→</span><span class="result">눕히다</span></li>
+                    <li><span>입다</span><span class="arrow">→</span><span class="result">입히다</span></li>
+                    <li><span>익다</span><span class="arrow">→</span><span class="result">익히다</span></li>
+                </ul>
+            </article>
+
+            <article class="pattern-card" data-tone="rose">
+                <div class="pattern-head">
+                    <h3>반응/동작</h3>
+                    <span class="pattern-badge">-기다</span>
+                </div>
+                <p>웃음, 숨기, 씻기, 착용 같은 반응이나 몸동작을 만들 때 자주 나옵니다.</p>
+                <ul class="example-list">
+                    <li><span>웃다</span><span class="arrow">→</span><span class="result">웃기다</span></li>
+                    <li><span>벗다</span><span class="arrow">→</span><span class="result">벗기다</span></li>
+                    <li><span>신다</span><span class="arrow">→</span><span class="result">신기다</span></li>
+                    <li><span>숨다</span><span class="arrow">→</span><span class="result">숨기다</span></li>
+                </ul>
+            </article>
+
+            <article class="pattern-card" data-tone="violet">
+                <div class="pattern-head">
+                    <h3>단어쌍 암기</h3>
+                    <span class="pattern-badge">확인</span>
+                </div>
+                <p>규칙으로 끝까지 계산하기보다 자주 쓰는 짝을 문장째로 확인합니다.</p>
+                <ul class="example-list">
+                    <li><span>먹다</span><span class="arrow">→</span><span class="result">먹이다</span></li>
+                    <li><span>높다</span><span class="arrow">→</span><span class="result">높이다</span></li>
+                    <li><span>낮다</span><span class="arrow">→</span><span class="result">낮추다</span></li>
+                    <li><span>늦다</span><span class="arrow">→</span><span class="result">늦추다</span></li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="bottom-grid" aria-label="수업 활용 요약">
+            <article class="board-summary">
+                <h2>학생용 판서 요약</h2>
+                <ul class="board-lines">
+                    <li>단형 사동은 공식보다 자주 쓰는 짝을 외운다.</li>
+                    <li>그래도 힌트는 있다: ㄹ은 리, 모음은 우, 몸/상태는 히, 반응/동작은 기.</li>
+                    <li>형태를 맞힌 뒤에는 꼭 짧은 문장으로 확인한다.</li>
+                </ul>
+            </article>
+
+            <article class="teacher-note">
+                <h2>교사용 안내</h2>
+                <ul>
+                    <li><b>예측</b>은 경향으로 돕고, 정답 확인은 단어쌍으로 처리합니다.</li>
+                    <li><b>예외</b> 때문에 학생에게 모든 동사를 새로 만들게 하지 않습니다.</li>
+                    <li><b>문장</b>은 사동주와 피사동주가 보이도록 짧게 고정합니다.</li>
+                </ul>
+            </article>
+        </section>
+    </main>
+</body>
+</html>
