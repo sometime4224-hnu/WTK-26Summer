@@ -14,6 +14,7 @@
     <script src="https://cdn.tailwindcss.com" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="../shared/listening-workbook.css?v=20260324-audiosync">
+    <link rel="stylesheet" href="listening-sample.css?v=20260617-c11-sample">
     <style>
         body {
             margin: 0;
@@ -54,7 +55,7 @@
     </style>
         <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
-<body>
+<body class="c11-listening-sample">
         <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -63,13 +64,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="../index.html"><i class="fa-solid fa-house"></i> 메인으로</a>
         <span class="divider">|</span>
         <a href="index.html"><i class="fa-solid fa-folder-open"></i> 11과 목록</a>
+        <span class="divider">|</span>
+        <a href="listening2.html"><i class="fa-solid fa-headphones"></i> 듣기 2</a>
+        <span class="divider">|</span>
+        <a href="listening1-student-quiz.html"><i class="fa-solid fa-pen-to-square"></i> 학생 퀴즈</a>
     </nav>
 
     <div id="listening-workbook-app"></div>
 
     <script>
         window.LISTENING_WORKBOOK_CONFIG = {
-            kicker: "Chapter 11 Listening Lab",
+            kicker: "Chapter 11 Listening",
             title: "11과 듣기 1",
             titleVi: "Luyện nghe bài 11 - Nghe 1",
             description: "아웃도어 매장 첫 출근 상황을 바탕으로 지시 표현과 작업 순서를 익히는 듣기 워크북입니다. 핵심어 보기, 순서 배열, 이해 점검 중심으로 간결하게 연습할 수 있습니다.",
@@ -85,12 +90,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     hideSpeakingSection: true,
                     moveBackgroundPromptIntoPrediction: true,
                     relocateQuizBelowSubtitle: true,
-                    quizStartsCollapsed: true
+                    quizStartsCollapsed: true,
+                    removeDictoglossSection: true
                 }
             },
             instructionLanguage: {
-                enabled: true,
+                enabled: false,
                 default: "ko"
+            },
+            translationScaffold: {
+                mode: "minimal",
+                maxSubtitleStage: 2,
+                localizeLearnerContent: false
             },
             theme: {
                 accent: "#b45309",
@@ -99,13 +110,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 surface: "rgba(255,255,255,0.94)",
                 pageBackground: "linear-gradient(180deg, #fff9f2 0%, #fffdf8 42%, #f7faf8 100%)"
             },
-            featureList: [
-                "상황 예측",
-                "단계별 자막",
-                "핵심어 보기",
-                "순서 배열",
-                "이해 점검"
-            ],
+            featureList: ["듣기", "지문", "문제"],
             featureListVi: [
                 "Du doan tinh huong",
                 "Phu de theo tung buoc",
@@ -120,6 +125,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         removeDictoglossSection: true
                     },
                     label: "Track 19",
+                    audioTrackNumber: 19,
                     title: "듣기 1: 아웃도어 매장 첫날",
                     titleVi: "Nghe 1: Ngay dau o cua hang outdoor",
                     summary: "새 직원이 매장에서 처음으로 받은 지시를 순서대로 듣고, 마네킹 옷차림과 포스터 위치 같은 핵심 정보를 정리하는 활동입니다.",
@@ -140,7 +146,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         caption: "참고 그림: 매장 첫날에 해야 할 일을 순서대로 안내받는 상황입니다.",
                         captionVi: "Hinh tham khao: tinh huong duoc huong dan cong viec theo thu tu trong ngay dau di lam."
                     },
-        audioSrc: null,
+        audioSrc: "../../서울대 한국어 웹 보조 교재 제작/교과서 소스/음원 모음/3B/00_트랙_전체/SB/Seoul Univ_3B_Trk_19.mp3",
+                    audioSourceType: "original",
                     scene: {
                         emoji: "🧥",
                         title: "상황 그림: 새 직원에게 업무를 설명하는 매장 책임자",
@@ -511,8 +518,127 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }
             ]
         };
+
+        (function applyAudioTranscript() {
+            const lesson = window.LISTENING_WORKBOOK_CONFIG.lessons[0];
+            lesson.transcript = [
+                { speaker: "안내", text: "잘 듣고 질문에 답하세요.", start: 3.34, end: 6.60, chunks: [{ text: "잘", start: 3.34, end: 4.30 }, { text: "듣고", start: 4.30, end: 5.08 }, { text: "질문에", start: 5.08, end: 5.84 }, { text: "답하세요.", start: 5.84, end: 6.60 }], keywords: ["질문에 답하세요"] },
+                { speaker: "남", text: "안녕하세요.", start: 7.62, end: 8.08, chunks: [{ text: "안녕하세요.", start: 7.62, end: 8.08 }], keywords: ["인사"] },
+                { speaker: "여", text: "어서 와요. 오늘은 첫날이니까 제가 하는 걸 보고 잘 따라하세요. 전에도 옷가게에서 일한 적이 있으니까 어렵지 않을 거예요.", start: 9.36, end: 18.76, chunks: [{ text: "어서", start: 9.36, end: 9.60 }, { text: "와요.", start: 9.60, end: 10.08 }, { text: "오늘은", start: 10.72, end: 11.04 }, { text: "첫날이니까", start: 11.04, end: 12.06 }, { text: "제가", start: 12.06, end: 12.48 }, { text: "하는", start: 12.48, end: 12.78 }, { text: "걸", start: 12.78, end: 12.96 }, { text: "보고", start: 12.96, end: 13.42 }, { text: "잘", start: 13.42, end: 13.70 }, { text: "따라하세요.", start: 13.70, end: 14.46 }, { text: "전에도", start: 15.10, end: 15.62 }, { text: "옷가게에서", start: 15.62, end: 16.46 }, { text: "일한", start: 16.46, end: 16.78 }, { text: "적이", start: 16.78, end: 17.00 }, { text: "있으니까", start: 17.00, end: 17.62 }, { text: "어렵지", start: 17.62, end: 18.20 }, { text: "않을", start: 18.20, end: 18.44 }, { text: "거예요.", start: 18.44, end: 18.76 }], keywords: ["첫날", "잘 따라하기", "옷가게 경험"] },
+                { speaker: "남", text: "네, 열심히 하겠습니다.", start: 19.84, end: 21.40, chunks: [{ text: "네,", start: 19.84, end: 20.24 }, { text: "열심히", start: 20.48, end: 20.80 }, { text: "하겠습니다.", start: 20.80, end: 21.40 }], keywords: ["열심히", "다짐"] },
+                { speaker: "여", text: "우선, 마네킹이 입고 있는 옷을 벗기고 이 점퍼를 입혀 주세요.", start: 22.46, end: 27.10, chunks: [{ text: "우선,", start: 22.46, end: 23.30 }, { text: "마네킹이", start: 23.50, end: 24.06 }, { text: "입고", start: 24.06, end: 24.42 }, { text: "있는", start: 24.42, end: 24.66 }, { text: "옷을", start: 24.66, end: 25.16 }, { text: "벗기고", start: 25.16, end: 25.84 }, { text: "이", start: 25.84, end: 26.10 }, { text: "점퍼를", start: 26.10, end: 26.48 }, { text: "입혀", start: 26.48, end: 26.76 }, { text: "주세요.", start: 26.76, end: 27.10 }], keywords: ["마네킹", "옷 벗기기", "점퍼"] },
+                { speaker: "남", text: "네, 알겠습니다.", start: 27.92, end: 29.42, chunks: [{ text: "네,", start: 27.92, end: 28.38 }, { text: "알겠습니다.", start: 28.58, end: 29.42 }], keywords: ["긍정"] },
+                { speaker: "여", text: "옷을 다 입히고 나서 이 모자도 좀 씌워 줄래요? 신발은 이 등산화로 갈아 신겨 주세요.", start: 30.16, end: 37.42, chunks: [{ text: "옷을", start: 30.16, end: 30.74 }, { text: "다", start: 30.74, end: 30.98 }, { text: "입히고", start: 30.98, end: 31.38 }, { text: "나서", start: 31.38, end: 31.84 }, { text: "이", start: 31.84, end: 32.30 }, { text: "모자도", start: 32.30, end: 32.76 }, { text: "좀", start: 32.76, end: 33.20 }, { text: "씌워", start: 33.20, end: 33.48 }, { text: "줄래요?", start: 33.48, end: 34.04 }, { text: "신발은", start: 34.72, end: 35.52 }, { text: "이", start: 35.52, end: 35.78 }, { text: "등산화로", start: 35.78, end: 36.42 }, { text: "갈아", start: 36.42, end: 36.78 }, { text: "신겨", start: 36.78, end: 37.02 }, { text: "주세요.", start: 37.02, end: 37.42 }], keywords: ["모자", "등산화", "갈아 신기기"] },
+                { speaker: "남", text: "네, 알겠습니다.", start: 38.50, end: 40.04, chunks: [{ text: "네,", start: 38.50, end: 38.78 }, { text: "알겠습니다.", start: 39.16, end: 40.04 }], keywords: ["알겠습니다"] },
+                { speaker: "여", text: "다 했으면 이 포스터를 잘 보이는 데에 붙여 주세요.", start: 40.88, end: 44.54, chunks: [{ text: "다", start: 40.88, end: 41.06 }, { text: "했으면", start: 41.06, end: 41.72 }, { text: "이", start: 41.72, end: 42.00 }, { text: "포스터를", start: 42.00, end: 42.64 }, { text: "잘", start: 42.64, end: 42.96 }, { text: "보이는", start: 42.96, end: 43.20 }, { text: "데에", start: 43.20, end: 43.84 }, { text: "붙여", start: 43.84, end: 44.08 }, { text: "주세요.", start: 44.08, end: 44.54 }], keywords: ["포스터", "잘 보이는 곳"] },
+                { speaker: "남", text: "가게 문 앞쪽에 붙일까요?", start: 45.62, end: 47.36, chunks: [{ text: "가게", start: 45.62, end: 45.98 }, { text: "문", start: 45.98, end: 46.14 }, { text: "앞쪽에", start: 46.14, end: 46.74 }, { text: "붙일까요?", start: 46.74, end: 47.36 }], keywords: ["문 앞쪽", "위치 확인"] },
+                { speaker: "여", text: "문보다는 저기 계산대 아래 붙이는 게 좋겠네요.", start: 48.66, end: 52.08, chunks: [{ text: "문보다는", start: 48.66, end: 49.58 }, { text: "저기", start: 49.58, end: 50.16 }, { text: "계산대", start: 50.16, end: 50.66 }, { text: "아래", start: 50.66, end: 50.88 }, { text: "붙이는", start: 50.88, end: 51.30 }, { text: "게", start: 51.30, end: 51.44 }, { text: "좋겠네요.", start: 51.44, end: 52.08 }], keywords: ["문보다", "계산대 아래", "최종 위치"] },
+                { speaker: "남", text: "네.", start: 53.34, end: 53.76, chunks: [{ text: "네.", start: 53.34, end: 53.76 }], keywords: ["긍정"] },
+                { speaker: "여", text: "저는 물건 가지러 창고에 좀 다녀올 테니까 무슨 일 생기면 연락하세요.", start: 54.68, end: 60.16, chunks: [{ text: "저는", start: 54.68, end: 55.32 }, { text: "물건", start: 55.32, end: 55.76 }, { text: "가지러", start: 55.76, end: 56.26 }, { text: "창고에", start: 56.26, end: 56.80 }, { text: "좀", start: 56.80, end: 57.04 }, { text: "다녀올", start: 57.04, end: 57.38 }, { text: "테니까", start: 57.38, end: 58.14 }, { text: "무슨", start: 58.14, end: 58.56 }, { text: "일", start: 58.56, end: 58.74 }, { text: "생기면", start: 58.74, end: 59.44 }, { text: "연락하세요.", start: 59.44, end: 60.16 }], keywords: ["창고", "물건 가지러 감", "무슨 일", "연락"] },
+                { speaker: "남", text: "네, 걱정 마세요.", start: 61.42, end: 62.88, chunks: [{ text: "네,", start: 61.42, end: 61.76 }, { text: "걱정", start: 62.18, end: 62.36 }, { text: "마세요.", start: 62.36, end: 62.88 }], keywords: ["걱정 마세요", "응답"] }
+            ];
+        })();
+
+        (function enforceKoreanOnlySample() {
+            const config = window.LISTENING_WORKBOOK_CONFIG;
+            if (!config) return;
+
+            config.instructionLanguage = { enabled: false, default: "ko" };
+            config.translationScaffold = {
+                ...(config.translationScaffold || {}),
+                mode: "minimal",
+                maxSubtitleStage: 2,
+                localizeLearnerContent: false
+            };
+
+            function removeVietnameseFields(value) {
+                if (!value || typeof value !== "object") return;
+                if (Array.isArray(value)) {
+                    value.forEach(removeVietnameseFields);
+                    return;
+                }
+
+                Object.keys(value).forEach((key) => {
+                    if (key === "vi" || key.endsWith("Vi")) {
+                        delete value[key];
+                        return;
+                    }
+                    removeVietnameseFields(value[key]);
+                });
+            }
+
+            removeVietnameseFields(config);
+        })();
+    </script>
+    <script>
+        (function () {
+            const prefix = "korean3b.listening.v3";
+            const page = (window.location.pathname || "").toLowerCase();
+            const seed = {
+                [`${prefix}:${page}:track19:listens`]: 3,
+                [`${prefix}:${page}:track19:stage`]: 0,
+                [`${prefix}:${page}:track19:quiz-language`]: "ko",
+                [`${prefix}:${page}:page:instruction-language`]: "ko",
+                [`${prefix}:${page}:page:quick-dock-collapsed`]: true
+            };
+
+            Object.entries(seed).forEach(([key, value]) => {
+                window.localStorage.setItem(key, JSON.stringify(value));
+            });
+        })();
     </script>
     <script src="../shared/listening-workbook.js?v=20260324-audiosync"></script>
+    <script>
+        window.C11_LISTENING_CUTTOON_CONFIG = {
+            lessonId: "track19",
+            stageZeroLabel: "컷툰 듣기",
+            panels: [
+                {
+                    title: "첫 출근 인사",
+                    note: "새 직원이 아웃도어 매장에 와서 매장 책임자에게 인사합니다.",
+                    start: 3.34,
+                    end: 8.08,
+                    image: "../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-01.webp"
+                },
+                {
+                    title: "첫날 업무 안내",
+                    note: "책임자는 첫날이라 자신이 하는 일을 보고 따라 하라고 안내합니다.",
+                    start: 9.36,
+                    end: 21.40,
+                    image: "../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-02.webp"
+                },
+                {
+                    title: "점퍼 입히기",
+                    note: "마네킹이 입고 있는 옷을 벗기고 새 점퍼를 입히라는 지시가 나옵니다.",
+                    start: 22.46,
+                    end: 29.42,
+                    image: "../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-03.webp"
+                },
+                {
+                    title: "모자와 등산화",
+                    note: "점퍼를 입힌 뒤 모자를 씌우고 등산화로 갈아 신겨야 합니다.",
+                    start: 30.16,
+                    end: 40.04,
+                    image: "../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-04.webp"
+                },
+                {
+                    title: "포스터 위치",
+                    note: "포스터를 잘 보이는 곳에 붙이되, 문 앞보다 계산대 아래가 좋다고 정정합니다.",
+                    start: 40.88,
+                    end: 53.76,
+                    image: "../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-05.webp"
+                },
+                {
+                    title: "창고에 다녀오기",
+                    note: "책임자가 창고에 다녀오는 동안 새 직원은 문제가 생기면 연락하기로 합니다.",
+                    start: 54.68,
+                    end: 62.88,
+                    image: "../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-06.webp"
+                }
+            ]
+        };
+    </script>
+    <script src="listening-sample-enhancements.js?v=20260617-c11-sample"></script>
     <script src="../shared/learning-enhancements.js?v=20260318-c11-listening"></script>
     <script src="../shared/site-copyright.js"></script>
     <script src="../shared/page-qr.js"></script>

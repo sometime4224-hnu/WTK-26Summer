@@ -14,6 +14,7 @@
     <script src="https://cdn.tailwindcss.com" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="../shared/listening-workbook.css?v=20260324-audiosync">
+    <link rel="stylesheet" href="listening-sample.css?v=20260617-c11-sample">
     <style>
         body {
             margin: 0;
@@ -54,7 +55,7 @@
     </style>
         <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
-<body>
+<body class="c11-listening-sample">
         <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -63,13 +64,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="../index.html"><i class="fa-solid fa-house"></i> 메인으로</a>
         <span class="divider">|</span>
         <a href="index.html"><i class="fa-solid fa-folder-open"></i> 11과 목록</a>
+        <span class="divider">|</span>
+        <a href="listening1.html"><i class="fa-solid fa-headphones"></i> 듣기 1</a>
+        <span class="divider">|</span>
+        <a href="listening2-student-quiz.html"><i class="fa-solid fa-pen-to-square"></i> 학생 퀴즈</a>
     </nav>
 
     <div id="listening-workbook-app"></div>
 
     <script>
         window.LISTENING_WORKBOOK_CONFIG = {
-            kicker: "Chapter 11 Listening Lab",
+            kicker: "Chapter 11 Listening",
             title: "11과 듣기 2",
             titleVi: "Luyện nghe bài 11 - Nghe 2",
             description: "이직을 고민하는 직장인의 대화를 바탕으로 이유 설명과 장단점 비교를 정리하는 듣기 워크북입니다. 핵심어 보기, 이유 비교 카드, 이해 점검 중심으로 더 간결하게 구성했습니다.",
@@ -85,12 +90,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     hideSpeakingSection: true,
                     moveBackgroundPromptIntoPrediction: true,
                     relocateQuizBelowSubtitle: true,
-                    quizStartsCollapsed: true
+                    quizStartsCollapsed: true,
+                    removeDictoglossSection: true
                 }
             },
             instructionLanguage: {
-                enabled: true,
+                enabled: false,
                 default: "ko"
+            },
+            translationScaffold: {
+                mode: "minimal",
+                maxSubtitleStage: 2,
+                localizeLearnerContent: false
             },
             theme: {
                 accent: "#0284c7",
@@ -99,13 +110,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 surface: "rgba(255,255,255,0.94)",
                 pageBackground: "linear-gradient(180deg, #f4fbff 0%, #fbfeff 42%, #f8fafc 100%)"
             },
-            featureList: [
-                "상황 예측",
-                "단계별 자막",
-                "핵심어 보기",
-                "이직 이유 비교",
-                "이해 점검"
-            ],
+            featureList: ["듣기", "지문", "문제"],
             featureListVi: [
                 "Du doan tinh huong",
                 "Phu de theo tung buoc",
@@ -155,6 +160,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         }
                     },
                     label: "Track 20",
+                    audioTrackNumber: 20,
                     title: "듣기 2: 이직을 고민하는 직장인",
                     titleVi: "Nghe 2: Nhan vien dang can nhac chuyen viec",
                     summary: "남자가 왜 회사를 옮기고 싶어 하는지, 또 현재 회사의 어떤 점 때문에 망설이는지를 비교하며 듣는 활동입니다.",
@@ -175,7 +181,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         caption: "참고 그림: 업무 조건과 직장 분위기를 두고 현실적인 고민을 나누는 상황입니다.",
                         captionVi: "Hinh tham khao: tinh huong chia se mot cach thuc te ve dieu kien lam viec va khong khi cong ty."
                     },
-        audioSrc: null,
+        audioSrc: "../../서울대 한국어 웹 보조 교재 제작/교과서 소스/음원 모음/3B/00_트랙_전체/SB/Seoul Univ_3B_Trk_20.mp3",
+                    audioSourceType: "original",
                     scene: {
                         emoji: "💼",
                         title: "상황 그림: 이직을 고민하며 장단점을 따져 보는 대화",
@@ -537,8 +544,139 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }
             ]
         };
+
+        (function applyAudioTranscript() {
+            const lesson = window.LISTENING_WORKBOOK_CONFIG.lessons[0];
+            lesson.transcript = [
+                { speaker: "안내", text: "잘 듣고 질문에 답하세요.", start: 3.02, end: 6.28, chunks: [{ text: "잘", start: 3.02, end: 4.26 }, { text: "듣고", start: 4.26, end: 4.92 }, { text: "질문에", start: 4.92, end: 5.60 }, { text: "답하세요.", start: 5.60, end: 6.28 }], keywords: ["질문에 답하세요"] },
+                { speaker: "남", text: "요즘 회사를 옮길까 말까 고민 중이야.", start: 7.36, end: 10.74, chunks: [{ text: "요즘", start: 7.36, end: 7.80 }, { text: "회사를", start: 7.80, end: 8.40 }, { text: "옮길까", start: 8.40, end: 9.12 }, { text: "말까", start: 9.12, end: 9.70 }, { text: "고민", start: 9.70, end: 10.06 }, { text: "중이야.", start: 10.06, end: 10.74 }], keywords: ["회사 옮기기", "고민"] },
+                { speaker: "여", text: "아니, 왜? 연봉이 높아서 좋다고 했잖아.", start: 11.64, end: 14.90, chunks: [{ text: "아니,", start: 11.64, end: 12.00 }, { text: "왜?", start: 12.00, end: 12.30 }, { text: "연봉이", start: 12.92, end: 13.42 }, { text: "높아서", start: 13.42, end: 13.96 }, { text: "좋다고", start: 13.96, end: 14.40 }, { text: "했잖아.", start: 14.40, end: 14.90 }], keywords: ["연봉", "좋다고 했잖아"] },
+                { speaker: "남", text: "연봉은 마음에 드는데 너무 바빠서 내 생활이 없어. 지난 주말에도 늦게까지 회사에서 일하느라고 다른 일은 아무것도 못했어.", start: 15.92, end: 27.08, chunks: [{ text: "연봉은", start: 15.92, end: 16.60 }, { text: "마음에", start: 16.60, end: 17.00 }, { text: "드는데", start: 17.00, end: 18.06 }, { text: "너무", start: 18.06, end: 18.64 }, { text: "바빠서", start: 18.64, end: 19.58 }, { text: "내", start: 19.58, end: 19.80 }, { text: "생활이", start: 19.80, end: 20.32 }, { text: "없어.", start: 20.32, end: 20.80 }, { text: "지난", start: 21.68, end: 21.84 }, { text: "주말에도", start: 21.84, end: 22.88 }, { text: "늦게까지", start: 22.88, end: 23.58 }, { text: "회사에서", start: 23.58, end: 24.20 }, { text: "일하느라고", start: 24.20, end: 25.20 }, { text: "다른", start: 25.20, end: 25.58 }, { text: "일은", start: 25.58, end: 26.04 }, { text: "아무것도", start: 26.04, end: 26.38 }, { text: "못했어.", start: 26.38, end: 27.08 }], keywords: ["연봉 만족", "너무 바쁨", "생활이 없다", "주말 근무"] },
+                { speaker: "여", text: "많이 힘들겠다. 만약 회사를 옮긴다면 어떤 곳에서 일하고 싶은데?", start: 27.84, end: 34.38, chunks: [{ text: "많이", start: 27.84, end: 28.40 }, { text: "힘들겠다.", start: 28.40, end: 29.42 }, { text: "만약", start: 30.28, end: 30.68 }, { text: "회사를", start: 30.68, end: 31.14 }, { text: "옮긴다면", start: 31.14, end: 31.98 }, { text: "어떤", start: 31.98, end: 32.40 }, { text: "곳에서", start: 32.40, end: 32.84 }, { text: "일하고", start: 32.84, end: 33.16 }, { text: "싶은데?", start: 33.16, end: 34.38 }], keywords: ["많이 힘듦", "어떤 회사", "희망 조건"] },
+                { speaker: "남", text: "연봉은 좀 낮아도 휴가가 길었으면 좋겠어. 또, 야근도 없었으면 좋겠고.", start: 34.76, end: 42.16, chunks: [{ text: "연봉은", start: 34.76, end: 35.34 }, { text: "좀", start: 35.34, end: 35.60 }, { text: "낮아도", start: 35.60, end: 36.72 }, { text: "휴가가", start: 36.72, end: 37.40 }, { text: "길었으면", start: 37.40, end: 37.84 }, { text: "좋겠어.", start: 37.84, end: 38.48 }, { text: "또,", start: 39.10, end: 39.70 }, { text: "야근도", start: 39.88, end: 40.46 }, { text: "없었으면", start: 40.46, end: 40.94 }, { text: "좋겠고.", start: 40.94, end: 42.16 }], keywords: ["휴가", "야근 없음", "연봉 낮아도"] },
+                { speaker: "여", text: "어떤 회사든지 힘든 점은 있을 거야. 그리고 아무리 휴가가 길어도 월급이 적으면 좋아하는 일을 할 수 없잖아.", start: 42.60, end: 51.54, chunks: [{ text: "어떤", start: 42.60, end: 42.88 }, { text: "회사든지", start: 42.88, end: 43.96 }, { text: "힘든", start: 43.96, end: 44.36 }, { text: "점은", start: 44.36, end: 44.74 }, { text: "있을", start: 44.74, end: 45.02 }, { text: "거야.", start: 45.02, end: 45.42 }, { text: "그리고", start: 46.20, end: 46.82 }, { text: "아무리", start: 46.82, end: 47.38 }, { text: "휴가가", start: 47.38, end: 47.98 }, { text: "길어도", start: 47.98, end: 48.62 }, { text: "월급이", start: 48.62, end: 49.30 }, { text: "적으면", start: 49.30, end: 49.82 }, { text: "좋아하는", start: 49.82, end: 50.34 }, { text: "일을", start: 50.34, end: 50.72 }, { text: "할", start: 50.72, end: 50.84 }, { text: "수", start: 50.84, end: 50.96 }, { text: "없잖아.", start: 50.96, end: 51.54 }], keywords: ["어떤 회사든", "힘든 점", "월급이 적으면", "좋아하는 일"] },
+                { speaker: "남", text: "그 말도 맞네. 정말 어떻게 해야 할지 모르겠어.", start: 51.54, end: 57.40, chunks: [{ text: "그", start: 51.54, end: 52.76 }, { text: "말도", start: 52.76, end: 53.08 }, { text: "맞네.", start: 53.08, end: 54.22 }, { text: "정말", start: 54.44, end: 54.78 }, { text: "어떻게", start: 54.78, end: 55.20 }, { text: "해야", start: 55.20, end: 55.44 }, { text: "할지", start: 55.44, end: 55.80 }, { text: "모르겠어.", start: 55.80, end: 57.40 }], keywords: ["맞장구", "고민"] },
+                { speaker: "여", text: "지금 다니는 회사에 좋은 점을 한번 생각해 보는 건 어때? 무엇이든지 좋으니까 얘기해 봐.", start: 57.66, end: 64.54, chunks: [{ text: "지금", start: 57.66, end: 57.98 }, { text: "다니는", start: 57.98, end: 58.44 }, { text: "회사에", start: 58.44, end: 59.26 }, { text: "좋은", start: 59.26, end: 59.54 }, { text: "점을", start: 59.54, end: 59.94 }, { text: "한번", start: 59.94, end: 60.26 }, { text: "생각해", start: 60.26, end: 60.74 }, { text: "보는", start: 60.74, end: 60.96 }, { text: "건", start: 60.96, end: 61.14 }, { text: "어때?", start: 61.14, end: 61.52 }, { text: "무엇이든지", start: 62.26, end: 62.98 }, { text: "좋으니까", start: 62.98, end: 63.64 }, { text: "얘기해", start: 63.64, end: 64.24 }, { text: "봐.", start: 64.24, end: 64.54 }], keywords: ["좋은 점 생각", "얘기해 봐"] },
+                { speaker: "남", text: "우선 집에서 가깝고 무엇보다 함께 일하는 동료들이 마음에 들어. 그리고 새로운 상사도 나한테 잘해주고 사무실 분위기도 좋고.", start: 65.46, end: 78.28, chunks: [{ text: "우선", start: 65.46, end: 66.22 }, { text: "집에서", start: 66.22, end: 66.88 }, { text: "가깝고", start: 66.88, end: 68.38 }, { text: "무엇보다", start: 68.38, end: 69.08 }, { text: "함께", start: 69.08, end: 69.64 }, { text: "일하는", start: 69.64, end: 70.02 }, { text: "동료들이", start: 70.02, end: 70.88 }, { text: "마음에", start: 70.88, end: 71.32 }, { text: "들어.", start: 71.32, end: 71.64 }, { text: "그리고", start: 72.42, end: 73.10 }, { text: "새로운", start: 73.10, end: 73.66 }, { text: "상사도", start: 73.66, end: 74.54 }, { text: "나한테", start: 74.54, end: 74.86 }, { text: "잘해주고", start: 74.86, end: 76.00 }, { text: "사무실", start: 76.00, end: 76.60 }, { text: "분위기도", start: 76.60, end: 76.98 }, { text: "좋고.", start: 76.98, end: 78.28 }], keywords: ["집에서 가까움", "동료", "상사", "분위기"] },
+                { speaker: "여", text: "이렇게 좋은 점이 많은데 옮길 수 있겠어?", start: 78.28, end: 81.48, chunks: [{ text: "이렇게", start: 78.28, end: 78.90 }, { text: "좋은", start: 78.90, end: 79.24 }, { text: "점이", start: 79.24, end: 79.60 }, { text: "많은데", start: 79.60, end: 80.34 }, { text: "옮길", start: 80.34, end: 80.80 }, { text: "수", start: 80.80, end: 80.96 }, { text: "있겠어?", start: 80.96, end: 81.48 }], keywords: ["좋은 점 많다", "옮길 수 있겠어"] },
+                { speaker: "남", text: "그래. 다시 한번 생각해 볼게. 고마워.", start: 82.58, end: 86.02, chunks: [{ text: "그래.", start: 82.58, end: 82.98 }, { text: "다시", start: 83.38, end: 83.54 }, { text: "한번", start: 83.54, end: 83.78 }, { text: "생각해", start: 83.78, end: 84.24 }, { text: "볼게.", start: 84.24, end: 85.06 }, { text: "고마워.", start: 85.50, end: 86.02 }], keywords: ["다시 생각", "고마워"] }
+            ];
+        })();
+
+        (function enforceKoreanOnlySample() {
+            const config = window.LISTENING_WORKBOOK_CONFIG;
+            if (!config) return;
+
+            config.instructionLanguage = { enabled: false, default: "ko" };
+            config.translationScaffold = {
+                ...(config.translationScaffold || {}),
+                mode: "minimal",
+                maxSubtitleStage: 2,
+                localizeLearnerContent: false
+            };
+
+            function removeVietnameseFields(value) {
+                if (!value || typeof value !== "object") return;
+                if (Array.isArray(value)) {
+                    value.forEach(removeVietnameseFields);
+                    return;
+                }
+
+                Object.keys(value).forEach((key) => {
+                    if (key === "vi" || key.endsWith("Vi")) {
+                        delete value[key];
+                        return;
+                    }
+                    removeVietnameseFields(value[key]);
+                });
+            }
+
+            removeVietnameseFields(config);
+        })();
+    </script>
+    <script>
+        (function () {
+            const prefix = "korean3b.listening.v3";
+            const page = (window.location.pathname || "").toLowerCase();
+            const seed = {
+                [`${prefix}:${page}:track20:listens`]: 3,
+                [`${prefix}:${page}:track20:stage`]: 0,
+                [`${prefix}:${page}:track20:quiz-language`]: "ko",
+                [`${prefix}:${page}:page:instruction-language`]: "ko",
+                [`${prefix}:${page}:page:quick-dock-collapsed`]: true
+            };
+
+            Object.entries(seed).forEach(([key, value]) => {
+                window.localStorage.setItem(key, JSON.stringify(value));
+            });
+        })();
     </script>
     <script src="../shared/listening-workbook.js?v=20260324-audiosync"></script>
+    <script>
+        window.C11_LISTENING_CUTTOON_CONFIG = {
+            lessonId: "track20",
+            stageZeroLabel: "컷툰 듣기",
+            panels: [
+                {
+                    title: "이직 고민",
+                    note: "남자는 요즘 회사를 옮길지 말지 고민하고 있다고 말합니다.",
+                    start: 7.36,
+                    end: 10.74,
+                    image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-01.webp"
+                },
+                {
+                    title: "연봉은 좋지만",
+                    note: "여자는 연봉이 높아서 좋다고 했던 점을 떠올립니다.",
+                    start: 11.64,
+                    end: 14.90,
+                    image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-02.webp"
+                },
+                {
+                    title: "바쁜 회사 생활",
+                    note: "남자는 너무 바빠서 자기 생활이 없고 주말에도 늦게까지 일했다고 말합니다.",
+                    start: 15.92,
+                    end: 27.08,
+                    image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-03.webp"
+                },
+                {
+                    title: "옮긴다면?",
+                    note: "여자는 회사를 옮긴다면 어떤 곳에서 일하고 싶은지 묻습니다.",
+                    start: 27.84,
+                    end: 34.38,
+                    image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-04.webp"
+                },
+                {
+                    title: "바라는 새 회사",
+                    note: "남자는 연봉이 조금 낮아도 휴가가 길고 야근이 없었으면 좋겠다고 말합니다.",
+                    start: 34.76,
+                    end: 42.16,
+                    image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-05.webp"
+                },
+                {
+                    title: "현실적인 조언",
+                    note: "여자는 어떤 회사든 힘든 점이 있고 월급이 적으면 좋아하는 일을 하기 어렵다고 조언합니다.",
+                    start: 42.60,
+                    end: 51.54,
+                    image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-06.webp"
+                },
+                {
+                    title: "좋은 점 생각하기",
+                    note: "여자는 지금 다니는 회사의 좋은 점을 한번 생각해 보라고 권합니다.",
+                    start: 51.54,
+                    end: 64.54,
+                    image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-07.webp"
+                },
+                {
+                    title: "다시 생각하기",
+                    note: "남자는 현재 회사의 장점을 떠올리고 이직 문제를 다시 생각해 보기로 합니다.",
+                    start: 65.46,
+                    end: 86.02,
+                    image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-08.webp"
+                }
+            ]
+        };
+    </script>
+    <script src="listening-sample-enhancements.js?v=20260617-c11-sample"></script>
     <script src="../shared/learning-enhancements.js?v=20260318-c11-listening"></script>
     <script src="../shared/site-copyright.js"></script>
     <script src="../shared/page-qr.js"></script>
