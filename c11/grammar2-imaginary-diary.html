@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>가상 일기 쓰기</title>
+    <meta name="description" content="-(ㄴ/는)다면을 사용해 상상 일기를 씁니다." />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Noto Sans KR', sans-serif !important;
+            background: linear-gradient(135deg, #fdf6e2 0%, #fef3c7 100%);
+            min-height: 100vh;
+        }
+        .safe { word-break: keep-all; overflow-wrap: break-word; }
+        .vi-text { display: none; }
+        .vi-on .vi-text { display: block; }
+        .hidden { display: none !important; }
+
+        .postcard {
+            background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            background-color: #fffaf0;
+        }
+
+        .theme-card-btn.active {
+            border-color: #d97706;
+            background-color: #fef3c7;
+            box-shadow: 0 10px 15px -3px rgba(217, 119, 6, 0.1);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Navigation Bar -->
+    <nav class="flex items-center justify-between border-b border-amber-200 bg-white/90 px-4 py-3 sticky top-0 z-50 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <a href="../index.html" class="flex items-center gap-1.5 text-amber-700 hover:text-amber-800 text-sm font-bold no-underline">
+                <i class="fa-solid fa-house"></i> 메인
+            </a>
+            <span class="text-slate-300">|</span>
+            <a href="index.html" class="flex items-center gap-1.5 text-amber-700 hover:text-amber-800 text-sm font-bold no-underline">
+                <i class="fa-solid fa-folder-open"></i> 11과 목록
+            </a>
+            <span class="text-slate-300">|</span>
+            <a href="grammar2.html" class="flex items-center gap-1.5 text-amber-700 hover:text-amber-800 text-sm font-bold no-underline">
+                <i class="fa-solid fa-book-open"></i> 문법 2
+            </a>
+        </div>
+        <button id="viToggle" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors">
+            Tiếng Việt OFF
+        </button>
+    </nav>
+
+    <main id="page" class="flex-1 max-w-5xl w-full mx-auto p-4 md:py-4 flex flex-col justify-between">
+        <!-- 상단 헤더 -->
+        <header class="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 pb-2.5 mb-4 shrink-0 text-left">
+            <div class="flex items-baseline gap-2.5">
+                <h1 class="text-xl font-black text-slate-800">가상 일기 쓰기</h1>
+                <p class="text-xs text-slate-500 mt-1 safe">-(ㄴ/는)다면을 사용해 상상 일기를 씁니다.</p>
+                <p class="vi-text text-[11px] text-amber-700 mt-1 safe font-medium">Viết nhật ký giả định sử dụng cấu trúc -(ㄴ/는)다면.</p>
+            </div>
+            <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-100 shrink-0">Grammar 2 B</span>
+        </header>
+
+        <!-- 태블릿 가로모드 최적화 2단 레이아웃 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1 w-full">
+
+            <!-- 왼쪽 사이드바: 가이드 및 주제 리스트 -->
+            <div class="lg:col-span-4 flex flex-col gap-4 w-full">
+                <!-- 일기 가이드 보드 -->
+                <div class="bg-amber-900 text-amber-50 p-5 rounded-2xl shadow-sm border border-amber-800">
+                    <h3 class="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5 border-b border-amber-800 pb-2 mb-3">
+                        <i data-lucide="info" class="w-4.5 h-4.5"></i> 작가 가이드 (Writer's Guide)
+                    </h3>
+                    <div class="text-[11px] leading-relaxed space-y-2 safe">
+                        <p><b>-(ㄴ/는)다면:</b> 현실에서 일어날 가능성이 매우 낮은 상상 속 가정을 표현할 때 쓰며, 일기 쓰기나 가정을 강조하는 글에 자주 활용됩니다.</p>
+                        <p class="vi-text text-amber-200 mt-1">Cấu trúc giả định giả tưởng dùng cho tình huống có xác suất xảy ra cực kỳ thấp.</p>
+                        <div class="bg-amber-950/60 p-2.5 rounded-lg border border-amber-800 text-[10px] space-y-1">
+                            <p class="text-yellow-300 font-bold">💡 Conjugation Rule:</p>
+                            <p>· 받침 O 동사: 먹다 $\rightarrow$ 먹는다면</p>
+                            <p>· 받침 X 동사: 가다 $\rightarrow$ 간다면</p>
+                            <p>· 형용사: 좋다 $\rightarrow$ 좋다면</p>
+                            <p>· 명사: 학생 $\rightarrow$ 학생이라면</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 주제 선택 패널 -->
+                <div class="bg-white border border-amber-200 rounded-2xl p-5 shadow-sm space-y-3">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">주제 리스트 (Select Theme)</h3>
+                    <div class="flex flex-col gap-2">
+                        <button class="theme-card-btn w-full p-4 rounded-xl border border-slate-200 hover:border-amber-400 bg-slate-50 hover:bg-amber-50/20 text-left transition-all cursor-pointer flex items-center gap-3" data-theme-idx="0" type="button">
+                            <span class="text-2xl shrink-0">💰</span>
+                            <div>
+                                <p class="font-bold text-slate-800 text-xs">나에게 10억 원이 생기다</p>
+                                <p class="text-[10px] text-slate-400">If I had 1 billion won</p>
+                            </div>
+                        </button>
+                        <button class="theme-card-btn w-full p-4 rounded-xl border border-slate-200 hover:border-amber-400 bg-slate-50 hover:bg-amber-50/20 text-left transition-all cursor-pointer flex items-center gap-3" data-theme-idx="1" type="button">
+                            <span class="text-2xl shrink-0">👻</span>
+                            <div>
+                                <p class="font-bold text-slate-800 text-xs">하루 동안 투명인간이 되다</p>
+                                <p class="text-[10px] text-slate-400">If I became invisible for a day</p>
+                            </div>
+                        </button>
+                        <button class="theme-card-btn w-full p-4 rounded-xl border border-slate-200 hover:border-amber-400 bg-slate-50 hover:bg-amber-50/20 text-left transition-all cursor-pointer flex items-center gap-3" data-theme-idx="2" type="button">
+                            <span class="text-2xl shrink-0">✈</span>
+                            <div>
+                                <p class="font-bold text-slate-800 text-xs">안 가본 나라로 이민을 가다</p>
+                                <p class="text-[10px] text-slate-400">If I immigrated to a new country</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오른쪽 영역: 메인 빌더 또는 가상 엽서 -->
+            <div class="lg:col-span-8 flex flex-col gap-4 w-full">
+                <!-- 대기 화면 (아무 주제도 선택 안 했을 때) -->
+                <div id="landingCard" class="bg-white border border-amber-200 rounded-2xl p-8 shadow-sm text-center min-h-[360px] flex flex-col justify-center items-center">
+                    <span class="text-5xl text-amber-400 mb-4">✍</span>
+                    <h3 class="text-base font-bold text-slate-700">가상 일기 작성을 시작해 보세요</h3>
+                    <p class="text-xs text-slate-500 mt-1.5">왼쪽 주제 리스트에서 상상하고 싶은 카드 중 하나를 선택하면 대화식 빌더가 열립니다.</p>
+                    <p class="vi-text text-xs text-blue-700 mt-0.5">Chọn một chủ đề ở danh sách bên trái để bắt đầu viết nhật ký.</p>
+                </div>
+
+                <!-- 일기 작성기 단계 -->
+                <section id="diaryBuilder" class="hidden bg-white border border-amber-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between min-h-[360px]">
+                    <div>
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                            <h2 id="builderTitle" class="text-sm font-black text-amber-800">일기 작성 중...</h2>
+                        </div>
+
+                        <!-- 스텝 네비게이션 -->
+                        <div class="flex items-center gap-2 mb-6 text-xs text-slate-400">
+                            <span id="stepTab1" class="font-bold text-amber-600 border-b-2 border-amber-500 pb-1">1. 가정 만들기</span>
+                            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                            <span id="stepTab2" class="pb-1">2. 상상 행동 고르기</span>
+                            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                            <span id="stepTab3" class="pb-1">3. 소감 마무리</span>
+                        </div>
+
+                        <!-- 스텝 1: 어미 변환 선택 -->
+                        <div id="builderStep1" class="space-y-4">
+                            <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                                <p class="text-xs font-bold text-amber-800">질문: 시작 부분을 가정법 형태인 '-(ㄴ/는)다면'으로 바르게 바꾼 것은?</p>
+                                <p id="step1Prompt" class="text-sm font-bold text-slate-800 mt-2">만약 나에게 10억 원이 [생기다] ...</p>
+                            </div>
+                            <div id="step1Choices" class="grid grid-cols-1 gap-2.5"></div>
+                        </div>
+
+                        <!-- 스텝 2: 행동 선택 (가정절 결정 후) -->
+                        <div id="builderStep2" class="hidden space-y-4">
+                            <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                                <p class="text-xs font-bold text-amber-800">질문: 만약 상황이 일어난다면 하고 싶은 행동을 선택해 보세요. (2개 선택)</p>
+                                <p class="text-xs text-slate-500 mt-0.5">선택한 카드들이 일기의 몸체가 됩니다.</p>
+                            </div>
+                            <div id="step2Choices" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                            <div class="flex justify-end mt-4">
+                                <button id="btnConfirmStep2" disabled class="px-5 py-2.5 rounded-xl bg-slate-200 text-slate-400 text-xs font-bold cursor-not-allowed" type="button">다음 단계로 (0/2)</button>
+                            </div>
+                        </div>
+
+                        <!-- 스텝 3: 결론 및 소감 선택 -->
+                        <div id="builderStep3" class="hidden space-y-4">
+                            <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                                <p class="text-xs font-bold text-amber-800">질문: 일기의 마지막에 어울리는 감정이나 생각을 골라 주세요.</p>
+                            </div>
+                            <div id="step3Choices" class="grid grid-cols-1 gap-2.5"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 최종 엽서 렌더링 영역 (일기 완성 시 표시) -->
+                <section id="postcardView" class="hidden space-y-4">
+                    <div class="postcard border border-amber-200 rounded-3xl p-6 md:p-8 shadow-md flex flex-col justify-between min-h-[300px] relative overflow-hidden">
+                        <!-- 아날로그 디자인 요소 -->
+                        <div class="absolute top-6 right-6 w-16 h-20 border border-slate-300 bg-amber-50 shadow-sm flex items-center justify-center text-[10px] font-serif text-slate-400 rotate-3 select-none">
+                            POSTAGE
+                        </div>
+
+                        <div>
+                            <h3 class="font-serif italic text-amber-800 text-xs tracking-wider uppercase border-b border-amber-200/60 pb-2 mb-5">Imaginary Diary</h3>
+                            <p id="postcardContentKo" class="font-serif text-slate-800 text-sm md:text-base leading-loose tracking-wide safe"></p>
+                        </div>
+
+                        <div class="mt-6 border-t border-amber-200/60 pt-4 flex flex-col gap-2">
+                            <p id="postcardContentVi" class="vi-text text-xs text-blue-700 leading-relaxed italic safe"></p>
+                            <p class="text-[9px] text-slate-400 font-mono text-right">Written using -(ㄴ/는)다면 & -았/었을 텐데</p>
+                        </div>
+                    </div>
+
+                    <!-- 유용한 팁 및 자가 체크리스트 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 text-slate-800">
+                            <h4 class="text-xs font-bold text-emerald-800 flex items-center gap-1 uppercase"><i data-lucide="check-square" class="w-4 h-4"></i> 자가 체크리스트</h4>
+                            <ul class="text-[10px] text-slate-600 mt-2 list-disc pl-4 space-y-1">
+                                <li><b>가정의 연결:</b> 동사 받침 유무, ㄹ탈락 규칙을 준수했는가? (예: 살다 $\rightarrow$ 산다면)</li>
+                                <li><b>상상 어미:</b> 후회나 상상을 나타내는 '-았/었을 텐데'가 올바르게 사용되었는가?</li>
+                                <li><b>의미 확인:</b> 단순 조건인 -(으)면보다 더 비현실적인 가정이 잘 느껴지는가?</li>
+                            </ul>
+                        </div>
+                        <div class="flex flex-col gap-2 justify-center">
+                            <button id="btnCopy" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl text-xs font-bold shadow transition-colors flex items-center justify-center gap-1.5 cursor-pointer" type="button">
+                                <i data-lucide="copy" class="w-4 h-4"></i> 일기 텍스트 복사하기
+                            </button>
+                            <button onclick="changeTheme()" class="w-full border border-amber-300 bg-white hover:bg-amber-50 text-amber-800 py-3 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer" type="button">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 새 일기 작성하기
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Copyright -->
+    <script src="../shared/site-copyright.js"></script>
+    <script>
+        const themes = [
+            {
+                prompt: '만약 나에게 10억 원이 [생기다] ...',
+                base: '생기다',
+                step1Options: [
+                    { text: '생긴다면', isCorrect: true, display: '생긴다면' },
+                    { text: '생기는다면', isCorrect: false, display: '생기는다면' },
+                    { text: '생기라면', isCorrect: false, display: '생기라면' }
+                ],
+                actions: [
+                    { ko: '우선 넓고 예쁜 집을 사고 부모님께 선물을 드릴 텐데.', vi: 'Trước tiên tôi sẽ mua một ngôi nhà rộng đẹp và tặng quà cho bố mẹ.', key: 'house' },
+                    { ko: '평소에 가고 싶었던 세계 여러 나라로 여행을 떠날 텐데.', vi: 'Tôi sẽ đi du lịch đến nhiều quốc gia trên thế giới mà tôi hằng mong ước.', key: 'travel' },
+                    { ko: '가난하고 힘든 사람들을 돕는 재단에 돈을 기부할 텐데.', vi: 'Tôi sẽ quyên góp tiền cho một quỹ giúp đỡ những người nghèo khổ và khó khăn.', key: 'donate' },
+                    { ko: '일을 모두 그만두고 매일 먹고 놀면서 쉴 텐데.', vi: 'Tôi sẽ nghỉ việc hoàn toàn, chỉ ăn chơi và nghỉ ngơi mỗi ngày.', key: 'rest' }
+                ],
+                conclusions: [
+                    { ko: '생각만 해도 하루 종일 웃음이 나고 기분이 좋아진다.', vi: 'Chỉ nghĩ đến thôi tôi cũng mỉm cười suốt cả ngày và cảm thấy tuyệt vời.', display: '생각만 해도 기분이 좋다' },
+                    { ko: '정말 나에게 이런 행운이 찾아오면 얼마나 좋을까.', vi: 'Nếu vận may như thế thực sự đến với tôi thì tốt biết mấy.', display: '행운이 오면 좋겠다' },
+                    { ko: '상상만으로도 오늘 하루를 버티는 힘이 생긴다.', vi: 'Chỉ bằng việc tưởng tượng thôi cũng giúp tôi có thêm sức mạnh để vượt qua hôm nay.', display: '상상만으로 힘이 난다' }
+                ]
+            },
+            {
+                prompt: '만약 내가 하루 동안 투명인간이 [되다] ...',
+                base: '되다',
+                step1Options: [
+                    { text: '된다면', isCorrect: true, display: '된다면' },
+                    { text: '되는다면', isCorrect: false, display: '되는다면' },
+                    { text: '되라면', isCorrect: false, display: '되라면' }
+                ],
+                actions: [
+                    { ko: '평소에 표를 구하기 힘들었던 유명 콘서트에 몰래 들어갈 텐데.', vi: 'Tôi sẽ lẻn vào một buổi hòa nhạc nổi tiếng mà bình thường rất khó mua vé.', key: 'concert' },
+                    { ko: '나를 괴롭히던 사람에게 장난을 쳐서 혼내 줄 텐데.', vi: 'Tôi sẽ chơi khăm và trừng phạt kẻ từng bắt nạt mình.', key: 'prank' },
+                    { ko: '아무도 모르게 좋아하는 사람의 곁을 조용히 지켜볼 텐데.', vi: 'Tôi sẽ lặng lẽ đứng cạnh và quan sát người mình thích mà không ai biết.', key: 'crush' },
+                    { ko: '은행 금고 구경을 하거나 맛있는 빵을 몰래 먹을 텐데.', vi: 'Tôi sẽ đi tham quan kho tiền ngân hàng hoặc ăn trộm vài chiếc bánh mỳ ngon lành.', key: 'steal' }
+                ],
+                conclusions: [
+                    { ko: '하지만 아무도 나를 못 알아보면 외롭고 무서울 것 같다.', vi: 'Nhưng nếu không ai nhận ra tôi, chắc tôi sẽ cảm thấy cô đơn và sợ hãi.', display: '외롭고 무서울 것 같다' },
+                    { ko: '하루 동안 이런 신기한 마법을 경험할 수 있으면 재미있겠다.', vi: 'Sẽ thật thú vị nếu được trải nghiệm phép thuật kỳ diệu này trong một ngày.', display: '재미있을 것 같다' },
+                    { ko: '오늘 밤 꿈에서라도 투명인간이 되어 모험을 떠나고 싶다.', vi: 'Tôi ước gì tối nay trong giấc mơ mình sẽ biến thành người vô hình để đi phiêu lưu.', display: '꿈에서라도 경험하고 싶다' }
+                ]
+            },
+            {
+                prompt: '만약 내가 가보지 않은 나라로 이민을 [가다] ...',
+                base: '가다',
+                step1Options: [
+                    { text: '간다면', isCorrect: true, display: '간다면' },
+                    { text: '가는다면', isCorrect: false, display: '가는다면' },
+                    { text: '가다면', isCorrect: false, display: '가다면' }
+                ],
+                actions: [
+                    { ko: '매일 새로운 거리와 문화를 구경하며 재미있게 살 텐데.', vi: 'Tôi sẽ sống vui vẻ, ngắm nhìn những đường phố và nền văn hóa mới mỗi ngày.', key: 'explore' },
+                    { ko: '그 나라의 언어를 열심히 배워서 현지 친구들을 많이 사귈 텐데.', vi: 'Tôi sẽ học chăm chỉ ngôn ngữ nước đó để kết bạn với nhiều người bản xứ.', key: 'language' },
+                    { ko: '고향에 있는 가족과 옛 친구들이 매일 그리울 텐데.', vi: 'Chắc là tôi sẽ nhớ gia đình và bạn bè cũ ở quê nhà da diết mỗi ngày.', key: 'miss' },
+                    { ko: '낯선 음식과 날씨 때문에 처음에는 고생을 좀 할 텐데.', vi: 'Có lẽ ban đầu tôi sẽ gặp chút khó khăn do đồ ăn và thời tiết xa lạ.', key: 'hardship' }
+                ],
+                conclusions: [
+                    { ko: '어려움도 있겠지만 새로운 삶을 개척하는 것은 가치 있는 일이다.', vi: 'Mặc dù sẽ có khó khăn, nhưng khai phá một cuộc sống mới là điều rất giá trị.', display: '가치 있는 일이다' },
+                    { ko: '지금 살고 있는 곳을 떠나 새로운 모험을 떠나는 상상만으로 짜릿하다.', vi: 'Chỉ tưởng tượng cảnh rời bỏ nơi đang sống để đi phiêu lưu đã thấy phấn khích.', display: '상상만으로 짜릿하다' },
+                    { ko: '외국어 공부를 더 열심히 해서 언젠가 꼭 도전해 보고 싶다.', vi: 'Tôi muốn học ngoại ngữ chăm chỉ hơn để nhất định sẽ thử thách bản thân một ngày nào đó.', display: '언젠가 도전하고 싶다' }
+                ]
+            }
+        ];
+
+        let state = {
+            currentTheme: null,
+            conjugation: '',
+            selectedActions: [],
+            conclusion: ''
+        };
+
+        const page = document.getElementById('page');
+        const viToggle = document.getElementById('viToggle');
+
+        const landingCard = document.getElementById('landingCard');
+        const diaryBuilder = document.getElementById('diaryBuilder');
+        const builderTitle = document.getElementById('builderTitle');
+        const stepTab1 = document.getElementById('stepTab1');
+        const stepTab2 = document.getElementById('stepTab2');
+        const stepTab3 = document.getElementById('stepTab3');
+
+        const builderStep1 = document.getElementById('builderStep1');
+        const step1Prompt = document.getElementById('step1Prompt');
+        const step1Choices = document.getElementById('step1Choices');
+
+        const builderStep2 = document.getElementById('builderStep2');
+        const step2Choices = document.getElementById('step2Choices');
+        const btnConfirmStep2 = document.getElementById('btnConfirmStep2');
+
+        const builderStep3 = document.getElementById('builderStep3');
+        const step3Choices = document.getElementById('step3Choices');
+
+        const postcardView = document.getElementById('postcardView');
+        const postcardContentKo = document.getElementById('postcardContentKo');
+        const postcardContentVi = document.getElementById('postcardContentVi');
+        const btnCopy = document.getElementById('btnCopy');
+
+        // Bilingual Toggle
+        let viOn = false;
+        viToggle.addEventListener('click', function() {
+            viOn = !viOn;
+            page.classList.toggle('vi-on', viOn);
+            viToggle.textContent = viOn ? 'Tiếng Việt ON' : 'Tiếng Việt OFF';
+        });
+
+        // Click Theme
+        document.querySelectorAll('.theme-card-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active classes from all buttons
+                document.querySelectorAll('.theme-card-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const idx = Number(btn.dataset.themeIdx);
+                selectTheme(idx);
+            });
+        });
+
+        function selectTheme(idx) {
+            state.currentTheme = themes[idx];
+            state.conjugation = '';
+            state.selectedActions = [];
+            state.conclusion = '';
+
+            landingCard.classList.add('hidden');
+            postcardView.classList.add('hidden');
+            diaryBuilder.classList.remove('hidden');
+
+            builderTitle.textContent = `주제: ${state.currentTheme.prompt.replace('[생기다]', '').replace('[되다]', '').replace('[가다]', '')}`;
+
+            showStep1();
+        }
+
+        function changeTheme() {
+            // Remove active classes
+            document.querySelectorAll('.theme-card-btn').forEach(b => b.classList.remove('active'));
+
+            landingCard.classList.remove('hidden');
+            diaryBuilder.classList.add('hidden');
+            postcardView.classList.add('hidden');
+        }
+
+        // STEP 1: Conjugation
+        function showStep1() {
+            stepTab1.className = "font-bold text-amber-600 border-b-2 border-amber-500 pb-1";
+            stepTab2.className = "pb-1 text-slate-400";
+            stepTab3.className = "pb-1 text-slate-400";
+
+            builderStep1.classList.remove('hidden');
+            builderStep2.classList.add('hidden');
+            builderStep3.classList.add('hidden');
+
+            step1Prompt.textContent = state.currentTheme.prompt;
+            step1Choices.innerHTML = state.currentTheme.step1Options.map((opt, i) => `
+                <button onclick="handleStep1(${opt.isCorrect}, '${opt.display}')" class="py-3.5 px-4 rounded-xl border border-slate-200 hover:border-amber-400 bg-white hover:bg-amber-50/20 text-xs font-bold text-slate-800 transition-all cursor-pointer text-center" type="button">
+                    ${opt.text}
+                </button>
+            `).join('');
+        }
+
+        function handleStep1(isCorrect, val) {
+            if (!isCorrect) {
+                alert(viOn ? "Không chính xác. Hãy nhớ quy tắc động từ: V-(ㄴ/는)다면" : "틀렸습니다. 동사 받침 유무를 다시 확인해 보세요!");
+                return;
+            }
+            state.conjugation = val;
+            showStep2();
+        }
+
+        // STEP 2: Actions
+        function showStep2() {
+            stepTab1.className = "text-slate-400 pb-1";
+            stepTab2.className = "font-bold text-amber-600 border-b-2 border-amber-500 pb-1";
+            stepTab3.className = "pb-1 text-slate-400";
+
+            builderStep1.classList.add('hidden');
+            builderStep2.classList.remove('hidden');
+            builderStep3.classList.add('hidden');
+
+            state.selectedActions = [];
+            renderStep2Cards();
+        }
+
+        function renderStep2Cards() {
+            step2Choices.innerHTML = state.currentTheme.actions.map((act, i) => {
+                const isSelected = state.selectedActions.includes(act);
+                return `
+                    <button onclick="toggleAction(${i})" class="p-3.5 rounded-xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between min-h-[90px] ${isSelected ? 'border-amber-500 bg-amber-50/50' : 'border-slate-200 bg-white hover:border-amber-300'}" type="button">
+                        <p class="text-[11px] font-bold text-slate-800 leading-normal">${act.ko}</p>
+                        <p class="vi-text text-[9px] text-blue-700 mt-1 leading-relaxed">${act.vi}</p>
+                    </button>
+                `;
+            }).join('');
+
+            const count = state.selectedActions.length;
+            btnConfirmStep2.textContent = `다음 단계로 (${count}/2)`;
+
+            if (count === 2) {
+                btnConfirmStep2.disabled = false;
+                btnConfirmStep2.className = "px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors cursor-pointer";
+                btnConfirmStep2.onclick = showStep3;
+            } else {
+                btnConfirmStep2.disabled = true;
+                btnConfirmStep2.className = "px-5 py-2.5 rounded-xl bg-slate-200 text-slate-400 text-xs font-bold cursor-not-allowed";
+                btnConfirmStep2.onclick = null;
+            }
+        }
+
+        function toggleAction(idx) {
+            const act = state.currentTheme.actions[idx];
+            const foundIdx = state.selectedActions.indexOf(act);
+            if (foundIdx > -1) {
+                state.selectedActions.splice(foundIdx, 1);
+            } else {
+                if (state.selectedActions.length >= 2) {
+                    state.selectedActions.shift();
+                }
+                state.selectedActions.push(act);
+            }
+            renderStep2Cards();
+        }
+
+        // STEP 3: Conclusion
+        function showStep3() {
+            stepTab1.className = "text-slate-400 pb-1";
+            stepTab2.className = "text-slate-400 pb-1";
+            stepTab3.className = "font-bold text-amber-600 border-b-2 border-amber-500 pb-1";
+
+            builderStep2.classList.add('hidden');
+            builderStep3.classList.remove('hidden');
+
+            step3Choices.innerHTML = state.currentTheme.conclusions.map((con, i) => `
+                <button onclick="finishDiary(${i})" class="p-3.5 rounded-xl border border-slate-200 hover:border-amber-400 bg-white hover:bg-amber-50/20 text-xs font-bold text-slate-800 text-left transition-all cursor-pointer min-h-[80px] flex flex-col justify-between" type="button">
+                    <span>${con.display}</span>
+                    <span class="vi-text text-[9px] text-blue-500 font-normal mt-1">${con.vi}</span>
+                </button>
+            `).join('');
+        }
+
+        function finishDiary(conclusionIdx) {
+            const t = state.currentTheme;
+            const con = t.conclusions[conclusionIdx];
+            state.conclusion = con;
+
+            diaryBuilder.classList.add('hidden');
+
+            // Format full diary text
+            const firstPartKo = `만약 나에게 ${t.base === '생기다' ? '10억 원이' : t.base === '되다' ? '하루 동안 투명인간이' : '가보지 않은 나라로 이민을'} ${state.conjugation},`;
+            const firstPartVi = `Nếu ${t.base === '생기다' ? 'có 1 tỷ won' : t.base === '되다' ? 'biến thành người vô hình trong một ngày' : 'di cư đến một đất nước tôi chưa từng đi'},`;
+
+            const fullKo = `${firstPartKo} ${state.selectedActions[0].ko} 그리고 ${state.selectedActions[1].ko} ${con.ko}`;
+            const fullVi = `${firstPartVi} ${state.selectedActions[0].vi} Và ${state.selectedActions[1].vi} ${con.vi}`;
+
+            postcardContentKo.textContent = fullKo;
+            postcardContentVi.textContent = fullVi;
+
+            postcardView.classList.remove('hidden');
+
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
+
+        btnCopy.addEventListener('click', () => {
+            const text = postcardContentKo.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert(viOn ? "Đã sao chép vào bộ nhớ tạm!" : "일기 텍스트가 복사되었습니다!");
+            });
+        });
+
+        // Initialize Lucide
+        window.onload = function() {
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
+    </script>
+</body>
+</html>

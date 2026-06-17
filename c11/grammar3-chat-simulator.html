@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>메신저 대화 연습</title>
+    <meta name="description" content="대화에 맞는 조사(-든지/-도)를 연습합니다." />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Noto Sans KR', sans-serif !important;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            min-height: 100vh;
+        }
+        .safe { word-break: keep-all; overflow-wrap: break-word; }
+        .vi-text { display: none; }
+        .vi-on .vi-text { display: block; }
+        .hidden { display: none !important; }
+
+        .chat-container {
+            background-color: #b3cde4; /* Classic Kakao-like chat background */
+        }
+        .bubble-friend {
+            background-color: #ffffff;
+            border-radius: 2px 14px 14px 14px;
+        }
+        .bubble-me {
+            background-color: #ffeb33; /* Yellow Kakao bubble */
+            border-radius: 14px 2px 14px 14px;
+        }
+        .avatar-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Navigation Bar -->
+    <nav class="flex items-center justify-between border-b border-sky-200 bg-white/90 px-4 py-3 sticky top-0 z-50 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <a href="../index.html" class="flex items-center gap-1.5 text-sky-700 hover:text-sky-800 text-sm font-bold no-underline">
+                <i class="fa-solid fa-house"></i> 메인
+            </a>
+            <span class="text-slate-300">|</span>
+            <a href="index.html" class="flex items-center gap-1.5 text-sky-700 hover:text-sky-800 text-sm font-bold no-underline">
+                <i class="fa-solid fa-folder-open"></i> 11과 목록
+            </a>
+            <span class="text-slate-300">|</span>
+            <a href="grammar3.html" class="flex items-center gap-1.5 text-sky-700 hover:text-sky-800 text-sm font-bold no-underline">
+                <i class="fa-solid fa-book-open"></i> 문법 3
+            </a>
+        </div>
+        <button id="viToggle" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors">
+            Tiếng Việt OFF
+        </button>
+    </nav>
+
+    <main id="page" class="flex-1 max-w-5xl w-full mx-auto p-4 md:py-4 flex flex-col justify-between">
+        <!-- 상단 헤더 -->
+        <header class="flex flex-wrap items-center justify-between gap-2 border-b border-sky-200 pb-2.5 mb-4 shrink-0 text-left">
+            <div class="flex items-baseline gap-2.5">
+                <h1 class="text-xl font-black text-slate-800">메신저 대화 연습</h1>
+                <p class="text-xs text-slate-500 mt-1 safe">대화에 맞는 조사(-든지/-도)를 연습합니다.</p>
+                <p class="vi-text text-[11px] text-sky-700 mt-1 safe font-medium">Luyện tập tiểu từ -든지/-도 trong hội thoại.</p>
+            </div>
+            <span class="text-[10px] font-bold text-sky-650 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-100 shrink-0">Grammar 3 B</span>
+        </header>
+
+        <!-- 태블릿 가로모드 최적화 2단 레이아웃 -->
+        <div id="gameGrid" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch flex-1 w-full">
+            <!-- 왼쪽: 교육용 약속 가이드 보드 -->
+            <div class="lg:col-span-4 flex flex-col gap-4 w-full">
+                <div class="bg-sky-900 text-sky-50 p-5 rounded-2xl shadow-sm border border-sky-800">
+                    <h3 class="text-xs font-bold text-sky-300 uppercase tracking-wider flex items-center gap-1.5 border-b border-sky-850 pb-2 mb-3">
+                        <i data-lucide="message-square" class="w-4.5 h-4.5"></i> 메신저 답변 가이드
+                    </h3>
+                    <div class="text-[11px] leading-relaxed space-y-2.5 safe">
+                        <p>대화방에서 약속을 하거나 의견을 말할 때 상황에 맞는 조사를 호응시켜야 자연스럽습니다.</p>
+                        <div>
+                            <p class="font-bold text-yellow-300">1. 자유로운 선택/허용: -든지</p>
+                            <p class="opacity-90">대상이 제한 없이 무엇이든 상관없다는 긍정적 의미를 나타냅니다.</p>
+                            <p class="opacity-75 font-mono">예) 어디든지 다 좋아, 언제든지 연락해</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-yellow-300">2. 전면 부정: 아무 N도 + 부정문</p>
+                            <p class="opacity-90">아주 작거나 미약한 것조차 부정하여 완전히 없음(결핍)을 나타냅니다. 반드시 부정 서술어(없다, 안, 못 등)가 호응해야 합니다.</p>
+                            <p class="opacity-75 font-mono">예) 아무도 없어, 아무것도 안 먹을래</p>
+                        </div>
+                        <p class="vi-text text-sky-200 font-semibold border-t border-sky-800 pt-2 mt-2">Dùng "-든지" cho câu khẳng định tự do chọn lựa và "아mu N도 + phủ định" cho câu phủ định hoàn toàn.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오른쪽: KakaoTalk 모바일 메신저 프레임 -->
+            <div class="lg:col-span-8 flex flex-col justify-start items-center w-full">
+                <div class="w-full max-w-md bg-white border-2 border-slate-300 rounded-3xl overflow-hidden shadow-lg flex flex-col h-[520px]">
+                    <!-- 모바일 탑 헤더 -->
+                    <div class="bg-slate-800 text-white px-4 py-3 flex items-center justify-between shrink-0">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="chevron-left" class="w-5 h-5 text-slate-400"></i>
+                            <div>
+                                <p class="font-bold text-sm">주말 모임 기획 톡방 (4)</p>
+                                <p class="text-[10px] text-slate-400">민우, 지선, 수빈, 나</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="search" class="w-4.5 h-4.5 text-slate-400"></i>
+                            <i data-lucide="menu" class="w-4.5 h-4.5 text-slate-400"></i>
+                        </div>
+                    </div>
+
+                    <!-- 대화 스크롤 영역 -->
+                    <div id="chatArea" class="chat-container flex-1 overflow-y-auto p-4 space-y-4">
+                        <!-- 메시지들이 동적으로 들어갑니다 -->
+                    </div>
+
+                    <!-- 하단 선택지 영역 (답변 대기 상태) -->
+                    <div class="bg-slate-50 border-t border-slate-200 p-4 shrink-0">
+                        <div id="choicesWrap" class="space-y-2.5">
+                            <!-- 선택 버튼 3가지가 나타납니다 -->
+                        </div>
+
+                        <!-- 피드백 & 다음 버튼 -->
+                        <div id="chatFeedback" class="hidden bg-white border border-slate-200 rounded-xl p-3.5 mt-2 text-xs text-slate-700"></div>
+                        <button id="btnNext" class="hidden w-full bg-slate-800 hover:bg-slate-900 text-white py-3 mt-3 rounded-xl text-xs font-bold transition-colors cursor-pointer" type="button">다음 대화 진행하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 최종 완료 리포트 -->
+        <section id="reportPanel" class="hidden bg-white border border-slate-300 rounded-3xl p-6 mt-4 text-center shadow">
+            <h3 class="text-xs text-sky-600 font-bold uppercase tracking-wider">채팅 완성 리포트</h3>
+            <h4 class="text-xl font-black mt-1">대화 약속 성사 리스트</h4>
+            <div class="my-4 bg-slate-50 border rounded-2xl p-4">
+                <p id="finalScore" class="text-3xl font-black text-slate-800">0 / 40점</p>
+                <p id="finalPercent" class="text-xs text-slate-500 mt-1">정답률 0%</p>
+            </div>
+            <div id="wrongReport" class="text-left text-xs space-y-2 max-h-40 overflow-y-auto mb-4"></div>
+            <button onclick="restartGame()" class="w-full bg-sky-600 hover:bg-sky-700 text-white py-3 rounded-xl text-xs font-bold transition-colors cursor-pointer" type="button">다시 시작하기</button>
+        </section>
+    </main>
+
+    <!-- Footer Copyright -->
+    <script src="../shared/site-copyright.js"></script>
+    <script>
+        const scenarios = [
+            // ── 1번 시나리오: 약속 시간 정하기 ──
+            {
+                id: 1,
+                messages: [
+                    { sender: '민우', avatar: '👨', text: '이번 주 토요일에 우리 몇 시에 만날래? 다들 언제 시간 괜찮아?' },
+                    { sender: '지선', avatar: '👧', text: '나는 주말에는 스케줄이 비어 있어! 언제든지 다 좋아.' }
+                ],
+                choices: [
+                    {
+                        text: '나도 이번 주에는 특별한 일이 없어서 언제든지 다 괜찮아!',
+                        isCorrect: true,
+                        replyKo: '나도 이번 주에는 특별한 일이 없어서 언제든지 다 괜찮아!',
+                        replyVi: 'Tớ tuần này cũng không có việc gì đặc biệt nên lúc nào cũng được hết!',
+                        explainKo: '긍정의 의미로 무엇이든 선택해도 상관없을 때는 "언제든지"를 사용하는 것이 문법적으로 가장 알맞습니다.',
+                        explainVi: 'Khi mang nghĩa khẳng định, bất kỳ thời điểm nào cũng được chọn thì dùng "언제든지" là thích hợp nhất.'
+                    },
+                    {
+                        text: '나는 이번 주말에 약속이 없어서 아무 때도 시간 있어!',
+                        isCorrect: false,
+                        replyKo: '나는 이번 주말에 약속이 없어서 아무 때도 시간 있어!',
+                        replyVi: 'Tớ cuối tuần này không có hẹn nên có thời gian vào bất cứ lúc nào!',
+                        explainKo: '"아무 때도"는 전면 부정의 뉘앙스를 지닌 조사 "도"가 포함되어 있으므로, 긍정형인 "시간 있어"가 아닌 "시간 없어"처럼 부정 서술어와만 결합해야 합니다.',
+                        explainVi: '"아무 때도" chứa tiểu từ phủ định "도" nên bắt buộc phải kết hợp với vị ngữ phủ định như "시간 없어" chứ không đi với "시간 있어".'
+                    },
+                    {
+                        text: '미안한데 나 이번 주말에는 언제든지 시간이 없어.',
+                        isCorrect: false,
+                        replyKo: '미안한데 나 이번 주말에는 언제든지 시간이 없어.',
+                        replyVi: 'Xin lỗi nhé nhưng cuối tuần này tớ lúc nào cũng không có thời gian.',
+                        explainKo: '완전히 시간이 없는 부정적인 결핍을 나타낼 때는 긍정의 선택 표현인 "언제든지"가 아니라 "아무 때도 시간이 없어"라고 대답해야 자연스럽습니다.',
+                        explainVi: 'Để diễn tả sự phủ định hoàn toàn không có thời gian thì phải nói "아무 때도 시간이 없어" chứ không dùng "언제든지".'
+                    }
+                ]
+            },
+            // ── 2번 시나리오: 약속 장소 정하기 ──
+            {
+                id: 2,
+                messages: [
+                    { sender: '수빈', avatar: '👩', text: '좋아! 그럼 시간은 일단 2시로 하자. 다들 어디서 만날래?' }
+                ],
+                choices: [
+                    {
+                        text: '신촌이나 홍대 쪽이면 아무 데도 괜찮아.',
+                        isCorrect: false,
+                        replyKo: '신촌이나 홍대 쪽이면 아무 데도 괜찮아.',
+                        replyVi: 'Nếu là khu Sinchon hay Hongdae thì ở đâu cũng không sao cả.',
+                        explainKo: '"괜찮아"는 긍정 서술어이므로 부정문 조사인 "아무 데도"와 같이 쓸 수 없습니다. "어디든지"를 써야 합니다.',
+                        explainVi: '"괜찮아" là vị ngữ khẳng định nên không thể đi cùng tiểu từ phủ định "아무 데도". Bắt buộc phải dùng "어디든지".'
+                    },
+                    {
+                        text: '지하철역 부근이면 어디든지 다 좋아! 너희 정하기 편한 데로 정해.',
+                        isCorrect: true,
+                        replyKo: '지하철역 부근이면 어디든지 다 좋아! 너희 정하기 편한 데로 정해.',
+                        replyVi: 'If it\'s near the subway station, anywhere is fine! You guys decide.',
+                        explainKo: '"어디든지"는 어떤 장소든 다 허용됨을 가리키는 긍정 서술어 "좋아"와 자연스럽게 연결되는 정답입니다.',
+                        explainVi: '"어디든지" liên kết rất tự nhiên với vị ngữ khẳng định "좋아" để chỉ bất cứ địa điểm nào cũng được chấp nhận.'
+                    },
+                    {
+                        text: '나는 집돌이라서 집 밖이면 어디든지 다 안 가고 싶어.',
+                        isCorrect: false,
+                        replyKo: '나는 집돌이라서 집 밖이면 어디든지 다 안 가고 싶어.',
+                        replyVi: 'Tớ là người thích ở nhà nên ngoài nhà ra thì tớ lúc nào cũng không muốn đi đâu.',
+                        explainKo: '가지 않겠다는 부정의 의사를 밝힐 때는 "어디든지 다 안 가"가 아니라 "아무 데도 안 가고 싶어"라고 작성해야 문맥에 호환됩니다.',
+                        explainVi: 'Để bày tỏ ý muốn phủ định không đi đâu cả thì phải dùng cấu trúc "아무 데도 안 가고 싶어" thay vì "어디든지 안 가".'
+                    }
+                ]
+            },
+            // ── 3번 시나리오: 메뉴 선택하기 ──
+            {
+                id: 3,
+                messages: [
+                    { sender: '민우', avatar: '👨', text: '그럼 신촌 2시 확정! 점심은 뭐 먹을까? 혹시 가리거나 못 먹는 음식 있어?' }
+                ],
+                choices: [
+                    {
+                        text: '저는 못 먹는 거 없어요. 아무 음식도 다 잘 먹어요!',
+                        isCorrect: false,
+                        replyKo: '저는 못 먹는 거 없어요. 아무 음식도 다 잘 먹어요!',
+                        replyVi: 'Tớ không kén ăn đâu. Món nào tớ cũng đều ăn rất ngon!',
+                        explainKo: '"잘 먹어요"는 긍정문입니다. "아무 음식도"는 부정문 전용이므로 긍정문에는 "무슨 음식이든지"를 써야 합니다.',
+                        explainVi: '"잘 먹어요" là câu khẳng định. "아무 음식도" chỉ dùng cho phủ định nên câu khẳng định phải dùng "무슨 음식이든지".'
+                    },
+                    {
+                        text: '저도 다 잘 먹어서 무슨 음식이든지 다 괜찮아요! 다들 먹고 싶은 걸로 시켜요.',
+                        isCorrect: true,
+                        replyKo: '저도 다 잘 먹어서 무슨 음식이든지 다 괜찮아요! 다들 먹고 싶은 걸로 시켜요.',
+                        replyVi: 'Tớ cũng ăn gì cũng được nên bất kỳ món nào cũng được nhé! Mọi người cứ gọi món mình thích đi.',
+                        explainKo: '명사 "음식"을 수식하면서 어떤 것이든 수용함을 의미하므로 "무슨 음식이든지"가 정확합니다. (음식에 받침이 있으므로 이든지)',
+                        explainVi: 'Vừa bổ nghĩa cho danh từ "음식" vừa mang nghĩa chấp nhận bất kể món gì nên dùng "무슨 음식이든지" là chính xác. (음식 có 받침 nên thêm 이든지)'
+                    },
+                    {
+                        text: '저는 오늘 배탈이 나서 무슨 음식이든지 못 먹을 것 같아요.',
+                        isCorrect: false,
+                        replyKo: '저는 오늘 배탈이 나서 무슨 음식이든지 못 먹을 것 같아요.',
+                        replyVi: 'Tớ hôm nay bị đau bụng nên món ăn nào tớ cũng không ăn được.',
+                        explainKo: '못 먹는다는 전면 부정이므로 "아무것도 못 먹을 것 같아요"가 올바른 표현입니다.',
+                        explainVi: 'Phủ định hoàn toàn việc không thể ăn được gì thì phải dùng "아무것도 못 먹을 것 같아요".'
+                    }
+                ]
+            },
+            // ── 4번 시나리오: 단톡방 멤버 초대하기 ──
+            {
+                id: 4,
+                messages: [
+                    { sender: '지선', avatar: '👧', text: '민우 회비 보냈나? 지석이랑 유미도 단톡방에 올 수 있나 물어봤는데 다들 대답이 있나?' }
+                ],
+                choices: [
+                    {
+                        text: '주말이라서 다들 바쁜가 봐. 단톡방에 물어봤는데 아무도 대답이 없어.',
+                        isCorrect: true,
+                        replyKo: '주말이라서 다들 바쁜가 봐. 단톡방에 물어봤는데 아무도 대답이 없어.',
+                        replyVi: 'Có lẽ cuối tuần mọi người đều bận. Tớ hỏi trong nhóm chát nhưng chẳng ai trả lời cả.',
+                        explainKo: '"대답이 없어"라는 부정 서술문이 오므로 사람 전면 부정인 "아무도"를 활용한 대답이 정답입니다.',
+                        explainVi: 'Vì đi kèm vị ngữ phủ định "대답이 없어" nên câu trả lời dùng từ phủ định người "아무도" là chính xác.'
+                    },
+                    {
+                        text: '주말이라서 다들 바쁜가 봐. 단톡방에 물어봤는데 누구든지 대답이 없어.',
+                        isCorrect: false,
+                        replyKo: '주말이라서 다들 바쁜가 봐. 단톡방에 물어봤는데 누구든지 대답이 없어.',
+                        replyVi: 'Có lẽ cuối tuần mọi người bận. Tớ hỏi trong nhóm chát nhưng bất kỳ ai cũng không trả lời.',
+                        explainKo: '부정문(없어) 앞에는 긍정의 선택형 조사인 "누구든지"가 올 수 없습니다.',
+                        explainVi: 'Không thể dùng từ cho phép "누구든지" trước vị ngữ phủ định.'
+                    },
+                    {
+                        text: '대답이 다들 빠르네! 단톡방에 물어봤는데 아무도 벌써 읽고 대답했어.',
+                        isCorrect: false,
+                        replyKo: '대답이 다들 빠르네! 단톡방에 물어봤는데 아무도 벌써 읽고 대답했어.',
+                        replyVi: 'Mọi người trả lời nhanh thật! Tớ vừa hỏi trong nhóm chat mà chẳng ai đã đọc và trả lời rồi.',
+                        explainKo: '"벌써 대답했어"는 긍정이므로 전면 부정형인 "아무도"와 모순됩니다. "누구든지 다 대답했어" 또는 "벌써 다 대답했어"라고 해야 합니다.',
+                        explainVi: '"벌써 대답했어" mang nghĩa khẳng định nên mâu thuẫn với từ phủ định "아무도".'
+                    }
+                ]
+            }
+        ];
+
+        let state = {
+            idx: 0,
+            score: 0,
+            answered: false,
+            logs: []
+        };
+
+        const page = document.getElementById('page');
+        const viToggle = document.getElementById('viToggle');
+        const chatArea = document.getElementById('chatArea');
+        const choicesWrap = document.getElementById('choicesWrap');
+        const chatFeedback = document.getElementById('chatFeedback');
+        const btnNext = document.getElementById('btnNext');
+
+        const gameGrid = document.getElementById('gameGrid');
+        const reportPanel = document.getElementById('reportPanel');
+        const finalScore = document.getElementById('finalScore');
+        const finalPercent = document.getElementById('finalPercent');
+        const wrongReport = document.getElementById('wrongReport');
+
+        // Bilingual Toggle
+        let viOn = false;
+        viToggle.addEventListener('click', function() {
+            viOn = !viOn;
+            page.classList.toggle('vi-on', viOn);
+            viToggle.textContent = viOn ? 'Tiếng Việt ON' : 'Tiếng Việt OFF';
+        });
+
+        function esc(t) {
+            return String(t == null ? '' : t)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function initGame() {
+            state.idx = 0;
+            state.score = 0;
+            state.logs = [];
+
+            reportPanel.classList.add('hidden');
+            gameGrid.classList.remove('hidden');
+            document.querySelector('header').classList.remove('hidden');
+
+            chatArea.innerHTML = '';
+            loadScenario();
+        }
+
+        function loadScenario() {
+            if (state.idx >= scenarios.length) {
+                showResults();
+                return;
+            }
+
+            state.answered = false;
+            chatFeedback.classList.add('hidden');
+            btnNext.classList.add('hidden');
+            choicesWrap.classList.remove('hidden');
+
+            const sc = scenarios[state.idx];
+
+            // Render friend messages
+            sc.messages.forEach(msg => {
+                appendFriendMessage(msg.sender, msg.avatar, msg.text);
+            });
+
+            // Render choices
+            renderChoices(sc);
+
+            // Scroll to bottom
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function appendFriendMessage(sender, avatar, text) {
+            const div = document.createElement('div');
+            div.className = "flex items-start gap-2.5 max-w-[85%]";
+            div.innerHTML = `
+                <div class="avatar-circle shrink-0">${avatar}</div>
+                <div>
+                    <p class="text-[10px] text-slate-500 font-bold mb-0.5">${sender}</p>
+                    <div class="bubble-friend px-3 py-2 text-xs text-slate-800 shadow-sm leading-relaxed safe">
+                        ${esc(text)}
+                    </div>
+                </div>
+            `;
+            chatArea.appendChild(div);
+        }
+
+        function appendMyMessage(text) {
+            const div = document.createElement('div');
+            div.className = "flex items-start gap-2.5 max-w-[85%] ml-auto justify-end";
+            div.innerHTML = `
+                <div class="text-right">
+                    <p class="text-[10px] text-slate-500 font-bold mb-0.5">나</p>
+                    <div class="bubble-me px-3 py-2 text-xs text-slate-800 shadow-sm leading-relaxed text-left safe">
+                        ${esc(text)}
+                    </div>
+                </div>
+                <div class="avatar-circle shrink-0 bg-yellow-400">나</div>
+            `;
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function renderChoices(sc) {
+            choicesWrap.innerHTML = sc.choices.map((choice, i) => `
+                <button onclick="selectReply(${choice.isCorrect}, ${i})" class="w-full py-3.5 px-4 border border-slate-200 hover:border-sky-500 bg-white hover:bg-sky-50/20 text-xs font-bold text-slate-800 rounded-xl text-left transition-all cursor-pointer safe" type="button">
+                    ${choice.text}
+                </button>
+            `).join('');
+        }
+
+        function selectReply(isCorrect, choiceIdx) {
+            if (state.answered) return;
+            state.answered = true;
+
+            const sc = scenarios[state.idx];
+            const choice = sc.choices[choiceIdx];
+
+            choicesWrap.classList.add('hidden');
+            appendMyMessage(choice.replyKo);
+
+            if (isCorrect) {
+                state.score += 10;
+            }
+
+            // Save log
+            state.logs.push({
+                chapter: `시나리오 ${state.idx + 1}`,
+                ok: isCorrect,
+                user: choice.replyKo,
+                correct: sc.choices.find(c => c.isCorrect).replyKo,
+                score: isCorrect ? 10 : 0,
+                explainKo: choice.explainKo,
+                explainVi: choice.explainVi
+            });
+
+            // Show feedback bubble
+            chatFeedback.className = `p-3.5 rounded-xl border mt-3 text-xs leading-relaxed ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}`;
+            chatFeedback.innerHTML = `
+                <p class="font-bold flex items-center gap-1">
+                    <i data-lucide="${isCorrect ? 'check-circle' : 'alert-triangle'}" class="w-4 h-4"></i>
+                    ${isCorrect ? '올바른 대화 선택! (+10점)' : '친구들의 반응이 어색합니다 (오답)'}
+                </p>
+                <p class="mt-1"><b>해설:</b> ${esc(choice.explainKo)}</p>
+                <p class="vi-text mt-1 text-[11px] text-blue-700 font-semibold"><b>Giải thích:</b> ${esc(choice.explainVi)}</p>
+            `;
+            chatFeedback.classList.remove('hidden');
+            btnNext.classList.remove('hidden');
+
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
+
+        btnNext.addEventListener('click', () => {
+            state.idx++;
+            loadScenario();
+        });
+
+        function showResults() {
+            // Hide messenger grid UI
+            gameGrid.classList.add('hidden');
+            document.querySelector('header').classList.add('hidden');
+
+            const totalScorePossible = scenarios.length * 10;
+            const percentage = Math.round((state.score / totalScorePossible) * 100);
+
+            finalScore.textContent = `${state.score} / ${totalScorePossible}점`;
+            finalPercent.textContent = `정답률: ${percentage}%`;
+
+            wrongReport.innerHTML = state.logs.map((log, i) => `
+                <div class="p-3 border rounded-xl ${log.ok ? 'border-emerald-100 bg-emerald-50/50' : 'border-rose-100 bg-rose-50/50'}">
+                    <div class="flex items-center justify-between font-bold text-slate-800">
+                        <span>[${log.chapter}]</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] ${log.ok ? 'bg-emerald-200 text-emerald-800' : 'bg-rose-200 text-rose-800'}">${log.score}점</span>
+                    </div>
+                    <div class="mt-1.5 text-slate-600 space-y-1">
+                        <p><b>내 대답:</b> ${esc(log.user)}</p>
+                        <p><b>올바른 대답:</b> ${esc(log.correct)}</p>
+                        <p class="text-[10px] text-slate-500 mt-1">${esc(log.explainKo)}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            reportPanel.classList.remove('hidden');
+        }
+
+        function restartGame() {
+            initGame();
+        }
+
+        window.onload = function() {
+            initGame();
+        };
+    </script>
+</body>
+</html>

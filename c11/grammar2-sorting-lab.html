@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>조건과 가정 구분</title>
+    <meta name="description" content="-(으)면과 -(ㄴ/는)다면의 차이를 배웁니다." />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Noto Sans KR', sans-serif !important;
+            background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%);
+            min-height: 100vh;
+        }
+        .safe { word-break: keep-all; overflow-wrap: break-word; }
+        .vi-text { display: none; }
+        .vi-on .vi-text { display: block; }
+        .hidden { display: none !important; }
+
+        .sorting-card {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+        }
+        .sorting-card.slide-out-left {
+            transform: translateX(-150%) rotate(-15deg);
+            opacity: 0;
+        }
+        .sorting-card.slide-out-right {
+            transform: translateX(150%) rotate(15deg);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Navigation Bar -->
+    <nav class="flex items-center justify-between border-b border-emerald-100 bg-white/90 px-4 py-3 sticky top-0 z-50 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <a href="../index.html" class="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 text-sm font-bold no-underline">
+                <i class="fa-solid fa-house"></i> 메인
+            </a>
+            <span class="text-slate-300">|</span>
+            <a href="index.html" class="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 text-sm font-bold no-underline">
+                <i class="fa-solid fa-folder-open"></i> 11과 목록
+            </a>
+            <span class="text-slate-300">|</span>
+            <a href="grammar2.html" class="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 text-sm font-bold no-underline">
+                <i class="fa-solid fa-book-open"></i> 문법 2
+            </a>
+        </div>
+        <button id="viToggle" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors">
+            Tiếng Việt OFF
+        </button>
+    </nav>
+
+    <main id="page" class="flex-1 max-w-4xl w-full mx-auto p-4 md:py-4">
+        <header class="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-100 pb-2.5 mb-4 text-left">
+            <div class="flex items-baseline gap-2.5">
+                <h1 class="text-xl font-black text-slate-800">조건과 가정 구분</h1>
+                <p class="text-xs text-slate-500 mt-1 safe">-(으)면과 -(ㄴ/는)다면의 차이를 배웁니다.</p>
+                <p class="vi-text text-[11px] text-emerald-700 mt-1 safe font-medium">Phân biệt -(으)면 và -(ㄴ/는)다면.</p>
+            </div>
+            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100 shrink-0">Grammar 2 A</span>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- 가이드 칠판 (왼쪽) -->
+            <section class="bg-emerald-900 text-emerald-50 p-5 rounded-2xl shadow-md border-4 border-emerald-800 self-start lg:col-span-4">
+                <h2 class="text-base font-bold flex items-center gap-2 border-b border-emerald-700 pb-2 mb-3">
+                    <i data-lucide="info" class="w-5 h-5 text-emerald-300"></i> 연구실 가이드
+                </h2>
+                <div class="space-y-4 text-xs leading-relaxed safe">
+                    <div>
+                        <p class="font-bold text-yellow-300 text-sm">1. 일반 조건: -(으)면</p>
+                        <p class="mt-1 opacity-90">일상생활에서 흔히 일어나거나, 실현 가능성이 높은 실제 조건에 사용합니다.</p>
+                        <p class="opacity-75 font-mono mt-0.5">예) 날씨가 좋으면 산책을 해요.</p>
+                        <p class="vi-text text-emerald-200 mt-1 font-semibold">Dùng cho điều kiện thực tế, khả năng xảy ra cao trong đời sống.</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-yellow-300 text-sm">2. 비현실적 가정: -(ㄴ/는)다면</p>
+                        <p class="mt-1 opacity-90">확률이 극히 낮거나, 상상 속의 불가능한 가정을 강조할 때 씁니다.</p>
+                        <p class="opacity-75 font-mono mt-0.5">예) 내가 새라면 하늘을 날 텐데.</p>
+                        <p class="vi-text text-emerald-200 mt-1 font-semibold">Dùng khi giả định tình huống giả tưởng, khả năng xảy ra cực kỳ thấp.</p>
+                    </div>
+                    <div class="bg-emerald-950 p-2.5 rounded-lg border border-emerald-700">
+                        <p class="font-bold text-amber-300">⚠ 활용 꿀팁:</p>
+                        <p class="mt-0.5 opacity-90">동사는 받침 유무에 따라 **-ㄴ다면/-는다면**, 형용사는 **-다면**, 명사는 **-(이)라면**을 사용합니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 게임 스테이지 (오른쪽) -->
+            <section class="lg:col-span-8 flex flex-col gap-4">
+                <article class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm min-h-[420px] flex flex-col justify-between">
+                    <!-- 상단 정보 및 프로그레스 -->
+                    <div>
+                        <div class="flex items-center justify-between text-xs mb-2">
+                            <span id="progressLabel" class="font-bold text-emerald-600">진행도: 1 / 8</span>
+                            <span id="scoreLabel" class="font-bold text-indigo-600">점수: 0점</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden mb-5">
+                            <div id="progressBar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 12.5%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 카드 콘텐츠 영역 -->
+                    <div id="gameCard" class="sorting-card flex-1 flex flex-col justify-center items-center text-center p-6 bg-slate-50 border border-slate-100 rounded-xl relative overflow-hidden my-4">
+                        <div class="absolute top-2 left-2 bg-slate-200/80 text-[10px] text-slate-500 font-bold px-2 py-0.5 rounded">기본 단어</div>
+                        <p id="verbBase" class="text-3xl font-black text-slate-800 tracking-wide"></p>
+
+                        <div class="mt-4 max-w-sm">
+                            <p id="situationDesc" class="text-sm font-bold text-slate-600 leading-relaxed safe"></p>
+                            <p id="situationDescVi" class="vi-text text-xs text-blue-700 mt-1 leading-relaxed safe"></p>
+                        </div>
+                    </div>
+
+                    <!-- 1단계: 조건 vs 가정 판단 버튼 -->
+                    <div id="stepChoice" class="grid grid-cols-2 gap-4">
+                        <button id="btnCond" class="choice-btn py-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-sm font-bold transition-all shadow-sm flex flex-col items-center justify-center gap-1 cursor-pointer" type="button">
+                            <span>조건: -(으)면</span>
+                            <span class="text-[10px] font-normal opacity-80">(실현 가능성 높음)</span>
+                            <span class="vi-text text-[9px] font-semibold text-emerald-800">(Điều kiện thực tế)</span>
+                        </button>
+                        <button id="btnHypo" class="choice-btn py-4 rounded-xl border-2 border-indigo-500 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-sm font-bold transition-all shadow-sm flex flex-col items-center justify-center gap-1 cursor-pointer" type="button">
+                            <span>가정: -(ㄴ/는)다면</span>
+                            <span class="text-[10px] font-normal opacity-80">(실현 가능성 낮음)</span>
+                            <span class="vi-text text-[9px] font-semibold text-indigo-800">(Giả định khó xảy ra)</span>
+                        </button>
+                    </div>
+
+                    <!-- 2단계: 문법 활용 어미 입력 단계 (결정 후 숨김 해제) -->
+                    <div id="stepTransform" class="hidden space-y-4">
+                        <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-4">
+                            <p class="text-xs font-bold text-indigo-800">2단계: 올바른 문법 형태로 변환하기</p>
+                            <p class="text-xs text-slate-600 mt-1">위 기본 단어를 분류에 맞는 어미 형태로 직접 적어보세요.</p>
+                            <p class="vi-text text-[11px] text-blue-700">Hãy chia động từ/tính từ trên sang dạng ngữ pháp đã chọn.</p>
+                            <p class="text-sm font-bold text-slate-700 mt-3 flex items-center gap-1">
+                                <span id="transHintWord" class="underline decoration-indigo-400">가다</span> + <span id="transHintSuffix">-(ㄴ/는)다면</span>
+                            </p>
+                        </div>
+                        <div class="flex gap-2">
+                            <input id="conjugationInput" type="text" autocomplete="off" class="flex-1 border-2 border-slate-300 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-indigo-500" placeholder="변환된 형태 입력 (예: 간다면)" />
+                            <button id="btnSubmitTrans" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition-colors cursor-pointer" type="button">확인</button>
+                        </div>
+                    </div>
+
+                    <!-- 결과 피드백 박스 -->
+                    <div id="feedbackBox" class="hidden mt-4 rounded-xl border p-4"></div>
+
+                    <!-- 다음 버튼 -->
+                    <button id="btnNext" class="hidden mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white py-3.5 rounded-xl text-sm font-bold shadow-sm transition-colors cursor-pointer" type="button">다음 단계로 →</button>
+                </article>
+
+                <!-- 최종 결과판 -->
+                <article id="resultPanel" class="hidden bg-white border border-slate-200 rounded-2xl p-5 shadow-sm text-center">
+                    <h3 class="text-xs text-emerald-600 font-bold uppercase tracking-wide">연구 완료</h3>
+                    <h4 class="text-2xl font-black text-slate-800 mt-1">실험 결과 리포트</h4>
+
+                    <div class="my-6 max-w-sm mx-auto bg-slate-50 border border-slate-100 rounded-2xl p-5">
+                        <p id="resultScore" class="text-4xl font-black text-slate-800"></p>
+                        <p id="resultPercent" class="text-xs text-slate-500 mt-1"></p>
+                    </div>
+
+                    <div class="text-left mb-6">
+                        <p class="text-xs font-bold text-slate-600 mb-2">오답 리스트 및 핵심 해설</p>
+                        <div id="wrongList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+                    </div>
+
+                    <button class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl text-sm font-bold transition-colors cursor-pointer" onclick="resetGame()" type="button">다시 실험하기</button>
+                </article>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer Copyright -->
+    <script src="../shared/site-copyright.js"></script>
+    <script>
+        const cards = [
+            {
+                base: '당첨되다',
+                desc: '만약에 복권(로또)에 1등으로 당첨되다 (확률이 극히 낮음)',
+                descVi: 'Giả định nếu trúng giải nhất xổ số (xác suất cực kỳ thấp)',
+                isHypothetical: true,
+                suffix: '-(ㄴ/는)다면',
+                answer: '당첨된다면',
+                explainKo: '복권 1등 당첨은 실현 확률이 매우 낮으므로 일반적인 조건인 -(으)면 보다는 가정형인 -(ㄴ/는)다면이 어울립니다.',
+                explainVi: 'Trúng giải nhất xổ số có xác suất cực kỳ thấp nên dùng dạng giả định -(ㄴ/는)다면 thay vì điều kiện thông thường -(으)면.'
+            },
+            {
+                base: '뜨다',
+                desc: '내일 아침에 해가 뜨다 (자연의 법칙, 반드시 일어남)',
+                descVi: 'Sáng mai mặt trời mọc (quy luật tự nhiên, chắc chắn xảy ra)',
+                isHypothetical: false,
+                suffix: '-(으)면',
+                answer: '뜨면',
+                explainKo: '내일 아침에 해가 뜨는 것은 당연하고 확실한 미래의 일이므로 가정형이 아닌 일반적인 조건 -(으)면을 사용합니다.',
+                explainVi: 'Mặt trời mọc vào sáng mai là điều tự nhiên chắc chắn xảy ra, nên dùng điều kiện -(으)면 chứ không dùng giả định.'
+            },
+            {
+                base: '되다',
+                desc: '내가 다시 어린아이로 되다 (인간의 힘으로 불가능함)',
+                descVi: 'Tôi trở lại thành một đứa trẻ (điều không thể đối với con người)',
+                isHypothetical: true,
+                suffix: '-(이)라면',
+                answer: '된다면',
+                explainKo: '이미 어른이 된 사람이 다시 아이가 되는 것은 현실에서 불가능한 상상이므로 가정형 -(ㄴ/는)다면이 필수적입니다.',
+                explainVi: 'Việc một người lớn trở lại làm trẻ con là điều không tưởng, bắt buộc dùng giả định -(ㄴ/는)다면.'
+            },
+            {
+                base: '하다',
+                desc: '시험공부를 열심히 하다 (본인의 의지로 가능한 현실적 상황)',
+                descVi: 'Học bài chăm chỉ để thi (tình huống thực tế có thể làm được bằng ý chí)',
+                isHypothetical: false,
+                suffix: '-(으)면',
+                answer: '하면',
+                explainKo: '공부를 열심히 하는 것은 충분히 실현 가능한 행동이므로 가정하기보다는 단순한 조건인 -(으)면(하면)을 쓰는 것이 자연스럽습니다.',
+                explainVi: 'Học tập chăm chỉ là hành động hoàn toàn có thể làm được, nên dùng điều kiện -(으)면 (하면).'
+            },
+            {
+                base: '태어나다',
+                desc: '내가 다시 태어나다 (불교적/비현실적 상상 상황)',
+                descVi: 'Tôi được sinh ra một lần nữa (giả định phi thực tế)',
+                isHypothetical: true,
+                suffix: '-(ㄴ/는)다면',
+                answer: '태어난다면',
+                explainKo: '다시 태어나는 것은 상상 속 비현실적 상황이므로 가정형 -(ㄴ/는)다면을 붙여 "태어난다면"이 됩니다.',
+                explainVi: 'Được đầu thai/sinh ra lần nữa là tình huống tưởng tượng phi thực tế nên dùng -(ㄴ/는)다면 thành 태어난다면.'
+            },
+            {
+                base: '좋다',
+                desc: '이번 주말에 날씨가 좋다 (날씨 예보상 맑을 가능성이 높음)',
+                descVi: 'Thời tiết cuối tuần này đẹp (theo dự báo thời tiết khả năng cao sẽ nắng đẹp)',
+                isHypothetical: false,
+                suffix: '-(으)면',
+                answer: '좋으면',
+                explainKo: '날씨가 좋은 것은 일상적으로 일어나는 실현 가능한 조건이므로 -(으)면(좋으면)을 사용합니다.',
+                explainVi: 'Thời tiết đẹp là một điều kiện thực tế dễ xảy ra ở hiện tại/tương lai, dùng 좋으면.'
+            },
+            {
+                base: '가다',
+                desc: '타임머신을 타고 과거로 가다 (현재 과학 기술로 불가능함)',
+                descVi: 'Đi về quá khứ bằng cỗ máy thời gian (điều không thể với khoa học hiện tại)',
+                isHypothetical: true,
+                suffix: '-(ㄴ/는)다면',
+                answer: '간다면',
+                explainKo: '타임머신 탑승과 과거 여행은 공상적인 상황이므로 가정형을 사용하여 "간다면"이 됩니다.',
+                explainVi: 'Đi về quá khứ bằng cỗ máy thời gian là tình huống viễn tưởng, dùng giả định thành 간다면.'
+            },
+            {
+                base: '고프다',
+                desc: '점심시간이 되어 배가 고프다 (매일 일어나는 생리 현상)',
+                descVi: 'Đói bụng khi đến giờ ăn trưa (hiện tượng sinh lý xảy ra mỗi ngày)',
+                isHypothetical: false,
+                suffix: '-(으)면',
+                answer: '고프면',
+                explainKo: '시간이 흘러 배가 고픈 것은 누구나 겪는 현실적인 조건이므로 -(으)면(고프면)이 자연스럽습니다.',
+                explainVi: 'Đến giờ đói bụng là điều hiển nhiên xảy ra hàng ngày, dùng điều kiện 고프면.'
+            }
+        ];
+
+        let state = {
+            idx: 0,
+            score: 0,
+            chosenCorrectType: false,
+            answeredChoice: false,
+            answeredTrans: false,
+            logs: []
+        };
+
+        const page = document.getElementById('page');
+        const viToggle = document.getElementById('viToggle');
+        const progressLabel = document.getElementById('progressLabel');
+        const scoreLabel = document.getElementById('scoreLabel');
+        const progressBar = document.getElementById('progressBar');
+        const gameCard = document.getElementById('gameCard');
+        const verbBase = document.getElementById('verbBase');
+        const situationDesc = document.getElementById('situationDesc');
+        const situationDescVi = document.getElementById('situationDescVi');
+
+        const stepChoice = document.getElementById('stepChoice');
+        const btnCond = document.getElementById('btnCond');
+        const btnHypo = document.getElementById('btnHypo');
+
+        const stepTransform = document.getElementById('stepTransform');
+        const transHintWord = document.getElementById('transHintWord');
+        const transHintSuffix = document.getElementById('transHintSuffix');
+        const conjugationInput = document.getElementById('conjugationInput');
+        const btnSubmitTrans = document.getElementById('btnSubmitTrans');
+
+        const feedbackBox = document.getElementById('feedbackBox');
+        const btnNext = document.getElementById('btnNext');
+        const resultPanel = document.getElementById('resultPanel');
+
+        // Bilingual Toggle
+        let viOn = false;
+        viToggle.addEventListener('click', function() {
+            viOn = !viOn;
+            page.classList.toggle('vi-on', viOn);
+            viToggle.textContent = viOn ? 'Tiếng Việt ON' : 'Tiếng Việt OFF';
+        });
+
+        function esc(t) {
+            return String(t == null ? '' : t)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function norm(t) { return String(t || '').toLowerCase().replace(/[\s.,!?~]/g, ''); }
+
+        function shuffle(arr) {
+            const c = arr.slice();
+            for (let i = c.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const tmp = c[i]; c[i] = c[j]; c[j] = tmp;
+            }
+            return c;
+        }
+
+        let shuffledCards = [];
+
+        function initGame() {
+            shuffledCards = shuffle(cards);
+            state.idx = 0;
+            state.score = 0;
+            state.logs = [];
+            resultPanel.classList.add('hidden');
+            document.querySelector('.grid').classList.remove('hidden');
+            document.querySelector('header').classList.remove('hidden');
+            document.getElementById('btnCond').parentElement.parentElement.classList.remove('hidden');
+            renderCard();
+        }
+
+        function renderCard() {
+            const card = shuffledCards[state.idx];
+            const total = shuffledCards.length;
+
+            progressLabel.textContent = `진행도: ${state.idx + 1} / ${total}`;
+            scoreLabel.textContent = `점수: ${state.score}점`;
+            progressBar.style.width = `${((state.idx + 1) / total) * 100}%`;
+
+            verbBase.textContent = card.base;
+            situationDesc.textContent = card.desc;
+            situationDescVi.textContent = card.descVi;
+
+            // Reset states
+            state.answeredChoice = false;
+            state.answeredTrans = false;
+            state.chosenCorrectType = false;
+
+            // Reset UI elements
+            gameCard.className = "sorting-card flex-1 flex flex-col justify-center items-center text-center p-6 bg-slate-50 border border-slate-100 rounded-xl relative overflow-hidden my-4";
+            stepChoice.classList.remove('hidden');
+            btnCond.disabled = false;
+            btnHypo.disabled = false;
+            btnCond.className = "choice-btn py-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-sm font-bold transition-all shadow-sm flex flex-col items-center justify-center gap-1 cursor-pointer";
+            btnHypo.className = "choice-btn py-4 rounded-xl border-2 border-indigo-500 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-sm font-bold transition-all shadow-sm flex flex-col items-center justify-center gap-1 cursor-pointer";
+
+            stepTransform.classList.add('hidden');
+            conjugationInput.value = '';
+            conjugationInput.disabled = false;
+            btnSubmitTrans.disabled = false;
+
+            feedbackBox.classList.add('hidden');
+            btnNext.classList.add('hidden');
+        }
+
+        function handleChoice(isHypoChosen) {
+            if (state.answeredChoice) return;
+            state.answeredChoice = true;
+
+            const card = shuffledCards[state.idx];
+            const isCorrectType = (isHypoChosen === card.isHypothetical);
+            state.chosenCorrectType = isCorrectType;
+
+            btnCond.disabled = true;
+            btnHypo.disabled = true;
+
+            if (isCorrectType) {
+                // Correct Type
+                state.score += 5; // 5 points for type
+                if (isHypoChosen) {
+                    btnHypo.className = "choice-btn py-4 rounded-xl border-2 border-emerald-500 bg-emerald-500 text-white text-sm font-bold shadow-sm flex flex-col items-center justify-center gap-1";
+                    btnCond.className = "choice-btn py-4 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-400 text-sm font-bold shadow-sm flex flex-col items-center justify-center gap-1";
+                } else {
+                    btnCond.className = "choice-btn py-4 rounded-xl border-2 border-emerald-500 bg-emerald-500 text-white text-sm font-bold shadow-sm flex flex-col items-center justify-center gap-1";
+                    btnHypo.className = "choice-btn py-4 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-400 text-sm font-bold shadow-sm flex flex-col items-center justify-center gap-1";
+                }
+
+                // Show step 2
+                transHintWord.textContent = card.base;
+                transHintSuffix.textContent = card.isHypothetical ? '-(ㄴ/는)다면' : '-(으)면';
+                stepTransform.classList.remove('hidden');
+                conjugationInput.focus();
+            } else {
+                // Wrong Type
+                if (isHypoChosen) {
+                    btnHypo.className = "choice-btn py-4 rounded-xl border-2 border-rose-500 bg-rose-500 text-white text-sm font-bold shadow-sm flex flex-col items-center justify-center gap-1";
+                    btnCond.className = "choice-btn py-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-700 text-sm font-bold shadow-sm flex flex-col items-center justify-center gap-1";
+                } else {
+                    btnCond.className = "choice-btn py-4 rounded-xl border-2 border-rose-500 bg-rose-500 text-white text-sm font-bold shadow-sm flex flex-col items-center justify-center gap-1";
+                    btnHypo.className = "choice-btn py-4 rounded-xl border-2 border-indigo-500 bg-indigo-50 text-indigo-700 text-sm font-bold shadow-sm flex flex-col items-center justify-center gap-1";
+                }
+
+                // Jump straight to feedback and fail the card
+                showFeedback(false, `[분류 실패] 이 상황은 ${card.isHypothetical ? '비현실적인 가정' : '현실적인 조건'}이 맞습니다.`, `[Phân loại sai] Tình huống này là ${card.isHypothetical ? 'giả định khó xảy ra' : 'điều kiện thực tế'}.`);
+            }
+        }
+
+        btnCond.addEventListener('click', () => handleChoice(false));
+        btnHypo.addEventListener('click', () => handleChoice(true));
+
+        function submitConjugation() {
+            if (state.answeredTrans) return;
+            const inputVal = conjugationInput.value.trim();
+            if (!inputVal) return;
+
+            state.answeredTrans = true;
+            conjugationInput.disabled = true;
+            btnSubmitTrans.disabled = true;
+
+            const card = shuffledCards[state.idx];
+            const isCorrectConjugation = (norm(inputVal) === norm(card.answer));
+
+            if (isCorrectConjugation) {
+                state.score += 5; // 5 points for conjugation
+                showFeedback(true, '정답입니다! 정확한 문법 형태로 변환했습니다.', 'Đúng rồi! Bạn đã chia chính xác dạng ngữ pháp.');
+            } else {
+                showFeedback(false, `활용 형태가 틀렸습니다. 올바른 결합 형태는 "${card.answer}"입니다.`, `Dạng chia bị sai. Dạng đúng phải là "${card.answer}".`);
+            }
+        }
+
+        btnSubmitTrans.addEventListener('click', submitConjugation);
+        conjugationInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !state.answeredTrans) {
+                e.preventDefault();
+                submitConjugation();
+            }
+        });
+
+        function showFeedback(isOk, textKo, textVi) {
+            const card = shuffledCards[state.idx];
+            const totalScore = (state.chosenCorrectType ? 5 : 0) + (isOk && state.chosenCorrectType ? 5 : 0);
+
+            // log the result
+            state.logs.push({
+                base: card.base,
+                desc: card.desc,
+                correctSuffix: card.isHypothetical ? '가정 (다면)' : '조건 (면)',
+                correctAnswer: card.answer,
+                userAnswer: conjugationInput.value.trim() || '(분류 실패)',
+                ok: (isOk && state.chosenCorrectType),
+                score: totalScore,
+                explainKo: card.explainKo,
+                explainVi: card.explainVi
+            });
+
+            feedbackBox.className = `mt-4 rounded-xl border p-4 ${isOk && state.chosenCorrectType ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}`;
+            feedbackBox.innerHTML = `
+                <p class="text-sm font-bold flex items-center gap-1">
+                    <i data-lucide="${isOk && state.chosenCorrectType ? 'check-circle' : 'alert-triangle'}" class="w-4 h-4"></i>
+                    ${isOk && state.chosenCorrectType ? '성공 (+10점)' : '오답'}
+                </p>
+                <p class="text-xs mt-1"><b>설명:</b> ${esc(textKo)}</p>
+                <p class="vi-text text-xs mt-1 font-semibold"><b>Giải thích:</b> ${esc(textVi)}</p>
+                <div class="mt-3 border-t border-dashed ${isOk && state.chosenCorrectType ? 'border-emerald-200' : 'border-rose-200'} pt-2">
+                    <p class="text-xs text-slate-700"><b>💡 왜 그럴까요? (상황 상세 설명):</b></p>
+                    <p class="text-xs text-slate-600 mt-0.5">${esc(card.explainKo)}</p>
+                    <p class="vi-text text-[11px] text-blue-700 mt-1">${esc(card.explainVi)}</p>
+                </div>
+            `;
+            feedbackBox.classList.remove('hidden');
+            btnNext.classList.remove('hidden');
+
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
+
+        btnNext.addEventListener('click', () => {
+            state.idx++;
+            if (state.idx >= shuffledCards.length) {
+                showResults();
+            } else {
+                renderCard();
+            }
+        });
+
+        function showResults() {
+            // Hide sorting UI
+            document.getElementById('btnCond').parentElement.parentElement.classList.add('hidden');
+            document.querySelector('header').classList.add('hidden');
+
+            const totalScorePossible = shuffledCards.length * 10;
+            const percentage = Math.round((state.score / totalScorePossible) * 100);
+
+            resultScore.textContent = `${state.score} / ${totalScorePossible}점`;
+            resultPercent.textContent = `정답률: ${percentage}%`;
+
+            const wrongList = document.getElementById('wrongList');
+            wrongList.innerHTML = state.logs.map((log, i) => `
+                <div class="p-3 border rounded-xl ${log.ok ? 'border-emerald-100 bg-emerald-50/50' : 'border-rose-100 bg-rose-50/50'}">
+                    <div class="flex items-start justify-between">
+                        <p class="text-xs font-bold text-slate-800">${i + 1}. [${log.base}] - ${log.desc}</p>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded ${log.ok ? 'bg-emerald-200 text-emerald-800' : 'bg-rose-200 text-rose-800'}">
+                            ${log.score}점
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-2 text-xs text-slate-600 border-t border-slate-200/40 pt-1">
+                        <div><b>구분:</b> ${log.correctSuffix}</div>
+                        <div><b>정답:</b> ${log.correctAnswer}</div>
+                        <div class="col-span-2"><b>내 입력:</b> ${log.userAnswer}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            resultPanel.classList.remove('hidden');
+        }
+
+        function resetGame() {
+            initGame();
+        }
+
+        // Initialize game on load
+        window.onload = function() {
+            initGame();
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>든지와 아무도</title>
+    <meta name="description" content="-든지와 아무...도의 차이를 배웁니다." />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Noto Sans KR', sans-serif !important;
+            min-height: 100vh;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        .safe { word-break: keep-all; overflow-wrap: break-word; }
+        .vi-text { display: none; }
+        .vi-on .vi-text { display: block; }
+        .hidden { display: none !important; }
+
+        /* Shop Theme (Light Emerald) */
+        body.theme-shop {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            color: #1f2937;
+        }
+
+        /* Room Theme (Dark Monotone) */
+        body.theme-room {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+        }
+    </style>
+</head>
+<body class="theme-shop flex flex-col min-h-screen">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Navigation Bar -->
+    <nav class="flex items-center justify-between border-b border-slate-200 bg-white/90 px-4 py-3 sticky top-0 z-50 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <a href="../index.html" class="flex items-center gap-1.5 text-slate-700 hover:text-slate-800 text-sm font-bold no-underline">
+                <i class="fa-solid fa-house"></i> 메인
+            </a>
+            <span class="text-slate-300">|</span>
+            <a href="index.html" class="flex items-center gap-1.5 text-slate-700 hover:text-slate-800 text-sm font-bold no-underline">
+                <i class="fa-solid fa-folder-open"></i> 11과 목록
+            </a>
+            <span class="text-slate-300">|</span>
+            <a href="grammar3.html" class="flex items-center gap-1.5 text-slate-700 hover:text-slate-800 text-sm font-bold no-underline">
+                <i class="fa-solid fa-book-open"></i> 문법 3
+            </a>
+        </div>
+        <button id="viToggle" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors">
+            Tiếng Việt OFF
+        </button>
+    </nav>
+
+    <main id="page" class="flex-1 max-w-5xl w-full mx-auto p-4 md:py-4 flex flex-col justify-between">
+        <!-- 모드 헤더 -->
+        <header class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2.5 mb-4 shrink-0 text-left">
+            <div class="flex items-baseline gap-2.5 flex-wrap">
+                <h1 id="modeTitle" class="text-xl font-black text-slate-800 transition-all">든지와 아무도</h1>
+                <p id="modeDesc" class="text-xs text-slate-500 mt-1 transition-all safe">-든지와 아무...도의 차이를 배웁니다.</p>
+                <p id="modeDescVi" class="vi-text text-[11px] text-blue-700 mt-1 transition-all safe font-medium">Phân biệt -든지 và 아무...do.</p>
+            </div>
+            <span id="modeBadge" class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-250 transition-all shrink-0">1부: 무엇이든지 상점</span>
+        </header>
+
+        <!-- 태블릿 가로모드 최적화 2단 레이아웃 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1 w-full">
+
+            <!-- 왼쪽 정보 가이드판 -->
+            <section class="bg-white/95 border border-slate-200 rounded-2xl p-5 shadow-sm lg:col-span-4 text-slate-800 w-full">
+                <h2 class="text-base font-bold flex items-center gap-2 border-b border-slate-100 pb-2 mb-3">
+                    <i data-lucide="gamepad-2" class="w-5 h-5 text-emerald-600"></i> 미션 가이드
+                </h2>
+                <div class="space-y-4 text-xs leading-relaxed safe">
+                    <div>
+                        <p class="font-bold text-emerald-700 text-sm flex items-center gap-1"><i data-lucide="store" class="w-4 h-4"></i> 1부: 무엇이든지 상점</p>
+                        <p class="mt-1 text-slate-600">모든 것이 허용되는 마법 상점입니다. 손님의 어떠한 까다로운 질문에도 **'-든지'**를 사용해 자유로운 선택권을 제공해 주세요.</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-rose-700 text-sm flex items-center gap-1"><i data-lucide="key" class="w-4 h-4"></i> 2부: 아무것도 없는 방</p>
+                        <p class="mt-1 text-slate-600">어두컴컴하고 텅 빈 방입니다. 주변의 심각한 결핍 상황을 **'아무 + N + 도 + 부정'** 문장을 정확히 조합하여 탈출의 실마리를 찾으세요.</p>
+                    </div>
+                    <div class="bg-amber-50 p-2.5 rounded-lg border border-amber-200 text-slate-700">
+                        <p class="font-bold text-amber-800 text-[11px]">💡 주의 사항:</p>
+                        <p class="mt-0.5 text-slate-600">부정문에서는 반드시 `아무도 안 온다 / 아무것도 없다` 처럼 **부정 서술어**가 호응해야 성공합니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 오른쪽 메인 게임판 -->
+            <section class="lg:col-span-8 flex flex-col gap-4 w-full">
+                <article class="bg-white border border-slate-200 text-slate-800 rounded-2xl p-6 shadow-sm min-h-[440px] flex flex-col justify-between w-full">
+
+                    <!-- 상태 정보 -->
+                    <div>
+                        <div class="flex items-center justify-between text-xs mb-2">
+                            <span id="stageProgress" class="font-bold text-emerald-600">상점 미션: 1 / 3</span>
+                            <span id="stageScore" class="font-bold text-indigo-600">점수: 0점</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden mb-4">
+                            <div id="stageBar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 16.6%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 캐릭터 또는 상황 그래픽 스페이스 -->
+                    <div id="stageGraphics" class="flex-1 flex flex-col justify-center items-center p-6 bg-slate-50 border border-slate-100 rounded-xl my-4 text-center min-h-[180px]">
+                        <div id="avatar" class="text-4xl mb-3">🍎</div>
+                        <p id="characterSpeech" class="text-base font-bold text-slate-800 leading-relaxed max-w-sm safe">"손님: 과일을 하나 사고 싶은데요. 무슨 과일이 맛있나요?"</p>
+                        <p id="characterSpeechVi" class="vi-text text-xs text-blue-700 mt-1 leading-relaxed max-w-sm safe">"Khách: Tôi muốn mua một quả trái cây. Trái cây nào ngon ạ?"</p>
+                    </div>
+
+                    <!-- 문제 해결 인터페이스 -->
+                    <div>
+                        <!-- 질문 선택지 (1부 상점용) -->
+                        <div id="shopChoices" class="grid grid-cols-1 gap-2.5"></div>
+
+                        <!-- 조각 조립식 답변 (2부 방탈출용) -->
+                        <div id="roomPuzzle" class="hidden space-y-4">
+                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center font-mono font-bold text-xs min-h-[50px] flex items-center justify-center gap-1.5 text-slate-700" id="puzzleOutput">
+                                <span class="text-slate-400 text-xs">아래 단어 조각을 순서대로 선택하세요.</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2 justify-center" id="puzzlePieces"></div>
+                            <div class="flex gap-2">
+                                <button onclick="resetPuzzle()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg cursor-pointer" type="button">조각 초기화</button>
+                                <button onclick="checkPuzzle()" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg cursor-pointer" type="button">문장 완성하기</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 피드백 박스 -->
+                    <div id="feedbackBox" class="hidden mt-4 rounded-xl border p-4 text-xs"></div>
+
+                    <!-- 다음 단계 버튼 -->
+                    <button id="btnNext" class="hidden mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl text-xs font-bold shadow transition-colors cursor-pointer" type="button">다음 미션으로 →</button>
+                </article>
+
+                <!-- 최종 완료 리포트 -->
+                <article id="finalReport" class="hidden bg-white border border-slate-200 text-slate-800 rounded-2xl p-6 shadow-sm text-center">
+                    <h3 class="text-xs text-emerald-600 font-bold uppercase tracking-wider">롤플레잉 완료</h3>
+                    <h4 class="text-2xl font-black mt-1">상점 및 방탈출 실험 완료 리포트</h4>
+
+                    <div class="my-6 max-w-sm mx-auto bg-slate-50 border border-slate-100 rounded-2xl p-5">
+                        <p id="finalScore" class="text-4xl font-black text-slate-800">0 / 60점</p>
+                        <p id="finalPercent" class="text-xs text-slate-500 mt-1">정답률 0%</p>
+                    </div>
+
+                    <div class="text-left mb-6">
+                        <p class="text-xs font-bold text-slate-600 mb-2">각 미션별 피드백 리포트</p>
+                        <div id="reportList" class="space-y-2 max-h-52 overflow-y-auto"></div>
+                    </div>
+
+                    <button class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3.5 rounded-xl text-xs font-bold transition-colors cursor-pointer" onclick="restartGame()" type="button">처음부터 다시 시작</button>
+                </article>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer Copyright -->
+    <script src="../shared/site-copyright.js"></script>
+    <script>
+        const missions = [
+            // ── 1부: 무엇이든지 상점 (든지) ──
+            {
+                part: 1,
+                avatar: '🍎',
+                speech: '손님: 과일을 하나 사고 싶은데요. 무슨 과일이 맛있나요?',
+                speechVi: 'Khách: Tôi muốn mua một quả trái cây. Trái cây nào ngon ạ?',
+                choices: [
+                    { text: '우리 가게 과일은 다 싱싱해요. 무슨 과일이든지 다 골라 보세요!', isCorrect: true, answer: '무슨 과일이든지' },
+                    { text: '우리 가게 과일은 다 싱싱해요. 아무 과일도 골라 보세요!', isCorrect: false },
+                    { text: '우리 가게 과일은 다 싱싱해요. 무엇이든지 과일을 골라 보세요!', isCorrect: false }
+                ],
+                explainKo: '명사 "과일"이 존재하므로 "무슨 과일이든지" 형태를 쓰는 것이 문법적으로 가장 옳습니다. "아무"는 부정문 전용이고, "무엇이든지"는 뒤에 명사 수식 없이 단독으로 쓰여야 합니다.',
+                explainVi: 'Vì có danh từ "과일" đi kèm nên dùng "muân 과일이든지" là đúng ngữ pháp nhất. "아무" chỉ dùng trong câu phủ định, còn "무엇이든지" dùng độc lập không có danh từ theo sau.'
+            },
+            {
+                part: 1,
+                avatar: '⏰',
+                speech: '손님: 사장님, 오늘 약속을 좀 잡고 싶은데 언제 시간이 괜찮으세요?',
+                speechVi: 'Khách: Chủ tiệm ơi, tôi muốn hẹn gặp hôm nay, khi nào tiện cho anh ạ?',
+                choices: [
+                    { text: '저는 오늘 아무 때도 시간 있어요. 편할 때 오세요!', isCorrect: false },
+                    { text: '저는 오늘 바빠서 언제든지 갈 수 있어요!', isCorrect: false },
+                    { text: '저는 오늘 주말보다 한가해요. 언제든지 편할 때 연락하세요!', isCorrect: true, answer: '언제든지' }
+                ],
+                explainKo: '시간에 제한이 없음을 의미하는 긍정적인 상황이므로 "언제든지"가 어울립니다. "아무 때도"는 부정문 전용이며, "아무 때도 시간 있어요"는 어색한 표현입니다.',
+                explainVi: 'Tình huống khẳng định thể hiện không giới hạn thời gian nên dùng "언제든지". "아무 때도" chỉ dùng cho câu phủ định.'
+            },
+            {
+                part: 1,
+                avatar: '🛋',
+                speech: '손님: 이 식당에서는 어디에 앉아야 자리가 편한가요?',
+                speechVi: 'Khách: Nhà hàng này thì ngồi ở đâu thoải mái ạ?',
+                choices: [
+                    { text: '아무 데도 자리가 편해요.', isCorrect: false },
+                    { text: '빈자리가 아주 많아요. 어디든지 마음에 드는 곳에 앉으세요.', isCorrect: true, answer: '어디든지' },
+                    { text: '빈자리가 없어서 어디든지 앉을 수 없어요.', isCorrect: false }
+                ],
+                explainKo: '어디나 편하게 다 가능하다는 긍정/허용의 의미이므로 "어디든지"를 사용해야 합니다.',
+                explainVi: 'Mang ý nghĩa cho phép/khẳng định ngồi đâu cũng được nên dùng "어디든지".'
+            },
+
+            // ── 2부: 아무것도 없는 방 (도) ──
+            {
+                part: 2,
+                avatar: '🕯',
+                speech: '방이 너무 캄캄해서 빛을 찾을 수 없다. [빛이 하나도 없음]',
+                speechVi: 'Căn phòng tối om không tìm thấy ánh sáng nào. [Hoàn toàn không có ánh sáng]',
+                pieces: ['아무', '도', '빛', '없어요', '보이지', '않아요', '든지'],
+                target: ['아무', '빛', '도', '보이지', '않아요'],
+                explainKo: '사물/상황의 전면 부정으로 "아무 N도 + 부정" 형태입니다. "아무 빛도 보이지 않아요"가 자연스러운 문장 결합입니다.',
+                explainVi: 'Phủ định hoàn toàn sự vật/hoàn cảnh: "아무 N도 + phủ định". "아무 빛도 보이지 않아요" là câu tự nhiên nhất.'
+            },
+            {
+                part: 2,
+                avatar: '❄',
+                speech: '냉장고가 완전히 비어서 먹을 게 아예 없다. [결핍/아사 위기]',
+                speechVi: 'Tủ lạnh trống rỗng hoàn toàn không có gì để ăn. [Hoàn cảnh thiếu thốn]',
+                pieces: ['아무', '도', '없어요', '것', '먹을 수', '먹든지', '도'],
+                target: ['아무', '것', '도', '없어요'],
+                explainKo: '사물의 전면 부정은 "아무것도 없어요"가 정답입니다. 든지 표현인 "아무것이든지 없어요"는 비문입니다.',
+                explainVi: 'Phủ định hoàn toàn sự vật dùng "아무것도 없어요". Dùng "아무것이든지 없어요" là sai ngữ pháp.'
+            },
+            {
+                part: 2,
+                avatar: '🚪',
+                speech: '출구가 굳게 잠겨서 나갈 수 있는 길이 전혀 없다. [고립]',
+                speechVi: 'Lối ra bị khóa chặt không có cách nào ra ngoài. [Cô lập]',
+                pieces: ['아무', '도', '데', '도', '갈 수', '없어요', '든지'],
+                target: ['아무', '데', '도', '갈 수', '없어요'],
+                explainKo: '장소의 전면 부정은 "아무 데도 + 부정" 형식을 사용해 "아무 데도 갈 수 없어요"로 구성해야 문이 열립니다.',
+                explainVi: 'Phủ định hoàn toàn địa điểm dùng cấu trúc "아무 데도 + phủ định" thành "아무 데도 갈 수 없어요".'
+            }
+        ];
+
+        let state = {
+            idx: 0,
+            score: 0,
+            answered: false,
+            puzzleSelection: [],
+            logs: []
+        };
+
+        const page = document.getElementById('page');
+        const viToggle = document.getElementById('viToggle');
+
+        const modeBadge = document.getElementById('modeBadge');
+        const modeTitle = document.getElementById('modeTitle');
+        const modeDesc = document.getElementById('modeDesc');
+        const modeDescVi = document.getElementById('modeDescVi');
+
+        const stageProgress = document.getElementById('stageProgress');
+        const stageScore = document.getElementById('stageScore');
+        const stageBar = document.getElementById('stageBar');
+
+        const avatar = document.getElementById('avatar');
+        const characterSpeech = document.getElementById('characterSpeech');
+        const characterSpeechVi = document.getElementById('characterSpeechVi');
+
+        const shopChoices = document.getElementById('shopChoices');
+        const roomPuzzle = document.getElementById('roomPuzzle');
+        const puzzleOutput = document.getElementById('puzzleOutput');
+        const puzzlePieces = document.getElementById('puzzlePieces');
+
+        const feedbackBox = document.getElementById('feedbackBox');
+        const btnNext = document.getElementById('btnNext');
+        const finalReport = document.getElementById('finalReport');
+
+        // Bilingual Toggle
+        let viOn = false;
+        viToggle.addEventListener('click', function() {
+            viOn = !viOn;
+            page.classList.toggle('vi-on', viOn);
+            viToggle.textContent = viOn ? 'Tiếng Việt ON' : 'Tiếng Việt OFF';
+        });
+
+        function esc(t) {
+            return String(t == null ? '' : t)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function shuffle(arr) {
+            const c = arr.slice();
+            for (let i = c.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const tmp = c[i]; c[i] = c[j]; c[j] = tmp;
+            }
+            return c;
+        }
+
+        function initGame() {
+            state.idx = 0;
+            state.score = 0;
+            state.answered = false;
+            state.logs = [];
+
+            finalReport.classList.add('hidden');
+            document.querySelector('.grid').classList.remove('hidden');
+            document.querySelector('header').classList.remove('hidden');
+            document.querySelector('article').classList.remove('hidden');
+
+            renderStage();
+        }
+
+        function renderStage() {
+            const mission = missions[state.idx];
+            const total = missions.length;
+
+            state.answered = false;
+
+            // UI Mode Switch
+            if (mission.part === 1) {
+                document.body.className = "theme-shop flex flex-col min-h-screen";
+                modeBadge.className = "text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-200 transition-all shrink-0";
+                modeBadge.textContent = "1부: 무엇이든지 상점 (든지)";
+                stageProgress.textContent = `상점 미션: ${state.idx + 1} / 3`;
+                stageProgress.className = "font-bold text-emerald-600";
+                stageBar.className = "bg-emerald-500 h-full transition-all duration-300";
+
+                // Show choices / Hide puzzle
+                shopChoices.classList.remove('hidden');
+                roomPuzzle.classList.add('hidden');
+
+                renderShopChoices(mission);
+            } else {
+                document.body.className = "theme-room flex flex-col min-h-screen text-slate-100";
+                modeBadge.className = "text-[10px] font-bold bg-rose-900 text-rose-100 px-2.5 py-0.5 rounded-full border border-rose-800 transition-all shrink-0";
+                modeBadge.textContent = "2부: 아무것도 없는 방 (도)";
+                stageProgress.textContent = `방탈출 미션: ${state.idx - 2} / 3`;
+                stageProgress.className = "font-bold text-rose-400";
+                stageBar.className = "bg-rose-600 h-full transition-all duration-300";
+
+                // Hide choices / Show puzzle
+                shopChoices.classList.add('hidden');
+                roomPuzzle.classList.remove('hidden');
+
+                resetPuzzle();
+                renderRoomPuzzle(mission);
+            }
+
+            stageScore.textContent = `점수: ${state.score}점`;
+            stageBar.style.width = `${((state.idx + 1) / total) * 100}%`;
+
+            avatar.textContent = mission.avatar;
+            characterSpeech.textContent = mission.speech;
+            characterSpeechVi.textContent = mission.speechVi;
+
+            feedbackBox.classList.add('hidden');
+            btnNext.classList.add('hidden');
+        }
+
+        // 1부 상점형 렌더링
+        function renderShopChoices(mission) {
+            shopChoices.innerHTML = mission.choices.map((choice, i) => `
+                <button onclick="handleShopAnswer(${choice.isCorrect}, ${i})" class="choice-btn p-3.5 rounded-xl border border-slate-200 hover:border-emerald-500 bg-white hover:bg-emerald-50/20 text-xs font-bold text-slate-800 text-left transition-all cursor-pointer flex items-center justify-between" type="button">
+                    <span>${choice.text}</span>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 shrink-0 ml-2"></i>
+                </button>
+            `).join('');
+
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
+
+        function handleShopAnswer(isCorrect, choiceIdx) {
+            if (state.answered) return;
+            state.answered = true;
+
+            const mission = missions[state.idx];
+            if (isCorrect) {
+                state.score += 10;
+            }
+
+            // disable buttons and paint green/red
+            const buttons = shopChoices.querySelectorAll('button');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (mission.choices[i].isCorrect) {
+                    btn.className = "choice-btn p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-xs font-bold text-emerald-800 text-left w-full flex justify-between items-center";
+                } else if (i === choiceIdx) {
+                    btn.className = "choice-btn p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-xs font-bold text-rose-800 text-left w-full flex justify-between items-center";
+                } else {
+                    btn.className = "choice-btn p-3.5 rounded-xl border border-slate-100 bg-slate-50 text-xs font-bold text-slate-400 text-left w-full flex justify-between items-center";
+                }
+            });
+
+            // save log
+            state.logs.push({
+                mission: `상점 미션 ${state.idx + 1}`,
+                ok: isCorrect,
+                user: mission.choices[choiceIdx].text,
+                correct: mission.choices.find(c => c.isCorrect).text,
+                score: isCorrect ? 10 : 0,
+                explainKo: mission.explainKo,
+                explainVi: mission.explainVi
+            });
+
+            showFeedback(isCorrect, mission.explainKo, mission.explainVi);
+        }
+
+        // 2부 방탈출 퀴즈 조립기
+        function renderRoomPuzzle(mission) {
+            const shuffledPieces = shuffle(mission.pieces);
+            puzzlePieces.innerHTML = shuffledPieces.map((piece, i) => `
+                <button onclick="addPiece('${piece}', this)" class="piece-btn px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-xs font-bold text-white transition-all cursor-pointer" type="button">
+                    ${piece}
+                </button>
+            `).join('');
+        }
+
+        function addPiece(val, btn) {
+            if (state.answered) return;
+            state.puzzleSelection.push({ val, btn });
+            btn.classList.add('opacity-40');
+            btn.disabled = true;
+            updatePuzzleOutput();
+        }
+
+        function updatePuzzleOutput() {
+            if (state.puzzleSelection.length === 0) {
+                puzzleOutput.innerHTML = `<span class="text-slate-400 text-xs">아래 단어 조각을 순서대로 선택하세요.</span>`;
+            } else {
+                puzzleOutput.innerHTML = state.puzzleSelection.map(item => `
+                    <span class="px-2.5 py-1 bg-rose-100 text-rose-800 rounded-md text-xs font-bold">${item.val}</span>
+                `).join(' ');
+            }
+        }
+
+        function resetPuzzle() {
+            if (state.answered) return;
+            state.puzzleSelection.forEach(item => {
+                item.btn.classList.remove('opacity-40');
+                item.btn.disabled = false;
+            });
+            state.puzzleSelection = [];
+            updatePuzzleOutput();
+        }
+
+        function checkPuzzle() {
+            if (state.answered) return;
+            if (state.puzzleSelection.length === 0) return;
+
+            state.answered = true;
+            const mission = missions[state.idx];
+            const userSentence = state.puzzleSelection.map(x => x.val).join(' ');
+            const targetSentence = mission.target.join(' ');
+            const isCorrect = (userSentence === targetSentence);
+
+            if (isCorrect) {
+                state.score += 10;
+            }
+
+            // disable buttons
+            puzzlePieces.querySelectorAll('button').forEach(btn => btn.disabled = true);
+
+            state.logs.push({
+                mission: `방탈출 미션 ${state.idx - 2}`,
+                ok: isCorrect,
+                user: userSentence,
+                correct: targetSentence,
+                score: isCorrect ? 10 : 0,
+                explainKo: mission.explainKo,
+                explainVi: mission.explainVi
+            });
+
+            showFeedback(isCorrect, mission.explainKo, mission.explainVi);
+        }
+
+        function showFeedback(isOk, textKo, textVi) {
+            feedbackBox.className = `mt-4 rounded-xl border p-4 ${isOk ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}`;
+            feedbackBox.innerHTML = `
+                <p class="text-xs font-bold flex items-center gap-1">
+                    <i data-lucide="${isOk ? 'check-circle' : 'alert-triangle'}" class="w-4.5 h-4.5"></i>
+                    ${isOk ? '정답입니다! 미션 클리어 (+10점)' : '오답입니다. 서술 호응을 확인해 보세요.'}
+                </p>
+                <p class="text-xs mt-1.5 leading-relaxed"><b>💡 왜 그럴까요?:</b> ${esc(textKo)}</p>
+                <p class="vi-text text-[11px] mt-1 leading-relaxed"><b>Giải thích:</b> ${esc(textVi)}</p>
+            `;
+            feedbackBox.classList.remove('hidden');
+            btnNext.classList.remove('hidden');
+
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
+
+        btnNext.addEventListener('click', () => {
+            state.idx++;
+            if (state.idx >= missions.length) {
+                showResults();
+            } else {
+                renderStage();
+            }
+        });
+
+        function showResults() {
+            // Hide normal stage UI
+            document.querySelector('.grid').classList.add('hidden');
+            document.querySelector('header').classList.add('hidden');
+            document.querySelector('article').classList.add('hidden');
+
+            const totalScorePossible = missions.length * 10;
+            const percentage = Math.round((state.score / totalScorePossible) * 100);
+
+            finalScore.textContent = `${state.score} / ${totalScorePossible}점`;
+            finalPercent.textContent = `정답률: ${percentage}%`;
+
+            const reportList = document.getElementById('reportList');
+            reportList.innerHTML = state.logs.map((log, i) => `
+                <div class="p-3 border rounded-xl ${log.ok ? 'border-emerald-100 bg-emerald-50/50' : 'border-rose-100 bg-rose-50/50'} text-xs">
+                    <div class="flex items-center justify-between font-bold text-slate-800">
+                        <span>${i + 1}. [${log.mission}]</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] ${log.ok ? 'bg-emerald-200 text-emerald-800' : 'bg-rose-200 text-rose-800'}">${log.score}점</span>
+                    </div>
+                    <div class="mt-2 text-slate-600 space-y-1 border-t border-slate-100 pt-1.5">
+                        <p><b>내 대답:</b> ${esc(log.user)}</p>
+                        <p><b>올바른 문장:</b> ${esc(log.correct)}</p>
+                        <p class="text-[10px] text-slate-500 mt-1">${esc(log.explainKo)}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            finalReport.classList.remove('hidden');
+        }
+
+        function restartGame() {
+            initGame();
+        }
+
+        window.onload = function() {
+            initGame();
+        };
+    </script>
+</body>
+</html>

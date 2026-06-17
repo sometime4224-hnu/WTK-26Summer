@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11과 문법2 보조 활동 | 쉬운 만약 밸런스 게임</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --page-max: 1080px;
+            --nav-height: 58px;
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #dbe3ef;
+            --panel: #ffffff;
+            --soft: #f8fbff;
+            --indigo: #4f46e5;
+            --amber: #b45309;
+            --green: #047857;
+            --rose: #be123c;
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 12% 8%, rgba(125, 211, 252, .22), transparent 32%),
+                radial-gradient(circle at 90% 18%, rgba(253, 186, 116, .24), transparent 30%),
+                linear-gradient(180deg, #f8fbff 0%, #eef7f5 100%);
+        }
+        button {
+            font-family: inherit;
+        }
+        .safe {
+            word-break: keep-all;
+            overflow-wrap: anywhere;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .injected-global-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: var(--nav-height);
+            padding: 0 max(14px, calc((100vw - var(--page-max)) / 2 + 18px));
+            border-bottom: 1px solid rgba(148, 163, 184, .3);
+            background: rgba(255, 255, 255, .9);
+            backdrop-filter: blur(12px);
+        }
+        .injected-global-nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+        .injected-global-nav a:hover {
+            color: var(--indigo);
+        }
+        .divider {
+            color: #cbd5e1;
+        }
+        .page-shell {
+            width: min(var(--page-max), calc(100% - 28px));
+            margin: 16px auto 40px;
+        }
+        .top-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 12px 14px;
+            border: 1px solid rgba(148, 163, 184, .26);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .86);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, .06);
+        }
+        .top-strip h1 {
+            margin: 0;
+            font-size: clamp(20px, 3.1vw, 32px);
+            line-height: 1.2;
+        }
+        .top-strip p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.55;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #e0e7ff;
+            color: #3730a3;
+            font-size: 11px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .game-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(280px, 330px);
+            gap: 16px;
+            align-items: start;
+            margin-top: 14px;
+        }
+        .main-stage,
+        .side-panel,
+        .board {
+            min-width: 0;
+        }
+        .board,
+        .side-panel {
+            border: 1px solid rgba(148, 163, 184, .28);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, .07);
+        }
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 12px;
+            border: 1px solid rgba(148, 163, 184, .26);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .84);
+        }
+        .round-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+        .round-tab,
+        .ghost-button,
+        .primary-button,
+        .choice-card,
+        .word-chip {
+            border: 0;
+            cursor: pointer;
+            transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+        }
+        .round-tab {
+            padding: 8px 11px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            background: transparent;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .round-tab.is-active {
+            border-color: #c7d2fe;
+            background: #eef2ff;
+            color: #3730a3;
+            box-shadow: 0 8px 18px rgba(79, 70, 229, .12);
+        }
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: #fffbeb;
+            color: #92400e;
+            font-size: 12px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .board {
+            margin-top: 14px;
+            padding: clamp(14px, 2.4vw, 22px);
+        }
+        .board-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .question-card {
+            margin-top: 14px;
+            padding: clamp(18px, 3vw, 28px);
+            border: 1px solid #c7d2fe;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #eef2ff 0%, #ffffff 72%);
+        }
+        .question-card h2 {
+            margin: 8px 0 0;
+            font-size: clamp(24px, 4vw, 42px);
+            line-height: 1.22;
+        }
+        .question-card p {
+            margin: 8px 0 0;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+        .choice-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+        .choice-card {
+            position: relative;
+            min-height: 170px;
+            padding: 18px;
+            border: 2px solid rgba(148, 163, 184, .28);
+            border-radius: 8px;
+            text-align: left;
+            background: #fff;
+        }
+        .choice-card:hover,
+        .choice-card:focus-visible {
+            transform: translateY(-2px);
+            border-color: #818cf8;
+            box-shadow: 0 16px 30px rgba(79, 70, 229, .13);
+            outline: none;
+        }
+        .choice-card.is-selected {
+            border-color: #34d399;
+            background: #ecfdf5;
+        }
+        .choice-card.is-dimmed {
+            opacity: .48;
+        }
+        .choice-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #334155;
+            font-weight: 900;
+        }
+        .choice-card strong {
+            display: block;
+            margin-top: 14px;
+            color: #0f172a;
+            font-size: clamp(18px, 2.5vw, 26px);
+            line-height: 1.3;
+        }
+        .tap-hint {
+            display: inline-flex;
+            margin-top: 18px;
+            color: #6366f1;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .selection-feedback {
+            margin-top: 14px;
+            padding: 12px 14px;
+            border: 1px solid #a7f3d0;
+            border-radius: 8px;
+            background: #ecfdf5;
+            color: #047857;
+            font-size: 14px;
+            font-weight: 900;
+        }
+        #builderBoard {
+            scroll-margin-top: calc(var(--nav-height) + 12px);
+        }
+        .clause-hint {
+            display: grid;
+            grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+            margin-top: 14px;
+            padding: 12px 14px;
+            border: 1px solid #fde68a;
+            border-left-width: 4px;
+            border-radius: 8px;
+            background: #fffbeb;
+        }
+        .clause-hint-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: #fef3c7;
+            color: var(--amber);
+            font-size: 11px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .clause-hint-main {
+            min-width: 0;
+        }
+        .clause-hint-line {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 28px;
+            min-width: 0;
+        }
+        .clause-hint-text {
+            flex: 1 1 auto;
+            min-width: 0;
+            margin: 0;
+            color: #1e293b;
+            font-size: 16px;
+            font-weight: 900;
+            line-height: 1.45;
+        }
+        .grammar-target-label {
+            flex: 0 0 auto;
+            margin-left: auto;
+            padding: 5px 9px;
+            border: 1px solid #fed7aa;
+            border-radius: 999px;
+            background: #fff7ed;
+            color: #9a3412;
+            font-size: 11px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .hint-note {
+            margin: 4px 0 0;
+            color: #64748b;
+            font-size: 11px;
+            line-height: 1.45;
+        }
+        .picked-box {
+            margin-top: 12px;
+            padding: 12px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+        .picked-box p {
+            margin: 0;
+        }
+        .picked-label {
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 900;
+        }
+        .picked-text {
+            margin-top: 4px !important;
+            font-size: 15px;
+            font-weight: 900;
+        }
+        .slot-box {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            min-height: 78px;
+            margin-top: 14px;
+            padding: 14px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+        .empty-prompt {
+            width: 100%;
+            margin: 0;
+            color: #94a3b8;
+            font-size: 13px;
+            text-align: center;
+        }
+        .word-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 70px;
+            margin-top: 8px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #eef2f7;
+        }
+        .word-chip {
+            padding: 10px 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #fff;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 900;
+        }
+        .word-chip:hover,
+        .word-chip:focus-visible {
+            border-color: #818cf8;
+            outline: none;
+        }
+        .word-chip:disabled {
+            cursor: not-allowed;
+            opacity: .38;
+        }
+        .assembled-chip {
+            border-color: #c7d2fe;
+            background: #eef2ff;
+            color: #3730a3;
+        }
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .ghost-button,
+        .primary-button {
+            min-height: 44px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 900;
+        }
+        .ghost-button {
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #334155;
+        }
+        .primary-button {
+            background: #4f46e5;
+            color: #fff;
+        }
+        .primary-button:hover {
+            background: #4338ca;
+        }
+        .feedback {
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .feedback.success {
+            border: 1px solid #a7f3d0;
+            background: #ecfdf5;
+        }
+        .feedback.error {
+            border: 1px solid #fecdd3;
+            background: #fff1f2;
+        }
+        .feedback-title {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 900;
+        }
+        .side-panel {
+            position: sticky;
+            top: calc(var(--nav-height) + 14px);
+            padding: 16px;
+        }
+        .progress-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 12px;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .progress-track {
+            height: 8px;
+            margin-top: 6px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 20%;
+            border-radius: inherit;
+            background: #4f46e5;
+            transition: width .24s ease;
+        }
+        .history-list {
+            display: grid;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .history-item {
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+            font-size: 12px;
+        }
+        .history-item strong {
+            display: block;
+            color: #0f172a;
+            line-height: 1.35;
+        }
+        .history-item span {
+            display: block;
+            margin-top: 4px;
+            color: #64748b;
+        }
+        .break-board,
+        .result-board {
+            text-align: center;
+        }
+        .break-board h2,
+        .result-board h2 {
+            margin: 8px 0 0;
+            font-size: clamp(22px, 3vw, 34px);
+        }
+        .break-board p,
+        .result-board p {
+            color: #475569;
+            line-height: 1.6;
+        }
+        @media (max-width: 880px) {
+            .game-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .side-panel {
+                position: static;
+            }
+        }
+        @media (max-width: 620px) {
+            .injected-global-nav {
+                gap: 8px;
+                overflow-x: auto;
+                justify-content: flex-start;
+            }
+            .divider {
+                display: none;
+            }
+            .top-strip {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+            .choice-grid,
+            .action-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .choice-card {
+                min-height: 138px;
+            }
+            .clause-hint {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .clause-hint-line {
+                gap: 6px 28px;
+            }
+            .grammar-target-label {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav id="injected-global-nav" class="injected-global-nav">
+        <a href="../index.html">메인으로</a>
+        <span class="divider">|</span>
+        <a href="index.html">단원 홈</a>
+        <span class="divider">|</span>
+        <a href="grammar2.html">문법 2 본문</a>
+        <span class="divider">|</span>
+        <a href="grammar2-if-balance-game.html">기존 밸런스 게임</a>
+    </nav>
+
+    <div class="page-shell">
+        <header class="top-strip">
+            <div>
+                <span class="badge">Easy Balance Game</span>
+                <h1>쉬운 만약 밸런스 게임</h1>
+                <p class="safe">쉬운 어휘로 선택하고, 내가 고른 내용과 맞는 가정문을 조립해 보세요.</p>
+            </div>
+            <span class="score-pill"><span id="compactScoreVal">0</span> / 5</span>
+        </header>
+
+        <div class="game-grid">
+            <main class="main-stage">
+                <section class="toolbar" aria-label="라운드 선택">
+                    <div class="round-tabs">
+                        <button id="roundTab1" class="round-tab is-active" type="button" onclick="selectRound(1)">1라운드: 생활</button>
+                        <button id="roundTab2" class="round-tab" type="button" onclick="selectRound(2)">2라운드: 쉬운 상상</button>
+                    </div>
+                    <span id="progressText" class="score-pill">질문 1 / 5</span>
+                </section>
+
+                <article id="selectBoard" class="board">
+                    <div class="board-head">
+                        <span class="badge">Question</span>
+                        <span class="safe" style="color:#64748b;font-size:12px;font-weight:900;">마음에 드는 선택지를 누르세요.</span>
+                    </div>
+                    <div class="question-card">
+                        <span id="dilemmaSituation" class="badge">쉬운 상황</span>
+                        <h2 id="dilemmaTitle" class="safe"></h2>
+                        <p class="safe">선택 후에는 같은 내용으로 문장을 조립합니다.</p>
+                    </div>
+                    <div class="choice-grid">
+                        <button id="optACard" class="choice-card" type="button" onclick="pickOption('A')">
+                            <span class="choice-letter">A</span>
+                            <strong id="optAText" class="safe"></strong>
+                            <span class="tap-hint">탭해서 선택</span>
+                        </button>
+                        <button id="optBCard" class="choice-card" type="button" onclick="pickOption('B')">
+                            <span class="choice-letter">B</span>
+                            <strong id="optBText" class="safe"></strong>
+                            <span class="tap-hint">탭해서 선택</span>
+                        </button>
+                    </div>
+                    <div id="selectionFeedback" class="selection-feedback hidden"></div>
+                </article>
+
+                <article id="builderBoard" class="board hidden">
+                    <div class="board-head">
+                        <span class="badge">Sentence Builder</span>
+                        <button class="ghost-button" type="button" onclick="goBackToSelect()">다시 선택</button>
+                    </div>
+
+                    <div id="clauseHint" class="clause-hint" aria-live="polite">
+                        <span class="clause-hint-label">앞 절 참고</span>
+                        <div class="clause-hint-main">
+                            <div class="clause-hint-line">
+                                <p id="clauseHintText" class="clause-hint-text safe"></p>
+                                <span class="grammar-target-label">목표 문법 · -(ㄴ/는)다면 / -(이)라면</span>
+                            </div>
+                            <p class="hint-note safe">이 기본형 문장을 조건 표현으로 바꾸어 문장 앞부분을 만드세요.</p>
+                        </div>
+                    </div>
+
+                    <div class="picked-box">
+                        <p class="picked-label">내가 선택한 내용</p>
+                        <p id="pickedSummary" class="picked-text safe"></p>
+                    </div>
+
+                    <div class="slot-box">
+                        <p id="emptyPrompt" class="empty-prompt">아래 단어 카드를 순서대로 탭하여 조립하세요.</p>
+                        <div id="assembledSlots" style="display:flex;flex-wrap:wrap;gap:8px;width:100%;"></div>
+                    </div>
+
+                    <div style="margin-top:16px;">
+                        <p style="margin:0 0 8px;color:#64748b;font-size:12px;font-weight:900;">선택 카드</p>
+                        <div id="wordPool" class="word-pool"></div>
+                    </div>
+
+                    <div class="action-grid">
+                        <button class="ghost-button" type="button" onclick="resetBuilder()">초기화</button>
+                        <button id="checkBtn" class="primary-button" type="button" onclick="checkAssembly()">정답 확인</button>
+                    </div>
+
+                    <div id="feedbackBox" class="feedback hidden"></div>
+                    <button id="nextBtn" class="primary-button hidden" style="width:100%;margin-top:14px;" type="button" onclick="nextDilemma()">다음 단계로 이동</button>
+                </article>
+
+                <article id="roundBreakBoard" class="board break-board hidden">
+                    <span id="breakRoundBadge" class="badge">1라운드 완료</span>
+                    <h2>잠시 쉬어가세요</h2>
+                    <p>이번 라운드 점수는 <strong><span id="breakScoreVal">0</span> / 5</strong>입니다.</p>
+                    <div class="action-grid">
+                        <button class="ghost-button" type="button" onclick="goBackToRoundSelect()">라운드 다시 보기</button>
+                        <button id="breakNextBtn" class="primary-button" type="button" onclick="startNextRound()">다음 라운드 계속하기</button>
+                    </div>
+                </article>
+
+                <article id="resultBoard" class="board result-board hidden">
+                    <span class="badge">Complete</span>
+                    <h2>쉬운 밸런스 게임 완료</h2>
+                    <p>총점은 <strong><span id="finalScore">0</span> / 10</strong>입니다.</p>
+                    <button class="primary-button" type="button" onclick="restartGame()">처음부터 다시 하기</button>
+                </article>
+            </main>
+
+            <aside class="side-panel">
+                <span id="activeRoundBadge" class="badge">1라운드</span>
+                <div class="progress-row">
+                    <span>라운드 진행</span>
+                    <span id="sideProgressText">질문 1 / 5</span>
+                </div>
+                <div class="progress-track">
+                    <div id="progressBar" class="progress-fill"></div>
+                </div>
+                <div class="progress-row">
+                    <span>라운드 점수</span>
+                    <span><span id="scoreVal">0</span> / 5</span>
+                </div>
+                <div style="margin-top:18px;">
+                    <strong style="font-size:14px;">나의 선택 기록</strong>
+                    <div id="choiceSummary" class="history-list">
+                        <p style="margin:0;color:#94a3b8;font-size:12px;">선택을 시작하면 여기에 기록됩니다.</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const easyDilemmas = [
+            {
+                id: 1,
+                situation: "생활 상황",
+                title: "비가 많이 온다면?",
+                choices: {
+                    A: {
+                        text: "집에 있을래요",
+                        targetTokens: ["비가", "많이", "온다면", "집에", "있을래요"],
+                        hintText: "비가 많이 온다.",
+                        distractors: ["오면", "오라면", "나갈래요"],
+                        explain: "'오다'는 받침이 없으므로 '-ㄴ다면'을 붙여 '온다면'으로 씁니다."
+                    },
+                    B: {
+                        text: "우산을 쓰고 나갈래요",
+                        targetTokens: ["비가", "많이", "온다면", "우산을", "쓰고", "나갈래요"],
+                        hintText: "비가 많이 온다.",
+                        distractors: ["오면", "오라면", "있을래요"],
+                        explain: "'오다'는 받침이 없으므로 '-ㄴ다면'을 붙여 '온다면'으로 씁니다."
+                    }
+                }
+            },
+            {
+                id: 2,
+                situation: "생활 상황",
+                title: "시간이 많다면?",
+                choices: {
+                    A: {
+                        text: "책을 읽을래요",
+                        targetTokens: ["시간이", "많다면", "책을", "읽을래요"],
+                        hintText: "시간이 많다.",
+                        distractors: ["많으면", "많으라면", "운동을"],
+                        explain: "형용사 '많다'는 '-다면'을 붙여 '많다면'으로 씁니다."
+                    },
+                    B: {
+                        text: "운동을 할래요",
+                        targetTokens: ["시간이", "많다면", "운동을", "할래요"],
+                        hintText: "시간이 많다.",
+                        distractors: ["많으면", "많으라면", "책을"],
+                        explain: "형용사 '많다'는 '-다면'을 붙여 '많다면'으로 씁니다."
+                    }
+                }
+            },
+            {
+                id: 3,
+                situation: "공부 상황",
+                title: "한국어를 잘한다면?",
+                choices: {
+                    A: {
+                        text: "친구와 이야기할래요",
+                        targetTokens: ["내가", "한국어를", "잘한다면", "친구와", "이야기할래요"],
+                        hintText: "내가 한국어를 잘한다.",
+                        distractors: ["잘하면", "잘하라면", "한국에"],
+                        explain: "'잘하다'는 받침이 없으므로 '-ㄴ다면'을 붙여 '잘한다면'으로 씁니다."
+                    },
+                    B: {
+                        text: "한국에 갈래요",
+                        targetTokens: ["내가", "한국어를", "잘한다면", "한국에", "갈래요"],
+                        hintText: "내가 한국어를 잘한다.",
+                        distractors: ["잘하면", "잘하라면", "친구와"],
+                        explain: "'잘하다'는 받침이 없으므로 '-ㄴ다면'을 붙여 '잘한다면'으로 씁니다."
+                    }
+                }
+            },
+            {
+                id: 4,
+                situation: "학교 상황",
+                title: "내가 선생님이라면?",
+                choices: {
+                    A: {
+                        text: "숙제를 조금 줄래요",
+                        targetTokens: ["내가", "선생님이라면", "숙제를", "조금", "줄래요"],
+                        hintText: "내가 선생님이다.",
+                        distractors: ["선생님라면", "선생님이면", "게임을"],
+                        explain: "명사 '선생님'은 받침이 있으므로 '-이라면'을 붙입니다."
+                    },
+                    B: {
+                        text: "게임을 할래요",
+                        targetTokens: ["내가", "선생님이라면", "게임을", "할래요"],
+                        hintText: "내가 선생님이다.",
+                        distractors: ["선생님라면", "선생님이면", "숙제를"],
+                        explain: "명사 '선생님'은 받침이 있으므로 '-이라면'을 붙입니다."
+                    }
+                }
+            },
+            {
+                id: 5,
+                situation: "생활 상황",
+                title: "오늘이 주말이라면?",
+                choices: {
+                    A: {
+                        text: "늦게 일어날래요",
+                        targetTokens: ["오늘이", "주말이라면", "늦게", "일어날래요"],
+                        hintText: "오늘이 주말이다.",
+                        distractors: ["주말라면", "주말이면", "가족과"],
+                        explain: "명사 '주말'은 받침이 있으므로 '-이라면'을 붙입니다."
+                    },
+                    B: {
+                        text: "가족과 놀래요",
+                        targetTokens: ["오늘이", "주말이라면", "가족과", "놀래요"],
+                        hintText: "오늘이 주말이다.",
+                        distractors: ["주말라면", "주말이면", "늦게"],
+                        explain: "명사 '주말'은 받침이 있으므로 '-이라면'을 붙입니다."
+                    }
+                }
+            },
+            {
+                id: 6,
+                situation: "아침 상황",
+                title: "매일 일찍 일어난다면?",
+                choices: {
+                    A: {
+                        text: "아침을 먹을래요",
+                        targetTokens: ["매일", "일찍", "일어난다면", "아침을", "먹을래요"],
+                        hintText: "매일 일찍 일어난다.",
+                        distractors: ["일어나면", "일어나라면", "산책을"],
+                        explain: "'일어나다'는 받침이 없으므로 '-ㄴ다면'을 붙여 '일어난다면'으로 씁니다."
+                    },
+                    B: {
+                        text: "산책을 할래요",
+                        targetTokens: ["매일", "일찍", "일어난다면", "산책을", "할래요"],
+                        hintText: "매일 일찍 일어난다.",
+                        distractors: ["일어나면", "일어나라면", "아침을"],
+                        explain: "'일어나다'는 받침이 없으므로 '-ㄴ다면'을 붙여 '일어난다면'으로 씁니다."
+                    }
+                }
+            },
+            {
+                id: 7,
+                situation: "날씨 상황",
+                title: "날씨가 춥다면?",
+                choices: {
+                    A: {
+                        text: "따뜻한 옷을 입을래요",
+                        targetTokens: ["날씨가", "춥다면", "따뜻한", "옷을", "입을래요"],
+                        hintText: "날씨가 춥다.",
+                        distractors: ["추우면", "춥으라면", "차를"],
+                        explain: "형용사 '춥다'는 '-다면'을 붙여 '춥다면'으로 씁니다."
+                    },
+                    B: {
+                        text: "따뜻한 차를 마실래요",
+                        targetTokens: ["날씨가", "춥다면", "따뜻한", "차를", "마실래요"],
+                        hintText: "날씨가 춥다.",
+                        distractors: ["추우면", "춥으라면", "옷을"],
+                        explain: "형용사 '춥다'는 '-다면'을 붙여 '춥다면'으로 씁니다."
+                    }
+                }
+            },
+            {
+                id: 8,
+                situation: "상상 상황",
+                title: "내가 가수라면?",
+                choices: {
+                    A: {
+                        text: "노래를 부를래요",
+                        targetTokens: ["내가", "가수라면", "노래를", "부를래요"],
+                        hintText: "내가 가수다.",
+                        distractors: ["가수이라면", "가수이면", "춤을"],
+                        explain: "명사 '가수'는 받침이 없으므로 '-라면'을 붙입니다."
+                    },
+                    B: {
+                        text: "춤을 출래요",
+                        targetTokens: ["내가", "가수라면", "춤을", "출래요"],
+                        hintText: "내가 가수다.",
+                        distractors: ["가수이라면", "가수이면", "노래를"],
+                        explain: "명사 '가수'는 받침이 없으므로 '-라면'을 붙입니다."
+                    }
+                }
+            },
+            {
+                id: 9,
+                situation: "생활 상황",
+                title: "돈이 생긴다면?",
+                choices: {
+                    A: {
+                        text: "맛있는 음식을 살래요",
+                        targetTokens: ["돈이", "생긴다면", "맛있는", "음식을", "살래요"],
+                        hintText: "돈이 생긴다.",
+                        distractors: ["생기면", "생기라면", "친구에게"],
+                        explain: "'생기다'는 받침이 없으므로 '-ㄴ다면'을 붙여 '생긴다면'으로 씁니다."
+                    },
+                    B: {
+                        text: "친구에게 선물을 줄래요",
+                        targetTokens: ["돈이", "생긴다면", "친구에게", "선물을", "줄래요"],
+                        hintText: "돈이 생긴다.",
+                        distractors: ["생기면", "생기라면", "음식을"],
+                        explain: "'생기다'는 받침이 없으므로 '-ㄴ다면'을 붙여 '생긴다면'으로 씁니다."
+                    }
+                }
+            },
+            {
+                id: 10,
+                situation: "학교 상황",
+                title: "시험이 끝난다면?",
+                choices: {
+                    A: {
+                        text: "잠을 많이 잘래요",
+                        targetTokens: ["시험이", "끝난다면", "잠을", "많이", "잘래요"],
+                        hintText: "시험이 끝난다.",
+                        distractors: ["끝나면", "끝나라면", "영화를"],
+                        explain: "'끝나다'는 받침이 없으므로 '-ㄴ다면'을 붙여 '끝난다면'으로 씁니다."
+                    },
+                    B: {
+                        text: "영화를 볼래요",
+                        targetTokens: ["시험이", "끝난다면", "영화를", "볼래요"],
+                        hintText: "시험이 끝난다.",
+                        distractors: ["끝나면", "끝나라면", "잠을"],
+                        explain: "'끝나다'는 받침이 없으므로 '-ㄴ다면'을 붙여 '끝난다면'으로 씁니다."
+                    }
+                }
+            }
+        ];
+
+        const gameState = {
+            activeRound: 1,
+            currentIdx: 0,
+            roundScore: 0,
+            score: 0,
+            activePrompt: null,
+            assembled: [],
+            history: []
+        };
+
+        const selectBoardEl = document.getElementById('selectBoard');
+        const builderBoardEl = document.getElementById('builderBoard');
+        const roundBreakBoardEl = document.getElementById('roundBreakBoard');
+        const resultBoardEl = document.getElementById('resultBoard');
+        const dilemmaTitleEl = document.getElementById('dilemmaTitle');
+        const dilemmaSituationEl = document.getElementById('dilemmaSituation');
+        const optACardEl = document.getElementById('optACard');
+        const optBCardEl = document.getElementById('optBCard');
+        const optATextEl = document.getElementById('optAText');
+        const optBTextEl = document.getElementById('optBText');
+        const selectionFeedbackEl = document.getElementById('selectionFeedback');
+        const pickedSummaryEl = document.getElementById('pickedSummary');
+        const clauseHintTextEl = document.getElementById('clauseHintText');
+        const wordPoolEl = document.getElementById('wordPool');
+        const assembledSlotsEl = document.getElementById('assembledSlots');
+        const emptyPromptEl = document.getElementById('emptyPrompt');
+        const checkBtnEl = document.getElementById('checkBtn');
+        const feedbackBoxEl = document.getElementById('feedbackBox');
+        const nextBtnEl = document.getElementById('nextBtn');
+        const progressTextEl = document.getElementById('progressText');
+        const sideProgressTextEl = document.getElementById('sideProgressText');
+        const progressBarEl = document.getElementById('progressBar');
+        const scoreValEl = document.getElementById('scoreVal');
+        const compactScoreValEl = document.getElementById('compactScoreVal');
+        const activeRoundBadgeEl = document.getElementById('activeRoundBadge');
+        const choiceSummaryEl = document.getElementById('choiceSummary');
+        const breakRoundBadgeEl = document.getElementById('breakRoundBadge');
+        const breakScoreValEl = document.getElementById('breakScoreVal');
+        const breakNextBtnEl = document.getElementById('breakNextBtn');
+        const finalScoreEl = document.getElementById('finalScore');
+
+        let selectionTransitionTimer = null;
+
+        function esc(text) {
+            return String(text == null ? '' : text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function norm(text) {
+            return String(text || '').replace(/[\s.,!?~]/g, '');
+        }
+
+        function shuffle(items) {
+            const result = items.slice();
+            for (let i = result.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const temp = result[i];
+                result[i] = result[j];
+                result[j] = temp;
+            }
+            return result;
+        }
+
+        function clearPendingTransition() {
+            if (selectionTransitionTimer) {
+                clearTimeout(selectionTransitionTimer);
+                selectionTransitionTimer = null;
+            }
+        }
+
+        function createActivePrompt(choiceKey) {
+            const dilemma = easyDilemmas[gameState.currentIdx];
+            const choice = dilemma.choices[choiceKey];
+            return {
+                questionId: dilemma.id,
+                choiceKey,
+                title: dilemma.title,
+                situation: dilemma.situation,
+                choiceText: choice.text,
+                targetTokens: choice.targetTokens.slice(),
+                hintText: choice.hintText,
+                distractors: choice.distractors.slice(),
+                explain: choice.explain
+            };
+        }
+
+        function setScore(value) {
+            scoreValEl.textContent = value;
+            compactScoreValEl.textContent = value;
+        }
+
+        function setRoundTab(roundNum) {
+            for (let i = 1; i <= 2; i++) {
+                const tab = document.getElementById(`roundTab${i}`);
+                if (tab) tab.classList.toggle('is-active', i === roundNum);
+            }
+            activeRoundBadgeEl.textContent = `${roundNum}라운드`;
+        }
+
+        function resetChoiceCards() {
+            clearPendingTransition();
+            optACardEl.classList.remove('is-selected', 'is-dimmed');
+            optBCardEl.classList.remove('is-selected', 'is-dimmed');
+            optACardEl.disabled = false;
+            optBCardEl.disabled = false;
+            selectionFeedbackEl.classList.add('hidden');
+            selectionFeedbackEl.innerHTML = '';
+        }
+
+        function updateProgress() {
+            const currentInRound = (gameState.currentIdx % 5) + 1;
+            const text = `질문 ${currentInRound} / 5`;
+            progressTextEl.textContent = text;
+            sideProgressTextEl.textContent = text;
+            progressBarEl.style.width = `${(currentInRound / 5) * 100}%`;
+        }
+
+        function showOnly(boardEl) {
+            [selectBoardEl, builderBoardEl, roundBreakBoardEl, resultBoardEl].forEach(el => {
+                el.classList.toggle('hidden', el !== boardEl);
+            });
+        }
+
+        function loadDilemma() {
+            clearPendingTransition();
+            gameState.activePrompt = null;
+            gameState.assembled = [];
+
+            if (gameState.currentIdx >= easyDilemmas.length) {
+                showFinalResults();
+                return;
+            }
+
+            const roundEndIdx = gameState.activeRound * 5;
+            if (gameState.currentIdx >= roundEndIdx) {
+                showRoundBreak();
+                return;
+            }
+
+            const dilemma = easyDilemmas[gameState.currentIdx];
+            dilemmaTitleEl.textContent = dilemma.title;
+            dilemmaSituationEl.textContent = dilemma.situation;
+            optATextEl.textContent = dilemma.choices.A.text;
+            optBTextEl.textContent = dilemma.choices.B.text;
+            resetChoiceCards();
+            updateProgress();
+            showOnly(selectBoardEl);
+        }
+
+        function selectRound(roundNum) {
+            clearPendingTransition();
+            gameState.activeRound = roundNum;
+            gameState.currentIdx = (roundNum - 1) * 5;
+            gameState.roundScore = 0;
+            gameState.activePrompt = null;
+            gameState.assembled = [];
+            gameState.history = [];
+            setScore(0);
+            setRoundTab(roundNum);
+            renderHistorySummary();
+            loadDilemma();
+        }
+
+        function goBackToRoundSelect() {
+            selectRound(gameState.activeRound);
+        }
+
+        function pickOption(choiceKey) {
+            if (selectionTransitionTimer || optACardEl.disabled || optBCardEl.disabled) return;
+
+            const prompt = createActivePrompt(choiceKey);
+            gameState.activePrompt = prompt;
+            pickedSummaryEl.textContent = prompt.choiceText;
+            clauseHintTextEl.textContent = prompt.hintText;
+
+            const selected = choiceKey === 'A' ? optACardEl : optBCardEl;
+            const other = choiceKey === 'A' ? optBCardEl : optACardEl;
+            selected.classList.add('is-selected');
+            other.classList.add('is-dimmed');
+            optACardEl.disabled = true;
+            optBCardEl.disabled = true;
+            selectionFeedbackEl.classList.remove('hidden');
+            selectionFeedbackEl.textContent = `${choiceKey} 선택을 저장했습니다. 같은 내용으로 문장을 조립합니다.`;
+
+            selectionTransitionTimer = window.setTimeout(function () {
+                selectionTransitionTimer = null;
+                showOnly(builderBoardEl);
+                initSentenceBuilder();
+                scrollPanelIntoView(builderBoardEl);
+            }, 650);
+        }
+
+        function goBackToSelect() {
+            clearPendingTransition();
+            gameState.activePrompt = null;
+            gameState.assembled = [];
+            resetChoiceCards();
+            showOnly(selectBoardEl);
+        }
+
+        function scrollPanelIntoView(panelEl) {
+            if (!panelEl || typeof panelEl.scrollIntoView !== 'function') return;
+            const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            panelEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        }
+
+        function initSentenceBuilder() {
+            const prompt = gameState.activePrompt;
+            if (!prompt) return;
+
+            gameState.assembled = [];
+            feedbackBoxEl.classList.add('hidden');
+            feedbackBoxEl.innerHTML = '';
+            feedbackBoxEl.className = 'feedback hidden';
+            nextBtnEl.classList.add('hidden');
+            checkBtnEl.disabled = false;
+            clauseHintTextEl.textContent = prompt.hintText;
+            pickedSummaryEl.textContent = prompt.choiceText;
+
+            const tokens = Array.from(new Set(prompt.targetTokens.concat(prompt.distractors)));
+            renderWordPool(shuffle(tokens));
+            renderAssembledSentence();
+        }
+
+        function renderWordPool(tokens) {
+            wordPoolEl.innerHTML = '';
+            tokens.forEach(token => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'word-chip';
+                btn.textContent = token;
+                btn.dataset.token = token;
+                btn.onclick = () => addToken(token, btn);
+                wordPoolEl.appendChild(btn);
+            });
+        }
+
+        function addToken(token, btn) {
+            if (btn.disabled) return;
+            gameState.assembled.push(token);
+            btn.disabled = true;
+            renderAssembledSentence();
+        }
+
+        function removeToken(index, token) {
+            if (!nextBtnEl.classList.contains('hidden')) return;
+
+            gameState.assembled.splice(index, 1);
+            const disabledButton = Array.from(wordPoolEl.children).find(btn => btn.dataset.token === token && btn.disabled);
+            if (disabledButton) disabledButton.disabled = false;
+            renderAssembledSentence();
+        }
+
+        function renderAssembledSentence() {
+            assembledSlotsEl.innerHTML = '';
+            emptyPromptEl.classList.toggle('hidden', gameState.assembled.length > 0);
+            gameState.assembled.forEach((token, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'word-chip assembled-chip';
+                btn.textContent = token;
+                btn.onclick = () => removeToken(index, token);
+                assembledSlotsEl.appendChild(btn);
+            });
+        }
+
+        function resetBuilder() {
+            initSentenceBuilder();
+        }
+
+        function checkAssembly() {
+            const prompt = gameState.activePrompt;
+            if (!prompt || gameState.assembled.length === 0) return;
+
+            const targets = prompt.targetTokens;
+            const isCorrectLength = gameState.assembled.length === targets.length;
+            const isCorrectSequence = isCorrectLength && targets.every((token, index) => (
+                norm(token) === norm(gameState.assembled[index])
+            ));
+            const assembledText = gameState.assembled.join(' ');
+            const correctText = targets.join(' ');
+
+            checkBtnEl.disabled = true;
+            feedbackBoxEl.classList.remove('hidden');
+            nextBtnEl.classList.remove('hidden');
+
+            if (isCorrectSequence) {
+                gameState.roundScore += 1;
+                gameState.score += 1;
+                setScore(gameState.roundScore);
+                feedbackBoxEl.className = 'feedback success';
+                feedbackBoxEl.innerHTML = `
+                    <p class="feedback-title" style="color:var(--green);">정답입니다!</p>
+                    <p><b>조립된 문장:</b> ${esc(assembledText)}</p>
+                    <p><b>문법 포인트:</b> ${esc(prompt.explain)}</p>
+                `;
+            } else {
+                feedbackBoxEl.className = 'feedback error';
+                feedbackBoxEl.innerHTML = `
+                    <p class="feedback-title" style="color:var(--rose);">오답입니다.</p>
+                    <p><b>내가 조립한 문장:</b> ${esc(assembledText || '(비어 있음)')}</p>
+                    <p><b>올바른 문장 순서:</b> <span style="color:var(--green);font-weight:900;">${esc(correctText)}</span></p>
+                    <p><b>문법 포인트:</b> ${esc(prompt.explain)}</p>
+                `;
+            }
+
+            gameState.history.push({
+                title: prompt.title,
+                choiceText: prompt.choiceText,
+                correct: isCorrectSequence
+            });
+            renderHistorySummary();
+        }
+
+        function renderHistorySummary() {
+            if (gameState.history.length === 0) {
+                choiceSummaryEl.innerHTML = '<p style="margin:0;color:#94a3b8;font-size:12px;">선택을 시작하면 여기에 기록됩니다.</p>';
+                return;
+            }
+            choiceSummaryEl.innerHTML = '';
+            gameState.history.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = 'history-item';
+                row.innerHTML = `
+                    <strong>${index + 1}. ${esc(item.title)} ${item.correct ? 'O' : 'X'}</strong>
+                    <span>선택: ${esc(item.choiceText)}</span>
+                `;
+                choiceSummaryEl.appendChild(row);
+            });
+        }
+
+        function nextDilemma() {
+            clearPendingTransition();
+            gameState.currentIdx += 1;
+            gameState.activePrompt = null;
+            gameState.assembled = [];
+            loadDilemma();
+        }
+
+        function showRoundBreak() {
+            showOnly(roundBreakBoardEl);
+            breakRoundBadgeEl.textContent = `${gameState.activeRound}라운드 완료`;
+            breakScoreValEl.textContent = gameState.roundScore;
+            breakNextBtnEl.textContent = gameState.activeRound < 2 ? '다음 라운드 계속하기' : '최종 결과 보기';
+        }
+
+        function startNextRound() {
+            if (gameState.activeRound < 2) {
+                selectRound(gameState.activeRound + 1);
+            } else {
+                showFinalResults();
+            }
+        }
+
+        function showFinalResults() {
+            clearPendingTransition();
+            showOnly(resultBoardEl);
+            finalScoreEl.textContent = gameState.score;
+            progressTextEl.textContent = '완료';
+            sideProgressTextEl.textContent = '완료';
+            progressBarEl.style.width = '100%';
+        }
+
+        function restartGame() {
+            gameState.score = 0;
+            selectRound(1);
+        }
+
+        window.__easyBalanceGameData = easyDilemmas;
+        window.__easyBalanceGame = {
+            createActivePromptForTest(index, choiceKey) {
+                const previousIdx = gameState.currentIdx;
+                gameState.currentIdx = index;
+                const prompt = createActivePrompt(choiceKey);
+                gameState.currentIdx = previousIdx;
+                return prompt;
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadDilemma();
+            if (window.lucide) window.lucide.createIcons();
+        });
+    </script>
+    <script src="../shared/learning-enhancements.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>
