@@ -120,25 +120,48 @@
                 max(12px, env(safe-area-inset-bottom))
                 max(16px, env(safe-area-inset-left));
             display: grid;
-            grid-template-rows: auto auto auto minmax(0, 1fr);
+            grid-template-rows: auto auto minmax(0, 1fr);
             gap: 12px;
             overflow: hidden;
         }
 
         .turn-hero {
+            position: fixed;
+            top: calc(46px + 10px);
+            left: max(16px, env(safe-area-inset-left), calc((100vw - 1100px) / 2 + 16px));
+            z-index: 120;
+            width: min(430px, calc(100vw - 32px));
             display: grid;
             grid-template-columns: minmax(0, 1fr);
             align-content: end;
             justify-items: start;
             gap: 4px;
-            min-height: 68px;
-            padding: 0 4px 2px;
+            min-height: 0;
+            padding: 12px 16px 13px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.74);
+            box-shadow: 0 22px 54px rgba(15, 23, 42, 0.18);
+            backdrop-filter: blur(16px);
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
             text-align: left;
+            transform: translateY(-8px) scale(0.98);
+            transition: opacity 0.22s ease, visibility 0.22s ease, transform 0.22s ease;
         }
 
         .turn-hero[data-side="right"] {
+            right: max(16px, env(safe-area-inset-right), calc((100vw - 1100px) / 2 + 16px));
+            left: auto;
             justify-items: end;
             text-align: right;
+        }
+
+        .turn-hero.is-visible {
+            opacity: 0.94;
+            visibility: visible;
+            transform: translateY(0) scale(1);
         }
 
         .turn-hero__main {
@@ -147,7 +170,7 @@
             gap: 14px;
             min-width: 0;
             color: var(--blue);
-            font-size: clamp(2.15rem, 6.4vw, 4.35rem);
+            font-size: clamp(1.72rem, 4.8vw, 3.35rem);
             line-height: 0.92;
             font-weight: 1000;
             letter-spacing: 0;
@@ -177,7 +200,7 @@
 
         .turn-hero__sub {
             color: #64748b;
-            font-size: 0.86rem;
+            font-size: 0.8rem;
             font-weight: 900;
             text-align: inherit;
             white-space: nowrap;
@@ -195,22 +218,22 @@
 
         .pair-toolbar {
             display: grid;
-            gap: 9px;
-            padding: 10px;
+            gap: 7px;
+            padding: 8px;
         }
 
         .action-hint {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 9px;
-            min-height: 36px;
-            padding: 7px 11px;
-            border-radius: 16px;
+            gap: 7px;
+            min-height: 30px;
+            padding: 6px 10px;
+            border-radius: 14px;
             background: linear-gradient(135deg, #fff7ed, #fff1f2);
             color: #9f1239;
-            font-size: 0.94rem;
-            line-height: 1.35;
+            font-size: 0.88rem;
+            line-height: 1.28;
             font-weight: 950;
             box-shadow: 0 10px 22px rgba(225, 29, 72, 0.08);
             animation: actionHintPulse 1.05s ease-in-out infinite;
@@ -250,8 +273,8 @@
             display: inline-flex;
             align-items: center;
             gap: 7px;
-            margin: 0 0 7px;
-            padding: 6px 10px;
+            margin: 0 0 5px;
+            padding: 5px 9px;
             border-radius: 999px;
             background: var(--accent-soft);
             color: var(--accent-strong);
@@ -262,16 +285,16 @@
         h1 {
             margin: 0;
             color: var(--ink);
-            font-size: clamp(1.35rem, 3vw, 2.15rem);
-            line-height: 1.18;
+            font-size: clamp(1.24rem, 2.55vw, 1.92rem);
+            line-height: 1.14;
             font-weight: 950;
         }
 
         .toolbar-copy {
-            margin: 7px 0 0;
+            margin: 5px 0 0;
             color: #475569;
-            font-size: 0.94rem;
-            line-height: 1.55;
+            font-size: 0.88rem;
+            line-height: 1.38;
             font-weight: 700;
         }
 
@@ -281,7 +304,7 @@
             justify-content: center;
             gap: 6px;
             min-width: 106px;
-            padding: 8px 11px;
+            padding: 6px 10px;
             border-radius: 999px;
             background: #f8fafc;
             border: 1px solid rgba(148, 163, 184, 0.28);
@@ -326,8 +349,8 @@
             min-width: 0;
             display: grid;
             gap: 2px;
-            padding: 7px 10px;
-            border-radius: 16px;
+            padding: 6px 9px;
+            border-radius: 14px;
             border: 1px solid rgba(148, 163, 184, 0.24);
             background: #ffffff;
         }
@@ -368,9 +391,9 @@
             align-items: center;
             justify-content: center;
             gap: 7px;
-            min-height: 44px;
-            padding: 0 12px;
-            border-radius: 14px;
+            min-height: 38px;
+            padding: 0 10px;
+            border-radius: 12px;
             border: 1px solid transparent;
             color: #334155;
             background: #ffffff;
@@ -467,7 +490,7 @@
         }
 
         .progress-track {
-            height: 10px;
+            height: 8px;
             overflow: hidden;
             border-radius: 999px;
             background: #e2e8f0;
@@ -817,34 +840,130 @@
         @media (max-width: 800px) {
             .pair-shell {
                 height: calc(100dvh - 42px);
-                padding: 10px 12px;
-                gap: 10px;
+                padding: 8px 12px;
+                gap: 8px;
             }
 
-            .toolbar-head,
             .current-head,
             .script-head {
                 align-items: flex-start;
                 flex-direction: column;
             }
 
+            .pair-toolbar {
+                gap: 5px;
+                padding: 7px;
+            }
+
+            .toolbar-head {
+                align-items: center;
+                flex-direction: row;
+                gap: 8px;
+            }
+
+            .eyebrow {
+                display: none;
+            }
+
+            h1 {
+                font-size: 1.08rem;
+                line-height: 1.08;
+            }
+
+            .toolbar-copy {
+                display: none;
+            }
+
+            .status-pill {
+                min-width: 86px;
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+
             .control-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-columns: minmax(128px, 1fr) repeat(4, 42px);
+                gap: 6px;
             }
 
             .control-grid .pair-btn--primary {
-                grid-column: 1 / -1;
-                min-height: 50px;
+                grid-column: auto;
+                min-height: 40px;
+                font-size: 14px;
+            }
+
+            #pauseBtn,
+            #prevBtn,
+            #nextBtn,
+            #resetBtn,
+            #swapSidesBtn {
+                gap: 0;
+                font-size: 0;
+            }
+
+            #pauseBtn i,
+            #prevBtn i,
+            #nextBtn i,
+            #resetBtn i,
+            #swapSidesBtn i {
                 font-size: 14px;
             }
 
             .side-row {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr);
+                gap: 6px;
+            }
+
+            .side-seat {
+                display: flex;
+                min-height: 36px;
+                align-items: center;
+                justify-content: space-between;
+                gap: 6px;
+                padding: 4px 8px;
+            }
+
+            .side-seat__label {
+                font-size: 10px;
+                letter-spacing: 0;
+            }
+
+            .side-seat__name {
+                font-size: 0.9rem;
+                line-height: 1.1;
+            }
+
+            .side-seat__note {
+                display: none;
+            }
+
+            .action-hint {
+                justify-content: flex-start;
+                min-height: 28px;
+                padding: 5px 8px;
+                font-size: 0.82rem;
+            }
+
+            .progress-row {
+                gap: 7px;
+            }
+
+            .progress-label,
+            .progress-percent {
+                font-size: 11px;
             }
 
             .turn-hero {
                 gap: 4px;
-                min-height: 54px;
+                top: calc(42px + 8px);
+                left: 12px;
+                right: auto;
+                width: calc(100vw - 24px);
+                padding: 10px 13px 11px;
+            }
+
+            .turn-hero[data-side="right"] {
+                left: auto;
+                right: 12px;
             }
 
             .live-grid {
@@ -942,13 +1061,23 @@
             }
 
             .control-grid {
-                gap: 7px;
+                grid-template-columns: minmax(124px, 1fr) repeat(4, 40px);
+                gap: 6px;
             }
 
             .pair-btn {
-                min-height: 44px;
-                padding: 0 9px;
+                min-height: 38px;
+                padding: 0 8px;
                 font-size: 12px;
+            }
+
+            .control-grid .pair-btn--primary {
+                min-height: 40px;
+                font-size: 13px;
+            }
+
+            .side-row {
+                grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
             }
         }
     </style>
@@ -966,7 +1095,7 @@
     </nav>
 
     <main class="pair-shell">
-        <div id="turnHero" class="turn-hero" data-side="left" aria-live="polite">
+        <div id="turnHero" class="turn-hero" data-side="left" aria-live="polite" aria-hidden="true">
             <div id="turnHeroMain" class="turn-hero__main">
                 <span class="turn-hero__arrow"><i class="fa-solid fa-arrow-left"></i></span>
                 <span id="turnHeroSide">왼쪽 차례</span>
@@ -979,7 +1108,6 @@
                 <div>
                     <p class="eyebrow"><i class="fa-solid fa-user-group"></i> 11과 말하기 PAIR</p>
                     <h1>회사 생활과 아르바이트 함께하기</h1>
-                    <p class="toolbar-copy safe">전체 대본을 보면서 마리코와 아키라가 번갈아 말합니다. 현재 문장이 맞게 인식되고 잠깐 쉬면 자동으로 다음 문장으로 넘어갑니다.</p>
                 </div>
                 <span id="micState" class="status-pill"><i class="fa-solid fa-microphone"></i>마이크 대기</span>
             </div>
@@ -1004,7 +1132,7 @@
 
             <div id="actionHint" class="action-hint" data-mode="prepare">
                 <i class="fa-solid fa-bolt"></i>
-                <strong>말하기 시작</strong>을 누르면 음성 인식 권한을 확인하고 바로 시작합니다.
+                말하기 시작을 누르면 바로 시작합니다.
             </div>
 
             <div class="side-row" aria-label="태블릿 좌우 역할 배정">
@@ -1201,6 +1329,7 @@
                 setMicState('음성 인식 준비 중', 'ready');
                 setFeedback('브라우저의 음성 인식 권한을 확인한 뒤 바로 대화를 시작합니다.', 0);
                 updateActionHint();
+                render();
 
                 try {
                     state.running = true;
@@ -1514,11 +1643,18 @@
                     refs.currentSide.innerHTML = side.icon + escapeHtml(side.label + ' 차례');
                     refs.currentText.textContent = line.text;
                 }
+                syncTurnHeroVisibility();
                 refs.currentScore.textContent = currentScore() ? currentScore() + '점' : (state.running ? '듣는 중' : '대기');
                 refs.prevBtn.disabled = state.current <= 0;
                 refs.nextBtn.disabled = state.current >= lines.length;
                 refs.manualDoneBtn.disabled = state.current >= lines.length;
                 renderScript();
+            }
+
+            function syncTurnHeroVisibility() {
+                const shouldShow = (state.starting || state.running) && state.current < lines.length;
+                refs.turnHero.classList.toggle('is-visible', shouldShow);
+                refs.turnHero.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
             }
 
             function renderScript() {
@@ -1594,13 +1730,13 @@
 
                 if (state.current >= lines.length) {
                     refs.actionHint.dataset.mode = 'done';
-                    refs.actionHint.innerHTML = '<i class="fa-solid fa-circle-check"></i>대화가 끝났습니다. 처음부터 다시 하려면 <strong>처음부터</strong>를 누르세요.';
+                    refs.actionHint.innerHTML = '<i class="fa-solid fa-circle-check"></i>대화가 끝났습니다.';
                     return;
                 }
 
                 if (state.starting) {
                     refs.actionHint.dataset.mode = 'prepare';
-                    refs.actionHint.innerHTML = '<i class="fa-solid fa-microphone-lines"></i>음성 인식 권한을 확인하고 있습니다.';
+                    refs.actionHint.innerHTML = '<i class="fa-solid fa-microphone-lines"></i>마이크 권한 확인 중입니다.';
                     return;
                 }
 
@@ -1618,13 +1754,13 @@
 
                 if (!state.running) {
                     refs.actionHint.dataset.mode = 'prepare';
-                    refs.actionHint.innerHTML = '<i class="fa-solid fa-bolt"></i><strong>말하기 시작</strong>을 누르면 음성 인식 권한을 확인하고 바로 시작합니다.';
+                    refs.actionHint.innerHTML = '<i class="fa-solid fa-bolt"></i>말하기 시작을 누르면 바로 시작합니다.';
                     refs.startBtn.classList.add('is-next-action');
                     return;
                 }
 
                 refs.actionHint.dataset.mode = 'running';
-                refs.actionHint.innerHTML = '<i class="fa-solid fa-ear-listen"></i>현재 차례 학생이 말하고, 문장이 끝나면 잠깐 쉬어 주세요.';
+                refs.actionHint.innerHTML = '<i class="fa-solid fa-ear-listen"></i>말하고 잠깐 쉬면 자동으로 넘어갑니다.';
             }
 
             function updateSideLabels() {
