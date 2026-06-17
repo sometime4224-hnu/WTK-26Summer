@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>11과 말하기 PAIR | 회사 생활과 아르바이트</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --bg-top: #fff7ed;
+            --bg-bottom: #eef6ff;
+            --surface: rgba(255, 255, 255, 0.94);
+            --surface-soft: rgba(255, 255, 255, 0.78);
+            --line: rgba(148, 163, 184, 0.28);
+            --ink: #0f172a;
+            --muted: #64748b;
+            --accent: #e11d48;
+            --accent-strong: #be123c;
+            --accent-soft: #fff1f2;
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+            --green: #047857;
+            --green-soft: #ecfdf5;
+            --warn: #b45309;
+            --warn-soft: #fff7ed;
+            --danger: #b91c1c;
+            --danger-soft: #fff1f2;
+            --shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+            overscroll-behavior: none;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            min-height: 100vh;
+            min-height: 100dvh;
+            color: var(--ink);
+            font-family: "Noto Sans KR", system-ui, sans-serif;
+            background:
+                radial-gradient(circle at 12% 10%, rgba(251, 113, 133, 0.18), transparent 28%),
+                radial-gradient(circle at 92% 16%, rgba(56, 189, 248, 0.18), transparent 26%),
+                linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+            overscroll-behavior: none;
+            touch-action: manipulation;
+        }
+
+        button {
+            font: inherit;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .safe {
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+
+        .pair-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 46px;
+            padding: 0 max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+            border-bottom: 1px solid rgba(225, 29, 72, 0.18);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+        }
+
+        .pair-nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--accent-strong);
+            font-size: 12px;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .pair-nav__title {
+            min-width: 0;
+            flex: 1;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 950;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pair-shell {
+            width: min(1100px, 100%);
+            height: calc(100dvh - 46px);
+            margin: 0 auto;
+            padding:
+                12px
+                max(16px, env(safe-area-inset-right))
+                max(12px, env(safe-area-inset-bottom))
+                max(16px, env(safe-area-inset-left));
+            display: grid;
+            grid-template-rows: auto auto auto minmax(0, 1fr);
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .turn-hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            align-content: end;
+            justify-items: start;
+            gap: 4px;
+            min-height: 68px;
+            padding: 0 4px 2px;
+            text-align: left;
+        }
+
+        .turn-hero[data-side="right"] {
+            justify-items: end;
+            text-align: right;
+        }
+
+        .turn-hero__main {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 14px;
+            min-width: 0;
+            color: var(--blue);
+            font-size: clamp(2.15rem, 6.4vw, 4.35rem);
+            line-height: 0.92;
+            font-weight: 1000;
+            letter-spacing: 0;
+            text-shadow: 0 12px 26px rgba(37, 99, 235, 0.16);
+            transform-origin: left center;
+            will-change: transform;
+        }
+
+        .turn-hero[data-side="right"] .turn-hero__main {
+            color: var(--accent);
+            flex-direction: row-reverse;
+            transform-origin: right center;
+            text-shadow: 0 12px 26px rgba(225, 29, 72, 0.16);
+        }
+
+        .turn-hero__speaker {
+            flex-shrink: 0;
+            color: #334155;
+            font-size: clamp(1.05rem, 2.3vw, 1.55rem);
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .turn-hero__arrow {
+            font-size: 0.72em;
+        }
+
+        .turn-hero__sub {
+            color: #64748b;
+            font-size: 0.86rem;
+            font-weight: 900;
+            text-align: inherit;
+            white-space: nowrap;
+        }
+
+        .pair-toolbar,
+        .current-panel,
+        .script-panel,
+        .summary-panel {
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+
+        .pair-toolbar {
+            display: grid;
+            gap: 9px;
+            padding: 10px;
+        }
+
+        .action-hint {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            min-height: 36px;
+            padding: 7px 11px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #fff7ed, #fff1f2);
+            color: #9f1239;
+            font-size: 0.94rem;
+            line-height: 1.35;
+            font-weight: 950;
+            box-shadow: 0 10px 22px rgba(225, 29, 72, 0.08);
+            animation: actionHintPulse 1.05s ease-in-out infinite;
+        }
+
+        .action-hint[data-mode="running"] {
+            background: linear-gradient(135deg, #eff6ff, #ecfeff);
+            color: var(--blue);
+            animation: none;
+        }
+
+        .action-hint[data-mode="done"] {
+            background: linear-gradient(135deg, #ecfdf5, #ffffff);
+            color: var(--green);
+            animation: none;
+        }
+
+        @keyframes actionHintPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 10px 22px rgba(225, 29, 72, 0.08);
+            }
+            50% {
+                transform: scale(1.015);
+                box-shadow: 0 16px 30px rgba(225, 29, 72, 0.18);
+            }
+        }
+
+        .toolbar-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin: 0 0 7px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent-strong);
+            font-size: 11px;
+            font-weight: 950;
+        }
+
+        h1 {
+            margin: 0;
+            color: var(--ink);
+            font-size: clamp(1.35rem, 3vw, 2.15rem);
+            line-height: 1.18;
+            font-weight: 950;
+        }
+
+        .toolbar-copy {
+            margin: 7px 0 0;
+            color: #475569;
+            font-size: 0.94rem;
+            line-height: 1.55;
+            font-weight: 700;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-width: 106px;
+            padding: 8px 11px;
+            border-radius: 999px;
+            background: #f8fafc;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            color: #475569;
+            font-size: 12px;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .status-pill.is-ready {
+            border-color: rgba(4, 120, 87, 0.2);
+            background: var(--green-soft);
+            color: var(--green);
+        }
+
+        .status-pill.is-running {
+            border-color: rgba(37, 99, 235, 0.2);
+            background: var(--blue-soft);
+            color: var(--blue);
+        }
+
+        .status-pill.is-warn {
+            border-color: rgba(180, 83, 9, 0.24);
+            background: var(--warn-soft);
+            color: var(--warn);
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .side-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .side-seat {
+            min-width: 0;
+            display: grid;
+            gap: 2px;
+            padding: 7px 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            background: #ffffff;
+        }
+
+        .side-seat[data-side="left"] {
+            border-color: rgba(37, 99, 235, 0.22);
+            background: var(--blue-soft);
+        }
+
+        .side-seat[data-side="right"] {
+            border-color: rgba(225, 29, 72, 0.22);
+            background: var(--accent-soft);
+        }
+
+        .side-seat__label {
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: 0.06em;
+        }
+
+        .side-seat__name {
+            color: #0f172a;
+            font-size: 1rem;
+            line-height: 1.2;
+            font-weight: 950;
+        }
+
+        .side-seat__note {
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .pair-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 44px;
+            padding: 0 12px;
+            border-radius: 14px;
+            border: 1px solid transparent;
+            color: #334155;
+            background: #ffffff;
+            cursor: pointer;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 950;
+            transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+        }
+
+        .pair-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            border-color: rgba(148, 163, 184, 0.36);
+        }
+
+        .pair-btn:disabled {
+            opacity: 0.48;
+            cursor: not-allowed;
+        }
+
+        .pair-btn--primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            color: #ffffff;
+        }
+
+        .pair-btn--blue {
+            background: var(--blue-soft);
+            border-color: rgba(37, 99, 235, 0.18);
+            color: var(--blue);
+        }
+
+        .pair-btn--green {
+            background: var(--green-soft);
+            border-color: rgba(4, 120, 87, 0.18);
+            color: var(--green);
+        }
+
+        .pair-btn--warn {
+            background: var(--warn-soft);
+            border-color: rgba(180, 83, 9, 0.18);
+            color: var(--warn);
+        }
+
+        .pair-btn.is-next-action {
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 0 5px rgba(225, 29, 72, 0.14), 0 14px 28px rgba(225, 29, 72, 0.18);
+            animation: nextActionPulse 0.9s ease-in-out infinite;
+        }
+
+        .pair-btn.is-next-action::after {
+            content: "";
+            position: absolute;
+            inset: -7px;
+            z-index: -1;
+            border-radius: 19px;
+            border: 2px solid rgba(225, 29, 72, 0.32);
+            animation: nextActionRing 0.9s ease-out infinite;
+        }
+
+        @keyframes nextActionPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 5px rgba(225, 29, 72, 0.14), 0 14px 28px rgba(225, 29, 72, 0.18);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(225, 29, 72, 0.2), 0 18px 34px rgba(225, 29, 72, 0.28);
+            }
+        }
+
+        @keyframes nextActionRing {
+            0% {
+                transform: scale(0.96);
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        .progress-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-label,
+        .progress-percent {
+            color: #475569;
+            font-size: 12px;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .progress-track {
+            height: 10px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        .progress-fill {
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--accent), #38bdf8);
+            transition: width 0.22s ease;
+        }
+
+        .current-panel {
+            display: grid;
+            gap: 9px;
+            padding: 12px;
+            min-height: 0;
+        }
+
+        .current-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .speaker-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 11px;
+            border-radius: 999px;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--blue), #0ea5e9);
+            font-size: 13px;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .speaker-chip[data-speaker="아키라"] {
+            background: linear-gradient(135deg, var(--accent), #fb7185);
+        }
+
+        .turn-stack {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .side-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 13px;
+            border-radius: 999px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 950;
+            white-space: nowrap;
+            box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+        }
+
+        .side-chip[data-side="left"] {
+            background: linear-gradient(135deg, var(--blue), #0ea5e9);
+        }
+
+        .side-chip[data-side="right"] {
+            background: linear-gradient(135deg, var(--accent), #fb7185);
+        }
+
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 74px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 950;
+        }
+
+        .current-text {
+            margin: 0;
+            padding: 12px;
+            border-radius: 18px;
+            border: 2px solid rgba(225, 29, 72, 0.26);
+            background: linear-gradient(135deg, #fff1f2, #ffffff);
+            color: #111827;
+            font-size: clamp(1.16rem, 2.8vw, 1.78rem);
+            line-height: 1.55;
+            font-weight: 950;
+        }
+
+        .live-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 220px;
+            gap: 10px;
+        }
+
+        .live-box {
+            min-height: 58px;
+            padding: 10px;
+            border-radius: 16px;
+            border: 1px dashed rgba(148, 163, 184, 0.42);
+            background: #ffffff;
+        }
+
+        .live-label {
+            margin: 0 0 7px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+
+        .live-text {
+            margin: 0;
+            color: #334155;
+            font-size: 0.95rem;
+            line-height: 1.55;
+            font-weight: 750;
+        }
+
+        .meter {
+            display: grid;
+            align-content: center;
+            gap: 6px;
+            padding: 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            background: #f8fafc;
+        }
+
+        .meter-bar {
+            height: 12px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        .meter-fill {
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #f97316, #22c55e);
+            transition: width 0.18s ease;
+        }
+
+        .script-panel {
+            min-height: 0;
+            padding: 11px;
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr);
+            overflow: hidden;
+        }
+
+        .script-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .script-title {
+            margin: 0;
+            color: #0f172a;
+            font-size: 1.05rem;
+            font-weight: 950;
+        }
+
+        .script-list {
+            display: grid;
+            gap: 8px;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 2px 4px 2px 0;
+            scroll-behavior: smooth;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .script-line {
+            display: grid;
+            grid-template-columns: 70px minmax(0, 1fr) auto;
+            align-items: start;
+            gap: 10px;
+            padding: 11px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            background: #ffffff;
+            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .script-line.is-current {
+            border-color: rgba(225, 29, 72, 0.48);
+            background: linear-gradient(135deg, #fff1f2, #ffffff);
+            box-shadow: 0 10px 24px rgba(225, 29, 72, 0.08);
+        }
+
+        .script-line.is-done {
+            border-color: rgba(4, 120, 87, 0.2);
+            background: var(--green-soft);
+        }
+
+        .script-line.is-retry {
+            border-color: rgba(180, 83, 9, 0.3);
+            background: var(--warn-soft);
+        }
+
+        .line-speaker {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 2px;
+            min-height: 30px;
+            padding: 0 9px;
+            border-radius: 999px;
+            background: var(--blue-soft);
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .script-line[data-speaker="아키라"] .line-speaker {
+            background: var(--accent-soft);
+            color: var(--accent-strong);
+        }
+
+        .line-side {
+            display: block;
+            font-size: 10px;
+            line-height: 1;
+            opacity: 0.78;
+        }
+
+        .line-text {
+            margin: 0;
+            color: #1f2937;
+            font-size: 0.96rem;
+            line-height: 1.58;
+            font-weight: 760;
+        }
+
+        .line-content {
+            min-width: 0;
+            display: grid;
+            gap: 7px;
+        }
+
+        .line-heard {
+            margin: 0;
+            padding: 7px 9px;
+            border-radius: 12px;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            font-weight: 800;
+        }
+
+        .line-heard strong {
+            color: #0f172a;
+            font-weight: 950;
+        }
+
+        .script-line.is-current .line-heard {
+            background: #ffffff;
+            color: #334155;
+        }
+
+        .script-line.is-current .line-text {
+            color: #111827;
+            font-size: 1.05rem;
+            font-weight: 950;
+        }
+
+        .line-state {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 58px;
+            padding: 6px 8px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .script-line.is-current .line-state {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .script-line.is-done .line-state {
+            background: var(--green);
+            color: #ffffff;
+        }
+
+        .script-line.is-retry .line-state {
+            background: var(--warn);
+            color: #ffffff;
+        }
+
+        .summary-panel {
+            display: none;
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 70;
+            width: min(420px, calc(100% - 32px));
+            padding: 16px;
+            text-align: center;
+        }
+
+        .summary-panel.is-visible {
+            display: block;
+        }
+
+        .summary-panel h2 {
+            margin: 0 0 8px;
+            color: #0f172a;
+            font-size: 1.4rem;
+            font-weight: 950;
+        }
+
+        .summary-panel p {
+            margin: 0;
+            color: #475569;
+            font-weight: 750;
+            line-height: 1.6;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 800px) {
+            .pair-shell {
+                height: calc(100dvh - 42px);
+                padding: 10px 12px;
+                gap: 10px;
+            }
+
+            .toolbar-head,
+            .current-head,
+            .script-head {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .control-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .control-grid .pair-btn--primary {
+                grid-column: 1 / -1;
+                min-height: 50px;
+                font-size: 14px;
+            }
+
+            .side-row {
+                grid-template-columns: 1fr;
+            }
+
+            .turn-hero {
+                gap: 4px;
+                min-height: 54px;
+            }
+
+            .live-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .script-line {
+                grid-template-columns: 58px minmax(0, 1fr);
+            }
+
+            .line-state {
+                grid-column: 2;
+                justify-self: start;
+            }
+        }
+
+        @media (min-width: 860px) {
+            .pair-toolbar {
+                grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.45fr);
+                grid-template-areas:
+                    "head controls"
+                    "head sides"
+                    "hint hint"
+                    "progress progress";
+                align-items: center;
+                row-gap: 9px;
+            }
+
+            .toolbar-head {
+                grid-area: head;
+            }
+
+            .control-grid {
+                grid-area: controls;
+            }
+
+            .side-row {
+                grid-area: sides;
+            }
+
+            .action-hint {
+                grid-area: hint;
+            }
+
+            .progress-row {
+                grid-area: progress;
+            }
+
+            .toolbar-copy {
+                font-size: 0.86rem;
+                line-height: 1.42;
+            }
+
+            .current-panel {
+                grid-template-columns: minmax(0, 1.08fr) minmax(310px, 0.92fr);
+                grid-template-areas:
+                    "turn live"
+                    "text live";
+                align-items: stretch;
+            }
+
+            .current-head {
+                grid-area: turn;
+            }
+
+            .current-text {
+                grid-area: text;
+                align-self: stretch;
+                display: flex;
+                align-items: center;
+            }
+
+            .live-grid {
+                grid-area: live;
+                grid-template-columns: 1fr;
+                align-content: stretch;
+            }
+
+            .live-box,
+            .meter {
+                min-height: 0;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .pair-nav {
+                min-height: 42px;
+                padding: 0 8px;
+            }
+
+            .pair-toolbar,
+            .current-panel,
+            .script-panel {
+                border-radius: 18px;
+            }
+
+            .control-grid {
+                gap: 7px;
+            }
+
+            .pair-btn {
+                min-height: 44px;
+                padding: 0 9px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="pair-nav" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i>메인</a>
+        <a href="index.html"><i class="fa-solid fa-list"></i>11과</a>
+        <span class="pair-nav__title">말하기 PAIR</span>
+    </nav>
+
+    <main class="pair-shell">
+        <div id="turnHero" class="turn-hero" data-side="left" aria-live="polite">
+            <div id="turnHeroMain" class="turn-hero__main">
+                <span class="turn-hero__arrow"><i class="fa-solid fa-arrow-left"></i></span>
+                <span id="turnHeroSide">왼쪽 차례</span>
+            </div>
+            <div id="turnHeroSpeaker" class="turn-hero__sub">마리코가 말해요</div>
+        </div>
+
+        <section class="pair-toolbar" aria-label="친구와 함께하기 제어">
+            <div class="toolbar-head">
+                <div>
+                    <p class="eyebrow"><i class="fa-solid fa-user-group"></i> 11과 말하기 PAIR</p>
+                    <h1>회사 생활과 아르바이트 함께하기</h1>
+                    <p class="toolbar-copy safe">전체 대본을 보면서 마리코와 아키라가 번갈아 말합니다. 현재 문장이 맞게 인식되고 잠깐 쉬면 자동으로 다음 문장으로 넘어갑니다.</p>
+                </div>
+                <span id="micState" class="status-pill"><i class="fa-solid fa-microphone"></i>마이크 대기</span>
+            </div>
+
+            <div class="control-grid">
+                <button id="startBtn" class="pair-btn pair-btn--primary" type="button">
+                    <i class="fa-solid fa-play"></i>말하기 시작
+                </button>
+                <button id="pauseBtn" class="pair-btn pair-btn--warn" type="button" disabled>
+                    <i class="fa-solid fa-pause"></i>일시정지
+                </button>
+                <button id="prevBtn" class="pair-btn" type="button">
+                    <i class="fa-solid fa-arrow-left"></i>이전
+                </button>
+                <button id="nextBtn" class="pair-btn pair-btn--blue" type="button">
+                    다음<i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <button id="resetBtn" class="pair-btn" type="button">
+                    <i class="fa-solid fa-rotate-right"></i>처음부터
+                </button>
+            </div>
+
+            <div id="actionHint" class="action-hint" data-mode="prepare">
+                <i class="fa-solid fa-bolt"></i>
+                <strong>말하기 시작</strong>을 누르면 음성 인식 권한을 확인하고 바로 시작합니다.
+            </div>
+
+            <div class="side-row" aria-label="태블릿 좌우 역할 배정">
+                <div class="side-seat" data-side="left">
+                    <span class="side-seat__label">왼쪽</span>
+                    <strong id="leftSpeakerName" class="side-seat__name">마리코</strong>
+                    <span class="side-seat__note">태블릿 왼쪽</span>
+                </div>
+                <button id="swapSidesBtn" class="pair-btn pair-btn--blue" type="button">
+                    <i class="fa-solid fa-right-left"></i>좌우 바꾸기
+                </button>
+                <div class="side-seat" data-side="right">
+                    <span class="side-seat__label">오른쪽</span>
+                    <strong id="rightSpeakerName" class="side-seat__name">아키라</strong>
+                    <span class="side-seat__note">태블릿 오른쪽</span>
+                </div>
+            </div>
+
+            <div class="progress-row" aria-label="진행률">
+                <span id="progressLabel" class="progress-label">1 / 10</span>
+                <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+                <span id="progressPercent" class="progress-percent">0%</span>
+            </div>
+        </section>
+
+        <section class="current-panel" aria-label="현재 말할 문장">
+            <div class="current-head">
+                <div class="turn-stack">
+                    <span id="currentSide" class="side-chip" data-side="left">
+                        <i class="fa-solid fa-arrow-left"></i>왼쪽 차례
+                    </span>
+                    <span id="currentSpeaker" class="speaker-chip" data-speaker="마리코">
+                        <i class="fa-solid fa-comment-dots"></i>마리코
+                    </span>
+                </div>
+                <span id="currentScore" class="score-pill">대기</span>
+            </div>
+            <p id="currentText" class="current-text safe"></p>
+            <div class="live-grid">
+                <div class="live-box">
+                    <p class="live-label">실시간 인식</p>
+                    <p id="liveTranscript" class="live-text safe">말하기 시작을 누르면 음성 인식 권한을 요청합니다.</p>
+                </div>
+                <div class="meter">
+                    <p class="live-label">자동 판정 점수</p>
+                    <div class="meter-bar"><div id="scoreFill" class="meter-fill"></div></div>
+                    <p id="feedbackText" class="live-text safe">현재 문장과 인식 문장을 비교합니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="script-panel" aria-label="전체 대본">
+            <div class="script-head">
+                <h2 class="script-title">전체 대본</h2>
+                <button id="manualDoneBtn" class="pair-btn pair-btn--green" type="button">
+                    <i class="fa-solid fa-check"></i>현재 문장 완료
+                </button>
+            </div>
+            <div id="scriptList" class="script-list"></div>
+        </section>
+
+        <section id="summaryPanel" class="summary-panel" aria-label="완료 결과">
+            <h2>대화 완료</h2>
+            <p id="summaryText" class="safe">두 사람이 11과 말하기 대본을 끝까지 연습했습니다.</p>
+        </section>
+    </main>
+
+    <script>
+        (() => {
+            const lines = [
+                { id: 'c11-pair-01', speaker: '마리코', text: '아키라 씨, 요즘 회사 생활 어때요?' },
+                { id: 'c11-pair-02', speaker: '아키라', text: '보고서 준비 때문에 바쁘지만 동료들이 도와줘서 괜찮아요.' },
+                { id: 'c11-pair-03', speaker: '마리코', text: '그렇군요. 저도 한국에서 일해 보고 싶은데 일자리가 있을까요?' },
+                { id: 'c11-pair-04', speaker: '아키라', text: '어떤 일을 하고 싶은데요?' },
+                { id: 'c11-pair-05', speaker: '마리코', text: '만약 일하게 된다면 학교 다니면서 할 수 있는 아르바이트가 좋을 것 같아요.' },
+                { id: 'c11-pair-06', speaker: '아키라', text: '그럼 일본어 번역을 해 보는 건 어때요? 마침 우리 회사에서 서류 번역할 사람을 구하고 있어요.' },
+                { id: 'c11-pair-07', speaker: '마리코', text: '정말요? 그런데 제가 잘할 수 있을까요?' },
+                { id: 'c11-pair-08', speaker: '아키라', text: '그럼요. 마리코 씨는 무슨 일이든지 성실하게 하잖아요.' },
+                { id: 'c11-pair-09', speaker: '마리코', text: '그런데 근무 시간이 어떻게 돼요?' },
+                { id: 'c11-pair-10', speaker: '아키라', text: '출퇴근 시간이 자유로워요. 원하는 시간에 언제든지 일할 수 있어요.' }
+            ];
+
+            const RecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const canUseSpeech = !!RecognitionClass;
+            const silenceMs = 1050;
+            const speakers = Array.from(new Set(lines.map((line) => line.speaker)));
+
+            const refs = {
+                micState: document.getElementById('micState'),
+                startBtn: document.getElementById('startBtn'),
+                pauseBtn: document.getElementById('pauseBtn'),
+                prevBtn: document.getElementById('prevBtn'),
+                nextBtn: document.getElementById('nextBtn'),
+                resetBtn: document.getElementById('resetBtn'),
+                manualDoneBtn: document.getElementById('manualDoneBtn'),
+                swapSidesBtn: document.getElementById('swapSidesBtn'),
+                leftSpeakerName: document.getElementById('leftSpeakerName'),
+                rightSpeakerName: document.getElementById('rightSpeakerName'),
+                actionHint: document.getElementById('actionHint'),
+                progressLabel: document.getElementById('progressLabel'),
+                progressFill: document.getElementById('progressFill'),
+                progressPercent: document.getElementById('progressPercent'),
+                turnHero: document.getElementById('turnHero'),
+                turnHeroMain: document.getElementById('turnHeroMain'),
+                turnHeroSide: document.getElementById('turnHeroSide'),
+                turnHeroSpeaker: document.getElementById('turnHeroSpeaker'),
+                currentSide: document.getElementById('currentSide'),
+                currentSpeaker: document.getElementById('currentSpeaker'),
+                currentText: document.getElementById('currentText'),
+                currentScore: document.getElementById('currentScore'),
+                liveTranscript: document.getElementById('liveTranscript'),
+                feedbackText: document.getElementById('feedbackText'),
+                scoreFill: document.getElementById('scoreFill'),
+                scriptList: document.getElementById('scriptList'),
+                summaryPanel: document.getElementById('summaryPanel'),
+                summaryText: document.getElementById('summaryText')
+            };
+
+            const state = {
+                current: 0,
+                running: false,
+                starting: false,
+                recognition: null,
+                recognitionSerial: 0,
+                restartTimer: 0,
+                finalParts: [],
+                finalPartKeys: [],
+                ignoreResultsUntil: 0,
+                finalText: '',
+                interimText: '',
+                lastResultAt: 0,
+                lastEvaluatedText: '',
+                silenceTimer: 0,
+                leftSpeaker: lines[0].speaker,
+                rightSpeaker: speakers.find((speaker) => speaker !== lines[0].speaker) || '',
+                statuses: lines.map(() => 'waiting'),
+                scores: lines.map(() => null),
+                heard: lines.map(() => '')
+            };
+
+            init();
+
+            function init() {
+                bindEvents();
+                render();
+                if (!RecognitionClass) {
+                    setMicState('음성 인식 미지원', 'warn');
+                    refs.startBtn.disabled = true;
+                    refs.liveTranscript.textContent = '이 브라우저는 자동 음성 인식을 지원하지 않습니다. 수동 다음 버튼으로 프로토타입 흐름을 확인할 수 있어요.';
+                }
+                if (!canUseSpeech) {
+                    refs.startBtn.disabled = true;
+                    refs.liveTranscript.textContent = '이 환경에서는 자동 음성 인식을 시작할 수 없습니다. localhost 또는 HTTPS에서 열어 주세요.';
+                }
+                window.addEventListener('beforeunload', cleanup);
+            }
+
+            function bindEvents() {
+                refs.startBtn.addEventListener('click', startConversation);
+                refs.pauseBtn.addEventListener('click', pauseConversation);
+                refs.prevBtn.addEventListener('click', previousLine);
+                refs.nextBtn.addEventListener('click', nextLineManual);
+                refs.resetBtn.addEventListener('click', resetConversation);
+                refs.manualDoneBtn.addEventListener('click', completeCurrentManually);
+                refs.swapSidesBtn.addEventListener('click', swapSides);
+            }
+
+            function swapSides() {
+                const nextLeft = state.rightSpeaker;
+                state.rightSpeaker = state.leftSpeaker;
+                state.leftSpeaker = nextLeft;
+                render();
+            }
+
+            async function startConversation() {
+                if (state.running || state.starting) {
+                    return;
+                }
+                if (!RecognitionClass) {
+                    setFeedback('이 브라우저는 자동 음성 인식을 지원하지 않습니다.', 0);
+                    return;
+                }
+                if (!canUseSpeech) {
+                    setFeedback('자동 음성 인식을 시작할 수 없는 환경입니다. localhost 또는 HTTPS에서 열어 주세요.', 0);
+                    return;
+                }
+                if (state.current >= lines.length) {
+                    return;
+                }
+
+                state.starting = true;
+                refs.startBtn.disabled = true;
+                refs.pauseBtn.disabled = true;
+                setMicState('음성 인식 준비 중', 'ready');
+                setFeedback('브라우저의 음성 인식 권한을 확인한 뒤 바로 대화를 시작합니다.', 0);
+                updateActionHint();
+
+                try {
+                    state.running = true;
+                    clearLineCapture();
+                    if (!startRecognition()) {
+                        throw new Error('speech recognition start failed');
+                    }
+                    refs.pauseBtn.disabled = false;
+                    setMicState('듣는 중', 'running');
+                    setFeedback('현재 문장을 말하고 잠깐 쉬면 자동으로 다음 문장을 판단합니다.', 0);
+                } catch (error) {
+                    state.running = false;
+                    refs.startBtn.disabled = !RecognitionClass || !canUseSpeech || state.current >= lines.length;
+                    refs.pauseBtn.disabled = true;
+                    setMicState('권한 필요', 'warn');
+                    setFeedback('음성 인식을 시작하지 못했습니다. 권한을 허용한 뒤 말하기 시작을 다시 눌러 주세요.', 0);
+                    console.error(error);
+                } finally {
+                    state.starting = false;
+                    if (state.running) {
+                        refs.startBtn.disabled = true;
+                    }
+                    render();
+                }
+            }
+
+            function pauseConversation() {
+                state.running = false;
+                refs.startBtn.disabled = !RecognitionClass || !canUseSpeech || state.current >= lines.length;
+                refs.pauseBtn.disabled = true;
+                stopRecognition();
+                setMicState('일시정지', 'ready');
+                setFeedback('일시정지했습니다. 이어 하려면 말하기 시작을 누르세요.', currentScore());
+                render();
+            }
+
+            function startRecognition() {
+                if (!RecognitionClass || !state.running) {
+                    return false;
+                }
+                if (state.recognition) {
+                    return true;
+                }
+
+                window.clearTimeout(state.restartTimer);
+                state.restartTimer = 0;
+                state.recognitionSerial += 1;
+                const serial = state.recognitionSerial;
+                const recognition = new RecognitionClass();
+                recognition.lang = 'ko-KR';
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.maxAlternatives = 1;
+
+                recognition.onresult = function (event) {
+                    if (serial !== state.recognitionSerial) {
+                        return;
+                    }
+                    handleSpeechResult(event);
+                };
+                recognition.onerror = function (event) {
+                    if (serial !== state.recognitionSerial) {
+                        return;
+                    }
+                    if (event.error === 'aborted') {
+                        return;
+                    }
+                    if (event.error === 'no-speech') {
+                        setFeedback('소리가 잘 감지되지 않았어요. 현재 문장을 조금 더 또렷하게 말해 보세요.', currentScore());
+                        return;
+                    }
+                    setFeedback('음성 인식이 잠시 불안정합니다. 계속 말하거나 수동 다음을 사용할 수 있어요.', currentScore());
+                    console.error(event);
+                };
+                recognition.onend = function () {
+                    if (serial !== state.recognitionSerial) {
+                        return;
+                    }
+                    state.recognition = null;
+                    if (state.running && state.current < lines.length) {
+                        state.restartTimer = window.setTimeout(function () {
+                            state.restartTimer = 0;
+                            if (serial === state.recognitionSerial && state.running && state.current < lines.length) {
+                                startRecognition();
+                            }
+                        }, 180);
+                    }
+                };
+
+                state.recognition = recognition;
+                try {
+                    recognition.start();
+                    return true;
+                } catch (error) {
+                    console.error(error);
+                    state.recognition = null;
+                    setFeedback('음성 인식을 시작하지 못했습니다. 잠시 후 다시 시작해 주세요.', 0);
+                    return false;
+                }
+            }
+
+            function stopRecognition() {
+                window.clearTimeout(state.silenceTimer);
+                window.clearTimeout(state.restartTimer);
+                state.restartTimer = 0;
+                state.recognitionSerial += 1;
+                if (!state.recognition) {
+                    return;
+                }
+                const recognition = state.recognition;
+                state.recognition = null;
+                try {
+                    recognition.onresult = null;
+                    recognition.onerror = null;
+                    recognition.onend = null;
+                    recognition.stop();
+                } catch (error) {
+                    try {
+                        recognition.abort();
+                    } catch (abortError) {
+                        console.error(abortError);
+                    }
+                }
+            }
+
+            function handleSpeechResult(event) {
+                if (!state.running || state.current >= lines.length) {
+                    return;
+                }
+
+                let interim = '';
+                let finalChunk = '';
+                let hasNewFinal = false;
+                if (Date.now() < state.ignoreResultsUntil) {
+                    return;
+                }
+
+                for (let index = Math.max(event.resultIndex || 0, 0); index < event.results.length; index += 1) {
+                    const phrase = String(event.results[index][0].transcript || '').trim();
+                    if (!phrase) {
+                        continue;
+                    }
+                    if (event.results[index].isFinal) {
+                        const key = normalize(phrase);
+                        if (key && !state.finalPartKeys.includes(key)) {
+                            state.finalPartKeys.push(key);
+                            state.finalParts.push(phrase);
+                            hasNewFinal = true;
+                        }
+                    } else {
+                        interim += ' ' + phrase;
+                    }
+                }
+
+                if (!hasNewFinal && !interim.trim()) {
+                    return;
+                }
+
+                state.finalText = state.finalParts.join(' ').trim();
+                state.interimText = interim.trim();
+                state.lastResultAt = Date.now();
+                updateLiveTranscript();
+                scheduleSilenceCheck();
+            }
+
+            function scheduleSilenceCheck() {
+                window.clearTimeout(state.silenceTimer);
+                state.silenceTimer = window.setTimeout(function () {
+                    if (!state.running || Date.now() - state.lastResultAt < silenceMs - 80) {
+                        return;
+                    }
+                    evaluateCurrentBySilence();
+                }, silenceMs);
+            }
+
+            function evaluateCurrentBySilence() {
+                const spoken = currentTranscript();
+                if (!spoken || spoken === state.lastEvaluatedText) {
+                    return;
+                }
+
+                state.lastEvaluatedText = spoken;
+                const target = lines[state.current].text;
+                const score = scoreSentence(target, spoken);
+                state.heard[state.current] = spoken;
+                refs.currentScore.textContent = score + '점';
+                refs.scoreFill.style.width = score + '%';
+
+                if (score >= passThreshold(target)) {
+                    completeCurrent(score, spoken);
+                    return;
+                }
+
+                state.statuses[state.current] = 'retry';
+                setFeedback('조금 부족해요. 같은 문장을 한 번 더 말해 보세요.', score);
+                renderScript();
+                const retryIndex = state.current;
+                window.setTimeout(function () {
+                    if (state.running && state.current === retryIndex && state.statuses[retryIndex] === 'retry') {
+                        state.statuses[retryIndex] = 'waiting';
+                        clearLineCapture({ ignoreStale: true });
+                        renderScript();
+                    }
+                }, 950);
+            }
+
+            function completeCurrent(score, spoken) {
+                const completedIndex = state.current;
+                state.statuses[completedIndex] = 'done';
+                state.scores[completedIndex] = score;
+                state.heard[completedIndex] = spoken;
+                setFeedback('좋아요. 다음 문장으로 넘어갑니다.', score);
+                state.current = completedIndex + 1;
+                clearLineCapture({ ignoreStale: true });
+
+                if (state.current >= lines.length) {
+                    finishConversation();
+                    return;
+                }
+
+                render();
+                scrollCurrentLine();
+            }
+
+            function completeCurrentManually() {
+                if (state.current >= lines.length) {
+                    return;
+                }
+                completeCurrent(Math.max(currentScore(), 80), currentTranscript() || '(수동 완료)');
+            }
+
+            function nextLineManual() {
+                if (state.current >= lines.length) {
+                    return;
+                }
+                state.statuses[state.current] = state.statuses[state.current] === 'done' ? 'done' : 'waiting';
+                state.current = Math.min(lines.length, state.current + 1);
+                clearLineCapture({ ignoreStale: true });
+                if (state.current >= lines.length) {
+                    finishConversation();
+                    return;
+                }
+                setFeedback('다음 문장으로 이동했습니다.', 0);
+                render();
+                scrollCurrentLine();
+            }
+
+            function previousLine() {
+                if (state.current <= 0) {
+                    return;
+                }
+                state.current -= 1;
+                state.statuses[state.current] = 'waiting';
+                state.scores[state.current] = null;
+                state.heard[state.current] = '';
+                clearLineCapture({ ignoreStale: true });
+                setFeedback('이전 문장으로 돌아왔습니다.', 0);
+                render();
+                scrollCurrentLine();
+            }
+
+            function finishConversation() {
+                state.running = false;
+                refs.startBtn.disabled = true;
+                refs.pauseBtn.disabled = true;
+                stopRecognition();
+                setMicState('완료', 'ready');
+                const completed = state.statuses.filter((status) => status === 'done').length;
+                const validScores = state.scores.filter((score) => typeof score === 'number');
+                const avg = validScores.length
+                    ? Math.round(validScores.reduce((sum, score) => sum + score, 0) / validScores.length)
+                    : 0;
+                refs.summaryPanel.classList.add('is-visible');
+                refs.summaryText.textContent = completed + '개 문장을 완료했습니다. 자동 판정 평균은 ' + (avg || '-') + '점입니다.';
+                setFeedback('대화를 끝까지 마쳤습니다.', avg);
+                render();
+            }
+
+            function resetConversation() {
+                state.running = false;
+                state.current = 0;
+                state.statuses = lines.map(() => 'waiting');
+                state.scores = lines.map(() => null);
+                state.heard = lines.map(() => '');
+                clearLineCapture();
+                stopRecognition();
+                refs.summaryPanel.classList.remove('is-visible');
+                refs.startBtn.disabled = !RecognitionClass || !canUseSpeech;
+                refs.pauseBtn.disabled = true;
+                setMicState('음성 인식 대기', 'ready');
+                setFeedback('처음 문장으로 돌아왔습니다.', 0);
+                render();
+            }
+
+            function render() {
+                const line = lines[Math.min(state.current, lines.length - 1)];
+                const doneCount = state.statuses.filter((status) => status === 'done').length;
+                const progress = Math.round((doneCount / lines.length) * 100);
+                refs.progressLabel.textContent = Math.min(state.current + 1, lines.length) + ' / ' + lines.length;
+                refs.progressFill.style.width = progress + '%';
+                refs.progressPercent.textContent = progress + '%';
+                updateSideLabels();
+                updateActionHint();
+
+                if (line) {
+                    const side = sideForSpeaker(line.speaker);
+                    updateTurnHero(line, side);
+                    refs.currentSpeaker.dataset.speaker = line.speaker;
+                    refs.currentSpeaker.innerHTML = '<i class="fa-solid fa-comment-dots"></i>' + escapeHtml(line.speaker);
+                    refs.currentSide.dataset.side = side.id;
+                    refs.currentSide.innerHTML = side.icon + escapeHtml(side.label + ' 차례');
+                    refs.currentText.textContent = line.text;
+                }
+                refs.currentScore.textContent = currentScore() ? currentScore() + '점' : (state.running ? '듣는 중' : '대기');
+                refs.prevBtn.disabled = state.current <= 0;
+                refs.nextBtn.disabled = state.current >= lines.length;
+                refs.manualDoneBtn.disabled = state.current >= lines.length;
+                renderScript();
+            }
+
+            function renderScript() {
+                refs.scriptList.innerHTML = lines.map(function (line, index) {
+                    const side = sideForSpeaker(line.speaker);
+                    const isCurrent = index === state.current && state.current < lines.length;
+                    const status = state.statuses[index];
+                    const score = state.scores[index];
+                    const heard = isCurrent ? currentTranscript() : state.heard[index];
+                    const heardLabel = isCurrent ? '말하는 중' : '내 발음';
+                    const heardMarkup = heard
+                        ? '<p class="line-heard safe"><strong>' + escapeHtml(heardLabel) + ':</strong> ' + escapeHtml(heard) + '</p>'
+                        : '';
+                    const stateText = isCurrent
+                        ? '현재'
+                        : (status === 'done' ? (score ? score + '점' : '완료') : (status === 'retry' ? '다시' : '대기'));
+                    const classes = [
+                        'script-line',
+                        isCurrent ? 'is-current' : '',
+                        status === 'done' ? 'is-done' : '',
+                        status === 'retry' ? 'is-retry' : ''
+                    ].filter(Boolean).join(' ');
+                    return [
+                        '<div class="' + classes + '" data-line-index="' + index + '" data-speaker="' + escapeHtml(line.speaker) + '">',
+                        '  <span class="line-speaker"><span class="line-side">' + escapeHtml(side.label) + '</span>' + escapeHtml(line.speaker) + '</span>',
+                        '  <div class="line-content">',
+                        '    <p class="line-text safe">' + escapeHtml(line.text) + '</p>',
+                        heardMarkup,
+                        '  </div>',
+                        '  <span class="line-state">' + escapeHtml(stateText) + '</span>',
+                        '</div>'
+                    ].join('');
+                }).join('');
+            }
+
+            function updateTurnHero(line, side) {
+                const previousSide = refs.turnHero.dataset.side;
+                const beforeRect = refs.turnHeroMain.getBoundingClientRect();
+                refs.turnHero.dataset.side = side.id;
+                refs.turnHeroSide.textContent = side.label + ' 차례';
+                refs.turnHeroMain.querySelector('.turn-hero__arrow').innerHTML = side.icon;
+                refs.turnHeroSpeaker.textContent = line.speaker + '이 말해요';
+
+                if (
+                    previousSide &&
+                    previousSide !== side.id &&
+                    typeof refs.turnHeroMain.animate === 'function' &&
+                    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                ) {
+                    const afterRect = refs.turnHeroMain.getBoundingClientRect();
+                    const deltaX = beforeRect.left - afterRect.left;
+                    const deltaY = beforeRect.top - afterRect.top;
+                    refs.turnHeroMain.animate([
+                        { opacity: 0.55, transform: 'translate(' + deltaX + 'px, ' + deltaY + 'px) scale(0.96)' },
+                        { opacity: 1, transform: 'translate(0, 0) scale(1.045)', offset: 0.72 },
+                        { opacity: 1, transform: 'translate(0, 0) scale(1)' }
+                    ], {
+                        duration: 420,
+                        easing: 'cubic-bezier(0.2, 0.85, 0.2, 1)'
+                    });
+                    refs.turnHeroSpeaker.animate([
+                        { opacity: 0.4, transform: 'translateX(' + Math.round(deltaX * 0.35) + 'px)' },
+                        { opacity: 1, transform: 'translateX(0)' }
+                    ], {
+                        duration: 320,
+                        easing: 'ease-out'
+                    });
+                }
+            }
+
+            function updateActionHint() {
+                refs.startBtn.classList.remove('is-next-action');
+
+                if (state.current >= lines.length) {
+                    refs.actionHint.dataset.mode = 'done';
+                    refs.actionHint.innerHTML = '<i class="fa-solid fa-circle-check"></i>대화가 끝났습니다. 처음부터 다시 하려면 <strong>처음부터</strong>를 누르세요.';
+                    return;
+                }
+
+                if (state.starting) {
+                    refs.actionHint.dataset.mode = 'prepare';
+                    refs.actionHint.innerHTML = '<i class="fa-solid fa-microphone-lines"></i>음성 인식 권한을 확인하고 있습니다.';
+                    return;
+                }
+
+                if (!RecognitionClass) {
+                    refs.actionHint.dataset.mode = 'prepare';
+                    refs.actionHint.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>이 브라우저는 자동 음성 인식을 지원하지 않습니다.';
+                    return;
+                }
+
+                if (!canUseSpeech) {
+                    refs.actionHint.dataset.mode = 'prepare';
+                    refs.actionHint.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>음성 인식은 localhost 또는 HTTPS에서 사용할 수 있습니다.';
+                    return;
+                }
+
+                if (!state.running) {
+                    refs.actionHint.dataset.mode = 'prepare';
+                    refs.actionHint.innerHTML = '<i class="fa-solid fa-bolt"></i><strong>말하기 시작</strong>을 누르면 음성 인식 권한을 확인하고 바로 시작합니다.';
+                    refs.startBtn.classList.add('is-next-action');
+                    return;
+                }
+
+                refs.actionHint.dataset.mode = 'running';
+                refs.actionHint.innerHTML = '<i class="fa-solid fa-ear-listen"></i>현재 차례 학생이 말하고, 문장이 끝나면 잠깐 쉬어 주세요.';
+            }
+
+            function updateSideLabels() {
+                refs.leftSpeakerName.textContent = state.leftSpeaker || '-';
+                refs.rightSpeakerName.textContent = state.rightSpeaker || '-';
+            }
+
+            function sideForSpeaker(speaker) {
+                if (speaker === state.leftSpeaker) {
+                    return {
+                        id: 'left',
+                        label: '왼쪽',
+                        icon: '<i class="fa-solid fa-arrow-left"></i>'
+                    };
+                }
+                return {
+                    id: 'right',
+                    label: '오른쪽',
+                    icon: '<i class="fa-solid fa-arrow-right"></i>'
+                };
+            }
+
+            function updateLiveTranscript() {
+                const spoken = currentTranscript();
+                const score = scoreSentence(lines[state.current].text, spoken);
+                refs.liveTranscript.textContent = spoken || '듣고 있습니다...';
+                refs.currentScore.textContent = score ? score + '점' : '듣는 중';
+                refs.scoreFill.style.width = score + '%';
+                refs.feedbackText.textContent = score >= passThreshold(lines[state.current].text)
+                    ? '좋아요. 잠깐 쉬면 다음 문장으로 넘어갑니다.'
+                    : '문장을 끝까지 말한 뒤 잠깐 쉬어 주세요.';
+                renderScript();
+            }
+
+            function clearLineCapture(options) {
+                const opts = options || {};
+                window.clearTimeout(state.silenceTimer);
+                state.ignoreResultsUntil = opts.ignoreStale ? Date.now() + 220 : 0;
+                state.finalParts = [];
+                state.finalPartKeys = [];
+                state.finalText = '';
+                state.interimText = '';
+                state.lastEvaluatedText = '';
+                state.lastResultAt = 0;
+                refs.liveTranscript.textContent = state.running ? '듣고 있습니다...' : '말하기 시작을 누르면 음성 인식 권한을 요청합니다.';
+                refs.scoreFill.style.width = '0%';
+                refs.currentScore.textContent = state.running ? '듣는 중' : '대기';
+            }
+
+            function setFeedback(message, score) {
+                refs.feedbackText.textContent = message;
+                refs.scoreFill.style.width = Math.max(0, Math.min(score || 0, 100)) + '%';
+            }
+
+            function setMicState(text, tone) {
+                refs.micState.classList.remove('is-ready', 'is-running', 'is-warn');
+                if (tone === 'ready') {
+                    refs.micState.classList.add('is-ready');
+                }
+                if (tone === 'running') {
+                    refs.micState.classList.add('is-running');
+                }
+                if (tone === 'warn') {
+                    refs.micState.classList.add('is-warn');
+                }
+                refs.micState.innerHTML = '<i class="fa-solid fa-microphone"></i>' + escapeHtml(text);
+            }
+
+            function currentTranscript() {
+                return (state.finalText + ' ' + state.interimText).trim();
+            }
+
+            function currentScore() {
+                const spoken = currentTranscript();
+                if (!spoken || state.current >= lines.length) {
+                    return 0;
+                }
+                return scoreSentence(lines[state.current].text, spoken);
+            }
+
+            function passThreshold(target) {
+                return normalize(target).length <= 8 ? 62 : 74;
+            }
+
+            function scoreSentence(target, spoken) {
+                const reference = normalize(target);
+                const heard = normalize(spoken);
+                if (!reference || !heard) {
+                    return 0;
+                }
+                if (heard.includes(reference)) {
+                    return 100;
+                }
+
+                const candidates = [heard];
+                if (heard.length > reference.length) {
+                    candidates.push(heard.slice(-reference.length));
+                    candidates.push(heard.slice(-Math.ceil(reference.length * 1.5)));
+                }
+
+                return candidates.reduce(function (best, candidate) {
+                    if (!candidate) {
+                        return best;
+                    }
+                    const distance = levenshtein(reference, candidate);
+                    const score = Math.max(0, Math.round((1 - distance / Math.max(reference.length, candidate.length, 1)) * 100));
+                    return Math.max(best, score);
+                }, 0);
+            }
+
+            function levenshtein(left, right) {
+                const rows = left.length + 1;
+                const cols = right.length + 1;
+                const dp = Array.from({ length: rows }, () => Array(cols).fill(0));
+                for (let row = 0; row < rows; row += 1) {
+                    dp[row][0] = row;
+                }
+                for (let col = 0; col < cols; col += 1) {
+                    dp[0][col] = col;
+                }
+                for (let row = 1; row < rows; row += 1) {
+                    for (let col = 1; col < cols; col += 1) {
+                        const cost = left[row - 1] === right[col - 1] ? 0 : 1;
+                        dp[row][col] = Math.min(
+                            dp[row - 1][col] + 1,
+                            dp[row][col - 1] + 1,
+                            dp[row - 1][col - 1] + cost
+                        );
+                    }
+                }
+                return dp[left.length][right.length];
+            }
+
+            function normalize(text) {
+                return String(text || '')
+                    .toLowerCase()
+                    .replace(/\s+/g, '')
+                    .replace(/[.,!?~"'“”‘’·:;()[\]{}]/g, '');
+            }
+
+            function scrollCurrentLine() {
+                window.setTimeout(function () {
+                    const current = document.querySelector('.script-line.is-current');
+                    if (current && refs.scriptList) {
+                        const currentRect = current.getBoundingClientRect();
+                        const listRect = refs.scriptList.getBoundingClientRect();
+                        const delta = currentRect.top - listRect.top - ((listRect.height - currentRect.height) / 2);
+                        if (Math.abs(delta) < 12) {
+                            return;
+                        }
+                        refs.scriptList.scrollTo({
+                            top: Math.max(0, refs.scriptList.scrollTop + delta),
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 80);
+            }
+
+            function cleanup() {
+                state.running = false;
+                stopRecognition();
+            }
+
+            function escapeHtml(text) {
+                return String(text == null ? '' : text)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+        })();
+    </script>
+</body>
+</html>
