@@ -45,6 +45,9 @@ On first automatic scroll, a phone-sized viewport should show:
   3. recording
   4. result
   5. summary
+- Prioritize speech-recognition evaluation over recorded-audio playback.
+- Do not open `getUserMedia`/`MediaRecorder` before `SpeechRecognition` when automatic evaluation is available; mobile browsers can fail to deliver recognition results if another recorder holds the microphone.
+- Recorded-audio replay is optional. If it conflicts with automatic evaluation, omit replay and let Web Speech use the microphone directly.
 - Use visual guidance only for learner focus.
 - Do not add a text-based "current step guide" card unless explicitly requested.
 - Use highlight, pulse, wave, and auto-scroll cues to guide attention.

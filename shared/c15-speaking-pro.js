@@ -11,6 +11,7 @@
         navigator.mediaDevices.getUserMedia &&
         window.MediaRecorder
     );
+    const recognitionOnlyMode = hasRecognition;
     const storageKey = config.storageKey || 'c15-speaking-pro-v1';
     const originalItems = Array.isArray(config.items) ? config.items.slice() : [];
     const speakerChoices = (config.speakerSelect && Array.isArray(config.speakerSelect.choices))
@@ -143,7 +144,7 @@
             refs.browserWarn.classList.toggle('hidden', hasRecognition);
         }
         if (refs.httpsWarn) {
-            refs.httpsWarn.classList.toggle('hidden', isSecureContextOrLocalhost() && canRecord);
+            refs.httpsWarn.classList.toggle('hidden', isSecureContextOrLocalhost() && (recognitionOnlyMode || canRecord));
         }
     }
 
@@ -575,8 +576,8 @@
     }
 
     async function startRecording() {
-        if (!canRecord) {
-            updateStatus('이 환경에서는 마이크 녹음이 제한됩니다. HTTPS 또는 최신 Chrome에서 다시 시도해 보세요.', false);
+        if (!hasRecognition && !canRecord) {
+            updateStatus('이 환경에서는 음성 인식이 제한됩니다. HTTPS 또는 최신 Chrome에서 다시 시도해 보세요.', false);
             return;
         }
 
@@ -587,13 +588,16 @@
         try {
             state.isStartingRecording = true;
             updateRecordButton(false, true);
-            updateStatus(
-                hasLiveMicrophone()
-                    ? '마이크 입력을 확인하고 있어요.'
-                    : '마이크 권한을 확인하고 있어요. 허용하면 바로 녹음이 시작됩니다.',
-                false
-            );
-            state.mediaStream = await ensureMediaStream();
+            updateStatus('음성 인식을 준비하고 있어요. 허용하면 바로 평가가 시작됩니다.', false);
+            if (!recognitionOnlyMode) {
+                updateStatus(
+                    hasLiveMicrophone()
+                        ? '마이크 입력을 확인하고 있어요.'
+                        : '마이크 권한을 확인하고 있어요. 허용하면 바로 녹음이 시작됩니다.',
+                    false
+                );
+                state.mediaStream = await ensureMediaStream();
+            }
         } catch (error) {
             state.isStartingRecording = false;
             updateRecordButton(false, false);
@@ -607,6 +611,20 @@
         state.recordingItemId = getCurrentItem() ? getCurrentItem().id : '';
         state.liveTranscript = '';
         state.finalTranscript = '';
+
+        if (recognitionOnlyMode) {
+            if (!startRecognition()) {
+                state.isStartingRecording = false;
+                updateRecordButton(false);
+                return;
+            }
+            state.isRecording = true;
+            updateRecordButton(true);
+            updateTranscript('듣고 있습니다. 문장을 끝까지 또박또박 말해 보세요.');
+            updateStatus('음성 인식 중이에요. 문장을 끝까지 말한 뒤 정지를 눌러 평가하세요.', true);
+            focusGuideStage('recording');
+            return;
+        }
 
         try {
             const mimeType = chooseMimeType();
@@ -672,7 +690,7 @@
 
     function startRecognition() {
         if (!hasRecognition) {
-            return;
+            return false;
         }
 
         state.recognition = new RecognitionClass();
@@ -711,8 +729,12 @@
 
         try {
             state.recognition.start();
+            return true;
         } catch (error) {
             console.error(error);
+            updateStatus('음성 인식을 시작하지 못했어요. 브라우저 권한을 확인한 뒤 다시 시도해 주세요.', false);
+            state.recognition = null;
+            return false;
         }
     }
 
@@ -974,7 +996,9 @@
         stopRecognition();
         if (state.mediaRecorder && state.mediaRecorder.state !== 'inactive') {
             try {
-                state.mediaRecorder.stop();
+                if (!recognitionOnlyMode) {
+                    state.mediaRecorder.stop();
+                }
             } catch (error) {
                 console.error(error);
             }
