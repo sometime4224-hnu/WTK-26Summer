@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>11과 문법 1 보조 | 사동 문장 만들기 흐름</title>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --ink: #122033;
+            --muted: #64748b;
+            --line: #d9e2ee;
+            --panel: #ffffff;
+            --soft: #f8fafc;
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+            --green: #0f766e;
+            --green-soft: #ecfdf5;
+            --orange: #ea580c;
+            --orange-soft: #fff7ed;
+            --shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--ink);
+            background:
+                linear-gradient(180deg, #ffffff 0%, #f6f8fb 48%, #eef6ff 100%);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif;
+        }
+
+        button { font: inherit; }
+
+        .global-nav {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 54px;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+        }
+
+        .global-nav a {
+            color: #334155;
+            font-size: 14px;
+            font-weight: 850;
+            text-decoration: none;
+        }
+
+        .nav-divider {
+            color: #cbd5e1;
+            font-weight: 900;
+        }
+
+        .page {
+            width: min(1320px, calc(100% - 28px));
+            margin: 0 auto;
+            padding: 16px 0 42px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: end;
+            margin-bottom: 12px;
+        }
+
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--green);
+            font-size: 12px;
+            font-weight: 950;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        p {
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+
+        h1 {
+            margin: 0;
+            color: #0f172a;
+            font-size: clamp(1.6rem, 3vw, 2.55rem);
+            line-height: 1.12;
+            letter-spacing: 0;
+        }
+
+        .lead {
+            margin: 8px 0 0;
+            max-width: 760px;
+            color: #475569;
+            font-size: 0.98rem;
+            font-weight: 780;
+            line-height: 1.55;
+        }
+
+        .counter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 98px;
+            min-height: 46px;
+            padding: 8px 12px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            background: var(--blue-soft);
+            color: #1d4ed8;
+            font-size: 1.05rem;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .viewer {
+            display: grid;
+            grid-template-columns: 300px minmax(0, 1fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .rail,
+        .stage {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: var(--shadow);
+        }
+
+        .rail {
+            position: sticky;
+            top: 70px;
+            padding: 12px;
+        }
+
+        .rail-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 0 2px 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .rail-head h2 {
+            margin: 0;
+            color: #0f172a;
+            font-size: 0.98rem;
+            font-weight: 950;
+        }
+
+        .thumb-list {
+            display: grid;
+            gap: 8px;
+            max-height: calc(100vh - 172px);
+            margin-top: 10px;
+            overflow: auto;
+            padding-right: 2px;
+        }
+
+        .thumb-button {
+            display: grid;
+            grid-template-columns: 76px minmax(0, 1fr);
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 74px;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #1f2937;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+        }
+
+        .thumb-button:hover,
+        .thumb-button:focus-visible {
+            border-color: #93c5fd;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.13);
+            outline: none;
+        }
+
+        .thumb-button[aria-current="true"] {
+            border-color: var(--blue);
+            background: var(--blue-soft);
+            transform: translateY(-1px);
+        }
+
+        .thumb-button img {
+            display: block;
+            width: 76px;
+            aspect-ratio: 1491 / 1055;
+            border: 1px solid #dbeafe;
+            border-radius: 6px;
+            object-fit: cover;
+            background: #eff6ff;
+        }
+
+        .thumb-copy {
+            min-width: 0;
+        }
+
+        .thumb-copy strong {
+            display: block;
+            color: #0f172a;
+            font-size: 0.86rem;
+            font-weight: 950;
+            line-height: 1.28;
+        }
+
+        .thumb-copy span {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.74rem;
+            font-weight: 850;
+            line-height: 1.3;
+        }
+
+        .stage {
+            overflow: hidden;
+        }
+
+        .stage-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
+            min-height: 80px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            background: linear-gradient(90deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .stage-title {
+            min-width: 0;
+        }
+
+        .stage-title h2 {
+            margin: 0;
+            color: #0f172a;
+            font-size: clamp(1.2rem, 2vw, 1.65rem);
+            font-weight: 950;
+            line-height: 1.25;
+        }
+
+        .stage-title p {
+            margin: 6px 0 0;
+            color: #475569;
+            font-size: 0.95rem;
+            font-weight: 760;
+            line-height: 1.45;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-width: 92px;
+            min-height: 42px;
+            padding: 8px 12px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            background: var(--blue);
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 0.94rem;
+            font-weight: 950;
+        }
+
+        .control-btn.secondary {
+            background: #ffffff;
+            color: #1d4ed8;
+        }
+
+        .control-btn:disabled {
+            opacity: 0.44;
+            cursor: default;
+        }
+
+        .control-btn:focus-visible {
+            outline: 3px solid rgba(37, 99, 235, 0.24);
+            outline-offset: 2px;
+        }
+
+        .image-wrap {
+            position: relative;
+            padding: 12px;
+            background: #f8fafc;
+        }
+
+        .slide-image {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1491 / 1055;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            object-fit: contain;
+            background: #ffffff;
+            box-shadow: 0 12px 26px rgba(15, 23, 42, 0.06);
+        }
+
+        .loading {
+            display: grid;
+            place-items: center;
+            min-height: 420px;
+            color: #475569;
+            font-weight: 900;
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            right: 24px;
+            bottom: 24px;
+            z-index: 6;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 8px 14px;
+            border: 1px solid rgba(15, 23, 42, 0.16);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.92);
+            color: #0f172a;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+            cursor: pointer;
+            font-size: 0.92rem;
+            font-weight: 950;
+            backdrop-filter: blur(8px);
+        }
+
+        .fullscreen-btn:focus-visible {
+            outline: 3px solid rgba(37, 99, 235, 0.28);
+            outline-offset: 2px;
+        }
+
+        .screen-tap-zone {
+            display: none;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            z-index: 4;
+            width: 50%;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .screen-tap-zone--prev { left: 0; }
+        .screen-tap-zone--next { right: 0; }
+
+        .image-wrap.is-fullscreen,
+        .image-wrap:fullscreen {
+            display: grid;
+            place-items: center;
+            width: 100vw;
+            height: 100vh;
+            padding: 0;
+            background: #020617;
+        }
+
+        .image-wrap.is-fullscreen .slide-image,
+        .image-wrap:fullscreen .slide-image {
+            width: 100vw;
+            height: 100vh;
+            aspect-ratio: auto;
+            border: 0;
+            border-radius: 0;
+            object-fit: contain;
+            background: #020617;
+            box-shadow: none;
+        }
+
+        .image-wrap.is-fullscreen .loading,
+        .image-wrap:fullscreen .loading {
+            position: absolute;
+            inset: 0;
+            min-height: 0;
+            color: #e2e8f0;
+            background: #020617;
+        }
+
+        .image-wrap.is-fullscreen .screen-tap-zone,
+        .image-wrap:fullscreen .screen-tap-zone {
+            display: block;
+        }
+
+        .image-wrap.is-fullscreen .screen-tap-zone:focus-visible,
+        .image-wrap:fullscreen .screen-tap-zone:focus-visible {
+            outline: 3px solid rgba(255, 255, 255, 0.5);
+            outline-offset: -8px;
+        }
+
+        .image-wrap.is-fullscreen .screen-tap-zone--prev:hover,
+        .image-wrap:fullscreen .screen-tap-zone--prev:hover {
+            background: linear-gradient(90deg, rgba(37, 99, 235, 0.16), transparent);
+        }
+
+        .image-wrap.is-fullscreen .screen-tap-zone--next:hover,
+        .image-wrap:fullscreen .screen-tap-zone--next:hover {
+            background: linear-gradient(270deg, rgba(37, 99, 235, 0.16), transparent);
+        }
+
+        .image-wrap.is-fullscreen .fullscreen-btn,
+        .image-wrap:fullscreen .fullscreen-btn {
+            right: 18px;
+            bottom: 18px;
+            border-color: rgba(255, 255, 255, 0.22);
+            background: rgba(15, 23, 42, 0.74);
+            color: #ffffff;
+        }
+
+        .image-wrap:fullscreen::backdrop {
+            background: #020617;
+        }
+
+        @media (max-width: 980px) {
+            .hero,
+            .viewer,
+            .stage-head {
+                grid-template-columns: 1fr;
+            }
+
+            .counter {
+                justify-self: start;
+            }
+
+            .rail {
+                position: static;
+            }
+
+            .thumb-list {
+                display: flex;
+                max-height: none;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding-bottom: 4px;
+            }
+
+            .thumb-button {
+                flex: 0 0 230px;
+                grid-template-columns: 68px minmax(0, 1fr);
+            }
+
+            .thumb-button img {
+                width: 68px;
+            }
+
+            .controls {
+                justify-content: stretch;
+            }
+
+            .control-btn {
+                flex: 1 1 0;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .global-nav {
+                align-items: flex-start;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 8px 12px;
+            }
+
+            .page {
+                width: min(100% - 20px, 1320px);
+                padding-top: 12px;
+            }
+
+            .lead {
+                font-size: 0.92rem;
+            }
+
+            .stage-head {
+                padding: 12px;
+            }
+
+            .image-wrap {
+                padding: 8px;
+            }
+
+            .thumb-button {
+                flex-basis: 206px;
+                min-height: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="global-nav" aria-label="상단 이동">
+        <a href="../index.html">전체 홈</a>
+        <span class="nav-divider">|</span>
+        <a href="index.html">11과 홈</a>
+        <span class="nav-divider">|</span>
+        <a href="grammar1.html">문법 1</a>
+        <span class="nav-divider">|</span>
+        <a href="grammar1-causative-slot-game.html">문장 자리 맞추기</a>
+    </nav>
+
+    <main class="page">
+        <section class="hero" aria-labelledby="pageTitle">
+            <div>
+                <p class="eyebrow">Causative Sentence Flow</p>
+                <h1 id="pageTitle">사동 문장 만들기 흐름</h1>
+                <p class="lead">B 기본 문장부터 A가 들어오는 사동 문장까지, 문장 자리가 어떻게 늘고 바뀌는지 순서대로 확인합니다.</p>
+            </div>
+            <div class="counter" id="stepCounter" aria-live="polite">1 / 8</div>
+        </section>
+
+        <div class="viewer">
+            <aside class="rail" aria-labelledby="slideListTitle">
+                <div class="rail-head">
+                    <h2 id="slideListTitle">학습 순서</h2>
+                </div>
+                <div class="thumb-list" id="thumbList"></div>
+            </aside>
+
+            <section class="stage" aria-labelledby="slideTitle">
+                <div class="stage-head">
+                    <div class="stage-title">
+                        <h2 id="slideTitle">자료를 불러오는 중입니다.</h2>
+                        <p id="slideSummary">잠시만 기다려 주세요.</p>
+                    </div>
+                    <div class="controls" aria-label="슬라이드 이동">
+                        <button class="control-btn secondary" id="prevBtn" type="button" aria-label="이전 단계">&larr; 이전</button>
+                        <button class="control-btn" id="nextBtn" type="button" aria-label="다음 단계">다음 &rarr;</button>
+                    </div>
+                </div>
+                <div class="image-wrap" id="imageWrap">
+                    <button class="screen-tap-zone screen-tap-zone--prev" id="fullscreenPrevZone" type="button" aria-label="이전 단계로 이동"></button>
+                    <button class="screen-tap-zone screen-tap-zone--next" id="fullscreenNextZone" type="button" aria-label="다음 단계로 이동"></button>
+                    <img
+                        class="slide-image"
+                        id="slideImage"
+                        alt=""
+                        width="1491"
+                        height="1055"
+                        decoding="async"
+                        hidden
+                    />
+                    <div class="loading" id="loadingText">이미지 준비 중</div>
+                    <button class="fullscreen-btn" id="fullscreenBtn" type="button" aria-label="전체화면 보기">전체화면</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const ASSET_BASE = "../assets/c11/grammar/images/causative-sentence-flow/";
+        const manifestUrl = ASSET_BASE + "manifest.json";
+
+        const refs = {
+            counter: document.getElementById("stepCounter"),
+            thumbList: document.getElementById("thumbList"),
+            title: document.getElementById("slideTitle"),
+            summary: document.getElementById("slideSummary"),
+            imageWrap: document.getElementById("imageWrap"),
+            image: document.getElementById("slideImage"),
+            loading: document.getElementById("loadingText"),
+            prev: document.getElementById("prevBtn"),
+            next: document.getElementById("nextBtn"),
+            fullscreen: document.getElementById("fullscreenBtn"),
+            prevZone: document.getElementById("fullscreenPrevZone"),
+            nextZone: document.getElementById("fullscreenNextZone"),
+        };
+
+        const FALLBACK_SLIDES = [
+            {
+                order: 1,
+                title: "B만 있어도 되는 말",
+                summary: "사람이나 동물 하나만 있어도 완성되는 기본 문장을 확인합니다.",
+                slide: "slides/01-b-only-sentence.webp",
+                thumb: "thumbs/01-b-only-sentence.webp",
+                slideWidth: 1491,
+                slideHeight: 1055,
+                thumbWidth: 360,
+                thumbHeight: 255
+            },
+            {
+                order: 2,
+                title: "B가 C를 하는 말",
+                summary: "사람과 대상이 함께 있어야 자연스러운 문장을 확인합니다.",
+                slide: "slides/02-b-c-action-sentence.webp",
+                thumb: "thumbs/02-b-c-action-sentence.webp",
+                slideWidth: 1491,
+                slideHeight: 1055,
+                thumbWidth: 360,
+                thumbHeight: 255
+            },
+            {
+                order: 3,
+                title: "이 행동에는 무엇이 필요해요?",
+                summary: "B만 있는 문장과 B+C 문장을 비교하고 A 도입을 준비합니다.",
+                slide: "slides/03-sentence-shape-check.webp",
+                thumb: "thumbs/03-sentence-shape-check.webp",
+                slideWidth: 1491,
+                slideHeight: 1055,
+                thumbWidth: 360,
+                thumbHeight: 255
+            },
+            {
+                order: 4,
+                title: "A가 들어오면 이렇게 바뀌어요",
+                summary: "B만 있던 문장에 A가 들어오면 B가 B를로 바뀌는 흐름을 봅니다.",
+                slide: "slides/04-add-a-to-b-only.webp",
+                thumb: "thumbs/04-add-a-to-b-only.webp",
+                slideWidth: 1491,
+                slideHeight: 1055,
+                thumbWidth: 360,
+                thumbHeight: 255
+            },
+            {
+                order: 5,
+                title: "모양 1: A가 B를 하게 해요",
+                summary: "B가 행동하던 문장이 A가 B를 하게 하는 문장으로 바뀝니다.",
+                slide: "slides/05-pattern-a-makes-b.webp",
+                thumb: "thumbs/05-pattern-a-makes-b.webp",
+                slideWidth: 1491,
+                slideHeight: 1055,
+                thumbWidth: 360,
+                thumbHeight: 255
+            },
+            {
+                order: 6,
+                title: "B와 C가 있는 문장에 A가 들어와요",
+                summary: "B가 C를 하던 문장에 A가 들어올 때의 변화를 확인합니다.",
+                slide: "slides/06-add-a-to-b-c.webp",
+                thumb: "thumbs/06-add-a-to-b-c.webp",
+                slideWidth: 1491,
+                slideHeight: 1055,
+                thumbWidth: 360,
+                thumbHeight: 255
+            },
+            {
+                order: 7,
+                title: "모양 2: A가 B에게 C를 하게 해요",
+                summary: "B가 C를 하던 문장이 A가 B에게 C를 하게 하는 문장으로 바뀝니다.",
+                slide: "slides/07-pattern-a-makes-b-do-c.webp",
+                thumb: "thumbs/07-pattern-a-makes-b-do-c.webp",
+                slideWidth: 1491,
+                slideHeight: 1055,
+                thumbWidth: 360,
+                thumbHeight: 255
+            },
+            {
+                order: 8,
+                title: "두 모양을 비교해요",
+                summary: "A가 들어올 때 생기는 두 가지 문장 모양을 나란히 정리합니다.",
+                slide: "slides/08-two-patterns-comparison.webp",
+                thumb: "thumbs/08-two-patterns-comparison.webp",
+                slideWidth: 1491,
+                slideHeight: 1055,
+                thumbWidth: 360,
+                thumbHeight: 255
+            }
+        ];
+
+        let slides = [];
+        let index = 0;
+        let fallbackFullscreen = false;
+
+        function esc(value) {
+            return String(value || "").replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[char]));
+        }
+
+        function slideAlt(slide) {
+            return "11과 문법1 사동 문장 만들기 흐름 " + slide.order + "단계: " + slide.title;
+        }
+
+        function renderThumbs() {
+            refs.thumbList.innerHTML = slides.map((slide, slideIndex) => (
+                '<button class="thumb-button" type="button" data-index="' + slideIndex + '" aria-current="' + (slideIndex === index ? "true" : "false") + '">' +
+                    '<img src="' + ASSET_BASE + esc(slide.thumb) + '" alt="" width="' + slide.thumbWidth + '" height="' + slide.thumbHeight + '" loading="lazy" decoding="async" />' +
+                    '<span class="thumb-copy">' +
+                        '<strong>' + slide.order + ". " + esc(slide.title) + '</strong>' +
+                        '<span>' + esc(slide.summary) + '</span>' +
+                    '</span>' +
+                '</button>'
+            )).join("");
+
+            refs.thumbList.querySelectorAll(".thumb-button").forEach((button) => {
+                button.addEventListener("click", () => {
+                    showSlide(Number(button.dataset.index));
+                });
+            });
+        }
+
+        function syncThumbState() {
+            refs.thumbList.querySelectorAll(".thumb-button").forEach((button) => {
+                const active = Number(button.dataset.index) === index;
+                button.setAttribute("aria-current", active ? "true" : "false");
+                if (active) {
+                    button.scrollIntoView({ block: "nearest", inline: "nearest" });
+                }
+            });
+        }
+
+        function showSlide(nextIndex) {
+            if (!slides.length) return;
+            index = Math.max(0, Math.min(slides.length - 1, nextIndex));
+            const slide = slides[index];
+
+            refs.counter.textContent = slide.order + " / " + slides.length;
+            refs.title.textContent = slide.title;
+            refs.summary.textContent = slide.summary;
+            const slideSrc = ASSET_BASE + slide.slide;
+            if (refs.image.getAttribute("src") === slideSrc && refs.image.complete) {
+                refs.loading.hidden = true;
+                refs.image.hidden = false;
+            } else {
+                refs.image.hidden = true;
+                refs.loading.hidden = false;
+                refs.image.src = slideSrc;
+            }
+            refs.image.alt = slideAlt(slide);
+            refs.image.width = slide.slideWidth;
+            refs.image.height = slide.slideHeight;
+            refs.prev.disabled = index === 0;
+            refs.next.disabled = index === slides.length - 1;
+            refs.prevZone.disabled = index === 0;
+            refs.nextZone.disabled = index === slides.length - 1;
+            syncThumbState();
+        }
+
+        function isFullscreenActive() {
+            return document.fullscreenElement === refs.imageWrap || fallbackFullscreen;
+        }
+
+        function syncFullscreenState() {
+            const active = isFullscreenActive();
+            refs.imageWrap.classList.toggle("is-fullscreen", active);
+            refs.fullscreen.textContent = active ? "나가기" : "전체화면";
+            refs.fullscreen.setAttribute("aria-label", active ? "전체화면 취소" : "전체화면 보기");
+        }
+
+        function enterFallbackFullscreen() {
+            fallbackFullscreen = true;
+            syncFullscreenState();
+        }
+
+        function exitFallbackFullscreen() {
+            fallbackFullscreen = false;
+            syncFullscreenState();
+        }
+
+        function toggleFullscreen() {
+            if (document.fullscreenElement === refs.imageWrap) {
+                document.exitFullscreen().catch(exitFallbackFullscreen);
+                return;
+            }
+
+            if (fallbackFullscreen) {
+                exitFallbackFullscreen();
+                return;
+            }
+
+            if (refs.imageWrap.requestFullscreen) {
+                refs.imageWrap.requestFullscreen().catch(enterFallbackFullscreen);
+                return;
+            }
+
+            enterFallbackFullscreen();
+        }
+
+        refs.image.addEventListener("load", () => {
+            refs.loading.hidden = true;
+            refs.image.hidden = false;
+        });
+
+        refs.prev.addEventListener("click", () => showSlide(index - 1));
+        refs.next.addEventListener("click", () => showSlide(index + 1));
+        refs.prevZone.addEventListener("click", () => showSlide(index - 1));
+        refs.nextZone.addEventListener("click", () => showSlide(index + 1));
+        refs.fullscreen.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleFullscreen();
+        });
+        document.addEventListener("fullscreenchange", () => {
+            fallbackFullscreen = false;
+            syncFullscreenState();
+        });
+        document.addEventListener("keydown", (event) => {
+            if (!isFullscreenActive()) return;
+            if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                showSlide(index - 1);
+            }
+            if (event.key === "ArrowRight") {
+                event.preventDefault();
+                showSlide(index + 1);
+            }
+            if (event.key === "Escape" && fallbackFullscreen) {
+                event.preventDefault();
+                exitFallbackFullscreen();
+            }
+        });
+
+        function loadSlides(nextSlides, nextIndex = index) {
+            slides = nextSlides;
+            renderThumbs();
+            showSlide(nextIndex);
+        }
+
+        loadSlides(FALLBACK_SLIDES, 0);
+
+        fetch(manifestUrl)
+            .then((response) => {
+                if (!response.ok) throw new Error("manifest load failed");
+                return response.json();
+            })
+            .then((manifest) => {
+                if (Array.isArray(manifest.items) && manifest.items.length) {
+                    loadSlides(manifest.items, index);
+                }
+            })
+            .catch(() => {
+                loadSlides(FALLBACK_SLIDES, index);
+            });
+    </script>
+</body>
+</html>
