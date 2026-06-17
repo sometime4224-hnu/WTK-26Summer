@@ -699,6 +699,15 @@ let micStream = null;
 let audioContext = null;
 let analyserNode = null;
 let vizAnimId = null;
+let sttFinalTranscript = '';
+let sttInterimTranscript = '';
+let sttAnalysisQueued = false;
+let sttAnalyzeTimer = null;
+let sttManualStop = false;
+let sttRestartCount = 0;
+let sttSessionId = 0;
+let sttLastError = '';
+const STT_MAX_RESTARTS = 5;
 
 // ─── localStorage 학습 기록 ──────────────────────────────────────────────────
 const LS_KEY = 'speak_c11_pro_v1';
@@ -962,7 +971,7 @@ function renderRecordPanel(d) {
         </div>
         <p id="recStatus" class="text-xs text-center mb-4">
             <span class="text-slate-400">준비 완료</span>
-            <span class="assist-guide block">마이크 버튼을 누르면 녹음이 시작됩니다.</span>
+            <span class="assist-guide block">마이크 버튼을 누르면 음성 인식 평가가 시작됩니다.</span>
         </p>
 
         <!-- 마이크 버튼 -->
@@ -1014,163 +1023,245 @@ function setDots(s) {
 
 // ─── STT ────────────────────────────────────────────────────────────────────
 function toggleRecording() {
-    isRecording ? stopRecording() : startRecording();
+    isRecording ? stopRecording({ manual: true }) : startRecording();
 }
 
 function startRecording() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return;
+    if (!SR) {
+        setRecStatus('<span class="text-orange-500">이 브라우저는 음성 인식을 지원하지 않습니다.</span>');
+        return;
+    }
 
-    let finalReceived = false;
-    let restartCount = 0;
-    const MAX_RESTARTS = 5;
+    const sessionId = ++sttSessionId;
+    if (sttAnalyzeTimer) { clearTimeout(sttAnalyzeTimer); sttAnalyzeTimer = null; }
+    sttFinalTranscript = '';
+    sttInterimTranscript = '';
+    sttAnalysisQueued = false;
+    sttManualStop = false;
+    sttRestartCount = 0;
+    sttLastError = '';
 
     // iOS에서 onstart가 늦게 발생하므로 UI를 즉시 활성화
     isRecording = true;
-    document.getElementById('micBtn').className =
-        'w-20 h-20 rounded-full bg-red-500 text-white text-3xl flex items-center justify-center transition-all shadow-xl relative mic-pulse';
-    document.getElementById('micIcon').className = 'fa-solid fa-stop';
-    document.getElementById('recStatus').innerHTML =
-        '<span class="text-red-500 font-bold">● 녹음 중입니다. 크고 또렷하게 말하세요.</span>';
+    setMicRecordingUi();
+    setRecStatus('<span class="text-red-500 font-bold">마이크 권한을 확인하고 있습니다...</span>');
 
     // PRO: getUserMedia + 파형 시각화 + MediaRecorder
     audioChunks = [];
     audioURL = null;
 
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            micStream = stream;
-
-            // Web Audio API 파형 시각화
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                analyserNode = audioContext.createAnalyser();
-                analyserNode.fftSize = 128;
-                analyserNode.smoothingTimeConstant = 0.8;
-                const source = audioContext.createMediaStreamSource(stream);
-                source.connect(analyserNode);
-
-                // CSS 파형 숨기고 canvas로 교체
-                const wf = document.getElementById('waveform');
-                if (wf) {
-                    wf.style.display = 'none';
-                    const canvas = document.createElement('canvas');
-                    canvas.id = 'vizCanvas';
-                    canvas.width = 200;
-                    canvas.height = 36;
-                    canvas.style.cssText = 'display:block;margin:0 auto 4px';
-                    wf.parentNode.insertBefore(canvas, wf);
-                    startVizLoop(canvas);
-                }
-            } catch(e) {
-                // 파형 시각화 실패 시 CSS 폴백
-                const wf = document.getElementById('waveform');
-                if (wf) { wf.classList.remove('hidden'); wf.style.display = 'flex'; }
-            }
-
-            // MediaRecorder 연결
-            if (window.MediaRecorder) {
-                try {
-                    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-                        ? 'audio/webm;codecs=opus'
-                        : MediaRecorder.isTypeSupported('audio/webm')
-                        ? 'audio/webm'
-                        : '';
-                    mediaRecorder = mimeType
-                        ? new MediaRecorder(stream, { mimeType })
-                        : new MediaRecorder(stream);
-
-                    mediaRecorder.ondataavailable = e => {
-                        if (e.data && e.data.size > 0) audioChunks.push(e.data);
-                    };
-                    mediaRecorder.onstop = () => {
-                        if (audioChunks.length > 0) {
-                            const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
-                            audioURL = URL.createObjectURL(blob);
-                        }
-                    };
-                    mediaRecorder.start();
-                } catch(e) {
-                    mediaRecorder = null;
-                }
-            }
-        })
-        .catch(err => {
-            // getUserMedia 실패 — CSS 파형 폴백
-            const wf = document.getElementById('waveform');
-            if (wf) { wf.classList.remove('hidden'); wf.style.display = 'flex'; }
-        });
-
-    // 기존 CSS 파형 박스 활성화 (getUserMedia 성공 전까지 임시)
     const box = document.getElementById('recognizedBox');
-    box.className = 'min-h-12 rounded-xl px-4 py-3 text-center text-sm mb-3 rec-status-active';
-    document.getElementById('recognizedText').textContent = '인식 중...';
+    if (box) box.className = 'min-h-12 rounded-xl px-4 py-3 text-center text-sm mb-3 rec-status-active';
+    updateRecognizedText('인식 준비 중...');
 
-    function startSR() {
-        recognition = new SR();
-        recognition.lang = 'ko-KR';
-        recognition.interimResults = true;
-        recognition.maxAlternatives = 3;
-
-        recognition.onstart = () => { isRecording = true; };
-
-        recognition.onresult = (e) => {
-            let interim = '', finalSpoken = '';
-            for (let i = e.resultIndex; i < e.results.length; i++) {
-                if (e.results[i].isFinal) {
-                    // 여러 인식 후보 중 목표 문장과 가장 유사한 것 선택
-                    const tgt = norm(DIALOGUES[currentIdx].target);
-                    let bestAlt = e.results[i][0].transcript;
-                    let bestSc = jamoAnalyze(norm(bestAlt), tgt).score;
-                    for (let a = 1; a < e.results[i].length; a++) {
-                        const altTxt = e.results[i][a].transcript;
-                        const s = jamoAnalyze(norm(altTxt), tgt).score;
-                        if (s > bestSc) { bestSc = s; bestAlt = altTxt; }
-                    }
-                    finalSpoken += bestAlt;
-                } else { interim += e.results[i][0].transcript; }
-            }
-            document.getElementById('recognizedText').textContent = finalSpoken || interim || '—';
-            if (finalSpoken) {
-                finalReceived = true;
-                const spoken = finalSpoken.trim();
-                stopRecording();
-                // onstop이 먼저 fire되도록 350ms 대기
-                setTimeout(() => analyzeResult(spoken), 350);
-            }
-        };
-
-        recognition.onerror = (e) => {
-            // iOS에서 no-speech는 자동 재시작 (말하기 전에 타임아웃 발생)
-            if (e.error === 'no-speech' && isRecording && restartCount < MAX_RESTARTS) {
-                restartCount++;
-                setTimeout(() => { if (isRecording) startSR(); }, 200);
-                return;
-            }
-            const msgs = {
-                'not-allowed': '마이크 권한이 필요합니다.',
-                'no-speech':   '음성이 감지되지 않았습니다. 조금 더 크게 말해 주세요.'
-            };
-            document.getElementById('recStatus').innerHTML =
-                '<span class="text-orange-500">' + (msgs[e.error] || '오류: ' + e.error) + '</span>';
-            stopRecording();
-        };
-
-        recognition.onend = () => {
-            if (!isRecording) return; // 사용자가 직접 중지함
-            if (!finalReceived && restartCount < MAX_RESTARTS) {
-                // iOS에서 결과 없이 onend 발생 시 자동 재시작
-                restartCount++;
-                setTimeout(() => { if (isRecording) startSR(); }, 200);
-            } else {
-                stopRecording();
-            }
-        };
-
-        try { recognition.start(); } catch(e) { stopRecording(); }
+    if (shouldUseRecognitionOnlyMode()) {
+        showCssWaveform();
+        setRecStatus('<span class="text-red-500 font-bold">● 음성 인식 중입니다. 문장을 끝까지 또렷하게 말해 주세요.</span>');
+        startSpeechRecognition(SR, sessionId);
+        return;
     }
 
-    startSR();
+    const startSRWhenReady = () => {
+        if (sessionId !== sttSessionId || !isRecording) return;
+        startSpeechRecognition(SR, sessionId);
+    };
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showCssWaveform();
+        startSRWhenReady();
+        return;
+    }
+
+    // 모바일에서 권한 팝업과 SpeechRecognition.start()가 겹치지 않도록
+    // 녹음 스트림이 준비된 뒤 인식기를 시작한다.
+    navigator.mediaDevices.getUserMedia({
+        audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+        }
+    })
+        .then(stream => {
+            if (sessionId !== sttSessionId || !isRecording) {
+                stream.getTracks().forEach(t => t.stop());
+                return;
+            }
+            micStream = stream;
+            setupAudioVisuals(stream);
+            setupMediaRecorder(stream);
+            setRecStatus('<span class="text-red-500 font-bold">● 녹음 중입니다. 크고 또렷하게 말하세요.</span>');
+            setTimeout(startSRWhenReady, 80);
+        })
+        .catch(err => {
+            sttLastError = err && (err.name || err.message) ? (err.name || err.message) : 'getUserMedia';
+            showCssWaveform();
+            setRecStatus('<span class="text-orange-500">녹음 권한 확인에 실패했습니다. 음성 인식만 다시 연결합니다.</span>');
+            startSRWhenReady();
+        });
+}
+
+function shouldUseRecognitionOnlyMode() {
+    // 표준 말하기 페이지는 녹음 저장보다 평가 진행을 우선한다.
+    // Web Speech API가 버튼 클릭 제스처와 마이크를 단독으로 쓰게 해야 모바일에서 안정적이다.
+    return true;
+}
+
+function setupAudioVisuals(stream) {
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyserNode = audioContext.createAnalyser();
+        analyserNode.fftSize = 128;
+        analyserNode.smoothingTimeConstant = 0.8;
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyserNode);
+
+        const wf = document.getElementById('waveform');
+        if (wf) {
+            wf.style.display = 'none';
+            const canvas = document.createElement('canvas');
+            canvas.id = 'vizCanvas';
+            canvas.width = 200;
+            canvas.height = 36;
+            canvas.style.cssText = 'display:block;margin:0 auto 4px';
+            wf.parentNode.insertBefore(canvas, wf);
+            startVizLoop(canvas);
+        }
+    } catch(e) {
+        showCssWaveform();
+    }
+}
+
+function setupMediaRecorder(stream) {
+    if (!window.MediaRecorder) return;
+    try {
+        const mimeCandidates = [
+            'audio/webm;codecs=opus',
+            'audio/webm',
+            'audio/mp4',
+            'audio/aac'
+        ];
+        const mimeType = mimeCandidates.find(type => MediaRecorder.isTypeSupported(type)) || '';
+        const recorder = mimeType
+            ? new MediaRecorder(stream, { mimeType })
+            : new MediaRecorder(stream);
+
+        mediaRecorder = recorder;
+        recorder.ondataavailable = e => {
+            if (e.data && e.data.size > 0) audioChunks.push(e.data);
+        };
+        recorder.onstop = () => {
+            if (audioChunks.length > 0) {
+                const type = recorder.mimeType || (audioChunks[0] && audioChunks[0].type) || 'audio/webm';
+                const blob = new Blob(audioChunks, { type });
+                audioURL = URL.createObjectURL(blob);
+            }
+        };
+        recorder.start();
+    } catch(e) {
+        mediaRecorder = null;
+    }
+}
+
+function startSpeechRecognition(SR, sessionId) {
+    if (sessionId !== sttSessionId || !isRecording || sttAnalysisQueued) return;
+
+    recognition = new SR();
+    recognition.lang = 'ko-KR';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 3;
+
+    recognition.onstart = () => {
+        if (sessionId !== sttSessionId) return;
+        isRecording = true;
+        setRecStatus('<span class="text-red-500 font-bold">● 인식 중입니다. 문장을 끝까지 말해 주세요.</span>');
+        updateRecognizedText('인식 중...');
+    };
+
+    recognition.onresult = (e) => {
+        if (sessionId !== sttSessionId || sttAnalysisQueued) return;
+        const finalParts = [];
+        const interimParts = [];
+        const tgt = norm(DIALOGUES[currentIdx].target);
+
+        for (let i = 0; i < e.results.length; i++) {
+            if (e.results[i].isFinal) {
+                // 여러 인식 후보 중 목표 문장과 가장 유사한 것 선택
+                let bestAlt = e.results[i][0].transcript;
+                let bestSc = jamoAnalyze(norm(bestAlt), tgt).score;
+                for (let a = 1; a < e.results[i].length; a++) {
+                    const altTxt = e.results[i][a].transcript;
+                    const s = jamoAnalyze(norm(altTxt), tgt).score;
+                    if (s > bestSc) { bestSc = s; bestAlt = altTxt; }
+                }
+                finalParts.push(bestAlt.trim());
+            } else {
+                interimParts.push(e.results[i][0].transcript.trim());
+            }
+        }
+
+        sttFinalTranscript = finalParts.join(' ').trim();
+        sttInterimTranscript = interimParts.join(' ').trim();
+        updateRecognizedText();
+
+        if (sttFinalTranscript) {
+            queueAnalyze(sttFinalTranscript);
+        }
+    };
+
+    recognition.onerror = (e) => {
+        if (sessionId !== sttSessionId || sttAnalysisQueued) return;
+        sttLastError = e.error || 'unknown';
+
+        if (sttLastError === 'aborted' && sttManualStop) return;
+        if (sttLastError === 'no-speech' && isRecording && !getCurrentTranscript() && sttRestartCount < STT_MAX_RESTARTS) {
+            sttRestartCount++;
+            setTimeout(() => startSpeechRecognition(SR, sessionId), 250);
+            return;
+        }
+
+        const msgs = {
+            'not-allowed': '마이크 권한이 필요합니다.',
+            'service-not-allowed': '브라우저의 음성 인식 서비스가 차단되었습니다.',
+            'audio-capture': '마이크 장치를 찾을 수 없습니다.',
+            'network': '음성 인식 서비스 연결이 불안정합니다.',
+            'no-speech': '음성이 감지되지 않았습니다. 조금 더 크게 말해 주세요.',
+            'language-not-supported': '한국어 음성 인식을 지원하지 않는 브라우저입니다.'
+        };
+        stopRecording({
+            suppressAnalyze: true,
+            statusHtml: '<span class="text-orange-500">' + (msgs[sttLastError] || '오류: ' + sttLastError) + '</span>'
+        });
+    };
+
+    recognition.onend = () => {
+        if (sessionId !== sttSessionId || sttAnalysisQueued || sttManualStop) return;
+        const spoken = getCurrentTranscript();
+        if (spoken) {
+            queueAnalyze(spoken);
+            return;
+        }
+        if (isRecording && sttRestartCount < STT_MAX_RESTARTS) {
+            sttRestartCount++;
+            setTimeout(() => startSpeechRecognition(SR, sessionId), 250);
+            return;
+        }
+        stopRecording({
+            suppressAnalyze: true,
+            statusHtml: '<span class="text-orange-500">텍스트 인식 결과가 없습니다. 다시 한 번 또렷하게 말해 주세요.</span>'
+        });
+    };
+
+    try {
+        recognition.start();
+    } catch(e) {
+        sttLastError = e && e.message ? e.message : 'start failed';
+        stopRecording({
+            suppressAnalyze: true,
+            statusHtml: '<span class="text-orange-500">음성 인식을 시작하지 못했습니다. 다시 시도해 주세요.</span>'
+        });
+    }
 }
 
 // PRO: canvas 파형 시각화 루프
@@ -1208,13 +1299,86 @@ function startVizLoop(canvas) {
     draw();
 }
 
-function stopRecording() {
+function getCurrentTranscript() {
+    return (sttFinalTranscript || sttInterimTranscript || '').trim();
+}
+
+function updateRecognizedText(fallback = '인식 중...') {
+    const el = document.getElementById('recognizedText');
+    if (el) el.textContent = getCurrentTranscript() || fallback;
+}
+
+function setRecStatus(html) {
+    const rs = document.getElementById('recStatus');
+    if (rs) rs.innerHTML = html;
+}
+
+function setMicRecordingUi() {
+    const btn = document.getElementById('micBtn');
+    if (btn) {
+        btn.className = 'w-20 h-20 rounded-full bg-red-500 text-white text-3xl flex items-center justify-center transition-all shadow-xl relative mic-pulse';
+        document.getElementById('micIcon').className = 'fa-solid fa-stop';
+    }
+}
+
+function setMicIdleUi() {
+    const btn = document.getElementById('micBtn');
+    if (btn) {
+        btn.className = 'w-20 h-20 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white text-3xl flex items-center justify-center transition-all shadow-xl';
+        document.getElementById('micIcon').className = 'fa-solid fa-microphone';
+    }
+}
+
+function showCssWaveform() {
+    const wf = document.getElementById('waveform');
+    if (wf) { wf.classList.remove('hidden'); wf.style.display = 'flex'; }
+}
+
+function queueAnalyze(spoken) {
+    const text = (spoken || getCurrentTranscript()).trim();
+    if (!text || sttAnalysisQueued) return false;
+
+    sttAnalysisQueued = true;
+    sttManualStop = false;
+    sttFinalTranscript = text;
+    sttInterimTranscript = '';
+    updateRecognizedText();
+    stopRecording({ suppressAnalyze: true, statusHtml: '<span class="text-green-600 font-bold">완료! 분석 중입니다...</span>' });
+
+    if (sttAnalyzeTimer) clearTimeout(sttAnalyzeTimer);
+    sttAnalyzeTimer = setTimeout(() => {
+        sttAnalyzeTimer = null;
+        analyzeResult(text);
+    }, 550);
+    return true;
+}
+
+function showNoTranscriptMessage() {
+    const errorText = sttLastError ? ` (${sttLastError})` : '';
+    const audioPreview = audioURL
+        ? `<audio controls src="${audioURL}" style="width:100%;margin-top:8px;height:34px"></audio>`
+        : '';
+    updateRecognizedText('텍스트 인식 실패');
+    setRecStatus(
+        '<span class="text-orange-500">텍스트 인식 결과가 없습니다' + errorText + '. Chrome 또는 Safari에서 다시 시도해 주세요.</span>' +
+        audioPreview
+    );
+}
+
+function stopRecording(options = {}) {
+    const { manual = false, suppressAnalyze = false, statusHtml = '<span class="text-green-600 font-bold">완료! 분석 중입니다...</span>' } = options;
+    sttManualStop = manual;
     isRecording = false;
-    if (recognition) { try { recognition.stop(); } catch(e) {} }
+    const activeRecognition = recognition;
+    recognition = null;
+    if (activeRecognition) { try { activeRecognition.stop(); } catch(e) {} }
 
     // PRO: mediaRecorder, audioContext, micStream 정리
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        try { mediaRecorder.stop(); } catch(e) {}
+    const recorder = mediaRecorder;
+    mediaRecorder = null;
+    if (recorder && recorder.state !== 'inactive') {
+        try { recorder.requestData(); } catch(e) {}
+        try { recorder.stop(); } catch(e) {}
     }
     if (vizAnimId) { cancelAnimationFrame(vizAnimId); vizAnimId = null; }
     if (audioContext) {
@@ -1230,16 +1394,23 @@ function stopRecording() {
     const canvas = document.getElementById('vizCanvas');
     if (canvas) canvas.remove();
 
-    const btn = document.getElementById('micBtn');
-    if (btn) {
-        btn.className = 'w-20 h-20 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white text-3xl flex items-center justify-center transition-all shadow-xl';
-        document.getElementById('micIcon').className = 'fa-solid fa-microphone';
-    }
+    setMicIdleUi();
     const wf = document.getElementById('waveform');
     if (wf) wf.style.display = 'none';
-    const rs = document.getElementById('recStatus');
-    if (rs) rs.innerHTML =
-        '<span class="text-green-600 font-bold">완료! 분석 중입니다...</span>';
+
+    if (manual && !suppressAnalyze) {
+        setRecStatus('<span class="text-indigo-600 font-bold">인식 결과를 확인하고 있습니다...</span>');
+        if (sttAnalyzeTimer) clearTimeout(sttAnalyzeTimer);
+        sttAnalyzeTimer = setTimeout(() => {
+            sttAnalyzeTimer = null;
+            if (!queueAnalyze(getCurrentTranscript())) {
+                showNoTranscriptMessage();
+            }
+        }, 900);
+        return;
+    }
+
+    setRecStatus(statusHtml);
 }
 
 // ─── 분석 엔진 ───────────────────────────────────────────────────────────────

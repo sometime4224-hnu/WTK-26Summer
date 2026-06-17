@@ -10,7 +10,7 @@
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>11과 말하기 발음 연습 PRO 모바일 테스트 | 인터뷰</title>
+    <title>11과 말하기 발음 연습 PRO | 인터뷰</title>
     <script src="https://cdn.tailwindcss.com" defer></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <style>
@@ -710,7 +710,7 @@ let sttLastError = '';
 const STT_MAX_RESTARTS = 5;
 
 // ─── localStorage 학습 기록 ──────────────────────────────────────────────────
-const LS_KEY = 'speak_c11_pro_mobile_test_v1';
+const LS_KEY = 'speak_c11_pro_v1';
 
 function lsLoad() {
     try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch(e) { return {}; }
@@ -971,7 +971,7 @@ function renderRecordPanel(d) {
         </div>
         <p id="recStatus" class="text-xs text-center mb-4">
             <span class="text-slate-400">준비 완료</span>
-            <span class="assist-guide block">마이크 버튼을 누르면 음성 인식 평가가 시작됩니다.</span>
+            <span class="assist-guide block">마이크 버튼을 누르면 녹음이 시작됩니다.</span>
         </p>
 
         <!-- 마이크 버튼 -->
@@ -1055,9 +1055,11 @@ function startRecording() {
     if (box) box.className = 'min-h-12 rounded-xl px-4 py-3 text-center text-sm mb-3 rec-status-active';
     updateRecognizedText('인식 준비 중...');
 
+    // 모바일·태블릿에서는 Web Speech API가 마이크를 단독으로 점유해야 인식이 동작한다.
+    // 녹음(MediaRecorder)을 동시에 켜면 인식기에 오디오가 전달되지 않아 평가가 멈춘다.
     if (shouldUseRecognitionOnlyMode()) {
         showCssWaveform();
-        setRecStatus('<span class="text-red-500 font-bold">평가 우선 모드입니다. 녹음 저장 없이 음성 인식만 시작합니다.</span>');
+        setRecStatus('<span class="text-red-500 font-bold">● 음성 인식 중입니다. 문장을 끝까지 또렷하게 말해 주세요.</span>');
         startSpeechRecognition(SR, sessionId);
         return;
     }
@@ -1073,7 +1075,7 @@ function startRecording() {
         return;
     }
 
-    // 모바일에서 권한 팝업과 SpeechRecognition.start()가 겹치지 않도록
+    // 데스크톱: 권한 팝업과 SpeechRecognition.start()가 겹치지 않도록
     // 녹음 스트림이 준비된 뒤 인식기를 시작한다.
     navigator.mediaDevices.getUserMedia({
         audio: {
@@ -1102,9 +1104,11 @@ function startRecording() {
 }
 
 function shouldUseRecognitionOnlyMode() {
-    // 모바일 테스트 페이지에서는 MediaRecorder/getUserMedia를 건너뛰어
-    // Web Speech API가 버튼 클릭 제스처와 마이크를 단독으로 쓰게 한다.
-    return true;
+    // 휴대폰·태블릿은 마이크를 단독 점유해야 Web Speech API가 동작한다.
+    // 이런 기기에서는 녹음 저장을 포기하고 음성 인식만 사용해 평가가 멈추지 않게 한다.
+    const ua = navigator.userAgent || '';
+    const isTouchMac = /Macintosh/.test(ua) && typeof navigator.maxTouchPoints === 'number' && navigator.maxTouchPoints > 1; // iPadOS
+    return /Android|iPhone|iPad|iPod|Mobile|Tablet|Silk|Kindle/i.test(ua) || isTouchMac;
 }
 
 function setupAudioVisuals(stream) {
