@@ -69,17 +69,38 @@
         }
 
         .page {
-            width: min(1120px, calc(100% - 32px));
+            width: min(1180px, calc(100% - 32px));
             margin: 0 auto;
-            padding: 22px 0 46px;
+            padding: 16px 0 46px;
         }
 
         .top {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            gap: 16px;
-            align-items: end;
-            margin-bottom: 16px;
+            grid-template-columns: minmax(0, 1fr) minmax(290px, 380px);
+            gap: 12px;
+            align-items: stretch;
+            margin-bottom: 8px;
+        }
+
+        .intro,
+        .task-card,
+        .chooser,
+        .sentence-panel {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: var(--shadow);
+        }
+
+        .intro {
+            padding: 14px 16px;
+        }
+
+        .task-card {
+            display: grid;
+            gap: 10px;
+            align-content: center;
+            padding: 12px;
         }
 
         .eyebrow {
@@ -93,16 +114,32 @@
 
         h1 {
             margin: 0;
-            font-size: clamp(1.85rem, 3.5vw, 3.2rem);
+            font-size: clamp(1.55rem, 2.7vw, 2.35rem);
             line-height: 1.08;
             letter-spacing: 0;
         }
 
         .lead {
-            margin: 10px 0 0;
+            margin: 8px 0 0;
             max-width: 720px;
             color: #475569;
-            line-height: 1.65;
+            font-weight: 800;
+            line-height: 1.4;
+            word-break: keep-all;
+        }
+
+        .task-label {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .verb-pair {
+            margin: 0;
+            color: #0f172a;
+            font-size: clamp(1.25rem, 2.3vw, 1.75rem);
+            font-weight: 950;
+            line-height: 1.2;
             word-break: keep-all;
         }
 
@@ -119,12 +156,10 @@
 
         .switch {
             grid-template-columns: repeat(2, minmax(96px, 1fr));
-            min-width: 250px;
         }
 
         .cases {
             grid-template-columns: repeat(4, minmax(0, 1fr));
-            margin-bottom: 10px;
         }
 
         .chooser-line {
@@ -133,23 +168,36 @@
             align-items: center;
             justify-content: space-between;
             gap: 8px;
-            margin-bottom: 14px;
+            margin-bottom: 8px;
+        }
+
+        .chooser {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 8px;
         }
 
         .formula-row {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            margin-bottom: 14px;
+            margin-bottom: 8px;
         }
 
         .workspace {
-            grid-template-columns: minmax(0, 1fr) 320px;
-            gap: 14px;
-            align-items: start;
+            width: min(100%, 1120px);
+            margin: 0 auto 8px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        .workspace > .sentence-panel {
+            align-self: stretch;
         }
 
         .slot-row {
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            padding: 0 16px 16px;
+            padding: 14px;
         }
 
         .nouns {
@@ -157,8 +205,14 @@
         }
 
         .actions {
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(92px, auto) 1fr 1fr;
+            align-items: stretch;
             margin-top: 12px;
+        }
+
+        .tray-body > .actions {
+            margin-top: 0;
+            margin-bottom: 8px;
         }
 
         .stage-btn,
@@ -178,12 +232,25 @@
         .tool,
         .noun,
         .list-btn {
-            min-height: 46px;
-            padding: 9px 10px;
+            min-height: 40px;
+            padding: 8px 10px;
             border: 1px solid var(--line);
             background: var(--panel);
             color: #334155;
             font-weight: 900;
+        }
+
+        .stage-btn:focus-visible,
+        .case-btn:focus-visible,
+        .tool:focus-visible,
+        .noun:focus-visible,
+        .sentence-slot:focus-visible,
+        .slot:focus-visible,
+        .list-btn:focus-visible,
+        .modal-choice:focus-visible,
+        .modal-close:focus-visible {
+            outline: 3px solid rgba(37, 99, 235, 0.24);
+            outline-offset: 2px;
         }
 
         .stage-btn[aria-pressed="true"] {
@@ -199,7 +266,6 @@
         }
 
         .list-btn {
-            min-width: 190px;
             border-color: #fed7aa;
             background: var(--orange-soft);
             color: #9a3412;
@@ -219,7 +285,6 @@
         }
 
         .formula,
-        .board,
         .tray {
             border: 1px solid var(--line);
             border-radius: 8px;
@@ -228,8 +293,8 @@
         }
 
         .formula {
-            min-height: 88px;
-            padding: 13px 14px;
+            min-height: 58px;
+            padding: 9px 12px;
             box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
         }
 
@@ -240,7 +305,7 @@
 
         .formula small {
             display: block;
-            margin-bottom: 7px;
+            margin-bottom: 4px;
             color: var(--muted);
             font-size: 0.77rem;
             font-weight: 900;
@@ -248,7 +313,7 @@
 
         .formula strong {
             display: block;
-            font-size: clamp(1rem, 2vw, 1.25rem);
+            font-size: clamp(0.98rem, 1.7vw, 1.18rem);
             line-height: 1.45;
             word-break: keep-all;
         }
@@ -258,8 +323,8 @@
             justify-content: space-between;
             align-items: center;
             gap: 12px;
-            min-height: 54px;
-            padding: 13px 16px;
+            min-height: 48px;
+            padding: 10px 14px;
             border-bottom: 1px solid #edf2f7;
         }
 
@@ -275,43 +340,155 @@
             word-break: keep-all;
         }
 
-        .sentence {
-            min-height: 78px;
-            margin: 16px;
-            padding: 14px 16px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: #f8fafc;
+        .sentence-panel {
+            display: grid;
+            gap: 6px;
+            margin-bottom: 8px;
+            padding: 10px 14px;
+            border-color: #bfdbfe;
+            background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
         }
 
-        .sentence > span {
-            display: block;
-            margin-bottom: 7px;
-            color: var(--muted);
-            font-size: 0.78rem;
+        .sentence-panel.good {
+            border-color: #5eead4;
+            background: linear-gradient(180deg, #ffffff 0%, var(--green-soft) 100%);
+        }
+
+        .sentence-panel.bad {
+            border-color: #fecdd3;
+            background: linear-gradient(180deg, #ffffff 0%, var(--rose-soft) 100%);
+        }
+
+        .sentence-panel.wait {
+            border-color: #fed7aa;
+            background: linear-gradient(180deg, #ffffff 0%, var(--orange-soft) 100%);
+        }
+
+        .sentence-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .sentence-meta strong {
+            color: #1e3a8a;
+            font-size: 0.92rem;
             font-weight: 900;
         }
 
         .line {
-            min-height: 34px;
-            font-size: clamp(1.18rem, 2.4vw, 1.55rem);
-            font-weight: 900;
-            line-height: 1.45;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            min-height: 46px;
+            padding-right: clamp(18px, 4vw, 44px);
+            padding-left: 8px;
+            font-size: clamp(1.28rem, 2.7vw, 1.86rem);
+            font-weight: 950;
+            line-height: 1.3;
             word-break: keep-all;
         }
 
-        .blank { color: #94a3b8; }
-        .particle { color: var(--orange); }
+        .line-token,
+        .verb-token {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 4px 9px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+        }
+
+        .sentence-slot {
+            cursor: pointer;
+            font: inherit;
+            font-weight: 950;
+            transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+        }
+
+        .sentence-slot.blank-token {
+            min-width: min(210px, 100%);
+            justify-content: space-between;
+            border-width: 3px;
+        }
+
+        .sentence-slot.ready,
+        .sentence-slot.drop-ready {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 26px rgba(37, 99, 235, 0.18);
+        }
+
+        .sentence-slot.correct {
+            border-color: #0f766e;
+        }
+
+        .sentence-slot.error {
+            border-color: var(--rose);
+            background: var(--rose-soft);
+        }
+
+        .sentence-slot.wait {
+            border-color: #fdba74;
+            background: var(--orange-soft);
+        }
+
+        .blank-token {
+            border-style: dashed;
+            color: #334155;
+        }
+
+        .slot-label {
+            color: inherit;
+            font-size: 0.72em;
+            font-weight: 950;
+        }
+
+        .particle {
+            margin-left: 2px;
+            color: #c2410c;
+        }
+
+        .verb-token {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        .tone-causer {
+            border-color: #fed7aa;
+            background: #fff7ed;
+            color: #9a3412;
+        }
+
+        .tone-actor {
+            border-color: #99f6e4;
+            background: #ecfdf5;
+            color: #115e59;
+        }
+
+        .tone-object {
+            border-color: #bfdbfe;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
 
         .slot {
             display: grid;
-            gap: 8px;
+            gap: 10px;
             min-height: 154px;
             width: 100%;
-            padding: 13px;
-            border: 1px solid var(--line);
+            padding: 14px;
+            border: 2px solid var(--line);
             background: var(--panel);
             text-align: left;
+            transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
         }
 
         .slot.filled {
@@ -329,19 +506,38 @@
             background: var(--rose-soft);
         }
 
+        .slot.wait {
+            border-color: #fdba74;
+            background: var(--orange-soft);
+        }
+
+        .slot.ready,
+        .slot.drop-ready {
+            transform: translateY(-2px);
+            border-style: dashed;
+            box-shadow: 0 14px 26px rgba(37, 99, 235, 0.16);
+        }
+
         .role {
-            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 0.92rem;
             font-weight: 900;
         }
 
         .badge {
-            float: right;
-            padding: 3px 6px;
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            padding: 3px 7px;
             border-radius: 999px;
             background: var(--orange-soft);
             color: #9a3412;
-            font-size: 0.68rem;
+            font-size: 0.7rem;
             font-weight: 900;
+            white-space: nowrap;
         }
 
         .question {
@@ -357,40 +553,129 @@
             justify-content: center;
             align-items: center;
             gap: 4px;
-            min-height: 54px;
+            min-height: 60px;
             margin-top: auto;
             padding: 10px;
-            border: 1px dashed #b6c3d4;
+            border: 2px dashed #b6c3d4;
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.8);
-            font-size: 1.05rem;
-            font-weight: 900;
+            font-size: 1.16rem;
+            font-weight: 950;
         }
 
-        .tray-body { padding: 14px 16px 16px; }
+        .slot-note {
+            min-height: 22px;
+            color: #475569;
+            font-size: 0.78rem;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+
+        .tray.needs-pick {
+            border-color: #fdba74;
+            box-shadow: 0 18px 36px rgba(234, 88, 12, 0.18);
+        }
+
+        .tray-body { padding: 10px 14px 14px; }
+
+        .support-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .noun {
+            display: grid;
+            gap: 2px;
+            min-height: 56px;
+            padding: 7px 9px;
+            text-align: left;
+            touch-action: manipulation;
+            transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+        }
+
+        .noun-label {
+            font-size: 0.74rem;
+            font-weight: 950;
+        }
+
+        .noun-text {
+            color: #0f172a;
+            font-size: 1.04rem;
+            font-weight: 950;
+        }
 
         .noun.selected {
             border-color: var(--blue);
             background: var(--blue-soft);
             color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.16);
+        }
+
+        .noun.available {
+            border-width: 2px;
+            border-color: #93c5fd;
+            background: #eff6ff;
+            color: #1d4ed8;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        }
+
+        .noun.available .noun-label::after {
+            content: " · 선택 가능";
+            color: #1d4ed8;
+            font-weight: 950;
         }
 
         .noun.used {
-            opacity: 0.42;
+            border-style: dashed;
+            background: #f8fafc;
+            color: #94a3b8;
+            opacity: 0.58;
             cursor: default;
         }
 
+        .noun.used .noun-text {
+            color: #64748b;
+        }
+
+        .noun.used .noun-label::after {
+            content: " · 사용됨";
+            color: #64748b;
+            font-weight: 950;
+        }
+
+        .tray.needs-pick .noun:not(.used) {
+            border-color: #fdba74;
+        }
+
+        .progress-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.82rem;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
         .feedback {
-            min-height: 74px;
-            margin-top: 12px;
-            padding: 12px;
+            min-height: 58px;
+            margin-top: 0;
+            padding: 9px 12px;
             border: 1px solid var(--line);
             border-radius: 8px;
             background: #f8fafc;
             color: #475569;
-            font-size: 0.92rem;
+            font-size: 0.86rem;
             font-weight: 800;
-            line-height: 1.55;
+            line-height: 1.45;
             word-break: keep-all;
         }
 
@@ -413,14 +698,27 @@
         }
 
         .takeaway {
-            margin-top: 14px;
-            padding: 13px 14px;
+            min-height: 58px;
+            margin-top: 0;
+            padding: 9px 12px;
             border-left: 4px solid var(--orange);
             background: #fffaf5;
             color: #334155;
+            font-size: 0.86rem;
             font-weight: 800;
-            line-height: 1.6;
+            line-height: 1.45;
             word-break: keep-all;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
         .modal-backdrop[hidden] { display: none; }
@@ -518,13 +816,19 @@
         @media(max-width: 720px) {
             .page {
                 width: min(100% - 24px, 1120px);
-                padding-top: 16px;
+                padding-top: 12px;
             }
+            .intro,
+            .task-card,
+            .chooser,
+            .sentence-panel { box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06); }
             .cases,
-            .formula-row,
-            .slot-row { grid-template-columns: 1fr; }
-            .slot { min-height: 138px; }
+            .formula-row { grid-template-columns: 1fr; }
+            .cases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .support-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .nouns { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .actions { grid-template-columns: 1fr 1fr; }
+            .progress-pill { grid-column: 1 / -1; }
             .modal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
 
@@ -532,6 +836,7 @@
             .nouns,
             .modal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .head { align-items: flex-start; flex-direction: column; }
+            .line { font-size: clamp(1.2rem, 8vw, 1.55rem); }
         }
     </style>
 </head>
@@ -550,21 +855,49 @@
 
     <main class="page">
         <section class="top" aria-labelledby="pageTitle">
-            <div>
+            <div class="intro">
                 <p class="eyebrow">Causative Structure</p>
                 <h1 id="pageTitle">사동 문장 자리 맞추기</h1>
-                <p class="lead">동사가 사동사로 바뀌면 문장에 필요한 자리가 달라집니다. 빈자리에 명사 카드를 놓으며 구조 변화를 확인합니다.</p>
+                <p class="lead">명사 카드를 빈자리에 놓고, 사동사가 만들거나 바꾸는 문장 자리를 바로 확인하세요.</p>
             </div>
-            <div class="switch" role="group" aria-label="동사 단계">
-                <button class="stage-btn" type="button" data-stage="base" aria-pressed="true">기본 동사</button>
-                <button class="stage-btn" type="button" data-stage="causative" aria-pressed="false">사동사</button>
+            <div class="task-card" aria-label="현재 동사와 단계 선택">
+                <span class="task-label">현재 동사</span>
+                <p class="verb-pair" id="activeVerbPair">자다 → 재우다</p>
+                <div class="switch" role="group" aria-label="동사 단계">
+                    <button class="stage-btn" type="button" data-stage="base" aria-pressed="true">기본 동사</button>
+                    <button class="stage-btn" type="button" data-stage="causative" aria-pressed="false">사동사</button>
+                </div>
             </div>
         </section>
 
-        <div class="cases" id="caseRow" role="group" aria-label="대표 동사 선택"></div>
-        <div class="chooser-line">
-            <button class="list-btn" id="openListBtn" type="button">전체 사동사 목록에서 고르기</button>
-            <span class="status" id="caseStatus"></span>
+        <section class="support-row" aria-label="활동 안내와 문장 조언">
+            <div class="feedback" id="feedback" aria-live="polite"></div>
+            <div class="takeaway" id="takeaway"></div>
+        </section>
+
+        <div class="workspace">
+            <section class="sentence-panel" id="sentencePanel" aria-labelledby="sentenceLabel">
+                <div class="sentence-meta">
+                    <strong id="sentenceLabel">완성 문장</strong>
+                    <span class="scene" id="sceneText"></span>
+                </div>
+                <div class="line" id="sentenceLine" aria-live="polite"></div>
+            </section>
+
+            <aside class="tray" id="tray" aria-labelledby="trayTitle">
+                <div class="head">
+                    <h2 id="trayTitle">명사 카드</h2>
+                    <span class="scene" id="selectedText">선택 없음</span>
+                </div>
+                <div class="tray-body">
+                    <div class="actions">
+                        <span class="progress-pill" id="fillProgress">0 / 0</span>
+                        <button class="tool primary" id="checkBtn" type="button">확인</button>
+                        <button class="tool" id="resetBtn" type="button">다시 놓기</button>
+                    </div>
+                    <div class="nouns" id="nounGrid"></div>
+                </div>
+            </aside>
         </div>
 
         <section class="formula-row" aria-label="문장 구조 비교">
@@ -578,35 +911,13 @@
             </div>
         </section>
 
-        <div class="workspace">
-            <section class="board" aria-labelledby="boardTitle">
-                <div class="head">
-                    <h2 id="boardTitle">문장 슬롯</h2>
-                    <span class="scene" id="sceneText"></span>
-                </div>
-                <div class="sentence" aria-live="polite">
-                    <span id="sentenceLabel">완성 문장</span>
-                    <div class="line" id="sentenceLine"></div>
-                </div>
-                <div class="slot-row" id="slotBoard"></div>
-            </section>
-
-            <aside class="tray" aria-labelledby="trayTitle">
-                <div class="head">
-                    <h2 id="trayTitle">명사 카드</h2>
-                    <span class="scene" id="selectedText">선택 없음</span>
-                </div>
-                <div class="tray-body">
-                    <div class="nouns" id="nounGrid"></div>
-                    <div class="actions">
-                        <button class="tool primary" id="checkBtn" type="button">확인</button>
-                        <button class="tool" id="resetBtn" type="button">다시 놓기</button>
-                    </div>
-                    <div class="feedback" id="feedback" aria-live="polite"></div>
-                    <div class="takeaway" id="takeaway"></div>
-                </div>
-            </aside>
-        </div>
+        <section class="chooser" aria-label="동사 선택">
+            <div class="chooser-line">
+                <span class="status" id="caseStatus"></span>
+                <button class="list-btn" id="openListBtn" type="button">전체 목록</button>
+            </div>
+            <div class="cases" id="caseRow" role="group" aria-label="대표 동사 선택"></div>
+        </section>
     </main>
 
     <div class="modal-backdrop" id="listModal" hidden>
@@ -726,12 +1037,19 @@
         ];
 
         const suffixGroups = ["-이", "-히", "-리", "-기", "-우", "-구", "-추"];
+        const roleTones = { causer: "causer", actor: "actor", target: "actor", object: "object" };
         const $ = (id) => document.getElementById(id);
         let caseId = "sleep";
         let stage = "base";
         let selected = null;
+        let dragged = null;
+        let manualDrag = null;
+        let suppressClick = false;
+        let needsPick = false;
         let filled = {};
         let status = {};
+        let feedbackText = "";
+        let feedbackTone = "";
 
         function item() {
             return cases.find((x) => x.id === caseId);
@@ -745,38 +1063,128 @@
             return (item().nouns.find((x) => x[0] === id) || [])[1];
         }
 
+        function esc(value) {
+            return String(value || "").replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[char]));
+        }
+
+        function toneFor(id) {
+            return roleTones[id] || "actor";
+        }
+
+        function toneClass(id) {
+            return "tone-" + toneFor(id);
+        }
+
+        function roleLabel() {
+            return "명사 후보";
+        }
+
         function resetSlots() {
             selected = null;
+            dragged = null;
+            needsPick = false;
             filled = {};
             status = {};
         }
 
         function line() {
             return data().slots.map((slot) => {
+                const filledId = filled[slot[0]];
+                const stateClass = status[slot[0]] || "";
+                const readyClass = selected ? "ready" : "";
+                const aria = slot[1] + ", " + slot[2] + ", " + (filledId ? noun(filledId) + slot[3] : "빈자리");
                 if (filled[slot[0]]) {
-                    return noun(filled[slot[0]]) + '<span class="particle">' + slot[3] + '</span>';
+                    return '<button class="line-token sentence-slot ' + toneClass(slot[4]) + ' filled ' + stateClass + '" type="button" data-slot="' + esc(slot[0]) + '" aria-label="' + esc(aria) + '"><span>' + esc(noun(filledId)) + '</span><span class="particle">' + esc(slot[3]) + '</span></button>';
                 }
-                return '<span class="blank">[' + slot[1] + ']' + slot[3] + '</span>';
-            }).join(" ") + " " + data().verb;
+                return '<button class="line-token sentence-slot blank-token ' + toneClass(slot[4]) + ' ' + stateClass + ' ' + readyClass + '" type="button" data-slot="' + esc(slot[0]) + '" aria-label="' + esc(aria) + '"><span class="slot-label">' + esc(slot[1]) + '</span><span class="particle">' + esc(slot[3]) + '</span></button>';
+            }).join(" ") + ' <span class="verb-token">' + esc(data().verb) + '</span>';
         }
 
         function msg(text, tone = "") {
-            $("feedback").textContent = text;
-            $("feedback").className = "feedback" + (tone ? " " + tone : "");
+            feedbackText = text;
+            feedbackTone = tone;
+            syncFeedback();
+        }
+
+        function syncFeedback() {
+            const feedback = $("feedback");
+            const panel = $("sentencePanel");
+            if (feedback) {
+                feedback.textContent = feedbackText;
+                feedback.className = "feedback" + (feedbackTone ? " " + feedbackTone : "");
+            }
+            if (panel) {
+                panel.className = "sentence-panel" + (feedbackTone ? " " + feedbackTone : "");
+            }
+        }
+
+        function startManualDrag(nounId, x, y) {
+            manualDrag = { nounId, startX: x, startY: y, moved: false };
+        }
+
+        function moveManualDrag(x, y) {
+            if (!manualDrag) return;
+            const movedFar = Math.abs(x - manualDrag.startX) > 8 || Math.abs(y - manualDrag.startY) > 8;
+            if (!movedFar && !manualDrag.moved) return;
+
+            manualDrag.moved = true;
+            dragged = manualDrag.nounId;
+            selected = dragged;
+            needsPick = false;
+
+            document.querySelectorAll(".sentence-slot").forEach((slot) => {
+                const box = slot.getBoundingClientRect();
+                const inside = x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
+                slot.classList.toggle("drop-ready", inside);
+            });
+            msg(noun(dragged) + " 카드를 드래그 중입니다. 빈자리에 놓으세요.", "wait");
+        }
+
+        function finishManualDrag(x, y) {
+            if (!manualDrag) return false;
+            const completedDrag = manualDrag;
+            manualDrag = null;
+            document.querySelectorAll(".sentence-slot.drop-ready").forEach((slot) => slot.classList.remove("drop-ready"));
+
+            if (!completedDrag.moved) return false;
+
+            suppressClick = true;
+            selected = completedDrag.nounId;
+            dragged = null;
+            const dropTarget = document.elementFromPoint(x, y);
+            const slot = dropTarget ? dropTarget.closest(".sentence-slot") : null;
+
+            if (slot) {
+                place(slot.dataset.slot);
+            } else {
+                msg("카드를 빈자리 위에 놓아 주세요.", "wait");
+                render();
+            }
+
+            setTimeout(() => {
+                suppressClick = false;
+            }, 0);
+            return true;
         }
 
         function renderCases() {
             $("caseRow").innerHTML = defaultCaseIds.map((id) => {
                 const c = cases.find((x) => x.id === id);
-                return '<button class="case-btn" type="button" data-id="' + c.id + '" aria-pressed="' + (c.id === caseId) + '">' + c.label + '</button>';
+                return '<button class="case-btn" type="button" data-id="' + esc(c.id) + '" aria-pressed="' + (c.id === caseId) + '">' + esc(c.label) + '</button>';
             }).join("");
 
             document.querySelectorAll(".case-btn").forEach((button) => {
                 button.onclick = () => {
                     caseId = button.dataset.id;
                     resetSlots();
-                    render();
                     msg("대표 동사를 불러왔습니다. 기본 동사와 사동사의 슬롯 수를 비교해 보세요.");
+                    render();
                 };
             });
         }
@@ -784,8 +1192,8 @@
         function renderModalList() {
             $("modalBody").innerHTML = suffixGroups.map((suffix) => {
                 const list = cases.filter((c) => c.suffix === suffix);
-                return '<section class="group"><h3>' + suffix + '</h3><div class="modal-grid">' + list.map((c) => {
-                    return '<button class="modal-choice ' + (c.id === caseId ? 'active' : '') + '" type="button" data-id="' + c.id + '">' + c.label + '</button>';
+                return '<section class="group"><h3>' + esc(suffix) + '</h3><div class="modal-grid">' + list.map((c) => {
+                    return '<button class="modal-choice ' + (c.id === caseId ? 'active' : '') + '" type="button" data-id="' + esc(c.id) + '">' + esc(c.label) + '</button>';
                 }).join("") + '</div></section>';
             }).join("");
 
@@ -795,8 +1203,8 @@
                     stage = "base";
                     resetSlots();
                     closeModal();
-                    render();
                     msg(item().label + "을/를 불러왔습니다. 기본 동사와 사동사 구조를 비교해 보세요.");
+                    render();
                 };
             });
         }
@@ -815,42 +1223,76 @@
             $("causativeFormulaText").textContent = current.causativeFormula;
             $("baseFormula").classList.toggle("active", stage === "base");
             $("causativeFormula").classList.toggle("active", stage === "causative");
+            $("activeVerbPair").textContent = current.label;
             $("sceneText").textContent = currentData.scene;
             $("sentenceLabel").textContent = currentData.name;
             $("sentenceLine").innerHTML = line();
             $("takeaway").textContent = currentData.takeaway;
             $("selectedText").textContent = selected ? noun(selected) + " 선택" : "선택 없음";
+            $("fillProgress").textContent = Object.keys(filled).length + " / " + currentData.slots.length;
+            $("tray").classList.toggle("needs-pick", needsPick);
             $("caseStatus").textContent = defaultCaseIds.includes(caseId)
                 ? "대표 4종: " + current.label
                 : "목록에서 선택: " + current.label;
+            syncFeedback();
 
-            $("slotBoard").innerHTML = currentData.slots.map((slot) => {
-                const filledClass = filled[slot[0]] ? "filled" : "";
-                const stateClass = status[slot[0]] || "";
-                const badge = slot[5] ? '<span class="badge">' + slot[5] + '</span>' : "";
-                const fillText = filled[slot[0]]
-                    ? noun(filled[slot[0]]) + '<span class="particle">' + slot[3] + '</span>'
-                    : '<span class="blank">빈자리</span><span class="particle">' + slot[3] + '</span>';
-                return '<button class="slot ' + filledClass + ' ' + stateClass + '" type="button" data-slot="' + slot[0] + '"><span class="role">' + slot[1] + ' ' + badge + '</span><span class="question">' + slot[2] + '</span><span class="fill">' + fillText + '</span></button>';
-            }).join("");
-
-            document.querySelectorAll(".slot").forEach((button) => {
+            document.querySelectorAll(".sentence-slot").forEach((button) => {
                 button.onclick = () => place(button.dataset.slot);
+                button.ondragover = (event) => {
+                    if (!dragged) return;
+                    event.preventDefault();
+                    button.classList.add("drop-ready");
+                };
+                button.ondragleave = () => button.classList.remove("drop-ready");
+                button.ondrop = (event) => {
+                    event.preventDefault();
+                    selected = dragged || event.dataTransfer.getData("text/plain");
+                    dragged = null;
+                    place(button.dataset.slot);
+                };
             });
 
             const used = Object.values(filled);
             $("nounGrid").innerHTML = current.nouns.map((n) => {
+                const isUsed = used.includes(n[0]);
                 const selectedClass = selected === n[0] ? "selected" : "";
-                const usedClass = used.includes(n[0]) ? "used" : "";
-                const disabled = used.includes(n[0]) ? 'aria-disabled="true"' : "";
-                return '<button class="noun ' + selectedClass + ' ' + usedClass + '" type="button" data-noun="' + n[0] + '" ' + disabled + '>' + n[1] + '</button>';
+                const stateClass = isUsed ? "used" : "available";
+                const disabled = isUsed ? 'aria-disabled="true"' : "";
+                const draggable = isUsed ? 'draggable="false"' : 'draggable="true"';
+                return '<button class="noun ' + selectedClass + ' ' + stateClass + '" type="button" data-noun="' + esc(n[0]) + '" aria-pressed="' + (selected === n[0]) + '" ' + disabled + ' ' + draggable + '><span class="noun-label">' + esc(roleLabel(n[0])) + '</span><span class="noun-text">' + esc(n[1]) + '</span></button>';
             }).join("");
 
             document.querySelectorAll(".noun").forEach((button) => {
                 button.onclick = () => {
+                    if (suppressClick) {
+                        suppressClick = false;
+                        return;
+                    }
                     if (button.getAttribute("aria-disabled") === "true") return;
                     selected = button.dataset.noun;
+                    needsPick = false;
+                    msg(noun(selected) + " 카드를 선택했습니다. 넣을 빈자리를 누르세요.", "wait");
                     render();
+                };
+                button.onmousedown = (event) => {
+                    if (button.getAttribute("aria-disabled") === "true" || event.button !== 0) return;
+                    startManualDrag(button.dataset.noun, event.clientX, event.clientY);
+                };
+                button.ondragstart = (event) => {
+                    if (button.getAttribute("aria-disabled") === "true") {
+                        event.preventDefault();
+                        return;
+                    }
+                    dragged = button.dataset.noun;
+                    selected = dragged;
+                    needsPick = false;
+                    event.dataTransfer.setData("text/plain", dragged);
+                    event.dataTransfer.effectAllowed = "move";
+                    msg(noun(dragged) + " 카드를 드래그 중입니다. 빈자리에 놓으세요.", "wait");
+                };
+                button.ondragend = () => {
+                    dragged = null;
+                    document.querySelectorAll(".sentence-slot.drop-ready").forEach((slot) => slot.classList.remove("drop-ready"));
                 };
             });
         }
@@ -860,9 +1302,14 @@
                 if (filled[slotId]) {
                     delete filled[slotId];
                     delete status[slotId];
-                    msg("자리를 비웠습니다.");
+                    needsPick = false;
+                    msg("자리를 비웠습니다. 새 카드를 고르세요.", "wait");
                     render();
+                    return;
                 }
+                needsPick = true;
+                msg("먼저 명사 카드를 고르거나 카드 그대로 빈자리로 드래그하세요.", "wait");
+                render();
                 return;
             }
 
@@ -875,15 +1322,13 @@
 
             filled[slotId] = selected;
             const slot = data().slots.find((x) => x[0] === slotId);
-            const ok = slot[4] === selected;
             const name = noun(selected);
-            status[slotId] = ok ? "correct" : "error";
+            delete status[slotId];
             selected = null;
+            needsPick = false;
             msg(
-                ok
-                    ? slot[1] + ": " + name + " 카드가 맞습니다. 문장에서는 '" + name + slot[3] + "'로 보입니다."
-                    : slot[1] + ' 자리는 "' + slot[2] + '"에 답하는 자리입니다.',
-                ok ? "good" : "bad"
+                name + " 카드를 넣었습니다. 문장에서는 '" + name + slot[3] + "'로 보입니다.",
+                "wait"
             );
             render();
         }
@@ -891,14 +1336,8 @@
         function check() {
             const empty = data().slots.find((slot) => !filled[slot[0]]);
             if (empty) {
+                status[empty[0]] = "wait";
                 msg(empty[1] + " 자리가 비어 있습니다.", "wait");
-                return;
-            }
-
-            const wrong = data().slots.find((slot) => filled[slot[0]] !== slot[4]);
-            if (wrong) {
-                status[wrong[0]] = "error";
-                msg(wrong[1] + " 자리를 다시 보세요. " + wrong[2], "bad");
                 render();
                 return;
             }
@@ -942,6 +1381,12 @@
         };
         document.addEventListener("keydown", (event) => {
             if (event.key === "Escape" && !$("listModal").hidden) closeModal();
+        });
+        document.addEventListener("mousemove", (event) => {
+            moveManualDrag(event.clientX, event.clientY);
+        });
+        document.addEventListener("mouseup", (event) => {
+            finishManualDrag(event.clientX, event.clientY);
         });
 
         msg("기본 동사와 사동사의 슬롯 수를 비교해 보세요.");
