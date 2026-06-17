@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <style>
+        :root {
+            --ink: #162033;
+            --muted: #64748b;
+            --line: #d6e1ee;
+            --panel: #ffffff;
+            --soft: #f7fafc;
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+            --green: #0f766e;
+            --green-soft: #ecfdf5;
+            --amber: #b45309;
+            --amber-soft: #fff7ed;
+            --rose: #be123c;
+            --shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--ink);
+            background:
+                linear-gradient(180deg, #ffffff 0%, #f8fafc 50%, #f1f7f5 100%);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .activity {
+            width: min(1320px, calc(100% - 28px));
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto auto minmax(420px, 1fr);
+            gap: 12px;
+            margin: 0 auto;
+            padding: 14px 0 20px;
+        }
+
+        .sentence-card,
+        .verb-card,
+        .palette,
+        .diagram-board {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: var(--shadow);
+        }
+
+        .sentence-card {
+            min-height: clamp(96px, 13vh, 138px);
+            display: grid;
+            place-items: center;
+            padding: 12px;
+        }
+
+        .sentence-pattern {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(6px, 1.4vw, 12px);
+            width: 100%;
+            min-height: 72px;
+            color: #0f172a;
+            font-size: clamp(2rem, 5vw, 4.8rem);
+            font-weight: 950;
+            line-height: 1.05;
+            letter-spacing: 0;
+            white-space: nowrap;
+        }
+
+        .sentence-blank {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: clamp(120px, 22vw, 270px);
+            min-height: clamp(58px, 8vw, 92px);
+            padding: 0 0.22em;
+            border: 3px dashed #93a4b8;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            cursor: pointer;
+            font-size: 0.82em;
+            font-weight: 950;
+            line-height: 1;
+            transition: border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+        }
+
+        .sentence-blank.is-filled {
+            border-style: solid;
+            border-color: var(--green);
+            background: var(--green-soft);
+            color: #115e59;
+        }
+
+        .sentence-blank.is-ready,
+        .sentence-blank.is-drop-ready {
+            border-color: var(--blue);
+            background: var(--blue-soft);
+            box-shadow: 0 14px 30px rgba(37, 99, 235, 0.18);
+            transform: translateY(-2px);
+        }
+
+        .particle {
+            color: #c2410c;
+        }
+
+        .verb-word {
+            color: #0f172a;
+        }
+
+        .verb-card {
+            min-height: 74px;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .verb-strip {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            min-width: 0;
+            overflow-x: auto;
+            padding-bottom: 2px;
+            scrollbar-width: thin;
+        }
+
+        .verb-button {
+            flex: 1 0 110px;
+            min-height: 52px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            cursor: pointer;
+            font-size: clamp(1rem, 1.55vw, 1.28rem);
+            font-weight: 950;
+            white-space: nowrap;
+            transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+        }
+
+        .verb-button:hover,
+        .verb-button:focus-visible,
+        .palette-token:hover,
+        .palette-token:focus-visible,
+        .arrow-tool:hover,
+        .arrow-tool:focus-visible,
+        .size-button:hover,
+        .size-button:focus-visible,
+        .board-token:focus-visible,
+        .sentence-blank:focus-visible {
+            outline: 3px solid rgba(37, 99, 235, 0.22);
+            outline-offset: 2px;
+        }
+
+        .verb-button[aria-pressed="true"] {
+            border-color: var(--green);
+            background: var(--green-soft);
+            color: #115e59;
+            transform: translateY(-1px);
+        }
+
+        .diagram-shell {
+            min-height: 0;
+            display: grid;
+            grid-template-columns: minmax(250px, 308px) minmax(0, 1fr);
+            gap: 12px;
+        }
+
+        .palette {
+            min-width: 0;
+            min-height: 0;
+            display: grid;
+            grid-template-rows: minmax(0, 1fr) auto auto;
+            gap: 10px;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .token-grid {
+            min-height: 0;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            align-content: start;
+            overflow: auto;
+            padding-right: 2px;
+        }
+
+        .palette-token {
+            min-width: 0;
+            min-height: 74px;
+            display: grid;
+            grid-template-columns: 38px minmax(0, 1fr);
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #172033;
+            cursor: grab;
+            text-align: left;
+            user-select: none;
+            transition: border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+        }
+
+        .palette-token:active {
+            cursor: grabbing;
+        }
+
+        .palette-token.is-selected {
+            border-color: var(--blue);
+            background: var(--blue-soft);
+            color: #1d4ed8;
+            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.14);
+            transform: translateY(-1px);
+        }
+
+        .token-visual {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            font-size: 1.72rem;
+        }
+
+        .token-label {
+            min-width: 0;
+            font-size: clamp(0.96rem, 1.45vw, 1.08rem);
+            font-weight: 950;
+            line-height: 1.18;
+            word-break: keep-all;
+            overflow-wrap: anywhere;
+        }
+
+        .shape-symbol {
+            width: 28px;
+            height: 28px;
+            display: block;
+        }
+
+        .shape-symbol.circle {
+            border-radius: 999px;
+            background: #38bdf8;
+            box-shadow: inset 0 0 0 3px #0f172a18;
+        }
+
+        .shape-symbol.square {
+            border-radius: 6px;
+            background: #f59e0b;
+            box-shadow: inset 0 0 0 3px #0f172a18;
+        }
+
+        .shape-symbol.triangle {
+            width: 0;
+            height: 0;
+            border-left: 16px solid transparent;
+            border-right: 16px solid transparent;
+            border-bottom: 29px solid #fb7185;
+        }
+
+        .arrow-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 7px;
+            padding-top: 0;
+        }
+
+        .size-controls {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
+        }
+
+        .size-button {
+            min-height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #172033;
+            cursor: pointer;
+            font-size: 1.45rem;
+            font-weight: 950;
+            line-height: 1;
+        }
+
+        .size-button:disabled {
+            color: #94a3b8;
+            cursor: default;
+            opacity: 0.62;
+        }
+
+        .arrow-tool {
+            min-width: 0;
+            min-height: 48px;
+            display: grid;
+            place-items: center;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+            cursor: grab;
+        }
+
+        .arrow-tool:active {
+            cursor: grabbing;
+        }
+
+        .arrow-tool svg {
+            width: 100%;
+            max-width: 50px;
+            height: 28px;
+            overflow: visible;
+        }
+
+        .diagram-board {
+            position: relative;
+            min-width: 0;
+            min-height: 520px;
+            overflow: hidden;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(248, 250, 252, 0.58)),
+                repeating-linear-gradient(0deg, rgba(148, 163, 184, 0.16) 0, rgba(148, 163, 184, 0.16) 1px, transparent 1px, transparent 44px),
+                repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.16) 0, rgba(148, 163, 184, 0.16) 1px, transparent 1px, transparent 44px),
+                #ffffff;
+            touch-action: none;
+        }
+
+        .diagram-board.is-ready {
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2), var(--shadow);
+        }
+
+        .reset-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 8;
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(148, 163, 184, 0.62);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #172033;
+            cursor: pointer;
+            font-size: 1.45rem;
+            font-weight: 950;
+            line-height: 1;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+            backdrop-filter: blur(8px);
+        }
+
+        .reset-button:hover,
+        .reset-button:focus-visible {
+            outline: 3px solid rgba(37, 99, 235, 0.22);
+            outline-offset: 2px;
+            border-color: var(--blue);
+        }
+
+        .arrow-layer,
+        .item-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .arrow-layer {
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .item-layer {
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .diagram-arrow .arrow-visible,
+        .diagram-arrow .arrow-hit {
+            fill: none;
+            vector-effect: non-scaling-stroke;
+        }
+
+        .diagram-arrow .arrow-visible {
+            stroke: #334155;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .diagram-arrow .arrow-hit {
+            stroke: transparent;
+            stroke-width: 20;
+            stroke-linecap: round;
+            pointer-events: stroke;
+            cursor: move;
+        }
+
+        .diagram-arrow[data-type="dashed"] .arrow-visible {
+            stroke: var(--blue);
+            stroke-dasharray: 9 8;
+        }
+
+        .diagram-arrow[data-type="double"] .arrow-visible {
+            stroke: var(--green);
+        }
+
+        .diagram-arrow[data-type="wide"] .arrow-visible {
+            stroke: var(--amber);
+            stroke-width: 7;
+        }
+
+        .diagram-arrow[data-type="curved"] .arrow-visible {
+            stroke: var(--rose);
+            stroke-width: 5;
+        }
+
+        .arrow-handle {
+            fill: #ffffff;
+            stroke: #0f172a;
+            stroke-width: 2;
+            vector-effect: non-scaling-stroke;
+            pointer-events: all;
+            cursor: grab;
+        }
+
+        .arrow-handle[data-handle="center"] {
+            fill: #0f172a;
+            stroke: #ffffff;
+            stroke-width: 3;
+        }
+
+        .arrow-handle:active {
+            cursor: grabbing;
+        }
+
+        .board-token {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 4;
+            display: grid;
+            place-items: center;
+            width: calc(60px * var(--object-scale, 1));
+            height: calc(60px * var(--object-scale, 1));
+            padding: calc(7px * var(--object-scale, 1));
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #172033;
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.14);
+            cursor: grab;
+            pointer-events: auto;
+            touch-action: none;
+            user-select: none;
+            transform: translate(-50%, -50%);
+        }
+
+        .board-token:active {
+            cursor: grabbing;
+        }
+
+        .board-token.is-selected {
+            border-color: var(--blue);
+            background: var(--blue-soft);
+        }
+
+        .board-token .token-visual {
+            width: 100%;
+            height: 100%;
+            font-size: calc(2rem * var(--object-scale, 1));
+        }
+
+        .board-token .shape-symbol {
+            transform: scale(var(--object-scale, 1));
+        }
+
+        .board-token .shape-symbol.circle,
+        .board-token .shape-symbol.square {
+            width: 28px;
+            height: 28px;
+        }
+
+        .board-token .shape-symbol.triangle {
+            border-left-width: 16px;
+            border-right-width: 16px;
+            border-bottom-width: 29px;
+        }
+
+        .drag-ghost {
+            position: fixed;
+            z-index: 80;
+            display: grid;
+            grid-template-columns: 34px minmax(0, auto);
+            align-items: center;
+            gap: 7px;
+            min-width: 108px;
+            min-height: 52px;
+            max-width: 190px;
+            padding: 7px 10px;
+            border: 2px solid var(--blue);
+            border-radius: 8px;
+            background: rgba(239, 246, 255, 0.96);
+            color: #1d4ed8;
+            box-shadow: 0 18px 36px rgba(15, 23, 42, 0.2);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+
+        .drag-ghost .token-visual {
+            width: 32px;
+            height: 32px;
+            font-size: 1.45rem;
+        }
+
+        .drag-ghost .token-label {
+            font-size: 1rem;
+            font-weight: 950;
+        }
+
+        @media (max-width: 980px) {
+            .activity {
+                width: min(100% - 20px, 1320px);
+                grid-template-rows: auto auto auto;
+            }
+
+            .diagram-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .palette {
+                grid-template-rows: auto auto auto;
+            }
+
+            .token-grid {
+                display: flex;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding-bottom: 4px;
+            }
+
+            .palette-token {
+                flex: 0 0 142px;
+            }
+
+            .diagram-board {
+                min-height: 520px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .activity {
+                width: min(100% - 14px, 1320px);
+                gap: 9px;
+                padding-top: 8px;
+            }
+
+            .sentence-card {
+                min-height: 92px;
+                padding: 8px;
+            }
+
+            .sentence-pattern {
+                min-height: 62px;
+                font-size: clamp(1.45rem, 8vw, 2.1rem);
+            }
+
+            .sentence-blank {
+                min-width: clamp(92px, 32vw, 150px);
+                min-height: 50px;
+                border-width: 2px;
+            }
+
+            .verb-card,
+            .palette {
+                padding: 8px;
+            }
+
+            .verb-button {
+                flex-basis: 88px;
+                min-height: 46px;
+            }
+
+            .arrow-grid {
+                gap: 5px;
+            }
+
+            .arrow-tool {
+                min-height: 42px;
+            }
+
+            .palette-token {
+                flex-basis: 124px;
+                min-height: 66px;
+                grid-template-columns: 32px minmax(0, 1fr);
+            }
+
+            .token-visual {
+                width: 32px;
+                height: 32px;
+                font-size: 1.45rem;
+            }
+
+            .diagram-board {
+                min-height: 430px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="activity" data-testid="activity">
+        <section class="sentence-card" data-testid="sentence-card" aria-label="문형">
+            <div class="sentence-pattern" id="sentencePattern" data-testid="sentence-pattern" aria-live="polite">
+                <button class="sentence-blank" id="sentenceBlank" data-testid="sentence-blank" type="button" aria-label="빈칸">____</button>
+                <span class="particle">(을/를)</span>
+                <span class="verb-word" id="verbWord">먹이다</span>
+            </div>
+        </section>
+
+        <section class="verb-card" aria-label="동사">
+            <div class="verb-strip" id="verbStrip" data-testid="verb-strip"></div>
+        </section>
+
+        <section class="diagram-shell">
+            <aside class="palette" aria-label="도구">
+                <div class="token-grid" id="tokenGrid" data-testid="token-grid"></div>
+                <div class="size-controls" aria-label="크기">
+                    <button class="size-button" id="objectSmaller" data-testid="object-smaller" type="button" aria-label="오브젝트 작게">-</button>
+                    <button class="size-button" id="objectBigger" data-testid="object-bigger" type="button" aria-label="오브젝트 크게">+</button>
+                </div>
+                <div class="arrow-grid" id="arrowGrid" data-testid="arrow-grid"></div>
+            </aside>
+
+            <section class="diagram-board" id="diagramBoard" data-testid="diagram-board" aria-label="도식">
+                <button class="reset-button" id="resetButton" data-testid="reset-button" type="button" aria-label="화면 초기화">↺</button>
+                <svg class="arrow-layer" id="arrowLayer" aria-hidden="true">
+                    <defs>
+                        <marker id="arrowHead" viewBox="0 0 12 12" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                            <path d="M2 2 L10 6 L2 10 Z" fill="#334155"></path>
+                        </marker>
+                        <marker id="arrowStart" viewBox="0 0 12 12" markerWidth="12" markerHeight="12" refX="2" refY="6" orient="auto-start-reverse">
+                            <path d="M2 2 L10 6 L2 10 Z" fill="#334155"></path>
+                        </marker>
+                    </defs>
+                    <g id="arrowItems"></g>
+                </svg>
+                <div class="item-layer" id="itemLayer"></div>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        const verbs = ["먹이다", "입히다", "앉히다", "눕히다", "깨우다", "웃기다", "재우다", "태우다"];
+        const tokens = [
+            { id: "circle", label: "동그라미", shape: "circle" },
+            { id: "square", label: "네모", shape: "square" },
+            { id: "triangle", label: "세모", shape: "triangle" },
+            { id: "rice", label: "밥", emoji: "🍚" },
+            { id: "coffee", label: "커피", emoji: "☕" },
+            { id: "juice", label: "주스", emoji: "🧃" },
+            { id: "water", label: "물", emoji: "💧" },
+            { id: "clothes", label: "옷", emoji: "👕" },
+            { id: "pants", label: "바지", emoji: "👖" },
+            { id: "skirt", label: "치마", emoji: "👗" },
+            { id: "friend", label: "친구", emoji: "🧑" },
+            { id: "sibling", label: "동생", emoji: "🧒" },
+            { id: "teacher", label: "선생님", emoji: "🧑‍🏫" }
+        ];
+        const arrowTypes = ["solid", "dashed", "double", "wide", "curved"];
+
+        const refs = {
+            verbStrip: document.getElementById("verbStrip"),
+            verbWord: document.getElementById("verbWord"),
+            blank: document.getElementById("sentenceBlank"),
+            tokenGrid: document.getElementById("tokenGrid"),
+            arrowGrid: document.getElementById("arrowGrid"),
+            objectSmaller: document.getElementById("objectSmaller"),
+            objectBigger: document.getElementById("objectBigger"),
+            reset: document.getElementById("resetButton"),
+            board: document.getElementById("diagramBoard"),
+            itemLayer: document.getElementById("itemLayer"),
+            arrowLayer: document.getElementById("arrowLayer"),
+            arrowItems: document.getElementById("arrowItems")
+        };
+
+        let currentVerb = verbs[0];
+        let selectedTokenId = null;
+        let objectScale = 1;
+        let boardItemId = 0;
+        let arrowId = 0;
+        let arrows = [];
+        let itemDrag = null;
+        let paletteDrag = null;
+        let dragGhost = null;
+        let suppressTokenClick = false;
+        let arrowDrag = null;
+
+        function esc(value) {
+            return String(value || "").replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[char]));
+        }
+
+        function tokenById(id) {
+            return tokens.find((token) => token.id === id);
+        }
+
+        function tokenIcon(token) {
+            if (token.shape) {
+                return '<span class="shape-symbol ' + token.shape + '" aria-hidden="true"></span>';
+            }
+            return esc(token.emoji || "");
+        }
+
+        function renderVerbs() {
+            refs.verbStrip.innerHTML = verbs.map((verb) => (
+                '<button class="verb-button" data-testid="verb-button" type="button" data-verb="' + esc(verb) + '" aria-pressed="' + (verb === currentVerb ? "true" : "false") + '">' + esc(verb) + '</button>'
+            )).join("");
+
+            refs.verbStrip.querySelectorAll(".verb-button").forEach((button) => {
+                button.addEventListener("click", () => {
+                    currentVerb = button.dataset.verb;
+                    refs.verbWord.textContent = currentVerb;
+                    renderVerbs();
+                });
+            });
+        }
+
+        function renderTokens() {
+            refs.tokenGrid.innerHTML = tokens.map((token) => (
+                '<button class="palette-token" type="button" draggable="false" data-token="' + esc(token.id) + '" aria-pressed="' + (token.id === selectedTokenId ? "true" : "false") + '">' +
+                    '<span class="token-visual">' + tokenIcon(token) + '</span>' +
+                    '<span class="token-label">' + esc(token.label) + '</span>' +
+                '</button>'
+            )).join("");
+
+            refs.tokenGrid.querySelectorAll(".palette-token").forEach((button) => {
+                button.classList.toggle("is-selected", button.dataset.token === selectedTokenId);
+                button.addEventListener("click", () => {
+                    if (suppressTokenClick) {
+                        suppressTokenClick = false;
+                        return;
+                    }
+                    selectToken(button.dataset.token);
+                });
+                button.addEventListener("pointerdown", (event) => startPaletteDrag(button, event));
+                button.addEventListener("pointermove", movePaletteDrag);
+                button.addEventListener("pointerup", finishPaletteDrag);
+                button.addEventListener("pointercancel", cancelPaletteDrag);
+                button.addEventListener("dragstart", (event) => {
+                    selectToken(button.dataset.token);
+                    event.dataTransfer.setData("application/x-token", button.dataset.token);
+                    event.dataTransfer.setData("text/plain", button.dataset.token);
+                    event.dataTransfer.effectAllowed = "copy";
+                });
+            });
+        }
+
+        function arrowIcon(type) {
+            if (type === "dashed") {
+                return '<svg viewBox="0 0 70 32" aria-hidden="true"><path d="M8 16 H56" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 7" fill="none"></path><path d="M50 9 L61 16 L50 23" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg>';
+            }
+            if (type === "double") {
+                return '<svg viewBox="0 0 70 32" aria-hidden="true"><path d="M14 16 H56" stroke="#0f766e" stroke-width="4" stroke-linecap="round" fill="none"></path><path d="M20 9 L9 16 L20 23" stroke="#0f766e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"></path><path d="M50 9 L61 16 L50 23" stroke="#0f766e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg>';
+            }
+            if (type === "wide") {
+                return '<svg viewBox="0 0 70 32" aria-hidden="true"><path d="M8 16 H55" stroke="#b45309" stroke-width="7" stroke-linecap="round" fill="none"></path><path d="M49 7 L62 16 L49 25" stroke="#b45309" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg>';
+            }
+            if (type === "curved") {
+                return '<svg viewBox="0 0 70 32" aria-hidden="true"><path d="M8 24 Q35 4 58 20" stroke="#be123c" stroke-width="4" stroke-linecap="round" fill="none"></path><path d="M50 13 L61 21 L48 26" stroke="#be123c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg>';
+            }
+            return '<svg viewBox="0 0 70 32" aria-hidden="true"><path d="M8 16 H56" stroke="#334155" stroke-width="4" stroke-linecap="round" fill="none"></path><path d="M50 9 L61 16 L50 23" stroke="#334155" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg>';
+        }
+
+        function renderArrowTools() {
+            refs.arrowGrid.innerHTML = arrowTypes.map((type, index) => (
+                '<button class="arrow-tool" type="button" draggable="true" data-arrow-type="' + type + '" aria-label="화살표 ' + (index + 1) + '">' + arrowIcon(type) + '</button>'
+            )).join("");
+
+            refs.arrowGrid.querySelectorAll(".arrow-tool").forEach((button) => {
+                button.addEventListener("click", () => createArrow(button.dataset.arrowType));
+                button.addEventListener("dragstart", (event) => {
+                    event.dataTransfer.setData("application/x-arrow", button.dataset.arrowType);
+                    event.dataTransfer.effectAllowed = "copy";
+                });
+            });
+        }
+
+        function selectToken(id) {
+            selectedTokenId = id;
+            refs.blank.classList.toggle("is-ready", Boolean(selectedTokenId));
+            renderTokens();
+            syncBoardSelection();
+        }
+
+        function markTokenSelected(id) {
+            selectedTokenId = id;
+            refs.blank.classList.toggle("is-ready", Boolean(selectedTokenId));
+            refs.tokenGrid.querySelectorAll(".palette-token").forEach((button) => {
+                const active = button.dataset.token === selectedTokenId;
+                button.classList.toggle("is-selected", active);
+                button.setAttribute("aria-pressed", active ? "true" : "false");
+            });
+            syncBoardSelection();
+        }
+
+        function placeToken(id) {
+            const token = tokenById(id);
+            if (!token) return;
+            refs.blank.textContent = token.label;
+            refs.blank.classList.add("is-filled");
+            refs.blank.classList.remove("is-drop-ready");
+            selectToken(id);
+        }
+
+        function clearBlank() {
+            refs.blank.textContent = "____";
+            refs.blank.classList.remove("is-filled");
+        }
+
+        function boardPointFromEvent(event) {
+            const rect = refs.board.getBoundingClientRect();
+            return {
+                x: clamp((event.clientX - rect.left) / rect.width * 100, 4, 96),
+                y: clamp((event.clientY - rect.top) / rect.height * 100, 5, 95)
+            };
+        }
+
+        function svgPointFromEvent(event) {
+            const rect = refs.board.getBoundingClientRect();
+            return {
+                x: clamp((event.clientX - rect.left) / rect.width * 100, 0, 100),
+                y: clamp((event.clientY - rect.top) / rect.height * 100, 0, 100)
+            };
+        }
+
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        function hasTransferType(event, type) {
+            return Array.from(event.dataTransfer.types || []).includes(type);
+        }
+
+        function addBoardToken(tokenId, x, y) {
+            const token = tokenById(tokenId);
+            if (!token) return;
+
+            boardItemId += 1;
+            const item = document.createElement("div");
+            item.className = "board-token";
+            item.tabIndex = 0;
+            item.setAttribute("role", "button");
+            item.setAttribute("aria-label", token.label);
+            item.dataset.token = token.id;
+            item.dataset.itemId = String(boardItemId);
+            item.style.left = x + "%";
+            item.style.top = y + "%";
+            item.innerHTML = '<span class="token-visual">' + tokenIcon(token) + '</span>';
+            refs.itemLayer.appendChild(item);
+            bindBoardItem(item);
+            selectToken(token.id);
+        }
+
+        function bindBoardItem(item) {
+            item.addEventListener("click", () => {
+                if (itemDrag && itemDrag.moved) return;
+                selectToken(item.dataset.token);
+            });
+
+            item.addEventListener("dblclick", () => {
+                item.remove();
+            });
+
+            item.addEventListener("keydown", (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    selectToken(item.dataset.token);
+                }
+            });
+
+            item.addEventListener("pointerdown", (event) => {
+                if (event.button !== 0 && event.pointerType === "mouse") return;
+                const point = boardPointFromEvent(event);
+                itemDrag = {
+                    item,
+                    pointerId: event.pointerId,
+                    startX: point.x,
+                    startY: point.y,
+                    baseX: parseFloat(item.style.left),
+                    baseY: parseFloat(item.style.top),
+                    moved: false
+                };
+                item.setPointerCapture(event.pointerId);
+                event.preventDefault();
+            });
+
+            item.addEventListener("pointermove", (event) => {
+                if (!itemDrag || itemDrag.item !== item) return;
+                const point = boardPointFromEvent(event);
+                const dx = point.x - itemDrag.startX;
+                const dy = point.y - itemDrag.startY;
+                if (Math.hypot(dx, dy) > 0.9) itemDrag.moved = true;
+                item.style.left = clamp(itemDrag.baseX + dx, 5, 95) + "%";
+                item.style.top = clamp(itemDrag.baseY + dy, 6, 94) + "%";
+            });
+
+            item.addEventListener("pointerup", (event) => finishItemDrag(event, item));
+            item.addEventListener("pointercancel", (event) => finishItemDrag(event, item));
+        }
+
+        function finishItemDrag(event, item) {
+            if (!itemDrag || itemDrag.item !== item) return;
+            const wasMoved = itemDrag.moved;
+            try {
+                item.releasePointerCapture(event.pointerId);
+            } catch (error) {
+                // Pointer capture can already be gone after cancellation.
+            }
+            itemDrag = null;
+            const target = document.elementFromPoint(event.clientX, event.clientY);
+            if (wasMoved && target && target.closest("#sentenceBlank")) {
+                placeToken(item.dataset.token);
+            }
+        }
+
+        function syncBoardSelection() {
+            refs.itemLayer.querySelectorAll(".board-token").forEach((item) => {
+                item.classList.toggle("is-selected", item.dataset.token === selectedTokenId);
+            });
+        }
+
+        function updateObjectScale(nextScale) {
+            objectScale = clamp(nextScale, 0.7, 1.9);
+            refs.board.style.setProperty("--object-scale", objectScale.toFixed(2));
+            refs.objectSmaller.disabled = objectScale <= 0.71;
+            refs.objectBigger.disabled = objectScale >= 1.89;
+        }
+
+        function resetActivity() {
+            currentVerb = verbs[0];
+            selectedTokenId = null;
+            itemDrag = null;
+            paletteDrag = null;
+            arrowDrag = null;
+            arrows = [];
+            refs.verbWord.textContent = currentVerb;
+            clearBlank();
+            refs.blank.classList.remove("is-ready", "is-drop-ready");
+            refs.board.classList.remove("is-ready");
+            refs.itemLayer.innerHTML = "";
+            removeDragGhost();
+            updateObjectScale(1);
+            renderVerbs();
+            renderTokens();
+            renderArrows();
+        }
+
+        function createDragGhost(tokenId, x, y) {
+            const token = tokenById(tokenId);
+            if (!token) return;
+            dragGhost = document.createElement("div");
+            dragGhost.className = "drag-ghost";
+            dragGhost.innerHTML =
+                '<span class="token-visual">' + tokenIcon(token) + '</span>' +
+                '<span class="token-label">' + esc(token.label) + '</span>';
+            document.body.appendChild(dragGhost);
+            moveDragGhost(x, y);
+        }
+
+        function moveDragGhost(x, y) {
+            if (!dragGhost) return;
+            dragGhost.style.left = x + "px";
+            dragGhost.style.top = y + "px";
+        }
+
+        function removeDragGhost() {
+            if (dragGhost) dragGhost.remove();
+            dragGhost = null;
+        }
+
+        function setPaletteDropTarget(x, y) {
+            const target = document.elementFromPoint(x, y);
+            refs.blank.classList.toggle("is-drop-ready", Boolean(target && target.closest("#sentenceBlank")));
+            refs.board.classList.toggle("is-ready", Boolean(target && target.closest("#diagramBoard")));
+        }
+
+        function startPaletteDrag(button, event) {
+            if (event.button !== 0 && event.pointerType === "mouse") return;
+            markTokenSelected(button.dataset.token);
+            paletteDrag = {
+                button,
+                pointerId: event.pointerId,
+                tokenId: button.dataset.token,
+                startX: event.clientX,
+                startY: event.clientY,
+                moved: false
+            };
+            button.setPointerCapture(event.pointerId);
+        }
+
+        function movePaletteDrag(event) {
+            if (!paletteDrag) return;
+            const distance = Math.hypot(event.clientX - paletteDrag.startX, event.clientY - paletteDrag.startY);
+            if (distance > 6) paletteDrag.moved = true;
+            if (!paletteDrag.moved) return;
+            if (!dragGhost) createDragGhost(paletteDrag.tokenId, event.clientX, event.clientY);
+            moveDragGhost(event.clientX, event.clientY);
+            setPaletteDropTarget(event.clientX, event.clientY);
+        }
+
+        function finishPaletteDrag(event) {
+            if (!paletteDrag) return;
+            const drag = paletteDrag;
+            paletteDrag = null;
+            try {
+                drag.button.releasePointerCapture(event.pointerId);
+            } catch (error) {
+                // Pointer capture may already be released.
+            }
+
+            refs.blank.classList.remove("is-drop-ready");
+            refs.board.classList.remove("is-ready");
+            removeDragGhost();
+
+            if (!drag.moved) return;
+            suppressTokenClick = true;
+            window.setTimeout(() => {
+                suppressTokenClick = false;
+            }, 0);
+
+            const target = document.elementFromPoint(event.clientX, event.clientY);
+            if (target && target.closest("#sentenceBlank")) {
+                placeToken(drag.tokenId);
+            } else if (target && target.closest("#diagramBoard")) {
+                const point = boardPointFromEvent(event);
+                addBoardToken(drag.tokenId, point.x, point.y);
+            }
+            event.preventDefault();
+        }
+
+        function cancelPaletteDrag(event) {
+            if (paletteDrag && paletteDrag.button) {
+                try {
+                    paletteDrag.button.releasePointerCapture(event.pointerId);
+                } catch (error) {
+                    // Pointer capture may already be released.
+                }
+            }
+            paletteDrag = null;
+            refs.blank.classList.remove("is-drop-ready");
+            refs.board.classList.remove("is-ready");
+            removeDragGhost();
+        }
+
+        function createArrow(type, center) {
+            const offset = (arrows.length % 5) * 7;
+            const y = center ? center.y : 36 + offset;
+            const x1 = center ? center.x - 18 : 28;
+            const x2 = center ? center.x + 18 : 72;
+
+            arrowId += 1;
+            arrows.push({
+                id: "arrow-" + arrowId,
+                type,
+                x1: clamp(x1, 5, 95),
+                y1: clamp(y, 8, 92),
+                x2: clamp(x2, 5, 95),
+                y2: clamp(y, 8, 92)
+            });
+            renderArrows();
+        }
+
+        function boardSize() {
+            const rect = refs.board.getBoundingClientRect();
+            return { width: Math.max(rect.width, 1), height: Math.max(rect.height, 1) };
+        }
+
+        function toPx(point, size) {
+            return {
+                x: point.x / 100 * size.width,
+                y: point.y / 100 * size.height
+            };
+        }
+
+        function arrowPath(arrow, size) {
+            const start = toPx({ x: arrow.x1, y: arrow.y1 }, size);
+            const end = toPx({ x: arrow.x2, y: arrow.y2 }, size);
+            const mid = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+            if (arrow.type !== "curved") {
+                return {
+                    d: "M" + start.x + " " + start.y + " L" + end.x + " " + end.y,
+                    start,
+                    end,
+                    center: mid
+                };
+            }
+
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+            const length = Math.max(Math.hypot(dx, dy), 1);
+            const bend = Math.min(82, Math.max(30, length * 0.24));
+            const control = {
+                x: mid.x - dy / length * bend,
+                y: mid.y + dx / length * bend
+            };
+            return {
+                d: "M" + start.x + " " + start.y + " Q" + control.x + " " + control.y + " " + end.x + " " + end.y,
+                start,
+                end,
+                center: mid
+            };
+        }
+
+        function renderArrows() {
+            const size = boardSize();
+            refs.arrowLayer.setAttribute("viewBox", "0 0 " + size.width + " " + size.height);
+            refs.arrowItems.innerHTML = arrows.map((arrow) => {
+                const path = arrowPath(arrow, size);
+                const markerStart = arrow.type === "double" ? ' marker-start="url(#arrowStart)"' : "";
+                const markerEnd = ' marker-end="url(#arrowHead)"';
+                return '' +
+                    '<g class="diagram-arrow" data-id="' + arrow.id + '" data-type="' + arrow.type + '" data-x1="' + arrow.x1.toFixed(2) + '" data-y1="' + arrow.y1.toFixed(2) + '" data-x2="' + arrow.x2.toFixed(2) + '" data-y2="' + arrow.y2.toFixed(2) + '">' +
+                        '<path class="arrow-hit" data-id="' + arrow.id + '" data-handle="center" d="' + path.d + '"></path>' +
+                        '<path class="arrow-visible" d="' + path.d + '"' + markerStart + markerEnd + '></path>' +
+                        '<circle class="arrow-handle" data-id="' + arrow.id + '" data-handle="start" cx="' + path.start.x + '" cy="' + path.start.y + '" r="8"></circle>' +
+                        '<circle class="arrow-handle" data-id="' + arrow.id + '" data-handle="center" cx="' + path.center.x + '" cy="' + path.center.y + '" r="7"></circle>' +
+                        '<circle class="arrow-handle" data-id="' + arrow.id + '" data-handle="end" cx="' + path.end.x + '" cy="' + path.end.y + '" r="8"></circle>' +
+                    '</g>';
+            }).join("");
+        }
+
+        function arrowById(id) {
+            return arrows.find((arrow) => arrow.id === id);
+        }
+
+        refs.blank.addEventListener("click", () => {
+            if (selectedTokenId) {
+                placeToken(selectedTokenId);
+            } else if (refs.blank.classList.contains("is-filled")) {
+                clearBlank();
+            }
+        });
+
+        refs.objectSmaller.addEventListener("click", () => updateObjectScale(objectScale - 0.15));
+        refs.objectBigger.addEventListener("click", () => updateObjectScale(objectScale + 0.15));
+        refs.reset.addEventListener("click", resetActivity);
+
+        refs.blank.addEventListener("dragover", (event) => {
+            if (!hasTransferType(event, "application/x-token") && !hasTransferType(event, "text/plain")) return;
+            event.preventDefault();
+            refs.blank.classList.add("is-drop-ready");
+        });
+
+        refs.blank.addEventListener("dragleave", () => {
+            refs.blank.classList.remove("is-drop-ready");
+        });
+
+        refs.blank.addEventListener("drop", (event) => {
+            event.preventDefault();
+            const tokenId = event.dataTransfer.getData("application/x-token") || event.dataTransfer.getData("text/plain");
+            refs.blank.classList.remove("is-drop-ready");
+            placeToken(tokenId);
+        });
+
+        refs.board.addEventListener("click", (event) => {
+            if (event.target.closest(".board-token") || event.target.closest(".arrow-handle") || event.target.closest(".arrow-hit")) return;
+            if (!selectedTokenId) return;
+            const point = boardPointFromEvent(event);
+            addBoardToken(selectedTokenId, point.x, point.y);
+        });
+
+        refs.board.addEventListener("dragover", (event) => {
+            if (
+                hasTransferType(event, "application/x-token") ||
+                hasTransferType(event, "application/x-arrow")
+            ) {
+                event.preventDefault();
+                refs.board.classList.add("is-ready");
+            }
+        });
+
+        refs.board.addEventListener("dragleave", () => {
+            refs.board.classList.remove("is-ready");
+        });
+
+        refs.board.addEventListener("drop", (event) => {
+            event.preventDefault();
+            refs.board.classList.remove("is-ready");
+            const tokenId = event.dataTransfer.getData("application/x-token");
+            const arrowType = event.dataTransfer.getData("application/x-arrow");
+            const point = boardPointFromEvent(event);
+            if (tokenId) addBoardToken(tokenId, point.x, point.y);
+            if (arrowType) createArrow(arrowType, point);
+        });
+
+        refs.arrowLayer.addEventListener("pointerdown", (event) => {
+            const target = event.target.closest(".arrow-handle, .arrow-hit");
+            if (!target) return;
+            const arrow = arrowById(target.dataset.id);
+            if (!arrow) return;
+            const point = svgPointFromEvent(event);
+            arrowDrag = {
+                id: arrow.id,
+                handle: target.dataset.handle || "center",
+                start: point,
+                base: { x1: arrow.x1, y1: arrow.y1, x2: arrow.x2, y2: arrow.y2 }
+            };
+            refs.arrowLayer.setPointerCapture(event.pointerId);
+            event.preventDefault();
+        });
+
+        refs.arrowLayer.addEventListener("pointermove", (event) => {
+            if (!arrowDrag) return;
+            const arrow = arrowById(arrowDrag.id);
+            if (!arrow) return;
+            const point = svgPointFromEvent(event);
+
+            if (arrowDrag.handle === "start") {
+                arrow.x1 = clamp(point.x, 2, 98);
+                arrow.y1 = clamp(point.y, 2, 98);
+            } else if (arrowDrag.handle === "end") {
+                arrow.x2 = clamp(point.x, 2, 98);
+                arrow.y2 = clamp(point.y, 2, 98);
+            } else {
+                const dx = point.x - arrowDrag.start.x;
+                const dy = point.y - arrowDrag.start.y;
+                arrow.x1 = clamp(arrowDrag.base.x1 + dx, 2, 98);
+                arrow.y1 = clamp(arrowDrag.base.y1 + dy, 2, 98);
+                arrow.x2 = clamp(arrowDrag.base.x2 + dx, 2, 98);
+                arrow.y2 = clamp(arrowDrag.base.y2 + dy, 2, 98);
+            }
+            renderArrows();
+        });
+
+        refs.arrowLayer.addEventListener("pointerup", (event) => {
+            if (!arrowDrag) return;
+            try {
+                refs.arrowLayer.releasePointerCapture(event.pointerId);
+            } catch (error) {
+                // Pointer capture can already be released in some browsers.
+            }
+            arrowDrag = null;
+        });
+
+        refs.arrowLayer.addEventListener("pointercancel", () => {
+            arrowDrag = null;
+        });
+
+        window.addEventListener("resize", renderArrows);
+
+        renderVerbs();
+        renderTokens();
+        renderArrowTools();
+        updateObjectScale(objectScale);
+    </script>
+</body>
+</html>
