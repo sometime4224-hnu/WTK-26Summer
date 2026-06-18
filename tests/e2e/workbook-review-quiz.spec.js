@@ -68,10 +68,15 @@ test.describe('workbook vocabulary and grammar review quizzes', () => {
       await expect(page.locator('.question-card[data-type="mcq"]')).toHaveCount(16);
       await expect(page.locator('.question-card[data-type="short"]')).toHaveCount(8);
       await expect(page.locator('.question-card[data-type="scaffold"]')).toHaveCount(4);
+      await expect(page.locator('#clearScoreLogsButton')).toHaveCount(0);
+      await expect(page.locator('#bottomCheckAllButton')).toBeAttached();
 
       const audit = await page.evaluate(() => {
         const seeds = ['alpha', 'beta', 'gamma', 'delta'];
         const source = JSON.stringify(window.__reviewQuiz.config);
+        const cards = Array.from(document.querySelectorAll('.question-card'));
+        const bottomButton = document.querySelector('#bottomCheckAllButton');
+        const lastCard = cards[cards.length - 1];
         return {
           counts: window.__reviewQuiz.getQuestionCounts(),
           currentSlots: window.__reviewQuiz.getAnswerSlotCounts(),
@@ -79,6 +84,9 @@ test.describe('workbook vocabulary and grammar review quizzes', () => {
             window.__reviewQuiz.buildAttempt(seed)
           )),
           looseNominalDunjiAnswers: /어떤 일이든지|\"일이든지\"/.test(source),
+          bottomButtonAfterLastQuestion: Boolean(
+            lastCard && bottomButton && (lastCard.compareDocumentPosition(bottomButton) & Node.DOCUMENT_POSITION_FOLLOWING)
+          ),
           imageLoaded: (() => {
             const image = document.querySelector('.review-media img');
             return image.complete && image.naturalWidth > 0;
@@ -94,6 +102,7 @@ test.describe('workbook vocabulary and grammar review quizzes', () => {
         { A: 4, B: 4, C: 4, D: 4 },
         { A: 4, B: 4, C: 4, D: 4 }
       ]);
+      expect(audit.bottomButtonAfterLastQuestion).toBe(true);
       if (target.chapter === '11') {
         expect(audit.looseNominalDunjiAnswers).toBe(false);
       }
@@ -158,6 +167,17 @@ test.describe('workbook vocabulary and grammar review quizzes', () => {
         expect(dunjiAudit.missingDunji).toBe(false);
         expect(dunjiAudit.missingMuseun).toBe(false);
         expect(dunjiAudit.exactForm).toBe(true);
+
+        const causativeHintAudit = await page.evaluate(() => {
+          const card = document.querySelector('[data-question-id="c11-scaffold-27"]');
+          const labels = Array.from(card.querySelectorAll('.required-list li')).map((item) => item.textContent.trim());
+          return {
+            labels,
+            hiddenFormsExposed: labels.some((label) => ['입히다', '먹이다', '재우다'].includes(label))
+          };
+        });
+        expect(causativeHintAudit.labels).toEqual(['입다', '먹다', '자다']);
+        expect(causativeHintAudit.hiddenFormsExposed).toBe(false);
       }
     }
   });
@@ -218,7 +238,7 @@ test.describe('workbook vocabulary and grammar review quizzes', () => {
     await expect(page.locator('#completionStamp')).toBeHidden();
 
     await fillAllCorrect(page);
-    await page.locator('#checkAllButton').click();
+    await page.locator('#bottomCheckAllButton').click();
     await expect(page.locator('#scoreMain')).toHaveText('28 / 28점');
     await expect(page.locator('#completionStamp')).toBeVisible();
     await expect(page.locator('#completionStamp')).toContainText('잘했어요');
@@ -230,7 +250,7 @@ test.describe('workbook vocabulary and grammar review quizzes', () => {
 
     await page.locator('#newAttemptButton').click();
     await fillAllCorrect(page);
-    await page.locator('#checkAllButton').click();
+    await page.locator('#bottomCheckAllButton').click();
     await expect(page.locator('.score-log-item')).toHaveCount(2);
     await expect(page.locator('.score-log-item').first()).toContainText('2회차');
 

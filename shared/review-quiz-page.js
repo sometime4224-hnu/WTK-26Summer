@@ -380,7 +380,6 @@
                         <h2 id="scoreLogTitle">점수 기록</h2>
                         <p>모든 문항을 푼 뒤 채점하면 회차별 점수가 저장됩니다.</p>
                     </div>
-                    <button id="clearScoreLogsButton" class="review-button" type="button">기록 지우기</button>
                 </div>
                 <ol id="scoreLogList" class="score-log-list">
                     ${renderScoreLogItems()}
@@ -439,6 +438,9 @@
 
             <form id="reviewQuizForm" autocomplete="off">
                 ${renderSections()}
+                <div class="bottom-check-panel">
+                    <button id="bottomCheckAllButton" class="review-button primary bottom-check-button" type="button">완료 / 정답확인</button>
+                </div>
             </form>
 
             ${renderScoreLogPanel()}
@@ -684,16 +686,11 @@
 
     function bindEvents() {
         document.getElementById("checkAllButton").addEventListener("click", checkAll);
+        document.getElementById("bottomCheckAllButton").addEventListener("click", checkAll);
         document.getElementById("resetButton").addEventListener("click", clearInputs);
         document.getElementById("newAttemptButton").addEventListener("click", newAttempt);
         document.getElementById("printButton").addEventListener("click", function () {
             window.print();
-        });
-        document.getElementById("clearScoreLogsButton").addEventListener("click", function () {
-            writeScoreLogs([]);
-            currentProgressMeta.loggedSignature = "";
-            saveProgress({ loggedSignature: "" });
-            updateScoreLogUi();
         });
 
         const form = document.getElementById("reviewQuizForm");
