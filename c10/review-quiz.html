@@ -3,1266 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>10과 워크북 어휘·문법 재구성 문제</title>
+    <title>10과 어휘·문법 복습</title>
     <link rel="stylesheet" href="../shared/project-topbar-compact.css">
-    <style>
-        :root {
-            --ink: #1f2937;
-            --muted: #64748b;
-            --paper: #fffdf8;
-            --bg: #f6f7fb;
-            --line: #d8dee9;
-            --accent: #d65a31;
-            --accent-dark: #9f3412;
-            --teal: #0f766e;
-            --plum: #6d28d9;
-            --ok: #047857;
-            --bad: #b91c1c;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            color: var(--ink);
-            background:
-                linear-gradient(90deg, rgba(15, 118, 110, 0.08) 0 1px, transparent 1px 100%),
-                linear-gradient(180deg, #f8fafc 0%, var(--bg) 100%);
-            background-size: 28px 28px, auto;
-            font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
-            word-break: keep-all;
-        }
-
-        .topbar {
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-height: 48px;
-            padding: 8px 14px;
-            background: rgba(255, 255, 255, 0.94);
-            border-bottom: 1px solid var(--line);
-            backdrop-filter: blur(10px);
-        }
-
-        .topbar a {
-            color: #1d4ed8;
-            font-size: 13px;
-            font-weight: 800;
-            text-decoration: none;
-        }
-
-        .topbar .divider {
-            color: #94a3b8;
-        }
-
-        .page {
-            width: min(1100px, calc(100% - 28px));
-            margin: 18px auto 42px;
-        }
-
-        .hero {
-            display: grid;
-            grid-template-columns: minmax(0, 1.25fr) minmax(220px, 0.75fr);
-            gap: 18px;
-            align-items: stretch;
-            margin-bottom: 18px;
-            overflow: hidden;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: var(--paper);
-            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
-        }
-
-        .hero-copy {
-            padding: 26px;
-        }
-
-        .eyebrow {
-            margin: 0 0 10px;
-            color: var(--accent-dark);
-            font-size: 13px;
-            font-weight: 900;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: clamp(1.9rem, 4vw, 3.2rem);
-            line-height: 1.08;
-            letter-spacing: 0;
-        }
-
-        .subtitle {
-            max-width: 700px;
-            margin: 14px 0 0;
-            color: var(--muted);
-            font-size: 1rem;
-            line-height: 1.7;
-        }
-
-        .tag-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 18px;
-        }
-
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            min-height: 30px;
-            padding: 5px 10px;
-            border: 1px solid rgba(214, 90, 49, 0.22);
-            border-radius: 999px;
-            background: #fff7ed;
-            color: #7c2d12;
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .hero-media {
-            min-height: 250px;
-            background: #ede9fe;
-        }
-
-        .hero-media img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .summary-strip {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
-            margin-bottom: 18px;
-        }
-
-        .summary-item {
-            padding: 13px 14px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: #ffffff;
-        }
-
-        .summary-item b {
-            display: block;
-            margin-bottom: 4px;
-            color: var(--teal);
-            font-size: 0.95rem;
-        }
-
-        .summary-item span {
-            color: var(--muted);
-            font-size: 0.88rem;
-        }
-
-        .toolbox {
-            position: sticky;
-            top: 48px;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 18px;
-            padding: 12px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
-            backdrop-filter: blur(10px);
-        }
-
-        .score {
-            min-height: 34px;
-            color: var(--muted);
-            font-weight: 800;
-        }
-
-        .score-stack {
-            display: grid;
-            gap: 3px;
-        }
-
-        .autosave-status {
-            color: var(--teal);
-            font-size: 0.82rem;
-            font-weight: 850;
-        }
-
-        .actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-
-        button {
-            min-height: 36px;
-            padding: 8px 12px;
-            border: 1px solid transparent;
-            border-radius: 8px;
-            font: inherit;
-            font-weight: 900;
-            cursor: pointer;
-        }
-
-        .primary {
-            background: var(--accent);
-            color: #ffffff;
-        }
-
-        .secondary {
-            border-color: var(--line);
-            background: #ffffff;
-            color: #334155;
-        }
-
-        .quiz-section {
-            margin-top: 18px;
-        }
-
-        .section-title {
-            display: flex;
-            align-items: end;
-            justify-content: space-between;
-            gap: 14px;
-            margin: 0 0 10px;
-        }
-
-        .section-title h2 {
-            margin: 0;
-            font-size: clamp(1.35rem, 2vw, 1.8rem);
-        }
-
-        .section-title p {
-            margin: 0;
-            color: var(--muted);
-            font-size: 0.92rem;
-            font-weight: 700;
-        }
-
-        .question-list {
-            display: grid;
-            gap: 12px;
-        }
-
-        .question {
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: #ffffff;
-            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
-        }
-
-        .question.correct {
-            border-color: rgba(4, 120, 87, 0.4);
-            background: #f0fdf4;
-        }
-
-        .question.wrong {
-            border-color: rgba(185, 28, 28, 0.35);
-            background: #fff7f7;
-        }
-
-        .q-head {
-            display: grid;
-            grid-template-columns: 52px 1fr auto;
-            gap: 12px;
-            align-items: start;
-            padding: 16px 16px 10px;
-        }
-
-        .q-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: #f1f5f9;
-            color: #0f172a;
-            font-weight: 900;
-        }
-
-        .q-area {
-            display: inline-flex;
-            align-items: center;
-            min-height: 26px;
-            padding: 4px 9px;
-            border-radius: 999px;
-            background: #eef2ff;
-            color: var(--plum);
-            font-size: 12px;
-            font-weight: 900;
-            white-space: nowrap;
-        }
-
-        .prompt {
-            margin: 0;
-            font-size: 1.05rem;
-            font-weight: 850;
-            line-height: 1.65;
-        }
-
-        .prompt small {
-            color: var(--muted);
-            font-size: 0.9rem;
-            font-weight: 800;
-        }
-
-        .options {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px;
-            padding: 0 16px 16px 80px;
-        }
-
-        .option {
-            display: grid;
-            grid-template-columns: 24px 1fr;
-            gap: 8px;
-            align-items: center;
-            min-height: 44px;
-            padding: 9px 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background: #ffffff;
-            cursor: pointer;
-        }
-
-        .option input {
-            width: 17px;
-            height: 17px;
-            margin: 0;
-        }
-
-        .option span {
-            line-height: 1.45;
-        }
-
-        .short-answer {
-            padding: 0 16px 16px 80px;
-        }
-
-        .short-answer input {
-            width: min(520px, 100%);
-            min-height: 44px;
-            padding: 9px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            background: #ffffff;
-            color: var(--ink);
-            font: inherit;
-        }
-
-        .feedback {
-            display: none;
-            margin: 0 16px 16px 80px;
-            padding: 10px 12px;
-            border-radius: 8px;
-            background: #f8fafc;
-            color: #334155;
-            font-size: 0.92rem;
-            line-height: 1.55;
-        }
-
-        .checked .feedback,
-        .show-answers .feedback {
-            display: block;
-        }
-
-        .feedback b {
-            color: var(--accent-dark);
-        }
-
-        .answer-key {
-            margin-top: 20px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: #ffffff;
-        }
-
-        .bottom-check {
-            margin-top: 22px;
-            padding: 18px;
-            border: 1px solid rgba(214, 90, 49, 0.28);
-            border-radius: 8px;
-            background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
-            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
-            text-align: center;
-        }
-
-        .bottom-check p {
-            margin: 0 0 12px;
-            color: #7c2d12;
-            font-weight: 850;
-        }
-
-        .bottom-check-button {
-            width: min(520px, 100%);
-            min-height: 62px;
-            padding: 14px 18px;
-            border-radius: 8px;
-            background: var(--accent);
-            color: #ffffff;
-            font-size: clamp(1.2rem, 3vw, 1.65rem);
-            box-shadow: 0 12px 24px rgba(214, 90, 49, 0.24);
-        }
-
-        .bottom-score {
-            margin-top: 12px;
-            min-height: 26px;
-            color: var(--accent-dark);
-            font-size: 1rem;
-            font-weight: 900;
-        }
-
-        .score-history {
-            margin-top: 14px;
-            padding: 14px 16px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: #ffffff;
-        }
-
-        .score-history-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .score-history h2 {
-            margin: 0;
-            font-size: 1.05rem;
-        }
-
-        .score-history button {
-            min-height: 32px;
-            padding: 6px 10px;
-            border-color: var(--line);
-            background: #f8fafc;
-            color: #475569;
-            font-size: 0.84rem;
-        }
-
-        .history-list {
-            display: grid;
-            gap: 7px;
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-
-        .history-list li {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 9px 10px;
-            border-radius: 8px;
-            background: #f8fafc;
-            color: #334155;
-            font-size: 0.92rem;
-        }
-
-        .history-score {
-            color: var(--teal);
-            font-weight: 900;
-            white-space: nowrap;
-        }
-
-        .answer-key summary {
-            padding: 14px 16px;
-            color: #0f172a;
-            font-weight: 900;
-            cursor: pointer;
-        }
-
-        .key-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px;
-            padding: 0 16px 16px;
-        }
-
-        .key-grid div {
-            padding: 9px 10px;
-            border-radius: 8px;
-            background: #f8fafc;
-            color: #334155;
-            font-size: 0.92rem;
-            line-height: 1.5;
-        }
-
-        .print-note {
-            margin-top: 16px;
-            color: var(--muted);
-            font-size: 0.85rem;
-            line-height: 1.6;
-            text-align: center;
-        }
-
-        @media (max-width: 760px) {
-            .page {
-                width: min(100% - 20px, 680px);
-                margin-top: 12px;
-            }
-
-            .hero {
-                grid-template-columns: 1fr;
-            }
-
-            .hero-copy {
-                padding: 20px;
-            }
-
-            .hero-media {
-                min-height: 210px;
-            }
-
-            .summary-strip {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .toolbox {
-                position: static;
-                align-items: stretch;
-                flex-direction: column;
-            }
-
-            .actions {
-                justify-content: stretch;
-            }
-
-            .actions button {
-                flex: 1 1 120px;
-            }
-
-            .section-title {
-                align-items: start;
-                flex-direction: column;
-            }
-
-            .q-head {
-                grid-template-columns: 44px 1fr;
-            }
-
-            .q-area {
-                grid-column: 2;
-                width: max-content;
-            }
-
-            .options,
-            .short-answer,
-            .feedback {
-                margin-left: 0;
-                padding-left: 16px;
-            }
-
-            .options {
-                grid-template-columns: 1fr;
-            }
-
-            .key-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media print {
-            body {
-                background: #ffffff;
-            }
-
-            .topbar,
-            .toolbox,
-            .answer-key,
-            .bottom-check,
-            .score-history,
-            .print-note {
-                display: none;
-            }
-
-            .page {
-                width: 100%;
-                margin: 0;
-            }
-
-            .hero {
-                box-shadow: none;
-                break-inside: avoid;
-            }
-
-            .question {
-                box-shadow: none;
-                break-inside: avoid;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../shared/review-quiz-page.css">
 </head>
-<body>
-    <nav class="topbar" aria-label="페이지 이동">
-        <a href="../index.html">메인으로</a>
-        <span class="divider">|</span>
-        <a href="index.html">10과 홈</a>
+<body class="review-quiz-page" data-chapter="10">
+    <nav class="review-topbar" aria-label="상단 이동">
+        <a href="../index.html">메인</a>
+        <span>|</span>
+        <a href="index.html">10과 목록</a>
     </nav>
 
-    <main class="page">
-        <header class="hero">
-            <div class="hero-copy">
-                <p class="eyebrow">Workbook Rebuild</p>
-                <h1>10과 어휘·문법 문제</h1>
-                <p class="subtitle">연애와 결혼 관련 어휘, 과거 회상 표현, 상대가 아는 사실을 상기하는 표현, 미래 계획 표현, 아직 부족함을 나타내는 표현을 확인합니다.</p>
-                <div class="tag-row" aria-label="학습 항목">
-                    <span class="tag">연애·결혼 어휘</span>
-                    <span class="tag">A/V-던</span>
-                    <span class="tag">A/V-잖아(요)</span>
-                    <span class="tag">V-(으)ㄹ 생각/계획/예정이다</span>
-                    <span class="tag">V-(으)려면 멀었다</span>
-                </div>
-            </div>
-            <figure class="hero-media" aria-label="10과 어휘 이미지">
-                <img src="../assets/c10/vocabulary/images/split-hq/c10_vocab_23_love_marriage.webp" alt="결혼과 연애를 주제로 한 삽화">
-            </figure>
-        </header>
-
-        <section class="summary-strip" aria-label="문제 구성">
-            <div class="summary-item">
-                <b>객관식 12문항</b>
-                <span>정답 번호 ①~④ 각 3문항</span>
-            </div>
-            <div class="summary-item">
-                <b>주관식 8문항</b>
-                <span>형태 변환과 문장 완성</span>
-            </div>
-            <div class="summary-item">
-                <b>총 20문항</b>
-                <span>워크북 범위 재구성</span>
-            </div>
-            <div class="summary-item">
-                <b>단원 10</b>
-                <span>결혼하려면 아직 멀었어요</span>
-            </div>
-        </section>
-
-        <div class="toolbox" aria-label="채점 도구">
-            <div class="score-stack">
-                <div id="score" class="score" aria-live="polite">아직 채점하지 않았습니다.</div>
-                <div id="autosaveStatus" class="autosave-status" aria-live="polite">자동 저장 준비됨</div>
-            </div>
-            <div class="actions">
-                <button class="primary" type="button" id="checkButton">정답 확인</button>
-                <button class="secondary" type="button" id="showButton">해설 표시</button>
-                <button class="secondary" type="button" id="resetButton">다시 풀기</button>
-                <button class="secondary" type="button" id="printButton">인쇄</button>
-            </div>
-        </div>
-
-        <form id="quizForm" autocomplete="off">
-            <section class="quiz-section" aria-labelledby="mcq-title">
-                <div class="section-title">
-                    <h2 id="mcq-title">객관식</h2>
-                    <p>각 문항에서 알맞은 답을 하나 고르세요.</p>
-                </div>
-
-                <div class="question-list">
-                    <article class="question" data-type="mcq" data-answer="2">
-                        <div class="q-head">
-                            <span class="q-number">1</span>
-                            <p class="prompt">“처음 보는 순간 좋아하게 되다”의 뜻에 가장 가까운 말은?</p>
-                            <span class="q-area">어휘</span>
-                        </div>
-                        <div class="options">
-                            <label class="option"><input type="radio" name="q1" value="1"><span>① 소개팅하다</span></label>
-                            <label class="option"><input type="radio" name="q1" value="2"><span>② 첫눈에 반하다</span></label>
-                            <label class="option"><input type="radio" name="q1" value="3"><span>③ 청혼하다</span></label>
-                            <label class="option"><input type="radio" name="q1" value="4"><span>④ 조건이 맞다</span></label>
-                        </div>
-                        <p class="feedback"><b>정답 ②</b> 처음 본 순간 바로 호감을 느끼는 것은 “첫눈에 반하다”입니다.</p>
-                    </article>
-
-                    <article class="question" data-type="mcq" data-answer="4">
-                        <div class="q-head">
-                            <span class="q-number">2</span>
-                            <p class="prompt">좋아하는 사람에게 자신의 마음을 직접 말하는 것은?</p>
-                            <span class="q-area">어휘</span>
-                        </div>
-                        <div class="options">
-                            <label class="option"><input type="radio" name="q2" value="1"><span>① 사귀다</span></label>
-                            <label class="option"><input type="radio" name="q2" value="2"><span>② 반하다</span></label>
-                            <label class="option"><input type="radio" name="q2" value="3"><span>③ 연애하다</span></label>
-                            <label class="option"><input type="radio" name="q2" value="4"><span>④ 고백하다</span></label>
-                        </div>
-                        <p class="feedback"><b>정답 ④</b> 마음을 직접 말하는 행동은 “고백하다”입니다.</p>
-                    </article>
-
-                    <article class="question" data-type="mcq" data-answer="1">
-                        <div class="q-head">
-                            <span class="q-number">3</span>
-                            <p class="prompt">“두 사람이 연인 관계로 만나다”의 뜻은?</p>
-                            <span class="q-area">어휘</span>
-                        </div>
-                        <div class="options">
-                            <label class="option"><input type="radio" name="q3" value="1"><span>① 사귀다</span></label>
-                            <label class="option"><input type="radio" name="q3" value="2"><span>② 청혼하다</span></label>
-                            <label class="option"><input type="radio" name="q3" value="3"><span>③ 얼굴이 빨개지다</span></label>
-                            <label class="option"><input type="radio" name="q3" value="4"><span>④ 첫눈에 반하다</span></label>
-                        </div>
-                        <p class="feedback"><b>정답 ①</b> 연인 관계로 만나는 것은 “사귀다”입니다.</p>
-                    </article>
-
-                    <article class="question" data-type="mcq" data-answer="3">
-                        <div class="q-head">
-                            <span class="q-number">4</span>
-                            <p class="prompt">민수 씨는 웃는 모습이 좋고 이야기도 재미있어서 정말 _______.</p>
-                            <span class="q-area">어휘</span>
-                        </div>
-                        <div class="options">
-                            <label class="option"><input type="radio" name="q4" value="1"><span>① 조건이 맞아요</span></label>
-                            <label class="option"><input type="radio" name="q4" value="2"><span>② 고백했어요</span></label>
-                            <label class="option"><input type="radio" name="q4" value="3"><span>③ 매력이 있어요</span></label>
-                            <label class="option"><input type="radio" name="q4" value="4"><span>④ 예정이에요</span></label>
-                        </div>
-                        <p class="feedback"><b>정답 ③</b> 좋은 인상과 끌리는 점을 말할 때 “매력이 있다”가 자연스럽습니다.</p>
-                    </article>
-
-                    <article class="question" data-type="mcq" data-answer="2">
-                        <div class="q-head">
-                            <span class="q-number">5</span>
-                            <p class="prompt">다음 중 사람의 성격이나 인상을 칭찬하는 표현이 아닌 것은?</p>
-                            <span class="q-area">어휘</span>
-                        </div>
-                        <div class="options">
-                            <label class="option"><input type="radio" name="q5" value="1"><span>① 마음씨가 착하다</span></label>
-                            <label class="option"><input type="radio" name="q5" value="2"><span>② 버스가 출발하다</span></label>
-                            <label class="option"><input type="radio" name="q5" value="3"><span>③ 인상이 좋다</span></label>
-                            <label class="option"><input type="radio" name="q5" value="4"><span>④ 말이 잘 통하다</span></label>
-                        </div>
-                        <p class="feedback"><b>정답 ②</b> “버스가 출발하다”는 교통 상황 표현입니다.</p>
-                    </article>
-
-                    <article class="question" data-type="mcq" data-answer="1">
-                        <div class="q-head">
-                            <span class="q-number">6</span>
-                            <p class="prompt">예전에 자주 _______ 카페가 없어졌어요.</p>
-                            <span class="q-area">A/V-던</span>
-                        </div>
-                        <div class="options">
-                            <label class="option"><input type="radio" name="q6" value="1"><span>① 가던</span></label>
-                            <label class="option"><input type="radio" name="q6" value="2"><span>② 간</span></label>
-                            <label class="option"><input type="radio" name="q6" value="3"><span>③ 갈</span></label>
-                            <label class="option"><input type="radio" name="q6" value="4"><span>④ 가는</span></label>
-                        </div>
-                        <p class="feedback"><b>정답 ①</b> 과거에 반복해서 갔던 장소를 회상하므로 “가던”이 맞습니다.</p>
-                    </article>
-
-                    <article class="question" data-type="mcq" data-answer="4">
-                        <div class="q-head">
-                            <span class="q-number">7</span>
-                            <p class="prompt">어렸을 때 제가 _______ 동네가 많이 변했어요.</p>
-                            <span class="q-area">A/V-던</span>
-                        </div>
-                        <div class="options">
-                            <label class="option"><input type="radio" name="q7" value="1"><span>① 살</span></label>
-                            <label class="option"><input type="radio" name="q7" value="2"><span>② 사는</span></label>
-                            <label class="option"><input type="radio" name="q7" value="3"><span>③ 산</span></label>
-                            <label class="option"><input type="radio" name="q7" value="4"><span>④ 살던</span></label>
-                        </div>
-                        <p class="feedback"><b>정답 ④</b> 어린 시절에 살았던 곳을 떠올리는 문맥이므로 “살던”이 자연스럽습니다.</p>
-                    </article>
-
-                    <article class="question" data-type="mcq" data-answer="3">
-                        <div class="q-head">
-                            <span class="q-number">8</span>
-                            <p class="prompt">다음 중 가장 자연스러운 문장은?</p>
-                            <span class="q-area">A/V-던</span>
-                        </div>
-                        <div class="options">
-                            <label class="option"><input type="radio" name="q8" value="1"><span>① 내일 먹던 케이크를 살 거예요.</span></label>
-                            <label class="option"><input type="radio" name="q8" value="2"><span>② 지금 먹던 케이크를 새로 만들 거예요.</span></label>
-                            <label class="option"><input type="radio" name="q8" value="3"><span>③ 어제 먹던 케이크를 동생이 다 먹었어요.</span></label>
-                            <label class="option"><input type="radio" name="q8" value="4"><span>④ 매일 먹을 케이크가 어제 맛있었어요.</span></label>
-                        </div>
-                        <p class="feedback"><b>정답 ③</b> 먹다가 남아 있던 케이크를 떠올리는 문맥이라 “먹던”이 어울립니다.</p>
-                    </article>
-
-                    <article class="question" data-type="mcq" data-answer="1">
-                        <div class="q-head">
-                            <span class="q-number">9</span>
-                            <p class="prompt">A: 왜 우산을 안 가져왔어요?<br>B: 아침에는 비가 안 _______.</p>
-                            <span class="q-area">A/V-잖아(요)</span>
-                        </div>
-                        <div class="options">
-                            <label class="option"><input type="radio" name="q9" value="1"><span>① 왔잖아요</span></label>
-                            <label class="option"><input type="radio" name="q9" value="2"><span>② 올 예정이에요</span></label>
-                            <label class="option"><input type="radio" name="q9" value="3"><span>③ 오던데요</span></label>
-                            <label class="option"><input type="radio" name="q9" value="4"><span>④ 오려면 멀었어요</span></label>
-                        </div>
-                        <p class="feedback"><b>정답 ①</b> 상대도 알 수 있는 과거 사실을 근거로 말하므로 “왔잖아요”가 자연스럽습니다.</p>
-                    </article>
-
-                    <article class="question" data-type="mcq" data-answer="4">
-                        <div class="q-head">
-                            <span class="q-number">10</span>
-                            <p class="prompt">A: 오늘 사람이 정말 많네요.<br>B: 주말이_______.</p>
-                            <span class="q-area">A/V-잖아(요)</span>
-                        </div>
-                        <div class="options">
-                            <label class="option"><input type="radio" name="q10" value="1"><span>① 었어요</span></label>
-                            <label class="option"><input type="radio" name="q10" value="2"><span>② 려면 멀었어요</span></label>
-                            <label class="option"><input type="radio" name="q10" value="3"><span>③ 될 계획이에요</span></label>
-                            <label class="option"><input type="radio" name="q10" value="4"><span>④ 잖아요</span></label>
-                        </div>
-                        <p class="feedback"><b>정답 ④</b> “주말이잖아요”는 사람이 많은 이유를 상대에게 상기시키는 표현입니다.</p>
-                    </article>
-
-                    <article class="question" data-type="mcq" data-answer="3">
-                        <div class="q-head">
-                            <span class="q-number">11</span>
-                            <p class="prompt">다음 달에 이사할 _______입니다.</p>
-                            <span class="q-area">V-(으)ㄹ 예정</span>
-                        </div>
-                        <div class="options">
-                            <label class="option"><input type="radio" name="q11" value="1"><span>① 고백</span></label>
-                            <label class="option"><input type="radio" name="q11" value="2"><span>② 인상</span></label>
-                            <label class="option"><input type="radio" name="q11" value="3"><span>③ 예정</span></label>
-                            <label class="option"><input type="radio" name="q11" value="4"><span>④ 조건</span></label>
-                        </div>
-                        <p class="feedback"><b>정답 ③</b> 정해진 미래 일정을 말할 때 “이사할 예정입니다”라고 합니다.</p>
-                    </article>
-
-                    <article class="question" data-type="mcq" data-answer="2">
-                        <div class="q-head">
-                            <span class="q-number">12</span>
-                            <p class="prompt">한국어를 원어민처럼 말하려면 아직 _______.</p>
-                            <span class="q-area">V-(으)려면 멀었다</span>
-                        </div>
-                        <div class="options">
-                            <label class="option"><input type="radio" name="q12" value="1"><span>① 반했어요</span></label>
-                            <label class="option"><input type="radio" name="q12" value="2"><span>② 멀었어요</span></label>
-                            <label class="option"><input type="radio" name="q12" value="3"><span>③ 맞았어요</span></label>
-                            <label class="option"><input type="radio" name="q12" value="4"><span>④ 고백했어요</span></label>
-                        </div>
-                        <p class="feedback"><b>정답 ②</b> 목표에 도달하기까지 시간이 더 필요할 때 “아직 멀었어요”라고 합니다.</p>
-                    </article>
-                </div>
-            </section>
-
-            <section class="quiz-section" aria-labelledby="short-title">
-                <div class="section-title">
-                    <h2 id="short-title">주관식</h2>
-                    <p>빈칸에 알맞은 말을 쓰세요.</p>
-                </div>
-
-                <div class="question-list">
-                    <article class="question" data-type="short" data-answers="사귀고">
-                        <div class="q-head">
-                            <span class="q-number">13</span>
-                            <p class="prompt">두 사람은 친구 소개로 만나서 지금 6개월째 _______ 있어요.</p>
-                            <span class="q-area">어휘</span>
-                        </div>
-                        <div class="short-answer">
-                            <input type="text" name="q13" aria-label="13번 답">
-                        </div>
-                        <p class="feedback"><b>예시 답</b> 사귀고</p>
-                    </article>
-
-                    <article class="question" data-type="short" data-answers="청혼했어요|청혼했습니다|고백했어요|고백했습니다">
-                        <div class="q-head">
-                            <span class="q-number">14</span>
-                            <p class="prompt">지훈 씨는 여자 친구에게 결혼하자고 _______.</p>
-                            <span class="q-area">어휘</span>
-                        </div>
-                        <div class="short-answer">
-                            <input type="text" name="q14" aria-label="14번 답">
-                        </div>
-                        <p class="feedback"><b>예시 답</b> 청혼했어요. “고백했어요”도 문맥상 가능합니다.</p>
-                    </article>
-
-                    <article class="question" data-type="short" data-answers="읽던">
-                        <div class="q-head">
-                            <span class="q-number">15</span>
-                            <p class="prompt">제가 어릴 때 자주 _______ 책입니다. <small>(읽다)</small></p>
-                            <span class="q-area">A/V-던</span>
-                        </div>
-                        <div class="short-answer">
-                            <input type="text" name="q15" aria-label="15번 답">
-                        </div>
-                        <p class="feedback"><b>예시 답</b> 읽던</p>
-                    </article>
-
-                    <article class="question" data-type="short" data-answers="살던">
-                        <div class="q-head">
-                            <span class="q-number">16</span>
-                            <p class="prompt">여기는 제가 예전에 _______ 동네예요. <small>(살다)</small></p>
-                            <span class="q-area">A/V-던</span>
-                        </div>
-                        <div class="short-answer">
-                            <input type="text" name="q16" aria-label="16번 답">
-                        </div>
-                        <p class="feedback"><b>예시 답</b> 살던</p>
-                    </article>
-
-                    <article class="question" data-type="short" data-answers="있잖아요|있잖아|있잖습니까">
-                        <div class="q-head">
-                            <span class="q-number">17</span>
-                            <p class="prompt">A: 왜 오늘 일찍 집에 가요?<br>B: 내일 시험이 _______.</p>
-                            <span class="q-area">A/V-잖아(요)</span>
-                        </div>
-                        <div class="short-answer">
-                            <input type="text" name="q17" aria-label="17번 답">
-                        </div>
-                        <p class="feedback"><b>예시 답</b> 있잖아요</p>
-                    </article>
-
-                    <article class="question" data-type="short" data-answers="졸업 후에 취직할 계획입니다|졸업 후에 취직할 계획이에요|졸업 후 취직할 계획입니다|졸업 후 취직할 계획이에요">
-                        <div class="q-head">
-                            <span class="q-number">18</span>
-                            <p class="prompt">`V-(으)ㄹ 계획이다`를 사용해 문장을 만드세요.<br><small>졸업 후 / 취직하다</small></p>
-                            <span class="q-area">V-(으)ㄹ 계획</span>
-                        </div>
-                        <div class="short-answer">
-                            <input type="text" name="q18" aria-label="18번 답">
-                        </div>
-                        <p class="feedback"><b>예시 답</b> 졸업 후에 취직할 계획입니다.</p>
-                    </article>
-
-                    <article class="question" data-type="short" data-answers="다음 주에 새 제품이 나올 예정입니다|다음 주에 새 제품이 나올 예정이에요|다음 주 새 제품이 나올 예정입니다|다음 주 새 제품이 나올 예정이에요">
-                        <div class="q-head">
-                            <span class="q-number">19</span>
-                            <p class="prompt">`V-(으)ㄹ 예정이다`를 사용해 문장을 만드세요.<br><small>다음 주 / 새 제품이 나오다</small></p>
-                            <span class="q-area">V-(으)ㄹ 예정</span>
-                        </div>
-                        <div class="short-answer">
-                            <input type="text" name="q19" aria-label="19번 답">
-                        </div>
-                        <p class="feedback"><b>예시 답</b> 다음 주에 새 제품이 나올 예정입니다.</p>
-                    </article>
-
-                    <article class="question" data-type="short" data-answers="멀었어요|아직 멀었어요|멀었습니다|아직 멀었습니다">
-                        <div class="q-head">
-                            <span class="q-number">20</span>
-                            <p class="prompt">운전을 잘하려면 아직 _______.</p>
-                            <span class="q-area">V-(으)려면 멀었다</span>
-                        </div>
-                        <div class="short-answer">
-                            <input type="text" name="q20" aria-label="20번 답">
-                        </div>
-                        <p class="feedback"><b>예시 답</b> 멀었어요</p>
-                    </article>
-                </div>
-            </section>
-
-            <section class="bottom-check" aria-label="최종 채점">
-                <p>모든 문제를 푼 뒤 아래 버튼을 눌러 점수를 확인하세요.</p>
-                <button class="bottom-check-button" type="button" id="bottomCheckButton">정답 확인</button>
-                <div id="bottomScore" class="bottom-score" aria-live="polite"></div>
-            </section>
-        </form>
-
-        <section class="score-history" aria-labelledby="history-title">
-            <div class="score-history-head">
-                <h2 id="history-title">점수 기록</h2>
-                <button type="button" id="clearHistoryButton">기록 지우기</button>
-            </div>
-            <ul id="historyList" class="history-list">
-                <li>아직 저장된 점수가 없습니다.</li>
-            </ul>
-        </section>
-
-        <details class="answer-key">
-            <summary>정답표</summary>
-            <div class="key-grid">
-                <div>1. ② 첫눈에 반하다</div>
-                <div>2. ④ 고백하다</div>
-                <div>3. ① 사귀다</div>
-                <div>4. ③ 매력이 있어요</div>
-                <div>5. ② 버스가 출발하다</div>
-                <div>6. ① 가던</div>
-                <div>7. ④ 살던</div>
-                <div>8. ③ 어제 먹던 케이크를 동생이 다 먹었어요.</div>
-                <div>9. ① 왔잖아요</div>
-                <div>10. ④ 잖아요</div>
-                <div>11. ③ 예정</div>
-                <div>12. ② 멀었어요</div>
-                <div>13. 사귀고</div>
-                <div>14. 청혼했어요</div>
-                <div>15. 읽던</div>
-                <div>16. 살던</div>
-                <div>17. 있잖아요</div>
-                <div>18. 졸업 후에 취직할 계획입니다.</div>
-                <div>19. 다음 주에 새 제품이 나올 예정입니다.</div>
-                <div>20. 멀었어요</div>
-            </div>
-        </details>
-
-        <p class="print-note">서울대 한국어 3B 워크북 10과 어휘·문법 학습 목표를 바탕으로 새로 구성한 보조 문제입니다.</p>
+    <main class="review-shell">
+        <div id="reviewQuizRoot"></div>
     </main>
 
-    <script src="../shared/site-copyright.js"></script>
     <script>
-        const form = document.getElementById("quizForm");
-        const score = document.getElementById("score");
-        const checkButton = document.getElementById("checkButton");
-        const bottomCheckButton = document.getElementById("bottomCheckButton");
-        const bottomScore = document.getElementById("bottomScore");
-        const showButton = document.getElementById("showButton");
-        const resetButton = document.getElementById("resetButton");
-        const printButton = document.getElementById("printButton");
-        const historyList = document.getElementById("historyList");
-        const clearHistoryButton = document.getElementById("clearHistoryButton");
-        const autosaveStatus = document.getElementById("autosaveStatus");
-        const HISTORY_KEY = "c10.review.wbVocabGrammar.scoreHistory.v1";
-        const PROGRESS_KEY = "c10.review.wbVocabGrammar.progress.v1";
-        let autosaveTimer;
-
-        function getQuestions() {
-            return [...document.querySelectorAll(".question")];
-        }
-
-        function normalize(value) {
-            return value
-                .trim()
-                .replace(/\s+/g, " ")
-                .replace(/[.。!?！？]+$/g, "");
-        }
-
-        function checkQuestion(question) {
-            const type = question.dataset.type;
-            question.classList.remove("correct", "wrong");
-
-            if (type === "mcq") {
-                const selected = question.querySelector("input[type='radio']:checked");
-                if (!selected) return false;
-                const isCorrect = selected.value === question.dataset.answer;
-                question.classList.add(isCorrect ? "correct" : "wrong");
-                return isCorrect;
-            }
-
-            const input = question.querySelector("input[type='text']");
-            const value = normalize(input.value);
-            if (!value) return false;
-            const answers = question.dataset.answers.split("|").map(normalize);
-            const isCorrect = answers.includes(value);
-            question.classList.add(isCorrect ? "correct" : "wrong");
-            return isCorrect;
-        }
-
-        function readHistory() {
-            try {
-                const value = localStorage.getItem(HISTORY_KEY);
-                return value ? JSON.parse(value) : [];
-            } catch (error) {
-                return [];
-            }
-        }
-
-        function writeHistory(history) {
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 10)));
-        }
-
-        function renderHistory() {
-            const history = readHistory();
-            historyList.innerHTML = "";
-
-            if (!history.length) {
-                const empty = document.createElement("li");
-                empty.textContent = "아직 저장된 점수가 없습니다.";
-                historyList.appendChild(empty);
-                return;
-            }
-
-            history.forEach((record) => {
-                const item = document.createElement("li");
-                const date = document.createElement("span");
-                const points = document.createElement("span");
-                date.textContent = new Date(record.time).toLocaleString("ko-KR", {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit"
-                });
-                points.className = "history-score";
-                points.textContent = `${record.correct}/${record.total}점 (${record.percent}%)`;
-                item.append(date, points);
-                historyList.appendChild(item);
-            });
-        }
-
-        function saveScore(correct, total) {
-            const history = readHistory();
-            history.unshift({
-                correct,
-                total,
-                percent: Math.round((correct / total) * 100),
-                time: Date.now()
-            });
-            writeHistory(history);
-            renderHistory();
-        }
-
-        function readProgress() {
-            try {
-                const value = localStorage.getItem(PROGRESS_KEY);
-                return value ? JSON.parse(value) : null;
-            } catch (error) {
-                return null;
-            }
-        }
-
-        function collectAnswers() {
-            const answers = {};
-            getQuestions().forEach((question) => {
-                const control = question.querySelector("input[type='radio']:checked, input[type='text']");
-                if (control && control.value) {
-                    answers[control.name] = control.value;
+        window.REVIEW_QUIZ_CONFIG = {
+            chapter: "10",
+            eyebrow: "Lesson 10 Review",
+            title: "10과 어휘·문법 복습",
+            subtitle: "연애와 결혼 어휘, 과거 회상 표현, 상기 표현, 미래 계획 표현, 아직 목표에 멀었음을 말하는 표현을 점검합니다.",
+            tags: ["연애·결혼", "-던", "-잖아(요)", "-(으)ㄹ 생각/계획/예정이다", "-(으)려면 멀었다"],
+            image: {
+                src: "../assets/c10/vocabulary/images/split-hq/c10_vocab_23_love_marriage.webp",
+                alt: "연애와 결혼 어휘를 나타내는 그림",
+                width: 640,
+                height: 420
+            },
+            rightsNote: "서울대 한국어 3B 워크북 10과 학습 목표를 바탕으로 새로 구성한 보조 문제입니다.",
+            questions: [
+                {
+                    id: "c10-mcq-01",
+                    type: "mcq",
+                    area: "어휘",
+                    kind: "뜻 고르기",
+                    targetSlot: 0,
+                    prompt: "처음 보고 바로 좋아했어요. 어떤 말이에요?",
+                    answer: "첫눈에 반하다",
+                    distractors: ["소개팅하다", "청혼하다", "조건이 맞다"],
+                    explanation: "처음 보고 바로 좋아하면 첫눈에 반하다를 씁니다."
+                },
+                {
+                    id: "c10-mcq-02",
+                    type: "mcq",
+                    area: "어휘",
+                    kind: "뜻 고르기",
+                    targetSlot: 1,
+                    prompt: "좋아한다고 직접 말해요. 어떤 말이에요?",
+                    answer: "고백하다",
+                    distractors: ["사귀다", "연애하다", "얼굴이 빨개지다"],
+                    explanation: "좋아하는 마음을 말하면 고백하다입니다."
+                },
+                {
+                    id: "c10-mcq-03",
+                    type: "mcq",
+                    area: "어휘",
+                    kind: "문맥 선택",
+                    targetSlot: 2,
+                    prompt: "두 사람이 서로 잘 맞아요. 어떤 말이에요?",
+                    answer: "조건이 맞다",
+                    distractors: ["마음씨가 착하다", "사랑에 빠지다", "얼굴이 빨개지다"],
+                    explanation: "두 사람의 상황이 잘 맞으면 조건이 맞다를 씁니다."
+                },
+                {
+                    id: "c10-mcq-04",
+                    type: "mcq",
+                    area: "어휘",
+                    kind: "문맥 선택",
+                    targetSlot: 3,
+                    prompt: "결혼하자고 말해요. 어떤 말이에요?",
+                    answer: "청혼하다",
+                    distractors: ["소개팅하다", "연애하다", "말이 잘 통하다"],
+                    explanation: "결혼하자고 말하면 청혼하다입니다."
+                },
+                {
+                    id: "c10-mcq-05",
+                    type: "mcq",
+                    area: "어휘",
+                    kind: "다른 것 찾기",
+                    targetSlot: 0,
+                    prompt: "사람을 설명하는 말이 아닌 것은?",
+                    answer: "버스가 출발하다",
+                    distractors: ["인상이 좋다", "마음씨가 착하다", "말이 잘 통하다"],
+                    explanation: "버스가 출발하다는 사람을 설명하는 말이 아닙니다."
+                },
+                {
+                    id: "c10-mcq-06",
+                    type: "mcq",
+                    area: "-던",
+                    kind: "형태 선택",
+                    targetSlot: 1,
+                    prompt: "예전에 자주 ___ 카페가 없어졌어요. (가다)",
+                    answer: "가던",
+                    distractors: ["간", "갈", "가는"],
+                    explanation: "예전에 자주 간 곳을 말하므로 가던이 맞습니다."
+                },
+                {
+                    id: "c10-mcq-07",
+                    type: "mcq",
+                    area: "-던",
+                    kind: "형태 선택",
+                    targetSlot: 2,
+                    prompt: "어릴 때 제가 ___ 동네가 변했어요. (살다)",
+                    answer: "살던",
+                    distractors: ["살", "사는", "산"],
+                    explanation: "예전에 살았던 곳을 말하므로 살던을 씁니다."
+                },
+                {
+                    id: "c10-mcq-08",
+                    type: "mcq",
+                    area: "-던",
+                    kind: "문장 선택",
+                    targetSlot: 3,
+                    prompt: "-던을 잘 쓴 문장은?",
+                    answer: "어제 먹던 빵을 동생이 치웠어요.",
+                    distractors: ["내일 먹던 빵을 살 거예요.", "매일 먹을 빵이 어제 맛있었어요.", "지금 먹을 빵을 어제 치웠어요."],
+                    explanation: "먹다가 남은 빵을 말하므로 먹던이 맞습니다."
+                },
+                {
+                    id: "c10-mcq-09",
+                    type: "mcq",
+                    area: "-잖아(요)",
+                    kind: "대화 완성",
+                    targetSlot: 0,
+                    prompt: "A: 오늘 길이 왜 이렇게 막혀요? B: 지금 퇴근 ___",
+                    answer: "시간이잖아요.",
+                    distractors: ["시간일 거예요.", "시간이던데요.", "시간이 멀었어요."],
+                    explanation: "상대도 아는 이유를 말할 때 -잖아요를 씁니다."
+                },
+                {
+                    id: "c10-mcq-10",
+                    type: "mcq",
+                    area: "-잖아(요)",
+                    kind: "형태 선택",
+                    targetSlot: 1,
+                    prompt: "A: 왜 밖에 안 나가요? B: 비가 ___",
+                    answer: "오잖아요.",
+                    distractors: ["올 예정이에요.", "오던 중이에요.", "오려면 멀었어요."],
+                    explanation: "지금 비가 오기 때문에 오잖아요가 맞습니다."
+                },
+                {
+                    id: "c10-mcq-11",
+                    type: "mcq",
+                    area: "계획 표현",
+                    kind: "문장 완성",
+                    targetSlot: 2,
+                    prompt: "졸업 후 한국 회사에 취직할 ___",
+                    answer: "계획이에요.",
+                    distractors: ["조건이에요.", "고백이에요.", "인상이에요."],
+                    explanation: "앞으로 할 일을 말할 때 V-(으)ㄹ 계획이다를 씁니다."
+                },
+                {
+                    id: "c10-mcq-12",
+                    type: "mcq",
+                    area: "예정 표현",
+                    kind: "문장 완성",
+                    targetSlot: 3,
+                    prompt: "다음 주에 새 메뉴가 ___",
+                    answer: "나올 예정이에요.",
+                    distractors: ["나오던 메뉴예요.", "나오잖아요.", "나오려면 멀었어요."],
+                    explanation: "정해진 일을 말할 때 V-(으)ㄹ 예정이다를 씁니다."
+                },
+                {
+                    id: "c10-mcq-13",
+                    type: "mcq",
+                    area: "생각 표현",
+                    kind: "문장 완성",
+                    targetSlot: 0,
+                    prompt: "이번 주말에 부모님께 인사드릴 ___",
+                    answer: "생각이에요.",
+                    distractors: ["반함이에요.", "조건이에요.", "마음씨예요."],
+                    explanation: "하고 싶은 일을 말할 때 V-(으)ㄹ 생각이다를 씁니다."
+                },
+                {
+                    id: "c10-mcq-14",
+                    type: "mcq",
+                    area: "-(으)려면 멀었다",
+                    kind: "문장 완성",
+                    targetSlot: 1,
+                    prompt: "한국어 뉴스를 잘 이해하려면 아직 ___",
+                    answer: "멀었어요.",
+                    distractors: ["반했어요.", "맞았어요.", "사귀었어요."],
+                    explanation: "아직 더 공부해야 한다는 뜻입니다."
+                },
+                {
+                    id: "c10-mcq-15",
+                    type: "mcq",
+                    area: "-(으)려면 멀었다",
+                    kind: "의미 확인",
+                    targetSlot: 2,
+                    prompt: "\"운전을 잘하려면 아직 멀었어요\"는 무슨 뜻이에요?",
+                    answer: "운전을 잘하기까지 시간이 더 필요해요.",
+                    distractors: ["운전을 이미 아주 잘해요.", "운전을 곧 그만둘 거예요.", "운전할 생각이 전혀 없어요."],
+                    explanation: "아직 멀었다는 더 연습해야 한다는 뜻입니다."
+                },
+                {
+                    id: "c10-mcq-16",
+                    type: "mcq",
+                    area: "-던",
+                    kind: "문장 선택",
+                    targetSlot: 3,
+                    prompt: "예전에 다닌 회사를 말하는 문장은?",
+                    answer: "작년에 다니던 회사에서 연락이 왔어요.",
+                    distractors: ["내년에 다니던 회사에 갈 거예요.", "지금 다니던 회사에 처음 입사해요.", "다음 주에 다니던 회사가 생길 거예요."],
+                    explanation: "예전 경험을 말할 때 -던을 씁니다."
+                },
+                {
+                    id: "c10-short-17",
+                    type: "short",
+                    area: "어휘",
+                    kind: "단답",
+                    prompt: "두 사람은 친구 소개로 만나서 지금 1년째 ______ 있어요.",
+                    support: "연인으로 만나다",
+                    answers: ["사귀고"],
+                    explanation: "연인으로 만나면 사귀고 있어요라고 합니다."
+                },
+                {
+                    id: "c10-short-18",
+                    type: "short",
+                    area: "어휘",
+                    kind: "단답",
+                    prompt: "민수 씨는 여자 친구에게 결혼하자고 ______.",
+                    support: "결혼하자고 말하다",
+                    answers: ["청혼했어요", "청혼했습니다"],
+                    explanation: "결혼하자고 말하면 청혼하다입니다."
+                },
+                {
+                    id: "c10-short-19",
+                    type: "short",
+                    area: "-던",
+                    kind: "형태 쓰기",
+                    prompt: "이건 제가 어릴 때 자주 ______ 만화책이에요. (보다)",
+                    answers: ["보던"],
+                    explanation: "예전에 자주 본 책이므로 보던입니다."
+                },
+                {
+                    id: "c10-short-20",
+                    type: "short",
+                    area: "-잖아(요)",
+                    kind: "대화 완성",
+                    prompt: "A: 왜 오늘 그렇게 바빠요? B: 내일 발표가 ______.",
+                    answers: ["있잖아요", "있잖아", "있잖습니까"],
+                    explanation: "상대도 아는 사실을 말합니다."
+                },
+                {
+                    id: "c10-short-21",
+                    type: "short",
+                    area: "계획 표현",
+                    kind: "형태 쓰기",
+                    prompt: "내년에 대학원에 ______. (가다 / 계획이다)",
+                    answers: ["갈 계획이에요", "갈 계획입니다", "갈 계획이다"],
+                    explanation: "가다 + ㄹ 계획이에요 = 갈 계획이에요입니다."
+                },
+                {
+                    id: "c10-short-22",
+                    type: "short",
+                    area: "예정 표현",
+                    kind: "형태 쓰기",
+                    prompt: "새 프로그램은 다음 달부터 ______. (시작되다 / 예정이다)",
+                    answers: ["시작될 예정이에요", "시작될 예정입니다", "시작될 예정이다"],
+                    explanation: "시작되다 + ㄹ 예정이에요 = 시작될 예정이에요입니다."
+                },
+                {
+                    id: "c10-short-23",
+                    type: "short",
+                    area: "-(으)려면 멀었다",
+                    kind: "단답",
+                    prompt: "혼자 긴 글을 쓰려면 아직 ______.",
+                    answers: ["멀었어요", "아직 멀었어요", "멀었습니다", "아직 멀었습니다"],
+                    explanation: "아직 더 연습해야 한다는 뜻입니다."
+                },
+                {
+                    id: "c10-short-24",
+                    type: "short",
+                    area: "어휘",
+                    kind: "단답",
+                    prompt: "처음 본 순간 좋아하게 되었어요. 첫눈에 ______.",
+                    answers: ["반했어요", "반했습니다"],
+                    explanation: "처음 보고 바로 좋아하면 첫눈에 반했어요라고 합니다."
+                },
+                {
+                    id: "c10-scaffold-25",
+                    type: "scaffold",
+                    area: "어휘",
+                    kind: "비계형",
+                    prompt: "좋아하는 사람을 2-3문장으로 쓰세요.",
+                    template: "저는 ___ 사람이 좋아요. 특히 ___ 사람과 이야기하고 싶어요. 서로 ___면 좋겠어요.",
+                    required: [
+                        { label: "인상이 좋다", accepts: ["인상이좋"] },
+                        { label: "말이 잘 통하다", accepts: ["말이잘통"] },
+                        { label: "조건이 맞다", accepts: ["조건이맞"] }
+                    ],
+                    example: "저는 인상이 좋은 사람에게 끌립니다. 특히 말이 잘 통하는 사람과는 대화가 편합니다. 그래서 서로 조건이 맞으면 좋겠습니다.",
+                    placeholder: "세 표현을 모두 넣어 쓰세요.",
+                    explanation: "좋아하는 사람을 쉬운 문장으로 설명합니다."
+                },
+                {
+                    id: "c10-scaffold-26",
+                    type: "scaffold",
+                    area: "-던 / -잖아(요)",
+                    kind: "비계형",
+                    prompt: "친구와 예전 장소를 말해 보세요.",
+                    template: "A: 예전에 우리가 자주 ___ 곳 기억나요? B: 그럼요. 거기 ___잖아요.",
+                    required: [
+                        { label: "-던", accepts: ["던"] },
+                        { label: "-잖아(요)", accepts: ["잖"] }
+                    ],
+                    example: "A: 예전에 우리가 자주 가던 카페 기억나요? B: 그럼요. 거기 케이크가 정말 맛있었잖아요.",
+                    placeholder: "A와 B의 대화로 쓰세요.",
+                    explanation: "예전 일은 -던, 상대도 아는 일은 -잖아(요)를 씁니다."
+                },
+                {
+                    id: "c10-scaffold-27",
+                    type: "scaffold",
+                    area: "계획 / 예정",
+                    kind: "비계형",
+                    prompt: "행사 준비 계획을 2문장으로 쓰세요.",
+                    template: "우선 __할 생각입니다. 그리고 __할 예정입니다.",
+                    required: [
+                        { label: "-(으)ㄹ 생각이다", accepts: ["생각"] },
+                        { label: "-(으)ㄹ 예정이다", accepts: ["예정"] }
+                    ],
+                    example: "우선 가족들과 날짜를 정할 생각입니다. 그리고 다음 달에 장소를 예약할 예정입니다.",
+                    placeholder: "생각이다와 예정이다를 쓰세요.",
+                    explanation: "하고 싶은 일은 생각이다, 정해진 일은 예정이다를 씁니다."
+                },
+                {
+                    id: "c10-scaffold-28",
+                    type: "scaffold",
+                    area: "-(으)려면 멀었다",
+                    kind: "비계형",
+                    prompt: "아직 잘 못하는 일을 말해 보세요.",
+                    template: "___려면 아직 멀었어요. 그래서 앞으로 ___ 계획이에요.",
+                    required: [
+                        { label: "-(으)려면", accepts: ["려면", "으려면"] },
+                        { label: "멀었어요", accepts: ["멀었"] },
+                        { label: "계획", accepts: ["계획"] }
+                    ],
+                    example: "한국어로 발표를 잘하려면 아직 멀었어요. 그래서 앞으로 매주 발표 연습을 할 계획이에요.",
+                    placeholder: "아직 어려운 일과 계획을 쓰세요.",
+                    explanation: "아직 어려운 일과 앞으로 할 일을 함께 말합니다."
                 }
-            });
-            return answers;
-        }
-
-        function updateAutosaveStatus(savedAt) {
-            if (!savedAt) {
-                autosaveStatus.textContent = "자동 저장 준비됨";
-                return;
-            }
-
-            autosaveStatus.textContent = `자동 저장됨 ${new Date(savedAt).toLocaleTimeString("ko-KR", {
-                hour: "2-digit",
-                minute: "2-digit"
-            })}`;
-        }
-
-        function writeProgressNow() {
-            clearTimeout(autosaveTimer);
-            autosaveTimer = null;
-
-            const savedAt = Date.now();
-            try {
-                localStorage.setItem(PROGRESS_KEY, JSON.stringify({
-                    answers: collectAnswers(),
-                    scoreText: score.textContent,
-                    bottomScoreText: bottomScore.textContent,
-                    showAnswers: document.body.classList.contains("show-answers"),
-                    checked: getQuestions().some((question) => question.classList.contains("checked")),
-                    savedAt
-                }));
-                updateAutosaveStatus(savedAt);
-            } catch (error) {
-                autosaveStatus.textContent = "자동 저장 불가";
-            }
-        }
-
-        function saveProgress() {
-            clearTimeout(autosaveTimer);
-            autosaveStatus.textContent = "저장 중...";
-            autosaveTimer = setTimeout(writeProgressNow, 180);
-        }
-
-        function restoreProgress() {
-            const progress = readProgress();
-            if (!progress || !progress.answers) return;
-
-            Object.entries(progress.answers).forEach(([name, value]) => {
-                const field = form.elements[name];
-                if (!field) return;
-                const controls = typeof field.length === "number" && !field.type ? [...field] : [field];
-                controls.forEach((control) => {
-                    if (control.type === "radio") {
-                        control.checked = control.value === value;
-                    } else {
-                        control.value = value;
-                    }
-                });
-            });
-
-            if (progress.checked) {
-                getQuestions().forEach((question) => {
-                    checkQuestion(question);
-                    question.classList.add("checked");
-                });
-            }
-
-            if (progress.showAnswers) {
-                document.body.classList.add("show-answers");
-                showButton.textContent = "해설 숨기기";
-            }
-
-            if (progress.scoreText) score.textContent = progress.scoreText;
-            if (progress.bottomScoreText) bottomScore.textContent = progress.bottomScoreText;
-            updateAutosaveStatus(progress.savedAt);
-        }
-
-        function clearProgress() {
-            clearTimeout(autosaveTimer);
-            localStorage.removeItem(PROGRESS_KEY);
-            updateAutosaveStatus(null);
-        }
-
-        function checkAll() {
-            const questions = getQuestions();
-            let correct = 0;
-            questions.forEach((question) => {
-                if (checkQuestion(question)) correct += 1;
-                question.classList.add("checked");
-            });
-            score.textContent = `${correct} / ${questions.length}점`;
-            bottomScore.textContent = `이번 점수: ${correct} / ${questions.length}점`;
-            document.body.classList.add("show-answers");
-            saveScore(correct, questions.length);
-            saveProgress();
-        }
-
-        checkButton.addEventListener("click", checkAll);
-        bottomCheckButton.addEventListener("click", checkAll);
-
-        showButton.addEventListener("click", () => {
-            document.body.classList.toggle("show-answers");
-            showButton.textContent = document.body.classList.contains("show-answers") ? "해설 숨기기" : "해설 표시";
-            saveProgress();
-        });
-
-        resetButton.addEventListener("click", () => {
-            form.reset();
-            getQuestions().forEach((question) => {
-                question.classList.remove("correct", "wrong", "checked");
-            });
-            document.body.classList.remove("show-answers");
-            showButton.textContent = "해설 표시";
-            score.textContent = "아직 채점하지 않았습니다.";
-            bottomScore.textContent = "";
-            clearProgress();
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        });
-
-        form.addEventListener("input", saveProgress);
-        form.addEventListener("change", saveProgress);
-
-        window.addEventListener("beforeunload", () => {
-            if (autosaveTimer) writeProgressNow();
-        });
-
-        printButton.addEventListener("click", () => {
-            window.print();
-        });
-
-        clearHistoryButton.addEventListener("click", () => {
-            localStorage.removeItem(HISTORY_KEY);
-            renderHistory();
-        });
-
-        restoreProgress();
-        renderHistory();
+            ]
+        };
     </script>
+    <script src="../shared/review-quiz-page.js" defer></script>
+    <script src="../shared/site-copyright.js" defer></script>
+    <script src="../shared/page-qr.js" defer></script>
 </body>
 </html>
