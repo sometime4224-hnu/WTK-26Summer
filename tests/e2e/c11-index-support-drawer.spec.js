@@ -27,9 +27,10 @@ test('c11 hub keeps grammar support materials collapsed until opened', async ({ 
   await grammar1Drawer.locator('summary.support-drawer__summary').click();
 
   await expect(grammar1Drawer).toHaveAttribute('open', '');
-  await expect(grammar1Drawer.locator('.support-drawer__links .lesson-link')).toHaveCount(10);
+  await expect(grammar1Drawer.locator('.support-drawer__links .lesson-link')).toHaveCount(11);
   await expect(grammar1Drawer.locator('.support-drawer__links .lesson-link').first()).toHaveAttribute('href', 'grammar1-causative-sentence-flow.html');
   await expect(page.locator('a[href="grammar1-causative-sentence-flow.html"]')).toBeVisible();
+  await expect(page.locator('a[href="writing-activity2-causative.html"]')).toBeVisible();
   await expect(page.locator('a[href="grammar1-causative-construction-lab.html"]')).toBeVisible();
   await expect(page.locator('a[href="grammar1-causative-influence-lab.html"]')).toBeVisible();
   await expect(page.locator('a[href="grammar1-causative-patterns.html"]')).toBeVisible();
