@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11과 듣기 컷툰</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --paper: #ffffff;
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #d8e2ed;
+            --teal: #0f766e;
+            --blue: #0369a1;
+            --amber: #b45309;
+            --rose: #be123c;
+            --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+            --active: var(--amber);
+            --active-soft: #fff7ed;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Noto Sans KR", system-ui, sans-serif;
+            background:
+                linear-gradient(135deg, rgba(240, 253, 250, 0.9), rgba(255, 247, 237, 0.42) 44%, rgba(239, 246, 255, 0.86)),
+                var(--bg);
+        }
+
+        img,
+        button {
+            display: block;
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            word-break: keep-all;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 8px 16px;
+            border-bottom: 1px solid rgba(216, 226, 237, 0.9);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar a,
+        .topbar strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: #115e59;
+            font-size: 0.92rem;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar span {
+            color: #cbd5e1;
+            font-weight: 900;
+        }
+
+        .topbar strong {
+            min-width: 0;
+            overflow: hidden;
+            color: #334155;
+            text-overflow: ellipsis;
+        }
+
+        .shell {
+            width: min(1160px, calc(100% - 32px));
+            margin: 16px auto 42px;
+        }
+
+        .lesson-switch {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .lesson-tab {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            min-height: 56px;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            color: #334155;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+            text-align: left;
+        }
+
+        .lesson-tab i {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: #e0f2fe;
+            color: var(--blue);
+        }
+
+        .lesson-tab strong,
+        .lesson-tab small {
+            display: block;
+            min-width: 0;
+        }
+
+        .lesson-tab small {
+            color: var(--muted);
+            font-weight: 800;
+        }
+
+        .lesson-tab[aria-pressed="true"] {
+            border-color: var(--active);
+            background: var(--active-soft);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--active) 16%, transparent);
+        }
+
+        .lesson-tab[aria-pressed="true"] i {
+            background: var(--active);
+            color: #fff;
+        }
+
+        .viewer {
+            display: grid;
+            grid-template-columns: 218px minmax(0, 1fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .panel {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow);
+        }
+
+        .cut-nav {
+            position: sticky;
+            top: 64px;
+            padding: 12px;
+        }
+
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--teal);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .cut-nav h2,
+        .stage h1,
+        .cut-gallery h2 {
+            margin: 0;
+        }
+
+        .cut-nav h2 {
+            font-size: 1.12rem;
+        }
+
+        .cut-list {
+            display: grid;
+            gap: 7px;
+            margin-top: 10px;
+        }
+
+        .cut-link {
+            display: grid;
+            grid-template-columns: 34px minmax(0, 1fr);
+            align-items: center;
+            gap: 8px;
+            min-height: 46px;
+            padding: 6px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            color: #334155;
+            text-align: left;
+        }
+
+        .cut-link span:first-child {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: #ccfbf1;
+            color: #115e59;
+            font-weight: 900;
+        }
+
+        .cut-link span:last-child {
+            min-width: 0;
+            overflow: hidden;
+            font-size: 0.88rem;
+            font-weight: 900;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .cut-link.is-active {
+            border-color: var(--active);
+            background: var(--active-soft);
+        }
+
+        .stage {
+            min-width: 0;
+            padding: 14px;
+        }
+
+        .stage-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: end;
+            margin-bottom: 12px;
+        }
+
+        .stage h1 {
+            font-size: clamp(1.7rem, 3.2vw, 3rem);
+            line-height: 1.08;
+        }
+
+        .stage-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            padding: 0 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: #115e59;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn.primary {
+            border-color: var(--active);
+            background: var(--active);
+            color: #fff;
+        }
+
+        .frame {
+            margin: 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #0f172a;
+        }
+
+        .frame img {
+            width: 100%;
+            height: min(62vh, 640px);
+            min-height: 360px;
+            object-fit: contain;
+            background: #0f172a;
+        }
+
+        .frame figcaption {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 14px;
+            background: #fff;
+        }
+
+        .frame-title {
+            display: grid;
+            gap: 4px;
+        }
+
+        .frame-title strong {
+            font-size: 1.08rem;
+        }
+
+        .frame-title span,
+        .time-badge {
+            color: var(--muted);
+            font-weight: 800;
+        }
+
+        .time-badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 32px;
+            padding: 0 10px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            font-size: 0.88rem;
+            white-space: nowrap;
+        }
+
+        .stage-controls {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .stage-controls button {
+            min-height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: #334155;
+            font-weight: 900;
+        }
+
+        .stage-controls button:disabled {
+            cursor: not-allowed;
+            opacity: 0.42;
+        }
+
+        .cut-gallery {
+            margin-top: 18px;
+        }
+
+        .cut-gallery h2 {
+            font-size: 1.28rem;
+        }
+
+        .gallery-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .panel-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .panel-card {
+            display: grid;
+            gap: 10px;
+            min-width: 0;
+            padding: 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+        }
+
+        .panel-card button {
+            padding: 0;
+            border: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #0f172a;
+        }
+
+        .panel-card img {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: contain;
+            background: #0f172a;
+        }
+
+        .panel-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.35;
+        }
+
+        .panel-card h3 span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: #fee2e2;
+            color: var(--rose);
+            font-size: 0.86rem;
+            font-weight: 900;
+        }
+
+        .panel-card p {
+            margin: 0;
+            color: #334155;
+            font-size: 0.92rem;
+            font-weight: 700;
+            line-height: 1.58;
+        }
+
+        .panel-card.is-active {
+            border-color: var(--active);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--active) 14%, transparent);
+        }
+
+        @media (max-width: 900px) {
+            .viewer,
+            .stage-head {
+                grid-template-columns: 1fr;
+            }
+
+            .cut-nav {
+                position: static;
+            }
+
+            .cut-list {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .stage-actions {
+                justify-content: flex-start;
+            }
+
+            .panel-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 620px) {
+            .topbar {
+                overflow-x: auto;
+            }
+
+            .shell {
+                width: min(100% - 20px, 1160px);
+            }
+
+            .lesson-switch,
+            .cut-list,
+            .panel-grid,
+            .frame figcaption {
+                grid-template-columns: 1fr;
+            }
+
+            .frame img {
+                height: min(58vh, 520px);
+                min-height: 260px;
+            }
+
+            .gallery-head {
+                align-items: start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span>|</span>
+        <a href="index.html">11과 목록</a>
+        <span>|</span>
+        <a href="listening1.html">듣기 1</a>
+        <span>|</span>
+        <a href="listening2.html">듣기 2</a>
+        <span>|</span>
+        <strong>듣기 컷툰</strong>
+    </nav>
+
+    <main class="shell">
+        <section class="lesson-switch" aria-label="듣기 선택">
+            <button class="lesson-tab" type="button" data-lesson-tab="listening1" aria-pressed="true">
+                <i class="fa-solid fa-headphones"></i>
+                <strong>듣기 1 컷툰</strong>
+                <small>6컷</small>
+            </button>
+            <button class="lesson-tab" type="button" data-lesson-tab="listening2" aria-pressed="false">
+                <i class="fa-solid fa-briefcase"></i>
+                <strong>듣기 2 컷툰</strong>
+                <small>8컷</small>
+            </button>
+        </section>
+
+        <section class="viewer" aria-label="컷툰 보기">
+            <aside class="panel cut-nav" aria-label="컷 목록">
+                <p class="eyebrow">Cut List</p>
+                <h2 id="cutListTitle">듣기 1</h2>
+                <div class="cut-list" id="cutList"></div>
+            </aside>
+
+            <section class="panel stage" aria-label="선택한 컷">
+                <div class="stage-head">
+                    <div>
+                        <p class="eyebrow">Listening Cuttoon</p>
+                        <h1 id="lessonTitle">11과 듣기 1 컷툰</h1>
+                    </div>
+                    <div class="stage-actions">
+                        <a class="btn" id="workbookLink" href="listening1.html"><i class="fa-solid fa-book-open"></i> 듣기 페이지</a>
+                        <a class="btn primary" href="index.html"><i class="fa-solid fa-table-list"></i> 11과 허브</a>
+                    </div>
+                </div>
+
+                <figure class="frame">
+                    <img id="mainPanelImage" src="../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-01.webp" alt="듣기 1 컷툰 1컷" loading="eager" decoding="async">
+                    <figcaption>
+                        <div class="frame-title">
+                            <strong id="panelTitle">첫 출근 인사</strong>
+                            <span id="panelNote">새 직원이 아웃도어 매장에 와서 매장 책임자에게 인사합니다.</span>
+                        </div>
+                        <span class="time-badge" id="panelTime">00:03-00:08</span>
+                    </figcaption>
+                </figure>
+
+                <div class="stage-controls">
+                    <button type="button" id="prevPanel"><i class="fa-solid fa-chevron-left"></i> 이전 컷</button>
+                    <button type="button" id="nextPanel">다음 컷 <i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </section>
+        </section>
+
+        <section class="cut-gallery" aria-label="컷별 전체 보기">
+            <div class="gallery-head">
+                <div>
+                    <p class="eyebrow">All Cuts</p>
+                    <h2 id="galleryTitle">듣기 1 전체 컷</h2>
+                </div>
+            </div>
+            <div class="panel-grid" id="panelGrid"></div>
+        </section>
+    </main>
+
+    <script>
+        (() => {
+            "use strict";
+
+            const lessons = {
+                listening1: {
+                    id: "listening1",
+                    title: "11과 듣기 1 컷툰",
+                    shortTitle: "듣기 1",
+                    galleryTitle: "듣기 1 전체 컷",
+                    workbookHref: "listening1.html",
+                    accent: "#b45309",
+                    accentSoft: "#fff7ed",
+                    panels: [
+                        {
+                            title: "첫 출근 인사",
+                            note: "새 직원이 아웃도어 매장에 와서 매장 책임자에게 인사합니다.",
+                            time: "00:03-00:08",
+                            image: "../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-01.webp"
+                        },
+                        {
+                            title: "첫날 업무 안내",
+                            note: "책임자는 첫날이라 자신이 하는 일을 보고 따라 하라고 안내합니다.",
+                            time: "00:09-00:21",
+                            image: "../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-02.webp"
+                        },
+                        {
+                            title: "점퍼 입히기",
+                            note: "마네킹이 입고 있는 옷을 벗기고 새 점퍼를 입히라는 지시가 나옵니다.",
+                            time: "00:22-00:29",
+                            image: "../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-03.webp"
+                        },
+                        {
+                            title: "모자와 등산화",
+                            note: "점퍼를 입힌 뒤 모자를 씌우고 등산화로 갈아 신겨야 합니다.",
+                            time: "00:30-00:40",
+                            image: "../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-04.webp"
+                        },
+                        {
+                            title: "포스터 위치",
+                            note: "포스터를 잘 보이는 곳에 붙이되, 문 앞보다 계산대 아래가 좋다고 정정합니다.",
+                            time: "00:40-00:53",
+                            image: "../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-05.webp"
+                        },
+                        {
+                            title: "창고에 다녀오기",
+                            note: "책임자가 창고에 다녀오는 동안 새 직원은 문제가 생기면 연락하기로 합니다.",
+                            time: "00:54-01:02",
+                            image: "../assets/c11/listening/cuttoon/listening1/listening1-cuttoon-panel-06.webp"
+                        }
+                    ]
+                },
+                listening2: {
+                    id: "listening2",
+                    title: "11과 듣기 2 컷툰",
+                    shortTitle: "듣기 2",
+                    galleryTitle: "듣기 2 전체 컷",
+                    workbookHref: "listening2.html",
+                    accent: "#0369a1",
+                    accentSoft: "#f0f9ff",
+                    panels: [
+                        {
+                            title: "이직 고민",
+                            note: "남자는 요즘 회사를 옮길지 말지 고민하고 있다고 말합니다.",
+                            time: "00:07-00:10",
+                            image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-01.webp"
+                        },
+                        {
+                            title: "연봉은 좋지만",
+                            note: "여자는 연봉이 높아서 좋다고 했던 점을 떠올립니다.",
+                            time: "00:11-00:14",
+                            image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-02.webp"
+                        },
+                        {
+                            title: "바쁜 회사 생활",
+                            note: "남자는 너무 바빠서 자기 생활이 없고 주말에도 늦게까지 일했다고 말합니다.",
+                            time: "00:15-00:27",
+                            image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-03.webp"
+                        },
+                        {
+                            title: "옮긴다면?",
+                            note: "여자는 회사를 옮긴다면 어떤 곳에서 일하고 싶은지 묻습니다.",
+                            time: "00:27-00:34",
+                            image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-04.webp"
+                        },
+                        {
+                            title: "바라는 새 회사",
+                            note: "남자는 연봉이 조금 낮아도 휴가가 길고 야근이 없었으면 좋겠다고 말합니다.",
+                            time: "00:34-00:42",
+                            image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-05.webp"
+                        },
+                        {
+                            title: "현실적인 조언",
+                            note: "여자는 어떤 회사든 힘든 점이 있고 월급이 적으면 좋아하는 일을 하기 어렵다고 조언합니다.",
+                            time: "00:42-00:51",
+                            image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-06.webp"
+                        },
+                        {
+                            title: "좋은 점 생각하기",
+                            note: "여자는 지금 다니는 회사의 좋은 점을 한번 생각해 보라고 권합니다.",
+                            time: "00:51-01:04",
+                            image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-07.webp"
+                        },
+                        {
+                            title: "다시 생각하기",
+                            note: "남자는 현재 회사의 장점을 떠올리고 이직 문제를 다시 생각해 보기로 합니다.",
+                            time: "01:05-01:26",
+                            image: "../assets/c11/listening/cuttoon/listening2/listening2-cuttoon-panel-08.webp"
+                        }
+                    ]
+                }
+            };
+
+            const refs = {
+                tabs: document.querySelectorAll("[data-lesson-tab]"),
+                cutListTitle: document.getElementById("cutListTitle"),
+                cutList: document.getElementById("cutList"),
+                lessonTitle: document.getElementById("lessonTitle"),
+                workbookLink: document.getElementById("workbookLink"),
+                mainPanelImage: document.getElementById("mainPanelImage"),
+                panelTitle: document.getElementById("panelTitle"),
+                panelNote: document.getElementById("panelNote"),
+                panelTime: document.getElementById("panelTime"),
+                prevPanel: document.getElementById("prevPanel"),
+                nextPanel: document.getElementById("nextPanel"),
+                galleryTitle: document.getElementById("galleryTitle"),
+                panelGrid: document.getElementById("panelGrid")
+            };
+
+            const state = {
+                lessonId: "listening1",
+                panelIndex: 0
+            };
+
+            function escapeHtml(value) {
+                return String(value)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#39;");
+            }
+
+            function parseHash() {
+                const raw = window.location.hash.replace(/^#/, "");
+                const match = raw.match(/^(listening[12])(?:-cut-(\d+))?$/);
+                if (!match || !lessons[match[1]]) {
+                    return { lessonId: "listening1", panelIndex: 0 };
+                }
+                const lesson = lessons[match[1]];
+                const panelIndex = match[2]
+                    ? Math.min(Math.max(Number(match[2]) - 1, 0), lesson.panels.length - 1)
+                    : 0;
+                return { lessonId: match[1], panelIndex };
+            }
+
+            function writeHash() {
+                const suffix = state.panelIndex > 0 ? `-cut-${String(state.panelIndex + 1).padStart(2, "0")}` : "";
+                const nextHash = `#${state.lessonId}${suffix}`;
+                if (window.location.hash !== nextHash) {
+                    history.replaceState(null, "", nextHash);
+                }
+            }
+
+            function renderLesson() {
+                const lesson = lessons[state.lessonId];
+                document.documentElement.style.setProperty("--active", lesson.accent);
+                document.documentElement.style.setProperty("--active-soft", lesson.accentSoft);
+
+                refs.tabs.forEach((tab) => {
+                    tab.setAttribute("aria-pressed", String(tab.dataset.lessonTab === state.lessonId));
+                });
+
+                refs.cutListTitle.textContent = lesson.shortTitle;
+                refs.lessonTitle.textContent = lesson.title;
+                refs.galleryTitle.textContent = lesson.galleryTitle;
+                refs.workbookLink.href = lesson.workbookHref;
+
+                refs.cutList.innerHTML = lesson.panels.map((panel, index) => `
+                    <button class="cut-link" type="button" data-panel-jump="${index}">
+                        <span>${index + 1}</span>
+                        <span>${escapeHtml(panel.title)}</span>
+                    </button>
+                `).join("");
+
+                refs.panelGrid.innerHTML = lesson.panels.map((panel, index) => `
+                    <article class="panel-card" data-panel-card="${index}">
+                        <button type="button" data-panel-jump="${index}" aria-label="${escapeHtml(`${index + 1}컷 ${panel.title}`)}">
+                            <img src="${escapeHtml(panel.image)}" alt="${escapeHtml(`${lesson.shortTitle} 컷툰 ${index + 1}컷, ${panel.title}`)}" loading="${index === 0 ? "eager" : "lazy"}" decoding="async">
+                        </button>
+                        <h3><span>${index + 1}</span> ${escapeHtml(panel.title)}</h3>
+                        <p>${escapeHtml(panel.note)}</p>
+                    </article>
+                `).join("");
+
+                refs.cutList.querySelectorAll("[data-panel-jump]").forEach((button) => {
+                    button.addEventListener("click", () => setPanel(Number(button.dataset.panelJump)));
+                });
+                refs.panelGrid.querySelectorAll("[data-panel-jump]").forEach((button) => {
+                    button.addEventListener("click", () => setPanel(Number(button.dataset.panelJump), true));
+                });
+
+                renderPanel();
+            }
+
+            function renderPanel() {
+                const lesson = lessons[state.lessonId];
+                const panel = lesson.panels[state.panelIndex];
+                refs.mainPanelImage.src = panel.image;
+                refs.mainPanelImage.alt = `${lesson.shortTitle} 컷툰 ${state.panelIndex + 1}컷, ${panel.title}`;
+                refs.panelTitle.textContent = `${state.panelIndex + 1}. ${panel.title}`;
+                refs.panelNote.textContent = panel.note;
+                refs.panelTime.textContent = panel.time;
+                refs.prevPanel.disabled = state.panelIndex === 0;
+                refs.nextPanel.disabled = state.panelIndex === lesson.panels.length - 1;
+
+                document.querySelectorAll("[data-panel-jump]").forEach((button) => {
+                    button.classList.toggle("is-active", Number(button.dataset.panelJump) === state.panelIndex);
+                });
+                document.querySelectorAll("[data-panel-card]").forEach((card) => {
+                    card.classList.toggle("is-active", Number(card.dataset.panelCard) === state.panelIndex);
+                });
+            }
+
+            function setLesson(lessonId) {
+                if (!lessons[lessonId]) return;
+                state.lessonId = lessonId;
+                state.panelIndex = 0;
+                renderLesson();
+                writeHash();
+            }
+
+            function setPanel(panelIndex, scrollToStage = false) {
+                const lesson = lessons[state.lessonId];
+                const nextIndex = Math.min(Math.max(panelIndex, 0), lesson.panels.length - 1);
+                state.panelIndex = nextIndex;
+                renderPanel();
+                writeHash();
+                if (scrollToStage) {
+                    refs.lessonTitle.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            }
+
+            refs.tabs.forEach((tab) => {
+                tab.addEventListener("click", () => setLesson(tab.dataset.lessonTab));
+            });
+            refs.prevPanel.addEventListener("click", () => setPanel(state.panelIndex - 1));
+            refs.nextPanel.addEventListener("click", () => setPanel(state.panelIndex + 1));
+
+            window.addEventListener("hashchange", () => {
+                const parsed = parseHash();
+                state.lessonId = parsed.lessonId;
+                state.panelIndex = parsed.panelIndex;
+                renderLesson();
+            });
+
+            const initial = parseHash();
+            state.lessonId = initial.lessonId;
+            state.panelIndex = initial.panelIndex;
+            renderLesson();
+            writeHash();
+        })();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>
