@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11과 읽기 컷툰 탐색 | 직장에서 성공하는 법</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <style>
+        :root {
+            --bg: #f4f6f8;
+            --paper: #ffffff;
+            --ink: #172033;
+            --muted: #667085;
+            --line: #dbe3ea;
+            --line-strong: #b8c7d4;
+            --teal: #0f766e;
+            --teal-dark: #115e59;
+            --amber: #b45309;
+            --amber-soft: #fef3c7;
+            --rose: #be123c;
+            --rose-soft: #ffe4e6;
+            --blue-soft: #e0f2fe;
+            --shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans KR", system-ui, sans-serif;
+            color: var(--ink);
+            background:
+                linear-gradient(135deg, rgba(20, 184, 166, 0.13), transparent 34%),
+                linear-gradient(315deg, rgba(251, 191, 36, 0.13), transparent 38%),
+                var(--bg);
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 50px;
+            padding: 8px 16px;
+            border-bottom: 1px solid rgba(219, 227, 234, 0.92);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar a,
+        .topbar strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--teal-dark);
+            font-size: 0.92rem;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar > span {
+            color: #cbd5e1;
+            font-weight: 900;
+        }
+
+        .topbar strong {
+            min-width: 0;
+            overflow: hidden;
+            color: #334155;
+            text-overflow: ellipsis;
+        }
+
+        .shell {
+            width: min(1440px, calc(100% - 28px));
+            margin: 14px auto 34px;
+        }
+
+        .page-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--teal-dark);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            word-break: keep-all;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.7rem, 3.1vw, 3rem);
+            line-height: 1.1;
+        }
+
+        .head-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 34px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 0 11px;
+            background: rgba(255, 255, 255, 0.94);
+            color: #475569;
+            font-size: 0.86rem;
+            font-weight: 900;
+        }
+
+        .reader-app {
+            display: grid;
+            grid-template-columns: minmax(340px, 470px) minmax(0, 1fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .tool-pane {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: var(--shadow);
+        }
+
+        .visual-pane {
+            position: sticky;
+            top: 64px;
+            padding: 12px;
+        }
+
+        .cut-toolbar {
+            display: grid;
+            grid-template-columns: 40px minmax(0, 1fr) 40px;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .icon-btn,
+        .stage-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--teal-dark);
+            font-weight: 900;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+        }
+
+        .icon-btn:hover,
+        .icon-btn:focus-visible,
+        .stage-action:hover,
+        .stage-action:focus-visible {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+            outline: none;
+        }
+
+        .cut-title {
+            min-width: 0;
+            text-align: center;
+        }
+
+        .cut-title strong {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 1.02rem;
+        }
+
+        .cut-title span {
+            display: block;
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+
+        .stage {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            background: #f8fafc;
+            aspect-ratio: 1 / 1;
+        }
+
+        .stage img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-placeholder {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 28px;
+            text-align: center;
+            background:
+                linear-gradient(135deg, rgba(15, 118, 110, 0.1), transparent 48%),
+                linear-gradient(315deg, rgba(180, 83, 9, 0.12), transparent 52%),
+                #f8fafc;
+        }
+
+        .image-placeholder[hidden] {
+            display: none;
+        }
+
+        .placeholder-inner {
+            display: grid;
+            gap: 8px;
+            max-width: 310px;
+        }
+
+        .placeholder-label {
+            display: inline-flex;
+            justify-self: center;
+            align-items: center;
+            min-height: 34px;
+            border-radius: 999px;
+            padding: 0 12px;
+            background: var(--teal);
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 900;
+        }
+
+        .placeholder-inner strong {
+            font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+            line-height: 1.25;
+        }
+
+        .placeholder-inner p {
+            margin: 0;
+            color: #526071;
+            line-height: 1.55;
+            font-weight: 700;
+        }
+
+        .stage-action {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            z-index: 6;
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+        }
+
+        .hotspot-layer {
+            position: absolute;
+            inset: 0;
+        }
+
+        .hotspot {
+            position: absolute;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 0;
+            background: rgba(255, 255, 255, 0.02);
+            color: #fff;
+        }
+
+        .hotspot:hover,
+        .hotspot:focus-visible,
+        .hotspot.is-active {
+            border-color: rgba(15, 118, 110, 0.9);
+            outline: none;
+        }
+
+        .hotspot-marker {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 27px;
+            height: 27px;
+            border: 2px solid #fff;
+            border-radius: 999px;
+            background: var(--rose);
+            color: #fff;
+            font-size: 0.75rem;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.26);
+        }
+
+        .hotspot.is-active .hotspot-marker {
+            background: var(--teal);
+        }
+
+        .hotspot-label {
+            position: absolute;
+            left: 50%;
+            bottom: calc(50% + 18px);
+            width: max-content;
+            max-width: min(220px, 80vw);
+            border-radius: 8px;
+            padding: 6px 8px;
+            background: rgba(17, 24, 39, 0.88);
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 900;
+            line-height: 1.3;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(4px);
+            transition: opacity 0.16s ease, transform 0.16s ease;
+            white-space: normal;
+        }
+
+        .hotspot:hover .hotspot-label,
+        .hotspot:focus-visible .hotspot-label,
+        .hotspot.is-active .hotspot-label {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .cut-note {
+            display: grid;
+            gap: 8px;
+            min-height: 112px;
+            margin-top: 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 11px;
+            background: #fbfdfd;
+        }
+
+        .cut-note h2 {
+            margin: 0;
+            font-size: 0.96rem;
+        }
+
+        .cut-note p {
+            margin: 0;
+            color: #475569;
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+
+        .target-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .target-chips span {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            border-radius: 999px;
+            padding: 0 9px;
+            background: var(--amber-soft);
+            color: #78350f;
+            font-size: 0.8rem;
+            font-weight: 900;
+        }
+
+        .thumb-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 7px;
+            min-width: 0;
+            width: 100%;
+            max-width: 100%;
+            margin-top: 10px;
+        }
+
+        .thumb {
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 0;
+            background: #fff;
+            aspect-ratio: 1 / 1;
+        }
+
+        .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumb-badge {
+            position: absolute;
+            left: 6px;
+            top: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.94);
+            color: #111827;
+            font-size: 0.77rem;
+            font-weight: 900;
+        }
+
+        .thumb-placeholder {
+            display: grid;
+            place-items: center;
+            gap: 4px;
+            width: 100%;
+            height: 100%;
+            padding: 8px;
+            background: #eef7f6;
+            color: var(--teal-dark);
+            text-align: center;
+        }
+
+        .thumb-placeholder b {
+            display: inline-grid;
+            place-items: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            background: var(--teal);
+            color: #fff;
+            font-size: 0.82rem;
+        }
+
+        .thumb-placeholder span {
+            color: #475569;
+            font-size: 0.7rem;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+
+        .thumb:hover,
+        .thumb:focus-visible,
+        .thumb.is-active {
+            border-color: var(--teal);
+            outline: none;
+        }
+
+        .text-pane {
+            min-width: 0;
+            padding: 18px;
+        }
+
+        .text-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .text-head h2 {
+            margin: 0;
+            font-size: clamp(1.35rem, 2.3vw, 2.1rem);
+        }
+
+        .text-head p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .text-actions {
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .progress-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 38px;
+            border-radius: 999px;
+            padding: 0 12px;
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .meaning-lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            max-width: min(100%, 300px);
+            border: 1px solid rgba(15, 118, 110, 0.18);
+            border-radius: 999px;
+            padding: 4px;
+            background: #ffffff;
+            color: var(--teal-dark);
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+        }
+
+        .meaning-lang__icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 26px;
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            background: #f0fdfa;
+            color: var(--teal-dark);
+            font-size: 0.8rem;
+        }
+
+        .meaning-lang__options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .meaning-lang__option {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+            min-height: 26px;
+            border: 0;
+            border-radius: 999px;
+            padding: 0 7px;
+            background: transparent;
+            color: var(--ink);
+            font: inherit;
+            font-size: 0.72rem;
+            font-weight: 950;
+            line-height: 1;
+            cursor: pointer;
+            letter-spacing: 0;
+        }
+
+        .meaning-lang__option:hover,
+        .meaning-lang__option:focus-visible {
+            background: #f1f5f9;
+            outline: none;
+        }
+
+        .meaning-lang__option.is-active {
+            background: #ccfbf1;
+            color: var(--teal-dark);
+        }
+
+        .passage {
+            display: grid;
+            gap: 18px;
+            font-size: clamp(1rem, 1.45vw, 1.17rem);
+            line-height: 2.02;
+        }
+
+        .vocab-panel {
+            display: grid;
+            gap: 8px;
+            margin: 4px 0 14px;
+            padding: 12px;
+            border: 1px solid rgba(15, 118, 110, 0.18);
+            border-radius: 8px;
+            background:
+                linear-gradient(135deg, rgba(240, 253, 250, 0.95), rgba(255, 251, 235, 0.88)),
+                #ffffff;
+        }
+
+        .vocab-panel__head {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .vocab-panel__tag {
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(15, 118, 110, 0.1);
+            color: var(--teal-dark);
+            font-size: 0.76rem;
+            font-weight: 900;
+        }
+
+        .vocab-panel h3,
+        .vocab-panel p {
+            margin: 0;
+        }
+
+        .vocab-panel h3 {
+            color: #111827;
+            font-size: 1.1rem;
+        }
+
+        .vocab-panel__meaning {
+            color: var(--ink);
+            font-weight: 700;
+            line-height: 1.55;
+        }
+
+        .vocab-panel__meaning[dir="rtl"] {
+            direction: rtl;
+            unicode-bidi: isolate;
+            text-align: left;
+        }
+
+        .vocab-panel__example {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: baseline;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .vocab-panel__example strong {
+            color: #92400e;
+            font-size: 0.86rem;
+        }
+
+        .passage-block {
+            display: grid;
+            gap: 8px;
+        }
+
+        .passage-block h3 {
+            margin: 0;
+            color: var(--teal-dark);
+            font-size: 1.05rem;
+        }
+
+        .passage-block p {
+            margin: 0;
+        }
+
+        .sentence {
+            border-radius: 6px;
+            padding: 2px 3px;
+            transition: background 0.18s ease, box-shadow 0.18s ease;
+            cursor: pointer;
+        }
+
+        .sentence:hover,
+        .sentence:focus-visible {
+            background: rgba(15, 118, 110, 0.1);
+            outline: none;
+        }
+
+        .sentence.is-active {
+            background: rgba(190, 18, 60, 0.1);
+            box-shadow: 0 0 0 2px rgba(190, 18, 60, 0.16);
+        }
+
+        .text-target {
+            border-radius: 5px;
+            padding: 1px 4px;
+            background: #fef3c7;
+            color: #111827;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+            box-shadow: inset 0 -1px 0 rgba(180, 83, 9, 0.3);
+            cursor: pointer;
+            font-weight: 800;
+            transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .text-target:hover,
+        .text-target:focus-visible {
+            background: #fde68a;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.24);
+        }
+
+        .text-target.is-active {
+            background: #fde68a;
+            color: #111827;
+            box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.18);
+        }
+
+        .text-target.is-vocab-active {
+            background: #ccfbf1;
+            color: var(--teal-dark);
+            box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.26);
+        }
+
+        .sentence-index {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 26px;
+            height: 26px;
+            margin-right: 6px;
+            border-radius: 999px;
+            background: var(--blue-soft);
+            color: #075985;
+            font-size: 0.76rem;
+            font-weight: 900;
+            vertical-align: text-bottom;
+        }
+
+        body.lightbox-open {
+            overflow: hidden;
+        }
+
+        .image-lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+
+        .image-lightbox.is-open {
+            display: flex;
+        }
+
+        .lightbox-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(3px);
+        }
+
+        .lightbox-card {
+            position: relative;
+            width: min(92vw, 820px);
+            max-height: min(92vh, 820px);
+        }
+
+        .lightbox-stage {
+            position: relative;
+            overflow: hidden;
+            width: min(92vw, 82vh, 820px);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 8px;
+            background: #0f172a;
+            aspect-ratio: 1 / 1;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+        }
+
+        .lightbox-stage img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .lightbox-stage .image-placeholder {
+            background:
+                linear-gradient(135deg, rgba(15, 118, 110, 0.18), transparent 48%),
+                linear-gradient(315deg, rgba(180, 83, 9, 0.18), transparent 52%),
+                #f8fafc;
+        }
+
+        @media (max-width: 980px) {
+            .reader-app {
+                grid-template-columns: 1fr;
+            }
+
+            .visual-pane {
+                position: static;
+            }
+
+            .thumb-grid {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding-bottom: 2px;
+            }
+
+            .thumb {
+                flex: 0 0 68px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .shell {
+                width: min(100% - 18px, 1440px);
+                margin-top: 10px;
+            }
+
+            .topbar {
+                overflow-x: auto;
+                padding: 8px 10px;
+            }
+
+            .page-head,
+            .text-head {
+                display: grid;
+                grid-template-columns: 1fr;
+                align-items: start;
+            }
+
+            .head-meta,
+            .text-actions {
+                justify-content: flex-start;
+            }
+
+            .visual-pane,
+            .text-pane {
+                padding: 10px;
+            }
+
+            .stage-action {
+                right: 10px;
+                bottom: 10px;
+                width: 38px;
+                height: 38px;
+            }
+
+            .image-lightbox {
+                padding: 10px;
+            }
+
+            .lightbox-stage {
+                width: min(96vw, 82vh);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar">
+        <a href="../index.html"><i class="fa-solid fa-house" aria-hidden="true"></i><span>메인</span></a>
+        <span>|</span>
+        <a href="./index.html"><i class="fa-solid fa-folder-open" aria-hidden="true"></i><span>11과 홈</span></a>
+        <span>|</span>
+        <a href="./reading.html"><i class="fa-solid fa-book-open" aria-hidden="true"></i><span>읽기</span></a>
+        <span>|</span>
+        <a href="./writing-cut.html"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i><span>컷 쓰기</span></a>
+        <span>|</span>
+        <strong>읽기 컷툰 탐색</strong>
+    </nav>
+
+    <main class="shell">
+        <header class="page-head">
+            <div>
+                <p class="eyebrow">C11 Reading Cuttoon</p>
+                <h1>직장에서 성공하는 법</h1>
+            </div>
+            <div class="head-meta">
+                <span class="pill"><i class="fa-solid fa-image" aria-hidden="true"></i><span id="cut-count-label">15컷</span></span>
+                <span class="pill"><i class="fa-solid fa-highlighter" aria-hidden="true"></i><span>문장 연결</span></span>
+            </div>
+        </header>
+
+        <section class="reader-app" aria-label="11과 읽기 컷툰 탐색 앱">
+            <aside class="tool-pane visual-pane" aria-label="컷 이미지 탐색">
+                <div class="cut-toolbar">
+                    <button class="icon-btn" type="button" id="prev-cut" aria-label="이전 컷">
+                        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+                    </button>
+                    <div class="cut-title">
+                        <strong id="cut-title">컷 제목</strong>
+                        <span id="cut-subtitle">1 / 15</span>
+                    </div>
+                    <button class="icon-btn" type="button" id="next-cut" aria-label="다음 컷">
+                        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div class="stage" id="stage">
+                    <img id="cut-image" alt="" hidden>
+                    <div class="image-placeholder" id="stage-placeholder" data-stage-placeholder></div>
+                    <div class="hotspot-layer" id="hotspot-layer"></div>
+                    <button class="stage-action" type="button" id="open-lightbox" aria-label="컷 크게 보기" title="컷 크게 보기">
+                        <i class="fa-solid fa-up-right-and-down-left-from-center" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <section class="cut-note" aria-live="polite">
+                    <h2 id="active-label">대표 문장</h2>
+                    <p id="active-note"></p>
+                    <div class="target-chips" id="target-chips"></div>
+                </section>
+
+                <div class="thumb-grid" id="thumb-grid" aria-label="컷 목록"></div>
+            </aside>
+
+            <article class="tool-pane text-pane" aria-label="읽기 지문">
+                <div class="text-head">
+                    <div>
+                        <p class="eyebrow">Passage</p>
+                        <h2 id="passage-title">직장에서 성공하는 법</h2>
+                        <p>원문 문장을 컷 단위로 선택해 흐름을 확인합니다.</p>
+                    </div>
+                    <div class="text-actions">
+                        <div class="meaning-lang" id="meaning-lang" role="group" aria-label="핵심 단어 의미 번역 언어">
+                            <span class="meaning-lang__icon" aria-hidden="true"><i class="fa-solid fa-language"></i></span>
+                            <div class="meaning-lang__options" id="meaning-lang-options"></div>
+                        </div>
+                        <span class="progress-badge"><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span id="progress-label">1 / 15</span></span>
+                    </div>
+                </div>
+                <section class="vocab-panel" id="vocab-panel" aria-live="polite" aria-label="핵심 단어 설명">
+                    <div class="vocab-panel__head">
+                        <span class="vocab-panel__tag">핵심 단어</span>
+                        <h3 id="vocab-word"></h3>
+                    </div>
+                    <p class="vocab-panel__meaning" id="vocab-meaning"></p>
+                    <p class="vocab-panel__example"><strong>예문</strong><span id="vocab-example"></span></p>
+                </section>
+                <div class="passage" id="passage"></div>
+            </article>
+        </section>
+    </main>
+
+    <div class="image-lightbox" id="image-lightbox" aria-hidden="true">
+        <div class="lightbox-backdrop" data-close-lightbox></div>
+        <div class="lightbox-card" role="dialog" aria-modal="true" aria-label="컷 크게 보기">
+            <div class="lightbox-stage" id="lightbox-stage">
+                <img id="lightbox-image" alt="" hidden>
+                <div class="image-placeholder" id="lightbox-placeholder"></div>
+                <div class="hotspot-layer" id="lightbox-hotspot-layer"></div>
+                <button class="stage-action" type="button" id="close-lightbox" aria-label="크게 보기 닫기" title="닫기">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./reading-cuttoon-data.js"></script>
+    <script>
+        (function () {
+            const data = window.C11_READING_CUTTOON_DATA;
+            if (!data) {
+                return;
+            }
+
+            const cutTitle = document.getElementById("cut-title");
+            const cutSubtitle = document.getElementById("cut-subtitle");
+            const cutImage = document.getElementById("cut-image");
+            const stagePlaceholder = document.getElementById("stage-placeholder");
+            const hotspotLayer = document.getElementById("hotspot-layer");
+            const activeLabel = document.getElementById("active-label");
+            const activeNote = document.getElementById("active-note");
+            const targetChips = document.getElementById("target-chips");
+            const thumbGrid = document.getElementById("thumb-grid");
+            const passage = document.getElementById("passage");
+            const vocabWord = document.getElementById("vocab-word");
+            const vocabMeaning = document.getElementById("vocab-meaning");
+            const vocabExample = document.getElementById("vocab-example");
+            const meaningLangOptions = document.getElementById("meaning-lang-options");
+            const progressLabel = document.getElementById("progress-label");
+            const cutCountLabel = document.getElementById("cut-count-label");
+            const openLightboxButton = document.getElementById("open-lightbox");
+            const imageLightbox = document.getElementById("image-lightbox");
+            const lightboxImage = document.getElementById("lightbox-image");
+            const lightboxPlaceholder = document.getElementById("lightbox-placeholder");
+            const lightboxHotspotLayer = document.getElementById("lightbox-hotspot-layer");
+            const closeLightboxButton = document.getElementById("close-lightbox");
+            const vocabNotes = data.vocabNotes || {};
+            const vocabFocusIds = new Set(data.vocabFocusIds || Object.keys(vocabNotes));
+            const MEANING_STORAGE_KEY = "preferred-lang";
+            const MEANING_LANGS = [
+                { code: "none", label: "한국어", short: "KO", dir: "ltr" },
+                { code: "en", label: "English", short: "EN", dir: "ltr" },
+                { code: "vi", label: "Tiếng Việt", short: "VI", dir: "ltr" },
+                { code: "mn", label: "Монгол", short: "MN", dir: "ltr" },
+                { code: "ar", label: "العربية", short: "AR", dir: "rtl" },
+                { code: "kk", label: "Қазақша", short: "KK", dir: "ltr" },
+                { code: "th", label: "ไทย", short: "TH", dir: "ltr" },
+            ];
+            const meaningLangMap = new Map(MEANING_LANGS.map((lang) => [lang.code, lang]));
+
+            const sentenceMap = new Map(data.sentences.map((sentence) => [sentence.id, sentence]));
+            const cutMap = new Map(data.cuts.map((cut) => [cut.id, cut]));
+            const segmentMap = new Map();
+            data.sentences.forEach((sentence) => {
+                sentence.segments.forEach((segment) => {
+                    if (segment.id) {
+                        segmentMap.set(segment.id, { sentence, segment });
+                    }
+                });
+            });
+
+            let activeCutId = data.cuts[0].id;
+            let activeHotspotId = null;
+            let activeTargets = new Set(data.cuts[0].sentenceIds);
+            let activeVocabId = null;
+            let activeMeaningLang = getStoredMeaningLang();
+            let lightboxReturnFocus = null;
+
+            function escapeHtml(value) {
+                return String(value)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            function normalizeMeaningLang(lang) {
+                return meaningLangMap.has(lang) ? lang : "none";
+            }
+
+            function getMeaningLangMeta(lang) {
+                return meaningLangMap.get(normalizeMeaningLang(lang)) || meaningLangMap.get("none");
+            }
+
+            function getStoredMeaningLang() {
+                try {
+                    return normalizeMeaningLang(localStorage.getItem(MEANING_STORAGE_KEY) || "none");
+                } catch {
+                    return "none";
+                }
+            }
+
+            function setStoredMeaningLang(lang) {
+                try {
+                    localStorage.setItem(MEANING_STORAGE_KEY, normalizeMeaningLang(lang));
+                } catch {
+                    // Ignore storage failures in restricted browser contexts.
+                }
+            }
+
+            function translateMeaning(note) {
+                if (!note) {
+                    return "";
+                }
+
+                const lang = normalizeMeaningLang(activeMeaningLang);
+                if (lang === "none") {
+                    return note.meaning || "";
+                }
+                return (note.meaningTranslations && note.meaningTranslations[lang]) || note.meaning || "";
+            }
+
+            function renderLanguageButtons() {
+                const activeMeta = getMeaningLangMeta(activeMeaningLang);
+                meaningLangOptions.innerHTML = MEANING_LANGS.map((lang) => `
+                    <button
+                        class="meaning-lang__option${lang.code === activeMeta.code ? " is-active" : ""}"
+                        type="button"
+                        aria-pressed="${lang.code === activeMeta.code}"
+                        aria-label="${escapeHtml(lang.label)} 의미 번역"
+                        title="${escapeHtml(lang.label)}"
+                        data-meaning-lang-option="${escapeHtml(lang.code)}"
+                        dir="${escapeHtml(lang.dir)}"
+                    >
+                        ${escapeHtml(lang.short)}
+                    </button>
+                `).join("");
+            }
+
+            function setMeaningLang(lang) {
+                activeMeaningLang = normalizeMeaningLang(lang);
+                setStoredMeaningLang(activeMeaningLang);
+                renderLanguageButtons();
+                renderVocabPanel();
+            }
+
+            function flattenSentence(sentence) {
+                return sentence.segments.map((segment) => segment.text).join("");
+            }
+
+            function getCutIndex(cutId) {
+                return Math.max(0, data.cuts.findIndex((cut) => cut.id === cutId));
+            }
+
+            function getActiveCut() {
+                return cutMap.get(activeCutId) || data.cuts[0];
+            }
+
+            function isFocusVocabId(vocabId) {
+                return Boolean(vocabId && vocabNotes[vocabId] && vocabFocusIds.has(vocabId));
+            }
+
+            function getVocabIdsForSentence(sentence) {
+                if (!sentence) {
+                    return [];
+                }
+                return sentence.segments
+                    .filter((segment) => isFocusVocabId(segment.id))
+                    .map((segment) => segment.id);
+            }
+
+            function getVocabIdsForCut(cut) {
+                if (!cut) {
+                    return [];
+                }
+                return cut.sentenceIds.flatMap((sentenceId) => getVocabIdsForSentence(sentenceMap.get(sentenceId)));
+            }
+
+            function getFirstVocabIdForCut(cut) {
+                const vocabIds = getVocabIdsForCut(cut);
+                return vocabIds[0] || null;
+            }
+
+            function cutHasVocab(cut, vocabId) {
+                return Boolean(vocabId && getVocabIdsForCut(cut).includes(vocabId));
+            }
+
+            function ensureActiveVocabForCut(cut) {
+                if (!activeVocabId || !cutHasVocab(cut, activeVocabId)) {
+                    activeVocabId = getFirstVocabIdForCut(cut);
+                }
+            }
+
+            function renderVocabPanel() {
+                const note = activeVocabId ? vocabNotes[activeVocabId] : null;
+                if (!note) {
+                    vocabWord.textContent = "핵심 단어";
+                    vocabMeaning.textContent = "선택한 단어의 쉬운 뜻이 여기에 표시됩니다.";
+                    vocabMeaning.setAttribute("lang", "ko");
+                    vocabMeaning.setAttribute("dir", "ltr");
+                    vocabExample.textContent = "문장 속 핵심 단어를 선택해 보세요.";
+                    return;
+                }
+
+                const segment = segmentMap.get(activeVocabId);
+                const meaningMeta = getMeaningLangMeta(activeMeaningLang);
+                vocabWord.textContent = note.word || (segment ? segment.segment.text : "핵심 단어");
+                vocabMeaning.textContent = translateMeaning(note);
+                vocabMeaning.setAttribute("lang", meaningMeta.code === "none" ? "ko" : meaningMeta.code);
+                vocabMeaning.setAttribute("dir", meaningMeta.dir);
+                vocabExample.textContent = note.example || "";
+            }
+
+            function setActiveVocab(vocabId) {
+                if (!vocabNotes[vocabId]) {
+                    return false;
+                }
+                activeVocabId = vocabId;
+                renderVocabPanel();
+                applyHighlights();
+                return true;
+            }
+
+            function hasImage(cut) {
+                return Boolean(cut.image && cut.image.trim());
+            }
+
+            function setPlaceholderContent(node, cut) {
+                node.innerHTML = `
+                    <div class="placeholder-inner">
+                        <span class="placeholder-label">컷 ${escapeHtml(cut.label)}</span>
+                        <strong>${escapeHtml(cut.title)}</strong>
+                        <p>이미지 준비 중입니다. 나중에 데이터의 image 값에 파일명을 넣으면 이 자리에 바로 표시됩니다.</p>
+                    </div>
+                `;
+            }
+
+            function renderMedia(imageNode, placeholderNode, cut) {
+                if (hasImage(cut)) {
+                    imageNode.hidden = false;
+                    imageNode.src = data.assetBase + cut.image;
+                    imageNode.alt = `${cut.label}번 컷, ${cut.title}`;
+                    placeholderNode.hidden = true;
+                    return;
+                }
+
+                imageNode.removeAttribute("src");
+                imageNode.alt = "";
+                imageNode.hidden = true;
+                placeholderNode.hidden = false;
+                setPlaceholderContent(placeholderNode, cut);
+            }
+
+            function renderSentence(sentence, index) {
+                const segments = sentence.segments.map((segment) => {
+                    if (!segment.id) {
+                        return escapeHtml(segment.text);
+                    }
+                    if (!isFocusVocabId(segment.id)) {
+                        return `<span class="text-segment" data-target-id="${escapeHtml(segment.id)}">${escapeHtml(segment.text)}</span>`;
+                    }
+
+                    const vocab = vocabNotes[segment.id];
+                    const vocabAttributes = ` data-vocab-id="${escapeHtml(segment.id)}" tabindex="0" aria-label="${escapeHtml((vocab.word || segment.text) + " 뜻과 예문")}"`;
+                    return `<span class="text-target" data-target-id="${escapeHtml(segment.id)}"${vocabAttributes}>${escapeHtml(segment.text)}</span>`;
+                }).join("");
+                return `<span class="sentence" role="button" tabindex="0" data-sentence data-sentence-id="${escapeHtml(sentence.id)}" data-target-id="${escapeHtml(sentence.id)}"><span class="sentence-index">${index + 1}</span>${segments}</span>`;
+            }
+
+            function renderPassage() {
+                let sentenceIndex = 0;
+                passage.innerHTML = data.passageLayout.map((block) => {
+                    const body = block.sentenceIds.map((id) => {
+                        const sentence = sentenceMap.get(id);
+                        const html = renderSentence(sentence, sentenceIndex);
+                        sentenceIndex += 1;
+                        return html;
+                    }).join(" ");
+                    return `
+                        <section class="passage-block">
+                            <h3>${escapeHtml(block.title)}</h3>
+                            <p>${body}</p>
+                        </section>
+                    `;
+                }).join("");
+            }
+
+            function renderThumbs() {
+                thumbGrid.innerHTML = data.cuts.map((cut) => {
+                    const imageMarkup = hasImage(cut)
+                        ? `<img src="${escapeHtml(data.assetBase + cut.image)}" alt="" loading="eager" decoding="async"><span class="thumb-badge">${escapeHtml(cut.label)}</span>`
+                        : `<div class="thumb-placeholder" data-thumb-placeholder><b>${escapeHtml(cut.label)}</b><span>이미지 준비 중</span></div>`;
+                    return `
+                        <button class="thumb" type="button" data-thumb data-cut-id="${escapeHtml(cut.id)}" aria-label="${escapeHtml(cut.label)}번 컷 ${escapeHtml(cut.title)}">
+                            ${imageMarkup}
+                        </button>
+                    `;
+                }).join("");
+            }
+
+            function findHotspot(cut, hotspotId) {
+                return (cut.hotspots || []).find((hotspot) => hotspot.id === hotspotId) || null;
+            }
+
+            function renderHotspotButtons(cut, layer) {
+                const hotspots = cut.hotspots || [];
+                layer.innerHTML = hotspots.map((item, index) => {
+                    const isActive = item.id === activeHotspotId;
+                    return `
+                        <button
+                            class="hotspot${isActive ? " is-active" : ""}"
+                            type="button"
+                            data-hotspot-id="${escapeHtml(item.id)}"
+                            style="left:${item.x}%;top:${item.y}%;width:${item.w}%;height:${item.h}%;"
+                            aria-label="${escapeHtml(item.label)}"
+                            title="${escapeHtml(item.label)}"
+                        >
+                            <span class="hotspot-marker">${index + 1}</span>
+                            <span class="hotspot-label">${escapeHtml(item.label)}</span>
+                        </button>
+                    `;
+                }).join("");
+            }
+
+            function sentenceHasActiveSegment(sentence) {
+                return sentence.segments.some((segment) => segment.id && activeTargets.has(segment.id));
+            }
+
+            function applyHighlights() {
+                document.querySelectorAll(".sentence").forEach((node) => {
+                    const sentenceId = node.dataset.sentenceId;
+                    const sentence = sentenceMap.get(sentenceId);
+                    node.classList.toggle("is-active", activeTargets.has(sentenceId) || sentenceHasActiveSegment(sentence));
+                });
+
+                document.querySelectorAll(".text-target, .text-segment").forEach((node) => {
+                    node.classList.toggle("is-active", activeTargets.has(node.dataset.targetId));
+                    node.classList.toggle("is-vocab-active", node.dataset.vocabId === activeVocabId);
+                });
+
+                document.querySelectorAll(".thumb").forEach((node) => {
+                    node.classList.toggle("is-active", node.dataset.cutId === activeCutId);
+                });
+            }
+
+            function getTargetTexts(cut, hotspot) {
+                if (!hotspot && Array.isArray(cut.keywords)) {
+                    return cut.keywords;
+                }
+
+                const chips = [];
+                const targets = hotspot ? hotspot.targetIds : cut.sentenceIds;
+                targets.forEach((targetId) => {
+                    if (segmentMap.has(targetId)) {
+                        chips.push(segmentMap.get(targetId).segment.text);
+                    } else if (sentenceMap.has(targetId)) {
+                        chips.push(flattenSentence(sentenceMap.get(targetId)));
+                    }
+                });
+                return [...new Set(chips)].slice(0, 4);
+            }
+
+            function renderCurrentCut() {
+                const cut = getActiveCut();
+                const cutIndex = getCutIndex(cut.id);
+                const hotspot = activeHotspotId ? findHotspot(cut, activeHotspotId) : null;
+                const sentence = sentenceMap.get(cut.sentenceIds[0]);
+
+                cutTitle.textContent = cut.title;
+                cutSubtitle.textContent = `${cutIndex + 1} / ${data.cuts.length}`;
+                progressLabel.textContent = `${cutIndex + 1} / ${data.cuts.length}`;
+                cutCountLabel.textContent = `${data.cuts.length}컷`;
+
+                renderMedia(cutImage, stagePlaceholder, cut);
+                renderMedia(lightboxImage, lightboxPlaceholder, cut);
+                renderHotspotButtons(cut, hotspotLayer);
+                renderHotspotButtons(cut, lightboxHotspotLayer);
+
+                activeLabel.textContent = hotspot ? hotspot.label : "대표 문장";
+                activeNote.textContent = hotspot ? hotspot.note : (cut.note || flattenSentence(sentence));
+                targetChips.innerHTML = getTargetTexts(cut, hotspot).map((text) => `<span>${escapeHtml(text)}</span>`).join("");
+                ensureActiveVocabForCut(cut);
+                renderVocabPanel();
+            }
+
+            function scrollToActiveTarget() {
+                const sentenceTarget = [...activeTargets].find((targetId) => sentenceMap.has(targetId));
+                const node = sentenceTarget ? document.querySelector(`.sentence[data-sentence-id="${sentenceTarget}"]`) : null;
+                if (node) {
+                    node.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+            }
+
+            function setActiveTargets(cut, hotspot) {
+                activeTargets = new Set(cut.sentenceIds);
+                if (hotspot && Array.isArray(hotspot.targetIds)) {
+                    hotspot.targetIds.forEach((targetId) => activeTargets.add(targetId));
+                }
+            }
+
+            function selectCut(cutId, options = {}) {
+                const cut = cutMap.get(cutId);
+                if (!cut) {
+                    return;
+                }
+                activeCutId = cut.id;
+                activeHotspotId = options.hotspotId || null;
+                const hotspot = activeHotspotId ? findHotspot(cut, activeHotspotId) : null;
+                setActiveTargets(cut, hotspot);
+                renderCurrentCut();
+                applyHighlights();
+                if (options.scrollText) {
+                    scrollToActiveTarget();
+                }
+            }
+
+            function selectHotspot(hotspotId) {
+                selectCut(activeCutId, { hotspotId, scrollText: true });
+            }
+
+            function moveCut(delta) {
+                const currentIndex = getCutIndex(activeCutId);
+                const nextIndex = (currentIndex + delta + data.cuts.length) % data.cuts.length;
+                selectCut(data.cuts[nextIndex].id, { scrollText: true });
+            }
+
+            function selectCutForSentence(sentenceId) {
+                const cut = data.cuts.find((item) => item.sentenceIds.includes(sentenceId));
+                if (cut) {
+                    selectCut(cut.id, { scrollText: false });
+                }
+            }
+
+            function isLightboxOpen() {
+                return imageLightbox.classList.contains("is-open");
+            }
+
+            function openLightbox() {
+                lightboxReturnFocus = document.activeElement;
+                imageLightbox.classList.add("is-open");
+                imageLightbox.setAttribute("aria-hidden", "false");
+                document.body.classList.add("lightbox-open");
+                renderCurrentCut();
+                closeLightboxButton.focus({ preventScroll: true });
+            }
+
+            function closeLightbox() {
+                imageLightbox.classList.remove("is-open");
+                imageLightbox.setAttribute("aria-hidden", "true");
+                document.body.classList.remove("lightbox-open");
+                if (lightboxReturnFocus && typeof lightboxReturnFocus.focus === "function") {
+                    lightboxReturnFocus.focus({ preventScroll: true });
+                } else {
+                    openLightboxButton.focus({ preventScroll: true });
+                }
+            }
+
+            renderLanguageButtons();
+            renderPassage();
+            renderThumbs();
+            renderCurrentCut();
+            applyHighlights();
+
+            document.getElementById("prev-cut").addEventListener("click", () => moveCut(-1));
+            document.getElementById("next-cut").addEventListener("click", () => moveCut(1));
+            meaningLangOptions.addEventListener("click", (event) => {
+                const langButton = event.target.closest("[data-meaning-lang-option]");
+                if (langButton) {
+                    setMeaningLang(langButton.dataset.meaningLangOption);
+                    langButton.focus({ preventScroll: true });
+                }
+            });
+            openLightboxButton.addEventListener("click", openLightbox);
+            closeLightboxButton.addEventListener("click", closeLightbox);
+            imageLightbox.addEventListener("click", (event) => {
+                if (event.target.closest("[data-close-lightbox]")) {
+                    closeLightbox();
+                }
+            });
+
+            hotspotLayer.addEventListener("click", (event) => {
+                const hotspotButton = event.target.closest("[data-hotspot-id]");
+                if (hotspotButton) {
+                    selectHotspot(hotspotButton.dataset.hotspotId);
+                }
+            });
+
+            lightboxHotspotLayer.addEventListener("click", (event) => {
+                const hotspotButton = event.target.closest("[data-hotspot-id]");
+                if (hotspotButton) {
+                    selectHotspot(hotspotButton.dataset.hotspotId);
+                }
+            });
+
+            thumbGrid.addEventListener("click", (event) => {
+                const thumbButton = event.target.closest("[data-cut-id]");
+                if (thumbButton) {
+                    selectCut(thumbButton.dataset.cutId, { scrollText: true });
+                }
+            });
+
+            passage.addEventListener("click", (event) => {
+                const vocabNode = event.target.closest("[data-vocab-id]");
+                if (vocabNode) {
+                    const sentenceNode = vocabNode.closest("[data-sentence-id]");
+                    if (sentenceNode) {
+                        selectCutForSentence(sentenceNode.dataset.sentenceId);
+                    }
+                    setActiveVocab(vocabNode.dataset.vocabId);
+                    return;
+                }
+
+                const sentenceNode = event.target.closest("[data-sentence-id]");
+                if (sentenceNode) {
+                    selectCutForSentence(sentenceNode.dataset.sentenceId);
+                }
+            });
+
+            passage.addEventListener("keydown", (event) => {
+                if (event.key !== "Enter" && event.key !== " ") {
+                    return;
+                }
+                const vocabNode = event.target.closest("[data-vocab-id]");
+                if (vocabNode) {
+                    event.preventDefault();
+                    const sentenceNode = vocabNode.closest("[data-sentence-id]");
+                    if (sentenceNode) {
+                        selectCutForSentence(sentenceNode.dataset.sentenceId);
+                    }
+                    setActiveVocab(vocabNode.dataset.vocabId);
+                    return;
+                }
+
+                const sentenceNode = event.target.closest("[data-sentence-id]");
+                if (sentenceNode) {
+                    event.preventDefault();
+                    selectCutForSentence(sentenceNode.dataset.sentenceId);
+                }
+            });
+
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape" && isLightboxOpen()) {
+                    closeLightbox();
+                }
+            });
+        })();
+    </script>
+    <script src="../shared/page-qr.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>
