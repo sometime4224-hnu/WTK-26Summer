@@ -15,6 +15,7 @@ test('c11 hub links to reading, reading cuttoon, and cut writing', async ({ page
 
   const readingCard = page.locator('article.path-card[data-tone="reading"]').filter({ hasText: '읽기 활동' });
   await expect(readingCard.locator('a[href="reading.html"]')).toContainText('읽기');
+  await expect(readingCard.locator('a[href="reading-quiz.html"]')).toContainText('읽기 문제 풀기');
   await expect(readingCard.locator('a[href="reading-cuttoon.html"]')).toContainText('읽기 컷툰 탐색');
   await expect(readingCard.locator('a[href="writing-cut.html"]')).toContainText('컷 쓰기 활동');
 });
@@ -37,6 +38,41 @@ test('c11 reading page renders the completed passage and grades checks', async (
   await page.locator('#blank-answer').fill('독서');
   await page.getByRole('button', { name: '정답 확인' }).click();
   await expect(page.locator('#blank-feedback')).toContainText('맞았습니다');
+});
+
+test('c11 reading quiz page grades multiple choice and written answers', async ({ page }) => {
+  await blockExternalRequests(page);
+
+  await page.goto('/c11/reading-quiz.html', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('h1')).toContainText('직장에서 성공하는 법');
+  await expect(page.locator('body')).toContainText('경제 경영 서적을 읽으면 업무에 필요한 지식을 얻을 수 있다.');
+  await expect(page.locator('[data-question-type="mc"]')).toHaveCount(4);
+  await expect(page.locator('[data-question-type="mc"] [data-choice]')).toHaveCount(16);
+  await expect(page.locator('[data-question-type="short"]')).toHaveCount(1);
+  await expect(page.locator('[data-question-type="subjective"]')).toHaveCount(1);
+
+  await page.locator('[data-question="q1"] [data-choice="2"]').click();
+  await expect(page.locator('[data-question="q1"] [data-feedback]')).toContainText('정답');
+  await expect(page.locator('#score-label')).toContainText('1 / 5');
+
+  await page.locator('[data-question="q2"] [data-choice="1"]').click();
+  await page.locator('[data-question="q3"] [data-choice="4"]').click();
+  await page.locator('[data-question="q4"] [data-choice="1"]').click();
+  await page.locator('#short-answer').fill('16권');
+  await page.locator('#check-short').click();
+  await expect(page.locator('#short-feedback')).toContainText('맞았습니다');
+  await expect(page.locator('#score-label')).toContainText('5 / 5');
+
+  await page.locator('#essay-answer').fill('동료가 바쁠 때 서류를 함께 들어 주겠습니다. 작은 일이지만 동료에게 도움이 되기 때문입니다.');
+  await page.locator('#check-essay').click();
+  await expect(page.locator('#essay-feedback')).toContainText('좋습니다');
+  await page.locator('#show-sample').click();
+  await expect(page.locator('#sample-answer')).toBeVisible();
+
+  await page.locator('#reset-quiz').click();
+  await expect(page.locator('#score-label')).toContainText('0 / 5');
+  await expect(page.locator('#short-answer')).toHaveValue('');
 });
 
 test('c11 reading cuttoon renders webp images and sentence navigation', async ({ page }) => {

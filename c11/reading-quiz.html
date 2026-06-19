@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11과 읽기 문제 풀기 - 직장에서 성공하는 법</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <style>
+        :root {
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #dbe3ea;
+            --teal: #0f766e;
+            --teal-soft: #ccfbf1;
+            --amber-soft: #fef3c7;
+            --green: #15803d;
+            --red: #b91c1c;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background:
+                linear-gradient(135deg, rgba(20, 184, 166, 0.12), transparent 34%),
+                linear-gradient(315deg, rgba(245, 158, 11, 0.12), transparent 38%),
+                #f4f6f8;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 54px;
+            padding: 8px 14px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .topbar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--teal);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 850;
+        }
+
+        .topbar span,
+        .topbar strong {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .shell {
+            width: min(100% - 24px, 1280px);
+            margin: 18px auto 36px;
+        }
+
+        .page-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: end;
+            margin-bottom: 16px;
+        }
+
+        .eyebrow {
+            margin: 0 0 4px;
+            color: var(--teal);
+            font-size: 0.78rem;
+            font-weight: 950;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin-top: 0;
+        }
+
+        h1 {
+            margin-bottom: 4px;
+            font-size: clamp(1.7rem, 3.6vw, 3rem);
+            line-height: 1.08;
+        }
+
+        .page-head p:last-child {
+            margin-bottom: 0;
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 40px;
+            border: 1px solid rgba(15, 118, 110, 0.2);
+            border-radius: 999px;
+            padding: 0 13px;
+            background: #ffffff;
+            color: var(--teal);
+            font-weight: 950;
+            white-space: nowrap;
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.2fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .panel {
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.07);
+        }
+
+        .passage-panel {
+            position: sticky;
+            top: 68px;
+            max-height: calc(100vh - 86px);
+            overflow: auto;
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--line);
+            background: #f8fafc;
+        }
+
+        .panel-head h2 {
+            margin: 0;
+            font-size: 1.05rem;
+        }
+
+        .panel-head a,
+        .small-link {
+            color: var(--teal);
+            font-size: 0.84rem;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .passage {
+            padding: 16px;
+            color: #334155;
+            font-size: 1rem;
+            line-height: 1.9;
+        }
+
+        .passage h3 {
+            margin: 14px 0 6px;
+            color: var(--teal);
+            font-size: 1.02rem;
+        }
+
+        .highlight {
+            border-radius: 5px;
+            padding: 1px 4px;
+            background: var(--teal-soft);
+            color: #115e59;
+            font-weight: 850;
+        }
+
+        .quiz-panel {
+            display: grid;
+            gap: 12px;
+            padding: 14px;
+        }
+
+        .question-card {
+            display: grid;
+            gap: 12px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 8px;
+            padding: 14px;
+            background: #ffffff;
+        }
+
+        .question-card.is-correct {
+            border-color: rgba(34, 197, 94, 0.45);
+            background: #f0fdf4;
+        }
+
+        .question-card.is-wrong {
+            border-color: rgba(239, 68, 68, 0.45);
+            background: #fef2f2;
+        }
+
+        .question-head {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .question-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 30px;
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            background: var(--amber-soft);
+            color: #92400e;
+            font-size: 0.82rem;
+            font-weight: 950;
+        }
+
+        .question-title {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.55;
+        }
+
+        .choice-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .choice-btn {
+            display: grid;
+            grid-template-columns: 26px minmax(0, 1fr);
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+            min-height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: #ffffff;
+            color: #334155;
+            font: inherit;
+            font-weight: 760;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .choice-btn:hover,
+        .choice-btn:focus-visible {
+            border-color: var(--teal);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+        }
+
+        .choice-btn.is-selected.is-correct {
+            border-color: #22c55e;
+            background: #dcfce7;
+            color: var(--green);
+        }
+
+        .choice-btn.is-selected.is-wrong {
+            border-color: #ef4444;
+            background: #fee2e2;
+            color: var(--red);
+        }
+
+        .choice-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            font-weight: 950;
+        }
+
+        .answer-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 11px 12px;
+            color: var(--ink);
+            font: inherit;
+            font-weight: 750;
+            background: #ffffff;
+        }
+
+        input {
+            max-width: 260px;
+        }
+
+        textarea {
+            min-height: 116px;
+            resize: vertical;
+            line-height: 1.65;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--teal);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+        }
+
+        .primary-btn,
+        .ghost-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            border-radius: 8px;
+            padding: 0 13px;
+            font: inherit;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .primary-btn {
+            border: 1px solid #0f766e;
+            background: #0f766e;
+            color: #ffffff;
+        }
+
+        .ghost-btn {
+            border: 1px solid var(--line);
+            background: #ffffff;
+            color: var(--teal);
+        }
+
+        .feedback {
+            min-height: 24px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+            font-weight: 850;
+            line-height: 1.55;
+        }
+
+        .feedback.is-correct {
+            color: var(--green);
+        }
+
+        .feedback.is-wrong {
+            color: var(--red);
+        }
+
+        .sample-answer {
+            display: none;
+            margin: 0;
+            border-left: 4px solid #0f766e;
+            padding: 10px 12px;
+            border-radius: 0 8px 8px 0;
+            background: #f0fdfa;
+            color: #115e59;
+            font-size: 0.92rem;
+            font-weight: 760;
+            line-height: 1.65;
+        }
+
+        .sample-answer.is-visible {
+            display: block;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            padding: 2px 0 0;
+        }
+
+        @media (max-width: 920px) {
+            .page-head,
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .passage-panel {
+                position: static;
+                max-height: none;
+            }
+
+            .score-pill {
+                justify-self: start;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .shell {
+                width: min(100% - 16px, 1280px);
+                margin-top: 10px;
+            }
+
+            .topbar {
+                gap: 9px;
+            }
+
+            .panel-head {
+                display: grid;
+                justify-content: stretch;
+            }
+
+            .answer-row {
+                display: grid;
+            }
+
+            input,
+            .primary-btn,
+            .ghost-btn {
+                max-width: none;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar">
+        <a href="../index.html"><i class="fa-solid fa-house" aria-hidden="true"></i><span>메인</span></a>
+        <span>|</span>
+        <a href="./index.html"><i class="fa-solid fa-folder-open" aria-hidden="true"></i><span>11과 홈</span></a>
+        <span>|</span>
+        <a href="./reading.html"><i class="fa-solid fa-book-open" aria-hidden="true"></i><span>읽기</span></a>
+        <span>|</span>
+        <a href="./reading-cuttoon.html"><i class="fa-solid fa-images" aria-hidden="true"></i><span>읽기 컷툰</span></a>
+        <span>|</span>
+        <strong>읽기 문제</strong>
+    </nav>
+
+    <main class="shell">
+        <header class="page-head">
+            <div>
+                <p class="eyebrow">C11 Reading Quiz</p>
+                <h1>직장에서 성공하는 법</h1>
+                <p>지문을 읽고 4지선다, 단답, 서술형 문제를 차례대로 풉니다.</p>
+            </div>
+            <div class="score-pill" aria-live="polite">
+                <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+                <span id="score-label">자동 채점 0 / 5</span>
+            </div>
+        </header>
+
+        <section class="layout" aria-label="읽기 지문과 문제 풀기">
+            <article class="panel passage-panel" aria-label="읽기 지문">
+                <div class="panel-head">
+                    <h2>읽기 지문</h2>
+                    <a href="./reading-cuttoon.html">컷툰으로 보기</a>
+                </div>
+                <div class="passage">
+                    <p>
+                        직장인이라면 누구든지 회사에서 꼭 필요한 사람이 되고 싶을 것이다. 그런 사람이 되려면 어떤 노력을 해야 할까?
+                        만약 회사에서 성공하고 싶다면 항상 <span class="highlight">친절</span>과 <span class="highlight">독서</span>를 실천해야 한다.
+                    </p>
+
+                    <h3>I. 친절한 사람이 성공한다.</h3>
+                    <p>
+                        회사에는 일을 맡기면 다른 사람보다 빨리 잘 해결하는 사람이 있다. 그 사람은 어려운 일이 생겨도 누군가의 도움을 받아 쉽게 해결한다.
+                        사람들은 그가 운이 좋다고 말한다. 왜 그 사람에게만 좋은 일이 자주 생길까? 그 이유는 평소의 작은 친절 때문이다.
+                    </p>
+                    <p>
+                        복사기를 도와주고 서류를 함께 들어 주고 우산을 빌려주는 것은 아주 작은 일이다.
+                        사람들은 이런 작은 친절을 오래 기억했다가 나중에 그 사람을 돕는다.
+                        그래서 친절한 사람이 그렇지 않은 사람보다 성공할 가능성이 높다.
+                    </p>
+
+                    <h3>II. 독서를 하는 사람이 성공한다.</h3>
+                    <p>
+                        독서를 하는 사람이 성공한다. 한국의 직장인들은 1년에 평균 16권의 책을 읽는다.
+                        가장 많이 읽는 책의 종류는 경제 경영 서적과 소설이다.
+                        경제 경영 서적을 읽으면 업무에 필요한 지식을 얻을 수 있다.
+                    </p>
+                </div>
+            </article>
+
+            <section class="panel quiz-panel" aria-label="읽기 문제">
+                <article class="question-card" data-question="q1" data-question-type="mc">
+                    <div class="question-head">
+                        <span class="question-number">1</span>
+                        <h2 class="question-title">이 글의 중심 생각으로 가장 알맞은 것은 무엇입니까?</h2>
+                    </div>
+                    <div class="choice-grid">
+                        <button class="choice-btn" type="button" data-choice="1"><span class="choice-label">①</span><span>회사에서 운이 좋은 사람을 만나는 방법</span></button>
+                        <button class="choice-btn" type="button" data-choice="2"><span class="choice-label">②</span><span>회사에서 성공하려면 친절과 독서를 실천해야 한다는 것</span></button>
+                        <button class="choice-btn" type="button" data-choice="3"><span class="choice-label">③</span><span>직장인은 소설보다 경제 경영 서적만 읽어야 한다는 것</span></button>
+                        <button class="choice-btn" type="button" data-choice="4"><span class="choice-label">④</span><span>회사에서는 어려운 일을 혼자 해결해야 한다는 것</span></button>
+                    </div>
+                    <p class="feedback" data-feedback></p>
+                </article>
+
+                <article class="question-card" data-question="q2" data-question-type="mc">
+                    <div class="question-head">
+                        <span class="question-number">2</span>
+                        <h2 class="question-title">친절한 사람이 나중에 도움을 받을 수 있는 이유는 무엇입니까?</h2>
+                    </div>
+                    <div class="choice-grid">
+                        <button class="choice-btn" type="button" data-choice="1"><span class="choice-label">①</span><span>사람들이 작은 친절을 오래 기억하기 때문에</span></button>
+                        <button class="choice-btn" type="button" data-choice="2"><span class="choice-label">②</span><span>친절한 사람은 책을 전혀 읽지 않기 때문에</span></button>
+                        <button class="choice-btn" type="button" data-choice="3"><span class="choice-label">③</span><span>친절한 사람은 항상 일을 다른 사람에게 미루기 때문에</span></button>
+                        <button class="choice-btn" type="button" data-choice="4"><span class="choice-label">④</span><span>사람들이 큰 선물만 오래 기억하기 때문에</span></button>
+                    </div>
+                    <p class="feedback" data-feedback></p>
+                </article>
+
+                <article class="question-card" data-question="q3" data-question-type="mc">
+                    <div class="question-head">
+                        <span class="question-number">3</span>
+                        <h2 class="question-title">글에서 말한 작은 친절의 예가 아닌 것은 무엇입니까?</h2>
+                    </div>
+                    <div class="choice-grid">
+                        <button class="choice-btn" type="button" data-choice="1"><span class="choice-label">①</span><span>복사기를 도와준다.</span></button>
+                        <button class="choice-btn" type="button" data-choice="2"><span class="choice-label">②</span><span>서류를 함께 들어 준다.</span></button>
+                        <button class="choice-btn" type="button" data-choice="3"><span class="choice-label">③</span><span>우산을 빌려준다.</span></button>
+                        <button class="choice-btn" type="button" data-choice="4"><span class="choice-label">④</span><span>혼자서 책만 읽고 다른 사람을 돕지 않는다.</span></button>
+                    </div>
+                    <p class="feedback" data-feedback></p>
+                </article>
+
+                <article class="question-card" data-question="q4" data-question-type="mc">
+                    <div class="question-head">
+                        <span class="question-number">4</span>
+                        <h2 class="question-title">경제 경영 서적을 읽으면 무엇을 얻을 수 있습니까?</h2>
+                    </div>
+                    <div class="choice-grid">
+                        <button class="choice-btn" type="button" data-choice="1"><span class="choice-label">①</span><span>업무에 필요한 지식</span></button>
+                        <button class="choice-btn" type="button" data-choice="2"><span class="choice-label">②</span><span>복사기를 고치는 기술만</span></button>
+                        <button class="choice-btn" type="button" data-choice="3"><span class="choice-label">③</span><span>우산을 빌리는 방법</span></button>
+                        <button class="choice-btn" type="button" data-choice="4"><span class="choice-label">④</span><span>운이 좋아지는 특별한 비밀</span></button>
+                    </div>
+                    <p class="feedback" data-feedback></p>
+                </article>
+
+                <article class="question-card" data-question="q5" data-question-type="short">
+                    <div class="question-head">
+                        <span class="question-number">5</span>
+                        <h2 class="question-title">한국의 직장인들은 1년에 평균 몇 권의 책을 읽습니까?</h2>
+                    </div>
+                    <div class="answer-row">
+                        <input id="short-answer" type="text" autocomplete="off" placeholder="예: 16권">
+                        <button class="primary-btn" type="button" id="check-short">정답 확인</button>
+                    </div>
+                    <p class="feedback" id="short-feedback" data-feedback></p>
+                </article>
+
+                <article class="question-card" data-question="q6" data-question-type="subjective">
+                    <div class="question-head">
+                        <span class="question-number">6</span>
+                        <h2 class="question-title">회사에서 성공하기 위해 내가 실천할 수 있는 작은 친절 한 가지와 그 이유를 쓰세요.</h2>
+                    </div>
+                    <textarea id="essay-answer" placeholder="예: 동료가 바쁠 때 서류 정리를 도와주겠습니다. 작은 도움이지만 동료가 저를 신뢰할 수 있기 때문입니다."></textarea>
+                    <div class="answer-row">
+                        <button class="primary-btn" type="button" id="check-essay">답안 확인</button>
+                        <button class="ghost-btn" type="button" id="show-sample">예시 보기</button>
+                    </div>
+                    <p class="feedback" id="essay-feedback" data-feedback></p>
+                    <p class="sample-answer" id="sample-answer">
+                        예시 답안: 동료가 무거운 서류를 옮길 때 함께 들어 주겠습니다. 작은 일이지만 동료가 그 친절을 기억하고, 나중에 저도 어려울 때 도움을 받을 수 있기 때문입니다.
+                    </p>
+                </article>
+
+                <div class="actions">
+                    <button class="ghost-btn" type="button" id="reset-quiz">다시 풀기</button>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        const answers = {
+            q1: "2",
+            q2: "1",
+            q3: "4",
+            q4: "1",
+        };
+        const graded = new Map();
+
+        function updateScore() {
+            const correctCount = Array.from(graded.values()).filter(Boolean).length;
+            document.getElementById("score-label").textContent = `자동 채점 ${correctCount} / 5`;
+        }
+
+        function setQuestionState(card, isCorrect, message) {
+            card.classList.toggle("is-correct", isCorrect);
+            card.classList.toggle("is-wrong", !isCorrect);
+            const feedback = card.querySelector("[data-feedback]");
+            feedback.textContent = message;
+            feedback.classList.toggle("is-correct", isCorrect);
+            feedback.classList.toggle("is-wrong", !isCorrect);
+        }
+
+        document.querySelectorAll("[data-question-type='mc']").forEach((card) => {
+            card.addEventListener("click", (event) => {
+                const choice = event.target.closest("[data-choice]");
+                if (!choice) {
+                    return;
+                }
+
+                const questionId = card.dataset.question;
+                const isCorrect = choice.dataset.choice === answers[questionId];
+                card.querySelectorAll("[data-choice]").forEach((button) => {
+                    button.classList.remove("is-selected", "is-correct", "is-wrong");
+                });
+                choice.classList.add("is-selected", isCorrect ? "is-correct" : "is-wrong");
+                graded.set(questionId, isCorrect);
+                setQuestionState(card, isCorrect, isCorrect ? "정답입니다." : "다시 지문에서 근거를 찾아 보세요.");
+                updateScore();
+            });
+        });
+
+        function normalizeShortAnswer(value) {
+            return value.trim().replace(/\s+/g, "").replace(/[.,]/g, "");
+        }
+
+        document.getElementById("check-short").addEventListener("click", () => {
+            const card = document.querySelector("[data-question='q5']");
+            const value = normalizeShortAnswer(document.getElementById("short-answer").value);
+            const isCorrect = value === "16" || value === "16권" || value === "열여섯권";
+            graded.set("q5", isCorrect);
+            setQuestionState(card, isCorrect, isCorrect ? "맞았습니다. 평균 16권입니다." : "다시 확인해 보세요. 숫자와 단위를 함께 볼 수 있습니다.");
+            updateScore();
+        });
+
+        document.getElementById("check-essay").addEventListener("click", () => {
+            const value = document.getElementById("essay-answer").value.trim();
+            const feedback = document.getElementById("essay-feedback");
+            if (value.length < 12) {
+                feedback.textContent = "한 가지 친절과 이유가 모두 보이도록 한 문장 이상 써 보세요.";
+                feedback.className = "feedback is-wrong";
+                return;
+            }
+            feedback.textContent = "좋습니다. 친절한 행동과 이유가 들어갔는지 예시 답안과 비교해 보세요.";
+            feedback.className = "feedback is-correct";
+        });
+
+        document.getElementById("show-sample").addEventListener("click", () => {
+            document.getElementById("sample-answer").classList.add("is-visible");
+        });
+
+        document.getElementById("reset-quiz").addEventListener("click", () => {
+            graded.clear();
+            document.querySelectorAll(".question-card").forEach((card) => {
+                card.classList.remove("is-correct", "is-wrong");
+                const feedback = card.querySelector("[data-feedback]");
+                if (feedback) {
+                    feedback.textContent = "";
+                    feedback.className = "feedback";
+                }
+            });
+            document.querySelectorAll(".choice-btn").forEach((button) => {
+                button.classList.remove("is-selected", "is-correct", "is-wrong");
+            });
+            document.getElementById("short-answer").value = "";
+            document.getElementById("essay-answer").value = "";
+            document.getElementById("sample-answer").classList.remove("is-visible");
+            updateScore();
+        });
+    </script>
+    <script src="../shared/page-qr.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>
