@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3B-8반 한 명 뽑기</title>
+  <title>3B-6반 한 명 뽑기</title>
   <style>
     * {
       box-sizing: border-box;
@@ -85,6 +85,18 @@
       gap: 10px;
     }
 
+    .reset-pool-button {
+      justify-self: center;
+      width: min(220px, 100%);
+      min-height: 48px;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 1rem;
+      box-shadow: none;
+    }
+
     .zoom-button {
       display: inline-grid;
       place-items: center;
@@ -106,9 +118,10 @@
 </head>
 <body>
   <main>
-    <h1 class="page-title">3B-8반 한 명 뽑기</h1>
+    <h1 class="page-title">3B-6반 한 명 뽑기</h1>
     <button type="button" id="draw-button">뽑기</button>
     <div id="student-name" aria-live="polite"></div>
+    <button type="button" class="reset-pool-button" id="reset-pool-button">풀 리셋</button>
     <div class="zoom-controls" aria-label="학생 이름 크기 조절">
       <button type="button" class="zoom-button" id="zoom-out" aria-label="학생 이름 축소">-</button>
       <button type="button" class="zoom-button" id="zoom-in" aria-label="학생 이름 확대">+</button>
@@ -149,10 +162,11 @@
 
       const button = document.getElementById('draw-button');
       const output = document.getElementById('student-name');
+      const resetPoolButton = document.getElementById('reset-pool-button');
       const zoomOutButton = document.getElementById('zoom-out');
       const zoomInButton = document.getElementById('zoom-in');
-      const storageKey = 'korean3b:single-student-draw-3b8-state';
-      const scaleStorageKey = 'korean3b:single-student-draw-3b8-name-scale';
+      const storageKey = 'korean3b:single-student-draw-3b6-state';
+      const scaleStorageKey = 'korean3b:single-student-draw-3b6-name-scale';
       const rosterKey = students.join('|');
       const minNameScale = 0.7;
       const maxNameScale = 1.5;
@@ -250,6 +264,18 @@
         return pool;
       }
 
+      function resetDrawPool() {
+        remainingStudents = [];
+        lastPickedStudent = '';
+        output.textContent = '';
+
+        try {
+          localStorage.removeItem(storageKey);
+        } catch {
+          // Keep the reset usable even when browser storage is blocked.
+        }
+      }
+
       button.addEventListener('click', () => {
         if (remainingStudents.length === 0) {
           remainingStudents = createDrawPool();
@@ -262,6 +288,7 @@
         output.textContent = pickedStudent;
       });
 
+      resetPoolButton.addEventListener('click', resetDrawPool);
       zoomOutButton.addEventListener('click', () => updateNameScale(-nameScaleStep));
       zoomInButton.addEventListener('click', () => updateNameScale(nameScaleStep));
     })();

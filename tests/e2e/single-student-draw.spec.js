@@ -28,7 +28,7 @@ const studentNames = [
   '원 티 응옥 린'
 ];
 
-const class8StudentNames = [
+const class6StudentNames = [
   '칭 텐 김',
   '찡 황 칸 후엔',
   '응우엔 빈 빈',
@@ -61,11 +61,26 @@ async function drawOne(page) {
   return page.locator('#student-name').innerText();
 }
 
+async function expectFullUniqueDraw(page, names) {
+  const drawnNames = [];
+
+  while (drawnNames.length < names.length) {
+    const pickedName = await drawOne(page);
+    expect(names).toContain(pickedName);
+    expect(drawnNames).not.toContain(pickedName);
+    drawnNames.push(pickedName);
+  }
+
+  expect(new Set(drawnNames).size).toBe(names.length);
+  return drawnNames;
+}
+
 test('draws exactly one student from the presentation roster', async ({ page }) => {
   await page.goto('/apps/standalone-pages/single-student-draw.html', { waitUntil: 'domcontentloaded' });
 
   await expect(page.locator('#draw-button')).toHaveCount(1);
   await expect(page.locator('#draw-button')).toHaveText('뽑기');
+  await expect(page.locator('#reset-pool-button')).toHaveText('풀 리셋');
   await expect(page.locator('#student-name')).toHaveText('');
 
   const pickedName = await drawOne(page);
@@ -105,12 +120,47 @@ test('draws every presentation student once before the pool resets', async ({ pa
   expect(firstNameFromResetPool).not.toBe(lastNameFromFinishedPool);
 });
 
-test('draws exactly one student from the 3B-8 roster', async ({ page }) => {
+test('manually resets the 3B-7 draw pool', async ({ page }) => {
+  await page.goto('/apps/standalone-pages/single-student-draw.html', { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => localStorage.clear());
+  await page.reload({ waitUntil: 'domcontentloaded' });
+
+  const firstPickedName = await drawOne(page);
+  expect(studentNames).toContain(firstPickedName);
+
+  await page.locator('#reset-pool-button').click();
+  await expect(page.locator('#student-name')).toHaveText('');
+
+  await expectFullUniqueDraw(page, studentNames);
+});
+
+test('draws every 3B-6 student once before the pool resets', async ({ page }) => {
   await page.goto('/apps/standalone-pages/single-student-draw-3b8.html', { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => localStorage.clear());
+  await page.reload({ waitUntil: 'domcontentloaded' });
 
-  await expect(page.locator('.page-title')).toHaveText('3B-8반 한 명 뽑기');
+  await expect(page.locator('.page-title')).toHaveText('3B-6반 한 명 뽑기');
   await expect(page.locator('#draw-button')).toHaveText('뽑기');
+  await expect(page.locator('#reset-pool-button')).toHaveText('풀 리셋');
 
-  const pickedName = await drawOne(page);
-  expect(class8StudentNames).toContain(pickedName);
+  const drawnNames = await expectFullUniqueDraw(page, class6StudentNames);
+  const lastNameFromFinishedPool = drawnNames[drawnNames.length - 1];
+  const firstNameFromResetPool = await drawOne(page);
+
+  expect(class6StudentNames).toContain(firstNameFromResetPool);
+  expect(firstNameFromResetPool).not.toBe(lastNameFromFinishedPool);
+});
+
+test('manually resets the 3B-6 draw pool', async ({ page }) => {
+  await page.goto('/apps/standalone-pages/single-student-draw-3b8.html', { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => localStorage.clear());
+  await page.reload({ waitUntil: 'domcontentloaded' });
+
+  const firstPickedName = await drawOne(page);
+  expect(class6StudentNames).toContain(firstPickedName);
+
+  await page.locator('#reset-pool-button').click();
+  await expect(page.locator('#student-name')).toHaveText('');
+
+  await expectFullUniqueDraw(page, class6StudentNames);
 });
