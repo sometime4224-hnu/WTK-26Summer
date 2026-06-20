@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>12과 어휘 보조 | 몸상태 체크업</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #64748b;
+      --page: #f7fafc;
+      --paper: #ffffff;
+      --line: #dbe4f0;
+      --line-soft: #edf2f7;
+      --teal: #0f766e;
+      --teal-soft: #ccfbf1;
+      --orange: #c2410c;
+      --orange-soft: #ffedd5;
+      --blue: #1d4ed8;
+      --blue-soft: #dbeafe;
+      --green: #15803d;
+      --green-soft: #dcfce7;
+      --red: #b91c1c;
+      --red-soft: #fee2e2;
+      --shadow: 0 16px 38px rgba(15, 23, 42, 0.08);
+      --topbar-height: 48px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--page);
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, #f8fbfd 0%, #eef7f7 48%, #fff7ed 100%);
+      font-family: "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+      letter-spacing: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      min-height: var(--topbar-height);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 12px;
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar__links {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .topbar__links::-webkit-scrollbar {
+      display: none;
+    }
+
+    .topbar a {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(23, 32, 51, 0.1);
+      border-radius: 8px;
+      background: rgba(23, 32, 51, 0.04);
+      color: var(--ink);
+      padding: 0 10px;
+      font-size: 0.8rem;
+      font-weight: 900;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .topbar a[aria-current="page"] {
+      border-color: var(--teal);
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+
+    .topbar__title {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 34px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.86fr) minmax(360px, 1.14fr);
+      align-items: stretch;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .hero__copy {
+      display: grid;
+      align-content: center;
+      gap: 14px;
+      padding: clamp(18px, 3vw, 30px);
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--teal);
+      font-size: 0.76rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 0;
+      font-size: clamp(2rem, 4.5vw, 3.55rem);
+      line-height: 1.03;
+      font-weight: 900;
+    }
+
+    .hero__lead {
+      margin: 0;
+      max-width: 32rem;
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1.7;
+    }
+
+    .hero__chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: #334155;
+      padding: 0 10px;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .hero__image {
+      min-height: 260px;
+      background: #edf6f5;
+    }
+
+    .hero__image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .section {
+      margin-top: 16px;
+    }
+
+    .section__head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    .section__head h2 {
+      margin: 2px 0 0;
+      font-size: clamp(1.35rem, 2.2vw, 2rem);
+      line-height: 1.12;
+      font-weight: 900;
+    }
+
+    .section__hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 800;
+      line-height: 1.55;
+    }
+
+    .diagnosis {
+      display: grid;
+      grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .surface {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .quiz-visual {
+      display: grid;
+      align-content: start;
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .quiz-visual__frame {
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      background: #fff;
+      aspect-ratio: 1 / 1;
+    }
+
+    .quiz-visual__frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .progress {
+      display: grid;
+      gap: 9px;
+    }
+
+    .progress__row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .progress__bar {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #e2e8f0;
+    }
+
+    .progress__fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--teal), var(--blue));
+      transition: width 0.22s ease;
+    }
+
+    .quiz-main {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .question-card {
+      display: grid;
+      gap: 8px;
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 14px;
+    }
+
+    .question-card__label {
+      margin: 0;
+      color: var(--orange);
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+
+    .question-card__text {
+      margin: 0;
+      font-size: clamp(1.1rem, 2.1vw, 1.55rem);
+      line-height: 1.45;
+      font-weight: 900;
+      word-break: keep-all;
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .option-btn,
+    .control-btn,
+    .pair-toggle,
+    .report-chip {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 900;
+      cursor: pointer;
+      transition: border-color 0.14s ease, background 0.14s ease, transform 0.14s ease;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      line-height: 1.3;
+      word-break: keep-all;
+    }
+
+    .option-btn:hover,
+    .control-btn:hover,
+    .pair-toggle:hover,
+    .report-chip:hover {
+      transform: translateY(-1px);
+      border-color: #93c5fd;
+    }
+
+    .option-btn.is-correct {
+      border-color: var(--green);
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .option-btn.is-wrong {
+      border-color: var(--red);
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .feedback {
+      min-height: 46px;
+      display: grid;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 11px 12px;
+      color: var(--muted);
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    .feedback[data-state="correct"] {
+      border-color: #86efac;
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .feedback[data-state="wrong"] {
+      border-color: #fecaca;
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .control-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 13px;
+    }
+
+    .control-btn--primary {
+      border-color: transparent;
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .control-btn--primary:hover {
+      border-color: transparent;
+      background: #0d6b64;
+    }
+
+    .pairs-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .pair-card {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 9px;
+      min-width: 0;
+      padding: 10px;
+    }
+
+    .pair-card__title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .pair-card__image {
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      background: #fff;
+      aspect-ratio: 1 / 1;
+    }
+
+    .pair-card__image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .pair-card__label {
+      min-height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 5px;
+      text-align: center;
+      color: #0f172a;
+      font-size: 0.96rem;
+      font-weight: 900;
+      line-height: 1.25;
+      word-break: keep-all;
+    }
+
+    .pair-toggle {
+      width: 100%;
+      padding: 0 10px;
+      color: var(--blue);
+      background: var(--blue-soft);
+      border-color: #bfdbfe;
+      font-size: 0.84rem;
+    }
+
+    .report-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(310px, 0.72fr);
+      gap: 12px;
+    }
+
+    .report-selector,
+    .report-result,
+    .extension-card {
+      padding: 14px;
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .report-chip {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+      padding: 7px;
+      text-align: left;
+      color: var(--ink);
+    }
+
+    .report-chip img {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      background: #fff;
+      object-fit: contain;
+    }
+
+    .report-chip.is-selected {
+      border-color: var(--teal);
+      background: var(--teal-soft);
+      color: #0f766e;
+    }
+
+    .report-output {
+      min-height: 112px;
+      display: grid;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 14px;
+      color: #0f172a;
+      font-size: clamp(1.04rem, 2vw, 1.35rem);
+      font-weight: 900;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .report-status {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+      line-height: 1.55;
+    }
+
+    .extension {
+      display: grid;
+      grid-template-columns: minmax(0, 0.36fr) minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+    }
+
+    .extension img {
+      width: 100%;
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .extension h3 {
+      margin: 0 0 6px;
+      font-size: 1.3rem;
+    }
+
+    .extension p {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-weight: 800;
+      line-height: 1.65;
+    }
+
+    .mini-list {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .mini-list li {
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      background: #fff7ed;
+      padding: 8px 10px;
+      color: #7c2d12;
+      font-size: 0.9rem;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .diagnosis,
+      .report-layout,
+      .extension {
+        grid-template-columns: 1fr;
+      }
+
+      .pairs-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .report-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      .shell {
+        width: min(100% - 18px, 1180px);
+        padding-top: 10px;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar__title {
+        display: none;
+      }
+
+      .hero__image {
+        min-height: 186px;
+      }
+
+      .option-grid,
+      .pairs-grid,
+      .report-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section__head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .control-row {
+        flex-direction: column;
+      }
+
+      .control-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="topbar" aria-label="12과 이동">
+    <div class="topbar__links">
+      <a href="index.html">12과 홈</a>
+      <a href="vocabulary.html">어휘 카드</a>
+      <a href="vocabulary-context.html">문맥형 어휘</a>
+      <a href="vocab-support-body-condition.html" aria-current="page">몸상태 체크업</a>
+    </div>
+    <span class="topbar__title">12과 어휘 보조</span>
+  </nav>
+
+  <main class="shell">
+    <section class="hero">
+      <div class="hero__copy">
+        <div>
+          <p class="eyebrow">Vocabulary Checkup</p>
+          <h1>몸상태 체크업</h1>
+        </div>
+        <p class="hero__lead">그림과 상황을 보고 몸상태 표현을 고른 뒤, 반대 표현을 비교하고 오늘의 컨디션 문장을 만들어 봅니다.</p>
+        <div class="hero__chips" aria-label="활동 단계">
+          <span class="chip">상황 판단</span>
+          <span class="chip">반대 표현</span>
+          <span class="chip">컨디션 리포트</span>
+        </div>
+      </div>
+      <div class="hero__image">
+        <img src="../assets/c12/vocabulary/images/body-condition-checkup/checkup-hero.webp" alt="여러 몸상태를 보여 주는 교실 장면">
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="diagnosis-title">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow">Step 1</p>
+          <h2 id="diagnosis-title">진단 카드</h2>
+        </div>
+        <p class="section__hint">상황을 읽고 가장 알맞은 몸상태 표현을 고르세요.</p>
+      </div>
+
+      <div class="diagnosis">
+        <aside class="quiz-visual surface">
+          <div class="quiz-visual__frame">
+            <img id="quiz-image" src="" alt="">
+          </div>
+          <div class="progress" aria-label="진행 상태">
+            <div class="progress__row">
+              <span id="progress-label">1 / 1</span>
+              <span id="score-label">점수 0</span>
+            </div>
+            <div class="progress__bar" aria-hidden="true">
+              <div id="progress-fill" class="progress__fill"></div>
+            </div>
+          </div>
+        </aside>
+
+        <div class="quiz-main surface">
+          <div class="question-card">
+            <p class="question-card__label">몸상태를 찾아요</p>
+            <p id="question-text" class="question-card__text"></p>
+          </div>
+          <div id="option-grid" class="option-grid" aria-label="정답 선택"></div>
+          <div id="feedback" class="feedback" data-state="idle">선택지를 누르면 바로 확인할 수 있어요.</div>
+          <div class="control-row">
+            <button id="reset-quiz" class="control-btn" type="button">처음부터</button>
+            <button id="next-question" class="control-btn control-btn--primary" type="button">다음 카드</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="pairs-title">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow">Step 2</p>
+          <h2 id="pairs-title">반대 표현 스위치</h2>
+        </div>
+        <p class="section__hint">버튼을 누르며 몸상태가 어떻게 바뀌는지 비교하세요.</p>
+      </div>
+      <div id="pairs-grid" class="pairs-grid"></div>
+    </section>
+
+    <section class="section" aria-labelledby="report-title">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow">Step 3</p>
+          <h2 id="report-title">나의 컨디션 리포트</h2>
+        </div>
+        <p class="section__hint">오늘 내 상태와 가까운 표현을 2~3개 고르세요.</p>
+      </div>
+      <div class="report-layout">
+        <div class="report-selector surface">
+          <div id="report-grid" class="report-grid" aria-label="컨디션 선택"></div>
+        </div>
+        <div class="report-result surface">
+          <div id="report-output" class="report-output">몸상태 표현을 골라 주세요.</div>
+          <p id="report-status" class="report-status">선택한 표현으로 자연스러운 문장을 만들어 줍니다.</p>
+          <div class="control-row">
+            <button id="clear-report" class="control-btn" type="button">선택 지우기</button>
+            <button id="copy-report" class="control-btn control-btn--primary" type="button">문장 복사</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="extension-title">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow">Extension</p>
+          <h2 id="extension-title">확장 카드</h2>
+        </div>
+        <p class="section__hint">핵심 점수에는 넣지 않고, 컨디션을 더 자세히 말할 때만 사용합니다.</p>
+      </div>
+      <article class="extension-card surface" data-extension-card="stress">
+        <div class="extension">
+          <img src="../assets/c12/vocabulary/images/body-condition-checkup/stress.webp" alt="스트레스를 받는 학생">
+          <div>
+            <h3>스트레스를 받다</h3>
+            <p>공부, 일, 관계 때문에 마음과 몸이 긴장되는 상태를 말할 때 씁니다.</p>
+            <ul class="mini-list">
+              <li>시험이 가까워져서 스트레스를 받아요.</li>
+              <li>스트레스를 받으면 몸이 무겁고 쉽게 지쳐요.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const STORAGE_KEY = "c12-body-condition-checkup";
+      const BASE = "../assets/c12/misc/images/split-variants-35/full/";
+      const CHECKUP = "../assets/c12/vocabulary/images/body-condition-checkup/";
+
+      const ITEMS = [
+        { id: "gain-weight", label: "살이 찌다", image: BASE + "n01a.webp", alt: "살이 찌다", reportFinal: "살이 쪘어요", reportConnective: "살이 찌고" },
+        { id: "lose-weight", label: "살이 빠지다", image: BASE + "n01b.webp", alt: "살이 빠지다", reportFinal: "살이 빠졌어요", reportConnective: "살이 빠지고" },
+        { id: "strong", label: "힘이 세다", image: BASE + "n02a.webp", alt: "힘이 세다", reportFinal: "힘이 세졌어요", reportConnective: "힘이 세지고" },
+        { id: "weak", label: "힘이 약하다", image: BASE + "n02b.webp", alt: "힘이 약하다", reportFinal: "힘이 약해요", reportConnective: "힘이 약하고" },
+        { id: "posture-good", label: "자세가 좋다", image: BASE + "n03a.webp", alt: "자세가 좋다", reportFinal: "자세가 좋아요", reportConnective: "자세가 좋고" },
+        { id: "posture-bad", label: "자세가 나쁘다", image: BASE + "n03b.webp", alt: "자세가 나쁘다", reportFinal: "자세가 나빠요", reportConnective: "자세가 나쁘고" },
+        { id: "body-heavy", label: "몸이 무겁다", image: BASE + "n04a.webp", alt: "몸이 무겁다", reportFinal: "몸이 무거워요", reportConnective: "몸이 무겁고" },
+        { id: "body-light", label: "몸이 가볍다", image: BASE + "n04b.webp", alt: "몸이 가볍다", reportFinal: "몸이 가벼워요", reportConnective: "몸이 가볍고" },
+        { id: "breathless", label: "숨이 차다", image: BASE + "n05.webp", alt: "숨이 차다", reportFinal: "숨이 차요", reportConnective: "숨이 차고" },
+        { id: "sweaty", label: "땀이 나다", image: BASE + "n06.webp", alt: "땀이 나다", reportFinal: "땀이 많이 나요", reportConnective: "땀이 많이 나고" },
+        { id: "cramp", label: "쥐가 나다", image: BASE + "n07.webp", alt: "쥐가 나다", reportFinal: "쥐가 났어요", reportConnective: "쥐가 나고" },
+        { id: "tired", label: "지치다", image: BASE + "n08.webp", alt: "지치다", reportFinal: "쉽게 지쳐요", reportConnective: "쉽게 지치고" },
+        { id: "refreshed", label: "기분이 상쾌하다", image: BASE + "n09.webp", alt: "기분이 상쾌하다", reportFinal: "기분이 상쾌해요", reportConnective: "기분이 상쾌하고" },
+        { id: "energy-up", label: "기운이 나다", image: BASE + "n10.webp", alt: "기운이 나다", reportFinal: "기운이 나요", reportConnective: "기운이 나고" },
+        { id: "body-better", label: "몸이 좋아지다", image: BASE + "n11.webp", alt: "몸이 좋아지다", reportFinal: "몸이 좋아졌어요", reportConnective: "몸이 좋아지고" },
+        { id: "muscle", label: "근육이 생기다", image: BASE + "n12.webp", alt: "근육이 생기다", reportFinal: "근육이 생겼어요", reportConnective: "근육이 생기고" },
+        { id: "energy-low", label: "기운이 없다", image: CHECKUP + "energy-low.webp", alt: "기운이 없다", reportFinal: "기운이 없어요", reportConnective: "기운이 없고" },
+        { id: "stress", label: "스트레스를 받다", image: CHECKUP + "stress.webp", alt: "스트레스를 받다", extensionOnly: true }
+      ];
+
+      const itemMap = new Map(ITEMS.map((item) => [item.id, item]));
+
+      const QUESTIONS = [
+        {
+          id: "q-heavy",
+          image: "body-heavy",
+          text: "아침에 일어났는데 몸이 둔하고 움직이기 힘들어요.",
+          answer: "몸이 무겁다",
+          choices: ["몸이 무겁다", "몸이 가볍다", "기운이 나다", "자세가 좋다"],
+          explain: "몸이 둔하고 피곤하게 느껴질 때는 '몸이 무겁다'가 자연스러워요."
+        },
+        {
+          id: "q-breath",
+          image: "breathless",
+          text: "계단을 조금만 올라가도 헉헉거리며 호흡이 가빠져요.",
+          answer: "숨이 차다",
+          choices: ["숨이 차다", "땀이 나다", "기분이 상쾌하다", "근육이 생기다"],
+          explain: "호흡이 가쁘고 힘든 상태는 '숨이 차다'라고 해요."
+        },
+        {
+          id: "q-sweat",
+          image: "sweaty",
+          text: "날씨가 더워서 가만히 있어도 얼굴과 등에 물방울이 맺혀요.",
+          answer: "땀이 나다",
+          choices: ["땀이 나다", "쥐가 나다", "몸이 좋아지다", "살이 빠지다"],
+          explain: "피부에서 땀이 나오는 몸 반응은 '땀이 나다'예요."
+        },
+        {
+          id: "q-cramp",
+          image: "cramp",
+          text: "갑자기 종아리 근육이 딱 굳으면서 아파요.",
+          answer: "쥐가 나다",
+          choices: ["쥐가 나다", "자세가 나쁘다", "몸이 가볍다", "힘이 세다"],
+          explain: "근육이 갑자기 수축해서 아플 때는 '쥐가 나다'를 써요."
+        },
+        {
+          id: "q-energy-low",
+          image: "energy-low",
+          text: "책상 앞에 앉아 있는데 아무것도 하고 싶지 않고 축 처져요.",
+          answer: "기운이 없다",
+          choices: ["기운이 없다", "기운이 나다", "기분이 상쾌하다", "자세가 좋다"],
+          explain: "몸에 힘이나 활기가 없을 때는 '기운이 없다'가 어울려요."
+        },
+        {
+          id: "q-refreshed",
+          image: "refreshed",
+          text: "샤워하고 창문을 열었더니 기분이 시원하고 개운해요.",
+          answer: "기분이 상쾌하다",
+          choices: ["기분이 상쾌하다", "몸이 무겁다", "지치다", "살이 찌다"],
+          explain: "시원하고 개운한 느낌은 '기분이 상쾌하다'라고 말해요."
+        },
+        {
+          id: "q-posture",
+          image: "posture-bad",
+          text: "오래 앉아 있었더니 등이 굽고 목이 앞으로 나왔어요.",
+          answer: "자세가 나쁘다",
+          choices: ["자세가 나쁘다", "자세가 좋다", "힘이 세다", "몸이 좋아지다"],
+          explain: "몸의 모양이 바르지 않을 때는 '자세가 나쁘다'를 써요."
+        },
+        {
+          id: "q-better",
+          image: "body-better",
+          text: "며칠 쉬고 나니 아프던 곳이 낫고 건강 상태가 회복됐어요.",
+          answer: "몸이 좋아지다",
+          choices: ["몸이 좋아지다", "땀이 나다", "힘이 약하다", "살이 찌다"],
+          explain: "건강 상태가 회복되는 변화는 '몸이 좋아지다'라고 해요."
+        }
+      ];
+
+      const PAIRS = [
+        { id: "weight", title: "체중 변화", a: "gain-weight", b: "lose-weight" },
+        { id: "power", title: "힘", a: "weak", b: "strong" },
+        { id: "posture", title: "자세", a: "posture-bad", b: "posture-good" },
+        { id: "body", title: "몸 느낌", a: "body-heavy", b: "body-light" },
+        { id: "energy", title: "기운", a: "energy-low", b: "energy-up" }
+      ];
+
+      const REPORT_IDS = [
+        "body-heavy",
+        "body-light",
+        "breathless",
+        "sweaty",
+        "cramp",
+        "tired",
+        "refreshed",
+        "energy-low",
+        "energy-up",
+        "body-better",
+        "posture-bad",
+        "posture-good"
+      ];
+
+      const els = {
+        quizImage: document.getElementById("quiz-image"),
+        progressLabel: document.getElementById("progress-label"),
+        scoreLabel: document.getElementById("score-label"),
+        progressFill: document.getElementById("progress-fill"),
+        questionText: document.getElementById("question-text"),
+        optionGrid: document.getElementById("option-grid"),
+        feedback: document.getElementById("feedback"),
+        nextQuestion: document.getElementById("next-question"),
+        resetQuiz: document.getElementById("reset-quiz"),
+        pairsGrid: document.getElementById("pairs-grid"),
+        reportGrid: document.getElementById("report-grid"),
+        reportOutput: document.getElementById("report-output"),
+        reportStatus: document.getElementById("report-status"),
+        clearReport: document.getElementById("clear-report"),
+        copyReport: document.getElementById("copy-report")
+      };
+
+      const defaultState = {
+        quizIndex: 0,
+        score: 0,
+        answered: false,
+        selectedAnswer: "",
+        history: [],
+        pairSides: {},
+        reportSelections: []
+      };
+
+      let activeQuestions = QUESTIONS.slice();
+      let state = loadState();
+
+      function loadState() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+          return {
+            ...defaultState,
+            ...saved,
+            pairSides: { ...defaultState.pairSides, ...(saved.pairSides || {}) },
+            reportSelections: Array.isArray(saved.reportSelections) ? saved.reportSelections.filter((id) => itemMap.has(id)) : []
+          };
+        } catch (error) {
+          return { ...defaultState, pairSides: {}, reportSelections: [] };
+        }
+      }
+
+      function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          quizIndex: state.quizIndex,
+          score: state.score,
+          answered: state.answered,
+          selectedAnswer: state.selectedAnswer,
+          history: state.history,
+          pairSides: state.pairSides,
+          reportSelections: state.reportSelections
+        }));
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        }[char]));
+      }
+
+      function getItemByLabel(label) {
+        return ITEMS.find((item) => item.label === label);
+      }
+
+      function currentQuestion() {
+        return activeQuestions[state.quizIndex] || activeQuestions[0];
+      }
+
+      function renderQuiz() {
+        if (!activeQuestions.length) activeQuestions = QUESTIONS.slice();
+        if (state.quizIndex >= activeQuestions.length) state.quizIndex = 0;
+        const question = currentQuestion();
+        const imageItem = itemMap.get(question.image) || getItemByLabel(question.answer);
+        const answered = state.answered;
+
+        els.quizImage.src = imageItem ? imageItem.image : "";
+        els.quizImage.alt = imageItem ? imageItem.alt : "";
+        els.questionText.textContent = question.text;
+        els.progressLabel.textContent = `${state.quizIndex + 1} / ${activeQuestions.length}`;
+        els.scoreLabel.textContent = `점수 ${state.score}`;
+        els.progressFill.style.width = `${((state.quizIndex + (answered ? 1 : 0)) / activeQuestions.length) * 100}%`;
+
+        els.optionGrid.innerHTML = question.choices.map((choice) => {
+          let className = "option-btn";
+          if (answered && choice === question.answer) className += " is-correct";
+          if (answered && choice === state.selectedAnswer && choice !== question.answer) className += " is-wrong";
+          return `<button class="${className}" type="button" data-option="${escapeHtml(choice)}"${answered ? " disabled" : ""}>${escapeHtml(choice)}</button>`;
+        }).join("");
+
+        if (answered) {
+          const correct = state.selectedAnswer === question.answer;
+          els.feedback.dataset.state = correct ? "correct" : "wrong";
+          els.feedback.textContent = `${correct ? "정답!" : `다시 확인해요. 정답: ${question.answer}`} ${question.explain}`;
+        } else {
+          els.feedback.dataset.state = "idle";
+          els.feedback.textContent = "선택지를 누르면 바로 확인할 수 있어요.";
+        }
+
+        els.nextQuestion.textContent = state.quizIndex === activeQuestions.length - 1 ? "처음 카드로" : "다음 카드";
+      }
+
+      function answerQuestion(choice) {
+        if (state.answered) return;
+        const question = currentQuestion();
+        const correct = choice === question.answer;
+        state.answered = true;
+        state.selectedAnswer = choice;
+        if (correct) state.score += 10;
+        state.history.push({
+          id: question.id,
+          selected: choice,
+          answer: question.answer,
+          correct
+        });
+        saveState();
+        renderQuiz();
+      }
+
+      function nextQuestion() {
+        state.quizIndex = state.quizIndex >= activeQuestions.length - 1 ? 0 : state.quizIndex + 1;
+        state.answered = false;
+        state.selectedAnswer = "";
+        saveState();
+        renderQuiz();
+      }
+
+      function resetQuiz() {
+        state.quizIndex = 0;
+        state.score = 0;
+        state.answered = false;
+        state.selectedAnswer = "";
+        state.history = [];
+        saveState();
+        renderQuiz();
+      }
+
+      function renderPairs() {
+        els.pairsGrid.innerHTML = PAIRS.map((pair) => {
+          const side = state.pairSides[pair.id] ? "b" : "a";
+          const item = itemMap.get(pair[side]);
+          return `
+            <article class="pair-card surface" data-pair-card="${escapeHtml(pair.id)}">
+              <div class="pair-card__title">
+                <span>${escapeHtml(pair.title)}</span>
+                <span>${side === "a" ? "전" : "후"}</span>
+              </div>
+              <div class="pair-card__image">
+                <img data-pair-image="${escapeHtml(pair.id)}" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.alt)}">
+              </div>
+              <div class="pair-card__label" data-pair-label="${escapeHtml(pair.id)}">${escapeHtml(item.label)}</div>
+              <button class="pair-toggle" type="button" data-pair-toggle="${escapeHtml(pair.id)}">반대로 바꾸기</button>
+            </article>
+          `;
+        }).join("");
+      }
+
+      function togglePair(pairId) {
+        state.pairSides[pairId] = !state.pairSides[pairId];
+        saveState();
+        renderPairs();
+      }
+
+      function renderReport() {
+        const selectedSet = new Set(state.reportSelections);
+        els.reportGrid.innerHTML = REPORT_IDS.map((id) => {
+          const item = itemMap.get(id);
+          return `
+            <button class="report-chip${selectedSet.has(id) ? " is-selected" : ""}" type="button" data-report-id="${escapeHtml(id)}" aria-pressed="${selectedSet.has(id) ? "true" : "false"}">
+              <img src="${escapeHtml(item.image)}" alt="">
+              <span>${escapeHtml(item.label)}</span>
+            </button>
+          `;
+        }).join("");
+
+        els.reportOutput.textContent = buildReportSentence();
+        if (state.reportSelections.length === 0) {
+          els.reportStatus.textContent = "선택한 표현으로 자연스러운 문장을 만들어 줍니다.";
+        } else {
+          els.reportStatus.textContent = `${state.reportSelections.length}개 선택됨. 최대 3개까지 고를 수 있어요.`;
+        }
+      }
+
+      function buildReportSentence() {
+        const selected = state.reportSelections.map((id) => itemMap.get(id)).filter(Boolean);
+        if (!selected.length) return "몸상태 표현을 골라 주세요.";
+        if (selected.length === 1) return `오늘은 ${selected[0].reportFinal}.`;
+        const parts = selected.slice(0, -1).map((item) => item.reportConnective);
+        const last = selected[selected.length - 1].reportFinal;
+        return `오늘은 ${parts.join(" ")} ${last}.`;
+      }
+
+      function toggleReport(id) {
+        const exists = state.reportSelections.includes(id);
+        if (exists) {
+          state.reportSelections = state.reportSelections.filter((selectedId) => selectedId !== id);
+        } else if (state.reportSelections.length < 3) {
+          state.reportSelections = [...state.reportSelections, id];
+        } else {
+          els.reportStatus.textContent = "문장이 너무 길어지지 않게 3개까지만 고를 수 있어요.";
+          return;
+        }
+        saveState();
+        renderReport();
+      }
+
+      async function copyReport() {
+        const sentence = buildReportSentence();
+        if (!state.reportSelections.length) {
+          els.reportStatus.textContent = "먼저 몸상태 표현을 골라 주세요.";
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(sentence);
+          els.reportStatus.textContent = "문장을 복사했어요.";
+        } catch (error) {
+          els.reportStatus.textContent = sentence;
+        }
+      }
+
+      function clearReport() {
+        state.reportSelections = [];
+        saveState();
+        renderReport();
+      }
+
+      function resetAll() {
+        activeQuestions = QUESTIONS.slice();
+        state = { ...defaultState, pairSides: {}, reportSelections: [] };
+        localStorage.removeItem(STORAGE_KEY);
+        renderAll();
+      }
+
+      function startWithQuestions(questions) {
+        activeQuestions = questions.map((question) => {
+          if (typeof question === "string") return QUESTIONS.find((item) => item.id === question);
+          return question;
+        }).filter(Boolean);
+        if (!activeQuestions.length) activeQuestions = QUESTIONS.slice();
+        state.quizIndex = 0;
+        state.score = 0;
+        state.answered = false;
+        state.selectedAnswer = "";
+        state.history = [];
+        saveState();
+        renderQuiz();
+      }
+
+      function renderAll() {
+        renderQuiz();
+        renderPairs();
+        renderReport();
+      }
+
+      els.optionGrid.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-option]");
+        if (button) answerQuestion(button.dataset.option);
+      });
+
+      els.nextQuestion.addEventListener("click", nextQuestion);
+      els.resetQuiz.addEventListener("click", resetQuiz);
+      els.pairsGrid.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-pair-toggle]");
+        if (button) togglePair(button.dataset.pairToggle);
+      });
+      els.reportGrid.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-report-id]");
+        if (button) toggleReport(button.dataset.reportId);
+      });
+      els.clearReport.addEventListener("click", clearReport);
+      els.copyReport.addEventListener("click", copyReport);
+
+      window.__C12_BODY_CONDITION__ = {
+        getItems: () => ITEMS.map((item) => ({ ...item })),
+        getQuestions: () => QUESTIONS.map((question) => ({ ...question, choices: question.choices.slice() })),
+        startWithQuestions,
+        reset: resetAll,
+        buildReportSentence,
+        storageKey: STORAGE_KEY
+      };
+
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
