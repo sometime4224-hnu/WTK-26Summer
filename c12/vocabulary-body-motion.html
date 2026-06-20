@@ -1,0 +1,2677 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>12과 신체 동작 만들기</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --motion-shell: min(1180px, calc(100vw - 28px));
+            --motion-line: #d9e2ec;
+            --motion-soft: #f7f9fc;
+            --motion-ink: #172033;
+            --motion-muted: #64748b;
+            --motion-blue: #2563eb;
+            --motion-green: #16a34a;
+            --motion-orange: #ea580c;
+            --motion-violet: #7c3aed;
+            --motion-pink: #db2777;
+        }
+
+        * { box-sizing: border-box; }
+
+        html {
+            min-height: 100%;
+            background: #f6f8fb;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100dvh;
+            color: var(--motion-ink);
+            font-family: "Noto Sans KR", system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button { font: inherit; }
+
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 0 14px;
+            overflow-x: auto;
+            border-bottom: 1px solid rgba(217, 226, 236, 0.9);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(14px);
+            scrollbar-width: none;
+        }
+
+        .top-nav::-webkit-scrollbar { display: none; }
+
+        .top-nav a,
+        .top-nav span {
+            flex: 0 0 auto;
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .top-nav .divider {
+            color: #cbd5e1;
+        }
+
+        .top-nav .title {
+            color: #475569;
+        }
+
+        .motion-shell {
+            width: var(--motion-shell);
+            margin: 14px auto 36px;
+        }
+
+        .expression-banner {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
+            min-height: 88px;
+            padding: 14px;
+            border: 1px solid var(--motion-line);
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 14px 36px rgba(15, 23, 42, 0.09);
+        }
+
+        .banner-kicker {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin: 0 0 4px;
+            color: var(--motion-orange);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .expression-text {
+            margin: 0;
+            color: #0f172a;
+            font-size: clamp(24px, 3.6vw, 46px);
+            font-weight: 900;
+            line-height: 1.08;
+            letter-spacing: 0;
+            word-break: keep-all;
+        }
+
+        .expression-feedback {
+            margin: 7px 0 0;
+            color: var(--motion-muted);
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .banner-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .view-toggle {
+            display: inline-grid;
+            grid-template-columns: repeat(2, minmax(54px, 1fr));
+            min-height: 40px;
+            overflow: hidden;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .view-toggle button {
+            min-width: 0;
+            border: 0;
+            border-right: 1px solid #dbeafe;
+            background: transparent;
+            color: #475569;
+            padding: 0 10px;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .view-toggle button:last-child {
+            border-right: 0;
+        }
+
+        .view-toggle button[aria-selected="true"] {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .icon-btn,
+        .text-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            background: #fff;
+            color: #1d4ed8;
+            font-weight: 900;
+            cursor: pointer;
+            transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+        }
+
+        .icon-btn {
+            width: 42px;
+            padding: 0;
+        }
+
+        .text-btn {
+            min-width: 92px;
+            padding: 0 13px;
+            gap: 7px;
+            font-size: 13px;
+        }
+
+        .icon-btn:hover,
+        .text-btn:hover {
+            border-color: #60a5fa;
+            background: #eff6ff;
+            transform: translateY(-1px);
+        }
+
+        .icon-btn:active,
+        .text-btn:active {
+            transform: translateY(0);
+        }
+
+        .lab-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stage-panel,
+        .side-panel,
+        .discover-panel {
+            border: 1px solid var(--motion-line);
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+        }
+
+        .stage-panel {
+            min-height: 620px;
+            overflow: hidden;
+        }
+
+        .stage-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 48px;
+            padding: 9px 12px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .stage-head h1 {
+            margin: 0;
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 900;
+        }
+
+        .stage-hint {
+            margin: 0;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .stage-wrap {
+            position: relative;
+            display: grid;
+            place-items: center;
+            min-height: 570px;
+            padding: 10px;
+            background:
+                linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(255, 255, 255, 0.98)),
+                repeating-linear-gradient(0deg, transparent 0 31px, rgba(148, 163, 184, 0.12) 32px),
+                repeating-linear-gradient(90deg, transparent 0 31px, rgba(148, 163, 184, 0.12) 32px);
+        }
+
+        .pose-stage {
+            width: min(100%, 500px);
+            height: min(70dvh, 560px);
+            min-height: 500px;
+            max-height: 590px;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .target-zone {
+            fill: rgba(37, 99, 235, 0.08);
+            stroke: rgba(37, 99, 235, 0.18);
+            stroke-width: 1.5;
+            opacity: 0;
+            transition: opacity 0.18s ease, stroke 0.18s ease, fill 0.18s ease;
+            pointer-events: none;
+        }
+
+        .target-zone.is-visible {
+            opacity: 1;
+        }
+
+        .target-zone.is-active {
+            fill: rgba(234, 88, 12, 0.13);
+            stroke: rgba(234, 88, 12, 0.82);
+            stroke-width: 2.5;
+            opacity: 1;
+        }
+
+        .guide-line {
+            fill: none;
+            stroke: rgba(37, 99, 235, 0.34);
+            stroke-width: 2;
+            stroke-dasharray: 8 7;
+            pointer-events: none;
+        }
+
+        .guide-line--ground {
+            stroke: rgba(22, 163, 74, 0.34);
+            stroke-dasharray: none;
+        }
+
+        .guide-label {
+            fill: #475569;
+            font-size: 12px;
+            font-weight: 900;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .limb-line {
+            fill: none;
+            stroke: #475569;
+            stroke-width: 16;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .limb-line--arm {
+            stroke: #64748b;
+            stroke-width: 15;
+        }
+
+        .limb-line--leg {
+            stroke: #334155;
+            stroke-width: 17;
+        }
+
+        .limb-line.is-active-limb {
+            stroke: #ea580c;
+            filter: drop-shadow(0 4px 8px rgba(234, 88, 12, 0.24));
+        }
+
+        .body-shape {
+            fill: #f8fafc;
+            stroke: #334155;
+            stroke-width: 8;
+            stroke-linejoin: round;
+        }
+
+        .head-shape {
+            fill: #fef3c7;
+            stroke: #334155;
+            stroke-width: 7;
+        }
+
+        .joint-dot {
+            fill: #fff;
+            stroke: rgba(51, 65, 85, 0.38);
+            stroke-width: 3;
+        }
+
+        .joint-dot.is-active-joint {
+            fill: #fef08a;
+            stroke: #ea580c;
+        }
+
+        .foot-triangle {
+            fill: rgba(22, 163, 74, 0.13);
+            stroke: rgba(22, 163, 74, 0.74);
+            stroke-width: 3;
+            stroke-linejoin: round;
+        }
+
+        .foot-detail {
+            fill: none;
+            stroke: rgba(22, 163, 74, 0.72);
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+
+        .foot-detail-dot {
+            fill: #f0fdf4;
+            stroke: rgba(22, 163, 74, 0.82);
+            stroke-width: 2;
+        }
+
+        .side-spine {
+            fill: none;
+            stroke: #0f766e;
+            stroke-width: 9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .side-sternum-line {
+            fill: none;
+            stroke: rgba(234, 88, 12, 0.68);
+            stroke-width: 4;
+            stroke-linecap: round;
+        }
+
+        .side-posture-dot {
+            fill: #fff;
+            stroke: rgba(15, 118, 110, 0.78);
+            stroke-width: 3;
+        }
+
+        .drag-handle {
+            fill: #2563eb;
+            stroke: #fff;
+            stroke-width: 4;
+            cursor: grab;
+            filter: drop-shadow(0 5px 8px rgba(37, 99, 235, 0.24));
+        }
+
+        .drag-handle[data-part*="Hand"] {
+            fill: var(--motion-orange);
+        }
+
+        .drag-handle[data-part*="Foot"] {
+            fill: var(--motion-green);
+        }
+
+        .drag-handle[data-part*="Heel"],
+        .drag-handle[data-part*="Knee"],
+        .drag-handle[data-part*="Elbow"] {
+            fill: #0f766e;
+        }
+
+        .drag-handle[data-part="head"] {
+            fill: var(--motion-pink);
+        }
+
+        .drag-handle[data-part="chest"],
+        .drag-handle[data-part="waist"] {
+            fill: var(--motion-violet);
+        }
+
+        .drag-handle.is-dragging {
+            cursor: grabbing;
+            stroke: #fef08a;
+            stroke-width: 5;
+        }
+
+        .pose-stage[data-view-mode="side"] #leftArmLine,
+        .pose-stage[data-view-mode="side"] #leftLegLine {
+            opacity: 0.42;
+            stroke-dasharray: 8 9;
+        }
+
+        .pose-stage[data-view-mode="side"] #rightArmLine,
+        .pose-stage[data-view-mode="side"] #rightLegLine {
+            stroke-width: 18;
+        }
+
+        .handle-label {
+            fill: #0f172a;
+            font-size: 10px;
+            font-weight: 900;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .side-detail {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 7px;
+            pointer-events: none;
+        }
+
+        .side-detail[hidden] {
+            display: none;
+        }
+
+        .side-metric {
+            min-width: 0;
+            border: 1px solid rgba(191, 219, 254, 0.95);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            padding: 7px 8px;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        }
+
+        .side-metric span {
+            display: block;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .side-metric strong {
+            display: block;
+            margin-top: 2px;
+            overflow: hidden;
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 900;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .side-panel {
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr) auto;
+            min-height: 620px;
+            overflow: hidden;
+        }
+
+        .mission-head {
+            padding: 12px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .mission-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .mission-label {
+            color: var(--motion-orange);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .mission-count {
+            min-width: 64px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            padding: 5px 8px;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .mission-title {
+            margin: 0;
+            color: #0f172a;
+            font-size: 22px;
+            font-weight: 900;
+            line-height: 1.22;
+            letter-spacing: 0;
+            word-break: keep-all;
+        }
+
+        .mission-feedback {
+            margin: 8px 0 0;
+            min-height: 22px;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.55;
+        }
+
+        .mission-feedback.is-done {
+            color: #15803d;
+        }
+
+        .mission-list {
+            display: grid;
+            align-content: start;
+            gap: 8px;
+            min-height: 0;
+            overflow: auto;
+            padding: 10px 12px;
+        }
+
+        .mission-chip {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            gap: 9px;
+            align-items: center;
+            width: 100%;
+            min-height: 48px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            padding: 8px 10px;
+            color: #334155;
+            font-weight: 900;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .mission-chip:hover {
+            border-color: #93c5fd;
+            background: #f8fbff;
+        }
+
+        .mission-chip.is-active {
+            border-color: #2563eb;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .mission-chip.is-done {
+            border-color: #86efac;
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .mission-chip__number {
+            display: inline-grid;
+            place-items: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            font-size: 12px;
+        }
+
+        .mission-chip.is-active .mission-chip__number {
+            background: #dbeafe;
+        }
+
+        .mission-chip.is-done .mission-chip__number {
+            background: #dcfce7;
+        }
+
+        .mission-chip__label {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        .mission-chip__source {
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .mission-actions {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            border-top: 1px solid #edf2f7;
+        }
+
+        .mission-actions .text-btn {
+            flex: 1 1 0;
+        }
+
+        .discover-panel {
+            margin-top: 12px;
+            padding: 12px;
+        }
+
+        .discover-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .discover-head h2 {
+            margin: 0;
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 900;
+        }
+
+        .discovery-count {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .discovery-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            min-height: 36px;
+        }
+
+        .discovery-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 32px;
+            border: 1px solid #c7d2fe;
+            border-radius: 8px;
+            background: #eef2ff;
+            padding: 5px 9px;
+            color: #3730a3;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .discovery-chip[data-source="core"] {
+            border-color: #fed7aa;
+            background: #fff7ed;
+            color: #9a3412;
+        }
+
+        .empty-discovery {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .motion-shell {
+                width: min(100vw - 18px, 760px);
+                margin-top: 10px;
+            }
+
+            .expression-banner {
+                grid-template-columns: 1fr;
+                min-height: 0;
+                padding: 12px;
+            }
+
+            .banner-actions {
+                justify-content: flex-start;
+            }
+
+            .lab-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stage-panel,
+            .side-panel {
+                min-height: 0;
+            }
+
+            .stage-wrap {
+                min-height: 520px;
+            }
+
+            .pose-stage {
+                height: min(63dvh, 530px);
+                min-height: 470px;
+            }
+
+            .side-panel {
+                grid-template-rows: auto auto auto;
+            }
+
+            .mission-list {
+                max-height: 260px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .top-nav {
+                gap: 8px;
+                padding: 0 10px;
+            }
+
+            .top-nav a,
+            .top-nav span {
+                font-size: 12px;
+            }
+
+            .motion-shell {
+                width: min(100vw - 12px, 520px);
+            }
+
+            .expression-text {
+                font-size: clamp(24px, 8vw, 34px);
+            }
+
+            .expression-feedback {
+                font-size: 12px;
+            }
+
+            .stage-head {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 3px;
+            }
+
+            .stage-wrap {
+                min-height: 455px;
+                padding: 4px;
+            }
+
+            .pose-stage {
+                height: 452px;
+                min-height: 440px;
+            }
+
+            .mission-title {
+                font-size: 19px;
+            }
+
+            .mission-list {
+                max-height: 232px;
+            }
+
+            .mission-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (min-width: 901px) and (max-height: 760px) {
+            .stage-panel,
+            .side-panel {
+                min-height: 540px;
+            }
+
+            .stage-wrap {
+                min-height: 492px;
+            }
+
+            .pose-stage {
+                height: min(66dvh, 500px);
+                min-height: 470px;
+            }
+
+            .mission-list {
+                max-height: 360px;
+            }
+        }
+
+        body.pc-mode .motion-shell {
+            width: min(1320px, calc(100vw - 38px));
+        }
+
+        body.pc-mode .lab-grid {
+            grid-template-columns: minmax(0, 1.18fr) minmax(340px, 0.82fr);
+        }
+
+        body.pc-mode .pose-stage {
+            width: min(100%, 560px);
+            height: min(72dvh, 640px);
+            max-height: 640px;
+        }
+    </style>
+</head>
+<body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <nav class="top-nav" aria-label="상단 이동">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
+        <span class="divider">|</span>
+        <a href="index.html">12과</a>
+        <span class="divider">|</span>
+        <a href="vocabulary.html">어휘</a>
+        <span class="divider">|</span>
+        <span class="title">신체 동작 만들기</span>
+    </nav>
+
+    <main class="motion-shell" id="motion-app">
+        <section class="expression-banner" aria-label="현재 동작 표현">
+            <div>
+                <p class="banner-kicker"><i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Current Expression</p>
+                <p id="expressionText" class="expression-text">직립 자세</p>
+                <p id="expressionFeedback" class="expression-feedback" aria-live="polite">파란 점을 움직여 신체 동작 표현을 만들어 보세요.</p>
+            </div>
+            <div class="banner-actions" aria-label="동작 조작">
+                <div class="view-toggle" role="tablist" aria-label="보기 방향">
+                    <button id="frontViewBtn" type="button" role="tab" aria-selected="true" data-view-mode="front">정면</button>
+                    <button id="sideViewBtn" type="button" role="tab" aria-selected="false" data-view-mode="side">측면</button>
+                </div>
+                <button id="resetPoseBtn" class="icon-btn" type="button" aria-label="직립 자세로 되돌리기" title="직립 자세로 되돌리기">
+                    <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                </button>
+                <button id="nextMissionTopBtn" class="text-btn" type="button">
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> 다음
+                </button>
+            </div>
+        </section>
+
+        <div class="lab-grid">
+            <section class="stage-panel" aria-label="신체 동작 조작 무대">
+                <div class="stage-head">
+                    <h1>신체 동작 만들기</h1>
+                    <p id="stageHint" class="stage-hint">손, 머리, 몸통, 발의 점을 움직이세요.</p>
+                </div>
+                <div id="stageWrap" class="stage-wrap">
+                    <svg id="poseStage" class="pose-stage" viewBox="0 0 360 520" role="img" aria-labelledby="poseTitle poseDesc">
+                        <title id="poseTitle">조작 가능한 인물 캐릭터</title>
+                        <desc id="poseDesc">손, 머리, 몸통, 발을 드래그해서 신체 동작을 만드는 SVG 캐릭터입니다.</desc>
+                        <g id="guideLayer" aria-hidden="true"></g>
+                        <g id="targetLayer" aria-hidden="true"></g>
+                        <g id="bodyLayer" aria-hidden="true">
+                            <path id="torsoShape" class="body-shape" d="" />
+                            <circle id="headShape" class="head-shape" cx="180" cy="105" r="32" />
+                            <path id="leftArmLine" class="limb-line limb-line--arm" d="" />
+                            <path id="rightArmLine" class="limb-line limb-line--arm" d="" />
+                            <path id="leftLegLine" class="limb-line limb-line--leg" d="" />
+                            <path id="rightLegLine" class="limb-line limb-line--leg" d="" />
+                            <line id="neckLine" class="limb-line" x1="180" y1="132" x2="180" y2="172" />
+                            <g id="jointLayer"></g>
+                        </g>
+                        <g id="handleLayer" aria-label="드래그 핸들"></g>
+                    </svg>
+                    <div id="sideDetail" class="side-detail" hidden aria-hidden="true">
+                        <div class="side-metric"><span>몸통</span><strong id="tiltMetric">0</strong></div>
+                        <div class="side-metric"><span>가슴</span><strong id="heelMetric">0</strong></div>
+                        <div class="side-metric"><span>목</span><strong id="armMetric">0</strong></div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="side-panel" aria-label="미션 목록">
+                <header class="mission-head">
+                    <div class="mission-meta">
+                        <span class="mission-label">Mission</span>
+                        <span id="missionCount" class="mission-count">1 / 10</span>
+                    </div>
+                    <h2 id="missionTitle" class="mission-title">손을 허리에 대다</h2>
+                    <p id="missionFeedback" class="mission-feedback" aria-live="polite">목표 표현을 만들면 자동으로 완료됩니다.</p>
+                </header>
+                <div id="missionList" class="mission-list"></div>
+                <div class="mission-actions">
+                    <button id="prevMissionBtn" class="text-btn" type="button"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> 이전</button>
+                    <button id="nextMissionBtn" class="text-btn" type="button">다음 <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+                </div>
+            </aside>
+        </div>
+
+        <section class="discover-panel" aria-label="발견한 표현">
+            <div class="discover-head">
+                <h2>발견한 표현</h2>
+                <span id="discoveryCount" class="discovery-count">0개</span>
+            </div>
+            <div id="discoveryList" class="discovery-list">
+                <span class="empty-discovery">아직 발견한 표현이 없습니다.</span>
+            </div>
+        </section>
+    </main>
+
+    <script>
+    (function () {
+        "use strict";
+
+        const SVG_NS = "http://www.w3.org/2000/svg";
+        const GESTURE_WINDOW_MS = 1500;
+        const DEFAULT_POSE = Object.freeze({
+            head: { x: 180, y: 105 },
+            chest: { x: 180, y: 205 },
+            waist: { x: 180, y: 292 },
+            leftHand: { x: 104, y: 304 },
+            rightHand: { x: 256, y: 304 },
+            leftElbow: { x: 118, y: 255 },
+            rightElbow: { x: 242, y: 255 },
+            leftFoot: { x: 145, y: 447 },
+            rightFoot: { x: 215, y: 447 },
+            leftKnee: { x: 148, y: 370 },
+            rightKnee: { x: 212, y: 370 },
+            leftToe: { x: 130, y: 475 },
+            leftHeel: { x: 160, y: 475 },
+            rightToe: { x: 230, y: 475 },
+            rightHeel: { x: 200, y: 475 }
+        });
+
+        const SIDE_DEFAULT_POSE = Object.freeze({
+            head: { x: 180, y: 105 },
+            chest: { x: 180, y: 205 },
+            waist: { x: 180, y: 292 },
+            pelvis: { x: 180, y: 354 }
+        });
+
+        const BODY_PARTS = {
+            head: { label: "머리", minX: 115, maxX: 245, minY: 64, maxY: 150, r: 13 },
+            chest: { label: "몸통", minX: 125, maxX: 235, minY: 165, maxY: 238, r: 12 },
+            waist: { label: "허리", minX: 130, maxX: 230, minY: 255, maxY: 318, r: 12 },
+            leftHand: { label: "왼손", minX: 32, maxX: 330, minY: 52, maxY: 430, r: 13 },
+            rightHand: { label: "오른손", minX: 30, maxX: 328, minY: 52, maxY: 430, r: 13 },
+            leftElbow: { label: "왼팔꿈치", minX: 42, maxX: 212, minY: 120, maxY: 365, r: 10 },
+            rightElbow: { label: "오른팔꿈치", minX: 148, maxX: 318, minY: 120, maxY: 365, r: 10 },
+            leftFoot: { label: "왼발목", minX: 54, maxX: 182, minY: 382, maxY: 475, r: 12 },
+            rightFoot: { label: "오른발목", minX: 178, maxX: 306, minY: 382, maxY: 475, r: 12 },
+            leftKnee: { label: "왼무릎", minX: 54, maxX: 205, minY: 300, maxY: 468, r: 10 },
+            rightKnee: { label: "오른무릎", minX: 155, maxX: 306, minY: 300, maxY: 468, r: 10 },
+            leftToe: { label: "왼발끝", minX: 54, maxX: 182, minY: 395, maxY: 490, r: 6, handle: false },
+            leftHeel: { label: "왼뒤꿈치", minX: 54, maxX: 182, minY: 395, maxY: 475, r: 9 },
+            rightToe: { label: "오른발끝", minX: 178, maxX: 306, minY: 395, maxY: 490, r: 6, handle: false },
+            rightHeel: { label: "오른뒤꿈치", minX: 178, maxX: 306, minY: 395, maxY: 475, r: 9 }
+        };
+
+        const SIDE_BODY_PARTS = {
+            head: { label: "머리", minX: 118, maxX: 250, minY: 64, maxY: 150, r: 13 },
+            chest: { label: "가슴", minX: 122, maxX: 250, minY: 165, maxY: 238, r: 12 },
+            waist: { label: "허리", minX: 130, maxX: 230, minY: 255, maxY: 318, r: 12 },
+            pelvis: { label: "골반", minX: 130, maxX: 230, minY: 328, maxY: 386, r: 12 }
+        };
+
+        const BODY_PARTS_BY_MODE = {
+            front: BODY_PARTS,
+            side: SIDE_BODY_PARTS
+        };
+
+        const DEFAULT_POSE_BY_MODE = {
+            front: DEFAULT_POSE,
+            side: SIDE_DEFAULT_POSE
+        };
+
+        const CONTACT_TARGETS = [
+            { id: "head", label: "머리에", source: "extend", radius: 38, point: (p) => p.head },
+            { id: "ear", label: "귀에", source: "extend", radius: 24, points: (p) => [p.earLeft, p.earRight] },
+            { id: "neck", label: "목에", source: "extend", radius: 31, point: (p) => p.neck },
+            { id: "shoulder", label: "어깨에", source: "extend", radius: 33, points: (p) => [p.leftShoulder, p.rightShoulder] },
+            { id: "chest", label: "가슴에", source: "extend", radius: 36, point: (p) => p.chest },
+            { id: "belly", label: "배에", source: "extend", radius: 36, point: (p) => midpoint(p.chest, p.waist) },
+            { id: "waist", label: "허리에", source: "core", radius: 46, point: (p) => p.waist },
+            { id: "knee", label: "무릎에", source: "extend", radius: 35, points: (p) => [p.leftKnee, p.rightKnee] }
+        ];
+
+        const MISSIONS = [
+            { id: "touch-waist", ruleId: "touch-waist", source: "core", label: "손을 허리에 대다" },
+            { id: "touch-head", ruleId: "touch-head", source: "extend", label: "손을 머리에 대다" },
+            { id: "touch-ear", ruleId: "touch-ear", source: "extend", label: "손을 귀에 대다" },
+            { id: "arm-stretch", ruleId: "arm-stretch", source: "core", label: "팔을 뻗다" },
+            { id: "arm-bend", ruleId: "arm-bend", source: "extend", label: "팔을 굽히다" },
+            { id: "side-bend", ruleId: "side-bend", source: "core", label: "옆구리를 굽히다" },
+            { id: "chest-open", ruleId: "chest-open", source: "core", label: "가슴을 펴다" },
+            { id: "body-lean-back", ruleId: "body-lean-back", source: "core", label: "몸을 뒤로 젖히다" },
+            { id: "leg-spread", ruleId: "leg-spread", source: "core", label: "다리를 벌리다" },
+            { id: "knee-bend", ruleId: "knee-bend", source: "extend", label: "무릎을 굽히다" },
+            { id: "heel-lift", ruleId: "heel-lift", source: "core", label: "발뒤꿈치를 들다" },
+            { id: "neck-turn", ruleId: "neck-turn", source: "core", label: "목을 돌리다" }
+        ];
+
+        const state = {
+            poses: {
+                front: clonePose(DEFAULT_POSE),
+                side: clonePose(SIDE_DEFAULT_POSE)
+            },
+            lastPart: null,
+            activeMissionIndex: 0,
+            completedMissions: new Set(),
+            discovered: new Map(),
+            currentExpression: null,
+            gestureTrails: {},
+            derivedSkeleton: null,
+            motionMetrics: {},
+            draggingPart: null,
+            viewMode: "front"
+        };
+
+        const els = {
+            stage: document.getElementById("poseStage"),
+            stageWrap: document.getElementById("stageWrap"),
+            guideLayer: document.getElementById("guideLayer"),
+            targetLayer: document.getElementById("targetLayer"),
+            handleLayer: document.getElementById("handleLayer"),
+            jointLayer: document.getElementById("jointLayer"),
+            torsoShape: document.getElementById("torsoShape"),
+            headShape: document.getElementById("headShape"),
+            leftArmLine: document.getElementById("leftArmLine"),
+            rightArmLine: document.getElementById("rightArmLine"),
+            leftLegLine: document.getElementById("leftLegLine"),
+            rightLegLine: document.getElementById("rightLegLine"),
+            neckLine: document.getElementById("neckLine"),
+            expressionText: document.getElementById("expressionText"),
+            expressionFeedback: document.getElementById("expressionFeedback"),
+            missionCount: document.getElementById("missionCount"),
+            missionTitle: document.getElementById("missionTitle"),
+            missionFeedback: document.getElementById("missionFeedback"),
+            missionList: document.getElementById("missionList"),
+            discoveryList: document.getElementById("discoveryList"),
+            discoveryCount: document.getElementById("discoveryCount"),
+            stageHint: document.getElementById("stageHint"),
+            sideDetail: document.getElementById("sideDetail"),
+            tiltMetric: document.getElementById("tiltMetric"),
+            heelMetric: document.getElementById("heelMetric"),
+            armMetric: document.getElementById("armMetric"),
+            frontViewBtn: document.getElementById("frontViewBtn"),
+            sideViewBtn: document.getElementById("sideViewBtn"),
+            resetPoseBtn: document.getElementById("resetPoseBtn"),
+            nextMissionTopBtn: document.getElementById("nextMissionTopBtn"),
+            prevMissionBtn: document.getElementById("prevMissionBtn"),
+            nextMissionBtn: document.getElementById("nextMissionBtn")
+        };
+
+        const MOTION_RULES = [
+            ...CONTACT_TARGETS.map((target) => ({
+                id: `touch-${target.id}`,
+                label: `손을 ${target.label} 대다`,
+                source: target.source,
+                kind: "contact",
+                modes: ["front"],
+                parts: ["leftHand", "rightHand", target.id],
+                driverParts: ["leftHand", "rightHand", "hand"],
+                targetParts: targetPartTokens(target.id),
+                detector: (skeleton) => detectHandContact(skeleton, target),
+                feedback: target.id === "waist"
+                    ? "교재의 핵심 표현입니다. 다른 부위에도 같은 동사 '대다'를 써 볼 수 있어요."
+                    : "'대다'는 손이 신체 부위에 닿는 장면으로 자연스럽게 확장됩니다."
+            })),
+            {
+                id: "arm-stretch",
+                label: "팔을 뻗다",
+                source: "core",
+                kind: "action",
+                modes: ["front"],
+                parts: ["leftHand", "rightHand"],
+                driverParts: ["leftHand", "rightHand", "hand"],
+                detector: detectArmStretch,
+                feedback: "손을 몸에서 멀리 보내면 팔을 뻗는 동작이 됩니다."
+            },
+            {
+                id: "arm-bend",
+                label: "팔을 굽히다",
+                source: "extend",
+                kind: "action",
+                modes: ["front"],
+                parts: ["leftElbow", "rightElbow", "leftHand", "rightHand"],
+                driverParts: ["leftElbow", "rightElbow", "elbow", "leftHand", "rightHand", "hand"],
+                detector: detectArmBend,
+                feedback: "팔꿈치를 몸 쪽으로 꺾으면 '팔을 굽히다'가 됩니다."
+            },
+            {
+                id: "leg-spread",
+                label: "다리를 벌리다",
+                source: "core",
+                kind: "action",
+                modes: ["front"],
+                parts: ["leftFoot", "rightFoot"],
+                driverParts: ["leftFoot", "rightFoot", "foot"],
+                detector: (skeleton) => state.viewMode === "front" && skeleton.metrics.frontRig.legSpread >= 124,
+                feedback: "두 발 사이가 넓어지면 다리를 벌린 자세입니다."
+            },
+            {
+                id: "knee-bend",
+                label: "무릎을 굽히다",
+                source: "extend",
+                kind: "action",
+                modes: ["front"],
+                parts: ["leftKnee", "rightKnee", "leftFoot", "rightFoot"],
+                driverParts: ["leftKnee", "rightKnee", "knee", "leftFoot", "rightFoot", "foot", "leg"],
+                detector: detectKneeBend,
+                feedback: "무릎을 꺾으면 '무릎을 굽히다', 더 넓게는 '다리를 굽히다'로 말할 수 있습니다."
+            },
+            {
+                id: "heel-lift",
+                label: "발뒤꿈치를 들다",
+                source: "core",
+                kind: "action",
+                modes: ["front"],
+                parts: ["leftFoot", "rightFoot"],
+                driverParts: ["leftFoot", "rightFoot", "leftHeel", "rightHeel", "heel", "foot"],
+                detector: (skeleton) => skeleton.metrics.frontRig.heelLift >= 24,
+                feedback: "발끝은 바닥에 두고 뒤꿈치만 올라가면 발뒤꿈치를 드는 동작입니다."
+            },
+            {
+                id: "body-lean-back",
+                label: "몸을 뒤로 젖히다",
+                source: "core",
+                kind: "action",
+                modes: ["front", "side"],
+                parts: ["chest", "head"],
+                driverParts: ["chest", "head"],
+                detector: detectBodyLeanBack,
+                feedback: "측면에서는 가슴과 머리가 뒤쪽 기준선으로 기울어지는지 더 자세히 볼 수 있습니다."
+            },
+            {
+                id: "side-bend",
+                label: "옆구리를 굽히다",
+                source: "core",
+                kind: "action",
+                modes: ["front"],
+                parts: ["chest", "waist", "head"],
+                driverParts: ["chest", "waist", "head"],
+                detector: (skeleton) => skeleton.metrics.frontRig.sideBend,
+                feedback: "목-가슴-허리 축이 한쪽으로 휘면 옆구리를 굽힌 자세입니다."
+            },
+            {
+                id: "chest-open",
+                label: "가슴을 펴다",
+                source: "core",
+                kind: "action",
+                modes: ["front", "side"],
+                parts: ["leftHand", "rightHand", "chest"],
+                driverParts: ["leftHand", "rightHand", "hand", "chest"],
+                detector: detectChestOpen,
+                feedback: "정면에서는 어깨를 열고, 측면에서는 가슴을 앞으로 내밀면 표현이 살아납니다."
+            },
+            {
+                id: "body-bend-forward",
+                label: "몸을 앞으로 굽히다",
+                source: "extend",
+                kind: "action",
+                modes: ["side"],
+                parts: ["chest", "waist", "pelvis", "head"],
+                driverParts: ["chest", "waist", "pelvis", "head"],
+                detector: detectBodyBendForward,
+                feedback: "옆에서 볼 때 가슴과 머리가 골반 기준선보다 앞으로 접히면 몸을 앞으로 굽힌 자세입니다."
+            },
+            {
+                id: "head-bow",
+                label: "고개를 숙이다",
+                source: "extend",
+                kind: "action",
+                modes: ["side"],
+                parts: ["head"],
+                driverParts: ["head"],
+                detector: detectHeadBow,
+                feedback: "머리와 턱이 목보다 앞·아래로 움직이면 고개를 숙인 자세입니다."
+            },
+            {
+                id: "head-lean-back",
+                label: "고개를 뒤로 젖히다",
+                source: "extend",
+                kind: "action",
+                modes: ["side"],
+                parts: ["head"],
+                driverParts: ["head"],
+                detector: detectHeadLeanBack,
+                feedback: "머리가 목보다 뒤쪽으로 넘어가면 고개를 뒤로 젖힌 자세입니다."
+            },
+            {
+                id: "neck-turn",
+                label: "목을 돌리다",
+                source: "core",
+                kind: "action",
+                modes: ["front"],
+                parts: ["head"],
+                driverParts: ["head"],
+                detector: (skeleton) => skeleton.metrics.neckRotation.valid,
+                feedback: "머리의 한 위치보다 좌우로 움직인 경로가 있을 때 목을 돌린다고 봅니다."
+            }
+        ];
+
+        init();
+
+        function init() {
+            buildTargetZones();
+            buildHandles();
+            buildMissionList();
+            bindEvents();
+            render();
+            exposeApi();
+        }
+
+        function bindEvents() {
+            els.frontViewBtn.addEventListener("click", () => setViewMode("front"));
+            els.sideViewBtn.addEventListener("click", () => setViewMode("side"));
+            els.resetPoseBtn.addEventListener("click", resetPose);
+            els.nextMissionTopBtn.addEventListener("click", nextMission);
+            els.nextMissionBtn.addEventListener("click", nextMission);
+            els.prevMissionBtn.addEventListener("click", previousMission);
+            els.stage.addEventListener("pointerdown", handlePointerDown);
+            els.stage.addEventListener("pointermove", handlePointerMove);
+            els.stage.addEventListener("pointerup", endDrag);
+            els.stage.addEventListener("pointercancel", endDrag);
+            els.stage.addEventListener("lostpointercapture", endDrag);
+        }
+
+        function buildTargetZones() {
+            CONTACT_TARGETS.forEach((target) => {
+                const circle = document.createElementNS(SVG_NS, "circle");
+                circle.classList.add("target-zone");
+                circle.dataset.targetId = target.id;
+                circle.setAttribute("r", String(target.radius));
+                els.targetLayer.appendChild(circle);
+            });
+        }
+
+        function buildHandles() {
+            Object.entries({ ...BODY_PARTS, ...SIDE_BODY_PARTS }).forEach(([part, meta]) => {
+                if (meta.handle === false) return;
+                const group = document.createElementNS(SVG_NS, "g");
+                group.dataset.part = part;
+
+                const circle = document.createElementNS(SVG_NS, "circle");
+                circle.classList.add("drag-handle");
+                circle.dataset.part = part;
+                circle.setAttribute("r", String(meta.r));
+                circle.setAttribute("tabindex", "0");
+                circle.setAttribute("role", "button");
+                circle.setAttribute("aria-label", `${meta.label} 움직이기`);
+
+                const label = document.createElementNS(SVG_NS, "text");
+                label.classList.add("handle-label");
+                label.dataset.labelFor = part;
+                label.textContent = meta.label;
+
+                group.append(circle, label);
+                els.handleLayer.appendChild(group);
+            });
+        }
+
+        function buildMissionList() {
+            els.missionList.innerHTML = "";
+            MISSIONS.forEach((mission, index) => {
+                const button = document.createElement("button");
+                button.className = "mission-chip";
+                button.type = "button";
+                button.dataset.missionId = mission.id;
+                button.innerHTML = `
+                    <span class="mission-chip__number">${index + 1}</span>
+                    <span class="mission-chip__label">${escapeHtml(mission.label)}</span>
+                    <span class="mission-chip__source">${mission.source === "core" ? "핵심" : "확장"}</span>
+                `;
+                button.addEventListener("click", () => startMission(mission.id));
+                els.missionList.appendChild(button);
+            });
+        }
+
+        function handlePointerDown(event) {
+            const handle = event.target.closest(".drag-handle");
+            if (!handle) return;
+            event.preventDefault();
+            const part = handle.dataset.part;
+            state.draggingPart = part;
+            state.lastPart = part;
+            handle.classList.add("is-dragging");
+            handle.setPointerCapture(event.pointerId);
+        }
+
+        function handlePointerMove(event) {
+            if (!state.draggingPart) return;
+            event.preventDefault();
+            const part = state.draggingPart;
+            const point = svgPoint(event.clientX, event.clientY);
+            movePart(part, point);
+            render();
+        }
+
+        function endDrag(event) {
+            if (!state.draggingPart) return;
+            const activeHandle = els.handleLayer.querySelector(`.drag-handle[data-part="${state.draggingPart}"]`);
+            if (activeHandle) {
+                activeHandle.classList.remove("is-dragging");
+                if (event.pointerId !== undefined && activeHandle.hasPointerCapture?.(event.pointerId)) {
+                    activeHandle.releasePointerCapture(event.pointerId);
+                }
+            }
+            state.draggingPart = null;
+        }
+
+        function svgPoint(clientX, clientY) {
+            const point = els.stage.createSVGPoint();
+            point.x = clientX;
+            point.y = clientY;
+            const matrix = els.stage.getScreenCTM();
+            if (!matrix) return { x: clientX, y: clientY };
+            const converted = point.matrixTransform(matrix.inverse());
+            return { x: converted.x, y: converted.y };
+        }
+
+        function movePart(part, point) {
+            const meta = activeBodyParts()[part];
+            if (!meta) return;
+            const previous = activePose()[part] ? { ...activePose()[part] } : null;
+            activePose()[part] = {
+                x: clamp(point.x, meta.minX, meta.maxX),
+                y: clamp(point.y, meta.minY, meta.maxY)
+            };
+            updateSidePostureFromDrag(part, previous, activePose()[part]);
+            applySidePostureConstraints(part);
+            applyFrontHeadConstraints(part);
+            applyFrontRigConstraints(part);
+            updateFootDetailsFromFootDrag(part);
+            updateAutoJointsFromDrag(part);
+            recordGesturePoint(part, activePose()[part], Date.now());
+            state.lastPart = part;
+        }
+
+        function updateSidePostureFromDrag(part, previous, current) {
+            if (state.viewMode !== "side" || part !== "chest" || !previous || !current) return;
+            const pose = activePose();
+            const headMeta = activeBodyParts().head;
+            if (!pose.head || !headMeta) return;
+            const dx = current.x - previous.x;
+            const dy = current.y - previous.y;
+            pose.head = {
+                x: clamp(pose.head.x + dx * 0.78, headMeta.minX, headMeta.maxX),
+                y: clamp(pose.head.y + dy * 0.42, headMeta.minY, headMeta.maxY)
+            };
+        }
+
+        function applySidePostureConstraints(part) {
+            if (state.viewMode !== "side" || !["head", "chest"].includes(part)) return;
+            const pose = activePose();
+            if (!pose.head || !pose.chest) return;
+            pose.head = constrainSideHeadToChest(pose.head, pose.chest, activeBodyParts().head);
+        }
+
+        function applyFrontHeadConstraints(part) {
+            if (state.viewMode !== "front" || !["head", "chest"].includes(part)) return;
+            const pose = activePose();
+            if (!pose.head || !pose.chest) return;
+            pose.head = constrainFrontHeadToChest(pose.head, pose.chest, activeBodyParts().head);
+        }
+
+        function updateFootDetailsFromFootDrag(part) {
+            const isFootHandle = part === "leftFoot" || part === "rightFoot";
+            const isHeelDetail = part === "leftHeel" || part === "rightHeel";
+            if (!isFootHandle && !isHeelDetail) return;
+            const side = part.startsWith("left") ? "left" : "right";
+            const pose = activePose();
+            const footKey = `${side}Foot`;
+            const foot = pose[footKey];
+            const defaults = activeDefaultPose();
+            const toeKey = `${side}Toe`;
+            const heelKey = `${side}Heel`;
+            const defaultToe = defaults[toeKey] || foot;
+            const defaultHeel = defaults[heelKey] || foot;
+            if (isHeelDetail) {
+                const currentToe = pose[toeKey] || defaultToe;
+                const toeWasGrounded = Math.abs(currentToe.y - defaultToe.y) <= 9;
+                pose[toeKey] = {
+                    x: currentToe.x,
+                    y: toeWasGrounded ? defaultToe.y : currentToe.y
+                };
+                pose[heelKey] = {
+                    x: pose[heelKey].x,
+                    y: toeWasGrounded ? Math.min(pose[heelKey].y, defaultHeel.y) : pose[heelKey].y
+                };
+                pose[footKey] = footAnkleFromTriangle(pose[toeKey], pose[heelKey]);
+                return;
+            }
+            const toeOffsetX = defaultToe.x - defaults[footKey].x;
+            const heelOffsetX = defaultHeel.x - defaults[footKey].x;
+            pose[heelKey] = {
+                x: clamp(foot.x + heelOffsetX, activeBodyParts()[heelKey].minX, activeBodyParts()[heelKey].maxX),
+                y: Math.min(defaultHeel.y, foot.y + 28)
+            };
+            pose[toeKey] = {
+                x: clamp(foot.x + toeOffsetX, activeBodyParts()[toeKey].minX, activeBodyParts()[toeKey].maxX),
+                y: defaultToe.y
+            };
+        }
+
+        function applyFrontRigConstraints(part) {
+            if (state.viewMode !== "front") return;
+            const pose = activePose();
+            const derived = derivePose(pose, "front");
+            if (part === "leftHand") {
+                pose.leftHand = constrainReach(derived.leftShoulder, pose.leftHand, 166);
+            } else if (part === "rightHand") {
+                pose.rightHand = constrainReach(derived.rightShoulder, pose.rightHand, 166);
+            } else if (part === "leftElbow") {
+                pose.leftElbow = constrainJointHandle(pose.leftElbow, derived.leftShoulder, pose.leftHand, 116);
+            } else if (part === "rightElbow") {
+                pose.rightElbow = constrainJointHandle(pose.rightElbow, derived.rightShoulder, pose.rightHand, 116);
+            } else if (part === "leftFoot") {
+                pose.leftFoot = constrainReach(derived.leftHip, pose.leftFoot, 220);
+            } else if (part === "rightFoot") {
+                pose.rightFoot = constrainReach(derived.rightHip, pose.rightFoot, 220);
+            } else if (part === "leftKnee") {
+                pose.leftKnee = constrainJointHandle(pose.leftKnee, derived.leftHip, pose.leftFoot, 126);
+            } else if (part === "rightKnee") {
+                pose.rightKnee = constrainJointHandle(pose.rightKnee, derived.rightHip, pose.rightFoot, 126);
+            }
+        }
+
+        function updateAutoJointsFromDrag(part) {
+            if (state.viewMode === "side") return;
+            const pose = activePose();
+            const derived = derivePose(pose, state.viewMode);
+            if (part === "leftHand") {
+                pose.leftElbow = neutralJoint(derived.leftShoulder, pose.leftHand);
+            } else if (part === "rightHand") {
+                pose.rightElbow = neutralJoint(derived.rightShoulder, pose.rightHand);
+            } else if (part === "leftFoot") {
+                pose.leftKnee = neutralJoint(derived.leftHip, pose.leftFoot);
+            } else if (part === "rightFoot") {
+                pose.rightKnee = neutralJoint(derived.rightHip, pose.rightFoot);
+            }
+        }
+
+        function recordGesturePoint(part, point, time = Date.now()) {
+            if (!part || !point) return;
+            const trail = state.gestureTrails[part] || [];
+            trail.push({ x: point.x, y: point.y, time });
+            state.gestureTrails[part] = pruneGestureTrail(trail, time);
+        }
+
+        function pruneGestureTrail(trail, now = Date.now()) {
+            return trail.filter((point) => now - point.time <= GESTURE_WINDOW_MS);
+        }
+
+        function clearGesture(part, shouldRender = true) {
+            if (part) {
+                delete state.gestureTrails[part];
+            } else {
+                state.gestureTrails = {};
+            }
+            if (shouldRender) render();
+        }
+
+        function resetPose() {
+            state.poses[state.viewMode] = clonePose(activeDefaultPose());
+            state.lastPart = null;
+            clearGesture(null, false);
+            render();
+        }
+
+        function nextMission() {
+            state.activeMissionIndex = (state.activeMissionIndex + 1) % MISSIONS.length;
+            render();
+        }
+
+        function previousMission() {
+            state.activeMissionIndex = (state.activeMissionIndex - 1 + MISSIONS.length) % MISSIONS.length;
+            render();
+        }
+
+        function startMission(idOrIndex) {
+            const index = typeof idOrIndex === "number"
+                ? idOrIndex
+                : MISSIONS.findIndex((mission) => mission.id === idOrIndex || mission.ruleId === idOrIndex);
+            if (index < 0) return false;
+            state.activeMissionIndex = index;
+            render();
+            return true;
+        }
+
+        function setViewMode(mode) {
+            if (!["front", "side"].includes(mode)) return false;
+            state.viewMode = mode;
+            render();
+            return true;
+        }
+
+        function render() {
+            const skeleton = getCurrentSkeleton();
+            const derived = skeleton.pose;
+            updateViewModeUi();
+            drawPose(derived);
+            const matches = detectExpressions();
+            updateExpression(matches);
+            updateMission(matches);
+            updateDiscovery(matches);
+            updateMissionButtons();
+            updateTargetZones(derived);
+            updateGuides(derived);
+            updateSideDetail(skeleton);
+        }
+
+        function updateViewModeUi() {
+            els.stage.dataset.viewMode = state.viewMode;
+            els.stageWrap.classList.toggle("is-side", state.viewMode === "side");
+            els.frontViewBtn.setAttribute("aria-selected", String(state.viewMode === "front"));
+            els.sideViewBtn.setAttribute("aria-selected", String(state.viewMode === "side"));
+            els.stageHint.textContent = state.viewMode === "side"
+                ? "측면에서 머리, 가슴, 허리, 골반의 점으로 몸통과 고개 자세를 만드세요."
+                : "손, 팔꿈치, 무릎, 발목, 뒤꿈치의 점을 움직이세요.";
+            els.sideDetail.hidden = state.viewMode !== "side";
+            els.sideDetail.setAttribute("aria-hidden", String(state.viewMode !== "side"));
+        }
+
+        function drawPose(pose) {
+            if (state.viewMode === "side") {
+                drawSidePosture(pose);
+                return;
+            }
+            drawFrontPose(pose);
+        }
+
+        function drawFrontPose(pose) {
+            const torsoPath = [
+                `M ${pose.leftShoulder.x} ${pose.leftShoulder.y}`,
+                `Q ${pose.chest.x} ${pose.chest.y - 22} ${pose.rightShoulder.x} ${pose.rightShoulder.y}`,
+                `L ${pose.rightHip.x} ${pose.rightHip.y}`,
+                `Q ${pose.waist.x} ${pose.waist.y + 18} ${pose.leftHip.x} ${pose.leftHip.y}`,
+                "Z"
+            ].join(" ");
+
+            els.torsoShape.setAttribute("d", torsoPath);
+            setCircle(els.headShape, pose.head.x, pose.head.y);
+            setLine(els.neckLine, pose.neck, pose.neckBase || pose.chest);
+            els.leftArmLine.setAttribute("d", polyPath([pose.leftShoulder, pose.leftElbow, pose.leftHand]));
+            els.rightArmLine.setAttribute("d", polyPath([pose.rightShoulder, pose.rightElbow, pose.rightHand]));
+            els.leftLegLine.setAttribute("d", polyPath([pose.leftHip, pose.leftKnee, pose.leftFoot]));
+            els.rightLegLine.setAttribute("d", polyPath([pose.rightHip, pose.rightKnee, pose.rightFoot]));
+            updateFrontLimbHighlights();
+            drawJoints(pose);
+            drawHandles(pose);
+        }
+
+        function drawSidePosture(pose) {
+            const frontOffset = 24;
+            const backOffset = 24;
+            const torsoPath = [
+                `M ${pose.neck.x - 13} ${pose.neck.y + 4}`,
+                `C ${pose.sternum.x - frontOffset} ${pose.sternum.y + 18}, ${pose.waist.x - frontOffset} ${pose.waist.y - 16}, ${pose.pelvis.x - 20} ${pose.pelvis.y}`,
+                `L ${pose.pelvis.x + backOffset} ${pose.pelvis.y}`,
+                `C ${pose.waist.x + backOffset} ${pose.waist.y - 20}, ${pose.chest.x + backOffset} ${pose.chest.y - 18}, ${pose.neck.x + 14} ${pose.neck.y + 4}`,
+                "Z"
+            ].join(" ");
+
+            els.torsoShape.setAttribute("d", torsoPath);
+            setCircle(els.headShape, pose.head.x, pose.head.y);
+            setLine(els.neckLine, pose.neck, pose.chest);
+            els.leftArmLine.setAttribute("d", "");
+            els.rightArmLine.setAttribute("d", "");
+            els.leftLegLine.setAttribute("d", "");
+            els.rightLegLine.setAttribute("d", "");
+            updateFrontLimbHighlights();
+            drawSideJoints(pose);
+            drawHandles(pose);
+        }
+
+        function updateFrontLimbHighlights() {
+            const active = state.viewMode === "front" ? currentActivePart() : "";
+            const isLeft = active.startsWith("left");
+            const isRight = active.startsWith("right");
+            const isArm = /Hand|Elbow/.test(active);
+            const isLeg = /Foot|Knee|Heel|Toe/.test(active);
+            els.leftArmLine.classList.toggle("is-active-limb", isLeft && isArm);
+            els.rightArmLine.classList.toggle("is-active-limb", isRight && isArm);
+            els.leftLegLine.classList.toggle("is-active-limb", isLeft && isLeg);
+            els.rightLegLine.classList.toggle("is-active-limb", isRight && isLeg);
+        }
+
+        function drawSideJoints(pose) {
+            els.jointLayer.innerHTML = "";
+            const spine = document.createElementNS(SVG_NS, "path");
+            spine.classList.add("side-spine");
+            spine.setAttribute("d", `M ${pose.pelvis.x.toFixed(2)} ${pose.pelvis.y.toFixed(2)} C ${pose.waist.x.toFixed(2)} ${pose.waist.y.toFixed(2)}, ${pose.spineMid.x.toFixed(2)} ${pose.spineMid.y.toFixed(2)}, ${pose.chest.x.toFixed(2)} ${pose.chest.y.toFixed(2)} S ${pose.chest.x.toFixed(2)} ${pose.chest.y.toFixed(2)}, ${pose.neck.x.toFixed(2)} ${pose.neck.y.toFixed(2)}`);
+            els.jointLayer.appendChild(spine);
+
+            const sternumLine = document.createElementNS(SVG_NS, "line");
+            sternumLine.classList.add("side-sternum-line");
+            setLine(sternumLine, pose.chest, pose.sternum);
+            els.jointLayer.appendChild(sternumLine);
+
+            [pose.head, pose.neck, pose.sternum, pose.chest, pose.spineMid, pose.waist, pose.pelvis].forEach((joint) => {
+                const circle = document.createElementNS(SVG_NS, "circle");
+                circle.classList.add("side-posture-dot");
+                circle.setAttribute("r", "5");
+                setCircle(circle, joint.x, joint.y);
+                els.jointLayer.appendChild(circle);
+            });
+        }
+
+        function drawJoints(pose) {
+            const joints = [
+                { part: "leftShoulder", point: pose.leftShoulder },
+                { part: "rightShoulder", point: pose.rightShoulder },
+                { part: "leftElbow", point: pose.leftElbow },
+                { part: "rightElbow", point: pose.rightElbow },
+                { part: "leftHip", point: pose.leftHip },
+                { part: "rightHip", point: pose.rightHip },
+                { part: "leftKnee", point: pose.leftKnee },
+                { part: "rightKnee", point: pose.rightKnee },
+                { part: "neck", point: pose.neck },
+                { part: "sternum", point: pose.sternum },
+                { part: "pelvis", point: pose.pelvis }
+            ];
+            els.jointLayer.innerHTML = "";
+            drawFootDetail(pose.leftToe, pose.leftHeel, pose.leftFoot);
+            drawFootDetail(pose.rightToe, pose.rightHeel, pose.rightFoot);
+            joints.forEach(({ part, point }) => {
+                const circle = document.createElementNS(SVG_NS, "circle");
+                circle.classList.add("joint-dot");
+                circle.classList.toggle("is-active-joint", isActiveFrontJoint(part));
+                circle.setAttribute("r", "5");
+                setCircle(circle, point.x, point.y);
+                els.jointLayer.appendChild(circle);
+            });
+        }
+
+        function isActiveFrontJoint(part) {
+            if (state.viewMode !== "front") return false;
+            const active = currentActivePart();
+            if (!active) return false;
+            if (part === active) return true;
+            const activeLeft = active.startsWith("left");
+            const activeRight = active.startsWith("right");
+            const sameSide = (activeLeft && part.startsWith("left")) || (activeRight && part.startsWith("right"));
+            if (!sameSide) return false;
+            if (/Hand|Elbow/.test(active)) return /Shoulder|Elbow/.test(part);
+            if (/Foot|Knee|Heel|Toe/.test(active)) return /Hip|Knee/.test(part);
+            return false;
+        }
+
+        function drawFootDetail(toe, heel, ankle) {
+            if (!toe || !heel || !ankle) return;
+            const triangle = document.createElementNS(SVG_NS, "polygon");
+            triangle.classList.add("foot-triangle");
+            triangle.setAttribute("points", `${toe.x.toFixed(2)},${toe.y.toFixed(2)} ${ankle.x.toFixed(2)},${ankle.y.toFixed(2)} ${heel.x.toFixed(2)},${heel.y.toFixed(2)}`);
+            els.jointLayer.appendChild(triangle);
+
+            const line = document.createElementNS(SVG_NS, "line");
+            line.classList.add("foot-detail");
+            setLine(line, toe, heel);
+            els.jointLayer.appendChild(line);
+            [toe, ankle, heel].forEach((point) => {
+                const circle = document.createElementNS(SVG_NS, "circle");
+                circle.classList.add("foot-detail-dot");
+                circle.setAttribute("r", "4");
+                setCircle(circle, point.x, point.y);
+                els.jointLayer.appendChild(circle);
+            });
+        }
+
+        function drawHandles(pose) {
+            const metas = activeBodyParts();
+            els.handleLayer.querySelectorAll("g[data-part]").forEach((group) => {
+                const part = group.dataset.part;
+                group.style.display = metas[part] ? "" : "none";
+            });
+            Object.entries(metas).forEach(([part, meta]) => {
+                const point = pose[part];
+                const circle = els.handleLayer.querySelector(`.drag-handle[data-part="${part}"]`);
+                const label = els.handleLayer.querySelector(`[data-label-for="${part}"]`);
+                if (!circle || !label || !point) return;
+                setCircle(circle, point.x, point.y);
+                circle.setAttribute("r", String(meta.r));
+                circle.setAttribute("aria-label", `${meta.label} 움직이기`);
+                label.setAttribute("x", String(point.x));
+                label.setAttribute("y", String(point.y - 18));
+                label.textContent = meta.label;
+            });
+        }
+
+        function updateExpression(matches) {
+            const current = matches[0] || null;
+            state.currentExpression = current;
+            if (!current) {
+                els.expressionText.textContent = "직립 자세";
+                els.expressionFeedback.textContent = "점 하나를 움직이면 현재 동작에 맞는 표현이 나타납니다.";
+                return;
+            }
+            els.expressionText.textContent = current.label;
+            els.expressionFeedback.textContent = current.feedback;
+            matches.forEach((match) => {
+                if (!state.discovered.has(match.id)) {
+                    state.discovered.set(match.id, {
+                        id: match.id,
+                        label: match.label,
+                        source: match.source
+                    });
+                }
+            });
+        }
+
+        function updateMission(matches) {
+            const mission = MISSIONS[state.activeMissionIndex];
+            const isDone = matches.some((match) => match.id === mission.ruleId);
+            if (isDone) state.completedMissions.add(mission.id);
+            els.missionCount.textContent = `${state.activeMissionIndex + 1} / ${MISSIONS.length}`;
+            els.missionTitle.textContent = mission.label;
+            els.missionFeedback.classList.toggle("is-done", isDone);
+            els.missionFeedback.textContent = isDone
+                ? "완료되었습니다. 같은 동사로 다른 부위도 만들어 보세요."
+                : "목표 표현을 만들면 자동으로 완료됩니다.";
+        }
+
+        function updateMissionButtons() {
+            const activeMission = MISSIONS[state.activeMissionIndex];
+            els.missionList.querySelectorAll(".mission-chip").forEach((button) => {
+                const mission = MISSIONS.find((item) => item.id === button.dataset.missionId);
+                const active = mission.id === activeMission.id;
+                const done = state.completedMissions.has(mission.id);
+                button.classList.toggle("is-active", active);
+                button.classList.toggle("is-done", done);
+                button.setAttribute("aria-current", active ? "true" : "false");
+            });
+        }
+
+        function updateDiscovery() {
+            const discoveries = Array.from(state.discovered.values());
+            els.discoveryCount.textContent = `${discoveries.length}개`;
+            if (!discoveries.length) {
+                els.discoveryList.innerHTML = '<span class="empty-discovery">아직 발견한 표현이 없습니다.</span>';
+                return;
+            }
+            els.discoveryList.innerHTML = discoveries.map((item) => `
+                <span class="discovery-chip" data-source="${escapeHtml(item.source)}">
+                    <i class="fa-solid ${item.source === "core" ? "fa-star" : "fa-plus"}" aria-hidden="true"></i>
+                    ${escapeHtml(item.label)}
+                </span>
+            `).join("");
+        }
+
+        function updateTargetZones(pose) {
+            if (state.viewMode === "side") {
+                els.targetLayer.querySelectorAll(".target-zone").forEach((circle) => {
+                    circle.classList.remove("is-visible", "is-active");
+                });
+                return;
+            }
+            const activeMission = MISSIONS[state.activeMissionIndex];
+            const targetId = activeMission.ruleId.startsWith("touch-")
+                ? activeMission.ruleId.replace("touch-", "")
+                : "";
+            const nearestTargetId = nearestContactTargetId(pose);
+            CONTACT_TARGETS.forEach((target) => {
+                const circle = els.targetLayer.querySelector(`[data-target-id="${target.id}"]`);
+                if (!circle) return;
+                const point = target.point ? target.point(pose) : average(target.points(pose));
+                setCircle(circle, point.x, point.y);
+                const visible = target.id === targetId || target.id === nearestTargetId || (!nearestTargetId && target.id === "waist");
+                circle.classList.toggle("is-visible", visible);
+                circle.classList.toggle("is-active", target.id === targetId);
+            });
+        }
+
+        function nearestContactTargetId(pose) {
+            const active = currentActivePart();
+            if (!/Hand$/.test(active || "")) return "";
+            const handPoints = active.startsWith("left")
+                ? [pose.leftPalm, pose.leftWrist]
+                : [pose.rightPalm, pose.rightWrist];
+            let nearest = { id: "", distance: Infinity };
+            CONTACT_TARGETS.forEach((target) => {
+                const targets = target.points ? target.points(pose) : [target.point(pose)];
+                const d = Math.min(...handPoints.filter(Boolean).flatMap((point) => targets.map((targetPoint) => distance(point, targetPoint))));
+                if (d < nearest.distance) nearest = { id: target.id, distance: d };
+            });
+            return nearest.distance <= 80 ? nearest.id : "";
+        }
+
+        function updateGuides(pose) {
+            if (state.viewMode !== "side") {
+                els.guideLayer.innerHTML = "";
+                return;
+            }
+            els.guideLayer.innerHTML = `
+                <line class="guide-line" x1="${escapeHtml(pose.pelvis.x)}" y1="62" x2="${escapeHtml(pose.pelvis.x)}" y2="424"></line>
+                <line class="guide-line guide-line--ground" x1="70" y1="${escapeHtml(pose.pelvis.y)}" x2="290" y2="${escapeHtml(pose.pelvis.y)}"></line>
+                <text class="guide-label" x="78" y="454">앞</text>
+                <text class="guide-label" x="282" y="454">뒤</text>
+                <text class="guide-label" x="${escapeHtml(pose.pelvis.x)}" y="${escapeHtml(pose.pelvis.y + 24)}">골반 기준</text>
+            `;
+        }
+
+        function updateSideDetail(skeleton) {
+            if (state.viewMode !== "side") return;
+            const posture = skeleton.metrics.sidePosture;
+            const torso = Math.round(posture.torsoExtension - posture.torsoFlexion);
+            const chest = Math.round(skeleton.metrics.chestForward);
+            const neck = Math.round(posture.neckExtension - posture.neckFlexion);
+            els.tiltMetric.textContent = `${torso > 0 ? "+" : ""}${torso}`;
+            els.heelMetric.textContent = `${chest}`;
+            els.armMetric.textContent = `${neck > 0 ? "+" : ""}${neck}`;
+        }
+
+        function detectExpressions(skeleton = getCurrentSkeleton()) {
+            const matches = MOTION_RULES.flatMap((rule) => {
+                if (rule.modes && !rule.modes.includes(state.viewMode)) return [];
+                const result = rule.detector(skeleton);
+                if (!result) return [];
+                const dynamic = typeof result === "object" ? result : {};
+                return [{
+                    id: dynamic.id || rule.id,
+                    label: dynamic.label || rule.label,
+                    source: rule.source,
+                    kind: rule.kind,
+                    parts: rule.parts,
+                    priority: scoreRule(rule, dynamic),
+                    feedback: dynamic.feedback || rule.feedback
+                }];
+            });
+            return matches.sort((a, b) => b.priority - a.priority || a.label.localeCompare(b.label, "ko"));
+        }
+
+        function scoreRule(rule, dynamic) {
+            let score = 0;
+            const activePart = currentActivePart();
+            const relation = activePartRelation(rule, dynamic, activePart);
+            if (rule.kind === "contact") score += 300;
+            if (rule.source === "core") score += 80;
+            if (dynamic?.handCount === 2) score += 22;
+            if (dynamic?.strength) score += Math.min(24, dynamic.strength);
+            if (relation === "driver") score += 360;
+            if (relation === "target") score += 50;
+            if (relation === "related") score += 24;
+            if (activePart?.includes("Hand") && rule.kind === "contact" && relation === "driver") score += 20;
+            if (/Foot|Toe|Heel/.test(activePart || "") && ["leg-spread", "heel-lift"].includes(rule.id)) score += 20;
+            if (activePart === "head" && rule.id === "neck-turn") score += 20;
+            if (activePart === "chest" && ["body-lean-back", "chest-open", "side-bend"].includes(rule.id)) score += 20;
+            if (activePart === "waist" && rule.id === "side-bend") score += 20;
+            if (state.viewMode === "side" && rule.id === "body-lean-back") score += 24;
+            return score;
+        }
+
+        function currentActivePart() {
+            return state.draggingPart || state.lastPart || "";
+        }
+
+        function activePartRelation(rule, dynamic, activePart) {
+            if (!activePart) return "";
+            const activeTokens = partTokens(activePart);
+            const driverParts = dynamic?.driverParts || rule.driverParts || [];
+            const targetParts = dynamic?.targetParts || rule.targetParts || [];
+            if (hasPartTokenOverlap(activeTokens, driverParts)) return "driver";
+            if (hasPartTokenOverlap(activeTokens, targetParts)) return "target";
+            if (hasPartTokenOverlap(activeTokens, rule.parts || [])) return "related";
+            return "";
+        }
+
+        function hasPartTokenOverlap(activeTokens, parts) {
+            const candidates = new Set(parts.flatMap((part) => partTokens(part)));
+            return activeTokens.some((token) => candidates.has(token));
+        }
+
+        function detectHandContact(skeleton, target) {
+            const pose = skeleton.pose;
+            const targetPoints = target.points ? target.points(pose) : [target.point(pose)];
+            const stableRadius = state.currentExpression?.id === `touch-${target.id}` ? target.radius + 6 : target.radius;
+            const left = isAnyPointNearAny([pose.leftPalm, pose.leftWrist], targetPoints, stableRadius);
+            const right = isAnyPointNearAny([pose.rightPalm, pose.rightWrist], targetPoints, stableRadius);
+            if (!left && !right) return false;
+            const handCount = Number(left) + Number(right);
+            const driverParts = [
+                ...(left ? ["leftHand"] : []),
+                ...(right ? ["rightHand"] : [])
+            ];
+            return {
+                label: `${handCount === 2 ? "양손을" : "손을"} ${target.label} 대다`,
+                handCount,
+                strength: handCount * 4,
+                driverParts,
+                targetParts: targetPartTokens(target.id),
+                feedback: target.id === "waist"
+                    ? "좋아요. 교재의 '손을 허리에 대다' 표현이 만들어졌습니다."
+                    : `좋아요. 같은 동사로 '${target.label} 대다'도 자연스럽게 말할 수 있습니다.`
+            };
+        }
+
+        function detectBodyLeanBack(skeleton) {
+            if (state.viewMode === "side") {
+                return skeleton.metrics.sidePosture.torsoExtension >= 34;
+            }
+            const threshold = state.viewMode === "side" ? 32 : 20;
+            return skeleton.metrics.spineLeanBack >= threshold;
+        }
+
+        function detectBodyBendForward(skeleton) {
+            const posture = skeleton.metrics.sidePosture;
+            return posture.torsoFlexion >= 34 && posture.spineCurve >= 34;
+        }
+
+        function detectArmStretch(skeleton) {
+            const pose = skeleton.pose;
+            return isArmExtended(pose.leftShoulder, pose.leftHand, "left") || isArmExtended(pose.rightShoulder, pose.rightHand, "right");
+        }
+
+        function detectArmBend(skeleton) {
+            const bend = skeleton.metrics.armBend;
+            if (!bend.valid) return false;
+            return {
+                strength: bend.strength,
+                feedback: "좋아요. 팔꿈치가 꺾여서 '팔을 굽히다'가 만들어졌습니다."
+            };
+        }
+
+        function detectKneeBend(skeleton) {
+            const bend = skeleton.metrics.kneeBend;
+            if (!bend.valid) return false;
+            const activePart = currentActivePart();
+            const label = /Knee|knee/.test(activePart || "") ? "무릎을 굽히다" : "다리를 굽히다";
+            return {
+                label,
+                strength: bend.strength,
+                feedback: label === "무릎을 굽히다"
+                    ? "좋아요. 무릎 관절을 꺾어 '무릎을 굽히다'가 만들어졌습니다."
+                    : "좋아요. 다리 전체가 접히는 자세라 '다리를 굽히다'로 말할 수 있습니다."
+            };
+        }
+
+        function detectChestOpen(skeleton) {
+            if (state.viewMode === "side") {
+                return skeleton.metrics.sidePosture.chestOpen;
+            }
+            return skeleton.metrics.frontRig.chestOpen;
+        }
+
+        function detectHeadBow(skeleton) {
+            const posture = skeleton.metrics.sidePosture;
+            return posture.neckFlexion >= 32 && posture.torsoFlexion < 38;
+        }
+
+        function detectHeadLeanBack(skeleton) {
+            const posture = skeleton.metrics.sidePosture;
+            return posture.neckExtension >= 32 && posture.torsoExtension < 38;
+        }
+
+        function isArmExtended(shoulder, hand) {
+            const horizontal = Math.abs(hand.x - shoulder.x) >= 96 && Math.abs(hand.y - shoulder.y) <= 78;
+            const upward = hand.y <= shoulder.y - 54;
+            const far = distance(shoulder, hand) >= 146;
+            return horizontal || upward || far;
+        }
+
+        function deriveSkeleton(basePose, mode = state.viewMode) {
+            if (mode === "side") {
+                const raw = ensureSidePoseDetails(basePose);
+                const pose = deriveSidePosture(raw);
+                const metrics = computeSideMotionMetrics(pose, raw);
+                return { raw, pose, metrics, mode };
+            }
+            const raw = ensureFootDetails(basePose, mode);
+            const pose = derivePose(raw, mode);
+            const metrics = computeMotionMetrics(pose, raw, mode);
+            return { raw, pose, metrics, mode };
+        }
+
+        function getCurrentSkeleton() {
+            const skeleton = deriveSkeleton(activePose(), state.viewMode);
+            state.derivedSkeleton = skeleton;
+            state.motionMetrics = skeleton.metrics;
+            return skeleton;
+        }
+
+        function ensureFootDetails(basePose, mode = state.viewMode) {
+            const pose = clonePose(basePose);
+            const defaults = DEFAULT_POSE_BY_MODE[mode] || DEFAULT_POSE;
+            ["left", "right"].forEach((side) => {
+                const footKey = `${side}Foot`;
+                const toeKey = `${side}Toe`;
+                const heelKey = `${side}Heel`;
+                const foot = pose[footKey] || defaults[footKey];
+                const defaultToe = defaults[toeKey] || foot;
+                const defaultHeel = defaults[heelKey] || foot;
+                pose[footKey] = foot ? { x: foot.x, y: foot.y } : { x: defaultHeel.x, y: defaultHeel.y };
+                if (!pose[toeKey]) pose[toeKey] = { x: pose[footKey].x + (defaultToe.x - defaultHeel.x), y: defaultToe.y };
+                if (!pose[heelKey]) pose[heelKey] = { x: pose[footKey].x, y: pose[footKey].y };
+            });
+            return pose;
+        }
+
+        function ensureSidePoseDetails(basePose) {
+            const source = basePose || {};
+            const defaults = SIDE_DEFAULT_POSE;
+            return Object.fromEntries(Object.entries(SIDE_BODY_PARTS).map(([part]) => {
+                const point = source[part] || defaults[part];
+                return [part, { x: point.x, y: point.y }];
+            }));
+        }
+
+        function computeSideMotionMetrics(pose) {
+            const defaults = deriveSidePosture(SIDE_DEFAULT_POSE);
+            const torsoCenterX = pose.chest.x * 0.62 + pose.head.x * 0.38;
+            const torsoFlexion = Math.max(0, pose.waist.x - torsoCenterX);
+            const torsoExtension = Math.max(0, torsoCenterX - pose.waist.x);
+            const spineCurve = Math.abs(pose.head.x - pose.chest.x)
+                + Math.abs(pose.chest.x - pose.waist.x)
+                + Math.abs(pose.waist.x - pose.pelvis.x);
+            const chestForward = Math.max(0, pose.waist.x - pose.sternum.x);
+            const chestDepth = pose.sternum.x - pose.waist.x;
+            const neckFlexion = Math.max(0, pose.chest.x - pose.head.x)
+                + Math.max(0, pose.head.y - defaults.head.y) * 0.45;
+            const neckExtension = Math.max(0, pose.head.x - pose.chest.x)
+                + Math.max(0, defaults.head.y - pose.head.y) * 0.45;
+            const chestOpen = chestForward >= 30
+                && torsoFlexion < 38
+                && torsoExtension < 20
+                && Math.abs(pose.head.x - pose.waist.x) <= 36;
+            const headNeckDistance = distance(pose.head, pose.neck);
+            const sidePosture = {
+                torsoFlexion,
+                torsoExtension,
+                spineCurve,
+                chestOpen,
+                neckFlexion,
+                neckExtension,
+                headNeckDistance
+            };
+
+            return {
+                mode: "side",
+                sidePosture,
+                chestOpen,
+                chestDepth,
+                chestForward,
+                spineLean: pose.chest.x - pose.waist.x,
+                spineLeanBack: torsoExtension,
+                spineCurve,
+                neckRotation: { totalDistance: 0, rangeX: 0, rangeY: 0, directionChanges: 0, valid: false },
+                armBend: emptyJointBend(),
+                kneeBend: emptyJointBend(),
+                heelLift: 0,
+                armExtension: 0,
+                sideBend: false
+            };
+        }
+
+        function computeMotionMetrics(pose, raw, mode) {
+            const defaultPose = DEFAULT_POSE_BY_MODE[mode] || DEFAULT_POSE;
+            const defaultSkeleton = derivePose(defaultPose, mode);
+            const leftFoot = footMetricsFor("left", pose, defaultPose);
+            const rightFoot = footMetricsFor("right", pose, defaultPose);
+            const leftArmBend = jointBendMetric(pose.leftShoulder, pose.leftElbow, pose.leftHand, defaultSkeleton.leftShoulder, defaultSkeleton.leftElbow, defaultSkeleton.leftHand);
+            const rightArmBend = jointBendMetric(pose.rightShoulder, pose.rightElbow, pose.rightHand, defaultSkeleton.rightShoulder, defaultSkeleton.rightElbow, defaultSkeleton.rightHand);
+            const leftKneeBend = jointBendMetric(pose.leftHip, pose.leftKnee, pose.leftFoot, defaultSkeleton.leftHip, defaultSkeleton.leftKnee, defaultSkeleton.leftFoot);
+            const rightKneeBend = jointBendMetric(pose.rightHip, pose.rightKnee, pose.rightFoot, defaultSkeleton.rightHip, defaultSkeleton.rightKnee, defaultSkeleton.rightFoot);
+            const neckRotation = gestureMetricsFor("head");
+            const shoulderSpan = distance(pose.leftShoulder, pose.rightShoulder);
+            const shoulderSpanGain = shoulderSpan - distance(defaultSkeleton.leftShoulder, defaultSkeleton.rightShoulder);
+            const armExtension = Math.max(
+                distance(pose.leftShoulder, pose.leftHand),
+                distance(pose.rightShoulder, pose.rightHand)
+            );
+            const armReach = {
+                left: distance(pose.leftShoulder, pose.leftHand),
+                right: distance(pose.rightShoulder, pose.rightHand),
+                max: armExtension
+            };
+            const legSpread = distance(pose.leftFoot, pose.rightFoot);
+            const headNeckDistance = distance(pose.head, pose.neck);
+            const spineCurve = Math.abs(pose.neck.x - pose.chest.x)
+                + Math.abs(pose.chest.x - pose.waist.x)
+                + Math.abs(pose.waist.x - pose.pelvis.x);
+            const sideCompression = Math.abs(pose.chest.x - pose.waist.x) + Math.abs(pose.head.x - pose.waist.x);
+            const lateralBend = Math.abs(pose.chest.x - pose.waist.x) >= 34 || Math.abs(pose.head.x - pose.waist.x) >= 50;
+            const chestForward = mode === "side" ? Math.max(0, pose.waist.x - pose.sternum.x) : 0;
+            const chestDepth = mode === "side" ? pose.sternum.x - pose.waist.x : 0;
+            const armOpenFront = mode === "front"
+                && pose.leftHand.x <= pose.leftShoulder.x - 66
+                && pose.rightHand.x >= pose.rightShoulder.x + 66
+                && Math.abs(pose.leftHand.y - pose.leftShoulder.y) <= 72
+                && Math.abs(pose.rightHand.y - pose.rightShoulder.y) <= 72;
+            const chestOpenFront = mode === "front" && (armOpenFront || shoulderSpanGain >= 18);
+            const armBackSide = Math.max(
+                pose.leftHand.x - pose.leftShoulder.x,
+                pose.rightHand.x - pose.rightShoulder.x
+            );
+            const chestOpenSide = mode === "side"
+                && chestForward >= 22
+                && armBackSide >= 42;
+            const spineLean = pose.chest.x - pose.waist.x;
+            const spineLeanBack = mode === "side"
+                ? Math.max(pose.chest.x - pose.waist.x, pose.head.x - pose.waist.x)
+                : Math.max(0, defaultPose.chest.y - pose.chest.y);
+            const maxHeelLift = Math.max(leftFoot.validHeelLift ? leftFoot.heelLift : 0, rightFoot.validHeelLift ? rightFoot.heelLift : 0);
+            const isChestOpen = chestOpenFront || chestOpenSide;
+            const isSideBend = mode === "front" && spineCurve >= 46 && lateralBend;
+            const frontRig = {
+                leftArmBend,
+                rightArmBend,
+                armReach,
+                leftKneeBend,
+                rightKneeBend,
+                legSpread,
+                heelLift: maxHeelLift,
+                sideBend: isSideBend,
+                chestOpen: isChestOpen,
+                neckRotation,
+                headNeckDistance
+            };
+
+            return {
+                mode,
+                leftFoot,
+                rightFoot,
+                leftArmBend,
+                rightArmBend,
+                leftKneeBend,
+                rightKneeBend,
+                armBend: summarizeJointBend(leftArmBend, rightArmBend),
+                kneeBend: summarizeJointBend(leftKneeBend, rightKneeBend),
+                frontRig,
+                heelLift: maxHeelLift,
+                headNeckDistance,
+                neckRotation,
+                shoulderSpan,
+                shoulderSpanGain,
+                armExtension,
+                armReach,
+                legSpread,
+                armBackSide,
+                chestDepth,
+                chestForward,
+                chestOpen: isChestOpen,
+                sideBend: isSideBend,
+                sideCompression,
+                lateralBend,
+                spineCurve,
+                spineLean,
+                spineLeanBack
+            };
+        }
+
+        function footMetricsFor(side, pose, defaultPose) {
+            const toe = pose[`${side}Toe`];
+            const heel = pose[`${side}Heel`];
+            const ankle = pose[`${side}Foot`];
+            const defaultToe = defaultPose[`${side}Toe`] || defaultPose[`${side}Foot`];
+            const groundY = defaultToe.y;
+            const heelLift = Math.max(0, groundY - heel.y);
+            const toeGroundGap = Math.abs(toe.y - groundY);
+            const wholeFootLift = Math.max(0, groundY - toe.y);
+            return {
+                toe,
+                heel,
+                ankle,
+                groundY,
+                heelLift,
+                toeGroundGap,
+                wholeFootLift,
+                validHeelLift: toeGroundGap <= 9 && heelLift >= 24 && heel.y <= toe.y - 18
+            };
+        }
+
+        function gestureMetricsFor(part) {
+            const now = Date.now();
+            const trail = pruneGestureTrail(state.gestureTrails[part] || [], now);
+            state.gestureTrails[part] = trail;
+            if (trail.length < 3) {
+                return { totalDistance: 0, rangeX: 0, rangeY: 0, directionChanges: 0, valid: false };
+            }
+            let totalDistance = 0;
+            let directionChanges = 0;
+            let previousDirection = 0;
+            const xs = trail.map((point) => point.x);
+            const ys = trail.map((point) => point.y);
+            for (let index = 1; index < trail.length; index += 1) {
+                const prev = trail[index - 1];
+                const current = trail[index];
+                totalDistance += distance(prev, current);
+                const dx = current.x - prev.x;
+                const direction = Math.abs(dx) < 2 ? previousDirection : Math.sign(dx);
+                if (previousDirection && direction && direction !== previousDirection) directionChanges += 1;
+                if (direction) previousDirection = direction;
+            }
+            const rangeX = Math.max(...xs) - Math.min(...xs);
+            const rangeY = Math.max(...ys) - Math.min(...ys);
+            const sideToSide = totalDistance >= 82 && rangeX >= 38 && directionChanges >= 1;
+            const circular = totalDistance >= 96 && rangeX >= 30 && rangeY >= 22 && directionChanges >= 1;
+            const valid = sideToSide || circular;
+            return { totalDistance, rangeX, rangeY, directionChanges, sideToSide, circular, valid };
+        }
+
+        function deriveSidePosture(basePose) {
+            const pose = clonePose(basePose);
+            pose.pelvis = pose.pelvis || { x: pose.waist.x, y: pose.waist.y + 62 };
+            pose.head = constrainSideHeadToChest(pose.head, pose.chest);
+            pose.spineMid = {
+                x: (pose.chest.x + pose.waist.x) / 2,
+                y: (pose.chest.y + pose.waist.y) / 2
+            };
+            pose.neck = sideHeadNeckAnchor(pose.head, pose.chest);
+            pose.sternum = {
+                x: pose.chest.x - 14,
+                y: pose.chest.y + 5
+            };
+            pose.chin = {
+                x: pose.head.x - 18,
+                y: pose.head.y + 22
+            };
+            pose.earLeft = add(pose.head, { x: -6, y: 0 });
+            pose.earRight = add(pose.head, { x: 6, y: 0 });
+            return pose;
+        }
+
+        function derivePose(basePose, mode = state.viewMode) {
+            const pose = clonePose(basePose);
+            const torsoVector = normalize({
+                x: pose.chest.x - pose.waist.x,
+                y: pose.chest.y - pose.waist.y
+            });
+            const up = length(torsoVector) ? torsoVector : { x: 0, y: -1 };
+            const side = { x: -up.y, y: up.x };
+            if (mode === "front") {
+                pose.head = constrainFrontHeadToChest(pose.head, pose.chest);
+            }
+            pose.neckBase = {
+                x: pose.chest.x + up.x * 22,
+                y: pose.chest.y + up.y * 22
+            };
+            pose.neck = mode === "front"
+                ? frontHeadNeckAnchor(pose.head, pose.neckBase)
+                : {
+                    x: pose.chest.x + up.x * 45,
+                    y: pose.chest.y + up.y * 45
+                };
+            pose.sternum = {
+                x: pose.chest.x + up.x * 10,
+                y: pose.chest.y + up.y * 10
+            };
+            pose.pelvis = {
+                x: pose.waist.x - up.x * 46,
+                y: pose.waist.y - up.y * 46
+            };
+            pose.headCenter = { x: pose.head.x, y: pose.head.y };
+            pose.chin = add(pose.head, { x: 0, y: 27 });
+            pose.earLeft = add(pose.head, { x: -29, y: 0 });
+            pose.earRight = add(pose.head, { x: 29, y: 0 });
+            if (mode === "side") {
+                pose.leftShoulder = add(pose.chest, { x: -15, y: 1 });
+                pose.rightShoulder = add(pose.chest, { x: 15, y: -1 });
+                pose.leftHip = add(pose.waist, { x: -13, y: 0 });
+                pose.rightHip = add(pose.waist, { x: 13, y: 0 });
+            } else {
+                pose.leftShoulder = add(pose.chest, scale(side, -48));
+                pose.rightShoulder = add(pose.chest, scale(side, 48));
+                pose.leftHip = add(pose.waist, scale(side, -29));
+                pose.rightHip = add(pose.waist, scale(side, 29));
+            }
+            pose.leftElbow = pose.leftElbow || neutralJoint(pose.leftShoulder, pose.leftHand);
+            pose.rightElbow = pose.rightElbow || neutralJoint(pose.rightShoulder, pose.rightHand);
+            pose.leftKnee = pose.leftKnee || neutralJoint(pose.leftHip, pose.leftFoot);
+            pose.rightKnee = pose.rightKnee || neutralJoint(pose.rightHip, pose.rightFoot);
+            pose.leftWrist = lerpPoint(pose.leftElbow, pose.leftHand, 0.82);
+            pose.rightWrist = lerpPoint(pose.rightElbow, pose.rightHand, 0.82);
+            pose.leftPalm = { x: pose.leftHand.x, y: pose.leftHand.y };
+            pose.rightPalm = { x: pose.rightHand.x, y: pose.rightHand.y };
+            return pose;
+        }
+
+        function neutralJoint(start, end) {
+            return midpoint(start, end);
+        }
+
+        function lerpPoint(a, b, amount) {
+            return {
+                x: a.x + (b.x - a.x) * amount,
+                y: a.y + (b.y - a.y) * amount
+            };
+        }
+
+        function constrainReach(origin, point, maxDistance) {
+            const currentDistance = distance(origin, point);
+            if (currentDistance <= maxDistance) return point;
+            const unit = normalize({ x: point.x - origin.x, y: point.y - origin.y });
+            return {
+                x: origin.x + unit.x * maxDistance,
+                y: origin.y + unit.y * maxDistance
+            };
+        }
+
+        function constrainJointHandle(point, start, end, maxSegment) {
+            let next = { x: point.x, y: point.y };
+            for (let index = 0; index < 4; index += 1) {
+                next = constrainReach(start, next, maxSegment);
+                next = constrainReach(end, next, maxSegment);
+            }
+            return next;
+        }
+
+        function constrainSideHeadToChest(head, chest, meta) {
+            const relativeX = clamp(head.x - chest.x, -64, 64);
+            const relativeY = clamp(head.y - chest.y, -126, -62);
+            const next = {
+                x: chest.x + relativeX,
+                y: chest.y + relativeY
+            };
+            if (!meta) return next;
+            return {
+                x: clamp(next.x, meta.minX, meta.maxX),
+                y: clamp(next.y, meta.minY, meta.maxY)
+            };
+        }
+
+        function constrainFrontHeadToChest(head, chest, meta) {
+            const relativeX = clamp(head.x - chest.x, -70, 70);
+            const relativeY = clamp(head.y - chest.y, -126, -58);
+            const next = {
+                x: chest.x + relativeX,
+                y: chest.y + relativeY
+            };
+            if (!meta) return next;
+            return {
+                x: clamp(next.x, meta.minX, meta.maxX),
+                y: clamp(next.y, meta.minY, meta.maxY)
+            };
+        }
+
+        function frontHeadNeckAnchor(head, neckBase) {
+            const towardNeckBase = {
+                x: neckBase.x - head.x,
+                y: neckBase.y - head.y
+            };
+            const direction = length(towardNeckBase) ? normalize(towardNeckBase) : { x: 0, y: 1 };
+            return add(head, scale(direction, 31));
+        }
+
+        function sideHeadNeckAnchor(head, chest) {
+            const towardChest = {
+                x: chest.x - head.x,
+                y: chest.y - head.y
+            };
+            const direction = length(towardChest) ? normalize(towardChest) : { x: 0, y: 1 };
+            return add(head, scale(direction, 31));
+        }
+
+        function jointBendMetric(start, joint, end, defaultStart, defaultJoint, defaultEnd) {
+            const angle = angleAtJoint(start, joint, end);
+            const defaultAngle = angleAtJoint(defaultStart, defaultJoint, defaultEnd);
+            const depth = pointLineDistance(joint, start, end);
+            const defaultDepth = pointLineDistance(defaultJoint, defaultStart, defaultEnd);
+            const flexion = Math.max(0, defaultAngle - angle);
+            const depthGain = Math.max(0, depth - defaultDepth);
+            const strength = Math.max(flexion, depthGain);
+            return {
+                angle,
+                defaultAngle,
+                depth,
+                defaultDepth,
+                flexion,
+                depthGain,
+                strength,
+                valid: strength >= 28 && depth >= 18
+            };
+        }
+
+        function summarizeJointBend(left, right) {
+            const stronger = left.strength >= right.strength ? left : right;
+            return {
+                left,
+                right,
+                angle: stronger.angle,
+                strength: stronger.strength,
+                valid: left.valid || right.valid
+            };
+        }
+
+        function emptyJointBend() {
+            return {
+                left: { angle: 180, strength: 0, valid: false },
+                right: { angle: 180, strength: 0, valid: false },
+                angle: 180,
+                strength: 0,
+                valid: false
+            };
+        }
+
+        function solveJoint(start, end, lenA, lenB, bendSign) {
+            const rawDx = end.x - start.x;
+            const rawDy = end.y - start.y;
+            const rawDistance = Math.max(0.01, Math.hypot(rawDx, rawDy));
+            const d = Math.min(rawDistance, lenA + lenB - 0.01);
+            const ux = rawDx / rawDistance;
+            const uy = rawDy / rawDistance;
+            const a = (lenA * lenA - lenB * lenB + d * d) / (2 * d);
+            const h = Math.sqrt(Math.max(0, lenA * lenA - a * a));
+            const px = start.x + ux * a;
+            const py = start.y + uy * a;
+            return {
+                x: px + (-uy) * h * bendSign,
+                y: py + ux * h * bendSign
+            };
+        }
+
+        function setPose(nextPose, options = {}) {
+            if (options.mode && ["front", "side"].includes(options.mode)) {
+                state.viewMode = options.mode;
+            }
+            Object.entries(nextPose || {}).forEach(([part, value]) => {
+                if (!activeBodyParts()[part] || !value) return;
+                movePart(part, value);
+            });
+            if (options.lastPart && activeBodyParts()[options.lastPart]) {
+                state.lastPart = options.lastPart;
+            }
+            render();
+            return detectExpressions();
+        }
+
+        function pushGesturePoint(part, point, time = Date.now()) {
+            if (!part || !point) return detectExpressions();
+            const meta = activeBodyParts()[part];
+            const nextPoint = meta
+                ? {
+                    x: clamp(point.x, meta.minX, meta.maxX),
+                    y: clamp(point.y, meta.minY, meta.maxY)
+                }
+                : { x: point.x, y: point.y };
+            if (meta) {
+                activePose()[part] = nextPoint;
+                applySidePostureConstraints(part);
+                applyFrontHeadConstraints(part);
+                applyFrontRigConstraints(part);
+                updateFootDetailsFromFootDrag(part);
+                updateAutoJointsFromDrag(part);
+            }
+            state.lastPart = part;
+            recordGesturePoint(part, nextPoint, Number.isFinite(time) ? time : Date.now());
+            render();
+            return detectExpressions();
+        }
+
+        function exposeApi() {
+            window.__C12_BODY_MOTION_LAB__ = {
+                getState: () => ({
+                    pose: clonePose(activePose()),
+                    poses: {
+                        front: clonePose(state.poses.front),
+                        side: clonePose(state.poses.side)
+                    },
+                    viewMode: state.viewMode,
+                    lastPart: state.lastPart,
+                    activeMission: MISSIONS[state.activeMissionIndex],
+                    completedMissions: Array.from(state.completedMissions),
+                    discovered: Array.from(state.discovered.values()),
+                    motionMetrics: cloneData(state.motionMetrics),
+                    currentExpression: state.currentExpression ? { ...state.currentExpression } : null
+                }),
+                getMetrics: () => cloneData(getCurrentSkeleton().metrics),
+                setPose,
+                pushGesturePoint,
+                clearGesture: (part) => {
+                    clearGesture(part);
+                    return cloneData(state.motionMetrics);
+                },
+                resetPose: () => {
+                    resetPose();
+                    return detectExpressions();
+                },
+                detectExpressions: () => detectExpressions().map((item) => ({ ...item })),
+                startMission,
+                setViewMode
+            };
+        }
+
+        function activePose() {
+            return state.poses[state.viewMode] || state.poses.front;
+        }
+
+        function activeBodyParts() {
+            return BODY_PARTS_BY_MODE[state.viewMode] || BODY_PARTS_BY_MODE.front;
+        }
+
+        function activeDefaultPose() {
+            return DEFAULT_POSE_BY_MODE[state.viewMode] || DEFAULT_POSE_BY_MODE.front;
+        }
+
+        function footAnkleFromTriangle(toe, heel) {
+            const topY = Math.min(toe.y, heel.y) - 28;
+            return {
+                x: (toe.x + heel.x) / 2,
+                y: clamp(topY, 382, 475)
+            };
+        }
+
+        function targetPartTokens(targetId) {
+            const map = {
+                head: ["head"],
+                ear: ["ear", "head"],
+                neck: ["neck", "head"],
+                shoulder: ["shoulder", "chest"],
+                chest: ["chest"],
+                belly: ["belly", "chest", "waist"],
+                waist: ["waist"],
+                knee: ["knee", "leg", "foot"]
+            };
+            return map[targetId] || [targetId];
+        }
+
+        function partTokens(part) {
+            if (!part) return [];
+            const tokens = new Set([part]);
+            if (/Hand$/.test(part) || part === "hand") tokens.add("hand");
+            if (/Elbow$/.test(part) || part === "elbow") {
+                tokens.add("elbow");
+                tokens.add("arm");
+            }
+            if (/Foot$/.test(part) || part === "foot") {
+                tokens.add("foot");
+                tokens.add("leg");
+            }
+            if (/Toe$/.test(part) || part === "toe") {
+                tokens.add("toe");
+                tokens.add("foot");
+                tokens.add("leg");
+            }
+            if (/Heel$/.test(part) || part === "heel") {
+                tokens.add("heel");
+                tokens.add("foot");
+                tokens.add("leg");
+            }
+            if (/Knee$/.test(part) || part === "knee") {
+                tokens.add("knee");
+                tokens.add("leg");
+            }
+            if (["ear", "neck"].includes(part)) tokens.add("head");
+            if (["shoulder", "belly"].includes(part)) tokens.add("chest");
+            if (["knee"].includes(part)) {
+                tokens.add("leg");
+                tokens.add("foot");
+            }
+            return Array.from(tokens);
+        }
+
+        function clonePose(pose) {
+            return Object.fromEntries(Object.entries(pose).map(([key, point]) => [key, { x: point.x, y: point.y }]));
+        }
+
+        function cloneData(value) {
+            if (value === undefined) return undefined;
+            return JSON.parse(JSON.stringify(value));
+        }
+
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        function escapeHtml(value) {
+            return String(value || "").replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[char]);
+        }
+
+        function setCircle(circle, x, y) {
+            circle.setAttribute("cx", Number(x).toFixed(2));
+            circle.setAttribute("cy", Number(y).toFixed(2));
+        }
+
+        function setLine(line, a, b) {
+            line.setAttribute("x1", Number(a.x).toFixed(2));
+            line.setAttribute("y1", Number(a.y).toFixed(2));
+            line.setAttribute("x2", Number(b.x).toFixed(2));
+            line.setAttribute("y2", Number(b.y).toFixed(2));
+        }
+
+        function polyPath(points) {
+            return points.map((point, index) => `${index ? "L" : "M"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
+        }
+
+        function add(a, b) {
+            return { x: a.x + b.x, y: a.y + b.y };
+        }
+
+        function offset(point, x, y) {
+            return { x: point.x + x, y: point.y + y };
+        }
+
+        function scale(point, scalar) {
+            return { x: point.x * scalar, y: point.y * scalar };
+        }
+
+        function midpoint(a, b) {
+            return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+        }
+
+        function average(points) {
+            return {
+                x: points.reduce((sum, point) => sum + point.x, 0) / points.length,
+                y: points.reduce((sum, point) => sum + point.y, 0) / points.length
+            };
+        }
+
+        function distance(a, b) {
+            return Math.hypot(a.x - b.x, a.y - b.y);
+        }
+
+        function angleAtJoint(start, joint, end) {
+            const a = { x: start.x - joint.x, y: start.y - joint.y };
+            const b = { x: end.x - joint.x, y: end.y - joint.y };
+            const denominator = Math.max(0.0001, length(a) * length(b));
+            const cosine = clamp((a.x * b.x + a.y * b.y) / denominator, -1, 1);
+            return Math.acos(cosine) * 180 / Math.PI;
+        }
+
+        function pointLineDistance(point, a, b) {
+            const lineLength = distance(a, b);
+            if (!lineLength) return distance(point, a);
+            return Math.abs((b.x - a.x) * (a.y - point.y) - (a.x - point.x) * (b.y - a.y)) / lineLength;
+        }
+
+        function length(point) {
+            return Math.hypot(point.x, point.y);
+        }
+
+        function normalize(point) {
+            const d = length(point);
+            if (!d) return { x: 0, y: 0 };
+            return { x: point.x / d, y: point.y / d };
+        }
+
+        function isNearAny(point, targets, radius) {
+            return targets.some((target) => distance(point, target) <= radius);
+        }
+
+        function isAnyPointNearAny(points, targets, radius) {
+            return points.filter(Boolean).some((point) => isNearAny(point, targets, radius));
+        }
+    })();
+    </script>
+    <script src="../shared/pc-mode.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>
