@@ -422,6 +422,48 @@
       background: #0d6b64;
     }
 
+    .quiz-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .auto-toggle {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      padding: 0 10px;
+      font-size: 0.82rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .auto-toggle__dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      box-shadow: 0 0 0 3px rgba(203, 213, 225, 0.32);
+    }
+
+    .auto-toggle[aria-pressed="true"] {
+      border-color: #99f6e4;
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+
+    .auto-toggle[aria-pressed="true"] .auto-toggle__dot {
+      background: var(--teal);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.16);
+    }
+
     .pairs-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -649,6 +691,15 @@
       .control-btn {
         width: 100%;
       }
+
+      .quiz-tools,
+      .auto-toggle {
+        width: 100%;
+      }
+
+      .auto-toggle {
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -714,6 +765,12 @@
           </div>
           <div id="option-grid" class="option-grid" aria-label="정답 선택"></div>
           <div id="feedback" class="feedback" data-state="idle">선택지를 누르면 바로 확인할 수 있어요.</div>
+          <div class="quiz-tools">
+            <button id="auto-advance-toggle" class="auto-toggle" type="button" aria-pressed="true">
+              <span class="auto-toggle__dot" aria-hidden="true"></span>
+              <span id="auto-advance-label">자동 넘김 켜짐</span>
+            </button>
+          </div>
           <div class="control-row">
             <button id="reset-quiz" class="control-btn" type="button">처음부터</button>
             <button id="next-question" class="control-btn control-btn--primary" type="button">다음 카드</button>
@@ -783,6 +840,7 @@
   <script>
     (() => {
       const STORAGE_KEY = "c12-body-condition-checkup";
+      const AUTO_ADVANCE_DELAY = 3000;
       const BASE = "../assets/c12/misc/images/split-variants-35/full/";
       const CHECKUP = "../assets/c12/vocabulary/images/body-condition-checkup/";
 
@@ -907,6 +965,8 @@
         questionText: document.getElementById("question-text"),
         optionGrid: document.getElementById("option-grid"),
         feedback: document.getElementById("feedback"),
+        autoAdvanceToggle: document.getElementById("auto-advance-toggle"),
+        autoAdvanceLabel: document.getElementById("auto-advance-label"),
         nextQuestion: document.getElementById("next-question"),
         resetQuiz: document.getElementById("reset-quiz"),
         pairsGrid: document.getElementById("pairs-grid"),
@@ -922,6 +982,8 @@
         score: 0,
         answered: false,
         selectedAnswer: "",
+        autoAdvance: true,
+        choiceOrders: {},
         history: [],
         pairSides: {},
         reportSelections: []
@@ -929,6 +991,7 @@
 
       let activeQuestions = QUESTIONS.slice();
       let state = loadState();
+      let autoAdvanceTimer = null;
 
       function loadState() {
         try {
@@ -936,11 +999,12 @@
           return {
             ...defaultState,
             ...saved,
+            choiceOrders: saved.choiceOrders && typeof saved.choiceOrders === "object" ? saved.choiceOrders : {},
             pairSides: { ...defaultState.pairSides, ...(saved.pairSides || {}) },
             reportSelections: Array.isArray(saved.reportSelections) ? saved.reportSelections.filter((id) => itemMap.has(id)) : []
           };
         } catch (error) {
-          return { ...defaultState, pairSides: {}, reportSelections: [] };
+          return { ...defaultState, choiceOrders: {}, pairSides: {}, reportSelections: [] };
         }
       }
 
@@ -950,6 +1014,8 @@
           score: state.score,
           answered: state.answered,
           selectedAnswer: state.selectedAnswer,
+          autoAdvance: state.autoAdvance,
+          choiceOrders: state.choiceOrders,
           history: state.history,
           pairSides: state.pairSides,
           reportSelections: state.reportSelections
@@ -974,12 +1040,56 @@
         return activeQuestions[state.quizIndex] || activeQuestions[0];
       }
 
+      function questionKey(question) {
+        return `${state.quizIndex}:${question.id || question.text}`;
+      }
+
+      function shuffleChoices(choices) {
+        const shuffled = choices.slice();
+        for (let index = shuffled.length - 1; index > 0; index -= 1) {
+          const swapIndex = Math.floor(Math.random() * (index + 1));
+          [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+        }
+        return shuffled;
+      }
+
+      function getChoiceOrder(question) {
+        const key = questionKey(question);
+        if (!Array.isArray(state.choiceOrders[key])) {
+          state.choiceOrders[key] = shuffleChoices(question.choices);
+          saveState();
+        }
+        return state.choiceOrders[key];
+      }
+
+      function clearAutoAdvanceTimer() {
+        if (autoAdvanceTimer) {
+          window.clearTimeout(autoAdvanceTimer);
+          autoAdvanceTimer = null;
+        }
+      }
+
+      function scheduleAutoAdvance() {
+        clearAutoAdvanceTimer();
+        if (!state.autoAdvance || !state.answered) return;
+        autoAdvanceTimer = window.setTimeout(() => {
+          autoAdvanceTimer = null;
+          nextQuestion();
+        }, AUTO_ADVANCE_DELAY);
+      }
+
+      function renderAutoAdvanceToggle() {
+        els.autoAdvanceToggle.setAttribute("aria-pressed", state.autoAdvance ? "true" : "false");
+        els.autoAdvanceLabel.textContent = state.autoAdvance ? "자동 넘김 켜짐" : "자동 넘김 꺼짐";
+      }
+
       function renderQuiz() {
         if (!activeQuestions.length) activeQuestions = QUESTIONS.slice();
         if (state.quizIndex >= activeQuestions.length) state.quizIndex = 0;
         const question = currentQuestion();
         const imageItem = itemMap.get(question.image) || getItemByLabel(question.answer);
         const answered = state.answered;
+        const choices = getChoiceOrder(question);
 
         els.quizImage.src = imageItem ? imageItem.image : "";
         els.quizImage.alt = imageItem ? imageItem.alt : "";
@@ -988,7 +1098,7 @@
         els.scoreLabel.textContent = `점수 ${state.score}`;
         els.progressFill.style.width = `${((state.quizIndex + (answered ? 1 : 0)) / activeQuestions.length) * 100}%`;
 
-        els.optionGrid.innerHTML = question.choices.map((choice) => {
+        els.optionGrid.innerHTML = choices.map((choice) => {
           let className = "option-btn";
           if (answered && choice === question.answer) className += " is-correct";
           if (answered && choice === state.selectedAnswer && choice !== question.answer) className += " is-wrong";
@@ -998,13 +1108,15 @@
         if (answered) {
           const correct = state.selectedAnswer === question.answer;
           els.feedback.dataset.state = correct ? "correct" : "wrong";
-          els.feedback.textContent = `${correct ? "정답!" : `다시 확인해요. 정답: ${question.answer}`} ${question.explain}`;
+          const autoText = state.autoAdvance ? " 3초 후 다음 카드로 넘어가요." : " 자동 넘김이 꺼져 있어요.";
+          els.feedback.textContent = `${correct ? "정답!" : `다시 확인해요. 정답: ${question.answer}`} ${question.explain}${autoText}`;
         } else {
           els.feedback.dataset.state = "idle";
           els.feedback.textContent = "선택지를 누르면 바로 확인할 수 있어요.";
         }
 
         els.nextQuestion.textContent = state.quizIndex === activeQuestions.length - 1 ? "처음 카드로" : "다음 카드";
+        renderAutoAdvanceToggle();
       }
 
       function answerQuestion(choice) {
@@ -1022,9 +1134,11 @@
         });
         saveState();
         renderQuiz();
+        scheduleAutoAdvance();
       }
 
       function nextQuestion() {
+        clearAutoAdvanceTimer();
         state.quizIndex = state.quizIndex >= activeQuestions.length - 1 ? 0 : state.quizIndex + 1;
         state.answered = false;
         state.selectedAnswer = "";
@@ -1033,13 +1147,25 @@
       }
 
       function resetQuiz() {
+        clearAutoAdvanceTimer();
         state.quizIndex = 0;
         state.score = 0;
         state.answered = false;
         state.selectedAnswer = "";
+        state.choiceOrders = {};
         state.history = [];
         saveState();
         renderQuiz();
+      }
+
+      function toggleAutoAdvance() {
+        state.autoAdvance = !state.autoAdvance;
+        if (!state.autoAdvance) {
+          clearAutoAdvanceTimer();
+        }
+        saveState();
+        renderQuiz();
+        scheduleAutoAdvance();
       }
 
       function renderPairs() {
@@ -1133,12 +1259,14 @@
 
       function resetAll() {
         activeQuestions = QUESTIONS.slice();
-        state = { ...defaultState, pairSides: {}, reportSelections: [] };
+        clearAutoAdvanceTimer();
+        state = { ...defaultState, choiceOrders: {}, pairSides: {}, reportSelections: [] };
         localStorage.removeItem(STORAGE_KEY);
         renderAll();
       }
 
       function startWithQuestions(questions) {
+        clearAutoAdvanceTimer();
         activeQuestions = questions.map((question) => {
           if (typeof question === "string") return QUESTIONS.find((item) => item.id === question);
           return question;
@@ -1148,6 +1276,7 @@
         state.score = 0;
         state.answered = false;
         state.selectedAnswer = "";
+        state.choiceOrders = {};
         state.history = [];
         saveState();
         renderQuiz();
@@ -1166,6 +1295,7 @@
 
       els.nextQuestion.addEventListener("click", nextQuestion);
       els.resetQuiz.addEventListener("click", resetQuiz);
+      els.autoAdvanceToggle.addEventListener("click", toggleAutoAdvance);
       els.pairsGrid.addEventListener("click", (event) => {
         const button = event.target.closest("[data-pair-toggle]");
         if (button) togglePair(button.dataset.pairToggle);
@@ -1183,6 +1313,7 @@
         startWithQuestions,
         reset: resetAll,
         buildReportSentence,
+        getRenderedChoices: () => Array.from(els.optionGrid.querySelectorAll("[data-option]")).map((button) => button.dataset.option),
         storageKey: STORAGE_KEY
       };
 

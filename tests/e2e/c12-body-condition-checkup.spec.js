@@ -91,6 +91,89 @@ test("diagnosis cards show correct and wrong feedback", async ({ page }) => {
   await expect(page.locator("#feedback")).toContainText("정답!");
 });
 
+test("diagnosis choices are shuffled when a question starts", async ({ page }) => {
+  await openCheckup(page);
+
+  const renderedChoices = await page.evaluate(() => {
+    const originalRandom = Math.random;
+    try {
+      Math.random = () => 0;
+      window.__C12_BODY_CONDITION__.startWithQuestions([{
+        id: "shuffle-heavy",
+        image: "body-heavy",
+        text: "몸이 둔하고 움직이기 힘들어요.",
+        answer: "몸이 무겁다",
+        choices: ["몸이 무겁다", "몸이 가볍다", "기운이 없다", "자세가 좋다"],
+        explain: "테스트 설명"
+      }]);
+      return window.__C12_BODY_CONDITION__.getRenderedChoices();
+    } finally {
+      Math.random = originalRandom;
+    }
+  });
+
+  expect(renderedChoices).toEqual(expect.arrayContaining(["몸이 무겁다", "몸이 가볍다", "기운이 없다", "자세가 좋다"]));
+  expect(renderedChoices[0]).not.toBe("몸이 무겁다");
+});
+
+test("auto advance moves after three seconds and can be toggled off", async ({ page }) => {
+  await openCheckup(page);
+  await page.evaluate(() => {
+    window.__C12_BODY_CONDITION__.startWithQuestions([
+      {
+        id: "auto-first",
+        image: "body-heavy",
+        text: "첫 번째 자동 문제",
+        answer: "몸이 무겁다",
+        choices: ["몸이 무겁다", "몸이 가볍다", "기운이 없다", "자세가 좋다"],
+        explain: "테스트 설명"
+      },
+      {
+        id: "auto-second",
+        image: "breathless",
+        text: "두 번째 자동 문제",
+        answer: "숨이 차다",
+        choices: ["숨이 차다", "땀이 나다", "몸이 좋아지다", "기분이 상쾌하다"],
+        explain: "테스트 설명"
+      }
+    ]);
+  });
+
+  await expect(page.locator("#auto-advance-toggle")).toHaveAttribute("aria-pressed", "true");
+  await page.locator('[data-option="몸이 무겁다"]').click();
+  await expect(page.locator("#feedback")).toContainText("3초 후 다음 카드");
+  await expect(page.locator("#question-text")).toHaveText("두 번째 자동 문제", { timeout: 4500 });
+
+  await page.locator("#auto-advance-toggle").click();
+  await expect(page.locator("#auto-advance-toggle")).toHaveAttribute("aria-pressed", "false");
+
+  await page.evaluate(() => {
+    window.__C12_BODY_CONDITION__.startWithQuestions([
+      {
+        id: "manual-first",
+        image: "body-heavy",
+        text: "자동 꺼짐 문제",
+        answer: "몸이 무겁다",
+        choices: ["몸이 무겁다", "몸이 가볍다", "기운이 없다", "자세가 좋다"],
+        explain: "테스트 설명"
+      },
+      {
+        id: "manual-second",
+        image: "breathless",
+        text: "넘어가면 안 되는 문제",
+        answer: "숨이 차다",
+        choices: ["숨이 차다", "땀이 나다", "몸이 좋아지다", "기분이 상쾌하다"],
+        explain: "테스트 설명"
+      }
+    ]);
+  });
+
+  await page.locator('[data-option="몸이 무겁다"]').click();
+  await expect(page.locator("#feedback")).toContainText("자동 넘김이 꺼져");
+  await page.waitForTimeout(3200);
+  await expect(page.locator("#question-text")).toHaveText("자동 꺼짐 문제");
+});
+
 test("opposite expression switch updates label and image", async ({ page }) => {
   await openCheckup(page);
 
