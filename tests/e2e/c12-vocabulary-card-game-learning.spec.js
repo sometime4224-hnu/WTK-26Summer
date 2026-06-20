@@ -67,6 +67,32 @@ test("c12 vocabulary card game shows a role prompt and same-role choices", async
   await expectNoHorizontalOverflow(page);
 });
 
+test("c12 vocabulary card game always builds the full shuffled question set", async ({ page }) => {
+  await openCardGame(page, { width: 390, height: 844 });
+
+  const result = await page.evaluate(() => {
+    const api = window.__C12_VOCAB_CARD_GAME__;
+    const originalRandom = Math.random;
+    try {
+      Math.random = () => 0.999;
+      const ordered = api.buildQuestions().map((question) => question.eq.explanation);
+      Math.random = () => 0;
+      const shuffled = api.buildQuestions().map((question) => question.eq.explanation);
+      return {
+        equationCount: api.getEquations().length,
+        ordered,
+        shuffled,
+      };
+    } finally {
+      Math.random = originalRandom;
+    }
+  });
+
+  expect(result.ordered).toHaveLength(result.equationCount);
+  expect(result.shuffled).toHaveLength(result.equationCount);
+  expect(result.shuffled).not.toEqual(result.ordered);
+});
+
 test("c12 vocabulary card game explains both wrong and correct answers", async ({ page }) => {
   await openCardGame(page, { width: 390, height: 844 });
   await startFixedQuestion(page, {

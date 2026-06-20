@@ -229,15 +229,6 @@
         .prog-track { background: #dbeafe; border-radius: 9999px; height: 8px; overflow: hidden; }
         .prog-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #6366f1); border-radius: 9999px; transition: width 0.45s ease; }
 
-        /* ── Mode buttons ── */
-        .mode-btn {
-            padding: 8px 18px; border-radius: 12px; font-weight: 700;
-            font-size: 13px; cursor: pointer; border: 2px solid transparent;
-            transition: all 0.15s;
-        }
-        .mode-btn.on { background: #2563eb; color: white; border-color: #2563eb; }
-        .mode-btn.off { background: #dbeafe; color: #2563eb; border-color: #bfdbfe; }
-
         /* ── Next button ── */
         .next-btn {
             width: 100%; padding: 14px;
@@ -440,7 +431,6 @@
         }
 
         .rules-card,
-        .mode-panel,
         .result-panel {
             border: 1px solid #bfdbfe;
             border-radius: 16px;
@@ -523,21 +513,6 @@
             border: 2px dashed #60a5fa;
             background: #bfdbfe;
         }
-        .mode-panel {
-            padding: 12px;
-        }
-        .mode-panel p {
-            margin: 0 0 10px;
-            color: #374151;
-            font-size: 0.86rem;
-            font-weight: 900;
-        }
-        #mode-btns {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
-
         #screen-game.active {
             display: grid;
             grid-template-rows: auto auto minmax(0, 1fr);
@@ -769,14 +744,6 @@
                 min-height: 40px;
                 font-size: 0.84rem;
             }
-            .mode-panel {
-                padding: 10px;
-            }
-            .mode-btn {
-                min-height: 38px;
-                padding: 6px 12px;
-                font-size: 12px;
-            }
             .start-btn {
                 min-height: 46px;
                 padding: 11px;
@@ -956,7 +923,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </li>
                 <li class="flex items-start gap-2">
                     <span class="mt-0.5">🃏</span>
-                    <span>아래 그림 카드 4장 중 빈칸에 맞는 카드를 고르세요.</span>
+                    <span>전체 문제를 풀며, 시작할 때마다 문제 순서가 바뀝니다.</span>
                 </li>
                 <li class="flex items-start gap-2">
                     <span class="mt-0.5">⭐</span>
@@ -978,16 +945,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </details>
 
-    <!-- Question count selector -->
-    <div class="mode-panel bg-white rounded-2xl p-4 mb-5 shadow-sm border border-blue-100">
-        <p class="font-bold text-gray-700 text-sm mb-3">⚙️ 문제 수 선택</p>
-        <div class="flex gap-2 justify-center" id="mode-btns">
-            <button class="mode-btn off" data-count="5" onclick="selectMode(5)">5문제</button>
-            <button class="mode-btn on" data-count="10" onclick="selectMode(10)">10문제</button>
-            <button class="mode-btn off" data-count="99" onclick="selectMode(99)">전체</button>
-        </div>
-    </div>
-
     <button class="start-btn" onclick="startGame()">🎮 게임 시작!</button>
 </div>
 
@@ -998,7 +955,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <!-- Progress / Score bar -->
     <div class="game-status flex justify-between items-center mb-2">
-        <span id="q-counter" class="text-sm font-bold text-blue-600">Q 1 / 10</span>
+        <span id="q-counter" class="text-sm font-bold text-blue-600">Q 1 / 15</span>
         <div id="streak-area" class="hidden">
             <span class="streak-badge"><i class="fa-solid fa-fire-flame-curved fa-sm"></i> <span id="streak-num">0</span>연속!</span>
         </div>
@@ -1145,17 +1102,17 @@ function getBlankMeta(id) {
 const EQUATIONS = [
     { a:'n04a', b:'v04',  c:'n11',  explanation:'몸이 무거울 때 푹 쉬면 몸이 좋아져요.' },
     { a:'v01',  b:'v08',  c:'n09',  explanation:'기운이 없을 때 일찍 자면 기분이 상쾌해져요.' },
-    { a:'v01',  b:'v07',  c:'n10',  explanation:'기운이 없을 때 약을 먹으면 기운이 나요.' },
+    { a:'v01',  b:'v07',  c:'n10',  explanation:'몸이 안 좋고 기운이 없을 때 약을 먹으면 기운이 나요.' },
     { a:'v02',  b:'v05',  c:'n09',  explanation:'스트레스를 받을 때 운동을 하면 기분이 상쾌해져요.' },
     { a:'v02',  b:'v04',  c:'n11',  explanation:'스트레스를 받을 때 푹 쉬면 몸이 좋아져요.' },
     { a:'n08',  b:'v08',  c:'n10',  explanation:'지쳤을 때 일찍 자면 기운이 나요.' },
-    { a:'v10',  b:'v06',  c:'n04b', explanation:'채소를 먹고 물을 마시면 몸이 가벼워져요.' },
+    { a:'v10',  b:'v06',  c:'n11',  explanation:'채소를 먹고 물을 마시면 몸이 좋아져요.' },
     { a:'n02b', b:'v05',  c:'n02a', explanation:'힘이 약할 때 운동을 하면 힘이 세져요.' },
     { a:'v11',  b:'v09',  c:'n01b', explanation:'매일 걷고 계단을 이용하면 살이 빠져요.' },
     { a:'v03',  b:'v05',  c:'n09',  explanation:'스트레칭을 하고 운동을 하면 기분이 상쾌해져요.' },
-    { a:'v06',  b:'v08',  c:'n10',  explanation:'물을 마시고 일찍 자면 기운이 나요.' },
+    { a:'v01',  b:'v06',  c:'n10',  explanation:'기운이 없을 때 물을 마시면 기운이 나요.' },
     { a:'n08',  b:'v03',  c:'n09',  explanation:'지쳤을 때 스트레칭을 하면 기분이 상쾌해져요.' },
-    { a:'v02',  b:'v08',  c:'n11',  explanation:'스트레스를 받을 때 일찍 자면 몸이 좋아져요.' },
+    { a:'v02',  b:'v08',  c:'n09',  explanation:'스트레스를 받을 때 일찍 자면 기분이 상쾌해져요.' },
     { a:'v05',  b:'v09',  c:'n01b', explanation:'운동을 하고 계단을 이용하면 살이 빠져요.' },
     { a:'v01',  b:'v04',  c:'n11',  explanation:'기운이 없을 때 푹 쉬면 몸이 좋아져요.' },
 ];
@@ -1164,7 +1121,6 @@ const EQUATIONS = [
    STATE
 ═══════════════════════════════════════ */
 let state = {
-    questionCount: 10,
     questions: [],
     current: 0,
     score: 0,
@@ -1245,18 +1201,6 @@ function blankHTML(meta) {
 }
 
 /* ═══════════════════════════════════════
-   MODE SELECTOR
-═══════════════════════════════════════ */
-function selectMode(n) {
-    state.questionCount = n;
-    document.querySelectorAll('.mode-btn').forEach(b => {
-        const on = Number(b.dataset.count) === n;
-        b.classList.toggle('on', on);
-        b.classList.toggle('off', !on);
-    });
-}
-
-/* ═══════════════════════════════════════
    BUILD QUESTIONS
 ═══════════════════════════════════════ */
 function createQuestion(eq, blankIdx, forcedChoices) {
@@ -1282,14 +1226,7 @@ function createQuestion(eq, blankIdx, forcedChoices) {
 }
 
 function buildQuestions() {
-    const shuffled = shuffle(EQUATIONS);
-    const count = Math.min(
-        state.questionCount >= 99 ? EQUATIONS.length : state.questionCount,
-        EQUATIONS.length
-    );
-    const selected = shuffled.slice(0, count);
-
-    return selected.map(eq => {
+    return shuffle(EQUATIONS).map(eq => {
         const blankIdx = Math.floor(Math.random() * 3); // 0=A 1=B 2=C
         return createQuestion(eq, blankIdx);
     });

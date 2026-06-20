@@ -75,7 +75,7 @@ async function expectGameLayoutColumns(page, minColumns) {
 test("c12 vocabulary card game keeps start controls and one-screen play visible on a small phone", async ({ page }) => {
   await openCardGame(page, { width: 360, height: 640 });
 
-  await expectLocatorInViewport(page, page.locator(".mode-panel"));
+  await expect(page.locator(".mode-panel")).toHaveCount(0);
   await expectLocatorInViewport(page, page.locator(".start-btn"));
 
   await startGame(page);
