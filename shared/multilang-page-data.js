@@ -229,12 +229,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung khi nguoi noi da lam mot viec roi phat hien ket qua hoac tinh huong moi.",
+                "title": "Hỗ trợ Tiếng Việt",
+                "summary": "Dùng khi người nói đã làm một việc rồi phát hiện kết quả hoặc tình huống mới.",
                 "points": [
-                    "Ve truoc thuong la hanh dong qua khu cua nguoi noi.",
-                    "Ve sau la ket qua, phat hien hoac thay doi sau hanh dong do.",
-                    "Sac thai gan nhu: sau khi toi lam thi moi biet."
+                    "Vế trước thường là hành động hoặc trải nghiệm trong quá khứ của người nói.",
+                    "Vế sau là kết quả, phát hiện hoặc thay đổi sau hành động đó.",
+                    "Sắc thái gần như: sau khi tôi làm thì mới biết."
                 ]
             }
         }
@@ -253,12 +253,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung de nhan manh muc do rat lon, rat manh hoac rat bat ngo.",
+                "title": "Hỗ trợ Tiếng Việt",
+                "summary": "Dùng để nhấn mạnh mức độ rất lớn, rất mạnh hoặc rất bất ngờ.",
                 "points": [
-                    "Nghia tu nhien gan voi: rat, cuc ky, dang ngac nhien.",
-                    "Can doi dang tinh tu hoac dong tu truoc phan ket.",
-                    "Dung khi muon noi cam xuc hoac muc do mot cach manh hon."
+                    "Nghĩa tự nhiên gần với: rất, cực kỳ, đáng ngạc nhiên.",
+                    "Cần đổi dạng tính từ hoặc động từ trước phần kết.",
+                    "Dùng khi muốn nói cảm xúc hoặc mức độ một cách mạnh hơn."
                 ]
             }
         }
@@ -277,12 +277,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung khi doan mot dieu dua tren dau hieu hoac bang chung.",
+                "title": "Hỗ trợ Tiếng Việt",
+                "summary": "Dùng khi đoán một điều dựa trên dấu hiệu hoặc bằng chứng.",
                 "points": [
-                    "Nghia gan voi: co ve la, hinh nhu la.",
-                    "Dung khi nguoi noi co can cu, khong phai doan ngau nhien.",
-                    "Hay chon dang tinh tu, dong tu hoac danh tu theo cau."
+                    "Nghĩa gần với: có vẻ là, hình như là.",
+                    "Dùng khi người nói có căn cứ, không phải đoán ngẫu nhiên.",
+                    "Hãy chọn dạng tính từ, động từ hoặc danh từ theo câu."
                 ]
             }
         }
@@ -301,12 +301,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung de noi dieu gi do can thiet, hoac dieu kien phai co truoc khi viec khac xay ra.",
+                "title": "Hỗ trợ Tiếng Việt",
+                "summary": "Dùng để nói điều gì đó cần thiết, hoặc điều kiện phải có trước khi việc khác xảy ra.",
                 "points": [
-                    "Trong nhieu cau, nghia la phai hoac can phai.",
-                    "Cung co the nghia la chi khi dieu nay xay ra thi dieu sau moi co the.",
-                    "Nhin ve sau de phan biet nghia nghia vu hay dieu kien."
+                    "Trong nhiều câu, nghĩa là phải hoặc cần phải.",
+                    "Cũng có thể nghĩa là chỉ khi điều này xảy ra thì điều sau mới có thể.",
+                    "Nhìn vế sau để phân biệt nghĩa vụ hay điều kiện."
                 ]
             }
         }

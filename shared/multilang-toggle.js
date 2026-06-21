@@ -115,6 +115,10 @@
         applyLang(lang);
     }
 
+    function refresh() {
+        applyLang(currentLang);
+    }
+
     function init() {
         document.querySelectorAll("[data-multilang-bar]").forEach(buildBar);
         applyLang(currentLang !== NONE ? currentLang : defaultLang);
@@ -128,6 +132,7 @@
 
     window.MultilangToggle = {
         setLang: selectLang,
+        refresh,
         getLang: () => currentLang,
         getLanguages: () => activeLangs.map((lang) => lang.code)
     };
