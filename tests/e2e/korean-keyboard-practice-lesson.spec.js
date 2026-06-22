@@ -54,6 +54,56 @@ async function expectNextKeyAnimation(page, code) {
   expect(style.height).toBeGreaterThan(0);
 }
 
+async function beginComposition(page, value, data = value) {
+  await page.locator("#answerInput").evaluate(
+    (input, payload) => {
+      input.focus();
+      input.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true, data: "" }));
+      input.value = payload.value;
+      input.dispatchEvent(new CompositionEvent("compositionupdate", { bubbles: true, data: payload.data }));
+      input.dispatchEvent(new InputEvent("input", {
+        bubbles: true,
+        data: payload.data,
+        inputType: "insertCompositionText",
+        isComposing: true
+      }));
+    },
+    { value, data }
+  );
+}
+
+async function updateComposition(page, value, data = value) {
+  await page.locator("#answerInput").evaluate(
+    (input, payload) => {
+      input.value = payload.value;
+      input.dispatchEvent(new CompositionEvent("compositionupdate", { bubbles: true, data: payload.data }));
+      input.dispatchEvent(new InputEvent("input", {
+        bubbles: true,
+        data: payload.data,
+        inputType: "insertCompositionText",
+        isComposing: true
+      }));
+    },
+    { value, data }
+  );
+}
+
+async function endComposition(page, value, data = value) {
+  await page.locator("#answerInput").evaluate(
+    (input, payload) => {
+      input.value = payload.value;
+      input.dispatchEvent(new CompositionEvent("compositionend", { bubbles: true, data: payload.data }));
+      input.dispatchEvent(new InputEvent("input", {
+        bubbles: true,
+        data: payload.data,
+        inputType: "insertText",
+        isComposing: false
+      }));
+    },
+    { value, data }
+  );
+}
+
 async function expectTransition(page, nextTitle) {
   await expect(page.locator("#transitionOverlay")).toBeVisible();
   await expect(page.locator("#transitionTitle")).toHaveText("잘했어요");
@@ -148,16 +198,21 @@ test.describe("korean keyboard 25-minute lesson", () => {
     await expectKeyHasClass(page, "KeyR", "is-next-key");
   });
 
-  test("shows the current mission and keyboard together in the first desktop view", async ({ page }) => {
+  test("keeps the target input directly above the keyboard on desktop", async ({ page }) => {
     await page.setViewportSize({ width: 1180, height: 720 });
     await page.goto("/apps/korean-keyboard-practice-lesson/index.html");
 
     const missionBox = await page.locator(".mission-panel").boundingBox();
-    const keyboardBox = await page.locator(".keyboard-panel").boundingBox();
+    const keyboardPanelBox = await page.locator(".keyboard-panel").boundingBox();
+    const focusBox = await page.locator(".keyboard-focus-strip").boundingBox();
+    const boardBox = await page.locator(".keyboard-board").boundingBox();
     expect(missionBox.y).toBeLessThan(210);
-    expect(keyboardBox.y).toBeLessThan(210);
-    expect(missionBox.x).toBeLessThan(keyboardBox.x);
+    expect(keyboardPanelBox.y).toBeLessThan(210);
+    expect(missionBox.x).toBeLessThan(keyboardPanelBox.x);
+    expect(Math.abs(focusBox.x - boardBox.x)).toBeLessThanOrEqual(2);
+    expect(focusBox.y).toBeLessThan(boardBox.y);
     await expect(page.locator("#targetDisplay")).toBeInViewport();
+    await expect(page.locator("#answerInput")).toBeInViewport();
     await expect(page.locator(".keyboard-board")).toBeInViewport();
   });
 
@@ -168,6 +223,13 @@ test.describe("korean keyboard 25-minute lesson", () => {
     await expect(page.locator("#feedbackStrip")).toContainText("한/영 키를 눌러");
     await expect(page.locator("#completedCount")).toHaveText("0");
     await expectKeyHasClass(page, "KeyR", "is-next-key");
+
+    await beginComposition(page, "ㄱ");
+    await expectKeyHasClass(page, "KeyK", "is-next-key");
+    await expectKeyHasClass(page, "KeyR", "is-typed");
+    await expect(page.locator("#completedCount")).toHaveText("0");
+    await endComposition(page, "ㄱ");
+    await expect(page.locator("#completedCount")).toHaveText("0");
 
     await page.locator("#answerInput").fill("가");
     await expect(page.locator("#completedCount")).toHaveText("1");
@@ -247,6 +309,13 @@ test.describe("korean keyboard 25-minute lesson", () => {
     await expectKeyHasClass(page, "KeyR", "is-next-key");
     await expectNextKeyAnimation(page, "KeyR");
 
+    await beginComposition(page, "ㄱ");
+    await expectKeyHasClass(page, "KeyR", "is-typed");
+    await expectKeyHasClass(page, "KeyK", "is-next-key");
+    await expect(page.locator("#completedCount")).toHaveText("0");
+    await endComposition(page, "ㄱ");
+    await expect(page.locator("#completedCount")).toHaveText("0");
+
     await page.locator("#answerInput").fill("ga");
     await expect(page.locator("#feedbackStrip")).toContainText("한/영 키 확인");
     await expect(page.locator("#completedCount")).toHaveText("0");
@@ -269,6 +338,24 @@ test.describe("korean keyboard 25-minute lesson", () => {
       await expectKeyHasClass(page, code, "is-required");
     }
     await expectKeyHasClass(page, "KeyG", "is-next-key");
+
+    await beginComposition(page, "ㅎ");
+    await expectKeyHasClass(page, "KeyG", "is-typed");
+    await expectKeyHasClass(page, "KeyK", "is-next-key");
+
+    await updateComposition(page, "하");
+    await expectKeyHasClass(page, "KeyS", "is-next-key");
+    await expect(page.locator("#completedCount")).toHaveText("0");
+    await endComposition(page, "하");
+
+    await page.locator("#answerInput").fill("한");
+    await expectKeyHasClass(page, "KeyR", "is-next-key");
+
+    await page.locator("#answerInput").fill("한ㄱ");
+    await expectKeyHasClass(page, "KeyN", "is-next-key");
+
+    await page.locator("#answerInput").fill("한구");
+    await expectKeyHasClass(page, "KeyR", "is-next-key");
 
     await page.locator("#answerInput").fill("한국");
     await expect(page.locator("#feedbackStrip")).toContainText("정확해요");
@@ -294,6 +381,11 @@ test.describe("korean keyboard 25-minute lesson", () => {
     }
     await expectKeyHasClass(page, "KeyG", "is-next-key");
 
+    await beginComposition(page, "하");
+    await expectKeyHasClass(page, "KeyS", "is-next-key");
+    await expect(page.locator("#completedCount")).toHaveText("0");
+    await endComposition(page, "하");
+
     await page.locator("#answerInput").fill("한국");
     await expect(page.locator("#completedCount")).toHaveText("1");
     await expect(page.locator("#rhythmWordCard")).toHaveText("학생");
@@ -316,18 +408,20 @@ test.describe("korean keyboard 25-minute lesson", () => {
     await expect(page.locator("#stageTask")).toContainText("한/영 확인");
   });
 
-  test("puts the mission before the keyboard on narrow screens without overflow", async ({ page }) => {
+  test("puts the target input and keyboard before progress info on narrow screens without overflow", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/apps/korean-keyboard-practice-lesson/index.html");
 
+    const focusBox = await page.locator(".keyboard-focus-strip").boundingBox();
+    const boardBox = await page.locator(".keyboard-board").boundingBox();
     const missionBox = await page.locator(".mission-panel").boundingBox();
-    const keyboardBox = await page.locator(".keyboard-panel").boundingBox();
-    expect(missionBox.y).toBeLessThan(keyboardBox.y);
+    expect(focusBox.y).toBeLessThan(boardBox.y);
+    expect(boardBox.y).toBeLessThan(missionBox.y);
     await expect(page.locator("#targetDisplay")).toBeInViewport();
 
     await reachRhythm(page);
     await expect(page.locator("#missionTitle")).toHaveText("리듬 단어 입력");
-    await expect(page.locator(".rhythm-lane")).toBeInViewport();
+    await expect(page.locator(".rhythm-lane")).toBeVisible();
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(2);

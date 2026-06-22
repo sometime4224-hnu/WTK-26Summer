@@ -108,7 +108,8 @@
     rhythmStartedAt: {},
     rhythmTimeCue: {},
     transitionOpen: false,
-    transitionStageIndex: 0
+    transitionStageIndex: 0,
+    guideAnimationToken: ""
   };
 
   let rhythmCueTimer = 0;
@@ -292,22 +293,61 @@
     });
   }
 
-  function getKeyboardGuideForText(target) {
+  function getTypingGuide(target, currentValue = "") {
     const sequence = getInputSequence(target);
+    const currentSequence = getInputSequence(currentValue);
+    let matchedCount = 0;
+
+    while (
+      matchedCount < sequence.length &&
+      matchedCount < currentSequence.length &&
+      sequence[matchedCount].jamo === currentSequence[matchedCount].jamo &&
+      sequence[matchedCount].code === currentSequence[matchedCount].code
+    ) {
+      matchedCount += 1;
+    }
+
+    const isPrefix = matchedCount === currentSequence.length && currentSequence.length <= sequence.length;
+    const nextInput = sequence[matchedCount] || null;
+    const remainingSequence = sequence.slice(matchedCount);
+    const typedSequence = sequence.slice(0, matchedCount);
+
     return {
       sequence,
-      requiredCodes: [...new Set(sequence.map((item) => item.code))],
-      nextCode: sequence[0] ? sequence[0].code : ""
+      currentSequence,
+      matchedCount,
+      isPrefix,
+      requiredCodes: [...new Set(remainingSequence.map((item) => item.code))],
+      typedCodes: [...new Set(typedSequence.map((item) => item.code))],
+      nextCode: nextInput ? nextInput.code : "",
+      nextJamo: nextInput ? nextInput.jamo : "",
+      guideToken: `${target}|${matchedCount}|${currentSequence.map((item) => item.jamo).join("")}`
     };
   }
 
-  function updateKeyboardGuide({ targetCode = "", requiredCodes = [], nextCode = "" } = {}) {
+  function getKeyboardGuideForText(target) {
+    return getTypingGuide(target, "");
+  }
+
+  function updateKeyboardGuide({ targetCode = "", requiredCodes = [], typedCodes = [], nextCode = "", guideToken = "" } = {}) {
     const requiredSet = new Set(requiredCodes.filter(Boolean));
+    const typedSet = new Set(typedCodes.filter(Boolean));
+    const nextToken = nextCode ? `${nextCode}:${guideToken || nextCode}` : "";
+    const shouldRestartNextAnimation = Boolean(nextToken) && nextToken !== state.guideAnimationToken;
+    state.guideAnimationToken = nextToken;
+    if (nextCode) typedSet.delete(nextCode);
+
     els.keyboardBoard.querySelectorAll(".key-button").forEach((button) => {
       const code = button.dataset.code;
+      const isNextKey = Boolean(nextCode) && code === nextCode;
       button.classList.toggle("is-target", Boolean(targetCode) && code === targetCode);
+      button.classList.toggle("is-typed", typedSet.has(code));
       button.classList.toggle("is-required", requiredSet.has(code));
-      button.classList.toggle("is-next-key", Boolean(nextCode) && code === nextCode);
+      if (isNextKey && shouldRestartNextAnimation) {
+        button.classList.remove("is-next-key");
+        void button.offsetWidth;
+      }
+      button.classList.toggle("is-next-key", isNextKey);
     });
   }
 
@@ -348,6 +388,52 @@
     `;
   }
 
+  function renderReachForTypingGuide(target, guide, isRhythm = false) {
+    const nextKey = guide.nextCode ? getKey(guide.nextCode) : null;
+    if (nextKey) {
+      els.currentKeyBadge.textContent = `다음 ${nextKey.hangul}`;
+      els.reachList.innerHTML = `
+        <span>다음 키</span>
+        <strong>${guide.nextJamo}</strong>
+        <p>${nextKey.latin} 자리 · ${FINGER_LABELS[nextKey.finger]}로 이어 입력합니다.</p>
+      `;
+      return;
+    }
+
+    els.currentKeyBadge.textContent = isRhythm ? "리듬 입력" : "한글 입력";
+    els.reachList.innerHTML = `
+      <span>지금 입력</span>
+      <strong>${target}</strong>
+      <p>${isRhythm ? "단어가 맞으면 다음 비트로 넘어갑니다." : "목표 입력을 마치면 다음 항목으로 넘어갑니다."}</p>
+    `;
+  }
+
+  function applyTypingGuide(target, currentValue = "", isRhythm = false) {
+    const guide = getTypingGuide(target, currentValue);
+    updateKeyboardGuide(guide);
+    renderReachForTypingGuide(target, guide, isRhythm);
+    return guide;
+  }
+
+  function getActiveTypingTarget(stage = getStage()) {
+    if (stage.kind === "warmup" && !state.readyImeDone) {
+      return { target: "가", isRhythm: false };
+    }
+
+    if ((stage.kind === "text" || stage.kind === "rhythm") && !isStageComplete(stage)) {
+      return { target: getCurrentTarget(stage), isRhythm: stage.kind === "rhythm" };
+    }
+
+    return null;
+  }
+
+  function refreshTypingGuideOnly(valueOverride = "") {
+    const activeTarget = getActiveTypingTarget();
+    if (!activeTarget || !activeTarget.target) return null;
+    const currentValue = normalizeText(els.answerInput.value || valueOverride);
+    return applyTypingGuide(activeTarget.target, currentValue, activeTarget.isRhythm);
+  }
+
   function renderReachForStage(stage) {
     if (stage.kind === "warmup" && !state.readyImeDone) {
       const nextInput = getInputSequence("가")[0];
@@ -363,19 +449,7 @@
 
     if (stage.kind === "text" || stage.kind === "rhythm") {
       const target = getCurrentTarget(stage) || "완료";
-      const isRhythm = stage.kind === "rhythm";
-      const nextInput = getInputSequence(target)[0];
-      const nextKey = nextInput ? getKey(nextInput.code) : null;
-      els.currentKeyBadge.textContent = nextKey ? `다음 ${nextKey.hangul}` : isRhythm ? "리듬 입력" : "한글 입력";
-      els.reachList.innerHTML = nextKey ? `
-        <span>다음 키</span>
-        <strong>${nextInput.jamo}</strong>
-        <p>${nextKey.latin} 자리 · ${FINGER_LABELS[nextKey.finger]}로 시작합니다.</p>
-      ` : `
-        <span>지금 입력</span>
-        <strong>${target}</strong>
-        <p>${isRhythm ? "판정선 가까이에 올 때 단어를 정확히 입력합니다." : "한글 입력 모드에서 목표 글자를 그대로 입력합니다."}</p>
-      `;
+      renderReachForTypingGuide(target, getTypingGuide(target, ""), stage.kind === "rhythm");
       return;
     }
 
@@ -403,8 +477,7 @@
       els.targetHint.textContent = "한/영 키로 한글 입력을 켠 뒤 R + K를 눌러 가를 만듭니다.";
       els.answerInput.hidden = false;
       els.answerInput.placeholder = "가";
-      updateKeyboardGuide(getKeyboardGuideForText("가"));
-      renderReachForStage(stage);
+      applyTypingGuide("가", els.answerInput.value, false);
       requestAnimationFrame(() => els.answerInput.focus());
       return;
     }
@@ -452,7 +525,7 @@
     const missed = state.rhythmMissed || 0;
     const cueActive = Boolean(state.rhythmTimeCue[stage.id]) && !isStageComplete(stage);
 
-    updateKeyboardGuide(getKeyboardGuideForText(target));
+    applyTypingGuide(target, els.answerInput.value, true);
     els.rhythmWordCard.textContent = target;
     els.rhythmWordCard.classList.remove("is-pulsing");
     void els.rhythmWordCard.offsetWidth;
@@ -468,7 +541,6 @@
         <span>진행 <strong>${completed}/${getStageTotal(stage)}</strong></span>
       </div>
     `;
-    renderReachForStage(stage);
     requestAnimationFrame(() => els.answerInput.focus());
   }
 
@@ -564,8 +636,7 @@
       els.targetHint.textContent = "한글 입력 모드";
       els.answerInput.hidden = false;
       els.answerInput.placeholder = target;
-      updateKeyboardGuide(getKeyboardGuideForText(target));
-      renderReachForStage(stage);
+      applyTypingGuide(target, els.answerInput.value, false);
       requestAnimationFrame(() => els.answerInput.focus());
       return;
     }
@@ -633,9 +704,15 @@
   function handleWarmupInput() {
     const stage = getStage();
     if (stage.kind !== "warmup") return;
-    if (state.readyImeDone || state.composing) return;
+    if (state.readyImeDone) return;
+    if (state.composing) {
+      refreshTypingGuideOnly();
+      return;
+    }
 
+    const target = "가";
     const value = normalizeText(els.answerInput.value);
+    const guide = applyTypingGuide(target, value, false);
     if (!value) {
       setFeedback("한/영 키로 한글 입력을 켠 뒤 R + K를 눌러 가를 입력하세요.", "");
       return;
@@ -654,12 +731,17 @@
     }
 
     state.lastEnglishValue = "";
-    if (value === "가") {
+    if (value === target) {
       state.readyImeDone = true;
       state.attempts[stage.id] = (state.attempts[stage.id] || 0) + 1;
       els.answerInput.value = "";
       setFeedback("한글 입력 확인 완료. 이제 F와 J 기준키를 눌러 보세요.", "good");
       render();
+      return;
+    }
+
+    if (guide.isPrefix) {
+      setFeedback("좋아요. 확대된 다음 키를 이어서 눌러 보세요.", "");
       return;
     }
 
@@ -737,11 +819,16 @@
 
   function handleRhythmInput() {
     const stage = getStage();
-    if (stage.kind !== "rhythm" || state.composing) return;
+    if (stage.kind !== "rhythm") return;
     if (isStageComplete(stage)) return;
+    if (state.composing) {
+      refreshTypingGuideOnly();
+      return;
+    }
 
     const target = getCurrentTarget(stage);
     const value = normalizeText(els.answerInput.value);
+    const guide = applyTypingGuide(target, value, true);
     if (!value) {
       setFeedback("리듬 단어를 입력하세요.", "");
       return;
@@ -774,13 +861,21 @@
       return;
     }
 
+    if (guide.isPrefix) {
+      setFeedback("좋아요. 확대된 다음 키를 이어서 입력하세요.", "");
+      return;
+    }
+
     if (value.length >= target.length) {
       state.attempts[stage.id] = (state.attempts[stage.id] || 0) + 1;
       state.rhythmMissed += 1;
       advanceRhythmTarget(stage);
       setFeedback("박자를 놓쳤어요. 다음 단어를 따라가세요.", "warn");
       render();
+      return;
     }
+
+    setFeedback("강조된 다음 키를 확인하고 이어서 입력하세요.", "warn");
   }
 
   function handleTextInput() {
@@ -793,11 +888,16 @@
       handleRhythmInput();
       return;
     }
-    if (stage.kind !== "text" || state.composing) return;
+    if (stage.kind !== "text") return;
     if (isStageComplete(stage)) return;
+    if (state.composing) {
+      refreshTypingGuideOnly();
+      return;
+    }
 
     const target = getCurrentTarget(stage);
     const value = normalizeText(els.answerInput.value);
+    const guide = applyTypingGuide(target, value, false);
     if (!value) {
       setFeedback("목표 글자를 입력하세요.", "");
       return;
@@ -829,11 +929,19 @@
       return;
     }
 
+    if (guide.isPrefix) {
+      setFeedback("좋아요. 확대된 다음 키를 이어서 입력하세요.", "");
+      return;
+    }
+
     if (value.length >= target.length) {
       state.attempts[stage.id] = (state.attempts[stage.id] || 0) + 1;
       setFeedback(`다시 입력해 보세요. 목표는 ${target}입니다.`, "bad");
       render();
+      return;
     }
+
+    setFeedback("강조된 다음 키를 확인하고 이어서 입력하세요.", "warn");
   }
 
   function goToStage(index, feedback) {
@@ -910,6 +1018,7 @@
     state.rhythmTimeCue = {};
     state.transitionOpen = false;
     state.transitionStageIndex = 0;
+    state.guideAnimationToken = "";
     setFeedback("한/영 키로 한글 입력을 켠 뒤 R + K를 눌러 가를 입력하세요.", "");
     render();
   }
@@ -941,14 +1050,25 @@
       handleFindCode(event.code);
     });
 
-    els.answerInput.addEventListener("compositionstart", () => {
+    els.answerInput.addEventListener("compositionstart", (event) => {
       state.composing = true;
+      refreshTypingGuideOnly(event.data);
+    });
+    els.answerInput.addEventListener("compositionupdate", (event) => {
+      refreshTypingGuideOnly(event.data);
     });
     els.answerInput.addEventListener("compositionend", () => {
       state.composing = false;
+      refreshTypingGuideOnly();
       handleTextInput();
     });
-    els.answerInput.addEventListener("input", handleTextInput);
+    els.answerInput.addEventListener("input", (event) => {
+      if (event.isComposing || state.composing) {
+        refreshTypingGuideOnly(event.data);
+        return;
+      }
+      handleTextInput();
+    });
     els.transitionNextButton.addEventListener("click", remindTransitionKeyboard);
     els.transitionRetryButton.addEventListener("click", remindTransitionKeyboard);
     els.resetLesson.addEventListener("click", resetLesson);

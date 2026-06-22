@@ -236,7 +236,7 @@ button {
 
 .lesson-layout {
   display: grid;
-  grid-template-columns: minmax(330px, 0.78fr) minmax(0, 1.22fr);
+  grid-template-columns: minmax(300px, 0.58fr) minmax(0, 1.42fr);
   gap: 12px;
   margin-top: 12px;
   align-items: stretch;
@@ -254,6 +254,12 @@ button {
   min-width: 0;
   border-color: #93c5fd;
   background: rgba(248, 251, 255, 0.96);
+}
+
+.keyboard-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .mission-head,
@@ -698,10 +704,27 @@ kbd {
   border-color: #047857;
 }
 
+.keyboard-focus-strip {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.keyboard-focus-strip .target-area {
+  min-height: 118px;
+}
+
+.keyboard-focus-strip .answer-input {
+  min-height: 72px;
+  resize: none;
+  padding: 12px 16px;
+  font-size: 28px;
+}
+
 .keyboard-board {
   display: grid;
   gap: 8px;
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .keyboard-row {
@@ -754,6 +777,13 @@ kbd {
   border-color: #60a5fa;
   background: #eff6ff;
   box-shadow: inset 0 -4px 0 rgba(37, 99, 235, 0.12), 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.key-button.is-typed {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+  box-shadow: inset 0 -4px 0 rgba(22, 101, 52, 0.1);
 }
 
 .key-button.is-next-key {
@@ -1353,8 +1383,12 @@ kbd {
     grid-template-columns: 1fr;
   }
 
-  .mission-panel {
+  .keyboard-panel {
     order: -1;
+  }
+
+  .mission-panel {
+    order: 0;
   }
 
   .stage-list {
@@ -1431,6 +1465,10 @@ kbd {
   h1,
   h2 {
     font-size: 19px;
+  }
+
+  .keyboard-focus-strip {
+    gap: 6px;
   }
 
   .keyboard-board,
