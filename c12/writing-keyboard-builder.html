@@ -238,7 +238,7 @@
         text-align: center;
       }
 
-      .typing-target span {
+      .typing-target > span {
         color: var(--blue);
         font-size: 13px;
         font-weight: 950;
@@ -251,9 +251,84 @@
         line-height: 1.08;
       }
 
+      .typing-target strong.target-expression {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: center;
+        gap: 0 0.08em;
+        max-width: 100%;
+        overflow-wrap: normal;
+        word-break: normal;
+      }
+
+      .typing-target strong.target-expression.is-long-target {
+        font-size: 52px;
+      }
+
+      .target-chunk {
+        display: inline-flex;
+        flex-wrap: nowrap;
+        white-space: pre;
+      }
+
+      .target-gap {
+        display: inline-block;
+        width: 0.32em;
+        flex: 0 0 0.32em;
+      }
+
+      .target-char {
+        position: relative;
+        display: inline-block;
+        min-width: 0.45em;
+        border-radius: 8px;
+        padding: 0 0.015em;
+        transition: background-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+      }
+
+      .target-char.is-punctuation {
+        background: #dbeafe;
+        color: #1d4ed8;
+        box-shadow: inset 0 -0.08em 0 rgba(37, 99, 235, 0.45);
+      }
+
+      .target-char.is-next {
+        background: #fef3c7;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+      }
+
+      .target-char.is-wrong {
+        background: #fee2e2;
+        color: #991b1b;
+        box-shadow: inset 0 -0.16em 0 #ef4444, 0 0 0 3px rgba(239, 68, 68, 0.18);
+      }
+
+      .target-char.is-extra-error::after {
+        position: absolute;
+        right: -0.18em;
+        bottom: -0.22em;
+        color: #dc2626;
+        content: "+";
+        font-size: 0.36em;
+        font-weight: 950;
+      }
+
       .typing-target strong.is-hidden-target {
         color: #334155;
         font-size: clamp(30px, 5.8vw, 56px);
+      }
+
+      .punctuation-note {
+        margin: 0;
+        padding: 7px 10px;
+        border: 1px solid #bfdbfe;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 13px;
+        font-weight: 950;
+        line-height: 1.2;
       }
 
       .cue {
@@ -508,6 +583,14 @@
           min-height: 172px;
         }
 
+        .typing-target strong.target-expression.is-long-target {
+          font-size: 30px;
+        }
+
+        .target-char {
+          min-width: 0.4em;
+        }
+
         input {
           min-height: 66px;
           font-size: 28px;
@@ -554,6 +637,7 @@
         <div class="typing-target" id="targetCard">
           <span id="itemMeta">시작 확인</span>
           <strong id="targetText">운동</strong>
+          <p class="punctuation-note" id="punctuationNote" hidden>문장부호도 똑같이 입력하세요.</p>
           <p class="cue" id="cueKo">한글 입력 모드인지 확인합니다.</p>
           <p class="note" id="noteText">정확히 입력하면 다음 단계로 이동합니다.</p>
           <div class="translation-panel" id="translationPanel" aria-label="선택 언어 보조 설명"></div>
@@ -639,7 +723,7 @@
           { id: "core-stretching", section: "core", target: "스트레칭을 하다", cueKo: "몸을 늘이고 풀어 주다", translations: tr("Tập giãn cơ", "Сунгалтын дасгал хийх", "ممارسة تمارين التمدد", "Созылу жаттығуын жасау", "ยืดเหยียดร่างกาย", "Do stretching", "ストレッチをする", "做拉伸运动"), note: "생활 속 운동 방법을 말할 때 씁니다.", mode: "copy" },
           { id: "exp-stairs-climb", section: "expansion", target: "계단을 오르다", cueKo: "계단 위쪽으로 올라가다", translations: tr("Leo cầu thang", "Шатаар өгсөх", "صعود الدرج", "Баспалдақпен көтерілу", "ขึ้นบันได", "Climb the stairs", "階段を上る", "爬楼梯"), note: "계단을 이용하다에서 더 구체화한 표현입니다.", mode: "copy" },
           { id: "exp-elevator", section: "expansion", target: "엘리베이터 대신 계단을 이용하다", cueKo: "승강기를 타지 않고 계단을 쓰다", translations: tr("Dùng cầu thang thay vì thang máy", "Цахилгаан шатны оронд шатаар явах", "استخدام الدرج بدل المصعد", "Лифттің орнына баспалдақты пайдалану", "ใช้บันไดแทนลิฟต์", "Use the stairs instead of the elevator", "エレベーターの代わりに階段を使う", "不用电梯而走楼梯"), note: "권유문에 바로 넣기 좋은 확장 표현입니다.", mode: "copy" },
-          { id: "exp-fresh-walk", section: "expansion", target: "맑은 공기를 마시며 걷기 운동을 하다", cueKo: "좋은 공기를 마시면서 걷다", translations: tr("Đi bộ trong không khí trong lành", "Цэвэр агаарт алхах дасгал хийх", "المشي مع استنشاق هواء نقي", "Таза ауа жұтып жүріп жүру", "เดินออกกำลังกายพร้อมสูดอากาศบริสุทธิ์", "Walk while breathing fresh air", "澄んだ空気を吸いながら歩く", "呼吸清新空气并步行运动"), note: "읽기 문장의 생활 운동 표현입니다.", mode: "copy" },
+          { id: "exp-fresh-walk", section: "expansion", target: "맑은 공기를 마시며 걷기 운동을 하다", displayChunks: ["맑은 공기를 마시며", "걷기 운동을 하다"], cueKo: "좋은 공기를 마시면서 걷다", translations: tr("Đi bộ trong không khí trong lành", "Цэвэр агаарт алхах дасгал хийх", "المشي مع استنشاق هواء نقي", "Таза ауа жұтып жүріп жүру", "เดินออกกำลังกายพร้อมสูดอากาศบริสุทธิ์", "Walk while breathing fresh air", "澄んだ空気を吸いながら歩く", "呼吸清新空气并步行运动"), note: "읽기 문장의 생활 운동 표현입니다.", mode: "copy" },
           { id: "exp-neck", section: "expansion", target: "고개를 천천히 돌리다", cueKo: "목을 무리하지 않고 돌리다", translations: tr("Xoay cổ chậm rãi", "Толгойгоо аажуухан эргүүлэх", "إدارة الرأس ببطء", "Басты жай айналдыру", "ค่อย ๆ หมุนศีรษะ", "Turn your head slowly", "首をゆっくり回す", "慢慢转动头部"), note: "스트레칭 방법을 설명하는 표현입니다.", mode: "copy" },
           { id: "exp-waist", section: "expansion", target: "두 손을 허리에 대다", cueKo: "손 두 개를 허리 위에 놓다", translations: tr("Đặt hai tay lên eo", "Хоёр гараа бэлхүүс дээр тавих", "وضع اليدين على الخصر", "Екі қолды белге қою", "วางมือทั้งสองข้างที่เอว", "Put both hands on your waist", "両手を腰に当てる", "双手放在腰上"), note: "동작 순서를 설명할 때 유용합니다.", mode: "copy" },
           { id: "exp-bend-back", section: "expansion", target: "몸을 뒤로 젖히다", cueKo: "몸을 뒤쪽으로 기울이다", translations: tr("Ngả người ra sau", "Биеэ арагш гэдийлгэх", "إمالة الجسم إلى الخلف", "Денені артқа шалқайту", "เอนตัวไปด้านหลัง", "Lean your body backward", "体を後ろに反らす", "身体向后仰"), note: "스트레칭 동작을 구체적으로 말합니다.", mode: "copy" },
@@ -690,6 +774,7 @@
           itemIndexByStage: Object.assign({}, DEFAULT_ITEM_INDEX_BY_STAGE),
           results: {},
           hintVisible: false,
+          mismatch: null,
           activeInputId: "typingInput",
           composing: false
         };
@@ -706,6 +791,7 @@
           targetCard: document.getElementById("targetCard"),
           itemMeta: document.getElementById("itemMeta"),
           targetText: document.getElementById("targetText"),
+          punctuationNote: document.getElementById("punctuationNote"),
           cueKo: document.getElementById("cueKo"),
           noteText: document.getElementById("noteText"),
           translationPanel: document.getElementById("translationPanel"),
@@ -733,6 +819,14 @@
 
         function hasEnglish(value) {
           return /[A-Za-z]/.test(value);
+        }
+
+        function isPunctuation(char) {
+          return /[.?!,]/.test(char);
+        }
+
+        function hasPunctuation(value) {
+          return Array.from(value || "").some(isPunctuation);
         }
 
         function isRecallStage(stageId) {
@@ -784,6 +878,134 @@
         function makeRecallHint(item) {
           if (!item) return "";
           return "뜻/상황: " + item.cueKo + " · 사용 단서: " + item.note + " · 글자 수: " + visibleCharCount(item.target) + "자";
+        }
+
+        function compareToTarget(input, target) {
+          const inputChars = Array.from(normalize(input));
+          const targetChars = Array.from(target || "");
+          const minLength = Math.min(inputChars.length, targetChars.length);
+          const wrongIndices = [];
+          for (let index = 0; index < minLength; index += 1) {
+            if (inputChars[index] !== targetChars[index]) {
+              wrongIndices.push(index);
+            }
+          }
+          const exact = wrongIndices.length === 0 && inputChars.length === targetChars.length;
+          const extra = inputChars.length > targetChars.length;
+          const prefix = wrongIndices.length === 0 && inputChars.length < targetChars.length;
+          const rest = prefix ? targetChars.slice(inputChars.length) : [];
+          const missingPunctuation = prefix && rest.length > 0 && rest.every(isPunctuation);
+          const missingIndices = missingPunctuation ? rest.map((_, offset) => inputChars.length + offset) : [];
+          const index = wrongIndices[0] == null
+            ? extra ? Math.max(targetChars.length - 1, 0) : inputChars.length
+            : wrongIndices[0];
+          return {
+            exact,
+            prefix,
+            index,
+            extra,
+            missingPunctuation,
+            wrongIndices,
+            missingIndices
+          };
+        }
+
+        function clearMismatch() {
+          state.mismatch = null;
+        }
+
+        function setMismatch(item, input) {
+          const analysis = compareToTarget(input, item ? item.target : "");
+          const fallbackIndex = Math.max(Array.from(item ? item.target : "").length - 1, 0);
+          const indices = analysis.missingPunctuation
+            ? analysis.missingIndices
+            : analysis.wrongIndices.length > 0
+              ? analysis.wrongIndices
+              : [analysis.extra ? fallbackIndex : analysis.index];
+          state.mismatch = item ? {
+            itemId: item.id,
+            index: analysis.index,
+            indices,
+            extra: analysis.extra,
+            missingPunctuation: analysis.missingPunctuation
+          } : null;
+          return analysis;
+        }
+
+        function chunkTargetText(item, displayText) {
+          if (item && Array.isArray(item.displayChunks) && item.displayChunks.join(" ") === displayText) {
+            return item.displayChunks;
+          }
+          return String(displayText || "").split(" ");
+        }
+
+        function nearestVisibleIndex(displayText, index) {
+          const chars = Array.from(displayText || "");
+          if (chars.length === 0) return 0;
+          const bounded = Math.max(0, Math.min(index, chars.length - 1));
+          if (chars[bounded] !== " ") return bounded;
+          for (let next = bounded + 1; next < chars.length; next += 1) {
+            if (chars[next] !== " ") return next;
+          }
+          for (let previous = bounded - 1; previous >= 0; previous -= 1) {
+            if (chars[previous] !== " ") return previous;
+          }
+          return bounded;
+        }
+
+        function visibleIndices(displayText, indices) {
+          const seen = new Set();
+          return indices.map((index) => nearestVisibleIndex(displayText, index)).filter((index) => {
+            if (seen.has(index)) return false;
+            seen.add(index);
+            return true;
+          });
+        }
+
+        function targetRenderState(stageId, item, displayText) {
+          const target = item ? item.target : displayText;
+          const value = normalize(els.typingInput.value);
+          const displayLastIndex = Math.max(Array.from(displayText || "").length - 1, 0);
+          if (!value) return { nextIndex: nearestVisibleIndex(displayText, 0) };
+          const analysis = compareToTarget(value, target);
+          const forced = item && state.mismatch && state.mismatch.itemId === item.id;
+          if (analysis.exact) return {};
+          const index = nearestVisibleIndex(displayText, Math.max(0, Math.min(analysis.index, displayLastIndex)));
+          const wrongIndices = visibleIndices(displayText, forced ? state.mismatch.indices : analysis.wrongIndices);
+          if (isRecallStage(stageId)) {
+            return forced ? { wrongIndices: wrongIndices.length ? wrongIndices : [index], extra: analysis.extra } : { nextIndex: index };
+          }
+          if (!forced && analysis.prefix) {
+            return { nextIndex: index };
+          }
+          return { wrongIndices: wrongIndices.length ? wrongIndices : [index], extra: analysis.extra };
+        }
+
+        function renderTargetExpression(displayText, item, options) {
+          const stageId = options && options.stageId ? options.stageId : currentStage().id;
+          const renderState = targetRenderState(stageId, item, displayText);
+          const chunks = chunkTargetText(item, displayText);
+          let charIndex = 0;
+          els.targetText.className = "target-expression";
+          els.targetText.classList.toggle("is-hidden-target", Boolean(options && options.hidden));
+          els.targetText.classList.toggle("is-long-target", Array.from(displayText || "").length > 16);
+          els.targetText.setAttribute("aria-label", displayText || "");
+          const wrongIndexSet = new Set(renderState.wrongIndices || []);
+          els.targetText.innerHTML = chunks.map((chunk, chunkIndex) => {
+            const gap = chunkIndex === 0 ? "" : '<span class="target-gap" aria-hidden="true"> </span>';
+            if (chunkIndex > 0) charIndex += 1;
+            const chars = Array.from(chunk).map((char) => {
+              const classes = ["target-char"];
+              if (isPunctuation(char)) classes.push("is-punctuation");
+              if (renderState.nextIndex === charIndex) classes.push("is-next");
+              if (wrongIndexSet.has(charIndex)) classes.push("is-wrong");
+              if (renderState.extra && wrongIndexSet.has(charIndex)) classes.push("is-extra-error");
+              const html = '<span class="' + classes.join(" ") + '" data-char-index="' + charIndex + '">' + escapeHtml(char) + "</span>";
+              charIndex += 1;
+              return html;
+            }).join("");
+            return gap + '<span class="target-chunk" data-chunk="' + escapeHtml(chunk) + '">' + chars + "</span>";
+          }).join("");
         }
 
         function escapeHtml(value) {
@@ -871,6 +1093,7 @@
               state.itemIndexByStage[stageId] = Math.max(0, Math.min(Number(state.itemIndexByStage[stageId]) || 0, max));
             });
             state.hintVisible = false;
+            state.mismatch = null;
             state.composing = false;
             state.activeInputId = "typingInput";
           } catch (error) {
@@ -923,6 +1146,7 @@
           clearTimers();
           state.stageIndex = Math.max(0, Math.min(index, STAGES.length - 1));
           state.hintVisible = false;
+          clearMismatch();
           render(options);
         }
 
@@ -931,6 +1155,7 @@
           const items = stageItems(stage.id);
           const nextIndex = currentItemIndex() + 1;
           state.hintVisible = false;
+          clearMismatch();
           if (nextIndex < items.length) {
             state.itemIndexByStage[stage.id] = nextIndex;
             render({ selectText: true });
@@ -953,6 +1178,7 @@
         }
 
         function completeCopyItem(item) {
+          clearMismatch();
           recordAttempt(item, true);
           setFeedback("정확해요. 다음 표현으로 넘어갑니다.", "good", "<kbd>자동 이동</kbd>");
           saveState();
@@ -969,6 +1195,7 @@
             return;
           }
           if (value === item.target) {
+            clearMismatch();
             recordAttempt(item, true);
             setFeedback("정확해요. 기억으로 입력했습니다.", "good", recallShortcut());
             saveState();
@@ -976,6 +1203,8 @@
             return;
           }
           recordAttempt(item, false);
+          setMismatch(item, value);
+          renderTarget();
           setFeedback("다시 입력하세요.", "bad", recallShortcut());
           saveState();
           focusInput(true);
@@ -988,14 +1217,19 @@
           clearTimers();
           if (hasEnglish(value)) {
             setFeedback("한/영 키 확인: 지금은 한글 입력 모드가 필요합니다.", "bad", "<kbd>한/영</kbd>");
+            renderTarget();
             return;
           }
           if (stage.id === "warmup") {
             if (value === WARMUP_TARGET) completeWarmup();
-            else setFeedback('"운동"을 입력하세요.', "warn", "<kbd>자동</kbd> 정확히 입력하면 이동");
+            else {
+              renderTarget();
+              setFeedback('"운동"을 입력하세요.', "warn", "<kbd>자동</kbd> 정확히 입력하면 이동");
+            }
             return;
           }
           if (isRecallStage(stage.id)) {
+            if (state.mismatch && currentItem() && state.mismatch.itemId === currentItem().id) renderTarget();
             setFeedback("단서를 보고 기억나는 표현을 입력한 뒤 Enter를 누르세요.", "", recallShortcut());
             return;
           }
@@ -1005,6 +1239,7 @@
             return;
           }
           if (item) {
+            renderTarget();
             setFeedback("목표 표현을 그대로 입력하세요.", "", "<kbd>자동</kbd> 정확히 치면 이동");
           }
         }
@@ -1040,6 +1275,7 @@
             itemIndexByStage: Object.assign({}, DEFAULT_ITEM_INDEX_BY_STAGE),
             results: {},
             hintVisible: false,
+            mismatch: null,
             activeInputId: "typingInput",
             composing: false
           });
@@ -1082,8 +1318,8 @@
           const item = currentItem();
           if (stage.id === "warmup") {
             els.itemMeta.textContent = "시작 확인";
-            els.targetText.textContent = WARMUP_TARGET;
-            els.targetText.classList.remove("is-hidden-target");
+            renderTargetExpression(WARMUP_TARGET, null, { stageId: stage.id });
+            els.punctuationNote.hidden = true;
             els.cueKo.textContent = "한글 입력 모드인지 확인합니다.";
             els.noteText.textContent = "정확히 입력하면 핵심 어휘로 이동합니다.";
             renderTranslations(WARMUP_TRANSLATIONS);
@@ -1098,15 +1334,14 @@
           els.noteText.textContent = item.note;
           renderTranslations(item.translations);
           els.typingInput.placeholder = isRecallStage(stage.id) ? "기억나는 표현 입력" : "목표 표현 입력";
+          els.punctuationNote.hidden = !hasPunctuation(item.target);
           if (isRecallStage(stage.id)) {
-            els.targetText.textContent = recallDisplayText(stage.id, item);
-            els.targetText.classList.add("is-hidden-target");
+            renderTargetExpression(recallDisplayText(stage.id, item), item, { stageId: stage.id, hidden: true });
             els.hintText.textContent = makeRecallHint(item);
             els.hintPanel.hidden = !state.hintVisible;
             return;
           }
-          els.targetText.textContent = item.target;
-          els.targetText.classList.remove("is-hidden-target");
+          renderTargetExpression(item.target, item, { stageId: stage.id });
           els.hintPanel.hidden = true;
         }
 
@@ -1155,7 +1390,15 @@
           }
           const item = currentItem();
           if (item && value === item.target) completeCopyItem(item);
-          else setFeedback("목표 표현을 그대로 입력하세요.", "warn", "<kbd>자동</kbd> 정확히 치면 이동");
+          else if (item) {
+            const analysis = setMismatch(item, value);
+            renderTarget();
+            setFeedback(
+              analysis.missingPunctuation ? "문장부호까지 입력하세요." : analysis.extra ? "추가 입력 확인" : "목표 표현을 그대로 입력하세요.",
+              "warn",
+              "<kbd>자동</kbd> 정확히 치면 이동"
+            );
+          }
         }
 
         document.addEventListener("click", (event) => {

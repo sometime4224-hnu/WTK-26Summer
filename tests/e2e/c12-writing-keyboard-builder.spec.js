@@ -75,6 +75,16 @@ async function reachRecall(page) {
   await completeCopyStage(page, GRAMMAR_TARGETS, "회상 1: 초성 회상");
 }
 
+async function reachExpansion(page) {
+  await completeWarmup(page);
+  await completeCopyStage(page, CORE_TARGETS, "확장 표현");
+}
+
+async function reachGrammar(page) {
+  await reachExpansion(page);
+  await completeCopyStage(page, EXPANSION_TARGETS, "문법 문장");
+}
+
 test.describe("c12 expression typing trainer", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/c12/writing-keyboard-builder.html");
@@ -92,6 +102,7 @@ test.describe("c12 expression typing trainer", () => {
     await expect(page.locator("#missionPrompt")).toContainText("운동");
     await expect(page.locator(".progress-dot")).toHaveCount(7);
     await expect(page.locator("#targetText")).toHaveText("운동");
+    await expect(page.locator("#targetText .target-char.is-next")).toHaveText("운");
     await expectFocused(page, "typingInput");
     await expect(page.locator("[data-multilang-btn]")).toHaveCount(9);
 
@@ -161,6 +172,37 @@ test.describe("c12 expression typing trainer", () => {
     await expect(page.locator("#targetText")).toHaveText(RECALL1_FIRST_DISPLAY);
   });
 
+  test("keeps the fresh-air walking expression in meaning chunks", async ({ page }) => {
+    await reachExpansion(page);
+
+    await page.locator("#typingInput").fill(EXPANSION_TARGETS[0]);
+    await expect(page.locator("#targetText")).toHaveText(EXPANSION_TARGETS[1]);
+    await page.locator("#typingInput").fill(EXPANSION_TARGETS[1]);
+    await expect(page.locator("#targetText")).toHaveText(EXPANSION_TARGETS[2]);
+
+    const walkingChunk = page.locator(".target-chunk").filter({ hasText: "걷기 운동을 하다" });
+    await expect(walkingChunk).toHaveCount(1);
+    await expect(walkingChunk).toHaveCSS("white-space", "pre");
+  });
+
+  test("marks wrong positions and punctuation requirements in the target", async ({ page }) => {
+    await completeWarmup(page);
+
+    await page.locator("#typingInput").fill("건강을 유치하다");
+    await expect(page.locator("#targetText .target-char.is-wrong")).toHaveText("지");
+
+    await reachGrammar(page);
+    await expect(page.locator("#punctuationNote")).toBeVisible();
+    await expect(page.locator("#punctuationNote")).toContainText("문장부호도 똑같이 입력하세요");
+    await expect(page.locator("#targetText .target-char.is-punctuation")).toHaveCount(1);
+
+    await page.locator("#typingInput").fill(GRAMMAR_TARGETS[0].slice(0, -1));
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#feedbackText")).toContainText("문장부호까지 입력하세요");
+    await expect(page.locator("#targetText .target-char.is-wrong")).toHaveText(".");
+    await expect(page.locator("#stageTitle")).toHaveText("문법 문장");
+  });
+
   test("runs two recall stages, keeps hint hotkeys visible, and shows the learning report", async ({ page }) => {
     await reachRecall(page);
 
@@ -175,6 +217,8 @@ test.describe("c12 expression typing trainer", () => {
     await page.locator("#typingInput").fill("건강을 지키다");
     await page.keyboard.press("Enter");
     await expect(page.locator("#feedbackText")).toContainText("다시 입력하세요");
+    await expect(page.locator("#targetText .target-char.is-wrong")).toHaveText(["ㅇ", "ㅈ", "ㅎ"]);
+    await expect(page.locator("#targetText")).not.toHaveText(RECALL_TARGETS[0]);
 
     await page.keyboard.press("Control+H");
     await expect(page.locator("#hintPanel")).toBeVisible();
@@ -197,6 +241,11 @@ test.describe("c12 expression typing trainer", () => {
     await expect(page.locator("#targetText")).toHaveText(RECALL2_FIRST_DISPLAY);
     await expect(page.locator("#targetText")).not.toHaveText(RECALL_TARGETS[0]);
     await expect(page.locator("#shortcutText")).toContainText("Ctrl+H");
+
+    await page.locator("#typingInput").fill("건강을 지키다");
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#targetText .target-char.is-wrong")).toHaveText(["?", "?", "?"]);
+    await expect(page.locator("#targetText")).not.toHaveText(RECALL_TARGETS[0]);
 
     await page.keyboard.press("Control+H");
     await expect(page.locator("#hintPanel")).toBeVisible();
@@ -228,7 +277,15 @@ test.describe("c12 expression typing trainer", () => {
     await page.reload();
 
     await expect(page.locator("#stageTitle")).toBeVisible();
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    let overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(2);
+
+    await reachExpansion(page);
+    await page.locator("#typingInput").fill(EXPANSION_TARGETS[0]);
+    await expect(page.locator("#targetText")).toHaveText(EXPANSION_TARGETS[1]);
+    await page.locator("#typingInput").fill(EXPANSION_TARGETS[1]);
+    await expect(page.locator("#targetText")).toHaveText(EXPANSION_TARGETS[2]);
+    overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(2);
   });
 
