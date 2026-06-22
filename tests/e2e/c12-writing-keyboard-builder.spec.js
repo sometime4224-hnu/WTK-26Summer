@@ -39,6 +39,8 @@ const RECALL_TARGETS = [
   "운동을 했더니 몸이 가벼워졌어요.",
   "꾸준히 운동해야 건강을 지킬 수 있어요."
 ];
+const RECALL1_FIRST_DISPLAY = "ㄱㄱㅇ ㅇㅈㅎㄷ";
+const RECALL2_FIRST_DISPLAY = "건강? ????";
 
 async function expectFocused(page, id) {
   await expect
@@ -70,7 +72,7 @@ async function reachRecall(page) {
   await completeWarmup(page);
   await completeCopyStage(page, CORE_TARGETS, "확장 표현");
   await completeCopyStage(page, EXPANSION_TARGETS, "문법 문장");
-  await completeCopyStage(page, GRAMMAR_TARGETS, "가림 회상");
+  await completeCopyStage(page, GRAMMAR_TARGETS, "회상 1: 초성 회상");
 }
 
 test.describe("c12 expression typing trainer", () => {
@@ -83,12 +85,12 @@ test.describe("c12 expression typing trainer", () => {
     await page.reload();
   });
 
-  test("loads the focused six-stage expression trainer", async ({ page }) => {
+  test("loads the focused seven-stage expression trainer", async ({ page }) => {
     await expect(page.locator(".mission-panel.is-current-task")).toBeVisible();
     await expect.poll(() => page.title()).toBe("12과 표현 타이핑 연습");
     await expect(page.locator("#stageTitle")).toHaveText("한/영 확인");
     await expect(page.locator("#missionPrompt")).toContainText("운동");
-    await expect(page.locator(".progress-dot")).toHaveCount(6);
+    await expect(page.locator(".progress-dot")).toHaveCount(7);
     await expect(page.locator("#targetText")).toHaveText("운동");
     await expectFocused(page, "typingInput");
     await expect(page.locator("[data-multilang-btn]")).toHaveCount(9);
@@ -155,16 +157,20 @@ test.describe("c12 expression typing trainer", () => {
     await completeCopyStage(page, EXPANSION_TARGETS, "문법 문장");
 
     await expect(page.locator("#targetText")).toHaveText("운동을 했더니 몸이 가벼워졌어요.");
-    await completeCopyStage(page, GRAMMAR_TARGETS, "가림 회상");
-    await expect(page.locator("#targetText")).toHaveText("가려진 표현");
+    await completeCopyStage(page, GRAMMAR_TARGETS, "회상 1: 초성 회상");
+    await expect(page.locator("#targetText")).toHaveText(RECALL1_FIRST_DISPLAY);
   });
 
-  test("hides recall targets, supports hints, and shows the learning report", async ({ page }) => {
+  test("runs two recall stages, keeps hint hotkeys visible, and shows the learning report", async ({ page }) => {
     await reachRecall(page);
 
-    await expect(page.locator("#stageTitle")).toHaveText("가림 회상");
-    await expect(page.locator("#targetText")).toHaveText("가려진 표현");
+    await expect(page.locator("#stageTitle")).toHaveText("회상 1: 초성 회상");
+    await expect(page.locator("#targetText")).toHaveText(RECALL1_FIRST_DISPLAY);
+    await expect(page.locator("#targetText")).not.toHaveText(RECALL_TARGETS[0]);
     await expect(page.locator("#hintPanel")).toBeHidden();
+    await expect(page.locator("#hintButton")).toBeVisible();
+    await expect(page.locator("#hintButton")).toContainText("Ctrl+H");
+    await expect(page.locator("#shortcutText")).toContainText("Ctrl+H");
 
     await page.locator("#typingInput").fill("건강을 지키다");
     await page.keyboard.press("Enter");
@@ -172,12 +178,14 @@ test.describe("c12 expression typing trainer", () => {
 
     await page.keyboard.press("Control+H");
     await expect(page.locator("#hintPanel")).toBeVisible();
-    await expect(page.locator("#hintText")).toHaveText(RECALL_TARGETS[0]);
+    await expect(page.locator("#hintText")).toContainText("글자 수: 7자");
+    await expect(page.locator("#hintText")).not.toContainText(RECALL_TARGETS[0]);
 
     await page.locator("#typingInput").fill(RECALL_TARGETS[0]);
     await page.keyboard.press("Enter");
     await expect(page.locator("#itemMeta")).toContainText("2 / 6");
-    await expect(page.locator("#targetText")).toHaveText("가려진 표현");
+    await expect(page.locator("#shortcutText")).toContainText("Ctrl+H");
+    await expect(page.locator("#targetText")).not.toHaveText(RECALL_TARGETS[1]);
 
     for (const [offset, target] of RECALL_TARGETS.slice(1).entries()) {
       await expect(page.locator("#itemMeta")).toContainText(`${offset + 2} / 6`);
@@ -185,11 +193,30 @@ test.describe("c12 expression typing trainer", () => {
       await page.keyboard.press("Enter");
     }
 
+    await expect(page.locator("#stageTitle")).toHaveText("회상 2: 부분 가림 회상");
+    await expect(page.locator("#targetText")).toHaveText(RECALL2_FIRST_DISPLAY);
+    await expect(page.locator("#targetText")).not.toHaveText(RECALL_TARGETS[0]);
+    await expect(page.locator("#shortcutText")).toContainText("Ctrl+H");
+
+    await page.keyboard.press("Control+H");
+    await expect(page.locator("#hintPanel")).toBeVisible();
+    await expect(page.locator("#hintText")).toContainText("글자 수: 7자");
+    await expect(page.locator("#hintText")).not.toContainText(RECALL_TARGETS[0]);
+
+    for (const [index, target] of RECALL_TARGETS.entries()) {
+      await expect(page.locator("#itemMeta")).toContainText(`${index + 1} / 6`);
+      await page.locator("#typingInput").fill(target);
+      await page.keyboard.press("Enter");
+      if (index < RECALL_TARGETS.length - 1) {
+        await expect(page.locator("#shortcutText")).toContainText("Ctrl+H");
+      }
+    }
+
     await expect(page.locator("#stageTitle")).toHaveText("학습 리포트");
     await expect(page.locator("#reportPanel")).toBeVisible();
-    await expect(page.locator("#totalMetric")).toHaveText("28");
-    await expect(page.locator("#correctMetric")).toHaveText("28");
-    await expect(page.locator("#hintMetric")).toHaveText("1");
+    await expect(page.locator("#totalMetric")).toHaveText("34");
+    await expect(page.locator("#correctMetric")).toHaveText("34");
+    await expect(page.locator("#hintMetric")).toHaveText("2");
     await expect(page.locator("#reviewList")).toContainText(RECALL_TARGETS[0]);
     await expect(page.locator("#retryButton")).toBeVisible();
   });

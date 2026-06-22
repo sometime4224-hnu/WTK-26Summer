@@ -124,7 +124,7 @@
 
       .progress-dots {
         display: grid;
-        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-columns: repeat(7, minmax(0, 1fr));
         gap: 6px;
         margin: 12px 0;
       }
@@ -595,7 +595,7 @@
 
         <div class="assist-actions">
           <button class="ghost-button" id="prevButton" type="button">이전</button>
-          <button class="ghost-button" id="hintButton" type="button">힌트</button>
+          <button class="ghost-button" id="hintButton" type="button">Ctrl+H 힌트</button>
           <button class="primary-button" id="checkButton" type="button">확인</button>
           <button class="primary-button" id="retryButton" type="button" hidden>재연습</button>
         </div>
@@ -660,22 +660,34 @@
           "grammar-light",
           "grammar-condition"
         ];
-        const RECALL_ITEMS = RECALL_SOURCE_IDS.map((id) => {
+        const RECALL_STAGE_IDS = ["recall1", "recall2"];
+        const RECALL1_ITEMS = RECALL_SOURCE_IDS.map((id) => {
           const item = TRAINING_SECTIONS.find((entry) => entry.id === id);
-          return Object.assign({}, item, { id: "recall-" + id, section: "recall", mode: "recall" });
+          return Object.assign({}, item, { id: "recall1-" + id, section: "recall1", mode: "recall1" });
+        });
+        const RECALL2_ITEMS = RECALL_SOURCE_IDS.map((id) => {
+          const item = TRAINING_SECTIONS.find((entry) => entry.id === id);
+          return Object.assign({}, item, { id: "recall2-" + id, section: "recall2", mode: "recall2" });
         });
         const STAGES = [
           { id: "warmup", label: "한/영", title: "한/영 확인", meta: "1단계", prompt: "한글 입력 모드로 짧게 시작합니다. 아래 칸에 운동을 입력하세요." },
           { id: "core", label: "핵심", title: "핵심 어휘", meta: "2단계", prompt: "12과 생활 속 운동 쓰기에 필요한 핵심 어휘를 정확히 따라 칩니다." },
           { id: "expansion", label: "확장", title: "확장 표현", meta: "3단계", prompt: "계단, 걷기, 스트레칭 동작을 더 구체적인 표현으로 연습합니다." },
           { id: "grammar", label: "문법", title: "문법 문장", meta: "4단계", prompt: "12과 목표 문법이 들어간 문장을 문장부호까지 정확히 입력합니다." },
-          { id: "recall", label: "회상", title: "가림 회상", meta: "5단계", prompt: "목표 표현을 가리고 뜻과 설명만 보고 다시 입력합니다." },
-          { id: "report", label: "리포트", title: "학습 리포트", meta: "6단계", prompt: "오늘 타이핑으로 익힌 표현과 재연습할 표현을 확인합니다." }
+          { id: "recall1", label: "회상1", title: "회상 1: 초성 회상", meta: "5단계", prompt: "초성 단서를 보고 연습한 표현을 다시 떠올려 입력합니다." },
+          { id: "recall2", label: "회상2", title: "회상 2: 부분 가림 회상", meta: "6단계", prompt: "앞 1~2글자만 보고 나머지 ? 자리를 기억으로 채웁니다." },
+          { id: "report", label: "리포트", title: "학습 리포트", meta: "7단계", prompt: "오늘 타이핑으로 익힌 표현과 재연습할 표현을 확인합니다." }
         ];
+        const INDEXED_STAGE_IDS = ["core", "expansion", "grammar", "recall1", "recall2"];
+        const DEFAULT_ITEM_INDEX_BY_STAGE = INDEXED_STAGE_IDS.reduce((acc, stageId) => {
+          acc[stageId] = 0;
+          return acc;
+        }, {});
+        const INITIALS = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
 
         const state = {
           stageIndex: 0,
-          itemIndexByStage: { core: 0, expansion: 0, grammar: 0, recall: 0 },
+          itemIndexByStage: Object.assign({}, DEFAULT_ITEM_INDEX_BY_STAGE),
           results: {},
           hintVisible: false,
           activeInputId: "typingInput",
@@ -723,6 +735,57 @@
           return /[A-Za-z]/.test(value);
         }
 
+        function isRecallStage(stageId) {
+          return RECALL_STAGE_IDS.indexOf(stageId) !== -1;
+        }
+
+        function recallShortcut() {
+          return "<kbd>Enter</kbd> 확인 <kbd>Ctrl+H</kbd> 힌트";
+        }
+
+        function isRevealedCharacter(char) {
+          return /[0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ]/.test(char);
+        }
+
+        function visibleCharCount(value) {
+          return Array.from(value || "").filter(isRevealedCharacter).length;
+        }
+
+        function getInitialConsonants(value) {
+          return Array.from(value || "").map((char) => {
+            const code = char.charCodeAt(0);
+            if (code >= 0xac00 && code <= 0xd7a3) {
+              return INITIALS[Math.floor((code - 0xac00) / 588)];
+            }
+            if (/\s/.test(char)) return " ";
+            if (/[.?!,]/.test(char)) return char;
+            return isRevealedCharacter(char) ? "?" : char;
+          }).join("");
+        }
+
+        function maskByLength(value) {
+          const chars = Array.from(value || "");
+          const revealLimit = visibleCharCount(value) <= 4 ? 1 : 2;
+          let revealed = 0;
+          return chars.map((char) => {
+            if (!isRevealedCharacter(char)) return char;
+            revealed += 1;
+            return revealed <= revealLimit ? char : "?";
+          }).join("");
+        }
+
+        function recallDisplayText(stageId, item) {
+          if (!item) return "";
+          if (stageId === "recall1") return getInitialConsonants(item.target);
+          if (stageId === "recall2") return maskByLength(item.target);
+          return item.target;
+        }
+
+        function makeRecallHint(item) {
+          if (!item) return "";
+          return "뜻/상황: " + item.cueKo + " · 사용 단서: " + item.note + " · 글자 수: " + visibleCharCount(item.target) + "자";
+        }
+
         function escapeHtml(value) {
           return String(value == null ? "" : value)
             .replace(/&/g, "&amp;")
@@ -753,11 +816,12 @@
         }
 
         function practiceItems() {
-          return TRAINING_SECTIONS.concat(RECALL_ITEMS);
+          return TRAINING_SECTIONS.concat(RECALL1_ITEMS, RECALL2_ITEMS);
         }
 
         function stageItems(stageId) {
-          if (stageId === "recall") return RECALL_ITEMS;
+          if (stageId === "recall1") return RECALL1_ITEMS;
+          if (stageId === "recall2") return RECALL2_ITEMS;
           return TRAINING_SECTIONS.filter((item) => item.section === stageId);
         }
 
@@ -799,10 +863,10 @@
           try {
             const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
             Object.assign(state, saved);
-            state.itemIndexByStage = Object.assign({ core: 0, expansion: 0, grammar: 0, recall: 0 }, saved.itemIndexByStage || {});
+            state.itemIndexByStage = Object.assign({}, DEFAULT_ITEM_INDEX_BY_STAGE, saved.itemIndexByStage || {});
             state.results = saved.results && typeof saved.results === "object" ? saved.results : {};
             state.stageIndex = Math.max(0, Math.min(Number(state.stageIndex) || 0, STAGES.length - 1));
-            ["core", "expansion", "grammar", "recall"].forEach((stageId) => {
+            INDEXED_STAGE_IDS.forEach((stageId) => {
               const max = Math.max(stageItems(stageId).length - 1, 0);
               state.itemIndexByStage[stageId] = Math.max(0, Math.min(Number(state.itemIndexByStage[stageId]) || 0, max));
             });
@@ -843,7 +907,7 @@
 
         function markHintUsed() {
           const item = currentItem();
-          if (!item || currentStage().id !== "recall") return;
+          if (!item || !isRecallStage(currentStage().id)) return;
           const previous = state.results[item.id] || {
             id: item.id,
             target: item.target,
@@ -870,12 +934,16 @@
           if (nextIndex < items.length) {
             state.itemIndexByStage[stage.id] = nextIndex;
             render({ selectText: true });
-            setFeedback("좋아요. 다음 표현을 입력하세요.", "good", stage.id === "recall" ? "<kbd>Enter</kbd> 확인" : "<kbd>자동</kbd> 정확히 치면 이동");
+            setFeedback("좋아요. 다음 표현을 입력하세요.", "good", isRecallStage(stage.id) ? recallShortcut() : "<kbd>자동</kbd> 정확히 치면 이동");
             return;
           }
           goToStage(state.stageIndex + 1, { selectText: true });
           if (currentStage().id !== "report") {
-            setFeedback("다음 단계로 넘어갑니다.", "good", "<kbd>자동</kbd>");
+            setFeedback(
+              isRecallStage(currentStage().id) ? "단서를 보고 기억나는 표현을 입력하세요." : "다음 단계로 넘어갑니다.",
+              "good",
+              isRecallStage(currentStage().id) ? recallShortcut() : "<kbd>자동</kbd>"
+            );
           }
         }
 
@@ -896,19 +964,19 @@
           if (!item) return;
           const value = normalize(els.typingInput.value);
           if (hasEnglish(value)) {
-            setFeedback("한/영 키 확인: 지금은 한글 입력 모드가 필요합니다.", "bad", "<kbd>한/영</kbd>");
+            setFeedback("한/영 키 확인: 지금은 한글 입력 모드가 필요합니다.", "bad", "<kbd>한/영</kbd> " + recallShortcut());
             focusInput(true);
             return;
           }
           if (value === item.target) {
             recordAttempt(item, true);
-            setFeedback("정확해요. 기억으로 입력했습니다.", "good", "<kbd>Enter</kbd> 다음 확인");
+            setFeedback("정확해요. 기억으로 입력했습니다.", "good", recallShortcut());
             saveState();
             advanceTimer = window.setTimeout(advanceItem, 300);
             return;
           }
           recordAttempt(item, false);
-          setFeedback("다시 입력하세요.", "bad", "<kbd>Ctrl+H</kbd> 힌트");
+          setFeedback("다시 입력하세요.", "bad", recallShortcut());
           saveState();
           focusInput(true);
         }
@@ -927,8 +995,8 @@
             else setFeedback('"운동"을 입력하세요.', "warn", "<kbd>자동</kbd> 정확히 입력하면 이동");
             return;
           }
-          if (stage.id === "recall") {
-            setFeedback("뜻을 보고 기억나는 표현을 입력한 뒤 Enter를 누르세요.", "", "<kbd>Enter</kbd> 확인 <kbd>Ctrl+H</kbd> 힌트");
+          if (isRecallStage(stage.id)) {
+            setFeedback("단서를 보고 기억나는 표현을 입력한 뒤 Enter를 누르세요.", "", recallShortcut());
             return;
           }
           const item = currentItem();
@@ -943,10 +1011,10 @@
 
         function showHint() {
           const item = currentItem();
-          if (!item || currentStage().id !== "recall") return;
+          if (!item || !isRecallStage(currentStage().id)) return;
           state.hintVisible = true;
           markHintUsed();
-          setFeedback("힌트를 보고 다시 입력하세요.", "warn", "<kbd>Enter</kbd> 확인");
+          setFeedback("힌트를 보고 다시 입력하세요.", "warn", recallShortcut());
           render({ preserveInput: true, preserveFocus: true });
           focusInput();
         }
@@ -957,18 +1025,19 @@
         }
 
         function retryRecall() {
-          state.stageIndex = 4;
-          state.itemIndexByStage.recall = 0;
+          state.stageIndex = STAGES.findIndex((stage) => stage.id === "recall1");
+          state.itemIndexByStage.recall1 = 0;
+          state.itemIndexByStage.recall2 = 0;
           state.hintVisible = false;
           render({ selectText: true });
-          setFeedback("재연습할 표현을 다시 입력하세요.", "", "<kbd>Enter</kbd> 확인 <kbd>Ctrl+H</kbd> 힌트");
+          setFeedback("재연습할 표현을 다시 입력하세요.", "", recallShortcut());
         }
 
         function resetTrainer() {
           clearTimers();
           Object.assign(state, {
             stageIndex: 0,
-            itemIndexByStage: { core: 0, expansion: 0, grammar: 0, recall: 0 },
+            itemIndexByStage: Object.assign({}, DEFAULT_ITEM_INDEX_BY_STAGE),
             results: {},
             hintVisible: false,
             activeInputId: "typingInput",
@@ -1028,11 +1097,11 @@
           els.cueKo.textContent = item.cueKo;
           els.noteText.textContent = item.note;
           renderTranslations(item.translations);
-          els.typingInput.placeholder = stage.id === "recall" ? "기억나는 표현 입력" : "목표 표현 입력";
-          if (stage.id === "recall") {
-            els.targetText.textContent = state.hintVisible ? "힌트를 확인하고 입력" : "가려진 표현";
+          els.typingInput.placeholder = isRecallStage(stage.id) ? "기억나는 표현 입력" : "목표 표현 입력";
+          if (isRecallStage(stage.id)) {
+            els.targetText.textContent = recallDisplayText(stage.id, item);
             els.targetText.classList.add("is-hidden-target");
-            els.hintText.textContent = item.target;
+            els.hintText.textContent = makeRecallHint(item);
             els.hintPanel.hidden = !state.hintVisible;
             return;
           }
@@ -1052,7 +1121,7 @@
           els.targetCard.hidden = isReport;
           els.inputWrap.hidden = isReport;
           els.reportPanel.hidden = !isReport;
-          els.hintButton.hidden = stage.id !== "recall";
+          els.hintButton.hidden = !isRecallStage(stage.id);
           els.checkButton.hidden = isReport;
           els.retryButton.hidden = !isReport;
           els.prevButton.disabled = state.stageIndex === 0;
@@ -1080,7 +1149,7 @@
             else setFeedback('"운동"을 입력하세요.', "warn", "<kbd>자동</kbd> 정확히 입력하면 이동");
             return;
           }
-          if (stage.id === "recall") {
+          if (isRecallStage(stage.id)) {
             submitRecallItem();
             return;
           }
@@ -1114,7 +1183,7 @@
           }
           if (event.key === "Enter") {
             event.preventDefault();
-            if (currentStage().id === "recall") submitRecallItem();
+            if (isRecallStage(currentStage().id)) submitRecallItem();
             else checkCurrent();
           }
         });
