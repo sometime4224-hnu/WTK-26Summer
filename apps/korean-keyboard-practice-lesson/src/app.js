@@ -30,14 +30,14 @@
     { code: "KeyM", latin: "M", hangul: "ㅡ", shiftHangul: "", hand: "right", finger: "right-index", row: "bottom" }
   ];
 
-  const WORD_TARGETS = ["한국", "학생", "학교", "이름", "컴퓨터", "전화", "커피", "가방", "친구", "오늘"];
+  const WORD_TARGETS = ["한국", "학생", "학교", "이름", "컴퓨터", "전화", "커피", "가방", "친구", "오늘", "사람", "시간", "음식", "운동", "시장", "가족", "사진", "버스"];
 
   const LESSON_STAGES = [
-    { id: "ready", title: "준비", minutes: 2, kind: "checklist", targets: [], completionLabel: "준비 확인" },
-    { id: "layout", title: "자판 보기", minutes: 2, kind: "info", targets: [], completionLabel: "자판 확인" },
-    { id: "home", title: "홈키 자리 찾기", minutes: 4, kind: "find", targets: ["KeyF", "KeyJ", "KeyA", "KeyS", "KeyD", "KeyK", "KeyL"], completionLabel: "홈키 완료" },
-    { id: "common", title: "자주 쓰는 자모 찾기", minutes: 4, kind: "find", targets: ["KeyR", "KeyT", "KeyG", "KeyH", "KeyY", "KeyU", "KeyN"], completionLabel: "확장 자리 완료" },
-    { id: "syllable", title: "음절 입력", minutes: 4, kind: "text", targets: ["가", "나", "다", "마", "바", "사", "아", "자", "하", "고", "구", "기"], completionLabel: "음절 완료" },
+    { id: "ready", title: "준비", minutes: 2, kind: "warmup", targets: ["KeyF", "KeyJ"], completionLabel: "준비 완료" },
+    { id: "layout", title: "자판 보기", minutes: 2, kind: "layout", targets: ["KeyF", "KeyJ", "KeyR", "KeyK"], completionLabel: "자판 확인" },
+    { id: "home", title: "홈키 자리 찾기", minutes: 4, kind: "find", targets: ["KeyF", "KeyJ", "KeyA", "KeyS", "KeyD", "KeyK", "KeyL", "KeyF", "KeyJ", "KeyA", "KeyS", "KeyD", "KeyK", "KeyL"], completionLabel: "홈키 완료" },
+    { id: "common", title: "자주 쓰는 자모 찾기", minutes: 4, kind: "find", targets: ["KeyR", "KeyT", "KeyG", "KeyH", "KeyY", "KeyU", "KeyN", "KeyB", "KeyM", "KeyE", "KeyW", "KeyO", "KeyP", "KeyV"], completionLabel: "확장 자리 완료" },
+    { id: "syllable", title: "음절 입력", minutes: 4, kind: "text", targets: ["가", "나", "다", "마", "바", "사", "아", "자", "하", "고", "구", "기", "거", "너", "더", "러", "머", "버", "서", "어", "저", "호", "후", "히"], completionLabel: "음절 완료" },
     { id: "word", title: "단어 입력", minutes: 4, kind: "text", targets: WORD_TARGETS, completionLabel: "단어 완료" },
     { id: "rhythm", title: "리듬 단어 입력", minutes: 4, kind: "rhythm", targets: WORD_TARGETS, completionLabel: "리듬 완료" },
     { id: "finish", title: "마무리", minutes: 1, kind: "summary", targets: [], completionLabel: "수업 정리" }
@@ -99,14 +99,16 @@
     targetIndex: {},
     completed: {},
     attempts: {},
-    checks: { input: false, hands: false },
     skipped: new Set(),
+    readyImeDone: false,
     englishWarnings: 0,
     lastEnglishValue: "",
     composing: false,
     rhythmMissed: 0,
     rhythmStartedAt: {},
-    rhythmTimeCue: {}
+    rhythmTimeCue: {},
+    transitionOpen: false,
+    transitionStageIndex: 0
   };
 
   let rhythmCueTimer = 0;
@@ -133,12 +135,21 @@
     completedCount: document.getElementById("completedCount"),
     totalCount: document.getElementById("totalCount"),
     attemptCount: document.getElementById("attemptCount"),
+    missionActions: document.getElementById("missionActions"),
+    completionPrompt: document.getElementById("completionPrompt"),
     prevStageButton: document.getElementById("prevStageButton"),
+    retryStageButton: document.getElementById("retryStageButton"),
     nextStageButton: document.getElementById("nextStageButton"),
     resetLesson: document.getElementById("resetLesson"),
     keyboardBoard: document.getElementById("keyboardBoard"),
     currentKeyBadge: document.getElementById("currentKeyBadge"),
-    reachList: document.getElementById("reachList")
+    reachList: document.getElementById("reachList"),
+    transitionOverlay: document.getElementById("transitionOverlay"),
+    transitionTitle: document.getElementById("transitionTitle"),
+    transitionMessage: document.getElementById("transitionMessage"),
+    transitionSummary: document.getElementById("transitionSummary"),
+    transitionNextButton: document.getElementById("transitionNextButton"),
+    transitionRetryButton: document.getElementById("transitionRetryButton")
   };
 
   function getStage() {
@@ -162,16 +173,17 @@
   }
 
   function getStageTotal(stage) {
-    if (stage.kind === "checklist") return 2;
+    if (stage.kind === "warmup") return stage.targets.length + 1;
+    if (stage.kind === "layout") return stage.targets.length;
     if (stage.kind === "info" || stage.kind === "summary") return 1;
     return stage.targets.length;
   }
 
   function getStageCompleted(stage) {
-    if (stage.kind === "checklist") {
-      return Number(state.checks.input) + Number(state.checks.hands);
-    }
     if (stage.kind === "summary") return 1;
+    if (stage.kind === "warmup") {
+      return Number(state.readyImeDone) + Math.min(state.completed[stage.id] || 0, stage.targets.length);
+    }
     return Math.min(state.completed[stage.id] || 0, getStageTotal(stage));
   }
 
@@ -196,7 +208,6 @@
     if (getStage().id !== stage.id || isStageComplete(stage)) return;
     state.rhythmTimeCue[stage.id] = true;
     els.targetArea.classList.add("is-time-cue");
-    els.nextStageButton.classList.add("is-cue");
     els.rhythmCaption.textContent = "권장 시간이 지났습니다. 다음 단계로 넘어가도 좋아요.";
     setFeedback("권장 시간이 지났습니다. 다음 단계로 넘어가도 좋아요.", "warn");
   }
@@ -208,6 +219,23 @@
     const elapsed = Date.now() - state.rhythmStartedAt[stage.id];
     const delay = Math.max(0, stage.minutes * 60 * 1000 - elapsed);
     rhythmCueTimer = window.setTimeout(() => activateRhythmTimeCue(stage), delay);
+  }
+
+  function closeTransitionOverlay() {
+    state.transitionOpen = false;
+    els.transitionOverlay.hidden = true;
+  }
+
+  function openTransitionOverlay(stage) {
+    const nextStage = LESSON_STAGES[state.stageIndex + 1];
+    state.transitionOpen = true;
+    state.transitionStageIndex = state.stageIndex;
+    els.transitionTitle.textContent = "잘했어요";
+    els.transitionMessage.textContent = `${stage.title} 연습을 끝냈습니다. 키보드로 다음 행동을 선택하세요.`;
+    els.transitionSummary.textContent = `완료 ${getStageCompleted(stage)}/${getStageTotal(stage)} · 다음 ${nextStage ? nextStage.title : "처음부터"}`;
+    els.transitionNextButton.innerHTML = `${nextStage ? "다음 연습" : "처음부터"} <kbd>Enter</kbd>`;
+    els.transitionOverlay.hidden = false;
+    requestAnimationFrame(() => els.transitionNextButton.focus());
   }
 
   function advanceRhythmTarget(stage) {
@@ -293,7 +321,7 @@
       const complete = isStageComplete(stage);
       const skipped = state.skipped.has(stage.id) && !complete;
       return `
-        <button class="stage-button${active ? " is-active" : ""}${complete ? " is-complete" : ""}${skipped ? " is-skipped" : ""}" type="button" data-stage-index="${index}">
+        <button class="stage-button${active ? " is-active" : ""}${complete ? " is-complete" : ""}${skipped ? " is-skipped" : ""}" type="button" data-stage-index="${index}" aria-disabled="true" tabindex="-1">
           <span>${index + 1}단계 · ${stage.minutes}분</span>
           <strong>${stage.title}</strong>
         </button>
@@ -321,6 +349,18 @@
   }
 
   function renderReachForStage(stage) {
+    if (stage.kind === "warmup" && !state.readyImeDone) {
+      const nextInput = getInputSequence("가")[0];
+      const nextKey = nextInput ? getKey(nextInput.code) : null;
+      els.currentKeyBadge.textContent = nextKey ? `다음 ${nextKey.hangul}` : "한/영 전환";
+      els.reachList.innerHTML = `
+        <span>한/영 확인</span>
+        <strong>가</strong>
+        <p>${nextKey ? `${nextKey.latin} 자리부터 눌러 한글 입력 상태를 확인합니다.` : "R과 K를 눌러 가가 나오는지 확인합니다."}</p>
+      `;
+      return;
+    }
+
     if (stage.kind === "text" || stage.kind === "rhythm") {
       const target = getCurrentTarget(stage) || "완료";
       const isRhythm = stage.kind === "rhythm";
@@ -339,29 +379,71 @@
       return;
     }
 
-    els.currentKeyBadge.textContent = stage.kind === "info" ? "전체 배열" : "수업 준비";
+    els.currentKeyBadge.textContent = stage.kind === "layout" ? "전체 배열" : "수업 준비";
     els.reachList.innerHTML = `
       <span>지금 안내</span>
       <strong>${stage.title}</strong>
-      <p>${stage.kind === "info" ? "왼손은 주로 자음, 오른손은 주로 모음을 담당합니다." : "손가락을 홈키 가까이에 편하게 올립니다."}</p>
+      <p>${stage.kind === "layout" ? "왼손은 주로 자음, 오른손은 주로 모음을 담당합니다." : "손가락을 홈키 가까이에 편하게 올립니다."}</p>
     `;
   }
 
-  function renderChecklist() {
+  function renderWarmupTask(stage) {
+    const pressedCount = getStageCompleted(stage);
     els.stageTask.hidden = false;
+
+    if (!state.readyImeDone) {
+      els.stageTask.innerHTML = `
+        <div class="rhythm-score-strip" aria-label="한영 전환 입력 진행">
+          <span>한/영 전환 <strong>확인</strong></span>
+          <span>누를 키 <strong>R · K</strong></span>
+          <span>진행 <strong>${pressedCount}/${getStageTotal(stage)}</strong></span>
+        </div>
+      `;
+      els.targetDisplay.textContent = "가";
+      els.targetHint.textContent = "한/영 키로 한글 입력을 켠 뒤 R + K를 눌러 가를 만듭니다.";
+      els.answerInput.hidden = false;
+      els.answerInput.placeholder = "가";
+      updateKeyboardGuide(getKeyboardGuideForText("가"));
+      renderReachForStage(stage);
+      requestAnimationFrame(() => els.answerInput.focus());
+      return;
+    }
+
+    const targetCode = getCurrentTarget(stage);
+    const key = getKey(targetCode);
     els.stageTask.innerHTML = `
-      <button class="check-button${state.checks.input ? " is-checked" : ""}" type="button" data-action="toggle-check" data-check="input">한/영 키를 눌러 한글 입력 상태를 확인했습니다.</button>
-      <button class="check-button${state.checks.hands ? " is-checked" : ""}" type="button" data-action="toggle-check" data-check="hands">양손을 홈키 가까이에 올렸습니다.</button>
+      <div class="rhythm-score-strip" aria-label="준비 키 입력 진행">
+        <span>한/영 <strong>완료</strong></span>
+        <span>기준키 <strong>F · J</strong></span>
+        <span>진행 <strong>${pressedCount}/${getStageTotal(stage)}</strong></span>
+      </div>
     `;
+    els.targetDisplay.textContent = key.hangul;
+    els.targetHint.textContent = `${key.latin} 키를 실제로 눌러 기준 위치를 확인합니다.`;
+    els.keyCapture.hidden = false;
+    updateKeyboardTarget(key.code);
+    renderReachForKey(key);
+    requestAnimationFrame(() => els.keyCapture.focus());
   }
 
-  function renderInfoTask(stage) {
-    const done = isStageComplete(stage);
+  function renderLayoutTask(stage) {
+    const targetCode = getCurrentTarget(stage);
+    const key = getKey(targetCode);
+    const pressedCount = getStageCompleted(stage);
     els.stageTask.hidden = false;
     els.stageTask.innerHTML = `
-      <button class="confirm-button${done ? " is-checked" : ""}" type="button" data-action="confirm-stage">왼손 자음 자리와 오른손 모음 자리를 확인했습니다.</button>
-      <button class="confirm-button${done ? " is-checked" : ""}" type="button" data-action="confirm-stage">홈키 ㅁ ㄴ ㅇ ㄹ / ㅓ ㅏ ㅣ를 확인했습니다.</button>
+      <div class="rhythm-score-strip" aria-label="자판 보기 키 입력 진행">
+        <span>홈키 <strong>F · J</strong></span>
+        <span>첫 글자 <strong>R · K</strong></span>
+        <span>진행 <strong>${pressedCount}/${getStageTotal(stage)}</strong></span>
+      </div>
     `;
+    els.targetDisplay.textContent = key.hangul;
+    els.targetHint.textContent = `${key.latin} 자리로 전체 자판의 기준 위치를 확인합니다.`;
+    els.keyCapture.hidden = false;
+    updateKeyboardTarget(key.code);
+    renderReachForKey(key);
+    requestAnimationFrame(() => els.keyCapture.focus());
   }
 
   function renderRhythmTask(stage) {
@@ -428,10 +510,16 @@
     els.stageStatus.textContent = complete ? "완료" : state.skipped.has(stage.id) ? "넘어감" : "진행 중";
     els.stageStatus.classList.toggle("is-complete", complete);
     els.stageStatus.classList.toggle("is-skipped", state.skipped.has(stage.id) && !complete);
+    els.missionActions.hidden = true;
+    els.missionActions.classList.remove("is-complete");
+    els.completionPrompt.hidden = true;
+    els.completionPrompt.textContent = `${stage.title} 완료! 다음 연습으로 넘어가거나 다시 할 수 있습니다.`;
+    els.prevStageButton.hidden = false;
     els.prevStageButton.disabled = state.stageIndex === 0;
+    els.retryStageButton.hidden = true;
     els.nextStageButton.classList.toggle("is-ready", complete);
     els.nextStageButton.classList.toggle("is-cue", timeCue);
-    els.nextStageButton.textContent = state.stageIndex === LESSON_STAGES.length - 1 ? "처음으로" : complete ? "다음 단계" : "넘어가기";
+    els.nextStageButton.textContent = "다음 연습";
 
     els.targetArea.classList.toggle("is-rhythm", isRhythm);
     els.targetArea.classList.toggle("is-time-cue", timeCue);
@@ -449,19 +537,13 @@
     els.stageTask.hidden = true;
     updateKeyboardTarget("");
 
-    if (stage.kind === "checklist") {
-      els.targetDisplay.textContent = "한/영";
-      els.targetHint.textContent = "한글 입력 모드와 손 위치를 확인합니다.";
-      renderChecklist();
-      renderReachForStage(stage);
+    if (stage.kind === "warmup") {
+      renderWarmupTask(stage);
       return;
     }
 
-    if (stage.kind === "info") {
-      els.targetDisplay.textContent = "자리";
-      els.targetHint.textContent = "왼손 자음, 오른손 모음, 홈키를 눈으로 확인합니다.";
-      renderInfoTask(stage);
-      renderReachForStage(stage);
+    if (stage.kind === "layout") {
+      renderLayoutTask(stage);
       return;
     }
 
@@ -513,14 +595,6 @@
     window.setTimeout(() => keyButton.classList.remove(className), 360);
   }
 
-  function completeCurrentStage() {
-    const stage = getStage();
-    state.completed[stage.id] = getStageTotal(stage);
-    state.skipped.delete(stage.id);
-    setFeedback(`${stage.title} 단계를 확인했습니다.`, "good");
-    render();
-  }
-
   function handleFindCode(code) {
     const stage = getStage();
     if (stage.kind !== "find") return;
@@ -539,11 +613,13 @@
       pulseKey(code, "is-hit");
       if (isStageComplete(stage)) {
         setFeedback(`${stage.completionLabel}: 모두 눌렀습니다.`, "good");
+        render();
+        openTransitionOverlay(stage);
       } else {
         state.targetIndex[stage.id] = getTargetIndex(stage) + 1;
         setFeedback("정확해요. 다음 자리를 찾아보세요.", "good");
+        render();
       }
-      render();
       return;
     }
 
@@ -551,6 +627,111 @@
     pulseKey(code, "is-miss");
     const pressedText = pressedKey ? `${pressedKey.hangul}(${pressedKey.latin})` : "다른 키";
     setFeedback(`${pressedText}가 아니라 ${targetKey.hangul}(${targetKey.latin}) 자리입니다.`, "bad");
+    render();
+  }
+
+  function handleWarmupInput() {
+    const stage = getStage();
+    if (stage.kind !== "warmup") return;
+    if (state.readyImeDone || state.composing) return;
+
+    const value = normalizeText(els.answerInput.value);
+    if (!value) {
+      setFeedback("한/영 키로 한글 입력을 켠 뒤 R + K를 눌러 가를 입력하세요.", "");
+      return;
+    }
+
+    if (/[A-Za-z]/.test(value)) {
+      if (state.lastEnglishValue !== value) {
+        state.englishWarnings += 1;
+        state.lastEnglishValue = value;
+        state.attempts[stage.id] = (state.attempts[stage.id] || 0) + 1;
+      }
+      els.answerInput.value = "";
+      setFeedback("한/영 키를 눌러 한글 입력으로 바꿔 보세요.", "bad");
+      render();
+      return;
+    }
+
+    state.lastEnglishValue = "";
+    if (value === "가") {
+      state.readyImeDone = true;
+      state.attempts[stage.id] = (state.attempts[stage.id] || 0) + 1;
+      els.answerInput.value = "";
+      setFeedback("한글 입력 확인 완료. 이제 F와 J 기준키를 눌러 보세요.", "good");
+      render();
+      return;
+    }
+
+    if (value.length >= 1) {
+      state.attempts[stage.id] = (state.attempts[stage.id] || 0) + 1;
+      setFeedback("목표는 가입니다. R + K를 천천히 눌러 보세요.", "bad");
+      render();
+    }
+  }
+
+  function handleWarmupCode(code) {
+    const stage = getStage();
+    if (stage.kind !== "warmup") return;
+    if (!state.readyImeDone) {
+      setFeedback("먼저 한/영 키를 확인하고 가를 입력하세요.", "warn");
+      requestAnimationFrame(() => els.answerInput.focus());
+      return;
+    }
+    if (isStageComplete(stage)) return;
+
+    const targetCode = getCurrentTarget(stage);
+    const targetKey = getKey(targetCode);
+    state.attempts[stage.id] = (state.attempts[stage.id] || 0) + 1;
+
+    if (code === targetCode) {
+      state.completed[stage.id] = (state.completed[stage.id] || 0) + 1;
+      state.skipped.delete(stage.id);
+      pulseKey(code, "is-hit");
+      if (isStageComplete(stage)) {
+        setFeedback("준비 완료: 한/영과 기준키를 확인했습니다.", "good");
+        render();
+        openTransitionOverlay(stage);
+      } else {
+        state.targetIndex[stage.id] = getTargetIndex(stage) + 1;
+        setFeedback("좋아요. 이제 오른손 기준키 J를 눌러 보세요.", "good");
+        render();
+      }
+      return;
+    }
+
+    pulseKey(code, "is-miss");
+    setFeedback(`${targetKey.hangul}(${targetKey.latin}) 기준키부터 눌러 보세요.`, "bad");
+    render();
+  }
+
+  function handleLayoutCode(code) {
+    const stage = getStage();
+    if (stage.kind !== "layout") return;
+    if (isStageComplete(stage)) return;
+
+    const targetCode = getCurrentTarget(stage);
+    const targetKey = getKey(targetCode);
+    state.attempts[stage.id] = (state.attempts[stage.id] || 0) + 1;
+
+    if (code === targetCode) {
+      state.completed[stage.id] = (state.completed[stage.id] || 0) + 1;
+      state.skipped.delete(stage.id);
+      pulseKey(code, "is-hit");
+      if (isStageComplete(stage)) {
+        setFeedback("자판 확인 완료: 홈키와 첫 글자 위치를 눌렀습니다.", "good");
+        render();
+        openTransitionOverlay(stage);
+      } else {
+        state.targetIndex[stage.id] = getTargetIndex(stage) + 1;
+        setFeedback("좋아요. 다음 자판 위치를 확인하세요.", "good");
+        render();
+      }
+      return;
+    }
+
+    pulseKey(code, "is-miss");
+    setFeedback(`${targetKey.hangul}(${targetKey.latin}) 자리를 눌러 자판 위치를 확인하세요.`, "bad");
     render();
   }
 
@@ -583,11 +764,13 @@
       if (isStageComplete(stage)) {
         clearRhythmCueTimer();
         setFeedback(`${stage.completionLabel}: 리듬 단어를 모두 입력했습니다.`, "good");
+        render();
+        openTransitionOverlay(stage);
       } else {
         advanceRhythmTarget(stage);
         setFeedback("정확해요. 다음 비트로 갑니다.", "good");
+        render();
       }
-      render();
       return;
     }
 
@@ -602,6 +785,10 @@
 
   function handleTextInput() {
     const stage = getStage();
+    if (stage.kind === "warmup") {
+      handleWarmupInput();
+      return;
+    }
     if (stage.kind === "rhythm") {
       handleRhythmInput();
       return;
@@ -632,11 +819,13 @@
       state.skipped.delete(stage.id);
       if (isStageComplete(stage)) {
         setFeedback(`${stage.completionLabel}: 모두 입력했습니다.`, "good");
+        render();
+        openTransitionOverlay(stage);
       } else {
         state.targetIndex[stage.id] = getTargetIndex(stage) + 1;
         setFeedback("정확해요. 다음 목표를 입력하세요.", "good");
+        render();
       }
-      render();
       return;
     }
 
@@ -648,89 +837,107 @@
   }
 
   function goToStage(index, feedback) {
+    closeTransitionOverlay();
     state.stageIndex = Math.max(0, Math.min(index, LESSON_STAGES.length - 1));
     if (feedback) setFeedback(feedback.message, feedback.kind);
     render();
   }
 
   function goNext() {
-    const stage = getStage();
+    if (!state.transitionOpen) {
+      setFeedback("현재 미션을 끝내면 다음 연습으로 넘어갈 수 있습니다.", "warn");
+      return;
+    }
+
+    const completedIndex = state.transitionStageIndex;
     if (state.stageIndex === LESSON_STAGES.length - 1) {
       resetLesson();
       return;
     }
 
-    if (!isStageComplete(stage)) {
-      state.skipped.add(stage.id);
-      goToStage(state.stageIndex + 1, { message: `${stage.title} 단계를 넘어갔습니다. 나중에 다시 연습할 수 있습니다.`, kind: "warn" });
+    if (completedIndex >= LESSON_STAGES.length - 1) {
+      resetLesson();
       return;
     }
 
-    state.skipped.delete(stage.id);
-    goToStage(state.stageIndex + 1, { message: "다음 단계로 이동했습니다.", kind: "good" });
+    goToStage(completedIndex + 1, { message: "다음 연습을 시작합니다.", kind: "good" });
   }
 
-  function goPrev() {
-    goToStage(state.stageIndex - 1, { message: "이전 단계로 이동했습니다.", kind: "" });
+  function remindTransitionKeyboard(event) {
+    event.preventDefault();
+    els.transitionMessage.textContent = "마우스 대신 Enter 또는 Space로 다음 연습, R로 다시 하기를 선택합니다.";
+  }
+
+  function retryStage() {
+    const stage = getStage();
+    clearRhythmCueTimer();
+    closeTransitionOverlay();
+    delete state.targetIndex[stage.id];
+    delete state.completed[stage.id];
+    delete state.attempts[stage.id];
+    state.skipped.delete(stage.id);
+    state.lastEnglishValue = "";
+    state.composing = false;
+
+    if (stage.kind === "warmup") {
+      state.readyImeDone = false;
+    }
+
+    if (stage.kind === "rhythm") {
+      state.rhythmMissed = 0;
+      delete state.rhythmStartedAt[stage.id];
+      delete state.rhythmTimeCue[stage.id];
+    }
+
+    setFeedback(`${stage.title} 단계를 다시 연습합니다.`, "");
+    render();
   }
 
   function resetLesson() {
     clearRhythmCueTimer();
+    closeTransitionOverlay();
     state.stageIndex = 0;
     state.targetIndex = {};
     state.completed = {};
     state.attempts = {};
-    state.checks = { input: false, hands: false };
     state.skipped = new Set();
+    state.readyImeDone = false;
     state.englishWarnings = 0;
     state.lastEnglishValue = "";
     state.composing = false;
     state.rhythmMissed = 0;
     state.rhythmStartedAt = {};
     state.rhythmTimeCue = {};
-    setFeedback("먼저 한/영 상태와 손 위치를 확인하세요.", "");
+    state.transitionOpen = false;
+    state.transitionStageIndex = 0;
+    setFeedback("한/영 키로 한글 입력을 켠 뒤 R + K를 눌러 가를 입력하세요.", "");
     render();
   }
 
   function bindEvents() {
-    document.addEventListener("click", (event) => {
-      const stageButton = event.target.closest("[data-stage-index]");
-      if (stageButton) {
-        goToStage(Number(stageButton.dataset.stageIndex), { message: "선택한 단계로 이동했습니다.", kind: "" });
-        return;
-      }
-
-      const checkButton = event.target.closest("[data-action='toggle-check']");
-      if (checkButton) {
-        const key = checkButton.dataset.check;
-        state.checks[key] = !state.checks[key];
-        if (isStageComplete(getStage())) {
-          state.skipped.delete(getStage().id);
-          setFeedback("준비가 끝났습니다. 다음 단계로 이동할 수 있습니다.", "good");
-        }
-        render();
-        return;
-      }
-
-      if (event.target.closest("[data-action='confirm-stage']")) {
-        completeCurrentStage();
-      }
-    });
-
-    els.keyboardBoard.addEventListener("click", (event) => {
-      const button = event.target.closest(".key-button");
-      if (!button) return;
-      handleFindCode(button.dataset.code);
-    });
-
     document.addEventListener("keydown", (event) => {
+      if (state.transitionOpen) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          goNext();
+          return;
+        }
+        if (event.key.toLowerCase() === "r") {
+          event.preventDefault();
+          retryStage();
+          return;
+        }
+      }
+
       const stage = getStage();
-      if (stage.kind !== "find") return;
+      if (stage.kind !== "find" && stage.kind !== "warmup" && stage.kind !== "layout") return;
       if (!event.code || !event.code.startsWith("Key")) return;
       if (event.ctrlKey || event.altKey || event.metaKey) return;
       const tagName = event.target && event.target.tagName;
       if (tagName === "TEXTAREA" || tagName === "INPUT") return;
       event.preventDefault();
+      handleWarmupCode(event.code);
+      handleLayoutCode(event.code);
       handleFindCode(event.code);
     });
 
@@ -742,8 +949,8 @@
       handleTextInput();
     });
     els.answerInput.addEventListener("input", handleTextInput);
-    els.nextStageButton.addEventListener("click", goNext);
-    els.prevStageButton.addEventListener("click", goPrev);
+    els.transitionNextButton.addEventListener("click", remindTransitionKeyboard);
+    els.transitionRetryButton.addEventListener("click", remindTransitionKeyboard);
     els.resetLesson.addEventListener("click", resetLesson);
   }
 

@@ -68,7 +68,7 @@
               <div class="stage-task" id="stageTask"></div>
             </div>
 
-            <div class="feedback-strip" id="feedbackStrip" aria-live="polite">먼저 한/영 상태와 손 위치를 확인하세요.</div>
+            <div class="feedback-strip" id="feedbackStrip" aria-live="polite">키보드에서 F와 J 기준키를 눌러 시작하세요.</div>
 
             <div class="mission-progress" aria-label="현재 단계 완료 상태">
               <div>
@@ -81,8 +81,10 @@
               </div>
             </div>
 
-            <div class="mission-actions">
+            <div class="mission-actions" id="missionActions">
+              <p class="completion-prompt" id="completionPrompt" hidden>이 단계 완료! 다음 연습으로 넘어가거나 다시 할 수 있습니다.</p>
               <button class="secondary-button" id="prevStageButton" type="button">이전</button>
+              <button class="retry-button" id="retryStageButton" type="button" hidden>다시 연습하기</button>
               <button class="next-button" id="nextStageButton" type="button">넘어가기</button>
             </div>
           </div>
@@ -148,6 +150,26 @@
         <a class="next-writing-link" href="../../c12/writing-keyboard-builder.html">표현 연습 시작</a>
       </section>
     </main>
+
+    <div class="transition-overlay" id="transitionOverlay" role="dialog" aria-modal="true" aria-labelledby="transitionTitle" hidden>
+      <div class="transition-dialog">
+        <div class="transition-signal" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <span class="transition-kicker">단계 완료</span>
+        <h2 id="transitionTitle">잘했어요</h2>
+        <p id="transitionMessage">이번 연습을 마쳤습니다.</p>
+        <div class="transition-summary" id="transitionSummary">완료 0/0 · 다음 연습으로 이동</div>
+        <div class="transition-actions">
+          <button class="retry-button" id="transitionRetryButton" type="button" aria-keyshortcuts="R">다시 하기 <kbd>R</kbd></button>
+          <button class="next-button" id="transitionNextButton" type="button" aria-keyshortcuts="Enter Space">다음 연습 <kbd>Enter</kbd></button>
+        </div>
+      </div>
+    </div>
 
     <script src="src/app.js"></script>
     <script src="../../shared/site-copyright.js"></script>
