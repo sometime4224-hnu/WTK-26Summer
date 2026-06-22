@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>생활 속 운동 답글 쓰기</title>
+    <title>12과 표현 타이핑 연습</title>
+    <link rel="stylesheet" href="../shared/multilang-toggle.css">
     <style>
       :root {
         --bg: #f7fafc;
@@ -36,7 +37,7 @@
       body {
         margin: 0;
         min-height: 100vh;
-        background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 58%, #fff7ed 100%);
+        background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 58%, #ecfdf5 100%);
         color: var(--ink);
         font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", system-ui, sans-serif;
         overflow-wrap: anywhere;
@@ -44,8 +45,7 @@
       }
 
       button,
-      input,
-      textarea {
+      input {
         font: inherit;
       }
 
@@ -107,7 +107,7 @@
       .nav-link,
       .reset-button,
       .ghost-button,
-      .copy-button {
+      .primary-button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -122,13 +122,9 @@
         text-decoration: none;
       }
 
-      .reset-button {
-        color: #475569;
-      }
-
       .progress-dots {
         display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-template-columns: repeat(6, minmax(0, 1fr));
         gap: 6px;
         margin: 12px 0;
       }
@@ -209,36 +205,33 @@
       }
 
       h1,
-      h2 {
+      h2,
+      h3,
+      p {
         margin: 0;
-        line-height: 1.08;
       }
 
       h1 {
-        font-size: clamp(36px, 6vw, 72px);
+        font-size: clamp(34px, 5.6vw, 68px);
         letter-spacing: 0;
-      }
-
-      h2 {
-        font-size: clamp(22px, 3.5vw, 36px);
+        line-height: 1.08;
       }
 
       .mission-prompt {
-        margin: 0;
-        max-width: 760px;
+        max-width: 800px;
         color: #334155;
-        font-size: clamp(17px, 2.4vw, 24px);
+        font-size: clamp(17px, 2.2vw, 23px);
         font-weight: 850;
         line-height: 1.52;
       }
 
       .typing-target {
         display: grid;
-        gap: 7px;
-        min-height: 114px;
+        gap: 8px;
+        min-height: 190px;
         align-content: center;
         justify-items: center;
-        padding: 14px;
+        padding: 16px;
         border: 2px solid rgba(37, 99, 235, 0.42);
         border-radius: 10px;
         background: rgba(219, 234, 254, 0.62);
@@ -253,25 +246,53 @@
 
       .typing-target strong {
         color: #0f172a;
-        font-size: clamp(40px, 8vw, 82px);
+        font-size: clamp(34px, 6.8vw, 70px);
         font-weight: 950;
-        line-height: 1;
+        line-height: 1.08;
       }
 
-      .typing-target p {
-        margin: 0;
-        color: #475569;
-        font-size: 14px;
+      .typing-target strong.is-hidden-target {
+        color: #334155;
+        font-size: clamp(30px, 5.8vw, 56px);
+      }
+
+      .cue {
+        color: #334155;
+        font-size: clamp(16px, 2.2vw, 22px);
         font-weight: 850;
+        line-height: 1.45;
       }
 
-      .input-stage {
-        display: none;
-        gap: 12px;
+      .note {
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.5;
       }
 
-      .input-stage.is-active {
+      .translation-panel {
+        width: min(100%, 760px);
+      }
+
+      .translation-panel .lang-box {
+        margin: 0;
+        text-align: start;
+      }
+
+      .language-row {
+        padding: 0;
+      }
+
+      .hint-panel {
         display: grid;
+        gap: 4px;
+        width: min(100%, 760px);
+        padding: 10px 12px;
+        border: 2px solid #fcd34d;
+        border-radius: 8px;
+        background: #fffbeb;
+        color: #92400e;
+        font-weight: 900;
       }
 
       .spotlight-input {
@@ -292,45 +313,27 @@
           0 18px 42px rgba(37, 99, 235, 0.18);
       }
 
-      input,
-      textarea {
+      input {
         width: 100%;
         min-width: 0;
+        min-height: 76px;
+        padding: 12px 16px;
         border: 4px solid #0f172a;
         border-radius: 12px;
         background: #ffffff;
         color: var(--ink);
+        font-size: clamp(26px, 5vw, 54px);
+        font-weight: 950;
+        line-height: 1.14;
+        text-align: center;
         outline: none;
       }
 
-      input {
-        min-height: 76px;
-        padding: 12px 16px;
-        font-size: clamp(30px, 6vw, 62px);
-        font-weight: 950;
-        line-height: 1.08;
-        text-align: center;
-      }
-
-      textarea {
-        min-height: 210px;
-        resize: vertical;
-        padding: 16px;
-        font-size: clamp(20px, 2.7vw, 30px);
-        font-weight: 850;
-        line-height: 1.55;
-      }
-
-      input:focus,
-      textarea:focus {
+      input:focus {
         border-color: #2563eb;
         box-shadow:
           0 0 0 6px rgba(37, 99, 235, 0.22),
           0 18px 44px rgba(37, 99, 235, 0.22);
-      }
-
-      textarea[readonly] {
-        background: #f8fafc;
       }
 
       .status-line {
@@ -387,7 +390,7 @@
         flex-wrap: wrap;
         justify-content: flex-end;
         gap: 8px;
-        opacity: 0.7;
+        opacity: 0.76;
       }
 
       .assist-actions:hover,
@@ -396,50 +399,67 @@
       }
 
       .ghost-button,
-      .copy-button {
+      .primary-button {
         min-height: 38px;
         padding: 8px 12px;
         font-size: 13px;
       }
 
-      .copy-button {
+      .primary-button {
         border-color: #0f172a;
         background: #0f172a;
         color: #ffffff;
       }
 
-      .preview-drawer {
-        margin-top: 12px;
-        border: 1px solid rgba(215, 224, 234, 0.94);
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.88);
-        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+      .report-panel {
+        display: grid;
+        gap: 14px;
       }
 
-      .preview-drawer summary {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+      .report-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 10px;
-        min-height: 46px;
-        padding: 10px 12px;
-        color: #334155;
-        cursor: pointer;
+      }
+
+      .report-card {
+        min-width: 0;
+        padding: 14px;
+        border: 1px solid #d7e0ea;
+        border-radius: 10px;
+        background: #ffffff;
+      }
+
+      .report-card span {
+        display: block;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .report-card strong {
+        display: block;
+        margin-top: 4px;
+        color: #0f172a;
+        font-size: clamp(28px, 5vw, 48px);
         font-weight: 950;
+      }
+
+      .review-list {
+        display: grid;
+        gap: 8px;
+        padding: 0;
+        margin: 0;
         list-style: none;
       }
 
-      .preview-drawer summary::-webkit-details-marker {
-        display: none;
-      }
-
-      .preview-drawer textarea {
-        min-height: 150px;
-        border-width: 2px;
-        border-radius: 0 0 10px 10px;
-        font-size: 16px;
-        font-weight: 750;
-        box-shadow: none;
+      .review-list li {
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #f8fafc;
+        color: #334155;
+        font-weight: 900;
       }
 
       @media (max-width: 680px) {
@@ -476,7 +496,7 @@
         .progress-dot {
           min-height: 32px;
           padding: 4px 2px;
-          font-size: 10px;
+          font-size: 9px;
         }
 
         .mission-panel {
@@ -485,17 +505,16 @@
         }
 
         .typing-target {
-          min-height: 98px;
+          min-height: 172px;
         }
 
         input {
           min-height: 66px;
-          font-size: 34px;
+          font-size: 28px;
         }
 
-        textarea {
-          min-height: 190px;
-          font-size: 20px;
+        .report-grid {
+          grid-template-columns: 1fr;
         }
 
         .assist-actions {
@@ -504,7 +523,7 @@
         }
 
         .ghost-button,
-        .copy-button {
+        .primary-button {
           width: 100%;
         }
       }
@@ -514,14 +533,14 @@
     <main class="focus-shell">
       <header class="topbar">
         <a class="nav-link" href="index.html">12과</a>
-        <div class="topbar-title" aria-label="생활 속 운동 답글 쓰기">
+        <div class="topbar-title" aria-label="12과 표현 타이핑 연습">
           <span>타이핑 집중 모드</span>
-          <strong>생활 속 운동 답글 쓰기</strong>
+          <strong>12과 표현 타이핑 연습</strong>
         </div>
-        <button class="reset-button" id="resetBuilder" type="button">처음부터</button>
+        <button class="reset-button" id="resetTrainer" type="button">처음부터</button>
       </header>
 
-      <div class="progress-dots" id="progressDots" aria-label="쓰기 진행 단계"></div>
+      <div class="progress-dots" id="progressDots" aria-label="표현 타이핑 진행 단계"></div>
 
       <section class="mission-panel is-current-task" id="missionPanel" aria-labelledby="stageTitle">
         <div class="mission-head">
@@ -530,58 +549,42 @@
           <p class="mission-prompt" id="missionPrompt">한글 입력 모드로 짧게 시작합니다. 아래 칸에 운동을 입력하세요.</p>
         </div>
 
-        <section class="input-stage is-active" data-stage="warmup" aria-label="한영 확인">
-          <div class="typing-target">
-            <span>지금 칠 단어</span>
-            <strong>운동</strong>
-            <p>정확히 입력하면 자동으로 다음 단계로 갑니다.</p>
-          </div>
-          <div class="spotlight-input">
-            <input id="warmupInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="운동">
-          </div>
-        </section>
+        <div class="language-row" data-multilang-bar></div>
 
-        <section class="input-stage" data-stage="words" aria-label="핵심어 타이핑">
-          <div class="typing-target">
-            <span>지금 칠 핵심어</span>
-            <strong id="targetWord">스트레칭</strong>
-            <p><b id="typedWordCount">0</b> / <b id="totalWordCount">4</b>개 완료</p>
+        <div class="typing-target" id="targetCard">
+          <span id="itemMeta">시작 확인</span>
+          <strong id="targetText">운동</strong>
+          <p class="cue" id="cueKo">한글 입력 모드인지 확인합니다.</p>
+          <p class="note" id="noteText">정확히 입력하면 다음 단계로 이동합니다.</p>
+          <div class="translation-panel" id="translationPanel" aria-label="선택 언어 보조 설명"></div>
+          <div class="hint-panel" id="hintPanel" hidden>
+            <span>힌트</span>
+            <strong id="hintText"></strong>
           </div>
-          <div class="spotlight-input">
-            <input id="wordInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="핵심어 입력">
-          </div>
-        </section>
+        </div>
 
-        <section class="input-stage" data-stage="sentences" aria-label="문장 만들기">
-          <div class="typing-target">
-            <span id="sentenceStepLabel">문장 1 / 3</span>
-            <strong id="sentenceTarget">건강 노력</strong>
-            <p id="sentenceHint">건강을 위해 하는 노력을 한 문장으로 씁니다.</p>
-          </div>
-          <div class="spotlight-input">
-            <textarea id="sentenceInput" placeholder="예: 물을 자주 마시고 채소와 과일을 먹습니다."></textarea>
-          </div>
-        </section>
+        <div class="spotlight-input" id="inputWrap">
+          <input id="typingInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="운동">
+        </div>
 
-        <section class="input-stage" data-stage="draft" aria-label="답글 다듬기">
-          <div class="typing-target">
-            <span>초안 다듬기</span>
-            <strong>답글</strong>
-            <p>자동으로 만든 답글을 읽고 필요하면 고쳐 씁니다.</p>
+        <section class="report-panel" id="reportPanel" aria-label="학습 리포트" hidden>
+          <div class="report-grid">
+            <div class="report-card">
+              <span>총 연습 항목</span>
+              <strong id="totalMetric">0</strong>
+            </div>
+            <div class="report-card">
+              <span>정확 입력</span>
+              <strong id="correctMetric">0</strong>
+            </div>
+            <div class="report-card">
+              <span>힌트 사용</span>
+              <strong id="hintMetric">0</strong>
+            </div>
           </div>
-          <div class="spotlight-input">
-            <textarea id="draftInput" placeholder="문장 조각으로 만든 답글 초안"></textarea>
-          </div>
-        </section>
-
-        <section class="input-stage" data-stage="final" aria-label="복사 준비">
-          <div class="typing-target">
-            <span>완성</span>
-            <strong>복사 준비</strong>
-            <p>Ctrl+C로 복사하거나 Enter를 눌러 복사합니다.</p>
-          </div>
-          <div class="spotlight-input">
-            <textarea id="finalOutput" readonly aria-label="최종 답글"></textarea>
+          <div>
+            <h2>재연습 추천 표현</h2>
+            <ul class="review-list" id="reviewList"></ul>
           </div>
         </section>
 
@@ -592,97 +595,124 @@
 
         <div class="assist-actions">
           <button class="ghost-button" id="prevButton" type="button">이전</button>
-          <button class="ghost-button" id="nextButton" type="button">다음</button>
-          <button class="copy-button" id="copyButton" type="button">복사</button>
+          <button class="ghost-button" id="hintButton" type="button">힌트</button>
+          <button class="primary-button" id="checkButton" type="button">확인</button>
+          <button class="primary-button" id="retryButton" type="button" hidden>재연습</button>
         </div>
       </section>
-
-      <details class="preview-drawer" id="previewDrawer">
-        <summary>
-          <span>완성 글 미리보기</span>
-          <span id="previewCount">0자</span>
-        </summary>
-        <textarea id="previewOutput" readonly aria-label="완성 글 미리보기"></textarea>
-      </details>
     </main>
 
+    <script>
+      window.MULTILANG_CONFIG = {
+        langs: ["vi", "mn", "ar", "kk", "th", "en", "ja", "zh"],
+        defaultLang: "none"
+      };
+    </script>
     <script>
       (function () {
         "use strict";
 
-        const STORAGE_KEY = "c12_life_exercise_keyboard_builder_v1";
-        const WORD_TARGETS = ["스트레칭", "계단", "걷기", "자세 교정"];
+        const STORAGE_KEY = "c12_expression_typing_trainer_v1";
+        const WARMUP_TARGET = "운동";
+        const LANGS = ["vi", "mn", "ar", "kk", "th", "en", "ja", "zh"];
+        const WARMUP_TRANSLATIONS = {
+          vi: "Kiểm tra chế độ gõ tiếng Hàn.",
+          mn: "Солонгосоор бичих горимыг шалгана.",
+          ar: "تحقّق من وضع الكتابة بالكورية.",
+          kk: "Корейше теру режимін тексеріңіз.",
+          th: "ตรวจสอบโหมดพิมพ์ภาษาเกาหลี",
+          en: "Check that Korean input mode is on.",
+          ja: "韓国語入力モードか確認します。",
+          zh: "确认是否处于韩语输入模式。"
+        };
+        function tr(vi, mn, ar, kk, th, en, ja, zh) {
+          return { vi, mn, ar, kk, th, en, ja, zh };
+        }
+        const TRAINING_SECTIONS = [
+          { id: "core-health-maintain", section: "core", target: "건강을 유지하다", cueKo: "건강을 계속 좋게 지키다", translations: tr("Duy trì sức khỏe", "Эрүүл мэндээ хадгалах", "الحفاظ على الصحة", "Денсаулықты сақтау", "รักษาสุขภาพ", "Maintain health", "健康を維持する", "保持健康"), note: "생활 속 운동 쓰기의 핵심 어휘입니다.", mode: "copy" },
+          { id: "core-stamina", section: "core", target: "체력을 기르다", cueKo: "몸의 힘과 버티는 힘을 키우다", translations: tr("Rèn luyện thể lực", "Биеийн тэнхээг нэмэгдүүлэх", "تنمية اللياقة البدنية", "Дене күшін дамыту", "เสริมสร้างสมรรถภาพร่างกาย", "Build physical strength", "体力をつける", "增强体力"), note: "운동의 목적을 말할 때 씁니다.", mode: "copy" },
+          { id: "core-stress", section: "core", target: "스트레스를 해소하다", cueKo: "긴장과 답답함을 풀다", translations: tr("Giải tỏa căng thẳng", "Стрессээ тайлах", "تخفيف التوتر", "Стресті жеңілдету", "คลายความเครียด", "Relieve stress", "ストレスを解消する", "缓解压力"), note: "운동의 장점을 설명하는 표현입니다.", mode: "copy" },
+          { id: "core-obesity", section: "core", target: "비만을 예방하다", cueKo: "살이 너무 찌는 것을 막다", translations: tr("Phòng ngừa béo phì", "Таргалалтаас сэргийлэх", "الوقاية من السمنة", "Семіздіктің алдын алу", "ป้องกันโรคอ้วน", "Prevent obesity", "肥満を予防する", "预防肥胖"), note: "건강 관리의 효과를 말합니다.", mode: "copy" },
+          { id: "core-stairs-use", section: "core", target: "계단을 이용하다", cueKo: "엘리베이터 대신 계단을 쓰다", translations: tr("Sử dụng cầu thang", "Шатаар явах", "استخدام الدرج", "Баспалдақты пайдалану", "ใช้บันได", "Use the stairs", "階段を利用する", "使用楼梯"), note: "바쁠 때 할 수 있는 생활 운동입니다.", mode: "copy" },
+          { id: "core-walking", section: "core", target: "걷기 운동을 하다", cueKo: "걸으면서 운동하다", translations: tr("Tập đi bộ", "Алхах дасгал хийх", "ممارسة رياضة المشي", "Жаяу жүру жаттығуын жасау", "ออกกำลังกายด้วยการเดิน", "Do walking exercise", "ウォーキングをする", "进行步行运动"), note: "쉽게 권할 수 있는 운동 표현입니다.", mode: "copy" },
+          { id: "core-posture", section: "core", target: "자세를 교정하다", cueKo: "나쁜 자세를 바르게 고치다", translations: tr("Chỉnh sửa tư thế", "Биеийн байрлалаа засах", "تصحيح وضعية الجسم", "Дене қалпын түзету", "ปรับท่าทางให้ถูกต้อง", "Correct posture", "姿勢を矯正する", "矫正姿势"), note: "읽기 주제와 연결되는 핵심 표현입니다.", mode: "copy" },
+          { id: "core-stretching", section: "core", target: "스트레칭을 하다", cueKo: "몸을 늘이고 풀어 주다", translations: tr("Tập giãn cơ", "Сунгалтын дасгал хийх", "ممارسة تمارين التمدد", "Созылу жаттығуын жасау", "ยืดเหยียดร่างกาย", "Do stretching", "ストレッチをする", "做拉伸运动"), note: "생활 속 운동 방법을 말할 때 씁니다.", mode: "copy" },
+          { id: "exp-stairs-climb", section: "expansion", target: "계단을 오르다", cueKo: "계단 위쪽으로 올라가다", translations: tr("Leo cầu thang", "Шатаар өгсөх", "صعود الدرج", "Баспалдақпен көтерілу", "ขึ้นบันได", "Climb the stairs", "階段を上る", "爬楼梯"), note: "계단을 이용하다에서 더 구체화한 표현입니다.", mode: "copy" },
+          { id: "exp-elevator", section: "expansion", target: "엘리베이터 대신 계단을 이용하다", cueKo: "승강기를 타지 않고 계단을 쓰다", translations: tr("Dùng cầu thang thay vì thang máy", "Цахилгаан шатны оронд шатаар явах", "استخدام الدرج بدل المصعد", "Лифттің орнына баспалдақты пайдалану", "ใช้บันไดแทนลิฟต์", "Use the stairs instead of the elevator", "エレベーターの代わりに階段を使う", "不用电梯而走楼梯"), note: "권유문에 바로 넣기 좋은 확장 표현입니다.", mode: "copy" },
+          { id: "exp-fresh-walk", section: "expansion", target: "맑은 공기를 마시며 걷기 운동을 하다", cueKo: "좋은 공기를 마시면서 걷다", translations: tr("Đi bộ trong không khí trong lành", "Цэвэр агаарт алхах дасгал хийх", "المشي مع استنشاق هواء نقي", "Таза ауа жұтып жүріп жүру", "เดินออกกำลังกายพร้อมสูดอากาศบริสุทธิ์", "Walk while breathing fresh air", "澄んだ空気を吸いながら歩く", "呼吸清新空气并步行运动"), note: "읽기 문장의 생활 운동 표현입니다.", mode: "copy" },
+          { id: "exp-neck", section: "expansion", target: "고개를 천천히 돌리다", cueKo: "목을 무리하지 않고 돌리다", translations: tr("Xoay cổ chậm rãi", "Толгойгоо аажуухан эргүүлэх", "إدارة الرأس ببطء", "Басты жай айналдыру", "ค่อย ๆ หมุนศีรษะ", "Turn your head slowly", "首をゆっくり回す", "慢慢转动头部"), note: "스트레칭 방법을 설명하는 표현입니다.", mode: "copy" },
+          { id: "exp-waist", section: "expansion", target: "두 손을 허리에 대다", cueKo: "손 두 개를 허리 위에 놓다", translations: tr("Đặt hai tay lên eo", "Хоёр гараа бэлхүүс дээр тавих", "وضع اليدين على الخصر", "Екі қолды белге қою", "วางมือทั้งสองข้างที่เอว", "Put both hands on your waist", "両手を腰に当てる", "双手放在腰上"), note: "동작 순서를 설명할 때 유용합니다.", mode: "copy" },
+          { id: "exp-bend-back", section: "expansion", target: "몸을 뒤로 젖히다", cueKo: "몸을 뒤쪽으로 기울이다", translations: tr("Ngả người ra sau", "Биеэ арагш гэдийлгэх", "إمالة الجسم إلى الخلف", "Денені артқа шалқайту", "เอนตัวไปด้านหลัง", "Lean your body backward", "体を後ろに反らす", "身体向后仰"), note: "스트레칭 동작을 구체적으로 말합니다.", mode: "copy" },
+          { id: "exp-heel", section: "expansion", target: "발뒤꿈치를 들다", cueKo: "뒤꿈치를 바닥에서 올리다", translations: tr("Nhấc gót chân", "Өсгийгөө өргөх", "رفع الكعبين", "Өкшені көтеру", "ยกส้นเท้า", "Lift your heels", "かかとを上げる", "抬起脚后跟"), note: "짧은 운동 동작으로 확장할 수 있습니다.", mode: "copy" },
+          { id: "exp-arm", section: "expansion", target: "팔을 쭉 뻗다", cueKo: "팔을 길게 펴다", translations: tr("Duỗi thẳng tay", "Гараа шулуун сунгах", "مدّ الذراعين جيدًا", "Қолды созу", "เหยียดแขนให้ตรง", "Stretch your arm out", "腕をまっすぐ伸ばす", "伸直手臂"), note: "운동 뒤 몸의 반응과 연결하기 좋습니다.", mode: "copy" },
+          { id: "grammar-light", section: "grammar", target: "운동을 했더니 몸이 가벼워졌어요.", cueKo: "V-았/었더니: 직접 운동한 뒤의 결과", translations: tr("Sau khi tập thể dục, cơ thể nhẹ hơn.", "Дасгал хийсний дараа бие хөнгөрсөн.", "بعد ممارسة الرياضة أصبح الجسم أخف.", "Жаттығу жасағаннан кейін дене жеңілдеді.", "หลังออกกำลังกาย รู้สึกตัวเบาขึ้น", "After exercising, my body felt lighter.", "運動したら体が軽くなりました。", "运动之后，身体变轻松了。"), note: "경험 뒤 결과를 말합니다.", mode: "copy" },
+          { id: "grammar-refreshed", section: "grammar", target: "목을 천천히 돌렸더니 기분이 상쾌해졌어요.", cueKo: "V-았/었더니: 목 스트레칭 뒤 변화", translations: tr("Sau khi xoay cổ, cảm giác sảng khoái hơn.", "Хүзүүгээ аажуухан эргүүлсний дараа сэргэг болсон.", "بعد إدارة الرقبة ببطء شعرت بالانتعاش.", "Мойынды жай айналдырғаннан кейін көңіл сергіді.", "หลังหมุนคอช้า ๆ รู้สึกสดชื่นขึ้น", "After slowly turning my neck, I felt refreshed.", "首をゆっくり回したら気分がすっきりしました。", "慢慢转动脖子后，感觉清爽了。"), note: "동작과 결과를 연결합니다.", mode: "copy" },
+          { id: "grammar-sweat", section: "grammar", target: "운동을 하면 땀이 얼마나 많이 나는지 몰라요.", cueKo: "얼마나 -는지 모르다: 정도 강조", translations: tr("Không biết ra mồ hôi nhiều đến mức nào.", "Дасгал хийхэд хөлс маш их гардаг.", "لا تتخيل كم يخرج العرق عند ممارسة الرياضة.", "Жаттығу жасағанда тер өте көп шығады.", "เวลาออกกำลังกาย เหงื่อออกมากจริง ๆ", "When I exercise, I sweat so much.", "運動すると汗がどれほど出るかわかりません。", "一运动就会出很多汗。"), note: "동사는 -는지 형태를 씁니다.", mode: "copy" },
+          { id: "grammar-body", section: "grammar", target: "요즘 몸이 얼마나 좋아졌는지 몰라요.", cueKo: "얼마나 -았/었는지 모르다: 변화 강조", translations: tr("Dạo này cơ thể tốt lên rất nhiều.", "Сүүлийн үед бие маш их сайжирсан.", "تحسنت صحتي كثيرًا هذه الأيام.", "Соңғы кезде денем қатты жақсарды.", "ช่วงนี้ร่างกายดีขึ้นมากจริง ๆ", "My body has improved so much lately.", "最近、体の調子がとても良くなりました。", "最近身体状态好了很多。"), note: "좋아진 정도를 강조합니다.", mode: "copy" },
+          { id: "grammar-guess", section: "grammar", target: "친구가 계속 하품해요. 어젯밤에 잠을 못 잔 모양이에요.", cueKo: "-(으)ㄴ 모양이다: 근거를 보고 추측", translations: tr("Bạn cứ ngáp, chắc tối qua ngủ không ngon.", "Найз минь эвшээгээд байна. Өчигдөр сайн унтаагүй бололтой.", "الصديق يتثاءب باستمرار. يبدو أنه لم ينم جيدًا البارحة.", "Досым қайта-қайта есінейді. Кеше түнде ұйықтамаған сияқты.", "เพื่อนหาวตลอด ดูเหมือนเมื่อคืนจะนอนไม่พอ", "My friend keeps yawning. It seems they did not sleep well last night.", "友達がずっとあくびをしています。昨夜よく眠れなかったようです。", "朋友一直打哈欠，好像昨晚没睡好。"), note: "보이는 단서로 추측합니다.", mode: "copy" },
+          { id: "grammar-condition", section: "grammar", target: "꾸준히 운동해야 건강을 지킬 수 있어요.", cueKo: "-아야/어야: 결과를 위한 조건", translations: tr("Phải tập đều đặn mới giữ được sức khỏe.", "Тогтмол дасгал хийж байж эрүүл байж чадна.", "يجب ممارسة الرياضة بانتظام للحفاظ على الصحة.", "Денсаулықты сақтау үшін тұрақты жаттығу керек.", "ต้องออกกำลังกายสม่ำเสมอจึงจะรักษาสุขภาพได้", "You need to exercise regularly to stay healthy.", "健康を守るには、こつこつ運動しなければなりません。", "要坚持运动才能保持健康。"), note: "건강을 지키기 위한 조건을 말합니다.", mode: "copy" }
+        ];
+        const RECALL_SOURCE_IDS = [
+          "core-health-maintain",
+          "core-stairs-use",
+          "exp-stairs-climb",
+          "exp-neck",
+          "grammar-light",
+          "grammar-condition"
+        ];
+        const RECALL_ITEMS = RECALL_SOURCE_IDS.map((id) => {
+          const item = TRAINING_SECTIONS.find((entry) => entry.id === id);
+          return Object.assign({}, item, { id: "recall-" + id, section: "recall", mode: "recall" });
+        });
         const STAGES = [
           { id: "warmup", label: "한/영", title: "한/영 확인", meta: "1단계", prompt: "한글 입력 모드로 짧게 시작합니다. 아래 칸에 운동을 입력하세요." },
-          { id: "words", label: "핵심어", title: "핵심어 타이핑", meta: "2단계", prompt: "생활 속 운동 답글에 들어갈 핵심어를 순서대로 입력합니다." },
-          { id: "sentences", label: "문장", title: "문장 만들기", meta: "3단계", prompt: "한 번에 한 문장만 씁니다. Ctrl+Enter로 다음 질문으로 넘어갑니다." },
-          { id: "draft", label: "답글", title: "답글 다듬기", meta: "4단계", prompt: "자동으로 만든 답글을 읽고 필요하면 고쳐 씁니다." },
-          { id: "final", label: "완성", title: "복사 준비", meta: "5단계", prompt: "완성한 답글을 복사할 준비가 되었습니다." }
-        ];
-        const SENTENCE_PROMPTS = [
-          {
-            key: "effort",
-            target: "건강 노력",
-            hint: "건강을 위해 하는 노력을 한 문장으로 씁니다.",
-            placeholder: "예: 물을 자주 마시고 채소와 과일을 먹습니다."
-          },
-          {
-            key: "exercise",
-            target: "생활 속 운동 방법",
-            hint: "시간이 없을 때 할 수 있는 운동을 권유합니다.",
-            placeholder: "예: 쉬는 시간에 스트레칭을 하고 계단을 이용해 보세요."
-          },
-          {
-            key: "benefit",
-            target: "운동 효과",
-            hint: "운동을 하면 좋은 점을 한 문장으로 씁니다.",
-            placeholder: "예: 스트레스가 풀리고 몸이 가벼워집니다."
-          }
+          { id: "core", label: "핵심", title: "핵심 어휘", meta: "2단계", prompt: "12과 생활 속 운동 쓰기에 필요한 핵심 어휘를 정확히 따라 칩니다." },
+          { id: "expansion", label: "확장", title: "확장 표현", meta: "3단계", prompt: "계단, 걷기, 스트레칭 동작을 더 구체적인 표현으로 연습합니다." },
+          { id: "grammar", label: "문법", title: "문법 문장", meta: "4단계", prompt: "12과 목표 문법이 들어간 문장을 문장부호까지 정확히 입력합니다." },
+          { id: "recall", label: "회상", title: "가림 회상", meta: "5단계", prompt: "목표 표현을 가리고 뜻과 설명만 보고 다시 입력합니다." },
+          { id: "report", label: "리포트", title: "학습 리포트", meta: "6단계", prompt: "오늘 타이핑으로 익힌 표현과 재연습할 표현을 확인합니다." }
         ];
 
         const state = {
           stageIndex: 0,
-          promptIndex: 0,
-          activeInputId: "warmupInput",
-          warmupDone: false,
-          wordIndex: 0,
-          typedWords: [],
-          sentences: { effort: "", exercise: "", benefit: "" },
-          draft: "",
-          final: "",
+          itemIndexByStage: { core: 0, expansion: 0, grammar: 0, recall: 0 },
+          results: {},
+          hintVisible: false,
+          activeInputId: "typingInput",
           composing: false
         };
 
         let advanceTimer = 0;
-        let sentencePauseTimer = 0;
+        let lastRenderKey = "";
 
         const els = {
-          resetBuilder: document.getElementById("resetBuilder"),
+          resetTrainer: document.getElementById("resetTrainer"),
           progressDots: document.getElementById("progressDots"),
-          missionPanel: document.getElementById("missionPanel"),
           stageMeta: document.getElementById("stageMeta"),
           stageTitle: document.getElementById("stageTitle"),
           missionPrompt: document.getElementById("missionPrompt"),
-          stageViews: Array.from(document.querySelectorAll(".input-stage")),
-          warmupInput: document.getElementById("warmupInput"),
-          targetWord: document.getElementById("targetWord"),
-          typedWordCount: document.getElementById("typedWordCount"),
-          totalWordCount: document.getElementById("totalWordCount"),
-          wordInput: document.getElementById("wordInput"),
-          sentenceStepLabel: document.getElementById("sentenceStepLabel"),
-          sentenceTarget: document.getElementById("sentenceTarget"),
-          sentenceHint: document.getElementById("sentenceHint"),
-          sentenceInput: document.getElementById("sentenceInput"),
-          draftInput: document.getElementById("draftInput"),
-          finalOutput: document.getElementById("finalOutput"),
+          targetCard: document.getElementById("targetCard"),
+          itemMeta: document.getElementById("itemMeta"),
+          targetText: document.getElementById("targetText"),
+          cueKo: document.getElementById("cueKo"),
+          noteText: document.getElementById("noteText"),
+          translationPanel: document.getElementById("translationPanel"),
+          hintPanel: document.getElementById("hintPanel"),
+          hintText: document.getElementById("hintText"),
+          inputWrap: document.getElementById("inputWrap"),
+          typingInput: document.getElementById("typingInput"),
+          reportPanel: document.getElementById("reportPanel"),
+          totalMetric: document.getElementById("totalMetric"),
+          correctMetric: document.getElementById("correctMetric"),
+          hintMetric: document.getElementById("hintMetric"),
+          reviewList: document.getElementById("reviewList"),
           statusLine: document.getElementById("statusLine"),
           feedbackText: document.getElementById("feedbackText"),
           shortcutText: document.getElementById("shortcutText"),
           prevButton: document.getElementById("prevButton"),
-          nextButton: document.getElementById("nextButton"),
-          copyButton: document.getElementById("copyButton"),
-          previewOutput: document.getElementById("previewOutput"),
-          previewCount: document.getElementById("previewCount")
+          hintButton: document.getElementById("hintButton"),
+          checkButton: document.getElementById("checkButton"),
+          retryButton: document.getElementById("retryButton")
         };
 
         function normalize(value) {
@@ -693,15 +723,64 @@
           return /[A-Za-z]/.test(value);
         }
 
-        function hasSentenceStop(value) {
-          return /[.!?。？！]\s*$/.test(value);
+        function escapeHtml(value) {
+          return String(value == null ? "" : value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        }
+
+        function syncMultilangBlocks() {
+          if (!window.MultilangToggle || typeof window.MultilangToggle.refresh !== "function") return;
+          window.MultilangToggle.refresh();
+        }
+
+        function renderTranslations(translations) {
+          const data = translations || {};
+          els.translationPanel.innerHTML = LANGS.map((lang) => {
+            const text = data[lang] || "";
+            const dir = lang === "ar" ? ' dir="rtl"' : "";
+            return '<p class="lang-box" data-lang="' + lang + '" lang="' + lang + '"' + dir + ">" + escapeHtml(text) + "</p>";
+          }).join("");
+          syncMultilangBlocks();
         }
 
         function clearTimers() {
           window.clearTimeout(advanceTimer);
-          window.clearTimeout(sentencePauseTimer);
           advanceTimer = 0;
-          sentencePauseTimer = 0;
+        }
+
+        function practiceItems() {
+          return TRAINING_SECTIONS.concat(RECALL_ITEMS);
+        }
+
+        function stageItems(stageId) {
+          if (stageId === "recall") return RECALL_ITEMS;
+          return TRAINING_SECTIONS.filter((item) => item.section === stageId);
+        }
+
+        function currentStage() {
+          return STAGES[state.stageIndex];
+        }
+
+        function currentItem() {
+          const stage = currentStage();
+          const items = stageItems(stage.id);
+          return items[state.itemIndexByStage[stage.id] || 0] || null;
+        }
+
+        function currentItemIndex() {
+          const stage = currentStage();
+          return state.itemIndexByStage[stage.id] || 0;
+        }
+
+        function stageDone(stageId) {
+          if (stageId === "warmup") return state.stageIndex > 0;
+          if (stageId === "report") return state.stageIndex === STAGES.length - 1;
+          const items = stageItems(stageId);
+          return items.length > 0 && items.every((item) => state.results[item.id] && state.results[item.id].correct);
         }
 
         function setFeedback(message, kind, shortcut) {
@@ -712,44 +791,6 @@
           els.statusLine.classList.toggle("is-warn", kind === "warn");
         }
 
-        function getStage() {
-          return STAGES[state.stageIndex];
-        }
-
-        function makeDraft() {
-          const effort = normalize(state.sentences.effort) || "물을 자주 마시고 채소와 과일을 먹는 것도 좋습니다.";
-          const exercise = normalize(state.sentences.exercise) || "쉬는 시간에 스트레칭을 하고 가까운 거리는 걸어 보세요.";
-          const benefit = normalize(state.sentences.benefit) || "스트레스가 풀리고 몸이 가벼워질 것입니다.";
-          return [
-            "안녕하세요. 바빠서 운동할 시간이 없어서 걱정이 많으시겠어요.",
-            "건강을 위해 " + effort,
-            "그리고 시간이 없을 때에는 " + exercise,
-            "이렇게 하면 " + benefit,
-            "처음에는 짧게 시작하고 꾸준히 하는 것이 중요합니다."
-          ].join("\n");
-        }
-
-        function syncDrafts() {
-          if (!normalize(state.draft) || state.stageIndex <= 2) {
-            state.draft = makeDraft();
-          }
-          if (!normalize(state.final) || state.stageIndex <= 3) {
-            state.final = state.draft;
-          }
-        }
-
-        function isStageDone(index) {
-          if (index === 0) return state.warmupDone;
-          if (index === 1) return state.typedWords.length >= WORD_TARGETS.length;
-          if (index === 2) return SENTENCE_PROMPTS.every((prompt) => normalize(state.sentences[prompt.key]));
-          if (index === 3) return Boolean(normalize(state.draft));
-          return Boolean(normalize(state.final));
-        }
-
-        function completedCount() {
-          return STAGES.filter((_, index) => isStageDone(index)).length;
-        }
-
         function saveState() {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
@@ -757,237 +798,185 @@
         function loadState() {
           try {
             const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-            if (typeof saved.step === "number" && typeof saved.stageIndex !== "number") {
-              saved.stageIndex = saved.step;
-            }
             Object.assign(state, saved);
-            state.typedWords = Array.isArray(state.typedWords) ? state.typedWords : [];
-            state.sentences = {
-              effort: saved.sentences && typeof saved.sentences === "object" ? saved.sentences.effort || "" : saved.effort || "",
-              exercise: saved.sentences && typeof saved.sentences === "object" ? saved.sentences.exercise || "" : saved.exercise || "",
-              benefit: saved.sentences && typeof saved.sentences === "object" ? saved.sentences.benefit || "" : saved.benefit || ""
-            };
+            state.itemIndexByStage = Object.assign({ core: 0, expansion: 0, grammar: 0, recall: 0 }, saved.itemIndexByStage || {});
+            state.results = saved.results && typeof saved.results === "object" ? saved.results : {};
             state.stageIndex = Math.max(0, Math.min(Number(state.stageIndex) || 0, STAGES.length - 1));
-            state.promptIndex = Math.max(0, Math.min(Number(state.promptIndex) || 0, SENTENCE_PROMPTS.length - 1));
-            state.wordIndex = Math.max(0, Math.min(Number(state.wordIndex) || 0, WORD_TARGETS.length));
+            ["core", "expansion", "grammar", "recall"].forEach((stageId) => {
+              const max = Math.max(stageItems(stageId).length - 1, 0);
+              state.itemIndexByStage[stageId] = Math.max(0, Math.min(Number(state.itemIndexByStage[stageId]) || 0, max));
+            });
+            state.hintVisible = false;
             state.composing = false;
+            state.activeInputId = "typingInput";
           } catch (error) {
             localStorage.removeItem(STORAGE_KEY);
           }
         }
 
-        function getActiveInput() {
-          return document.getElementById(state.activeInputId);
-        }
-
-        function setActiveInputId() {
-          if (state.stageIndex === 0) state.activeInputId = "warmupInput";
-          if (state.stageIndex === 1) state.activeInputId = "wordInput";
-          if (state.stageIndex === 2) state.activeInputId = "sentenceInput";
-          if (state.stageIndex === 3) state.activeInputId = "draftInput";
-          if (state.stageIndex === 4) state.activeInputId = "finalOutput";
-        }
-
-        function focusActiveInput(selectText) {
-          if (state.composing) return;
-          const input = getActiveInput();
-          if (!input) return;
+        function focusInput(selectText) {
+          if (state.composing || currentStage().id === "report") return;
           window.requestAnimationFrame(() => {
-            input.focus({ preventScroll: true });
-            if (selectText && typeof input.select === "function") input.select();
+            els.typingInput.focus({ preventScroll: true });
+            if (selectText) els.typingInput.select();
           });
+        }
+
+        function recordAttempt(item, correct) {
+          const previous = state.results[item.id] || {
+            id: item.id,
+            target: item.target,
+            section: item.section,
+            attempts: 0,
+            hint: false,
+            correct: false
+          };
+          state.results[item.id] = {
+            id: item.id,
+            target: item.target,
+            section: item.section,
+            attempts: previous.attempts + 1,
+            hint: previous.hint || state.hintVisible,
+            correct: previous.correct || correct
+          };
+        }
+
+        function markHintUsed() {
+          const item = currentItem();
+          if (!item || currentStage().id !== "recall") return;
+          const previous = state.results[item.id] || {
+            id: item.id,
+            target: item.target,
+            section: item.section,
+            attempts: 0,
+            hint: false,
+            correct: false
+          };
+          state.results[item.id] = Object.assign({}, previous, { hint: true });
         }
 
         function goToStage(index, options) {
           clearTimers();
           state.stageIndex = Math.max(0, Math.min(index, STAGES.length - 1));
-          if (state.stageIndex === 2) {
-            const nextEmptyIndex = SENTENCE_PROMPTS.findIndex((prompt) => !normalize(state.sentences[prompt.key]));
-            state.promptIndex = nextEmptyIndex >= 0 ? nextEmptyIndex : Math.min(state.promptIndex, SENTENCE_PROMPTS.length - 1);
-          }
-          if (state.stageIndex === 3) {
-            syncDrafts();
-          }
-          if (state.stageIndex === 4) {
-            syncDrafts();
-          }
-          setActiveInputId();
+          state.hintVisible = false;
           render(options);
         }
 
-        function goNextManual() {
-          if (state.stageIndex === 4) {
-            copyFinal();
+        function advanceItem() {
+          const stage = currentStage();
+          const items = stageItems(stage.id);
+          const nextIndex = currentItemIndex() + 1;
+          state.hintVisible = false;
+          if (nextIndex < items.length) {
+            state.itemIndexByStage[stage.id] = nextIndex;
+            render({ selectText: true });
+            setFeedback("좋아요. 다음 표현을 입력하세요.", "good", stage.id === "recall" ? "<kbd>Enter</kbd> 확인" : "<kbd>자동</kbd> 정확히 치면 이동");
             return;
           }
-          if (!isStageDone(state.stageIndex)) {
-            setFeedback("현재 입력을 먼저 완성하세요.", "warn", "<kbd>Enter</kbd> 또는 <kbd>Ctrl+Enter</kbd>");
-            focusActiveInput();
-            return;
+          goToStage(state.stageIndex + 1, { selectText: true });
+          if (currentStage().id !== "report") {
+            setFeedback("다음 단계로 넘어갑니다.", "good", "<kbd>자동</kbd>");
           }
-          goToStage(state.stageIndex + 1);
-        }
-
-        function goPrev() {
-          goToStage(state.stageIndex - 1);
         }
 
         function completeWarmup() {
-          state.warmupDone = true;
-          setFeedback("좋아요. 바로 핵심어로 넘어갑니다.", "good", "<kbd>자동 이동</kbd>");
-          advanceTimer = window.setTimeout(() => goToStage(1), 400);
+          setFeedback("좋아요. 핵심 어휘로 넘어갑니다.", "good", "<kbd>자동 이동</kbd>");
+          advanceTimer = window.setTimeout(() => goToStage(1, { selectText: true }), 300);
         }
 
-        function handleWarmupInput() {
-          const value = normalize(els.warmupInput.value);
+        function completeCopyItem(item) {
+          recordAttempt(item, true);
+          setFeedback("정확해요. 다음 표현으로 넘어갑니다.", "good", "<kbd>자동 이동</kbd>");
+          saveState();
+          advanceTimer = window.setTimeout(advanceItem, 300);
+        }
+
+        function submitRecallItem() {
+          const item = currentItem();
+          if (!item) return;
+          const value = normalize(els.typingInput.value);
           if (hasEnglish(value)) {
-            state.warmupDone = false;
-            clearTimers();
             setFeedback("한/영 키 확인: 지금은 한글 입력 모드가 필요합니다.", "bad", "<kbd>한/영</kbd>");
-            render({ preserveFocus: true });
+            focusInput(true);
             return;
           }
-          if (value === "운동") {
-            completeWarmup();
-            render({ preserveFocus: true });
+          if (value === item.target) {
+            recordAttempt(item, true);
+            setFeedback("정확해요. 기억으로 입력했습니다.", "good", "<kbd>Enter</kbd> 다음 확인");
+            saveState();
+            advanceTimer = window.setTimeout(advanceItem, 300);
             return;
           }
-          state.warmupDone = false;
-          clearTimers();
-          setFeedback('"운동"을 입력하세요.', "warn", "<kbd>자동</kbd> 정확히 입력하면 이동");
-          render({ preserveFocus: true });
+          recordAttempt(item, false);
+          setFeedback("다시 입력하세요.", "bad", "<kbd>Ctrl+H</kbd> 힌트");
+          saveState();
+          focusInput(true);
         }
 
-        function handleWordInput() {
+        function handleTypingInput() {
           if (state.composing) return;
-          const value = normalize(els.wordInput.value);
-          const target = WORD_TARGETS[state.wordIndex];
-          if (hasEnglish(value)) {
-            setFeedback("한/영 키 확인: 한글로 핵심어를 입력하세요.", "bad", "<kbd>한/영</kbd>");
-            return;
-          }
-          if (!target) {
-            goToStage(2);
-            return;
-          }
-          if (value !== target) {
-            setFeedback(target + " 입력 중입니다.", "", "<kbd>자동</kbd> 정확히 치면 다음 단어");
-            render({ preserveFocus: true });
-            return;
-          }
-          if (!state.typedWords.includes(target)) {
-            state.typedWords.push(target);
-          }
-          state.wordIndex += 1;
-          els.wordInput.value = "";
-          if (state.wordIndex >= WORD_TARGETS.length) {
-            setFeedback("핵심어 완료. 문장 만들기로 넘어갑니다.", "good", "<kbd>자동 이동</kbd>");
-            render({ preserveFocus: true });
-            advanceTimer = window.setTimeout(() => goToStage(2), 350);
-            return;
-          }
-          setFeedback("정확해요. 다음 핵심어를 입력하세요.", "good", "<kbd>자동</kbd> 다음 단어");
-          render({ preserveFocus: true });
-        }
-
-        function storeCurrentSentence() {
-          const prompt = SENTENCE_PROMPTS[state.promptIndex];
-          if (!prompt) return;
-          state.sentences[prompt.key] = els.sentenceInput.value;
-          syncDrafts();
-        }
-
-        function advanceSentencePrompt() {
+          const stage = currentStage();
+          const value = normalize(els.typingInput.value);
           clearTimers();
-          storeCurrentSentence();
-          if (!normalize(state.sentences[SENTENCE_PROMPTS[state.promptIndex].key])) {
-            setFeedback("한 문장을 먼저 써 주세요.", "warn", "<kbd>Ctrl+Enter</kbd> 문장 완료");
-            render({ preserveFocus: true });
+          if (hasEnglish(value)) {
+            setFeedback("한/영 키 확인: 지금은 한글 입력 모드가 필요합니다.", "bad", "<kbd>한/영</kbd>");
             return;
           }
-          if (state.promptIndex < SENTENCE_PROMPTS.length - 1) {
-            state.promptIndex += 1;
-            setFeedback("다음 문장으로 넘어갑니다.", "good", "<kbd>Ctrl+Enter</kbd> 문장 완료");
-            render({ selectText: true });
+          if (stage.id === "warmup") {
+            if (value === WARMUP_TARGET) completeWarmup();
+            else setFeedback('"운동"을 입력하세요.', "warn", "<kbd>자동</kbd> 정확히 입력하면 이동");
             return;
           }
-          setFeedback("문장 3개 완료. 답글 초안으로 넘어갑니다.", "good", "<kbd>자동 이동</kbd>");
-          advanceTimer = window.setTimeout(() => goToStage(3, { selectText: true }), 300);
-          render({ preserveFocus: true });
-        }
-
-        function handleSentenceInput() {
-          storeCurrentSentence();
-          clearTimeout(sentencePauseTimer);
-          if (hasSentenceStop(els.sentenceInput.value)) {
-            sentencePauseTimer = window.setTimeout(advanceSentencePrompt, 800);
-          }
-          setFeedback("문장을 쓰는 중입니다.", "", "<kbd>Ctrl+Enter</kbd> 문장 완료");
-          render({ preserveFocus: true });
-        }
-
-        function handleDraftInput() {
-          state.draft = els.draftInput.value;
-          state.final = state.draft;
-          setFeedback("답글을 다듬는 중입니다.", "", "<kbd>Ctrl+Enter</kbd> 복사 준비");
-          render({ preserveFocus: true });
-        }
-
-        function finishDraft() {
-          state.draft = els.draftInput.value;
-          if (!normalize(state.draft)) {
-            setFeedback("답글을 먼저 채워 주세요.", "warn", "<kbd>Ctrl+Enter</kbd> 복사 준비");
-            focusActiveInput();
+          if (stage.id === "recall") {
+            setFeedback("뜻을 보고 기억나는 표현을 입력한 뒤 Enter를 누르세요.", "", "<kbd>Enter</kbd> 확인 <kbd>Ctrl+H</kbd> 힌트");
             return;
           }
-          state.final = state.draft;
-          goToStage(4, { selectText: true });
-        }
-
-        function copyFinal() {
-          state.final = els.finalOutput.value || state.final;
-          const text = state.final;
-          if (!normalize(text)) {
-            setFeedback("복사할 답글이 없습니다.", "warn", "<kbd>Ctrl+Enter</kbd>");
+          const item = currentItem();
+          if (item && value === item.target) {
+            completeCopyItem(item);
             return;
           }
-          const done = () => {
-            setFeedback("복사되었습니다.", "good", "<kbd>Ctrl+C</kbd> 또는 <kbd>Enter</kbd>");
-            render({ preserveFocus: true });
-          };
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(done).catch(() => {
-              els.finalOutput.select();
-              document.execCommand("copy");
-              done();
-            });
-            return;
+          if (item) {
+            setFeedback("목표 표현을 그대로 입력하세요.", "", "<kbd>자동</kbd> 정확히 치면 이동");
           }
-          els.finalOutput.select();
-          document.execCommand("copy");
-          done();
         }
 
-        function resetBuilder() {
+        function showHint() {
+          const item = currentItem();
+          if (!item || currentStage().id !== "recall") return;
+          state.hintVisible = true;
+          markHintUsed();
+          setFeedback("힌트를 보고 다시 입력하세요.", "warn", "<kbd>Enter</kbd> 확인");
+          render({ preserveInput: true, preserveFocus: true });
+          focusInput();
+        }
+
+        function goPrev() {
+          if (state.stageIndex === 0) return;
+          goToStage(state.stageIndex - 1, { selectText: true });
+        }
+
+        function retryRecall() {
+          state.stageIndex = 4;
+          state.itemIndexByStage.recall = 0;
+          state.hintVisible = false;
+          render({ selectText: true });
+          setFeedback("재연습할 표현을 다시 입력하세요.", "", "<kbd>Enter</kbd> 확인 <kbd>Ctrl+H</kbd> 힌트");
+        }
+
+        function resetTrainer() {
           clearTimers();
           Object.assign(state, {
             stageIndex: 0,
-            promptIndex: 0,
-            activeInputId: "warmupInput",
-            warmupDone: false,
-            wordIndex: 0,
-            typedWords: [],
-            sentences: { effort: "", exercise: "", benefit: "" },
-            draft: "",
-            final: "",
+            itemIndexByStage: { core: 0, expansion: 0, grammar: 0, recall: 0 },
+            results: {},
+            hintVisible: false,
+            activeInputId: "typingInput",
             composing: false
           });
+          lastRenderKey = "";
           localStorage.removeItem(STORAGE_KEY);
-          els.warmupInput.value = "";
-          els.wordInput.value = "";
-          els.sentenceInput.value = "";
-          els.draftInput.value = "";
-          els.finalOutput.value = "";
+          els.typingInput.value = "";
           setFeedback('한글 입력 모드에서 "운동"을 입력하세요.', "", "<kbd>자동</kbd> 정확히 입력하면 이동");
           render({ selectText: true });
         }
@@ -996,58 +985,113 @@
           els.progressDots.innerHTML = STAGES.map((stage, index) => {
             const classes = ["progress-dot"];
             if (index === state.stageIndex) classes.push("is-current");
-            if (isStageDone(index)) classes.push("is-done");
+            if (stageDone(stage.id)) classes.push("is-done");
             return '<button class="' + classes.join(" ") + '" type="button" data-stage-index="' + index + '">' + (index + 1) + ". " + stage.label + "</button>";
           }).join("");
         }
 
-        function renderSentenceStage() {
-          const prompt = SENTENCE_PROMPTS[state.promptIndex];
-          els.sentenceStepLabel.textContent = "문장 " + (state.promptIndex + 1) + " / " + SENTENCE_PROMPTS.length;
-          els.sentenceTarget.textContent = prompt.target;
-          els.sentenceHint.textContent = prompt.hint;
-          els.sentenceInput.placeholder = prompt.placeholder;
-          els.sentenceInput.value = state.sentences[prompt.key] || "";
+        function renderReport() {
+          const items = practiceItems();
+          const results = Object.values(state.results);
+          const correct = results.filter((result) => result.correct).length;
+          const hints = results.filter((result) => result.hint).length;
+          const review = items.filter((item) => {
+            const result = state.results[item.id];
+            return !result || !result.correct || result.hint || result.attempts > 1;
+          });
+          const fallback = items.filter((item) => !review.some((entry) => entry.id === item.id)).slice(-3);
+          const reviewItems = review.concat(fallback).slice(0, 3);
+          els.totalMetric.textContent = String(items.length);
+          els.correctMetric.textContent = String(correct);
+          els.hintMetric.textContent = String(hints);
+          els.reviewList.innerHTML = reviewItems.map((item) => "<li>" + item.target + "</li>").join("");
+          setFeedback("학습 리포트가 준비되었습니다.", "good", "<kbd>재연습</kbd> 또는 처음부터");
+        }
+
+        function renderTarget() {
+          const stage = currentStage();
+          const item = currentItem();
+          if (stage.id === "warmup") {
+            els.itemMeta.textContent = "시작 확인";
+            els.targetText.textContent = WARMUP_TARGET;
+            els.targetText.classList.remove("is-hidden-target");
+            els.cueKo.textContent = "한글 입력 모드인지 확인합니다.";
+            els.noteText.textContent = "정확히 입력하면 핵심 어휘로 이동합니다.";
+            renderTranslations(WARMUP_TRANSLATIONS);
+            els.hintPanel.hidden = true;
+            els.typingInput.placeholder = WARMUP_TARGET;
+            return;
+          }
+          if (!item) return;
+          const items = stageItems(stage.id);
+          els.itemMeta.textContent = stage.title + " " + (currentItemIndex() + 1) + " / " + items.length;
+          els.cueKo.textContent = item.cueKo;
+          els.noteText.textContent = item.note;
+          renderTranslations(item.translations);
+          els.typingInput.placeholder = stage.id === "recall" ? "기억나는 표현 입력" : "목표 표현 입력";
+          if (stage.id === "recall") {
+            els.targetText.textContent = state.hintVisible ? "힌트를 확인하고 입력" : "가려진 표현";
+            els.targetText.classList.add("is-hidden-target");
+            els.hintText.textContent = item.target;
+            els.hintPanel.hidden = !state.hintVisible;
+            return;
+          }
+          els.targetText.textContent = item.target;
+          els.targetText.classList.remove("is-hidden-target");
+          els.hintPanel.hidden = true;
         }
 
         function render(options) {
-          const stage = getStage();
-          setActiveInputId();
-          syncDrafts();
-
+          const stage = currentStage();
+          const item = currentItem();
+          const renderKey = stage.id + ":" + (item ? item.id : "none");
+          const isReport = stage.id === "report";
           els.stageMeta.textContent = stage.meta;
           els.stageTitle.textContent = stage.title;
           els.missionPrompt.textContent = stage.prompt;
-          els.stageViews.forEach((view) => {
-            view.classList.toggle("is-active", view.dataset.stage === stage.id);
-          });
-
-          els.totalWordCount.textContent = String(WORD_TARGETS.length);
-          els.typedWordCount.textContent = String(Math.min(state.typedWords.length, WORD_TARGETS.length));
-          els.targetWord.textContent = WORD_TARGETS[state.wordIndex] || "완료";
-
-          if (stage.id === "sentences") renderSentenceStage();
-          if (stage.id === "draft") els.draftInput.value = state.draft;
-          if (stage.id === "final") els.finalOutput.value = state.final;
-
-          els.previewOutput.value = state.final || state.draft || makeDraft();
-          els.previewCount.textContent = els.previewOutput.value.length + "자";
+          els.targetCard.hidden = isReport;
+          els.inputWrap.hidden = isReport;
+          els.reportPanel.hidden = !isReport;
+          els.hintButton.hidden = stage.id !== "recall";
+          els.checkButton.hidden = isReport;
+          els.retryButton.hidden = !isReport;
           els.prevButton.disabled = state.stageIndex === 0;
-          els.copyButton.hidden = state.stageIndex !== 4;
 
+          if (!options || !options.preserveInput) {
+            if (renderKey !== lastRenderKey) els.typingInput.value = "";
+          }
+          lastRenderKey = renderKey;
+
+          if (isReport) renderReport();
+          else renderTarget();
           renderProgressDots();
           saveState();
 
           if (!options || !options.preserveFocus) {
-            focusActiveInput(Boolean(options && options.selectText));
+            focusInput(Boolean(options && options.selectText));
           }
+        }
+
+        function checkCurrent() {
+          const stage = currentStage();
+          const value = normalize(els.typingInput.value);
+          if (stage.id === "warmup") {
+            if (value === WARMUP_TARGET) completeWarmup();
+            else setFeedback('"운동"을 입력하세요.', "warn", "<kbd>자동</kbd> 정확히 입력하면 이동");
+            return;
+          }
+          if (stage.id === "recall") {
+            submitRecallItem();
+            return;
+          }
+          const item = currentItem();
+          if (item && value === item.target) completeCopyItem(item);
+          else setFeedback("목표 표현을 그대로 입력하세요.", "warn", "<kbd>자동</kbd> 정확히 치면 이동");
         }
 
         document.addEventListener("click", (event) => {
           const stageButton = event.target.closest("[data-stage-index]");
-          if (stageButton) {
-            goToStage(Number(stageButton.dataset.stageIndex), { selectText: true });
-          }
+          if (stageButton) goToStage(Number(stageButton.dataset.stageIndex), { selectText: true });
         });
 
         document.addEventListener("compositionstart", () => {
@@ -1055,60 +1099,37 @@
           clearTimers();
         });
 
-        document.addEventListener("compositionend", (event) => {
+        document.addEventListener("compositionend", () => {
           state.composing = false;
-          if (event.target === els.wordInput) handleWordInput();
-          if (event.target === els.sentenceInput) handleSentenceInput();
-          focusActiveInput();
+          handleTypingInput();
+          focusInput();
         });
 
-        els.warmupInput.addEventListener("input", handleWarmupInput);
-        els.wordInput.addEventListener("input", handleWordInput);
-        els.sentenceInput.addEventListener("input", handleSentenceInput);
-        els.draftInput.addEventListener("input", handleDraftInput);
-
-        els.warmupInput.addEventListener("keydown", (event) => {
-          if (event.key === "Enter" && isStageDone(0)) goToStage(1);
-        });
-
-        els.wordInput.addEventListener("keydown", (event) => {
+        els.typingInput.addEventListener("input", handleTypingInput);
+        els.typingInput.addEventListener("keydown", (event) => {
+          if (event.ctrlKey && event.key.toLowerCase() === "h") {
+            event.preventDefault();
+            showHint();
+            return;
+          }
           if (event.key === "Enter") {
             event.preventDefault();
-            handleWordInput();
+            if (currentStage().id === "recall") submitRecallItem();
+            else checkCurrent();
           }
         });
-
-        els.sentenceInput.addEventListener("keydown", (event) => {
-          if (event.ctrlKey && event.key === "Enter") {
-            event.preventDefault();
-            advanceSentencePrompt();
-          }
-        });
-
-        els.draftInput.addEventListener("keydown", (event) => {
-          if (event.ctrlKey && event.key === "Enter") {
-            event.preventDefault();
-            finishDraft();
-          }
-        });
-
-        els.finalOutput.addEventListener("keydown", (event) => {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            copyFinal();
-          }
-        });
-
         els.prevButton.addEventListener("click", goPrev);
-        els.nextButton.addEventListener("click", goNextManual);
-        els.copyButton.addEventListener("click", copyFinal);
-        els.resetBuilder.addEventListener("click", resetBuilder);
+        els.hintButton.addEventListener("click", showHint);
+        els.checkButton.addEventListener("click", checkCurrent);
+        els.retryButton.addEventListener("click", retryRecall);
+        els.resetTrainer.addEventListener("click", resetTrainer);
 
         loadState();
         setFeedback('한글 입력 모드에서 "운동"을 입력하세요.', "", "<kbd>자동</kbd> 정확히 입력하면 이동");
         render({ selectText: true });
       })();
     </script>
+    <script src="../shared/multilang-toggle.js"></script>
     <script src="../shared/site-copyright.js"></script>
     <script src="../shared/page-qr.js"></script>
   </body>
