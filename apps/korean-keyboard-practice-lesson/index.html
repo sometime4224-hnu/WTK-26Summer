@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>한글 자판 25분 수업</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="lesson-shell">
+      <header class="lesson-topbar">
+        <a class="nav-link" href="../index.html">허브</a>
+        <div class="brand-title" aria-label="한글 자판 25분 수업">
+          <span>학생 자율형</span>
+          <strong>한글 자판 25분 수업</strong>
+        </div>
+        <button class="reset-button" id="resetLesson" type="button">처음부터</button>
+      </header>
+
+      <section class="timeline-panel" aria-label="25분 수업 진행">
+        <div class="time-summary">
+          <span class="eyebrow">오늘 흐름</span>
+          <strong id="timeSummary">1단계 · 2분</strong>
+          <em>총 25분</em>
+        </div>
+        <div class="time-track" aria-label="권장 시간 진행률"><span id="timeProgress"></span></div>
+        <div class="stage-list" id="stageList" aria-label="수업 단계"></div>
+      </section>
+
+      <section class="lesson-layout" aria-label="현재 미션과 한글 자판">
+        <section class="mission-panel" aria-labelledby="missionTitle">
+          <div class="mission-head">
+            <div>
+              <span class="eyebrow" id="stageMeta">1단계 · 2분</span>
+              <h1 id="missionTitle">준비</h1>
+            </div>
+            <span class="status-pill" id="stageStatus">진행 중</span>
+          </div>
+
+          <div class="mission-card" id="missionCard">
+            <div class="target-area" id="targetArea">
+              <div class="standard-target" id="standardTarget">
+                <div class="mission-signal" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <span id="missionModeLabel">준비</span>
+                <strong id="targetDisplay">한/영</strong>
+                <p id="targetHint">한글 입력 모드와 손 위치를 확인합니다.</p>
+              </div>
+              <div class="rhythm-area" id="rhythmArea" hidden>
+                <div class="rhythm-lane" aria-label="리듬 단어 입력 레인">
+                  <div class="rhythm-judge-line" aria-hidden="true"></div>
+                  <div class="rhythm-word-card" id="rhythmWordCard">한국</div>
+                </div>
+                <p class="rhythm-caption" id="rhythmCaption">판정선에 맞춰 단어를 입력하세요.</p>
+              </div>
+            </div>
+
+            <div class="input-area" id="inputArea">
+              <div class="key-capture" id="keyCapture" tabindex="0" role="button" aria-label="물리 키 입력 영역" hidden>
+                <span>키보드에서 목표 자리를 누르세요.</span>
+              </div>
+              <textarea id="answerInput" class="answer-input" rows="2" autocomplete="off" autocapitalize="off" spellcheck="false" hidden></textarea>
+              <div class="stage-task" id="stageTask"></div>
+            </div>
+
+            <div class="feedback-strip" id="feedbackStrip" aria-live="polite">먼저 한/영 상태와 손 위치를 확인하세요.</div>
+
+            <div class="mission-progress" aria-label="현재 단계 완료 상태">
+              <div>
+                <span>완료</span>
+                <strong><b id="completedCount">0</b> / <b id="totalCount">2</b></strong>
+              </div>
+              <div>
+                <span>시도</span>
+                <strong id="attemptCount">0</strong>
+              </div>
+            </div>
+
+            <div class="mission-actions">
+              <button class="secondary-button" id="prevStageButton" type="button">이전</button>
+              <button class="next-button" id="nextStageButton" type="button">넘어가기</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="keyboard-panel" aria-labelledby="keyboardTitle">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">두벌식 기본 자리</span>
+              <h2 id="keyboardTitle">기본 자판</h2>
+            </div>
+            <div class="mode-badge" id="currentKeyBadge">수업 준비</div>
+          </div>
+          <div class="keyboard-board" id="keyboardBoard" aria-label="한국어 두벌식 키보드"></div>
+        </section>
+      </section>
+
+      <aside class="support-panel" aria-labelledby="supportTitle">
+        <div class="panel-head panel-head--stack">
+          <span class="eyebrow">파지법</span>
+          <h2 id="supportTitle">손가락 자리</h2>
+        </div>
+
+        <div class="hand-map" aria-label="왼손 오른손 손가락 자리">
+          <div class="hand-block">
+            <span class="hand-label">왼손</span>
+            <div class="finger-strip">
+              <span class="finger-chip" data-finger="left-pinky">새끼</span>
+              <span class="finger-chip" data-finger="left-ring">약지</span>
+              <span class="finger-chip" data-finger="left-middle">중지</span>
+              <span class="finger-chip" data-finger="left-index">검지</span>
+            </div>
+          </div>
+          <div class="hand-block">
+            <span class="hand-label">오른손</span>
+            <div class="finger-strip">
+              <span class="finger-chip" data-finger="right-index">검지</span>
+              <span class="finger-chip" data-finger="right-middle">중지</span>
+              <span class="finger-chip" data-finger="right-ring">약지</span>
+              <span class="finger-chip" data-finger="right-pinky">새끼</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="home-guide" aria-label="홈키 안내">
+          <span>홈키</span>
+          <strong>ㅁ ㄴ ㅇ ㄹ / ㅓ ㅏ ㅣ</strong>
+        </div>
+
+        <div class="reach-list" id="reachList" aria-label="현재 키 손가락 안내">
+          <span>지금 안내</span>
+          <strong>준비</strong>
+          <p>손가락을 홈키 가까이에 편하게 올립니다.</p>
+        </div>
+      </aside>
+
+      <section class="next-writing-panel" aria-labelledby="nextWritingLessonTitle">
+        <div>
+          <span class="eyebrow">다음 활동</span>
+          <h2 id="nextWritingLessonTitle">생활 속 운동 답글 쓰기</h2>
+          <p>25분 자판 수업을 마친 뒤 생활 속 운동 권유 답글을 완성합니다.</p>
+        </div>
+        <a class="next-writing-link" href="../../c12/writing-keyboard-builder.html">쓰기 시작</a>
+      </section>
+    </main>
+
+    <script src="src/app.js"></script>
+    <script src="../../shared/site-copyright.js"></script>
+    <script src="../../shared/page-qr.js"></script>
+  </body>
+</html>
