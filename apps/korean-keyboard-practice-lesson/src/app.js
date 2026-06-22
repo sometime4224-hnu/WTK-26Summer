@@ -44,6 +44,8 @@
   ];
 
   const TOTAL_MINUTES = LESSON_STAGES.reduce((sum, stage) => sum + stage.minutes, 0);
+  const RHYTHM_WORD_LIMIT_MS = 6500;
+  const RHYTHM_LIMIT_LINE_PERCENT = 40;
   const ROWS = {
     top: KEY_LAYOUT.filter((key) => key.row === "top"),
     home: KEY_LAYOUT.filter((key) => key.row === "home"),
@@ -105,7 +107,11 @@
     lastEnglishValue: "",
     composing: false,
     rhythmMissed: 0,
+    rhythmScore: 0,
+    rhythmLastScore: 0,
+    rhythmLastLabel: "대기",
     rhythmStartedAt: {},
+    rhythmWordStartedAt: {},
     rhythmTimeCue: {},
     transitionOpen: false,
     transitionStageIndex: 0,
@@ -113,6 +119,7 @@
   };
 
   let rhythmCueTimer = 0;
+  let rhythmDeadlineTimer = 0;
 
   const els = {
     stageList: document.getElementById("stageList"),
@@ -126,6 +133,7 @@
     rhythmArea: document.getElementById("rhythmArea"),
     rhythmWordCard: document.getElementById("rhythmWordCard"),
     rhythmCaption: document.getElementById("rhythmCaption"),
+    rhythmScoreboard: document.getElementById("rhythmScoreboard"),
     missionModeLabel: document.getElementById("missionModeLabel"),
     targetDisplay: document.getElementById("targetDisplay"),
     targetHint: document.getElementById("targetHint"),
@@ -182,6 +190,9 @@
 
   function getStageCompleted(stage) {
     if (stage.kind === "summary") return 1;
+    if (stage.kind === "rhythm") {
+      return Math.min((state.completed[stage.id] || 0) + state.rhythmMissed, getStageTotal(stage));
+    }
     if (stage.kind === "warmup") {
       return Number(state.readyImeDone) + Math.min(state.completed[stage.id] || 0, stage.targets.length);
     }
@@ -203,6 +214,12 @@
     if (!rhythmCueTimer) return;
     window.clearTimeout(rhythmCueTimer);
     rhythmCueTimer = 0;
+  }
+
+  function clearRhythmDeadlineTimer() {
+    if (!rhythmDeadlineTimer) return;
+    window.clearTimeout(rhythmDeadlineTimer);
+    rhythmDeadlineTimer = 0;
   }
 
   function activateRhythmTimeCue(stage) {
@@ -229,18 +246,62 @@
 
   function openTransitionOverlay(stage) {
     const nextStage = LESSON_STAGES[state.stageIndex + 1];
+    const isRhythm = stage.kind === "rhythm";
     state.transitionOpen = true;
     state.transitionStageIndex = state.stageIndex;
     els.transitionTitle.textContent = "잘했어요";
-    els.transitionMessage.textContent = `${stage.title} 연습을 끝냈습니다. 키보드로 다음 행동을 선택하세요.`;
-    els.transitionSummary.textContent = `완료 ${getStageCompleted(stage)}/${getStageTotal(stage)} · 다음 ${nextStage ? nextStage.title : "처음부터"}`;
+    els.transitionMessage.textContent = isRhythm
+      ? `${stage.title} 연습을 끝냈습니다. 점수를 확인하고 다음 행동을 선택하세요.`
+      : `${stage.title} 연습을 끝냈습니다. 키보드로 다음 연습으로 이동하세요.`;
+    els.transitionSummary.textContent = isRhythm
+      ? `점수 ${state.rhythmScore}점 · 성공 ${state.completed[stage.id] || 0}/${getStageTotal(stage)} · 놓침 ${state.rhythmMissed} · 다음 ${nextStage ? nextStage.title : "처음부터"}`
+      : `완료 ${getStageCompleted(stage)}/${getStageTotal(stage)} · 다음 ${nextStage ? nextStage.title : "처음부터"}`;
     els.transitionNextButton.innerHTML = `${nextStage ? "다음 연습" : "처음부터"} <kbd>Enter</kbd>`;
+    els.transitionRetryButton.hidden = !isRhythm;
+    els.transitionRetryButton.innerHTML = `7단계 다시 도전 <kbd>R</kbd>`;
     els.transitionOverlay.hidden = false;
     requestAnimationFrame(() => els.transitionNextButton.focus());
   }
 
   function advanceRhythmTarget(stage) {
     state.targetIndex[stage.id] = (getTargetIndex(stage) + 1) % stage.targets.length;
+    if (stage.kind === "rhythm") {
+      delete state.rhythmWordStartedAt[stage.id];
+    }
+  }
+
+  function getRhythmElapsed(stage) {
+    return Date.now() - (state.rhythmWordStartedAt[stage.id] || Date.now());
+  }
+
+  function getRhythmScore(elapsed) {
+    const ratio = Math.min(Math.max(elapsed / RHYTHM_WORD_LIMIT_MS, 0), 1);
+    if (ratio <= 0.42) return { points: 100, label: "빠름" };
+    if (ratio <= 0.7) return { points: 70, label: "좋음" };
+    return { points: 40, label: "아슬" };
+  }
+
+  function armRhythmDeadline(stage) {
+    clearRhythmDeadlineTimer();
+    if (stage.kind !== "rhythm" || isStageComplete(stage)) return;
+    if (!state.rhythmWordStartedAt[stage.id]) {
+      state.rhythmWordStartedAt[stage.id] = Date.now();
+    }
+    const remaining = Math.max(0, RHYTHM_WORD_LIMIT_MS - getRhythmElapsed(stage));
+    rhythmDeadlineTimer = window.setTimeout(() => missRhythmTarget(stage), remaining);
+  }
+
+  function renderRhythmScoreboard(stage) {
+    const success = state.completed[stage.id] || 0;
+    const processed = getStageCompleted(stage);
+    els.rhythmScoreboard.hidden = false;
+    els.rhythmScoreboard.innerHTML = `
+      <span>점수 <strong>${state.rhythmScore}</strong></span>
+      <span>성공 <strong>${success}</strong></span>
+      <span>놓침 <strong>${state.rhythmMissed}</strong></span>
+      <span>최근 <strong>${state.rhythmLastScore ? `+${state.rhythmLastScore}` : state.rhythmLastLabel}</strong></span>
+      <span>진행 <strong>${processed}/${getStageTotal(stage)}</strong></span>
+    `;
   }
 
   function renderKeyboard() {
@@ -522,21 +583,33 @@
   function renderRhythmTask(stage) {
     const target = getCurrentTarget(stage) || stage.targets[0];
     const completed = getStageCompleted(stage);
+    const success = state.completed[stage.id] || 0;
     const missed = state.rhythmMissed || 0;
     const cueActive = Boolean(state.rhythmTimeCue[stage.id]) && !isStageComplete(stage);
 
     applyTypingGuide(target, els.answerInput.value, true);
+    els.rhythmArea.style.setProperty("--rhythm-limit-x", `${RHYTHM_LIMIT_LINE_PERCENT}%`);
+    els.rhythmArea.style.setProperty("--rhythm-limit-ms", `${RHYTHM_WORD_LIMIT_MS}ms`);
+    els.targetDisplay.textContent = target;
+    els.targetHint.textContent = "제한 바 전 입력";
     els.rhythmWordCard.textContent = target;
     els.rhythmWordCard.classList.remove("is-pulsing");
     void els.rhythmWordCard.offsetWidth;
-    els.rhythmWordCard.classList.add("is-pulsing");
-    els.rhythmCaption.textContent = cueActive ? "권장 시간이 지났습니다. 다음 단계로 넘어가도 좋아요." : "판정선에 맞춰 단어를 정확히 입력하세요.";
+    if (!isStageComplete(stage)) {
+      els.rhythmWordCard.classList.add("is-pulsing");
+      armRhythmDeadline(stage);
+    } else {
+      clearRhythmDeadlineTimer();
+    }
+    els.rhythmCaption.textContent = cueActive ? "권장 시간이 지났습니다. 다음 단계로 넘어가도 좋아요." : "제한 바를 지나기 전에 단어를 입력하세요.";
     els.answerInput.hidden = false;
     els.answerInput.placeholder = target;
+    renderRhythmScoreboard(stage);
     els.stageTask.hidden = false;
     els.stageTask.innerHTML = `
       <div class="rhythm-score-strip" aria-label="리듬 입력 진행">
-        <span>성공 <strong>${completed}</strong></span>
+        <span>점수 <strong>${state.rhythmScore}</strong></span>
+        <span>성공 <strong>${success}</strong></span>
         <span>놓침 <strong>${missed}</strong></span>
         <span>진행 <strong>${completed}/${getStageTotal(stage)}</strong></span>
       </div>
@@ -557,6 +630,7 @@
     els.stageTask.innerHTML = `
       <div class="summary-list">
         <div class="summary-item"><span>완료한 미션</span><strong>${completedTargets}/${totalTargets}</strong></div>
+        <div class="summary-item"><span>리듬 점수</span><strong>${state.rhythmScore}</strong></div>
         <div class="summary-item"><span>리듬 성공</span><strong>${rhythmSuccess}</strong></div>
         <div class="summary-item"><span>놓친 단어</span><strong>${state.rhythmMissed}</strong></div>
         <div class="summary-item"><span>넘어간 단계</span><strong>${skippedCount}</strong></div>
@@ -597,6 +671,7 @@
     els.targetArea.classList.toggle("is-time-cue", timeCue);
     els.standardTarget.hidden = isRhythm;
     els.rhythmArea.hidden = !isRhythm;
+    els.rhythmScoreboard.hidden = !isRhythm;
     if (isRhythm) {
       armRhythmTimeCue(stage);
     } else {
@@ -817,6 +892,29 @@
     render();
   }
 
+  function missRhythmTarget(stage) {
+    if (getStage().id !== stage.id || stage.kind !== "rhythm" || isStageComplete(stage)) return;
+    clearRhythmDeadlineTimer();
+    state.attempts[stage.id] = (state.attempts[stage.id] || 0) + 1;
+    state.rhythmMissed += 1;
+    state.rhythmLastScore = 0;
+    state.rhythmLastLabel = "놓침";
+    state.skipped.delete(stage.id);
+    els.answerInput.value = "";
+
+    if (isStageComplete(stage)) {
+      clearRhythmCueTimer();
+      setFeedback(`${stage.completionLabel}: 리듬 단어를 모두 처리했습니다.`, "good");
+      render();
+      openTransitionOverlay(stage);
+      return;
+    }
+
+    advanceRhythmTarget(stage);
+    setFeedback("제한 바를 지나 놓쳤어요. 다음 단어를 따라가세요.", "warn");
+    render();
+  }
+
   function handleRhythmInput() {
     const stage = getStage();
     if (stage.kind !== "rhythm") return;
@@ -845,17 +943,22 @@
 
     state.lastEnglishValue = "";
     if (value === target) {
+      const result = getRhythmScore(getRhythmElapsed(stage));
+      clearRhythmDeadlineTimer();
       state.attempts[stage.id] = (state.attempts[stage.id] || 0) + 1;
       state.completed[stage.id] = (state.completed[stage.id] || 0) + 1;
+      state.rhythmScore += result.points;
+      state.rhythmLastScore = result.points;
+      state.rhythmLastLabel = result.label;
       state.skipped.delete(stage.id);
       if (isStageComplete(stage)) {
         clearRhythmCueTimer();
-        setFeedback(`${stage.completionLabel}: 리듬 단어를 모두 입력했습니다.`, "good");
+        setFeedback(`${stage.completionLabel}: ${state.rhythmScore}점을 기록했습니다.`, "good");
         render();
         openTransitionOverlay(stage);
       } else {
         advanceRhythmTarget(stage);
-        setFeedback("정확해요. 다음 비트로 갑니다.", "good");
+        setFeedback(`정확해요. ${result.label} +${result.points}점, 다음 단어로 갑니다.`, "good");
         render();
       }
       return;
@@ -867,11 +970,7 @@
     }
 
     if (value.length >= target.length) {
-      state.attempts[stage.id] = (state.attempts[stage.id] || 0) + 1;
-      state.rhythmMissed += 1;
-      advanceRhythmTarget(stage);
-      setFeedback("박자를 놓쳤어요. 다음 단어를 따라가세요.", "warn");
-      render();
+      missRhythmTarget(stage);
       return;
     }
 
@@ -945,6 +1044,7 @@
   }
 
   function goToStage(index, feedback) {
+    clearRhythmDeadlineTimer();
     closeTransitionOverlay();
     state.stageIndex = Math.max(0, Math.min(index, LESSON_STAGES.length - 1));
     if (feedback) setFeedback(feedback.message, feedback.kind);
@@ -973,12 +1073,20 @@
 
   function remindTransitionKeyboard(event) {
     event.preventDefault();
-    els.transitionMessage.textContent = "마우스 대신 Enter 또는 Space로 다음 연습, R로 다시 하기를 선택합니다.";
+    const stage = getStage();
+    els.transitionMessage.textContent = stage.kind === "rhythm"
+      ? "마우스 대신 Enter 또는 Space로 다음 연습, R로 7단계 다시 도전을 선택합니다."
+      : "마우스 대신 Enter 또는 Space로 다음 연습을 선택합니다.";
   }
 
   function retryStage() {
     const stage = getStage();
+    if (stage.kind !== "rhythm") {
+      els.transitionMessage.textContent = "다시 도전은 7단계 리듬 단어 입력에서만 사용할 수 있습니다.";
+      return;
+    }
     clearRhythmCueTimer();
+    clearRhythmDeadlineTimer();
     closeTransitionOverlay();
     delete state.targetIndex[stage.id];
     delete state.completed[stage.id];
@@ -993,16 +1101,21 @@
 
     if (stage.kind === "rhythm") {
       state.rhythmMissed = 0;
+      state.rhythmScore = 0;
+      state.rhythmLastScore = 0;
+      state.rhythmLastLabel = "대기";
       delete state.rhythmStartedAt[stage.id];
+      delete state.rhythmWordStartedAt[stage.id];
       delete state.rhythmTimeCue[stage.id];
     }
 
-    setFeedback(`${stage.title} 단계를 다시 연습합니다.`, "");
+    setFeedback("7단계 리듬 단어 입력을 다시 도전합니다.", "");
     render();
   }
 
   function resetLesson() {
     clearRhythmCueTimer();
+    clearRhythmDeadlineTimer();
     closeTransitionOverlay();
     state.stageIndex = 0;
     state.targetIndex = {};
@@ -1014,7 +1127,11 @@
     state.lastEnglishValue = "";
     state.composing = false;
     state.rhythmMissed = 0;
+    state.rhythmScore = 0;
+    state.rhythmLastScore = 0;
+    state.rhythmLastLabel = "대기";
     state.rhythmStartedAt = {};
+    state.rhythmWordStartedAt = {};
     state.rhythmTimeCue = {};
     state.transitionOpen = false;
     state.transitionStageIndex = 0;
@@ -1033,7 +1150,11 @@
         }
         if (event.key.toLowerCase() === "r") {
           event.preventDefault();
-          retryStage();
+          if (!els.transitionRetryButton.hidden) {
+            retryStage();
+          } else {
+            els.transitionMessage.textContent = "다시 도전은 7단계 리듬 단어 입력에서만 사용할 수 있습니다.";
+          }
           return;
         }
       }

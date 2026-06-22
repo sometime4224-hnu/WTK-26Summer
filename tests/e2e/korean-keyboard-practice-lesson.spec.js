@@ -104,12 +104,18 @@ async function endComposition(page, value, data = value) {
   );
 }
 
-async function expectTransition(page, nextTitle) {
+async function expectTransition(page, nextTitle, options = {}) {
+  const { canRetry = false } = options;
   await expect(page.locator("#transitionOverlay")).toBeVisible();
   await expect(page.locator("#transitionTitle")).toHaveText("잘했어요");
   await expect(page.locator("#transitionSummary")).toContainText(`다음 ${nextTitle}`);
   await expect(page.locator("#transitionNextButton")).toContainText("Enter");
-  await expect(page.locator("#transitionRetryButton")).toContainText("R");
+  if (canRetry) {
+    await expect(page.locator("#transitionRetryButton")).toBeVisible();
+    await expect(page.locator("#transitionRetryButton")).toContainText("R");
+  } else {
+    await expect(page.locator("#transitionRetryButton")).toBeHidden();
+  }
 }
 
 async function nextPractice(page, expectedTitle) {
@@ -246,16 +252,15 @@ test.describe("korean keyboard 25-minute lesson", () => {
     await expect(page.locator("#feedbackStrip")).toContainText("준비 완료");
     await expectTransition(page, "자판 보기");
 
-    await page.locator("#transitionNextButton").click();
+    await expect(page.locator("#transitionRetryButton")).toBeHidden();
+    await page.keyboard.press("r");
     await expect(page.locator("#transitionOverlay")).toBeVisible();
     await expect(page.locator("#missionTitle")).toHaveText("준비");
-    await expect(page.locator("#transitionMessage")).toContainText("마우스 대신");
+    await expect(page.locator("#transitionMessage")).toContainText("7단계");
 
-    await page.keyboard.press("r");
+    await page.keyboard.press("Enter");
     await expect(page.locator("#transitionOverlay")).toBeHidden();
-    await expect(page.locator("#missionTitle")).toHaveText("준비");
-    await expect(page.locator("#targetDisplay")).toHaveText("가");
-    await expect(page.locator("#completedCount")).toHaveText("0");
+    await expect(page.locator("#missionTitle")).toHaveText("자판 보기");
   });
 
   test("does not use the stage list as a mouse navigation control", async ({ page }) => {
@@ -374,8 +379,17 @@ test.describe("korean keyboard 25-minute lesson", () => {
     await expect(page.locator("#totalCount")).toHaveText("18");
     await expect(page.locator(".rhythm-lane")).toBeVisible();
     await expect(page.locator(".rhythm-judge-line")).toBeVisible();
+    await expect(page.locator("#rhythmScoreboard")).toBeVisible();
     await expect(page.locator("#answerInput")).toBeVisible();
     await expect(page.locator("#rhythmWordCard")).toHaveText("한국");
+    await expect(page.locator("#rhythmCaption")).toContainText("제한 바");
+    const limitRatio = await page.evaluate(() => {
+      const lane = document.querySelector(".rhythm-lane").getBoundingClientRect();
+      const line = document.querySelector(".rhythm-judge-line").getBoundingClientRect();
+      return (line.left - lane.left) / lane.width;
+    });
+    expect(limitRatio).toBeGreaterThan(0.37);
+    expect(limitRatio).toBeLessThan(0.43);
     for (const code of ["KeyG", "KeyK", "KeyS", "KeyR", "KeyN"]) {
       await expectKeyHasClass(page, code, "is-required");
     }
@@ -386,23 +400,45 @@ test.describe("korean keyboard 25-minute lesson", () => {
     await expect(page.locator("#completedCount")).toHaveText("0");
     await endComposition(page, "하");
 
-    await page.locator("#answerInput").fill("한국");
-    await expect(page.locator("#completedCount")).toHaveText("1");
+    await expect(page.locator("#completedCount")).toHaveText("1", { timeout: 8000 });
     await expect(page.locator("#rhythmWordCard")).toHaveText("학생");
+    await expect(page.locator("#rhythmScoreboard")).toContainText("놓침");
+    await expect(page.locator("#rhythmScoreboard")).toContainText("1");
+
+    await page.locator("#answerInput").fill("학생");
+    await expect(page.locator("#completedCount")).toHaveText("2");
+    await expect(page.locator("#rhythmScoreboard")).toContainText("점수");
+    await expect(page.locator("#rhythmWordCard")).toHaveText("학교");
     await expectKeyHasClass(page, "KeyG", "is-next-key");
-    await expectKeyHasClass(page, "KeyT", "is-required");
+    await expectKeyHasClass(page, "KeyY", "is-required");
     await expectKeyNotHasClass(page, "KeyN", "is-required");
 
     await page.locator("#answerInput").fill("hanguk");
     await expect(page.locator("#feedbackStrip")).toContainText("한/영 키 확인");
-    await expect(page.locator("#completedCount")).toHaveText("1");
+    await expect(page.locator("#completedCount")).toHaveText("2");
     await expectKeyHasClass(page, "KeyG", "is-next-key");
 
-    for (const target of WORD_TARGETS.slice(1)) {
+    for (const target of WORD_TARGETS.slice(2)) {
       await page.locator("#answerInput").fill(target);
     }
-    await expectTransition(page, "마무리");
+    await expectTransition(page, "마무리", { canRetry: true });
+    await expect(page.locator("#transitionSummary")).toContainText("점수");
+    await expect(page.locator("#transitionSummary")).toContainText("놓침 1");
+
+    await page.keyboard.press("r");
+    await expect(page.locator("#transitionOverlay")).toBeHidden();
+    await expect(page.locator("#missionTitle")).toHaveText("리듬 단어 입력");
+    await expect(page.locator("#targetDisplay")).toHaveText("한국");
+    await expect(page.locator("#completedCount")).toHaveText("0");
+    await expect(page.locator("#rhythmScoreboard")).toContainText("점수");
+    await expect(page.locator("#rhythmScoreboard")).toContainText("0");
+
+    for (const target of WORD_TARGETS) {
+      await page.locator("#answerInput").fill(target);
+    }
+    await expectTransition(page, "마무리", { canRetry: true });
     await nextPractice(page, "마무리");
+    await expect(page.locator("#stageTask")).toContainText("리듬 점수");
     await expect(page.locator("#stageTask")).toContainText("리듬 성공");
     await expect(page.locator("#stageTask")).toContainText("18");
     await expect(page.locator("#stageTask")).toContainText("한/영 확인");
