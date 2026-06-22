@@ -1,7 +1,7 @@
 const { test, expect } = require("@playwright/test");
 
 test.describe("korean keyboard writing standalone hub", () => {
-  test("loads the hub with both activity links", async ({ page }) => {
+  test("loads the hub with all typing activity links", async ({ page }) => {
     await page.goto("/apps/standalone-pages/korean-keyboard-writing-hub.html");
 
     await expect(page).toHaveTitle("한글 입력 수업 허브");
@@ -10,6 +10,8 @@ test.describe("korean keyboard writing standalone hub", () => {
     await expect(page.locator('[data-hub-link="keyboard-lesson"]')).toHaveAttribute("href", "../korean-keyboard-practice-lesson/index.html");
     await expect(page.locator('[data-hub-link="c12-writing"]')).toContainText("12과 표현 타이핑 연습");
     await expect(page.locator('[data-hub-link="c12-writing"]')).toHaveAttribute("href", "../../c12/writing-keyboard-builder.html");
+    await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toContainText("12과 동작 표현 타이핑 연습");
+    await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toHaveAttribute("href", "../../c12/writing-motion-typing.html");
     await expect(page.locator(".mini-key.is-next")).toContainText("ㄱ");
   });
 
@@ -29,6 +31,15 @@ test.describe("korean keyboard writing standalone hub", () => {
     await expect(page.locator("#stageTitle")).toHaveText("한/영 확인");
   });
 
+  test("opens the C12 motion expression typing trainer from the hub", async ({ page }) => {
+    await page.goto("/apps/standalone-pages/korean-keyboard-writing-hub.html");
+
+    await page.locator('[data-hub-link="c12-motion-typing"]').click();
+    await expect(page).toHaveURL(/\/c12\/writing-motion-typing\.html$/);
+    await expect(page.locator("#stageTitle")).toHaveText("한/영 확인");
+    await expect(page.locator("#motionPanel")).toHaveAttribute("data-motion-id", "ready");
+  });
+
   test("is linked from the common apps hub", async ({ page }) => {
     await page.goto("/apps/index.html");
 
@@ -37,12 +48,13 @@ test.describe("korean keyboard writing standalone hub", () => {
     await expect(hubLink).toContainText("한글 입력 수업 허브");
   });
 
-  test("keeps the two activity cards visible on mobile without horizontal overflow", async ({ page }) => {
+  test("keeps the typing activity cards visible on mobile without horizontal overflow", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/apps/standalone-pages/korean-keyboard-writing-hub.html");
 
     await expect(page.locator('[data-hub-link="keyboard-lesson"]')).toBeInViewport();
     await expect(page.locator('[data-hub-link="c12-writing"]')).toBeInViewport();
+    await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(2);
   });
