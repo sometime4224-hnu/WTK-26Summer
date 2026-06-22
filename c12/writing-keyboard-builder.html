@@ -1,0 +1,1115 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>생활 속 운동 답글 쓰기</title>
+    <style>
+      :root {
+        --bg: #f7fafc;
+        --surface: #ffffff;
+        --ink: #101827;
+        --muted: #64748b;
+        --line: #d7e0ea;
+        --focus: #0f172a;
+        --blue: #2563eb;
+        --blue-soft: #dbeafe;
+        --green: #047857;
+        --green-soft: #ecfdf5;
+        --amber: #b45309;
+        --amber-soft: #fffbeb;
+        --rose: #be123c;
+        --rose-soft: #fff1f2;
+        --shadow: 0 24px 56px rgba(15, 23, 42, 0.12);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 58%, #fff7ed 100%);
+        color: var(--ink);
+        font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", system-ui, sans-serif;
+        overflow-wrap: anywhere;
+        word-break: keep-all;
+      }
+
+      button,
+      input,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      .focus-shell {
+        width: min(980px, calc(100% - 24px));
+        margin: 10px auto 42px;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 10px;
+        min-height: 46px;
+        padding: 7px 8px;
+        border: 1px solid rgba(215, 224, 234, 0.94);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        backdrop-filter: blur(12px);
+      }
+
+      .topbar-title {
+        display: grid;
+        justify-items: center;
+        gap: 1px;
+        min-width: 0;
+        text-align: center;
+      }
+
+      .topbar-title span {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .topbar-title strong {
+        min-width: 0;
+        overflow: hidden;
+        color: var(--ink);
+        font-size: 15px;
+        font-weight: 950;
+        line-height: 1.2;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .nav-link,
+      .reset-button,
+      .ghost-button,
+      .copy-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 32px;
+        padding: 6px 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 900;
+        text-decoration: none;
+      }
+
+      .reset-button {
+        color: #475569;
+      }
+
+      .progress-dots {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 6px;
+        margin: 12px 0;
+      }
+
+      .progress-dot {
+        min-width: 0;
+        min-height: 38px;
+        padding: 6px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 950;
+        line-height: 1.15;
+      }
+
+      .progress-dot.is-current {
+        border-color: #0f172a;
+        background: #0f172a;
+        color: #ffffff;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.22);
+      }
+
+      .progress-dot.is-done {
+        border-color: #86efac;
+        background: var(--green-soft);
+        color: var(--green);
+      }
+
+      .mission-panel {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        display: grid;
+        gap: 14px;
+        padding: clamp(16px, 3.2vw, 30px);
+        border: 4px solid #0f172a;
+        border-radius: 12px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 246, 255, 0.98)),
+          #ffffff;
+        box-shadow: var(--shadow);
+      }
+
+      .mission-panel.is-current-task::before {
+        content: "";
+        position: absolute;
+        inset: 8px;
+        z-index: 0;
+        border: 2px solid rgba(37, 99, 235, 0.24);
+        border-radius: 8px;
+        background: linear-gradient(90deg, rgba(219, 234, 254, 0.38), rgba(236, 253, 245, 0.24));
+        pointer-events: none;
+      }
+
+      .mission-panel > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .mission-head {
+        display: grid;
+        gap: 6px;
+      }
+
+      .stage-kicker {
+        display: inline-flex;
+        width: max-content;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #0f172a;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 950;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        line-height: 1.08;
+      }
+
+      h1 {
+        font-size: clamp(36px, 6vw, 72px);
+        letter-spacing: 0;
+      }
+
+      h2 {
+        font-size: clamp(22px, 3.5vw, 36px);
+      }
+
+      .mission-prompt {
+        margin: 0;
+        max-width: 760px;
+        color: #334155;
+        font-size: clamp(17px, 2.4vw, 24px);
+        font-weight: 850;
+        line-height: 1.52;
+      }
+
+      .typing-target {
+        display: grid;
+        gap: 7px;
+        min-height: 114px;
+        align-content: center;
+        justify-items: center;
+        padding: 14px;
+        border: 2px solid rgba(37, 99, 235, 0.42);
+        border-radius: 10px;
+        background: rgba(219, 234, 254, 0.62);
+        text-align: center;
+      }
+
+      .typing-target span {
+        color: var(--blue);
+        font-size: 13px;
+        font-weight: 950;
+      }
+
+      .typing-target strong {
+        color: #0f172a;
+        font-size: clamp(40px, 8vw, 82px);
+        font-weight: 950;
+        line-height: 1;
+      }
+
+      .typing-target p {
+        margin: 0;
+        color: #475569;
+        font-size: 14px;
+        font-weight: 850;
+      }
+
+      .input-stage {
+        display: none;
+        gap: 12px;
+      }
+
+      .input-stage.is-active {
+        display: grid;
+      }
+
+      .spotlight-input {
+        position: relative;
+        display: grid;
+        gap: 8px;
+      }
+
+      .spotlight-input::before {
+        content: "";
+        position: absolute;
+        inset: -9px;
+        z-index: -1;
+        border-radius: 14px;
+        background: rgba(37, 99, 235, 0.18);
+        box-shadow:
+          0 0 0 6px rgba(37, 99, 235, 0.08),
+          0 18px 42px rgba(37, 99, 235, 0.18);
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        min-width: 0;
+        border: 4px solid #0f172a;
+        border-radius: 12px;
+        background: #ffffff;
+        color: var(--ink);
+        outline: none;
+      }
+
+      input {
+        min-height: 76px;
+        padding: 12px 16px;
+        font-size: clamp(30px, 6vw, 62px);
+        font-weight: 950;
+        line-height: 1.08;
+        text-align: center;
+      }
+
+      textarea {
+        min-height: 210px;
+        resize: vertical;
+        padding: 16px;
+        font-size: clamp(20px, 2.7vw, 30px);
+        font-weight: 850;
+        line-height: 1.55;
+      }
+
+      input:focus,
+      textarea:focus {
+        border-color: #2563eb;
+        box-shadow:
+          0 0 0 6px rgba(37, 99, 235, 0.22),
+          0 18px 44px rgba(37, 99, 235, 0.22);
+      }
+
+      textarea[readonly] {
+        background: #f8fafc;
+      }
+
+      .status-line {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        min-height: 48px;
+        padding: 10px 12px;
+        border: 1px solid #dbeafe;
+        border-radius: 8px;
+        background: #f8fafc;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 900;
+        line-height: 1.45;
+      }
+
+      .status-line.is-good {
+        border-color: #86efac;
+        background: var(--green-soft);
+        color: var(--green);
+      }
+
+      .status-line.is-bad {
+        border-color: #fda4af;
+        background: var(--rose-soft);
+        color: var(--rose);
+      }
+
+      .status-line.is-warn {
+        border-color: #fde68a;
+        background: var(--amber-soft);
+        color: var(--amber);
+      }
+
+      .status-line kbd {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 24px;
+        padding: 3px 7px;
+        border: 1px solid rgba(15, 23, 42, 0.18);
+        border-radius: 6px;
+        background: #ffffff;
+        color: #0f172a;
+        font: 900 12px/1.1 "Segoe UI", system-ui, sans-serif;
+        white-space: nowrap;
+      }
+
+      .assist-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+        opacity: 0.7;
+      }
+
+      .assist-actions:hover,
+      .assist-actions:focus-within {
+        opacity: 1;
+      }
+
+      .ghost-button,
+      .copy-button {
+        min-height: 38px;
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+
+      .copy-button {
+        border-color: #0f172a;
+        background: #0f172a;
+        color: #ffffff;
+      }
+
+      .preview-drawer {
+        margin-top: 12px;
+        border: 1px solid rgba(215, 224, 234, 0.94);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.88);
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+      }
+
+      .preview-drawer summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: 46px;
+        padding: 10px 12px;
+        color: #334155;
+        cursor: pointer;
+        font-weight: 950;
+        list-style: none;
+      }
+
+      .preview-drawer summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .preview-drawer textarea {
+        min-height: 150px;
+        border-width: 2px;
+        border-radius: 0 0 10px 10px;
+        font-size: 16px;
+        font-weight: 750;
+        box-shadow: none;
+      }
+
+      @media (max-width: 680px) {
+        .focus-shell {
+          width: min(100% - 12px, 980px);
+          margin-top: 6px;
+        }
+
+        .topbar {
+          grid-template-columns: auto minmax(0, 1fr) auto;
+          gap: 6px;
+          padding: 6px;
+        }
+
+        .nav-link,
+        .reset-button {
+          min-height: 30px;
+          padding: 5px 8px;
+          font-size: 11px;
+        }
+
+        .topbar-title strong {
+          font-size: 13px;
+        }
+
+        .topbar-title span {
+          font-size: 10px;
+        }
+
+        .progress-dots {
+          gap: 4px;
+        }
+
+        .progress-dot {
+          min-height: 32px;
+          padding: 4px 2px;
+          font-size: 10px;
+        }
+
+        .mission-panel {
+          padding: 14px;
+          border-width: 3px;
+        }
+
+        .typing-target {
+          min-height: 98px;
+        }
+
+        input {
+          min-height: 66px;
+          font-size: 34px;
+        }
+
+        textarea {
+          min-height: 190px;
+          font-size: 20px;
+        }
+
+        .assist-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .ghost-button,
+        .copy-button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="focus-shell">
+      <header class="topbar">
+        <a class="nav-link" href="index.html">12과</a>
+        <div class="topbar-title" aria-label="생활 속 운동 답글 쓰기">
+          <span>타이핑 집중 모드</span>
+          <strong>생활 속 운동 답글 쓰기</strong>
+        </div>
+        <button class="reset-button" id="resetBuilder" type="button">처음부터</button>
+      </header>
+
+      <div class="progress-dots" id="progressDots" aria-label="쓰기 진행 단계"></div>
+
+      <section class="mission-panel is-current-task" id="missionPanel" aria-labelledby="stageTitle">
+        <div class="mission-head">
+          <span class="stage-kicker" id="stageMeta">1단계</span>
+          <h1 id="stageTitle">한/영 확인</h1>
+          <p class="mission-prompt" id="missionPrompt">한글 입력 모드로 짧게 시작합니다. 아래 칸에 운동을 입력하세요.</p>
+        </div>
+
+        <section class="input-stage is-active" data-stage="warmup" aria-label="한영 확인">
+          <div class="typing-target">
+            <span>지금 칠 단어</span>
+            <strong>운동</strong>
+            <p>정확히 입력하면 자동으로 다음 단계로 갑니다.</p>
+          </div>
+          <div class="spotlight-input">
+            <input id="warmupInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="운동">
+          </div>
+        </section>
+
+        <section class="input-stage" data-stage="words" aria-label="핵심어 타이핑">
+          <div class="typing-target">
+            <span>지금 칠 핵심어</span>
+            <strong id="targetWord">스트레칭</strong>
+            <p><b id="typedWordCount">0</b> / <b id="totalWordCount">4</b>개 완료</p>
+          </div>
+          <div class="spotlight-input">
+            <input id="wordInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="핵심어 입력">
+          </div>
+        </section>
+
+        <section class="input-stage" data-stage="sentences" aria-label="문장 만들기">
+          <div class="typing-target">
+            <span id="sentenceStepLabel">문장 1 / 3</span>
+            <strong id="sentenceTarget">건강 노력</strong>
+            <p id="sentenceHint">건강을 위해 하는 노력을 한 문장으로 씁니다.</p>
+          </div>
+          <div class="spotlight-input">
+            <textarea id="sentenceInput" placeholder="예: 물을 자주 마시고 채소와 과일을 먹습니다."></textarea>
+          </div>
+        </section>
+
+        <section class="input-stage" data-stage="draft" aria-label="답글 다듬기">
+          <div class="typing-target">
+            <span>초안 다듬기</span>
+            <strong>답글</strong>
+            <p>자동으로 만든 답글을 읽고 필요하면 고쳐 씁니다.</p>
+          </div>
+          <div class="spotlight-input">
+            <textarea id="draftInput" placeholder="문장 조각으로 만든 답글 초안"></textarea>
+          </div>
+        </section>
+
+        <section class="input-stage" data-stage="final" aria-label="복사 준비">
+          <div class="typing-target">
+            <span>완성</span>
+            <strong>복사 준비</strong>
+            <p>Ctrl+C로 복사하거나 Enter를 눌러 복사합니다.</p>
+          </div>
+          <div class="spotlight-input">
+            <textarea id="finalOutput" readonly aria-label="최종 답글"></textarea>
+          </div>
+        </section>
+
+        <div class="status-line" id="statusLine" aria-live="polite">
+          <span id="feedbackText">한글 입력 모드에서 "운동"을 입력하세요.</span>
+          <span id="shortcutText"><kbd>자동</kbd> 정확히 입력하면 이동</span>
+        </div>
+
+        <div class="assist-actions">
+          <button class="ghost-button" id="prevButton" type="button">이전</button>
+          <button class="ghost-button" id="nextButton" type="button">다음</button>
+          <button class="copy-button" id="copyButton" type="button">복사</button>
+        </div>
+      </section>
+
+      <details class="preview-drawer" id="previewDrawer">
+        <summary>
+          <span>완성 글 미리보기</span>
+          <span id="previewCount">0자</span>
+        </summary>
+        <textarea id="previewOutput" readonly aria-label="완성 글 미리보기"></textarea>
+      </details>
+    </main>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const STORAGE_KEY = "c12_life_exercise_keyboard_builder_v1";
+        const WORD_TARGETS = ["스트레칭", "계단", "걷기", "자세 교정"];
+        const STAGES = [
+          { id: "warmup", label: "한/영", title: "한/영 확인", meta: "1단계", prompt: "한글 입력 모드로 짧게 시작합니다. 아래 칸에 운동을 입력하세요." },
+          { id: "words", label: "핵심어", title: "핵심어 타이핑", meta: "2단계", prompt: "생활 속 운동 답글에 들어갈 핵심어를 순서대로 입력합니다." },
+          { id: "sentences", label: "문장", title: "문장 만들기", meta: "3단계", prompt: "한 번에 한 문장만 씁니다. Ctrl+Enter로 다음 질문으로 넘어갑니다." },
+          { id: "draft", label: "답글", title: "답글 다듬기", meta: "4단계", prompt: "자동으로 만든 답글을 읽고 필요하면 고쳐 씁니다." },
+          { id: "final", label: "완성", title: "복사 준비", meta: "5단계", prompt: "완성한 답글을 복사할 준비가 되었습니다." }
+        ];
+        const SENTENCE_PROMPTS = [
+          {
+            key: "effort",
+            target: "건강 노력",
+            hint: "건강을 위해 하는 노력을 한 문장으로 씁니다.",
+            placeholder: "예: 물을 자주 마시고 채소와 과일을 먹습니다."
+          },
+          {
+            key: "exercise",
+            target: "생활 속 운동 방법",
+            hint: "시간이 없을 때 할 수 있는 운동을 권유합니다.",
+            placeholder: "예: 쉬는 시간에 스트레칭을 하고 계단을 이용해 보세요."
+          },
+          {
+            key: "benefit",
+            target: "운동 효과",
+            hint: "운동을 하면 좋은 점을 한 문장으로 씁니다.",
+            placeholder: "예: 스트레스가 풀리고 몸이 가벼워집니다."
+          }
+        ];
+
+        const state = {
+          stageIndex: 0,
+          promptIndex: 0,
+          activeInputId: "warmupInput",
+          warmupDone: false,
+          wordIndex: 0,
+          typedWords: [],
+          sentences: { effort: "", exercise: "", benefit: "" },
+          draft: "",
+          final: "",
+          composing: false
+        };
+
+        let advanceTimer = 0;
+        let sentencePauseTimer = 0;
+
+        const els = {
+          resetBuilder: document.getElementById("resetBuilder"),
+          progressDots: document.getElementById("progressDots"),
+          missionPanel: document.getElementById("missionPanel"),
+          stageMeta: document.getElementById("stageMeta"),
+          stageTitle: document.getElementById("stageTitle"),
+          missionPrompt: document.getElementById("missionPrompt"),
+          stageViews: Array.from(document.querySelectorAll(".input-stage")),
+          warmupInput: document.getElementById("warmupInput"),
+          targetWord: document.getElementById("targetWord"),
+          typedWordCount: document.getElementById("typedWordCount"),
+          totalWordCount: document.getElementById("totalWordCount"),
+          wordInput: document.getElementById("wordInput"),
+          sentenceStepLabel: document.getElementById("sentenceStepLabel"),
+          sentenceTarget: document.getElementById("sentenceTarget"),
+          sentenceHint: document.getElementById("sentenceHint"),
+          sentenceInput: document.getElementById("sentenceInput"),
+          draftInput: document.getElementById("draftInput"),
+          finalOutput: document.getElementById("finalOutput"),
+          statusLine: document.getElementById("statusLine"),
+          feedbackText: document.getElementById("feedbackText"),
+          shortcutText: document.getElementById("shortcutText"),
+          prevButton: document.getElementById("prevButton"),
+          nextButton: document.getElementById("nextButton"),
+          copyButton: document.getElementById("copyButton"),
+          previewOutput: document.getElementById("previewOutput"),
+          previewCount: document.getElementById("previewCount")
+        };
+
+        function normalize(value) {
+          return String(value || "").replace(/\s+/g, " ").trim();
+        }
+
+        function hasEnglish(value) {
+          return /[A-Za-z]/.test(value);
+        }
+
+        function hasSentenceStop(value) {
+          return /[.!?。？！]\s*$/.test(value);
+        }
+
+        function clearTimers() {
+          window.clearTimeout(advanceTimer);
+          window.clearTimeout(sentencePauseTimer);
+          advanceTimer = 0;
+          sentencePauseTimer = 0;
+        }
+
+        function setFeedback(message, kind, shortcut) {
+          els.feedbackText.textContent = message;
+          els.shortcutText.innerHTML = shortcut || "";
+          els.statusLine.classList.toggle("is-good", kind === "good");
+          els.statusLine.classList.toggle("is-bad", kind === "bad");
+          els.statusLine.classList.toggle("is-warn", kind === "warn");
+        }
+
+        function getStage() {
+          return STAGES[state.stageIndex];
+        }
+
+        function makeDraft() {
+          const effort = normalize(state.sentences.effort) || "물을 자주 마시고 채소와 과일을 먹는 것도 좋습니다.";
+          const exercise = normalize(state.sentences.exercise) || "쉬는 시간에 스트레칭을 하고 가까운 거리는 걸어 보세요.";
+          const benefit = normalize(state.sentences.benefit) || "스트레스가 풀리고 몸이 가벼워질 것입니다.";
+          return [
+            "안녕하세요. 바빠서 운동할 시간이 없어서 걱정이 많으시겠어요.",
+            "건강을 위해 " + effort,
+            "그리고 시간이 없을 때에는 " + exercise,
+            "이렇게 하면 " + benefit,
+            "처음에는 짧게 시작하고 꾸준히 하는 것이 중요합니다."
+          ].join("\n");
+        }
+
+        function syncDrafts() {
+          if (!normalize(state.draft) || state.stageIndex <= 2) {
+            state.draft = makeDraft();
+          }
+          if (!normalize(state.final) || state.stageIndex <= 3) {
+            state.final = state.draft;
+          }
+        }
+
+        function isStageDone(index) {
+          if (index === 0) return state.warmupDone;
+          if (index === 1) return state.typedWords.length >= WORD_TARGETS.length;
+          if (index === 2) return SENTENCE_PROMPTS.every((prompt) => normalize(state.sentences[prompt.key]));
+          if (index === 3) return Boolean(normalize(state.draft));
+          return Boolean(normalize(state.final));
+        }
+
+        function completedCount() {
+          return STAGES.filter((_, index) => isStageDone(index)).length;
+        }
+
+        function saveState() {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function loadState() {
+          try {
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+            if (typeof saved.step === "number" && typeof saved.stageIndex !== "number") {
+              saved.stageIndex = saved.step;
+            }
+            Object.assign(state, saved);
+            state.typedWords = Array.isArray(state.typedWords) ? state.typedWords : [];
+            state.sentences = {
+              effort: saved.sentences && typeof saved.sentences === "object" ? saved.sentences.effort || "" : saved.effort || "",
+              exercise: saved.sentences && typeof saved.sentences === "object" ? saved.sentences.exercise || "" : saved.exercise || "",
+              benefit: saved.sentences && typeof saved.sentences === "object" ? saved.sentences.benefit || "" : saved.benefit || ""
+            };
+            state.stageIndex = Math.max(0, Math.min(Number(state.stageIndex) || 0, STAGES.length - 1));
+            state.promptIndex = Math.max(0, Math.min(Number(state.promptIndex) || 0, SENTENCE_PROMPTS.length - 1));
+            state.wordIndex = Math.max(0, Math.min(Number(state.wordIndex) || 0, WORD_TARGETS.length));
+            state.composing = false;
+          } catch (error) {
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        }
+
+        function getActiveInput() {
+          return document.getElementById(state.activeInputId);
+        }
+
+        function setActiveInputId() {
+          if (state.stageIndex === 0) state.activeInputId = "warmupInput";
+          if (state.stageIndex === 1) state.activeInputId = "wordInput";
+          if (state.stageIndex === 2) state.activeInputId = "sentenceInput";
+          if (state.stageIndex === 3) state.activeInputId = "draftInput";
+          if (state.stageIndex === 4) state.activeInputId = "finalOutput";
+        }
+
+        function focusActiveInput(selectText) {
+          if (state.composing) return;
+          const input = getActiveInput();
+          if (!input) return;
+          window.requestAnimationFrame(() => {
+            input.focus({ preventScroll: true });
+            if (selectText && typeof input.select === "function") input.select();
+          });
+        }
+
+        function goToStage(index, options) {
+          clearTimers();
+          state.stageIndex = Math.max(0, Math.min(index, STAGES.length - 1));
+          if (state.stageIndex === 2) {
+            const nextEmptyIndex = SENTENCE_PROMPTS.findIndex((prompt) => !normalize(state.sentences[prompt.key]));
+            state.promptIndex = nextEmptyIndex >= 0 ? nextEmptyIndex : Math.min(state.promptIndex, SENTENCE_PROMPTS.length - 1);
+          }
+          if (state.stageIndex === 3) {
+            syncDrafts();
+          }
+          if (state.stageIndex === 4) {
+            syncDrafts();
+          }
+          setActiveInputId();
+          render(options);
+        }
+
+        function goNextManual() {
+          if (state.stageIndex === 4) {
+            copyFinal();
+            return;
+          }
+          if (!isStageDone(state.stageIndex)) {
+            setFeedback("현재 입력을 먼저 완성하세요.", "warn", "<kbd>Enter</kbd> 또는 <kbd>Ctrl+Enter</kbd>");
+            focusActiveInput();
+            return;
+          }
+          goToStage(state.stageIndex + 1);
+        }
+
+        function goPrev() {
+          goToStage(state.stageIndex - 1);
+        }
+
+        function completeWarmup() {
+          state.warmupDone = true;
+          setFeedback("좋아요. 바로 핵심어로 넘어갑니다.", "good", "<kbd>자동 이동</kbd>");
+          advanceTimer = window.setTimeout(() => goToStage(1), 400);
+        }
+
+        function handleWarmupInput() {
+          const value = normalize(els.warmupInput.value);
+          if (hasEnglish(value)) {
+            state.warmupDone = false;
+            clearTimers();
+            setFeedback("한/영 키 확인: 지금은 한글 입력 모드가 필요합니다.", "bad", "<kbd>한/영</kbd>");
+            render({ preserveFocus: true });
+            return;
+          }
+          if (value === "운동") {
+            completeWarmup();
+            render({ preserveFocus: true });
+            return;
+          }
+          state.warmupDone = false;
+          clearTimers();
+          setFeedback('"운동"을 입력하세요.', "warn", "<kbd>자동</kbd> 정확히 입력하면 이동");
+          render({ preserveFocus: true });
+        }
+
+        function handleWordInput() {
+          if (state.composing) return;
+          const value = normalize(els.wordInput.value);
+          const target = WORD_TARGETS[state.wordIndex];
+          if (hasEnglish(value)) {
+            setFeedback("한/영 키 확인: 한글로 핵심어를 입력하세요.", "bad", "<kbd>한/영</kbd>");
+            return;
+          }
+          if (!target) {
+            goToStage(2);
+            return;
+          }
+          if (value !== target) {
+            setFeedback(target + " 입력 중입니다.", "", "<kbd>자동</kbd> 정확히 치면 다음 단어");
+            render({ preserveFocus: true });
+            return;
+          }
+          if (!state.typedWords.includes(target)) {
+            state.typedWords.push(target);
+          }
+          state.wordIndex += 1;
+          els.wordInput.value = "";
+          if (state.wordIndex >= WORD_TARGETS.length) {
+            setFeedback("핵심어 완료. 문장 만들기로 넘어갑니다.", "good", "<kbd>자동 이동</kbd>");
+            render({ preserveFocus: true });
+            advanceTimer = window.setTimeout(() => goToStage(2), 350);
+            return;
+          }
+          setFeedback("정확해요. 다음 핵심어를 입력하세요.", "good", "<kbd>자동</kbd> 다음 단어");
+          render({ preserveFocus: true });
+        }
+
+        function storeCurrentSentence() {
+          const prompt = SENTENCE_PROMPTS[state.promptIndex];
+          if (!prompt) return;
+          state.sentences[prompt.key] = els.sentenceInput.value;
+          syncDrafts();
+        }
+
+        function advanceSentencePrompt() {
+          clearTimers();
+          storeCurrentSentence();
+          if (!normalize(state.sentences[SENTENCE_PROMPTS[state.promptIndex].key])) {
+            setFeedback("한 문장을 먼저 써 주세요.", "warn", "<kbd>Ctrl+Enter</kbd> 문장 완료");
+            render({ preserveFocus: true });
+            return;
+          }
+          if (state.promptIndex < SENTENCE_PROMPTS.length - 1) {
+            state.promptIndex += 1;
+            setFeedback("다음 문장으로 넘어갑니다.", "good", "<kbd>Ctrl+Enter</kbd> 문장 완료");
+            render({ selectText: true });
+            return;
+          }
+          setFeedback("문장 3개 완료. 답글 초안으로 넘어갑니다.", "good", "<kbd>자동 이동</kbd>");
+          advanceTimer = window.setTimeout(() => goToStage(3, { selectText: true }), 300);
+          render({ preserveFocus: true });
+        }
+
+        function handleSentenceInput() {
+          storeCurrentSentence();
+          clearTimeout(sentencePauseTimer);
+          if (hasSentenceStop(els.sentenceInput.value)) {
+            sentencePauseTimer = window.setTimeout(advanceSentencePrompt, 800);
+          }
+          setFeedback("문장을 쓰는 중입니다.", "", "<kbd>Ctrl+Enter</kbd> 문장 완료");
+          render({ preserveFocus: true });
+        }
+
+        function handleDraftInput() {
+          state.draft = els.draftInput.value;
+          state.final = state.draft;
+          setFeedback("답글을 다듬는 중입니다.", "", "<kbd>Ctrl+Enter</kbd> 복사 준비");
+          render({ preserveFocus: true });
+        }
+
+        function finishDraft() {
+          state.draft = els.draftInput.value;
+          if (!normalize(state.draft)) {
+            setFeedback("답글을 먼저 채워 주세요.", "warn", "<kbd>Ctrl+Enter</kbd> 복사 준비");
+            focusActiveInput();
+            return;
+          }
+          state.final = state.draft;
+          goToStage(4, { selectText: true });
+        }
+
+        function copyFinal() {
+          state.final = els.finalOutput.value || state.final;
+          const text = state.final;
+          if (!normalize(text)) {
+            setFeedback("복사할 답글이 없습니다.", "warn", "<kbd>Ctrl+Enter</kbd>");
+            return;
+          }
+          const done = () => {
+            setFeedback("복사되었습니다.", "good", "<kbd>Ctrl+C</kbd> 또는 <kbd>Enter</kbd>");
+            render({ preserveFocus: true });
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done).catch(() => {
+              els.finalOutput.select();
+              document.execCommand("copy");
+              done();
+            });
+            return;
+          }
+          els.finalOutput.select();
+          document.execCommand("copy");
+          done();
+        }
+
+        function resetBuilder() {
+          clearTimers();
+          Object.assign(state, {
+            stageIndex: 0,
+            promptIndex: 0,
+            activeInputId: "warmupInput",
+            warmupDone: false,
+            wordIndex: 0,
+            typedWords: [],
+            sentences: { effort: "", exercise: "", benefit: "" },
+            draft: "",
+            final: "",
+            composing: false
+          });
+          localStorage.removeItem(STORAGE_KEY);
+          els.warmupInput.value = "";
+          els.wordInput.value = "";
+          els.sentenceInput.value = "";
+          els.draftInput.value = "";
+          els.finalOutput.value = "";
+          setFeedback('한글 입력 모드에서 "운동"을 입력하세요.', "", "<kbd>자동</kbd> 정확히 입력하면 이동");
+          render({ selectText: true });
+        }
+
+        function renderProgressDots() {
+          els.progressDots.innerHTML = STAGES.map((stage, index) => {
+            const classes = ["progress-dot"];
+            if (index === state.stageIndex) classes.push("is-current");
+            if (isStageDone(index)) classes.push("is-done");
+            return '<button class="' + classes.join(" ") + '" type="button" data-stage-index="' + index + '">' + (index + 1) + ". " + stage.label + "</button>";
+          }).join("");
+        }
+
+        function renderSentenceStage() {
+          const prompt = SENTENCE_PROMPTS[state.promptIndex];
+          els.sentenceStepLabel.textContent = "문장 " + (state.promptIndex + 1) + " / " + SENTENCE_PROMPTS.length;
+          els.sentenceTarget.textContent = prompt.target;
+          els.sentenceHint.textContent = prompt.hint;
+          els.sentenceInput.placeholder = prompt.placeholder;
+          els.sentenceInput.value = state.sentences[prompt.key] || "";
+        }
+
+        function render(options) {
+          const stage = getStage();
+          setActiveInputId();
+          syncDrafts();
+
+          els.stageMeta.textContent = stage.meta;
+          els.stageTitle.textContent = stage.title;
+          els.missionPrompt.textContent = stage.prompt;
+          els.stageViews.forEach((view) => {
+            view.classList.toggle("is-active", view.dataset.stage === stage.id);
+          });
+
+          els.totalWordCount.textContent = String(WORD_TARGETS.length);
+          els.typedWordCount.textContent = String(Math.min(state.typedWords.length, WORD_TARGETS.length));
+          els.targetWord.textContent = WORD_TARGETS[state.wordIndex] || "완료";
+
+          if (stage.id === "sentences") renderSentenceStage();
+          if (stage.id === "draft") els.draftInput.value = state.draft;
+          if (stage.id === "final") els.finalOutput.value = state.final;
+
+          els.previewOutput.value = state.final || state.draft || makeDraft();
+          els.previewCount.textContent = els.previewOutput.value.length + "자";
+          els.prevButton.disabled = state.stageIndex === 0;
+          els.copyButton.hidden = state.stageIndex !== 4;
+
+          renderProgressDots();
+          saveState();
+
+          if (!options || !options.preserveFocus) {
+            focusActiveInput(Boolean(options && options.selectText));
+          }
+        }
+
+        document.addEventListener("click", (event) => {
+          const stageButton = event.target.closest("[data-stage-index]");
+          if (stageButton) {
+            goToStage(Number(stageButton.dataset.stageIndex), { selectText: true });
+          }
+        });
+
+        document.addEventListener("compositionstart", () => {
+          state.composing = true;
+          clearTimers();
+        });
+
+        document.addEventListener("compositionend", (event) => {
+          state.composing = false;
+          if (event.target === els.wordInput) handleWordInput();
+          if (event.target === els.sentenceInput) handleSentenceInput();
+          focusActiveInput();
+        });
+
+        els.warmupInput.addEventListener("input", handleWarmupInput);
+        els.wordInput.addEventListener("input", handleWordInput);
+        els.sentenceInput.addEventListener("input", handleSentenceInput);
+        els.draftInput.addEventListener("input", handleDraftInput);
+
+        els.warmupInput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" && isStageDone(0)) goToStage(1);
+        });
+
+        els.wordInput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            handleWordInput();
+          }
+        });
+
+        els.sentenceInput.addEventListener("keydown", (event) => {
+          if (event.ctrlKey && event.key === "Enter") {
+            event.preventDefault();
+            advanceSentencePrompt();
+          }
+        });
+
+        els.draftInput.addEventListener("keydown", (event) => {
+          if (event.ctrlKey && event.key === "Enter") {
+            event.preventDefault();
+            finishDraft();
+          }
+        });
+
+        els.finalOutput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            copyFinal();
+          }
+        });
+
+        els.prevButton.addEventListener("click", goPrev);
+        els.nextButton.addEventListener("click", goNextManual);
+        els.copyButton.addEventListener("click", copyFinal);
+        els.resetBuilder.addEventListener("click", resetBuilder);
+
+        loadState();
+        setFeedback('한글 입력 모드에서 "운동"을 입력하세요.', "", "<kbd>자동</kbd> 정확히 입력하면 이동");
+        render({ selectText: true });
+      })();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+  </body>
+</html>
