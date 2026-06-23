@@ -480,13 +480,15 @@
       </div>
     </main>
 
+    <script src="writing-expression-data.js"></script>
     <script src="../shared/multilang-toggle.js"></script>
     <script>
       (function () {
         "use strict";
 
         const STORAGE_KEY = "c12_writing_expression_assembly_v1";
-        const LANGS = ["vi", "mn", "ar", "kk", "th", "en", "ja", "zh"];
+        const DATA = window.C12_WRITING_TOPIC_DATA;
+        const LANGS = DATA.langs;
 
         function tx(en, vi, ar) {
           return {
@@ -507,13 +509,7 @@
           "اكتب ردا لشخص مشغول لا يستطيع ممارسة الرياضة ويقلق بشأن صحته ووزنه."
         );
 
-        const EXPRESSIONS = {
-          empathy: ["많이 걱정되시겠어요", "운동할 시간을 내기가 어렵지요", "몸이 무겁고 쉽게 지치는 모양이에요"],
-          problem: ["요즘 바빠서", "운동을 못 해서", "건강이 나빠진 것 같아서", "살도 찐 것 같아서"],
-          method: ["가까운 거리는 걸어가다", "버스 한 정거장 전에 내려서 걷다", "쉬는 시간마다 몸을 풀다", "오래 앉아 있을 때 허리를 펴다", "틈틈이 가벼운 운동을 하다", "하루에 5분만이라도 스트레칭을 하다"],
-          effect: ["스트레스가 풀리다", "몸이 가벼워지다", "쉽게 지치지 않다", "체력이 좋아지다", "자세를 교정할 수 있다", "건강을 지킬 수 있다"],
-          advice: ["먼저 쉬운 운동부터 시작해 보세요", "무리하지 말고 조금씩 해 보세요", "매일 조금씩 계속하는 것이 중요합니다", "운동할 시간이 없더라도", "이렇게 하면", "건강을 위해서는"]
-        };
+        const EXPRESSIONS = DATA.assemblyGroups;
 
         const ASSEMBLY_STEPS = [
           {

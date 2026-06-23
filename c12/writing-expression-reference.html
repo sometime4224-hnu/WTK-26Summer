@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>표현 자료</title>
+    <link rel="stylesheet" href="../shared/multilang-toggle.css">
+    <style>
+      :root {
+        --ink: #172033;
+        --muted: #64748b;
+        --line: #d7e0ea;
+        --soft: #f7f9fc;
+        --paper: #ffffff;
+        --blue: #2563eb;
+        --green: #059669;
+        --orange: #ea580c;
+        --red: #dc2626;
+        --shadow: 0 18px 44px rgba(15, 23, 42, 0.11);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, rgba(37, 99, 235, 0.08), transparent 280px),
+          linear-gradient(90deg, rgba(5, 150, 105, 0.08), transparent 360px),
+          var(--soft);
+        color: var(--ink);
+        font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .page {
+        width: min(1160px, calc(100% - 28px));
+        margin: 0 auto;
+        padding: 18px 0 36px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .topbar strong {
+        display: block;
+        font-size: clamp(22px, 4vw, 38px);
+        font-weight: 950;
+        line-height: 1.16;
+      }
+
+      .topbar span {
+        display: block;
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 850;
+        line-height: 1.5;
+      }
+
+      .home-link {
+        flex: 0 0 auto;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 10px 14px;
+        background: #fff;
+        color: var(--ink);
+        font-size: 13px;
+        font-weight: 900;
+        text-decoration: none;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 290px;
+        gap: 14px;
+        align-items: stretch;
+        margin-bottom: 14px;
+      }
+
+      .scenario,
+      .summary-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: var(--shadow);
+      }
+
+      .scenario {
+        padding: clamp(18px, 3vw, 28px);
+      }
+
+      .scenario .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        border-radius: 999px;
+        padding: 0 12px;
+        background: #172033;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 950;
+      }
+
+      .scenario h1 {
+        margin: 12px 0 8px;
+        font-size: clamp(28px, 5vw, 52px);
+        line-height: 1.06;
+        letter-spacing: 0;
+      }
+
+      .scenario p {
+        margin: 0;
+        color: #334155;
+        font-size: clamp(16px, 2.4vw, 21px);
+        font-weight: 850;
+        line-height: 1.55;
+      }
+
+      .summary-card {
+        display: grid;
+        align-content: center;
+        gap: 12px;
+        padding: 18px;
+      }
+
+      .summary-card .stat {
+        border-left: 5px solid var(--blue);
+        padding-left: 12px;
+      }
+
+      .summary-card .stat:nth-child(2) {
+        border-color: var(--green);
+      }
+
+      .summary-card .stat:nth-child(3) {
+        border-color: var(--orange);
+      }
+
+      .summary-card span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 950;
+      }
+
+      .summary-card strong {
+        display: block;
+        margin-top: 2px;
+        font-size: 26px;
+        font-weight: 950;
+      }
+
+      .toolband {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+      }
+
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .filter-btn {
+        min-height: 36px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0 12px;
+        background: #fff;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 950;
+        cursor: pointer;
+      }
+
+      .filter-btn.is-active {
+        border-color: var(--blue);
+        background: #eff6ff;
+        color: #1d4ed8;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      }
+
+      .search-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+        margin-top: 10px;
+      }
+
+      .search-row input {
+        width: 100%;
+        min-height: 44px;
+        border: 2px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 0 13px;
+        color: var(--ink);
+        font-size: 15px;
+        font-weight: 850;
+        outline: none;
+      }
+
+      .search-row input:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+      }
+
+      .result-count {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 950;
+        white-space: nowrap;
+      }
+
+      .language-row {
+        margin-top: 8px;
+      }
+
+      .category-section {
+        margin-top: 18px;
+      }
+
+      .category-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .category-head h2 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 950;
+      }
+
+      .category-head p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .expression-card {
+        min-width: 0;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 16px;
+        background: #fff;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
+      }
+
+      .card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .expression-card h3 {
+        margin: 0;
+        font-size: clamp(20px, 3vw, 28px);
+        font-weight: 950;
+        line-height: 1.24;
+        overflow-wrap: anywhere;
+      }
+
+      .badge {
+        flex: 0 0 auto;
+        border-radius: 999px;
+        padding: 6px 9px;
+        background: #f1f5f9;
+        color: #334155;
+        font-size: 11px;
+        font-weight: 950;
+        white-space: nowrap;
+      }
+
+      .info-grid {
+        display: grid;
+        gap: 8px;
+      }
+
+      .info-row {
+        border-left: 4px solid #cbd5e1;
+        padding: 8px 10px;
+        background: #f8fafc;
+      }
+
+      .info-row[data-kind="meaning"] {
+        border-color: var(--blue);
+      }
+
+      .info-row[data-kind="usage"] {
+        border-color: var(--green);
+      }
+
+      .info-row[data-kind="example"] {
+        border-color: var(--orange);
+      }
+
+      .info-row[data-kind="role"] {
+        border-color: #a855f7;
+      }
+
+      .info-row span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 950;
+      }
+
+      .info-row p {
+        margin: 3px 0 0;
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.55;
+      }
+
+      .empty {
+        margin-top: 16px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 8px;
+        padding: 18px;
+        background: #fff;
+        color: var(--muted);
+        font-size: 15px;
+        font-weight: 850;
+        text-align: center;
+      }
+
+      .empty[hidden] {
+        display: none;
+      }
+
+      @media (max-width: 860px) {
+        .hero,
+        .card-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .toolband {
+          position: static;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .page {
+          width: min(100% - 16px, 1160px);
+          padding-top: 10px;
+        }
+
+        .topbar {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .home-link {
+          align-self: flex-start;
+        }
+
+        .search-row {
+          grid-template-columns: 1fr;
+        }
+
+        .result-count {
+          white-space: normal;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      window.MULTILANG_CONFIG = {
+        langs: ["vi", "mn", "ar", "kk", "th", "en", "ja", "zh"],
+        defaultLang: "none",
+        ignoreStoredLang: true
+      };
+    </script>
+
+    <main class="page">
+      <header class="topbar">
+        <div>
+          <strong>표현 자료</strong>
+          <span>의미 · 쓰임 · 예문</span>
+        </div>
+        <a class="home-link" href="index.html">12과 목록</a>
+      </header>
+
+      <section class="hero" aria-label="쓰기 주제 요약">
+        <div class="scenario">
+          <span class="eyebrow">12과</span>
+          <h1>생활 속 운동</h1>
+          <p>답글 표현</p>
+        </div>
+        <aside class="summary-card">
+          <div class="stat"><span>표현</span><strong id="totalCount">0</strong></div>
+          <div class="stat"><span>범주</span><strong>6</strong></div>
+          <div class="stat"><span>활용</span><strong>답글</strong></div>
+        </aside>
+      </section>
+
+      <section class="toolband" aria-label="표현 필터">
+        <div class="filters" id="categoryFilters"></div>
+        <div class="search-row">
+          <input id="searchInput" type="search" autocomplete="off" placeholder="표현, 뜻, 예문 검색">
+          <span class="result-count" id="resultCount">0개 표시</span>
+        </div>
+        <div class="language-row" data-multilang-bar></div>
+      </section>
+
+      <div id="referenceList"></div>
+      <div class="empty" id="emptyState" hidden>조건에 맞는 표현이 없습니다.</div>
+    </main>
+
+    <script src="writing-expression-data.js"></script>
+    <script src="../shared/multilang-toggle.js"></script>
+    <script>
+      (function () {
+        "use strict";
+
+        const DATA = window.C12_WRITING_TOPIC_DATA;
+        const state = {
+          category: "all",
+          query: ""
+        };
+
+        const els = {
+          totalCount: document.getElementById("totalCount"),
+          resultCount: document.getElementById("resultCount"),
+          categoryFilters: document.getElementById("categoryFilters"),
+          searchInput: document.getElementById("searchInput"),
+          referenceList: document.getElementById("referenceList"),
+          emptyState: document.getElementById("emptyState")
+        };
+
+        function escapeHtml(value) {
+          return String(value || "").replace(/[&<>"']/g, (char) => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+          }[char]));
+        }
+
+        function normalize(value) {
+          return String(value || "").trim().toLowerCase();
+        }
+
+        function categoryByLabel(label) {
+          return DATA.categories.find((category) => category.label === label);
+        }
+
+        function filteredExpressions() {
+          const query = normalize(state.query);
+          return DATA.expressions.filter((item) => {
+            const categoryMatch = state.category === "all" || item.category === state.category;
+            const haystack = [
+              item.target,
+              item.meaningKo,
+              item.usageKo,
+              item.exampleKo,
+              item.paragraphRole,
+              ...Object.values(item.translations || {})
+            ].join(" ").toLowerCase();
+            return categoryMatch && (!query || haystack.includes(query));
+          });
+        }
+
+        function renderFilters() {
+          els.categoryFilters.innerHTML = DATA.categories.map((category) => {
+            const active = state.category === category.label || (state.category === "all" && category.id === "all");
+            return `<button class="filter-btn${active ? " is-active" : ""}" type="button" data-category="${escapeHtml(category.id === "all" ? "all" : category.label)}">${escapeHtml(category.label)}</button>`;
+          }).join("");
+        }
+
+        function renderTranslations(item) {
+          return DATA.langs.map((lang) => {
+            const dir = lang === "ar" ? ' dir="rtl"' : "";
+            return `<div class="lang-box" data-lang="${lang}" lang="${lang}"${dir}>${escapeHtml(item.translations[lang] || item.translations.en || "")}</div>`;
+          }).join("");
+        }
+
+        function renderCard(item) {
+          return `
+            <article class="expression-card" data-expression-card data-category="${escapeHtml(item.category)}">
+              <div class="card-top">
+                <h3>${escapeHtml(item.target)}</h3>
+                <span class="badge">${escapeHtml(item.category)}</span>
+              </div>
+              <div class="info-grid">
+                <div class="info-row" data-kind="meaning">
+                  <span>뜻</span>
+                  <p>${escapeHtml(item.meaningKo)}</p>
+                </div>
+                <div class="info-row" data-kind="usage">
+                  <span>언제 쓰나요?</span>
+                  <p>${escapeHtml(item.usageKo)}</p>
+                </div>
+                <div class="info-row" data-kind="example">
+                  <span>활용 예</span>
+                  <p>${escapeHtml(item.exampleKo)}</p>
+                </div>
+                <div class="info-row" data-kind="role">
+                  <span>문단에서의 역할</span>
+                  <p>${escapeHtml(item.paragraphRole)}</p>
+                </div>
+              </div>
+              ${renderTranslations(item)}
+            </article>
+          `;
+        }
+
+        function renderList() {
+          const items = filteredExpressions();
+          const grouped = DATA.categories
+            .filter((category) => category.id !== "all")
+            .map((category) => ({
+              category,
+              items: items.filter((item) => item.category === category.label)
+            }))
+            .filter((group) => group.items.length);
+
+          els.totalCount.textContent = String(DATA.expressions.length);
+          els.resultCount.textContent = `${items.length}개 표시`;
+          els.emptyState.hidden = items.length > 0;
+          els.referenceList.innerHTML = grouped.map((group) => `
+            <section class="category-section" data-category-section="${escapeHtml(group.category.label)}">
+              <div class="category-head">
+                <div>
+                  <h2>${escapeHtml(group.category.label)}</h2>
+                  <p>${escapeHtml(group.category.description)}</p>
+                </div>
+                <p>${group.items.length}개</p>
+              </div>
+              <div class="card-grid">
+                ${group.items.map(renderCard).join("")}
+              </div>
+            </section>
+          `).join("");
+          if (window.MultilangToggle) window.MultilangToggle.refresh();
+        }
+
+        function render() {
+          renderFilters();
+          renderList();
+        }
+
+        els.categoryFilters.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-category]");
+          if (!button) return;
+          state.category = button.dataset.category;
+          render();
+        });
+
+        els.searchInput.addEventListener("input", () => {
+          state.query = els.searchInput.value;
+          renderList();
+        });
+
+        window.__C12_WRITING_EXPRESSION_REFERENCE__ = {
+          get state() { return Object.assign({}, state); },
+          data: DATA,
+          get visibleCount() { return filteredExpressions().length; }
+        };
+
+        render();
+      })();
+    </script>
+  </body>
+</html>

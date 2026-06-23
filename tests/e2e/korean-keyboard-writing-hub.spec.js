@@ -14,6 +14,7 @@ test.describe("korean keyboard writing standalone hub", () => {
     await expect(page.locator('[data-hub-link="c12-writing-expression-learning"]')).toHaveAttribute("href", "../../c12/writing-expression-learning.html");
     await expect(page.locator('[data-hub-link="c12-writing-expression-assembly"]')).toContainText("12과 쓰기 표현 조립 연습");
     await expect(page.locator('[data-hub-link="c12-writing-expression-assembly"]')).toHaveAttribute("href", "../../c12/writing-expression-assembly.html");
+    await expect(page.locator('a[href="../../c12/writing-expression-reference.html"]')).toHaveCount(0);
     await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toContainText("12과 동작 표현 타이핑 연습");
     await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toHaveAttribute("href", "../../c12/writing-motion-typing.html");
     await expect(page.locator('[data-hub-link="c12-motion-typing-game"]')).toContainText("12과 어휘 표현 애니메이션 타이핑");
