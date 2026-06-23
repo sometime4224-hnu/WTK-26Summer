@@ -14,6 +14,8 @@ test.describe("korean keyboard writing standalone hub", () => {
     await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toHaveAttribute("href", "../../c12/writing-motion-typing.html");
     await expect(page.locator('[data-hub-link="c12-motion-typing-game"]')).toContainText("12과 어휘 표현 애니메이션 타이핑");
     await expect(page.locator('[data-hub-link="c12-motion-typing-game"]')).toHaveAttribute("href", "../../c12/writing-motion-typing-game.html");
+    await expect(page.locator('[data-hub-link="c12-writing-shower"]')).toContainText("12과 쓰기 소나기");
+    await expect(page.locator('[data-hub-link="c12-writing-shower"]')).toHaveAttribute("href", "../../c12/writing-shower.html");
     await expect(page.locator(".mini-key.is-next")).toContainText("ㄱ");
   });
 
@@ -52,6 +54,15 @@ test.describe("korean keyboard writing standalone hub", () => {
     await expect(page.locator("#motionPanel")).toHaveAttribute("data-scene-id", "ready");
   });
 
+  test("opens the C12 writing shower from the hub", async ({ page }) => {
+    await page.goto("/apps/standalone-pages/korean-keyboard-writing-hub.html");
+
+    await page.locator('[data-hub-link="c12-writing-shower"]').click();
+    await expect(page).toHaveURL(/\/c12\/writing-shower\.html$/);
+    await expect(page.locator("#missionTitle")).toHaveText("초급 쓰기");
+    await expect(page.locator(".stage-chip")).toHaveCount(18);
+  });
+
   test("is linked from the common apps hub", async ({ page }) => {
     await page.goto("/apps/index.html");
 
@@ -68,6 +79,7 @@ test.describe("korean keyboard writing standalone hub", () => {
     await expect(page.locator('[data-hub-link="c12-writing"]')).toBeInViewport();
     await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toBeVisible();
     await expect(page.locator('[data-hub-link="c12-motion-typing-game"]')).toBeVisible();
+    await expect(page.locator('[data-hub-link="c12-writing-shower"]')).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(2);
   });
