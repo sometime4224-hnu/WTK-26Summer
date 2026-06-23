@@ -442,6 +442,7 @@
     const audioLineState = new Map();
     const audioChunkState = new Map();
     const audioKeywordState = new Map();
+    const cuttoonPanelState = new Map();
     const lineChunkCache = new WeakMap();
     const sequenceState = new Map();
     let pageConfig = null;
@@ -2465,6 +2466,101 @@
         `;
     }
 
+    function lessonHasCuttoonPanels(lesson) {
+        return Boolean(lesson && Array.isArray(lesson.cuttoonPanels) && lesson.cuttoonPanels.length);
+    }
+
+    function getCuttoonPanelRange(panel) {
+        const start = Number(panel && panel.start);
+        const end = Number(panel && panel.end);
+        if (!Number.isFinite(start)) return null;
+        return {
+            start,
+            end: Number.isFinite(end) && end >= start ? end : start
+        };
+    }
+
+    function getCuttoonActivePanelIndex(lesson, currentTime) {
+        if (!lessonHasCuttoonPanels(lesson)) return null;
+        const safeTime = Number.isFinite(currentTime) ? currentTime : 0;
+        let lastStartedIndex = 0;
+        for (let index = 0; index < lesson.cuttoonPanels.length; index += 1) {
+            const range = getCuttoonPanelRange(lesson.cuttoonPanels[index]);
+            if (!range) continue;
+            if (safeTime < range.start) return Math.max(lastStartedIndex, 0);
+            lastStartedIndex = index;
+            if (safeTime >= range.start && safeTime < range.end + 0.05) return index;
+        }
+        return lesson.cuttoonPanels.length - 1;
+    }
+
+    function renderCuttoonPanelTime(panel) {
+        const range = getCuttoonPanelRange(panel);
+        if (!range) return "";
+        if (range.end > range.start) return `${formatClockTime(range.start)}-${formatClockTime(range.end)}`;
+        return formatClockTime(range.start);
+    }
+
+    function buildCuttoonSection(lesson) {
+        if (!lessonHasCuttoonPanels(lesson)) return "";
+        const panels = lesson.cuttoonPanels;
+        const firstPanel = panels[0] || {};
+        const firstImage = firstPanel.imageSrc || "";
+        const title = getLocalizedField(
+            lesson.cuttoonSync || {},
+            "title",
+            chooseLocalizedText("컷툰 자동 재생", "Phat cuttoon tu dong")
+        );
+        const copy = getLocalizedField(
+            lesson.cuttoonSync || {},
+            "copy",
+            chooseLocalizedText(
+                "원음 진행에 맞춰 현재 장면이 강조됩니다. 컷이나 대본 어절을 누르면 해당 부분으로 이동합니다.",
+                "Canh hien tai duoc danh dau theo am thanh. Bam vao tranh hoac cum tu de den doan do."
+            )
+        );
+
+        return `
+            <section class="lw-section lw-cuttoon-sync lw-progress-target" id="cuttoon-section-${escapeHtml(lesson.id)}">
+                <h3>${escapeHtml(title)}</h3>
+                <p class="lw-section-copy">${escapeHtml(copy)}</p>
+                <div class="lw-cuttoon-stage">
+                    <figure class="lw-cuttoon-main">
+                        ${firstImage ? `<img id="cuttoon-main-image-${escapeHtml(lesson.id)}" src="${escapeHtml(firstImage)}" alt="${escapeHtml(firstPanel.alt || firstPanel.title || title)}" loading="lazy" decoding="async">` : ""}
+                        <figcaption>
+                            <span id="cuttoon-main-time-${escapeHtml(lesson.id)}">${escapeHtml(renderCuttoonPanelTime(firstPanel))}</span>
+                            <strong id="cuttoon-main-title-${escapeHtml(lesson.id)}">${escapeHtml(firstPanel.title || "")}</strong>
+                            <em id="cuttoon-main-note-${escapeHtml(lesson.id)}">${escapeHtml(firstPanel.note || "")}</em>
+                        </figcaption>
+                    </figure>
+                    <div class="lw-cuttoon-strip" aria-label="${escapeHtml(title)}">
+                        ${panels.map((panel, index) => {
+                            const range = getCuttoonPanelRange(panel);
+                            const start = range ? range.start : 0;
+                            return `
+                                <button
+                                    type="button"
+                                    class="lw-cuttoon-card"
+                                    data-action="seek-audio"
+                                    data-lesson-id="${escapeHtml(lesson.id)}"
+                                    data-seek-time="${escapeHtml(start.toFixed(3))}"
+                                    data-cuttoon-panel-index="${index}"
+                                >
+                                    ${panel.imageSrc ? `<img src="${escapeHtml(panel.imageSrc)}" alt="${escapeHtml(panel.alt || panel.title || `컷 ${index + 1}`)}" loading="lazy" decoding="async">` : ""}
+                                    <span class="lw-cuttoon-card__meta">
+                                        <span>${escapeHtml(String(index + 1).padStart(2, "0"))}</span>
+                                        <strong>${escapeHtml(panel.title || "")}</strong>
+                                        <em>${escapeHtml(renderCuttoonPanelTime(panel))}</em>
+                                    </span>
+                                </button>
+                            `;
+                        }).join("")}
+                    </div>
+                </div>
+            </section>
+        `;
+    }
+
     function buildGrammarLinkSection(lesson) {
         if (!lesson.grammarLink || !lesson.grammarLink.href) return "";
 
@@ -2732,7 +2828,7 @@
             `;
         const relocateQuiz = isCompactModeEnabled() && settings.relocateQuizBelowSubtitle !== false;
         const sentenceMarkup = buildSentenceTrainer(lesson);
-        const coreSections = [buildSubtitleSection(lesson)];
+        const coreSections = [buildCuttoonSection(lesson), buildSubtitleSection(lesson)].filter(Boolean);
         if (relocateQuiz) coreSections.push(buildQuizSection(lesson));
         if (sentenceMarkup) coreSections.push(sentenceMarkup);
         const clarificationSections = [buildClarificationSection(lesson), buildOralFeatures(lesson)].filter(Boolean);
@@ -3008,14 +3104,27 @@
         const chunks = getLineChunks(line);
         if (!chunks) return decorateText(line.text, line.highlights || []);
 
-        return chunks.map((chunk, chunkIndex) => `
-            <span
-                class="lw-line-chunk"
-                id="${slotIdPrefix}-${lessonId}-${lineIndex}-${chunkIndex}"
-                data-line-index="${lineIndex}"
-                data-chunk-index="${chunkIndex}"
-            >${decorateText(chunk.text, line.highlights || [])}</span>
-        `).join(" ");
+        return chunks.map((chunk, chunkIndex) => {
+            const start = Number(chunk && chunk.start);
+            const seekAttributes = Number.isFinite(start)
+                ? `
+                    data-action="seek-audio"
+                    data-lesson-id="${escapeHtml(lessonId)}"
+                    data-seek-time="${escapeHtml(start.toFixed(3))}"
+                    role="button"
+                    tabindex="0"
+                `
+                : "";
+            return `
+                <span
+                    class="lw-line-chunk"
+                    id="${slotIdPrefix}-${lessonId}-${lineIndex}-${chunkIndex}"
+                    data-line-index="${lineIndex}"
+                    data-chunk-index="${chunkIndex}"
+                    ${seekAttributes}
+                >${decorateText(chunk.text, line.highlights || [])}</span>
+            `;
+        }).join(" ");
     }
 
     function getAudioActiveLineIndex(lessonId, currentTime) {
@@ -3142,11 +3251,64 @@
         }
     }
 
+    function updateCuttoonSyncUI(lessonId, currentTime = null, options = {}) {
+        const lesson = lessonMap.get(lessonId);
+        if (!lessonHasCuttoonPanels(lesson)) return;
+
+        const audio = document.getElementById(`audio-${lessonId}`);
+        const safeTime = Number.isFinite(currentTime)
+            ? currentTime
+            : (audio && Number.isFinite(audio.currentTime) ? audio.currentTime : Number(lesson.cuttoonPanels[0].start) || 0);
+        const activeIndex = getCuttoonActivePanelIndex(lesson, safeTime);
+        const previousIndex = cuttoonPanelState.get(lessonId);
+        if (!options.force && previousIndex === activeIndex) return;
+
+        if (Number.isInteger(previousIndex)) {
+            const previousCard = document.querySelector(`[data-lesson-id="${lessonId}"][data-cuttoon-panel-index="${previousIndex}"]`);
+            if (previousCard) previousCard.classList.remove("is-active");
+        }
+
+        if (!Number.isInteger(activeIndex)) {
+            cuttoonPanelState.delete(lessonId);
+            return;
+        }
+
+        const panel = lesson.cuttoonPanels[activeIndex];
+        const activeCard = document.querySelector(`[data-lesson-id="${lessonId}"][data-cuttoon-panel-index="${activeIndex}"]`);
+        if (activeCard) {
+            activeCard.classList.add("is-active");
+            if (options.scroll !== false && playbackState.kind === "audio" && playbackState.lessonId === lessonId) {
+                activeCard.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+            }
+        }
+
+        const image = document.getElementById(`cuttoon-main-image-${lessonId}`);
+        if (image && panel.imageSrc && image.getAttribute("src") !== panel.imageSrc) {
+            image.setAttribute("src", panel.imageSrc);
+            image.setAttribute("alt", panel.alt || panel.title || "");
+        }
+        const title = document.getElementById(`cuttoon-main-title-${lessonId}`);
+        if (title) title.textContent = panel.title || "";
+        const note = document.getElementById(`cuttoon-main-note-${lessonId}`);
+        if (note) note.textContent = panel.note || "";
+        const time = document.getElementById(`cuttoon-main-time-${lessonId}`);
+        if (time) time.textContent = renderCuttoonPanelTime(panel);
+
+        cuttoonPanelState.set(lessonId, activeIndex);
+    }
+
     function updateAudioSyncUI(lessonId, options = {}) {
         const lesson = lessonMap.get(lessonId);
         const audio = document.getElementById(`audio-${lessonId}`);
         const sourceType = getAudioTimingSourceType(lessonId);
         const hasAudioGuide = Boolean(lesson && (hasTimedTranscript(lesson, sourceType) || lessonHasTimedPublicCues(lesson, sourceType)));
+        if (lesson) {
+            updateCuttoonSyncUI(
+                lessonId,
+                audio && Number.isFinite(audio.currentTime) ? audio.currentTime : null,
+                options
+            );
+        }
         if (!lesson || !audio || !hasAudioGuide) {
             const previousLine = audioLineState.get(lessonId);
             const previousChunk = audioChunkState.get(lessonId);
@@ -4869,6 +5031,30 @@
         renderApp(pageConfig, { preserveRuntime: true });
     }
 
+    async function seekAudioTo(lessonId, rawTime, options = {}) {
+        const lesson = lessonMap.get(lessonId);
+        const audio = document.getElementById(`audio-${lessonId}`);
+        const targetTime = Number(rawTime);
+        if (!lesson || !audio || !Number.isFinite(targetTime)) return;
+
+        cancelSpeech();
+        pauseAllAudio();
+        const maxTime = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : targetTime;
+        audio.currentTime = Math.max(0, Math.min(targetTime, maxTime));
+        setQuickDockLesson(lessonId, { save: false });
+        setPlaybackState("audio", lessonId, { mode: "audio" });
+        updateAudioSyncUI(lessonId, { force: true, scroll: false });
+        refreshQuickDockProgress();
+
+        if (options.play === false) return;
+        try {
+            await audio.play();
+            setStatus(`listen-status-${lessonId}`, getInstructionText().audioPlaying, "info");
+        } catch (error) {
+            setStatus(`listen-status-${lessonId}`, getInstructionText().audioUnsupported, "warn");
+        }
+    }
+
     function handleClick(event) {
         const button = event.target.closest("[data-action]");
         if (!button) return;
@@ -4884,6 +5070,7 @@
         if (action === "check-prediction") return void checkPrediction(lessonId);
         if (action === "set-stage") return void setStage(lessonId, Number(button.dataset.stage));
         if (action === "set-speed") return void setSpeed(lessonId, Number(button.dataset.speed));
+        if (action === "seek-audio") return void seekAudioTo(lessonId, Number(button.dataset.seekTime));
         if (action === "quick-play") return void playQuickLesson();
         if (action === "quick-stop") return void stopQuickLesson();
         if (action === "toggle-quick-dock") return void setQuickDockCollapsed(!quickDockCollapsed);
@@ -5836,6 +6023,16 @@
         speechApi.onvoiceschanged = pickKoreanVoice;
     }
 
+    function handleKeyboardActivation(event) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        const target = event.target instanceof Element
+            ? event.target.closest('[data-action="seek-audio"][role="button"]')
+            : null;
+        if (!target) return;
+        event.preventDefault();
+        target.click();
+    }
+
     function init() {
         if (hasInitialized) return;
         pageConfig = window.LISTENING_WORKBOOK_CONFIG;
@@ -5848,6 +6045,7 @@
         renderApp(pageConfig);
         initSpeechVoice();
         document.addEventListener("click", handleClick);
+        document.addEventListener("keydown", handleKeyboardActivation);
         attachQuickDockListeners();
         attachSequenceTaskListeners();
         window.addEventListener("scroll", scheduleQuickDockViewportSync, { passive: true });
