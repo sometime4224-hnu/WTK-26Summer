@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>12과 문법2 보조활동 | 얼마나 온도계 챌린지</title>
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --ink: #172033;
+            --muted: #617086;
+            --line: #d8e0ea;
+            --panel: #ffffff;
+            --soft: #f6f9fc;
+            --amber: #d97706;
+            --amber-dark: #92400e;
+            --teal: #0f766e;
+            --blue: #1d4ed8;
+            --rose: #be123c;
+            --green: #047857;
+            --shadow: 0 16px 36px rgba(23, 32, 51, .09);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--ink);
+            background: linear-gradient(180deg, #f8fbff 0%, #fff8ed 52%, #f5fbfa 100%);
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: .56;
+        }
+
+        .safe {
+            word-break: keep-all;
+            overflow-wrap: anywhere;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 58px;
+            padding: 0 max(14px, calc((100vw - 1080px) / 2 + 18px));
+            border-bottom: 1px solid rgba(148, 163, 184, .28);
+            background: rgba(255, 255, 255, .9);
+            backdrop-filter: blur(12px);
+        }
+
+        .top-nav a,
+        .top-nav span {
+            color: #475569;
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .top-nav a:hover {
+            color: var(--amber-dark);
+        }
+
+        .top-nav .divider {
+            color: #cbd5e1;
+        }
+
+        .page-shell {
+            width: min(1080px, calc(100% - 24px));
+            margin: 16px auto 40px;
+        }
+
+        .panel {
+            min-width: 0;
+            border: 1px solid rgba(148, 163, 184, .3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .94);
+            box-shadow: var(--shadow);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 16px;
+            align-items: start;
+            padding: 18px;
+        }
+
+        .eyebrow {
+            margin: 0 0 7px;
+            color: var(--teal);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        p {
+            margin-top: 0;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+            font-size: 30px;
+            line-height: 1.2;
+            letter-spacing: 0;
+        }
+
+        h2 {
+            margin-bottom: 8px;
+            font-size: 20px;
+            line-height: 1.25;
+            letter-spacing: 0;
+        }
+
+        .lead {
+            margin-bottom: 0;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.72;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            min-height: 30px;
+            padding: 5px 10px;
+            border: 1px solid #c7d2fe;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #3730a3;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .primary-btn,
+        .secondary-btn,
+        .choice-btn,
+        .word-chip,
+        .slot-btn {
+            border: 0;
+            transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+        }
+
+        .primary-btn:hover,
+        .secondary-btn:hover,
+        .choice-btn:hover:not(:disabled),
+        .word-chip:hover:not(:disabled),
+        .slot-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .primary-btn,
+        .secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 52px;
+            padding: 0 18px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .primary-btn {
+            background: #172033;
+            color: #ffffff;
+            box-shadow: 0 12px 24px rgba(23, 32, 51, .18);
+        }
+
+        .secondary-btn {
+            border: 1px solid var(--line);
+            background: #ffffff;
+            color: #334155;
+        }
+
+        .intro-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .info-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px;
+            border: 1px solid rgba(148, 163, 184, .26);
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .info-strip strong {
+            display: block;
+            margin-bottom: 3px;
+            font-size: 14px;
+        }
+
+        .info-strip span {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .game-layout {
+            display: grid;
+            grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .game-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 14px;
+        }
+
+        .progress-wrap {
+            min-width: min(260px, 100%);
+        }
+
+        .meta-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .round-chip {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: #ccfbf1;
+            color: #115e59;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .progress-track {
+            height: 8px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #14b8a6, #f59e0b);
+            transition: width .25s ease;
+        }
+
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            padding: 0 12px;
+            border-radius: 999px;
+            background: #fff7ed;
+            color: var(--amber-dark);
+            font-size: 13px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .thermo-panel,
+        .question-panel {
+            padding: 16px;
+        }
+
+        .thermometer {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .heat-segment {
+            display: flex;
+            min-height: 74px;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 7px;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .heat-bar {
+            display: block;
+            min-height: 12px;
+            border-radius: 999px;
+            background: #cbd5e1;
+        }
+
+        .heat-segment.is-active .heat-bar {
+            background: linear-gradient(180deg, #fbbf24, #d97706);
+        }
+
+        .heat-segment strong {
+            color: #64748b;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .heat-segment.is-active strong {
+            color: var(--amber-dark);
+        }
+
+        .simple-line {
+            margin: 14px 0 0;
+            padding: 12px;
+            border-left: 4px solid #14b8a6;
+            border-radius: 8px;
+            background: #f0fdfa;
+            color: #134e4a;
+            font-size: 15px;
+            font-weight: 900;
+            line-height: 1.55;
+        }
+
+        .sentence-preview {
+            margin: 12px 0 0;
+            padding: 12px;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            background: #fff7ed;
+            color: #7c2d12;
+            font-size: 17px;
+            font-weight: 900;
+            line-height: 1.55;
+        }
+
+        .question-title {
+            margin-bottom: 6px;
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .question-text {
+            margin-bottom: 8px;
+            font-size: 21px;
+            font-weight: 900;
+            line-height: 1.42;
+        }
+
+        .hint {
+            margin-bottom: 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .choice-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .choice-btn {
+            width: 100%;
+            min-height: 58px;
+            padding: 12px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #1f2937;
+            font-size: 15px;
+            font-weight: 900;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .choice-btn.is-correct {
+            border-color: #10b981;
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .choice-btn.is-wrong {
+            border-color: #fb7185;
+            background: #fff1f2;
+            color: #9f1239;
+        }
+
+        .builder {
+            margin-top: 14px;
+        }
+
+        .slot-row,
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .slot-row {
+            min-height: 58px;
+            padding: 10px;
+            border: 1px dashed #94a3b8;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .slot-btn,
+        .word-chip {
+            min-height: 42px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .slot-btn {
+            border: 1px solid #bae6fd;
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        .word-bank {
+            margin-top: 12px;
+        }
+
+        .word-chip {
+            border: 1px solid #d8e0ea;
+            background: #ffffff;
+            color: #334155;
+        }
+
+        .word-chip.is-used {
+            border-color: #cbd5e1;
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        .builder-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .feedback {
+            margin-top: 14px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .feedback.ok {
+            border-color: #a7f3d0;
+            background: #ecfdf5;
+        }
+
+        .feedback.no {
+            border-color: #fecdd3;
+            background: #fff1f2;
+        }
+
+        .feedback strong {
+            color: var(--ink);
+        }
+
+        .feedback p {
+            margin-bottom: 7px;
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.62;
+        }
+
+        .feedback p:last-child {
+            margin-bottom: 0;
+        }
+
+        .feedback .state-ok {
+            color: var(--green);
+            font-size: 15px;
+            font-weight: 900;
+        }
+
+        .feedback .state-no {
+            color: var(--rose);
+            font-size: 15px;
+            font-weight: 900;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .result-stat {
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .result-stat span {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .result-stat strong {
+            display: block;
+            margin-top: 5px;
+            font-size: 28px;
+            color: var(--amber-dark);
+        }
+
+        .review-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .review-item {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        @media (max-width: 760px) {
+            .hero,
+            .game-layout,
+            .result-grid,
+            .intro-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            .game-top {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .thermometer {
+                gap: 6px;
+            }
+
+            .heat-segment {
+                min-height: 60px;
+                padding: 6px;
+            }
+
+            .heat-segment strong {
+                font-size: 11px;
+            }
+
+            .question-text {
+                font-size: 19px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .page-shell {
+                width: min(100% - 16px, 1080px);
+            }
+
+            .top-nav {
+                gap: 8px;
+                overflow-x: auto;
+            }
+
+            .top-nav a,
+            .top-nav span {
+                font-size: 12px;
+            }
+
+            .hero,
+            .game-top,
+            .thermo-panel,
+            .question-panel {
+                padding: 12px;
+            }
+
+            .choice-btn {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="top-nav" aria-label="상단 이동">
+        <a href="../index.html">메인</a>
+        <span class="divider">|</span>
+        <a href="index.html">12과 목록</a>
+        <span class="divider">|</span>
+        <a href="grammar2.html">문법 2</a>
+        <span class="divider">|</span>
+        <span>얼마나 온도계 챌린지</span>
+    </nav>
+
+    <main id="page" class="page-shell">
+        <section class="panel hero">
+            <div>
+                <p class="eyebrow">Grammar 2 Support</p>
+                <h1 class="safe">얼마나 온도계 챌린지</h1>
+                <p class="lead safe">상황의 강도를 최고 단계까지 올려 `얼마나 -(으)ㄴ/는지 몰라요` 문장으로 말해 봅니다.</p>
+                <div class="tag-row" aria-label="활동 정보">
+                    <span class="tag">12문항</span>
+                    <span class="tag">3라운드</span>
+                    <span class="tag">즉시 피드백</span>
+                    <span class="tag">문장 산출</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="screenStart" class="screen active">
+            <div class="intro-grid">
+                <article class="panel info-strip">
+                    <div>
+                        <strong>강도 올리기</strong>
+                        <span class="safe">`너무/정말`보다 감정이 큰 표현으로 바꿉니다.</span>
+                    </div>
+                    <span class="round-chip">1단계</span>
+                </article>
+                <article class="panel info-strip">
+                    <div>
+                        <strong>문장 만들기</strong>
+                        <span class="safe">상황에 맞는 문장을 고르고, 활용형을 확인하고, 단어를 조립합니다.</span>
+                    </div>
+                    <span class="round-chip">2-3단계</span>
+                </article>
+            </div>
+            <div class="panel hero" style="margin-top:12px;">
+                <div>
+                    <p class="eyebrow">Target Pattern</p>
+                    <h2 class="safe">얼마나 + 설명 + 지 몰라요</h2>
+                    <p class="lead safe">예: 한국어 공부가 얼마나 어려운지 몰라요.</p>
+                </div>
+                <div class="action-row" style="margin-top:0;">
+                    <button id="startBtn" class="primary-btn" type="button">시작하기</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="screenGame" class="screen">
+            <div class="panel game-top">
+                <div class="progress-wrap">
+                    <div class="meta-line">
+                        <span id="roundChip" class="round-chip">1라운드</span>
+                        <span id="progressText">1 / 12</span>
+                        <span id="roundText">상황 문장 고르기</span>
+                    </div>
+                    <div class="progress-track" aria-hidden="true">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                </div>
+                <div class="score-pill">정답 <span id="scoreText">0</span> / <span id="totalText">12</span></div>
+            </div>
+
+            <div class="game-layout">
+                <section class="panel thermo-panel" aria-label="강도 온도계">
+                    <p class="eyebrow">Degree Thermometer</p>
+                    <h2 id="sceneTitle" class="safe">상황</h2>
+                    <p id="sceneText" class="lead safe"></p>
+                    <div id="thermometer" class="thermometer" aria-label="5단계 온도계"></div>
+                    <p id="simpleLine" class="simple-line safe"></p>
+                    <p id="targetPreview" class="sentence-preview safe"></p>
+                </section>
+
+                <section class="panel question-panel">
+                    <p id="questionType" class="question-title"></p>
+                    <p id="questionText" class="question-text safe"></p>
+                    <p id="questionHint" class="hint safe"></p>
+
+                    <div id="choiceList" class="choice-list"></div>
+
+                    <div id="builder" class="builder hidden">
+                        <div id="slotRow" class="slot-row" aria-label="선택한 단어"></div>
+                        <div id="wordBank" class="word-bank" aria-label="단어 칩"></div>
+                        <div class="builder-actions">
+                            <button id="undoBtn" class="secondary-btn" type="button">한 칸 지우기</button>
+                            <button id="resetBuildBtn" class="secondary-btn" type="button">처음부터</button>
+                            <button id="checkBuildBtn" class="primary-btn" type="button">정답 확인</button>
+                        </div>
+                    </div>
+
+                    <div id="feedbackBox" class="feedback hidden"></div>
+                    <div class="action-row">
+                        <button id="nextBtn" class="primary-btn hidden" type="button">다음 문제</button>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section id="screenResult" class="screen">
+            <div class="panel hero">
+                <div>
+                    <p class="eyebrow">Result</p>
+                    <h1 class="safe">온도계 챌린지 완료</h1>
+                    <p id="resultComment" class="lead safe"></p>
+                </div>
+                <div class="action-row" style="margin-top:0;">
+                    <button id="restartBtn" class="primary-btn" type="button">다시 하기</button>
+                </div>
+            </div>
+            <div class="result-grid">
+                <article class="result-stat">
+                    <span>최종 점수</span>
+                    <strong id="finalScore">0 / 12</strong>
+                </article>
+                <article class="result-stat">
+                    <span>복습 포인트</span>
+                    <strong id="reviewPoint">형태 확인</strong>
+                </article>
+            </div>
+            <div id="reviewList" class="review-list"></div>
+            <div class="action-row">
+                <a class="secondary-btn" href="grammar2.html">문법 2 본문</a>
+                <a class="secondary-btn" href="index.html">12과 허브</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const QUESTIONS = [
+            {
+                id: 'degree_01',
+                round: 1,
+                roundTitle: '상황 문장 고르기',
+                type: 'choice',
+                scene: '공부가 아주 어려운 상황',
+                simple: '한국어 공부가 정말 어려워요.',
+                prompt: '강도 5 문장으로 가장 자연스러운 것을 고르세요.',
+                hintKo: '형용사 `어렵다`는 ㅂ 불규칙으로 `어려운지`가 됩니다.',
+                answer: '한국어 공부가 얼마나 어려운지 몰라요.',
+                options: [
+                    '한국어 공부가 얼마나 어려운지 몰라요.',
+                    '한국어 공부가 얼마나 어려워요?',
+                    '한국어 공부가 얼마나 어렵는지 몰라요.'
+                ],
+                explainKo: '`얼마나 + 어려운지 + 몰라요`로 정도가 매우 큼을 강조합니다.'
+            },
+            {
+                id: 'degree_02',
+                round: 1,
+                roundTitle: '상황 문장 고르기',
+                type: 'choice',
+                scene: '케이크가 아주 맛있는 상황',
+                simple: '이 케이크가 정말 맛있어요.',
+                prompt: '강도 5 문장으로 가장 자연스러운 것을 고르세요.',
+                hintKo: '`맛있다`는 `맛있는지`로 써요.',
+                answer: '이 케이크가 얼마나 맛있는지 몰라요.',
+                options: [
+                    '이 케이크가 얼마나 맛있은지 몰라요.',
+                    '이 케이크가 얼마나 맛있는지 몰라요.',
+                    '이 케이크가 얼마나 맛있어요 몰라요.'
+                ],
+                explainKo: '`있다/없다`가 들어간 형용사는 `-는지`를 써서 `맛있는지`가 됩니다.'
+            },
+            {
+                id: 'degree_03',
+                round: 1,
+                roundTitle: '상황 문장 고르기',
+                type: 'choice',
+                scene: '친구가 선물을 받고 아주 좋아하는 상황',
+                simple: '친구가 선물을 받고 정말 좋아해요.',
+                prompt: '강도 5 문장으로 가장 자연스러운 것을 고르세요.',
+                hintKo: '동사 `좋아하다`는 `좋아하는지`가 됩니다.',
+                answer: '친구가 선물을 받고 얼마나 좋아하는지 몰라요.',
+                options: [
+                    '친구가 선물을 받고 얼마나 좋아한지 몰라요.',
+                    '친구가 선물을 받고 얼마나 좋아하는지 몰라요.',
+                    '친구가 선물을 받고 얼마나 좋은지 몰라요.'
+                ],
+                explainKo: '동작을 말하는 `좋아하다` 뒤에는 `-는지`를 붙입니다.'
+            },
+            {
+                id: 'degree_04',
+                round: 1,
+                roundTitle: '상황 문장 고르기',
+                type: 'choice',
+                scene: '오늘 날씨가 아주 더운 상황',
+                simple: '오늘 날씨가 너무 더워요.',
+                prompt: '강도 5 문장으로 가장 자연스러운 것을 고르세요.',
+                hintKo: '`덥다`는 ㅂ 불규칙으로 `더운지`가 됩니다.',
+                answer: '오늘 날씨가 얼마나 더운지 몰라요.',
+                options: [
+                    '오늘 날씨가 얼마나 더운지 몰라요.',
+                    '오늘 날씨가 얼마나 덥는지 몰라요.',
+                    '오늘 날씨가 얼마나 더워서 몰라요.'
+                ],
+                explainKo: '`덥다`는 `더운지`로 바뀌어 강한 정도를 나타냅니다.'
+            },
+            {
+                id: 'degree_05',
+                round: 2,
+                roundTitle: '활용형 고르기',
+                type: 'blank',
+                scene: '제주도 바다가 아주 아름다운 상황',
+                simple: '제주도 바다가 정말 아름다워요.',
+                prompt: '제주도 바다가 얼마나 ____ 몰라요.',
+                hintKo: '`아름답다`의 ㅂ 불규칙을 확인하세요.',
+                answer: '아름다운지',
+                sentence: '제주도 바다가 얼마나 아름다운지 몰라요.',
+                options: ['아름다운지', '아름답는지', '아름다웠는지'],
+                explainKo: '`아름답다`는 ㅂ이 우로 바뀌어 `아름다운지`가 됩니다.'
+            },
+            {
+                id: 'degree_06',
+                round: 2,
+                roundTitle: '활용형 고르기',
+                type: 'blank',
+                scene: '요즘 일이 아주 많은 상황',
+                simple: '요즘 일이 너무 많아요.',
+                prompt: '요즘 일이 얼마나 ____ 몰라요.',
+                hintKo: '`많다`는 받침 있는 형용사입니다.',
+                answer: '많은지',
+                sentence: '요즘 일이 얼마나 많은지 몰라요.',
+                options: ['많는지', '많은지', '많았는지'],
+                explainKo: '받침 있는 형용사는 `-은지`를 붙여 `많은지`가 됩니다.'
+            },
+            {
+                id: 'degree_07',
+                round: 2,
+                roundTitle: '활용형 고르기',
+                type: 'blank',
+                scene: '아이가 아주 예쁜 상황',
+                simple: '아이가 정말 예뻐요.',
+                prompt: '아이가 얼마나 ____ 몰라요.',
+                hintKo: '`예쁘다`는 받침 없는 형용사입니다.',
+                answer: '예쁜지',
+                sentence: '아이가 얼마나 예쁜지 몰라요.',
+                options: ['예쁘는지', '예쁜지', '예쁠지'],
+                explainKo: '받침 없는 형용사는 `-ㄴ지`를 붙여 `예쁜지`가 됩니다.'
+            },
+            {
+                id: 'degree_08',
+                round: 2,
+                roundTitle: '활용형 고르기',
+                type: 'blank',
+                scene: '방이 아주 깨끗한 상황',
+                simple: '방이 정말 깨끗해요.',
+                prompt: '방이 얼마나 ____ 몰라요.',
+                hintKo: '`깨끗하다`는 하다 형용사입니다.',
+                answer: '깨끗한지',
+                sentence: '방이 얼마나 깨끗한지 몰라요.',
+                options: ['깨끗하는지', '깨끗한지', '깨끗했는지'],
+                explainKo: '`깨끗하다`는 현재 상태를 말할 때 `깨끗한지`가 됩니다.'
+            },
+            {
+                id: 'degree_09',
+                round: 3,
+                roundTitle: '단어 칩 조립',
+                type: 'build',
+                scene: '어제 이사해서 아주 피곤했던 상황',
+                simple: '어제 이사해서 정말 피곤했어요.',
+                prompt: '단어를 순서대로 눌러 강도 5 문장을 만드세요.',
+                hintKo: '과거 상태는 `피곤했는지`를 씁니다.',
+                answer: '어제 이사해서 얼마나 피곤했는지 몰라요.',
+                tokens: ['어제', '이사해서', '얼마나', '피곤했는지', '몰라요.'],
+                choices: ['얼마나', '어제', '피곤했는지', '정말', '이사해서', '몰라요.'],
+                explainKo: '어제의 상태를 강조하므로 `-았/었는지` 형태인 `피곤했는지`가 맞습니다.'
+            },
+            {
+                id: 'degree_10',
+                round: 3,
+                roundTitle: '단어 칩 조립',
+                type: 'build',
+                scene: '선생님이 아주 친절한 사람인 상황',
+                simple: '선생님이 정말 친절한 사람이에요.',
+                prompt: '단어를 순서대로 눌러 강도 5 문장을 만드세요.',
+                hintKo: '명사 `사람이다`는 `사람인지`가 됩니다.',
+                answer: '선생님이 얼마나 친절한 사람인지 몰라요.',
+                tokens: ['선생님이', '얼마나', '친절한', '사람인지', '몰라요.'],
+                choices: ['사람인지', '얼마나', '선생님이', '친절한', '사람이에요', '몰라요.'],
+                explainKo: '명사 뒤에는 `-(이)ㄴ지`를 붙여 `사람인지`로 말합니다.'
+            },
+            {
+                id: 'degree_11',
+                round: 3,
+                roundTitle: '단어 칩 조립',
+                type: 'build',
+                scene: '공연이 아주 멋있는 상황',
+                simple: '그 공연이 정말 멋있어요.',
+                prompt: '단어를 순서대로 눌러 강도 5 문장을 만드세요.',
+                hintKo: '`멋있다`는 `멋있는지`로 씁니다.',
+                answer: '그 공연이 얼마나 멋있는지 몰라요.',
+                tokens: ['그', '공연이', '얼마나', '멋있는지', '몰라요.'],
+                choices: ['그', '공연이', '멋있어요', '얼마나', '몰라요.', '멋있는지'],
+                explainKo: '`있다`가 들어간 형용사라 `멋있는지`가 자연스럽습니다.'
+            },
+            {
+                id: 'degree_12',
+                round: 3,
+                roundTitle: '단어 칩 조립',
+                type: 'build',
+                scene: '친구가 도와줘서 아주 고마운 상황',
+                simple: '친구가 도와줘서 정말 고마워요.',
+                prompt: '단어를 순서대로 눌러 강도 5 문장을 만드세요.',
+                hintKo: '`고맙다`는 ㅂ 불규칙으로 `고마운지`가 됩니다.',
+                answer: '친구가 도와줘서 얼마나 고마운지 몰라요.',
+                tokens: ['친구가', '도와줘서', '얼마나', '고마운지', '몰라요.'],
+                choices: ['친구가', '고마운지', '도와줘서', '몰라요.', '얼마나', '고맙는지'],
+                explainKo: '`고맙다`는 ㅂ이 우로 바뀌어 `고마운지`가 됩니다.'
+            }
+        ];
+
+        const screenStart = document.getElementById('screenStart');
+        const screenGame = document.getElementById('screenGame');
+        const screenResult = document.getElementById('screenResult');
+        const startBtn = document.getElementById('startBtn');
+        const roundChip = document.getElementById('roundChip');
+        const progressText = document.getElementById('progressText');
+        const roundText = document.getElementById('roundText');
+        const progressFill = document.getElementById('progressFill');
+        const scoreText = document.getElementById('scoreText');
+        const totalText = document.getElementById('totalText');
+        const sceneTitle = document.getElementById('sceneTitle');
+        const sceneText = document.getElementById('sceneText');
+        const thermometer = document.getElementById('thermometer');
+        const simpleLine = document.getElementById('simpleLine');
+        const targetPreview = document.getElementById('targetPreview');
+        const questionType = document.getElementById('questionType');
+        const questionText = document.getElementById('questionText');
+        const questionHint = document.getElementById('questionHint');
+        const choiceList = document.getElementById('choiceList');
+        const builder = document.getElementById('builder');
+        const slotRow = document.getElementById('slotRow');
+        const wordBank = document.getElementById('wordBank');
+        const undoBtn = document.getElementById('undoBtn');
+        const resetBuildBtn = document.getElementById('resetBuildBtn');
+        const checkBuildBtn = document.getElementById('checkBuildBtn');
+        const feedbackBox = document.getElementById('feedbackBox');
+        const nextBtn = document.getElementById('nextBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const finalScore = document.getElementById('finalScore');
+        const reviewPoint = document.getElementById('reviewPoint');
+        const resultComment = document.getElementById('resultComment');
+        const reviewList = document.getElementById('reviewList');
+
+        const state = {
+            index: 0,
+            score: 0,
+            answered: false,
+            selectedIndices: [],
+            logs: []
+        };
+
+        totalText.textContent = String(QUESTIONS.length);
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function normalize(value) {
+            return String(value || '').replace(/[\s.,!?~]/g, '').toLowerCase();
+        }
+
+        function currentQuestion() {
+            return QUESTIONS[state.index];
+        }
+
+        function showScreen(name) {
+            screenStart.classList.toggle('active', name === 'start');
+            screenGame.classList.toggle('active', name === 'game');
+            screenResult.classList.toggle('active', name === 'result');
+        }
+
+        function getTargetSentence(question) {
+            return question.sentence || question.answer;
+        }
+
+        function renderThermometer() {
+            thermometer.innerHTML = '';
+            for (let step = 1; step <= 5; step += 1) {
+                const segment = document.createElement('div');
+                segment.className = 'heat-segment is-active';
+                segment.innerHTML = '<span class="heat-bar" style="height:' + (10 + step * 8) + 'px"></span><strong>' + step + '</strong>';
+                thermometer.appendChild(segment);
+            }
+        }
+
+        function renderChoices(question) {
+            choiceList.innerHTML = '';
+            choiceList.classList.remove('hidden');
+            builder.classList.add('hidden');
+
+            question.options.forEach(function(option) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'choice-btn safe';
+                button.textContent = question.type === 'blank' ? option : option;
+                button.addEventListener('click', function() {
+                    answerQuestion(option, button);
+                });
+                choiceList.appendChild(button);
+            });
+        }
+
+        function selectedWords(question) {
+            return state.selectedIndices.map(function(index) {
+                return question.choices[index];
+            });
+        }
+
+        function renderBuilder(question) {
+            choiceList.innerHTML = '';
+            choiceList.classList.add('hidden');
+            builder.classList.remove('hidden');
+            slotRow.innerHTML = '';
+            wordBank.innerHTML = '';
+
+            const words = selectedWords(question);
+            if (!words.length) {
+                const placeholder = document.createElement('span');
+                placeholder.className = 'hint';
+                placeholder.textContent = '단어를 순서대로 선택하세요.';
+                slotRow.appendChild(placeholder);
+            } else {
+                words.forEach(function(word, selectedIndex) {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'slot-btn safe';
+                    button.textContent = word;
+                    button.addEventListener('click', function() {
+                        if (state.answered) {
+                            return;
+                        }
+                        state.selectedIndices = state.selectedIndices.slice(0, selectedIndex);
+                        renderBuilder(question);
+                    });
+                    slotRow.appendChild(button);
+                });
+            }
+
+            question.choices.forEach(function(word, index) {
+                const used = state.selectedIndices.includes(index);
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'word-chip safe' + (used ? ' is-used' : '');
+                button.textContent = word;
+                button.disabled = used || state.answered;
+                button.addEventListener('click', function() {
+                    if (state.answered) {
+                        return;
+                    }
+                    state.selectedIndices.push(index);
+                    renderBuilder(question);
+                });
+                wordBank.appendChild(button);
+            });
+
+            undoBtn.disabled = state.answered || state.selectedIndices.length === 0;
+            resetBuildBtn.disabled = state.answered || state.selectedIndices.length === 0;
+            checkBuildBtn.disabled = state.answered || state.selectedIndices.length === 0;
+        }
+
+        function renderQuestion() {
+            const question = currentQuestion();
+            state.answered = false;
+            state.selectedIndices = [];
+            feedbackBox.classList.add('hidden');
+            feedbackBox.className = 'feedback hidden';
+            feedbackBox.innerHTML = '';
+            nextBtn.classList.add('hidden');
+            scoreText.textContent = String(state.score);
+            roundChip.textContent = question.round + '라운드';
+            progressText.textContent = (state.index + 1) + ' / ' + QUESTIONS.length;
+            roundText.textContent = question.roundTitle;
+            progressFill.style.width = Math.round(((state.index + 1) / QUESTIONS.length) * 100) + '%';
+
+            sceneTitle.textContent = question.scene;
+            sceneText.textContent = '상황: ' + question.scene;
+            simpleLine.textContent = '보통 강조: ' + question.simple;
+            targetPreview.textContent = '강도 5: ' + getTargetSentence(question);
+            questionType.textContent = question.roundTitle;
+            questionText.textContent = question.prompt;
+            questionHint.textContent = '힌트: ' + question.hintKo;
+
+            renderThermometer();
+
+            if (question.type === 'build') {
+                renderBuilder(question);
+            } else {
+                renderChoices(question);
+            }
+        }
+
+        function lockInputs() {
+            Array.from(choiceList.querySelectorAll('button')).forEach(function(button) {
+                button.disabled = true;
+            });
+            Array.from(wordBank.querySelectorAll('button')).forEach(function(button) {
+                button.disabled = true;
+            });
+            undoBtn.disabled = true;
+            resetBuildBtn.disabled = true;
+            checkBuildBtn.disabled = true;
+        }
+
+        function showFeedback(ok, userAnswer, correctAnswer, question) {
+            feedbackBox.className = 'feedback ' + (ok ? 'ok' : 'no');
+            feedbackBox.innerHTML = '' +
+                '<p class="' + (ok ? 'state-ok' : 'state-no') + '">' + (ok ? '정답입니다.' : '오답입니다.') + '</p>' +
+                '<p><strong>내 답:</strong> ' + escapeHtml(userAnswer || '(무응답)') + '</p>' +
+                '<p><strong>정답:</strong> ' + escapeHtml(correctAnswer) + '</p>' +
+                '<p><strong>왜 이 형태인지:</strong> ' + escapeHtml(question.explainKo) + '</p>';
+            feedbackBox.classList.remove('hidden');
+            nextBtn.classList.remove('hidden');
+        }
+
+        function answerQuestion(answer, clickedButton) {
+            if (state.answered) {
+                return;
+            }
+            const question = currentQuestion();
+            const correctAnswer = question.answer;
+            const ok = normalize(answer) === normalize(correctAnswer);
+
+            state.answered = true;
+            if (ok) {
+                state.score += 1;
+            }
+            state.logs.push({
+                id: question.id,
+                ok: ok,
+                user: answer,
+                correct: correctAnswer,
+                prompt: question.prompt
+            });
+
+            Array.from(choiceList.querySelectorAll('button')).forEach(function(button) {
+                if (normalize(button.textContent) === normalize(correctAnswer)) {
+                    button.classList.add('is-correct');
+                } else if (button === clickedButton) {
+                    button.classList.add('is-wrong');
+                }
+            });
+
+            lockInputs();
+            showFeedback(ok, answer, correctAnswer, question);
+            scoreText.textContent = String(state.score);
+        }
+
+        function checkBuildAnswer() {
+            if (state.answered) {
+                return;
+            }
+            const question = currentQuestion();
+            const answer = selectedWords(question).join(' ');
+            const correctAnswer = question.answer;
+            const ok = normalize(answer) === normalize(correctAnswer);
+
+            state.answered = true;
+            if (ok) {
+                state.score += 1;
+            }
+            state.logs.push({
+                id: question.id,
+                ok: ok,
+                user: answer,
+                correct: correctAnswer,
+                prompt: question.prompt
+            });
+            lockInputs();
+            showFeedback(ok, answer, correctAnswer, question);
+            scoreText.textContent = String(state.score);
+        }
+
+        function renderResult() {
+            const wrong = state.logs.filter(function(log) {
+                return !log.ok;
+            });
+            finalScore.textContent = state.score + ' / ' + QUESTIONS.length;
+            reviewPoint.textContent = wrong.length ? '오답 복습' : '말하기 확장';
+            resultComment.textContent = state.score >= 10
+                ? '강한 정도 표현을 안정적으로 만들었습니다. 이제 자기 경험으로 한 문장을 말해 보세요.'
+                : '헷갈린 활용형을 다시 확인하면 문장 산출이 더 자연스러워집니다.';
+
+            reviewList.innerHTML = '';
+            if (!wrong.length) {
+                const item = document.createElement('div');
+                item.className = 'review-item';
+                item.textContent = '모든 문항을 맞혔습니다. 예: 요즘 제가 얼마나 바쁜지 몰라요.';
+                reviewList.appendChild(item);
+            } else {
+                wrong.forEach(function(log) {
+                    const item = document.createElement('div');
+                    item.className = 'review-item safe';
+                    item.innerHTML = '<strong>정답:</strong> ' + escapeHtml(log.correct) + '<br><strong>내 답:</strong> ' + escapeHtml(log.user || '(무응답)');
+                    reviewList.appendChild(item);
+                });
+            }
+            showScreen('result');
+        }
+
+        function startGame() {
+            state.index = 0;
+            state.score = 0;
+            state.answered = false;
+            state.selectedIndices = [];
+            state.logs = [];
+            showScreen('game');
+            renderQuestion();
+        }
+
+        function nextQuestion() {
+            if (state.index >= QUESTIONS.length - 1) {
+                renderResult();
+                return;
+            }
+            state.index += 1;
+            renderQuestion();
+        }
+
+        startBtn.addEventListener('click', startGame);
+        nextBtn.addEventListener('click', nextQuestion);
+        restartBtn.addEventListener('click', startGame);
+        undoBtn.addEventListener('click', function() {
+            const question = currentQuestion();
+            state.selectedIndices.pop();
+            renderBuilder(question);
+        });
+        resetBuildBtn.addEventListener('click', function() {
+            const question = currentQuestion();
+            state.selectedIndices = [];
+            renderBuilder(question);
+        });
+        checkBuildBtn.addEventListener('click', checkBuildAnswer);
+
+        window.__c12Grammar2DegreeChallengeData = QUESTIONS;
+        window.__c12Grammar2DegreeChallenge = {
+            start: startGame,
+            goToQuestion: function(index) {
+                state.index = Math.max(0, Math.min(QUESTIONS.length - 1, Number(index) || 0));
+                state.answered = false;
+                state.selectedIndices = [];
+                showScreen('game');
+                renderQuestion();
+            },
+            getState: function() {
+                return {
+                    index: state.index,
+                    score: state.score,
+                    answered: state.answered,
+                    selectedWords: selectedWords(currentQuestion()),
+                    logs: state.logs.slice()
+                };
+            },
+            answerCurrentCorrectly: function() {
+                const question = currentQuestion();
+                if (question.type === 'build') {
+                    state.selectedIndices = question.tokens.map(function(token) {
+                        return question.choices.indexOf(token);
+                    }).filter(function(index) {
+                        return index >= 0;
+                    });
+                    renderBuilder(question);
+                    checkBuildAnswer();
+                } else {
+                    const buttons = Array.from(choiceList.querySelectorAll('button'));
+                    const target = buttons.find(function(button) {
+                        return normalize(button.textContent) === normalize(question.answer);
+                    });
+                    if (target) {
+                        answerQuestion(target.textContent, target);
+                    }
+                }
+            }
+        };
+    </script>
+</body>
+</html>

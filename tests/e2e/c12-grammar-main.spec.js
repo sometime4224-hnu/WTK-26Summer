@@ -4,16 +4,30 @@ const pages = [
   {
     path: '/c12/grammar1.html',
     title: 'V-았더니/었더니',
+    visual: true,
+    storyCount: 5,
     resources: [
       'grammar1-card-game.html',
       'grammar1-reason.html',
       'grammar1-2-speaking.html'
     ]
   },
-  { path: '/c12/grammar2.html', title: '얼마나 -(으)ㄴ/는지 모르다' },
+  {
+    path: '/c12/grammar2.html',
+    title: '얼마나 -(으)ㄴ/는지 모르다',
+    visual: true,
+    storyCount: 6,
+    resources: [
+      'grammar2-degree-challenge.html',
+      'grammar1-2-speaking.html',
+      'grammar2-classic.html'
+    ]
+  },
   { path: '/c12/grammar3.html', title: '-(으)ㄴ/는 모양이다' },
   { path: '/c12/grammar4.html', title: '-아야/어야' }
 ];
+
+const scaffoldPages = pages.filter((page) => !page.visual);
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -52,9 +66,32 @@ async function expectOnlyScaffoldLanguageVisible(page, activeCode) {
   }
 }
 
+async function expectOnlyStoryLanguageVisible(page, target, activeCode) {
+  await expect(page.locator('body')).toHaveAttribute('data-active-lang', activeCode);
+
+  for (const lang of languages) {
+    const boxes = page.locator(`.story-card .lang-box[data-lang="${lang.code}"]`);
+    if (lang.code === activeCode) {
+      await expect(boxes).toHaveCount(target.storyCount);
+      await expect(page.locator(`.story-card .lang-box[data-lang="${lang.code}"].lang-visible`)).toHaveCount(target.storyCount);
+    } else {
+      await expect(page.locator(`.story-card .lang-box[data-lang="${lang.code}"].lang-visible`)).toHaveCount(0);
+    }
+  }
+}
+
+async function expectSelectedLanguageVisible(page, target, activeCode) {
+  if (target.visual) {
+    await expectOnlyStoryLanguageVisible(page, target, activeCode);
+    return;
+  }
+  await expectOnlyScaffoldLanguageVisible(page, activeCode);
+}
+
 async function expectTranslationsOff(page) {
   await expect(page.locator('body')).toHaveAttribute('data-active-lang', 'none');
   await expect(page.locator('.multilang-scaffold__box.lang-visible')).toHaveCount(0);
+  await expect(page.locator('.story-card .lang-box.lang-visible')).toHaveCount(0);
   await expect(page.locator('.quiz-translation.lang-visible')).toHaveCount(0);
 }
 
@@ -67,7 +104,8 @@ async function answerCurrentQuestionWrong(page) {
 
   const wrongChoice = await page.evaluate(() => {
     const prompt = document.getElementById('qText').textContent;
-    const item = window.C12_GRAMMAR_PAGE.quiz.find((q) => q.q === prompt);
+    const config = window.C12_GRAMMAR_PAGE || window.C12_GRAMMAR1_VISUAL_PROTOTYPE || window.C12_GRAMMAR2_VISUAL_PAGE;
+    const item = config.quiz.find((q) => q.q === prompt);
     const choices = Array.from(document.querySelectorAll('#choices button')).map((button) => button.textContent);
     return choices.find((choice) => choice !== item.answer) || choices[0];
   });
@@ -89,9 +127,15 @@ test('c12 grammar main pages are responsive and expose the shared structure', as
       await page.goto(target.path, { waitUntil: 'domcontentloaded' });
 
       await expect(page.locator('h1')).toContainText(target.title);
-      await expect(page.locator('.hero-panel')).toBeVisible();
-      await expect(page.locator('#learnPanel')).toBeVisible();
-      await expect(page.locator('#tabLearn')).toBeVisible();
+      if (target.visual) {
+        await expect(page.locator('.story-card')).toHaveCount(target.storyCount);
+        await expect(page.locator('.fullscreen-btn')).toHaveCount(target.storyCount);
+        await expect(page.locator('.translation-bar')).toBeVisible();
+      } else {
+        await expect(page.locator('.hero-panel')).toBeVisible();
+        await expect(page.locator('#learnPanel')).toBeVisible();
+        await expect(page.locator('#tabLearn')).toBeVisible();
+      }
       await expect(page.locator('#tabDrill')).toBeVisible();
       await expect(page.locator('#tabQuiz')).toBeVisible();
       await expectNoHorizontalOverflow(page);
@@ -109,6 +153,46 @@ test('c12 grammar1 exposes the existing support activities only', async ({ page 
   }
 });
 
+test('c12 grammar2 exposes the visual support activities', async ({ page }) => {
+  await blockExternalRequests(page);
+  await page.goto('/c12/grammar2.html', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('.resource-link')).toHaveCount(3);
+  for (const href of pages[1].resources) {
+    await expect(page.locator(`.resource-link[href="${href}"]`)).toBeVisible();
+  }
+});
+
+test('c12 grammar1 classic version remains available with the old structure', async ({ page }) => {
+  await blockExternalRequests(page);
+  await page.goto('/c12/grammar1-classic.html', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('h1')).toContainText('V-았더니/었더니');
+  await expect(page.locator('.hero-panel')).toBeVisible();
+  await expect(page.locator('#learnPanel')).toBeVisible();
+  await expect(page.locator('#tabLearn')).toBeVisible();
+  await expect(page.locator('a[href="grammar1.html"]')).toContainText('새 버전');
+
+  await expect(page.locator('[data-multilang-btn="vi"]')).toBeVisible();
+  await page.locator('[data-multilang-btn="vi"]').click();
+  await expectOnlyScaffoldLanguageVisible(page, 'vi');
+});
+
+test('c12 grammar2 classic version remains available with the old structure', async ({ page }) => {
+  await blockExternalRequests(page);
+  await page.goto('/c12/grammar2-classic.html', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('h1')).toContainText('얼마나 -(으)ㄴ/는지 모르다');
+  await expect(page.locator('.hero-panel')).toBeVisible();
+  await expect(page.locator('#learnPanel')).toBeVisible();
+  await expect(page.locator('#tabLearn')).toBeVisible();
+  await expect(page.locator('a[href="grammar2.html"]')).toContainText('새 버전');
+
+  await expect(page.locator('[data-multilang-btn="vi"]')).toBeVisible();
+  await page.locator('[data-multilang-btn="vi"]').click();
+  await expectOnlyScaffoldLanguageVisible(page, 'vi');
+});
+
 test('c12 grammar main pages support all scaffold languages', async ({ page }) => {
   await blockExternalRequests(page);
 
@@ -120,14 +204,18 @@ test('c12 grammar main pages support all scaffold languages', async ({ page }) =
       await expect(button).toBeVisible();
       await expect(button).toContainText(lang.name);
       await button.click();
-      await expectOnlyScaffoldLanguageVisible(page, lang.code);
+      await expectSelectedLanguageVisible(page, target, lang.code);
 
-      if (lang.code === 'vi') {
+      if (lang.code === 'vi' && !target.visual) {
         await expect(page.locator('.multilang-scaffold__box[data-lang="vi"]')).toContainText('Hỗ trợ Tiếng Việt');
       }
     }
 
-    await expect(page.locator('.multilang-scaffold__box[data-lang="ar"]')).toHaveAttribute('dir', 'rtl');
+    if (target.visual) {
+      await expect(page.locator('.story-card .lang-box[data-lang="ar"]').first()).toHaveAttribute('dir', 'rtl');
+    } else {
+      await expect(page.locator('.multilang-scaffold__box[data-lang="ar"]')).toHaveAttribute('dir', 'rtl');
+    }
     await page.locator('[data-multilang-btn="none"]').click();
     await expectTranslationsOff(page);
   }
@@ -139,7 +227,7 @@ test('c12 grammar dynamic Vietnamese helpers follow the selected language', asyn
   for (const target of pages) {
     await page.goto(target.path, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-multilang-btn="vi"]').click();
-    await expectOnlyScaffoldLanguageVisible(page, 'vi');
+    await expectSelectedLanguageVisible(page, target, 'vi');
 
     await page.locator('#tabDrill').click();
     await page.locator('#drillFace').click();
@@ -162,7 +250,7 @@ test('c12 grammar dynamic Vietnamese helpers stay hidden for non-Vietnamese lang
     for (const lang of nonVietnameseLanguages) {
       await page.goto(target.path, { waitUntil: 'domcontentloaded' });
       await page.locator(`[data-multilang-btn="${lang.code}"]`).click();
-      await expectOnlyScaffoldLanguageVisible(page, lang.code);
+      await expectSelectedLanguageVisible(page, target, lang.code);
 
       await page.locator('#tabDrill').click();
       await page.locator('#drillFace').click();
@@ -182,11 +270,15 @@ test('c12 grammar multilingual controls fit on mobile', async ({ page }) => {
 
   for (const target of pages) {
     await page.goto(target.path, { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('.multilang-scaffold')).toBeVisible();
+    if (target.visual) {
+      await expect(page.locator('.translation-bar')).toBeVisible();
+    } else {
+      await expect(page.locator('.multilang-scaffold')).toBeVisible();
+    }
 
     for (const lang of languages) {
       await page.locator(`[data-multilang-btn="${lang.code}"]`).click();
-      await expectOnlyScaffoldLanguageVisible(page, lang.code);
+      await expectSelectedLanguageVisible(page, target, lang.code);
       await expectNoHorizontalOverflow(page);
     }
 
