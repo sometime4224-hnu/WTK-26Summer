@@ -766,7 +766,7 @@
 
         .thermo-scale {
             display: grid;
-            grid-template-rows: repeat(5, 1fr);
+            grid-template-rows: repeat(6, 1fr);
             gap: 4px;
         }
 
@@ -797,7 +797,7 @@
 
         .rail-actions {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 5px;
             margin-top: 10px;
         }
@@ -817,6 +817,243 @@
             border-color: #f97316;
             background: #ffedd5;
             color: #9a3412;
+        }
+
+        .crack-layer {
+            position: absolute;
+            inset: 18px 18px 58px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .16s ease;
+            z-index: 3;
+        }
+
+        .crack-line {
+            position: absolute;
+            left: 50%;
+            top: 15%;
+            width: 3px;
+            height: 110px;
+            border-radius: 999px;
+            background: #7f1d1d;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, .72);
+            transform-origin: top center;
+        }
+
+        .crack-line:nth-child(1) {
+            transform: rotate(16deg);
+        }
+
+        .crack-line:nth-child(2) {
+            top: 30%;
+            height: 92px;
+            transform: rotate(-22deg);
+        }
+
+        .crack-line:nth-child(3) {
+            top: 46%;
+            height: 76px;
+            transform: rotate(34deg);
+        }
+
+        .glass-shard {
+            position: absolute;
+            left: 50%;
+            top: 20%;
+            width: 14px;
+            height: 14px;
+            opacity: 0;
+            border: 2px solid rgba(14, 116, 144, .75);
+            border-left-color: transparent;
+            background: rgba(224, 242, 254, .72);
+            clip-path: polygon(50% 0, 100% 100%, 0 78%);
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .glass-shard:nth-of-type(4) {
+            --tx: -38px;
+            --ty: -28px;
+            --rot: -34deg;
+        }
+
+        .glass-shard:nth-of-type(5) {
+            --tx: 34px;
+            --ty: -24px;
+            --rot: 31deg;
+        }
+
+        .glass-shard:nth-of-type(6) {
+            --tx: -32px;
+            --ty: 42px;
+            --rot: 58deg;
+        }
+
+        .glass-shard:nth-of-type(7) {
+            --tx: 42px;
+            --ty: 46px;
+            --rot: -55deg;
+        }
+
+        .break-message {
+            min-height: 38px;
+            margin: 8px 0 0;
+            padding: 8px 9px;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            background: #fff1f2;
+            color: #9f1239;
+            font-size: 12px;
+            font-weight: 950;
+            line-height: 1.35;
+            opacity: 0;
+            transform: translateY(-4px);
+        }
+
+        .break-message.is-visible {
+            opacity: 1;
+            animation: note-pop 1.45s ease both;
+        }
+
+        .thermometer.is-breaking {
+            animation: thermo-shake .48s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        .thermometer.is-breaking .tube {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 5px rgba(239, 68, 68, .14);
+        }
+
+        .thermometer.is-breaking .crack-layer {
+            opacity: 1;
+            animation: crack-flash 1.2s ease both;
+        }
+
+        .thermometer.is-breaking .glass-shard {
+            animation: shard-pop 1.05s ease-out both;
+        }
+
+        .top-burst {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -20px;
+            height: 118px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 6;
+        }
+
+        .burst-ring {
+            position: absolute;
+            left: 50%;
+            top: 54px;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(239, 68, 68, .85);
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(254, 215, 170, .75);
+            transform: translate(-50%, -50%) scale(.2);
+        }
+
+        .burst-ray,
+        .burst-dot {
+            position: absolute;
+            left: 50%;
+            top: 54px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .burst-ray {
+            width: 4px;
+            height: var(--h, 42px);
+            border-radius: 999px;
+            background: linear-gradient(180deg, #fef3c7 0%, #fb923c 54%, #ef4444 100%);
+            box-shadow: 0 0 10px rgba(249, 115, 22, .5);
+            transform-origin: 50% 100%;
+            transform: translate(-50%, -100%) rotate(var(--angle)) scaleY(.15);
+        }
+
+        .burst-dot {
+            width: var(--s, 9px);
+            height: var(--s, 9px);
+            border-radius: 50%;
+            background: var(--color, #f97316);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, .68), 0 0 12px rgba(249, 115, 22, .55);
+            transform: translate(-50%, -50%) scale(.65);
+        }
+
+        .thermometer.is-breaking .top-burst {
+            opacity: 1;
+            animation: top-burst-shell 1.1s ease-out both;
+        }
+
+        .thermometer.is-breaking .burst-ring {
+            animation: burst-ring-pop .72s ease-out both;
+        }
+
+        .thermometer.is-breaking .burst-ray {
+            animation: burst-ray-pop .82s cubic-bezier(.16, 1, .3, 1) both;
+            animation-delay: var(--delay, 0s);
+        }
+
+        .thermometer.is-breaking .burst-dot {
+            animation: burst-dot-pop .96s cubic-bezier(.16, 1, .3, 1) both;
+            animation-delay: var(--delay, 0s);
+        }
+
+        @keyframes thermo-shake {
+            10%, 90% { transform: translateX(-1px) rotate(-1deg); }
+            20%, 80% { transform: translateX(2px) rotate(1deg); }
+            30%, 50%, 70% { transform: translateX(-4px) rotate(-1.5deg); }
+            40%, 60% { transform: translateX(4px) rotate(1.5deg); }
+        }
+
+        @keyframes crack-flash {
+            0% { opacity: 0; transform: scale(.92); }
+            14% { opacity: 1; transform: scale(1.04); }
+            72% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(.98); }
+        }
+
+        @keyframes shard-pop {
+            0% { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(.6); }
+            18% { opacity: 1; }
+            78% { opacity: .95; }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(1.18); }
+        }
+
+        @keyframes note-pop {
+            0% { opacity: 0; transform: translateY(-6px) scale(.98); }
+            18% { opacity: 1; transform: translateY(0) scale(1); }
+            78% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-3px) scale(.99); }
+        }
+
+        @keyframes top-burst-shell {
+            0% { opacity: 0; transform: translateY(10px) scale(.86); }
+            12% { opacity: 1; transform: translateY(0) scale(1.02); }
+            74% { opacity: 1; transform: translateY(-4px) scale(1); }
+            100% { opacity: 0; transform: translateY(-8px) scale(.98); }
+        }
+
+        @keyframes burst-ring-pop {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(.18); }
+            18% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(4.6); }
+        }
+
+        @keyframes burst-ray-pop {
+            0% { opacity: 0; transform: translate(-50%, -100%) rotate(var(--angle)) scaleY(.12); }
+            16% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-50%, calc(-100% - var(--distance, 30px))) rotate(var(--angle)) scaleY(1); }
+        }
+
+        @keyframes burst-dot-pop {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(.55); }
+            18% { opacity: 1; }
+            100% { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1.05); }
         }
 
         @media (max-width: 880px) {
@@ -1062,7 +1299,7 @@
                         </section>
                         <section class="expression-column" aria-label="표현 변화">
                             <div class="expression-card">
-                                <span id="degreeBadge" class="degree-badge">5단계</span>
+                                <span id="degreeBadge" class="degree-badge">0단계</span>
                                 <p id="currentWord" class="current-word safe"></p>
                                 <div class="expression-output" aria-live="polite">
                                     <strong id="expressionText" class="safe"></strong>
@@ -1156,16 +1393,39 @@
 
             <aside class="thermo-rail" aria-label="온도계 조절">
                 <h2>정도 온도계</h2>
-                <p id="thermoLive" class="thermo-live" aria-live="polite">5단계: 얼마나 ...인지 몰라요</p>
+                <p id="thermoLive" class="thermo-live" aria-live="polite">0단계: 대기</p>
                 <div class="thermometer-wrap">
-                    <button id="thermometer" class="thermometer" type="button" role="slider" aria-label="정도 단계" aria-valuemin="1" aria-valuemax="5" aria-valuenow="5" aria-valuetext="5단계" tabindex="0">
+                    <button id="thermometer" class="thermometer" type="button" role="slider" aria-label="정도 단계" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" aria-valuetext="0단계" tabindex="0">
                         <span class="tube" aria-hidden="true"><span id="mercury" class="mercury"></span></span>
                         <span class="bulb" aria-hidden="true"></span>
-                        <span id="thermoHandle" class="thermo-handle" aria-hidden="true">5</span>
+                        <span id="thermoHandle" class="thermo-handle" aria-hidden="true">0</span>
+                        <span class="top-burst" aria-hidden="true">
+                            <span class="burst-ring"></span>
+                            <span class="burst-ray" style="--angle:-70deg; --distance:34px; --h:34px;"></span>
+                            <span class="burst-ray" style="--angle:-38deg; --distance:44px; --h:46px; --delay:.02s;"></span>
+                            <span class="burst-ray" style="--angle:0deg; --distance:48px; --h:52px; --delay:.04s;"></span>
+                            <span class="burst-ray" style="--angle:36deg; --distance:43px; --h:44px; --delay:.03s;"></span>
+                            <span class="burst-ray" style="--angle:68deg; --distance:33px; --h:34px; --delay:.01s;"></span>
+                            <span class="burst-dot" style="--x:-42px; --y:-24px; --s:8px; --color:#ef4444; --delay:.05s;"></span>
+                            <span class="burst-dot" style="--x:-24px; --y:-50px; --s:7px; --color:#f59e0b; --delay:.08s;"></span>
+                            <span class="burst-dot" style="--x:0px; --y:-58px; --s:10px; --color:#f97316; --delay:.04s;"></span>
+                            <span class="burst-dot" style="--x:26px; --y:-48px; --s:7px; --color:#ef4444; --delay:.07s;"></span>
+                            <span class="burst-dot" style="--x:44px; --y:-20px; --s:8px; --color:#f59e0b; --delay:.05s;"></span>
+                        </span>
+                        <span class="crack-layer" aria-hidden="true">
+                            <span class="crack-line"></span>
+                            <span class="crack-line"></span>
+                            <span class="crack-line"></span>
+                            <span class="glass-shard"></span>
+                            <span class="glass-shard"></span>
+                            <span class="glass-shard"></span>
+                            <span class="glass-shard"></span>
+                        </span>
                     </button>
                     <div id="thermoScale" class="thermo-scale" aria-hidden="true"></div>
                 </div>
                 <div id="railActions" class="rail-actions" aria-label="정도 단계 바로 선택"></div>
+                <p id="breakMessage" class="break-message" aria-live="polite"></p>
             </aside>
         </div>
     </main>
@@ -1175,12 +1435,18 @@
             "use strict";
 
             const DEGREE_LABELS = {
+                0: "대기",
                 1: "보통",
                 2: "조금 더",
                 3: "정말",
                 4: "너무",
                 5: "얼마나"
             };
+
+            const ZERO_EXPRESSION = "온도계를 올려 보세요.";
+            const ZERO_HINT = "0단계입니다. 단어를 고른 뒤 오른쪽 온도계를 움직이세요.";
+            const BREAK_CHANCE = 0.3;
+            let breakTimer = 0;
 
             const DATA = {
                 items: {
@@ -1492,7 +1758,7 @@
 
             const state = {
                 stage: "explore",
-                degree: 5,
+                degree: 0,
                 exploreKind: "adjectives",
                 selectedItemId: "delicious",
                 choiceIndex: 0,
@@ -1556,7 +1822,8 @@
                 thermoHandle: document.getElementById("thermoHandle"),
                 thermoScale: document.getElementById("thermoScale"),
                 thermoLive: document.getElementById("thermoLive"),
-                railActions: document.getElementById("railActions")
+                railActions: document.getElementById("railActions"),
+                breakMessage: document.getElementById("breakMessage")
             };
 
             function esc(value) {
@@ -1601,18 +1868,22 @@
             }
 
             function setDegree(value, options) {
-                const next = Math.max(1, Math.min(5, Math.round(Number(value) || 1)));
+                const previous = state.degree;
+                const next = Math.max(0, Math.min(5, Math.round(Number(value) || 0)));
                 state.degree = next;
                 renderThermometer();
                 if (!options || options.updateExplore !== false) {
                     renderExplore();
+                }
+                if (options && options.userAction && previous < 5 && next === 5 && Math.random() < BREAK_CHANCE) {
+                    playBreakEffect();
                 }
             }
 
             function setDegreeFromPointer(event) {
                 const rect = refs.thermometer.getBoundingClientRect();
                 const raw = (rect.bottom - event.clientY) / rect.height;
-                setDegree(1 + raw * 4);
+                setDegree(raw * 5, { userAction: true });
             }
 
             function showStage(stage) {
@@ -1631,7 +1902,7 @@
             }
 
             function renderThermometer() {
-                const percent = ((state.degree - 1) / 4) * 100;
+                const percent = (state.degree / 5) * 100;
                 refs.mercury.style.height = percent + "%";
                 refs.thermoHandle.style.bottom = "calc(58px + " + percent + "%)";
                 refs.thermoHandle.textContent = String(state.degree);
@@ -1650,23 +1921,37 @@
             function renderScale() {
                 refs.thermoScale.innerHTML = "";
                 refs.railActions.innerHTML = "";
-                [5, 4, 3, 2, 1].forEach(function (degree) {
+                [5, 4, 3, 2, 1, 0].forEach(function (degree) {
                     const mark = document.createElement("div");
                     mark.className = "scale-mark";
                     mark.dataset.degree = String(degree);
                     mark.innerHTML = "<strong>" + degree + "</strong><span>" + esc(DEGREE_LABELS[degree]) + "</span>";
                     refs.thermoScale.appendChild(mark);
                 });
-                [1, 2, 3, 4, 5].forEach(function (degree) {
+                [0, 1, 2, 3, 4, 5].forEach(function (degree) {
                     const button = document.createElement("button");
                     button.type = "button";
                     button.dataset.degree = String(degree);
                     button.textContent = String(degree);
                     button.addEventListener("click", function () {
-                        setDegree(degree);
+                        setDegree(degree, { userAction: true });
                     });
                     refs.railActions.appendChild(button);
                 });
+            }
+
+            function playBreakEffect() {
+                window.clearTimeout(breakTimer);
+                refs.thermometer.classList.remove("is-breaking");
+                refs.breakMessage.classList.remove("is-visible");
+                void refs.thermometer.offsetWidth;
+                refs.thermometer.classList.add("is-breaking");
+                refs.breakMessage.textContent = "쨍! 온도계가 잠깐 깨졌어요. 다시 조절할 수 있어요.";
+                refs.breakMessage.classList.add("is-visible");
+                breakTimer = window.setTimeout(function () {
+                    refs.thermometer.classList.remove("is-breaking");
+                    refs.breakMessage.classList.remove("is-visible");
+                }, 1500);
             }
 
             function renderItemList() {
@@ -1695,11 +1980,15 @@
                 refs.exploreDegreeStatus.textContent = state.degree + "단계";
                 refs.degreeBadge.textContent = degreeText(state.degree);
                 refs.currentWord.textContent = item.word + " / " + item.scene;
-                refs.expressionText.textContent = item.forms[state.degree - 1];
-                refs.formHint.textContent = state.degree === 5 ? item.hint : DEGREE_LABELS[state.degree] + " 정도 표현";
+                refs.expressionText.textContent = state.degree === 0 ? ZERO_EXPRESSION : item.forms[state.degree - 1];
+                refs.formHint.textContent = state.degree === 0 ? ZERO_HINT : (state.degree === 5 ? item.hint : DEGREE_LABELS[state.degree] + " 정도 표현");
 
                 renderItemList();
                 refs.degreeList.innerHTML = "";
+                const zeroLine = document.createElement("div");
+                zeroLine.className = "degree-line safe" + (state.degree === 0 ? " is-active" : "");
+                zeroLine.innerHTML = "<strong>0</strong><span>" + esc(ZERO_EXPRESSION) + "</span>";
+                refs.degreeList.appendChild(zeroLine);
                 item.forms.forEach(function (text, index) {
                     const degree = index + 1;
                     const line = document.createElement("div");
@@ -1875,7 +2164,7 @@
 
             function resetActivity() {
                 state.stage = "explore";
-                state.degree = 5;
+                state.degree = 0;
                 state.exploreKind = "adjectives";
                 state.selectedItemId = "delicious";
                 state.choiceIndex = 0;
@@ -1948,16 +2237,16 @@
                 refs.thermometer.addEventListener("keydown", function (event) {
                     if (event.key === "ArrowUp" || event.key === "ArrowRight") {
                         event.preventDefault();
-                        setDegree(state.degree + 1);
+                        setDegree(state.degree + 1, { userAction: true });
                     } else if (event.key === "ArrowDown" || event.key === "ArrowLeft") {
                         event.preventDefault();
-                        setDegree(state.degree - 1);
+                        setDegree(state.degree - 1, { userAction: true });
                     } else if (event.key === "Home") {
                         event.preventDefault();
-                        setDegree(1);
+                        setDegree(0, { userAction: true });
                     } else if (event.key === "End") {
                         event.preventDefault();
-                        setDegree(5);
+                        setDegree(5, { userAction: true });
                     }
                 });
             }
@@ -1995,6 +2284,7 @@
                 },
                 nextChoice: nextChoice,
                 nextTyping: nextTyping,
+                triggerBreakEffect: playBreakEffect,
                 getState: function () {
                     return {
                         stage: state.stage,

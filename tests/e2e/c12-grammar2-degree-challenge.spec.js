@@ -31,6 +31,8 @@ test('c12 grammar2 thermometer degree activity opens responsively', async ({ pag
     await expect(page.locator('h1').first()).toContainText('온도계 정도 활동');
     await expect(page.locator('#stageExplore')).toHaveClass(/is-active/);
     await expect(page.locator('#thermometer')).toHaveAttribute('role', 'slider');
+    await expect(page.locator('#thermometer')).toHaveAttribute('aria-valuenow', '0');
+    await expect(page.locator('.top-burst')).toHaveCount(1);
     await expect(page.locator('.usage-note')).toContainText('전통적으로는 부정적인 표현에 주로 썼습니다');
 
     const dataShape = await page.evaluate(() => ({
@@ -63,22 +65,44 @@ test('thermometer click and item chips change the expression', async ({ page }) 
 
   await page.locator('#verbModeBtn').click();
   await page.getByRole('button', { name: /기다리다/ }).click();
-  await expect(page.locator('#expressionText')).toContainText('버스를 얼마나 오래 기다렸는지 몰라요.');
+  await expect(page.locator('#expressionText')).toContainText('온도계를 올려 보세요.');
 
   const box = await page.locator('#thermometer').boundingBox();
   expect(box).not.toBeNull();
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height - 24);
+  await page.mouse.click(box.x + box.width / 2, box.y + 18);
 
-  await expect(page.locator('#thermometer')).toHaveAttribute('aria-valuenow', '1');
-  await expect(page.locator('#expressionText')).toContainText('버스를 기다렸어요.');
+  await expect(page.locator('#thermometer')).toHaveAttribute('aria-valuenow', '5');
+  await expect(page.locator('#expressionText')).toContainText('버스를 얼마나 오래 기다렸는지 몰라요.');
 
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height - 24);
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height - 18);
+
+  await expect(page.locator('#thermometer')).toHaveAttribute('aria-valuenow', '0');
+  await expect(page.locator('#expressionText')).toContainText('온도계를 올려 보세요.');
+
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height - 18);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width / 2, box.y + 18, { steps: 6 });
   await page.mouse.up();
 
   await expect(page.locator('#thermometer')).toHaveAttribute('aria-valuenow', '5');
   await expect(page.locator('#expressionText')).toContainText('버스를 얼마나 오래 기다렸는지 몰라요.');
+});
+
+test('raising thermometer to five can trigger a break effect', async ({ page }) => {
+  await openActivity(page, { width: 1280, height: 900 });
+  await page.evaluate(() => {
+    Math.random = () => 0.1;
+  });
+
+  const box = await page.locator('#thermometer').boundingBox();
+  expect(box).not.toBeNull();
+  await page.mouse.click(box.x + box.width / 2, box.y + 18);
+
+  await expect(page.locator('#thermometer')).toHaveAttribute('aria-valuenow', '5');
+  await expect(page.locator('#thermometer')).toHaveClass(/is-breaking/);
+  await expect(page.locator('.top-burst .burst-ray')).toHaveCount(5);
+  await expect(page.locator('.top-burst .burst-dot')).toHaveCount(5);
+  await expect(page.locator('#breakMessage')).toContainText('온도계가 잠깐 깨졌어요');
 });
 
 test('15 expression choices advance to typing practice', async ({ page }) => {
