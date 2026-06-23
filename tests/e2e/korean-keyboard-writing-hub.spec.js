@@ -10,6 +10,10 @@ test.describe("korean keyboard writing standalone hub", () => {
     await expect(page.locator('[data-hub-link="keyboard-lesson"]')).toHaveAttribute("href", "../korean-keyboard-practice-lesson/index.html");
     await expect(page.locator('[data-hub-link="c12-writing"]')).toContainText("12과 표현 타이핑 연습");
     await expect(page.locator('[data-hub-link="c12-writing"]')).toHaveAttribute("href", "../../c12/writing-keyboard-builder.html");
+    await expect(page.locator('[data-hub-link="c12-writing-expression-learning"]')).toContainText("12과 쓰기 주제 표현 학습");
+    await expect(page.locator('[data-hub-link="c12-writing-expression-learning"]')).toHaveAttribute("href", "../../c12/writing-expression-learning.html");
+    await expect(page.locator('[data-hub-link="c12-writing-expression-assembly"]')).toContainText("12과 쓰기 표현 조립 연습");
+    await expect(page.locator('[data-hub-link="c12-writing-expression-assembly"]')).toHaveAttribute("href", "../../c12/writing-expression-assembly.html");
     await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toContainText("12과 동작 표현 타이핑 연습");
     await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toHaveAttribute("href", "../../c12/writing-motion-typing.html");
     await expect(page.locator('[data-hub-link="c12-motion-typing-game"]')).toContainText("12과 어휘 표현 애니메이션 타이핑");
@@ -33,6 +37,22 @@ test.describe("korean keyboard writing standalone hub", () => {
     await page.locator('[data-hub-link="c12-writing"]').click();
     await expect(page).toHaveURL(/\/c12\/writing-keyboard-builder\.html$/);
     await expect(page.locator("#stageTitle")).toHaveText("한/영 확인");
+  });
+
+  test("opens the C12 writing topic expression learning page from the hub", async ({ page }) => {
+    await page.goto("/apps/standalone-pages/korean-keyboard-writing-hub.html");
+
+    await page.locator('[data-hub-link="c12-writing-expression-learning"]').click();
+    await expect(page).toHaveURL(/\/c12\/writing-expression-learning\.html$/);
+    await expect(page.locator("#stageTitle")).toHaveText("한/영 확인");
+  });
+
+  test("opens the C12 writing expression assembly page from the hub", async ({ page }) => {
+    await page.goto("/apps/standalone-pages/korean-keyboard-writing-hub.html");
+
+    await page.locator('[data-hub-link="c12-writing-expression-assembly"]').click();
+    await expect(page).toHaveURL(/\/c12\/writing-expression-assembly\.html$/);
+    await expect(page.locator("#stageTitle")).toHaveText("상황 파악");
   });
 
   test("opens the C12 motion expression typing trainer from the hub", async ({ page }) => {
@@ -77,6 +97,8 @@ test.describe("korean keyboard writing standalone hub", () => {
 
     await expect(page.locator('[data-hub-link="keyboard-lesson"]')).toBeInViewport();
     await expect(page.locator('[data-hub-link="c12-writing"]')).toBeInViewport();
+    await expect(page.locator('[data-hub-link="c12-writing-expression-learning"]')).toBeVisible();
+    await expect(page.locator('[data-hub-link="c12-writing-expression-assembly"]')).toBeVisible();
     await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toBeVisible();
     await expect(page.locator('[data-hub-link="c12-motion-typing-game"]')).toBeVisible();
     await expect(page.locator('[data-hub-link="c12-writing-shower"]')).toBeVisible();
