@@ -119,6 +119,49 @@
                 max-height: 85vh;
             }
         }
+
+        html[dir="rtl"] body {
+            text-align: right;
+        }
+
+        html[dir="rtl"] .reason-return-nav,
+        html[dir="rtl"] .reason-header .flex,
+        html[dir="rtl"] .grammar-card .flex,
+        html[dir="rtl"] #compare-fab-container,
+        html[dir="rtl"] .modal-inner .flex {
+            direction: rtl;
+        }
+
+        .ko-term,
+        .grammar-token,
+        .formula-token,
+        html[dir="rtl"] .font-mono,
+        html[dir="rtl"] #modalTitle,
+        html[dir="rtl"] .grammar-card h3 {
+            direction: ltr;
+            unicode-bidi: isolate;
+        }
+
+        html[dir="rtl"] .formula-token,
+        html[dir="rtl"] .font-mono {
+            text-align: left;
+        }
+
+        html[dir="rtl"] input,
+        html[dir="rtl"] textarea {
+            direction: rtl;
+            text-align: right;
+        }
+
+        #toggle-compare-mode {
+            right: 72px !important;
+        }
+
+        @media (max-width: 480px) {
+            #toggle-compare-mode {
+                right: 68px !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 pb-24">
@@ -153,6 +196,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <button class="lang-btn flex-shrink-0 px-4 py-1.5 text-sm rounded-full border border-slate-200 bg-white text-slate-600 font-medium transition-colors whitespace-nowrap active-lang" data-lang="ko">한국어</button>
                 <button class="lang-btn flex-shrink-0 px-4 py-1.5 text-sm rounded-full border border-slate-200 bg-white text-slate-600 font-medium transition-colors whitespace-nowrap" data-lang="en">English</button>
                 <button class="lang-btn flex-shrink-0 px-4 py-1.5 text-sm rounded-full border border-slate-200 bg-white text-slate-600 font-medium transition-colors whitespace-nowrap" data-lang="vi">Tiếng Việt</button>
+                <button class="lang-btn flex-shrink-0 px-4 py-1.5 text-sm rounded-full border border-slate-200 bg-white text-slate-600 font-medium transition-colors whitespace-nowrap" data-lang="ar">العربية</button>
+                <button class="lang-btn flex-shrink-0 px-4 py-1.5 text-sm rounded-full border border-slate-200 bg-white text-slate-600 font-medium transition-colors whitespace-nowrap" data-lang="mn">Монгол</button>
+                <button class="lang-btn flex-shrink-0 px-4 py-1.5 text-sm rounded-full border border-slate-200 bg-white text-slate-600 font-medium transition-colors whitespace-nowrap" data-lang="kk">Қазақша</button>
+                <button class="lang-btn flex-shrink-0 px-4 py-1.5 text-sm rounded-full border border-slate-200 bg-white text-slate-600 font-medium transition-colors whitespace-nowrap" data-lang="th">ไทย</button>
                 <button class="lang-btn flex-shrink-0 px-4 py-1.5 text-sm rounded-full border border-slate-200 bg-white text-slate-600 font-medium transition-colors whitespace-nowrap" data-lang="ja">日本語</button>
                 <button class="lang-btn flex-shrink-0 px-4 py-1.5 text-sm rounded-full border border-slate-200 bg-white text-slate-600 font-medium transition-colors whitespace-nowrap" data-lang="zh">中文</button>
             </div>
@@ -450,6 +497,149 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
         };
 
+        function buildReasonLang(labels, grammarTexts) {
+            const grammars = {};
+            Object.entries(langData.ko.grammars).forEach(([grammar, base]) => {
+                grammars[grammar] = Object.assign({}, base, grammarTexts[grammar] || {});
+            });
+            return Object.assign({}, labels, { grammars });
+        }
+
+        Object.assign(langData, {
+            ar: buildReasonLang({
+                title: "قواعد التعبير عن السبب في الكورية",
+                subtitle: "ادرس أوجه الشبه والاختلاف في لمحة واحدة.",
+                searchPlaceholder: "ابحث عن القاعدة أو المعنى...",
+                group1Title: "أكثر صيغ السبب شيوعا",
+                group1Subtitle: "يمكن غالبا التبديل بينها، لكن لكل صيغة نبرة خاصة.",
+                group2Title: "صيغ سبب ذات معنى محدد",
+                group2Subtitle: "تستعمل في مواقف محددة فقط.",
+                modalTabInfo: "الشرح",
+                modalTabExamples: "أمثلة",
+                labelFormula: "صيغة الربط (Formula)",
+                labelDesc: "المعنى",
+                labelConstraints: "القيود",
+                compareTitle: "جدول مقارنة القواعد",
+                toastCopied: "تم النسخ!",
+                compareModeStart: "وضع المقارنة",
+                compareModeComplete: "قارن",
+                compareModeCancel: "إلغاء",
+                alertSelectMore: "اختر عنصرين على الأقل للمقارنة."
+            }, {
+                "-아/어서": { desc: "أبسط صيغة وأكثرها استعمالا للتعبير عن السبب. تناسب غالبا جواب سؤال لماذا.", constraints: "لا تستعمل عادة مع الأمر أو الاقتراح مثل -으세요 و -읍시다.", examples: ["لأن الجو بارد أصبت بالزكام.", "لأنني كنت جائعا أكلت.", "آسف لأنني تأخرت."] },
+                "-(으)니까": { desc: "تدل على سبب مبني على حكم المتكلم أو تجربته. فيها نبرة بما أنني أرى أو جربت ذلك.", constraints: "تستعمل كثيرا مع الحكم الشخصي، ويمكن أن تأتي قبل الأمر أو الاقتراح.", examples: ["الجو بارد في الخارج، فارتد ملابس دافئة.", "يبدو أنك مشغول، لذلك سأتصل مرة أخرى لاحقا.", "بما أنك تأخرت فسأذهب بدلا منك."] },
+                "-기 때문에": { desc: "تشرح حقيقة موضوعية أو سببا واضحا. نبرتها منطقية ورسمية نسبيا.", constraints: "لا تناسب الأمر أو الاقتراح مثل -(으)니까.", examples: ["تأخرت بسبب الازدحام الشديد.", "لم يستطع الحضور إلى المدرسة لأنه أصيب بالزكام.", "لأن هذه مسألة مهمة جدا يجب أن نكون حذرين."] },
+                "-(으)므로": { desc: "صيغة رسمية جدا ومنطقية للتعبير عن السبب. تظهر غالبا في الكتابة أو العروض الرسمية.", constraints: "قد تبدو متكلفة أو غير طبيعية في الحديث اليومي.", examples: ["بما أن هذا المنتج يستخدم مواد صديقة للبيئة، يمكنكم استخدامه باطمئنان.", "بما أن كل الوثائق جاهزة، سنبدأ الاجتماع.", "بما أن النتائج مرضية، فلننتقل إلى المرحلة التالية."] },
+                "-느라고": { desc: "تستعمل عندما ينشغل الشخص بفعل سابق فلا يستطيع فعل شيء آخر، أو تظهر نتيجة سلبية.", constraints: "يجب أن يكون فاعل الجملتين واحدا، وتأتي النتيجة غالبا سلبية، وتلحق بالأفعال فقط.", examples: ["سهرت طوال الليل لأنني انشغلت بالألعاب.", "نسيت أن آكل لأنني كنت منشغلا بالدراسة.", "لم أستطع الرد على الهاتف لأنني كنت منشغلا بالعمل."] },
+                "-는 바람에": { desc: "تستعمل عندما يسبب حدث مفاجئ أو غير متوقع نتيجة سلبية.", constraints: "لا تستعمل للنتائج الإيجابية، وتظهر غالبا مع الماضي.", examples: ["ألغيت الرحلة لأن المطر هطل فجأة.", "تأخرت عن الموعد لأن السيارة تعطلت.", "لم أستطع السفر لأن صديقي مرض فجأة."] },
+                "-는 통에": { desc: "تستعمل عندما يؤدي جو صاخب أو فوضوي حولك إلى نتيجة سلبية.", constraints: "تركز على الارتباك أو الضجيج في البيئة المحيطة.", examples: ["لم أستطع النوم بسبب أعمال البناء في البيت المجاور.", "لم أستطع التركيز في الكتاب بسبب ضجة الأطفال.", "ضللت الطريق بسبب كثرة الناس."] },
+                "-는 탓에": { desc: "فيها نبرة لوم أو عتب على السبب، وتستعمل لإسناد نتيجة سلبية إلى سبب ما.", constraints: "لا تستعمل مع النتائج الإيجابية.", examples: ["بسبب تأخرك عوقبنا.", "بسبب البرد لا يبدو أن الزكام يتحسن.", "بسبب خطئه فشل المشروع."] },
+                "-았더니/었더니": { desc: "تدل على أن فعلا جربه المتكلم بنفسه في الماضي أدى إلى نتيجة أو اكتشاف جديد.", constraints: "تستعمل غالبا مع المتكلم وبناء على تجربة مباشرة.", examples: ["فتحت النافذة فدخل هواء بارد.", "درست بجد فارتفعت درجاتي.", "اتصلت بصديقي بعد مدة طويلة فرد شخص آخر."] },
+                "-다 보니": { desc: "تدل على أن تكرار فعل أو الاستمرار فيه أدى إلى إدراك جديد أو حالة جديدة.", constraints: "تستعمل مع الأفعال المستمرة أو المتكررة، لا مع فعل واحد فقط.", examples: ["مع ممارسة الرياضة كل يوم صار جسمي أخف.", "مع طول الحياة يمر الإنسان حتى بمثل هذه الأمور.", "مع كثرة لقاء صديقي نشأت بيننا مودة."] },
+                "-고 해서": { desc: "تذكر سببا واحدا ممثلا بين عدة أسباب، وتلمح إلى وجود أسباب أخرى أيضا.", constraints: "لا تستعمل عندما يوجد سبب واحد فقط.", examples: ["ذهبت إلى سيول لأرى صديقا قديما ولأسباب أخرى.", "خرجت لأتمرن وأتنفس بعض الهواء.", "بما أن العمل انتهى وأسبابا أخرى، غادرت مبكرا."] },
+                "-는 덕분에": { desc: "تستعمل عندما يؤدي السبب السابق إلى نتيجة جيدة. كلمة 덕분 تحمل معنى إيجابيا وشكرا.", constraints: "لا تستعمل مع النتائج السلبية.", examples: ["بفضل المعلم نجحت في الامتحان.", "بفضل مساعدتك انتهى العمل جيدا.", "بفضل الطقس الصحو أشعر بمزاج جيد."] }
+            }),
+            mn: buildReasonLang({
+                title: "Солонгос хэлний шалтгааны дүрэм",
+                subtitle: "Төстэй болон ялгаатай талыг нэг дор харж сурцгаая.",
+                searchPlaceholder: "Дүрэм, утга хайх...",
+                group1Title: "Хамгийн түгээмэл шалтгаан",
+                group1Subtitle: "Ихэнхдээ сольж хэрэглэж болох ч өнгө аяс нь ялгаатай.",
+                group2Title: "Тусгай утгатай шалтгаан",
+                group2Subtitle: "Зөвхөн тодорхой нөхцөлд хэрэглэдэг дүрмүүд.",
+                modalTabInfo: "Тайлбар",
+                modalTabExamples: "Жишээ",
+                labelFormula: "Холбох хэлбэр (Formula)",
+                labelDesc: "Утга",
+                labelConstraints: "Анхаарах зүйл",
+                compareTitle: "Дүрмийн харьцуулалт",
+                toastCopied: "Хуулагдлаа!",
+                compareModeStart: "Харьцуулах горим",
+                compareModeComplete: "Харьцуулах",
+                compareModeCancel: "Цуцлах",
+                alertSelectMore: "Харьцуулахын тулд дор хаяж хоёр зүйл сонгоно уу."
+            }, {
+                "-아/어서": { desc: "Шалтгаан илэрхийлэх хамгийн үндсэн, өргөн хэрэглэгддэг хэлбэр. Яагаад гэсэн асуултад хариулахад тохиромжтой.", constraints: "Захирах болон хамт хийхийг санал болгох өгүүлбэртэй ихэвчлэн хэрэглэдэггүй.", examples: ["Цаг агаар хүйтэн байсан болохоор ханиад хүрсэн.", "Өлссөн болохоор хоол идсэн.", "Оройтсонд уучлаарай."] },
+                "-(으)니까": { desc: "Ярьж байгаа хүний дүгнэлт, туршлага дээр үндэслэсэн шалтгааныг хэлнэ.", constraints: "Хувийн дүгнэлтэд сайн тохирно. Захирах, санал болгох өгүүлбэртэй хэрэглэж болно.", examples: ["Гадаа хүйтэн болохоор дулаан хувцас өмсөөрэй.", "Та завгүй юм шиг байна, дараа дахин залгая.", "Чи хоцорсон болохоор би оронд нь явъя."] },
+                "-기 때문에": { desc: "Бодит баримт эсвэл тодорхой шалтгааныг логик, арай албан өнгөөр тайлбарлана.", constraints: "-(으)니까 шиг захирах, санал болгох өгүүлбэртэй төдийлөн зохицохгүй.", examples: ["Замын түгжрэл их байсан учраас хоцорлоо.", "Тэр ханиад хүрсэн учраас сургуульдаа ирж чадсангүй.", "Энэ маш чухал асуудал учраас болгоомжтой байх хэрэгтэй."] },
+                "-(으)므로": { desc: "Маш албан, логик шалтгааныг илэрхийлдэг бичгийн хэлний хэлбэр.", constraints: "Өдөр тутмын ярианд хэрэглэвэл хатуу, эвгүй сонсогдож болно.", examples: ["Энэ бүтээгдэхүүн байгальд ээлтэй материал хэрэглэсэн тул тайван ашиглаж болно.", "Бүх бичиг баримт бэлэн болсон тул хурлаа эхэлье.", "Үр дүн хангалттай тул дараагийн шат руу оръё."] },
+                "-느라고": { desc: "Нэг үйлдэлд анхаарлаа төвлөрүүлснээс өөр зүйл хийж чадаагүй, эсвэл сөрөг үр дүн гарсныг хэлнэ.", constraints: "Хоёр өгүүлбэрийн эзэн ижил, үр дүн нь сөрөг байх ёстой. Зөвхөн үйл үгтэй хэрэглэнэ.", examples: ["Тоглоом тоглосоор шөнөжин суусан.", "Хичээл хийсээр хоол идэхээ мартсан.", "Ажилдаа завгүй байсан болохоор утсаа авч чадсангүй."] },
+                "-는 바람에": { desc: "Гэнэтийн эсвэл санаандгүй зүйл шалтгаан болж сөрөг үр дүн гарсныг хэлнэ.", constraints: "Эерэг үр дүнтэй хэрэглэдэггүй, ихэвчлэн өнгөрсөн цагтай хамт хэрэглэнэ.", examples: ["Гэнэт бороо орсны улмаас зугаалга цуцлагдсан.", "Машин эвдэрснээс болж уулзалтаасаа хоцорсон.", "Найз маань гэнэт өвдсөнөөс болоод аялалд явж чадсангүй."] },
+                "-는 통에": { desc: "Ойр орчны дуу чимээ, үймээн самуун шалтгаан болж сөрөг үр дүн гарсныг хэлнэ.", constraints: "Ихэвчлэн орчны эмх замбараагүй байдлыг онцолж хэрэглэнэ.", examples: ["Хажуу айлын засвараас болоод унтаж чадсангүй.", "Хүүхдүүд шуугилдсанаас номондоо төвлөрч чадсангүй.", "Хүн их байснаас замаа алдсан."] },
+                "-는 탓에": { desc: "Шалтгааныг буруутгах эсвэл гомдоллох өнгө аястай. Сөрөг үр дүнгийн хариуцлагыг заана.", constraints: "Эерэг нөхцөлд хэрэглэж болохгүй.", examples: ["Чи орой ирсэн болохоор бид шийтгүүлсэн.", "Цаг агаар хүйтнээс болоод ханиад эдгэрэх шинжгүй байна.", "Түүний алдаанаас болж төсөл нурсан."] },
+                "-았더니/었더니": { desc: "Өмнө нь өөрөө хийж үзсэн үйлдэл үр дүн эсвэл шинэ олж мэдсэн зүйлд хүрснийг хэлнэ.", constraints: "Ихэвчлэн нэгдүгээр биеийн шууд туршлага дээр үндэслэнэ.", examples: ["Цонхоо нээсэн чинь сэрүүн салхи орж ирсэн.", "Шаргуу хичээллэсэн чинь дүн сайжирсан.", "Удаан уулзаагүй найз руугаа залгасан чинь өөр хүн авсан."] },
+                "-다 보니": { desc: "Нэг үйлдлийг давтаж эсвэл үргэлжлүүлж байгаад шинэ зүйл ойлгох, эсвэл шинэ байдалд хүрэхийг хэлнэ.", constraints: "Нэг удаагийн үйлдэл биш, үргэлжилсэн эсвэл давтагдсан үйлдэлд хэрэглэнэ.", examples: ["Өдөр бүр дасгал хийсээр бие хөнгөрсөн.", "Удаан амьдрах тусам ийм зүйл ч үздэг юм байна.", "Найзтайгаа байнга уулзсаар дотноссон."] },
+                "-고 해서": { desc: "Олон шалтгаанаас нэгийг төлөөлүүлэн хэлж, өөр шалтгаан ч байгааг давхар илтгэнэ.", constraints: "Зөвхөн ганц шалтгаантай үед хэрэглэдэггүй.", examples: ["Удаан уулзаагүй найзтайгаа уулзах гээд бас бус шалтгаанаар Сөүл явсан.", "Дасгал хийх, салхинд гарах санаатай гадагш гарсан.", "Ажил дууссан болохоор бас бус шалтгаанаар эрт тарсан."] },
+                "-는 덕분에": { desc: "Өмнөх шалтгаанаас болж сайн үр дүн гарсныг хэлнэ. 덕분 гэдэг үг өөрөө эерэг утгатай.", constraints: "Сөрөг үр дүнтэй хэрэглэдэггүй.", examples: ["Багшийн ачаар шалгалтад тэнцсэн.", "Чи тусалсны ачаар ажил сайхан дууссан.", "Цэлмэг цаг агаарын ачаар сэтгэл сайхан байна."] }
+            }),
+            kk: buildReasonLang({
+                title: "Корей тіліндегі себеп грамматикасы",
+                subtitle: "Ұқсастықтар мен айырмашылықтарды бірден көріп үйреніңіз.",
+                searchPlaceholder: "Грамматика немесе мағынаны іздеу...",
+                group1Title: "Ең жиі қолданылатын себептер",
+                group1Subtitle: "Көп жағдайда алмастырып қолдануға болады, бірақ реңкі бөлек.",
+                group2Title: "Нақты мағынаға бөлінген себептер",
+                group2Subtitle: "Тек белгілі жағдайларда қолданылатын грамматикалар.",
+                modalTabInfo: "Түсіндіру",
+                modalTabExamples: "Мысалдар",
+                labelFormula: "Жалғау үлгісі (Formula)",
+                labelDesc: "Мағына",
+                labelConstraints: "Шектеулер",
+                compareTitle: "Грамматиканы салыстыру",
+                toastCopied: "Көшірілді!",
+                compareModeStart: "Салыстыру режимі",
+                compareModeComplete: "Салыстыру",
+                compareModeCancel: "Болдырмау",
+                alertSelectMore: "Салыстыру үшін кемінде екі элемент таңдаңыз."
+            }, {
+                "-아/어서": { desc: "Себеп білдіретін ең негізгі әрі кең тараған грамматика. Неге деген сұраққа жауап беруге жиі қолданылады.", constraints: "Бұйрық немесе ұсыныс сөйлемдерімен әдетте қолданылмайды.", examples: ["Ауа райы суық болғандықтан тұмау болдым.", "Қарным ашқандықтан тамақ жедім.", "Кешіккенім үшін кешіріңіз."] },
+                "-(으)니까": { desc: "Сөйлеушінің жеке пікірі немесе тәжірибесіне негізделген себепті білдіреді.", constraints: "Көбіне субъективті пайымдауға қолданылады. Бұйрық және ұсыныс сөйлемдерімен келе алады.", examples: ["Сыртта суық, сондықтан жылы киініңіз.", "Сіз бос емес сияқтысыз, кейін қайта хабарласамын.", "Сен кешіккендіктен мен орнына барамын."] },
+                "-기 때문에": { desc: "Объективті фактіні немесе айқын себепті логикалық және ресми түрде түсіндіреді.", constraints: "-(으)니까 сияқты бұйрық немесе ұсыныс сөйлемдерімен онша үйлеспейді.", examples: ["Көлік кептелісі қатты болғандықтан кешіктім.", "Ол тұмау болғандықтан мектепке келе алмады.", "Бұл өте маңызды мәселе болғандықтан мұқият болу керек."] },
+                "-(으)므로": { desc: "Өте ресми және логикалық себепті білдіреді. Көбіне жазба тілде немесе ресми баяндауда қолданылады.", constraints: "Күнделікті сөйлесуде қолданса, тым қатқыл естілуі мүмкін.", examples: ["Бұл өнім экологиялық материалдан жасалғандықтан, сенімді қолдануға болады.", "Барлық құжат дайын болғандықтан жиналысты бастаймыз.", "Нәтиже қанағаттанарлық болғандықтан келесі кезеңге өтейік."] },
+                "-느라고": { desc: "Алдыңғы әрекетке беріліп, басқа істі істей алмау немесе жағымсыз нәтиже шығуын білдіреді.", constraints: "Екі бөліктің бастауышы бірдей болуы керек, нәтиже жағымсыз болады, тек етістікке жалғанады.", examples: ["Ойын ойнаймын деп түні бойы ұйықтамадым.", "Сабақ оқимын деп тамақ ішуді ұмытып кеттім.", "Жұмыспен айналысып телефонды ала алмадым."] },
+                "-는 바람에": { desc: "Кенет немесе күтпеген оқиға себеп болып, жағымсыз нәтиже туған кезде қолданылады.", constraints: "Жақсы нәтижеге қолданылмайды және көбіне өткен шақпен келеді.", examples: ["Кенет жаңбыр жауғандықтан серуен тоқтатылды.", "Көлік бұзылып, кездесуге кешіктім.", "Досым кенет ауырып қалып, саяхатқа бара алмадым."] },
+                "-는 통에": { desc: "Айналадағы шу немесе ретсіз жағдай себеп болып, жағымсыз нәтиже шыққанын білдіреді.", constraints: "Көбіне сыртқы ортаның абыр-сабырын ерекше көрсетеді.", examples: ["Көрші үйдің жөндеуінен ұйықтай алмадым.", "Балалар шулағандықтан кітапқа зейін қоя алмадым.", "Адам көп болғандықтан жолдан адастым."] },
+                "-는 탓에": { desc: "Себепті кінәлау немесе реніш білдіру реңкі бар. Жағымсыз нәтижені бір себепке артады.", constraints: "Жақсы жағдайға қолдануға болмайды.", examples: ["Сен кеш келгендіктен біз жазаландық.", "Күн суық болғандықтан тұмауым жазылар емес.", "Оның қатесінен жоба бұзылды."] },
+                "-았더니/었더니": { desc: "Сөйлеуші өткенде өзі тікелей жасаған әрекет нәтижеге немесе жаңа байқауға әкелгенін білдіреді.", constraints: "Көбіне бірінші жақта және тікелей тәжірибеге негізделіп қолданылады.", examples: ["Терезені ашып едім, салқын жел кірді.", "Көп оқыған едім, бағам көтерілді.", "Көптен бері досыма телефон соқсам, басқа адам алды."] },
+                "-다 보니": { desc: "Әрекетті қайталап немесе жалғастыра келе жаңа нәрсені түсіну немесе жаңа күйге жетуді білдіреді.", constraints: "Бір реттік әрекетке емес, жалғасқан немесе қайталанған әрекетке қолданылады.", examples: ["Күнде жаттыға келе денем жеңілдеді.", "Ұзақ өмір сүре келе мұндайды да көреді екенсің.", "Досыммен жиі кездесе келе жақын болып кеттік."] },
+                "-고 해서": { desc: "Бірнеше себептің ішінен біреуін өкіл ретінде айтып, басқа себептер де бар екенін аңғартады.", constraints: "Тек бір ғана себеп болғанда қолданылмайды.", examples: ["Көптен көрмеген досымды көру үшін және басқа себептермен Сеулге бардым.", "Жаттығу да жасап, ауа да жұтайын деп сыртқа шықтым.", "Жұмыс та біткен соң және басқа себептермен ерте қайттым."] },
+                "-는 덕분에": { desc: "Алдыңғы себептің арқасында жақсы нәтиже шыққанын білдіреді. 덕분 сөзінің өзі жағымды мағына береді.", constraints: "Жағымсыз нәтижеге қолданылмайды.", examples: ["Мұғалімнің арқасында емтиханнан өттім.", "Сенің көмегіңнің арқасында жұмыс жақсы аяқталды.", "Ашық ауа райының арқасында көңіл күйім жақсы."] }
+            }),
+            th: buildReasonLang({
+                title: "ไวยากรณ์บอกเหตุผลในภาษาเกาหลี",
+                subtitle: "ดูความเหมือนและความต่างได้ในหน้าเดียว",
+                searchPlaceholder: "ค้นหาไวยากรณ์หรือความหมาย...",
+                group1Title: "เหตุผลที่ใช้บ่อยที่สุด",
+                group1Subtitle: "มักใช้แทนกันได้ แต่มีนัยต่างกันเล็กน้อย",
+                group2Title: "เหตุผลที่มีความหมายเฉพาะ",
+                group2Subtitle: "ใช้เฉพาะในสถานการณ์บางแบบ",
+                modalTabInfo: "คำอธิบาย",
+                modalTabExamples: "ตัวอย่าง",
+                labelFormula: "รูปเชื่อม (Formula)",
+                labelDesc: "ความหมาย",
+                labelConstraints: "ข้อจำกัด",
+                compareTitle: "ตารางเปรียบเทียบไวยากรณ์",
+                toastCopied: "คัดลอกแล้ว!",
+                compareModeStart: "โหมดเปรียบเทียบ",
+                compareModeComplete: "เปรียบเทียบ",
+                compareModeCancel: "ยกเลิก",
+                alertSelectMore: "กรุณาเลือกอย่างน้อย 2 รายการเพื่อเปรียบเทียบ"
+            }, {
+                "-아/어서": { desc: "ไวยากรณ์บอกเหตุผลที่พื้นฐานและใช้กว้างที่สุด มักใช้ตอบคำถามว่าทำไม", constraints: "โดยทั่วไปไม่ใช้กับประโยคคำสั่งหรือชักชวน เช่น -으세요 และ -읍시다", examples: ["เพราะอากาศหนาวเลยเป็นหวัด", "เพราะหิวเลยกินข้าว", "ขอโทษที่มาสาย"] },
+                "-(으)니까": { desc: "ใช้บอกเหตุผลจากการตัดสินใจหรือประสบการณ์ของผู้พูด มีนัยว่าเพราะฉันเห็นหรือคิดแบบนี้", constraints: "เหมาะกับความเห็นส่วนตัว และใช้กับคำสั่งหรือชักชวนได้", examples: ["ข้างนอกหนาว เพราะฉะนั้นใส่เสื้ออุ่น ๆ นะ", "คุณดูยุ่ง เดี๋ยวฉันโทรมาใหม่ทีหลัง", "เพราะเธอมาสาย ฉันจะไปแทนเอง"] },
+                "-기 때문에": { desc: "ใช้อธิบายข้อเท็จจริงหรือสาเหตุที่ชัดเจน มีน้ำเสียงเป็นเหตุเป็นผลและค่อนข้างเป็นทางการ", constraints: "ไม่ค่อยเข้ากับประโยคคำสั่งหรือชักชวนเหมือน -(으)니까", examples: ["มาสายเพราะรถติดมาก", "เขามาโรงเรียนไม่ได้เพราะเป็นหวัด", "เพราะนี่เป็นเรื่องสำคัญมาก จึงต้องรอบคอบ"] },
+                "-(으)므로": { desc: "ใช้บอกเหตุผลที่เป็นทางการและเป็นเหตุเป็นผลมาก มักพบในภาษาเขียนหรือประกาศทางการ", constraints: "ถ้าใช้ในบทสนทนาทั่วไปอาจฟังแข็งเกินไป", examples: ["ผลิตภัณฑ์นี้ใช้วัสดุเป็นมิตรต่อสิ่งแวดล้อม จึงใช้ได้อย่างสบายใจ", "เอกสารทั้งหมดพร้อมแล้ว ดังนั้นจะเริ่มประชุม", "ผลลัพธ์น่าพอใจ ดังนั้นไปขั้นตอนต่อไปกันเถอะ"] },
+                "-느라고": { desc: "ใช้เมื่อมัวแต่ทำสิ่งหนึ่งจนทำอีกสิ่งไม่ได้ หรือเกิดผลลัพธ์ด้านลบ", constraints: "ประธานของสองส่วนควรเป็นคนเดียวกัน ผลลัพธ์มักเป็นลบ และใช้กับกริยาเท่านั้น", examples: ["มัวแต่เล่นเกมเลยอยู่จนสว่าง", "มัวแต่อ่านหนังสือเลยลืมกินข้าว", "ยุ่งกับงานเลยรับโทรศัพท์ไม่ได้"] },
+                "-는 바람에": { desc: "ใช้เมื่อเหตุการณ์กะทันหันหรือไม่คาดคิดทำให้เกิดผลลัพธ์ด้านลบ", constraints: "ไม่ใช้กับผลลัพธ์ที่ดี และมักใช้กับอดีตกาล", examples: ["ฝนตกกะทันหัน เลยยกเลิกการไปปิกนิก", "รถเสียเลยไปนัดสาย", "เพื่อนป่วยกะทันหันเลยไปเที่ยวไม่ได้"] },
+                "-는 통에": { desc: "ใช้เมื่อสถานการณ์รอบตัวที่เสียงดังหรือวุ่นวายทำให้เกิดผลลัพธ์ด้านลบ", constraints: "มักเน้นความวุ่นวายหรือสภาพแวดล้อมรอบตัว", examples: ["เพราะบ้านข้าง ๆ ก่อสร้าง เลยนอนไม่หลับ", "เด็ก ๆ ส่งเสียงดัง เลยอ่านหนังสือไม่รู้เรื่อง", "คนเยอะมากเลยหลงทาง"] },
+                "-는 탓에": { desc: "มีนัยตำหนิหรือโทษสาเหตุของผลลัพธ์ด้านลบ", constraints: "ใช้กับสถานการณ์เชิงบวกไม่ได้", examples: ["เพราะเธอมาสาย พวกเราเลยโดนทำโทษ", "เพราะอากาศหนาว อาการหวัดเลยไม่ดีขึ้นเลย", "เพราะความผิดพลาดของเขา โครงการเลยเสียหาย"] },
+                "-았더니/었더니": { desc: "ใช้เมื่อการกระทำที่ผู้พูดเคยทำเองนำไปสู่ผลลัพธ์หรือสิ่งที่เพิ่งพบ", constraints: "มักใช้กับประสบการณ์ตรงของผู้พูด โดยเฉพาะมุมมองบุคคลที่หนึ่ง", examples: ["ลองเปิดหน้าต่างแล้วลมเย็นก็เข้ามา", "ตั้งใจเรียนแล้วคะแนนก็สูงขึ้น", "โทรหาเพื่อนหลังจากไม่ได้โทรนาน ปรากฏว่าคนอื่นรับสาย"] },
+                "-다 보니": { desc: "ใช้เมื่อทำสิ่งใดซ้ำ ๆ หรือทำต่อเนื่องจนได้รู้สิ่งใหม่หรือเกิดสภาพใหม่", constraints: "ใช้กับการกระทำที่ต่อเนื่องหรือซ้ำ ไม่ใช่การทำครั้งเดียว", examples: ["ออกกำลังกายทุกวันไปเรื่อย ๆ แล้วร่างกายเบาขึ้น", "อยู่มานานก็ได้เจอเรื่องแบบนี้ด้วย", "เจอเพื่อนบ่อย ๆ แล้วก็สนิทกันขึ้น"] },
+                "-고 해서": { desc: "ยกเหตุผลหนึ่งขึ้นมาแทนหลายเหตุผล และสื่อว่ายังมีเหตุผลอื่นด้วย", constraints: "ไม่ใช้เมื่อมีเหตุผลเดียวเท่านั้น", examples: ["ไปโซลเพราะจะเจอเพื่อนเก่าและมีเหตุผลอื่นด้วย", "ออกมาข้างนอกเพราะจะออกกำลังกายและสูดอากาศด้วย", "งานก็เสร็จแล้วและมีเหตุผลอื่น เลยเลิกงานเร็ว"] },
+                "-는 덕분에": { desc: "ใช้เมื่อสาเหตุก่อนหน้าทำให้เกิดผลลัพธ์ที่ดี คำว่า 덕분 มีความหมายเชิงบวก", constraints: "ไม่ใช้กับผลลัพธ์ด้านลบ", examples: ["เพราะครูช่วย ฉันเลยสอบผ่าน", "เพราะเธอช่วย งานเลยจบลงด้วยดี", "เพราะอากาศแจ่มใส เลยอารมณ์ดี"] }
+            })
+        });
+
         // --- STATE --- //
         let currentLang = 'ko';
         let isCompareMode = false;
@@ -474,6 +664,51 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         // --- FUNCTIONS --- //
 
+        const rtlLanguages = new Set(['ar']);
+        const speechLangMap = {
+            ko: 'ko-KR',
+            en: 'en-US',
+            vi: 'vi-VN',
+            ar: 'ar-SA',
+            mn: 'mn-MN',
+            kk: 'kk-KZ',
+            th: 'th-TH',
+            ja: 'ja-JP',
+            zh: 'zh-CN'
+        };
+        const grammarHeaderLabels = {
+            ko: '문법',
+            en: 'Grammar',
+            vi: 'Ngữ pháp',
+            ar: 'القاعدة',
+            mn: 'Дүрэм',
+            kk: 'Грамматика',
+            th: 'ไวยากรณ์',
+            ja: '文法',
+            zh: '语法'
+        };
+
+        function escapeHTML(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function applyDocumentLanguage() {
+            const isRtl = rtlLanguages.has(currentLang);
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+            document.body.dataset.activeLang = currentLang;
+            searchInput.dir = isRtl ? 'rtl' : 'ltr';
+        }
+
+        function getGrammarHeaderLabel() {
+            return grammarHeaderLabels[currentLang] || grammarHeaderLabels.ko;
+        }
+
         function renderGrammarCards() {
             grammarGroup1.innerHTML = '';
             grammarGroup2.innerHTML = '';
@@ -489,17 +724,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 const iconHTML = data.icon.map(iconClass => `<i class="fas ${iconClass} text-slate-300 group-hover:text-blue-400 transition-colors"></i>`).join('');
                 
                 // Formula Badge
-                const formulaBadge = `<span class="inline-block px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-500 mb-2">${data.formula}</span>`;
+                const formulaBadge = `<span class="formula-token inline-block px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-500 mb-2">${escapeHTML(data.formula)}</span>`;
 
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-2">
                         <div>
-                            <h3 class="font-bold text-lg text-slate-800">${grammar}</h3>
+                            <h3 class="grammar-token font-bold text-lg text-slate-800">${escapeHTML(grammar)}</h3>
                         </div>
                         <div class="text-lg">${iconHTML}</div>
                     </div>
                     ${formulaBadge}
-                    <p class="text-sm text-slate-600 line-clamp-2">${data.desc}</p>
+                    <p class="text-sm text-slate-600 line-clamp-2">${escapeHTML(data.desc)}</p>
                     
                     <!-- Checkmark for compare mode -->
                     <div class="absolute top-4 right-4 text-blue-500 opacity-0 check-icon transition-opacity">
@@ -568,7 +803,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         function speakText(text) {
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ko-KR';
+                utterance.lang = speechLangMap[currentLang] || 'ko-KR';
                 utterance.rate = 0.9; // 약간 천천히
                 window.speechSynthesis.speak(utterance);
             } else {
@@ -586,21 +821,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             const infoTab = document.getElementById('infoTab');
             infoTab.innerHTML = `
                 <div class="bg-blue-50 rounded-lg p-4 mb-4">
-                     <span class="text-xs font-bold text-blue-600 uppercase tracking-wide block mb-1">${labels.labelFormula}</span>
-                     <p class="font-mono text-lg text-slate-800">${data.formula}</p>
+                     <span class="text-xs font-bold text-blue-600 uppercase tracking-wide block mb-1">${escapeHTML(labels.labelFormula)}</span>
+                     <p class="formula-token font-mono text-lg text-slate-800">${escapeHTML(data.formula)}</p>
                 </div>
                 
                 <div class="mb-4">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wide block mb-1">${labels.labelDesc}</span>
-                    <p class="text-slate-700 leading-relaxed">${data.desc}</p>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wide block mb-1">${escapeHTML(labels.labelDesc)}</span>
+                    <p class="text-slate-700 leading-relaxed">${escapeHTML(data.desc)}</p>
                 </div>
                 
                 <div class="bg-red-50 rounded-lg p-4 border border-red-100">
                     <div class="flex items-center text-red-600 mb-2">
                         <i class="fas fa-exclamation-triangle mr-2 text-sm"></i>
-                        <span class="text-xs font-bold uppercase tracking-wide">${labels.labelConstraints}</span>
+                        <span class="text-xs font-bold uppercase tracking-wide">${escapeHTML(labels.labelConstraints)}</span>
                     </div>
-                    <p class="text-sm text-red-800 leading-relaxed">${data.constraints}</p>
+                    <p class="text-sm text-red-800 leading-relaxed">${escapeHTML(data.constraints)}</p>
                 </div>
             `;
 
@@ -609,13 +844,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             examplesTab.innerHTML = data.examples.map(ex => `
                 <div class="p-4 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-blue-300 transition-colors">
                     <div class="flex justify-between items-start mb-2">
-                        <p class="text-lg font-medium text-slate-800 break-keep pr-2">${ex}</p>
-                        <button class="text-slate-400 hover:text-blue-500 transition-colors p-1" onclick="speakText('${ex.replace(/'/g, "\\'")}')">
+                        <p class="text-lg font-medium text-slate-800 break-keep pr-2">${escapeHTML(ex)}</p>
+                        <button class="speak-btn text-slate-400 hover:text-blue-500 transition-colors p-1" type="button" data-speak-text="${escapeHTML(ex)}" aria-label="예문 듣기">
                             <i class="fas fa-volume-high"></i>
                         </button>
                     </div>
                     <div class="flex justify-end">
-                        <button class="text-xs text-slate-400 hover:text-blue-500 flex items-center gap-1 copy-btn" data-text="${ex}">
+                        <button class="text-xs text-slate-400 hover:text-blue-500 flex items-center gap-1 copy-btn" type="button" data-text="${escapeHTML(ex)}">
                             <i class="far fa-copy"></i> Copy
                         </button>
                     </div>
@@ -680,35 +915,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             let html = `<div class="grid gap-0 text-sm border-t border-l border-slate-200" style="${gridCols}">`;
             
             // Row: Title (Sticky Header)
-            html += `<div class="p-3 bg-slate-50 font-bold border-r border-b border-slate-200 sticky top-0 left-0 z-20">문법</div>`;
+            html += `<div class="p-3 bg-slate-50 font-bold border-r border-b border-slate-200 sticky top-0 left-0 z-20">${escapeHTML(getGrammarHeaderLabel())}</div>`;
             selectedGrammars.forEach(g => {
-                html += `<div class="p-3 bg-blue-50 font-bold text-blue-700 text-center border-r border-b border-slate-200 sticky top-0 z-10">${g}</div>`;
+                html += `<div class="grammar-token p-3 bg-blue-50 font-bold text-blue-700 text-center border-r border-b border-slate-200 sticky top-0 z-10">${escapeHTML(g)}</div>`;
             });
 
             // Row: Formula
-            html += `<div class="p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${labels.labelFormula}</div>`;
+            html += `<div class="p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${escapeHTML(labels.labelFormula)}</div>`;
             selectedGrammars.forEach(g => {
-                html += `<div class="p-3 bg-white font-mono text-center border-r border-b border-slate-200">${grammarData[g].formula}</div>`;
+                html += `<div class="formula-token p-3 bg-white font-mono text-center border-r border-b border-slate-200">${escapeHTML(grammarData[g].formula)}</div>`;
             });
 
             // Row: Description
-            html += `<div class="p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${labels.labelDesc}</div>`;
+            html += `<div class="p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${escapeHTML(labels.labelDesc)}</div>`;
             selectedGrammars.forEach(g => {
-                html += `<div class="p-3 bg-white border-r border-b border-slate-200">${grammarData[g].desc}</div>`;
+                html += `<div class="p-3 bg-white border-r border-b border-slate-200">${escapeHTML(grammarData[g].desc)}</div>`;
             });
 
             // Row: Constraints
-            html += `<div class="p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${labels.labelConstraints}</div>`;
+            html += `<div class="p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${escapeHTML(labels.labelConstraints)}</div>`;
             selectedGrammars.forEach(g => {
-                html += `<div class="p-3 bg-red-50 text-red-700 border-r border-b border-slate-200">${grammarData[g].constraints}</div>`;
+                html += `<div class="p-3 bg-red-50 text-red-700 border-r border-b border-slate-200">${escapeHTML(grammarData[g].constraints)}</div>`;
             });
             
             // Row: Examples
-            html += `<div class="p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${labels.modalTabExamples}</div>`;
+            html += `<div class="p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${escapeHTML(labels.modalTabExamples)}</div>`;
              selectedGrammars.forEach(g => {
                 html += `<div class="p-3 bg-white border-r border-b border-slate-200 space-y-2">`;
                 grammarData[g].examples.forEach(ex => {
-                    html += `<p class="text-xs bg-slate-100 p-2 rounded">${ex}</p>`;
+                    html += `<p class="text-xs bg-slate-100 p-2 rounded">${escapeHTML(ex)}</p>`;
                 });
                 html += `</div>`;
             });
@@ -727,6 +962,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         function updateUI() {
             const data = langData[currentLang];
+            applyDocumentLanguage();
             document.getElementById('app-title').textContent = data.title;
             document.getElementById('app-subtitle').textContent = data.subtitle;
             searchInput.placeholder = data.searchPlaceholder;
@@ -771,7 +1007,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         // Language Buttons
         document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.addEventListener('click', (event) => {
-                const newLang = event.target.dataset.lang;
+                const targetButton = event.currentTarget;
+                const newLang = targetButton.dataset.lang;
                 if (newLang === currentLang) return;
                 currentLang = newLang;
                 
@@ -780,11 +1017,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     b.classList.remove('bg-blue-600', 'text-white', 'border-transparent', 'active-lang');
                     b.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
                 });
-                event.target.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
-                event.target.classList.add('bg-blue-600', 'text-white', 'border-transparent', 'active-lang');
+                targetButton.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
+                targetButton.classList.add('bg-blue-600', 'text-white', 'border-transparent', 'active-lang');
                 
                 // Scroll into view if needed
-                event.target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                targetButton.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 
                 updateUI();
             });
@@ -838,6 +1075,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         
         // Copy Event (Delegation)
         document.addEventListener('click', (e) => {
+             const speakBtn = e.target.closest('.speak-btn');
+             if (speakBtn) {
+                speakText(speakBtn.dataset.speakText || '');
+                return;
+             }
+
              const btn = e.target.closest('.copy-btn');
              if (btn) {
                 const textToCopy = btn.dataset.text;
