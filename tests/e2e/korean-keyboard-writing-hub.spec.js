@@ -12,6 +12,8 @@ test.describe("korean keyboard writing standalone hub", () => {
     await expect(page.locator('[data-hub-link="c12-writing"]')).toHaveAttribute("href", "../../c12/writing-keyboard-builder.html");
     await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toContainText("12과 동작 표현 타이핑 연습");
     await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toHaveAttribute("href", "../../c12/writing-motion-typing.html");
+    await expect(page.locator('[data-hub-link="c12-motion-typing-game"]')).toContainText("12과 어휘 표현 애니메이션 타이핑");
+    await expect(page.locator('[data-hub-link="c12-motion-typing-game"]')).toHaveAttribute("href", "../../c12/writing-motion-typing-game.html");
     await expect(page.locator(".mini-key.is-next")).toContainText("ㄱ");
   });
 
@@ -40,6 +42,16 @@ test.describe("korean keyboard writing standalone hub", () => {
     await expect(page.locator("#motionPanel")).toHaveAttribute("data-motion-id", "ready");
   });
 
+  test("opens the C12 vocabulary animation typing trainer from the hub", async ({ page }) => {
+    await page.goto("/apps/standalone-pages/korean-keyboard-writing-hub.html");
+
+    await page.locator('[data-hub-link="c12-motion-typing-game"]').click();
+    await expect(page).toHaveURL(/\/c12\/writing-motion-typing-game\.html$/);
+    await expect(page.locator("#missionTitle")).toHaveText("한/영 확인");
+    await expect(page.locator("#motionPanel")).toHaveAttribute("data-motion-id", "ready");
+    await expect(page.locator("#motionPanel")).toHaveAttribute("data-scene-id", "ready");
+  });
+
   test("is linked from the common apps hub", async ({ page }) => {
     await page.goto("/apps/index.html");
 
@@ -55,6 +67,7 @@ test.describe("korean keyboard writing standalone hub", () => {
     await expect(page.locator('[data-hub-link="keyboard-lesson"]')).toBeInViewport();
     await expect(page.locator('[data-hub-link="c12-writing"]')).toBeInViewport();
     await expect(page.locator('[data-hub-link="c12-motion-typing"]')).toBeVisible();
+    await expect(page.locator('[data-hub-link="c12-motion-typing-game"]')).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(2);
   });

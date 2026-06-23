@@ -1,0 +1,1707 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>12과 어휘 표현 애니메이션 타이핑</title>
+    <link rel="stylesheet" href="../shared/site-theme.css">
+    <style>
+      :root {
+        --ink: #172033;
+        --muted: #64748b;
+        --line: #d7dee8;
+        --blue: #2563eb;
+        --green: #047857;
+        --orange: #ea580c;
+        --red: #dc2626;
+        --yellow-soft: #fef3c7;
+        --red-soft: #fee2e2;
+        --green-soft: #dcfce7;
+        --paper: #ffffff;
+        --field: #f8fafc;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        background:
+          linear-gradient(135deg, rgba(37, 99, 235, 0.12), transparent 36%),
+          linear-gradient(225deg, rgba(4, 120, 87, 0.12), transparent 40%),
+          linear-gradient(180deg, #f8fbff 0%, #eef7f1 56%, #fff7ed 100%);
+        color: var(--ink);
+        font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        overflow-wrap: anywhere;
+        word-break: keep-all;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .page {
+        width: min(100vw - 32px, 1180px);
+        margin: 0 auto;
+        padding: 18px 0 28px;
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .nav-link,
+      .ghost-button {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.84);
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 900;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .nav-link {
+        padding: 8px 14px;
+      }
+
+      .ghost-button {
+        padding: 8px 12px;
+      }
+
+      .topbar-title {
+        min-width: 0;
+        text-align: center;
+      }
+
+      .topbar-title span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 950;
+        text-transform: uppercase;
+      }
+
+      .topbar-title strong {
+        display: block;
+        overflow: hidden;
+        font-size: clamp(22px, 4vw, 34px);
+        font-weight: 950;
+        line-height: 1.1;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        min-height: 38px;
+        align-items: center;
+        border-radius: 999px;
+        background: #172033;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 950;
+        padding: 7px 13px;
+        white-space: nowrap;
+      }
+
+      .progress-dots {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .progress-dot {
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.76);
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 950;
+      }
+
+      .progress-dot.is-current {
+        border-color: #1d4ed8;
+        background: #dbeafe;
+        color: #1e3a8a;
+      }
+
+      .progress-dot.is-done {
+        border-color: #86efac;
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      .learning-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
+        gap: 14px;
+        align-items: start;
+      }
+
+      .visual-panel,
+      .mission-panel,
+      .report-panel {
+        border: 1px solid rgba(148, 163, 184, 0.42);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 18px 50px rgba(15, 23, 42, 0.12);
+      }
+
+      .visual-panel {
+        position: sticky;
+        top: 12px;
+        overflow: hidden;
+        padding: 18px;
+      }
+
+      .visual-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+
+      .stage-label {
+        display: inline-flex;
+        min-height: 32px;
+        align-items: center;
+        border-radius: 999px;
+        background: #dbeafe;
+        color: #1e40af;
+        font-size: 13px;
+        font-weight: 950;
+        padding: 6px 11px;
+      }
+
+      .visual-caption {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .motion-panel {
+        min-height: 500px;
+        border: 1px solid #dbe6f4;
+        border-radius: 14px;
+        background:
+          linear-gradient(180deg, #eef7ff 0%, #ffffff 58%, #e8f7ed 58%, #dcfce7 100%);
+        overflow: hidden;
+      }
+
+      .motion-stage {
+        display: block;
+        width: 100%;
+        height: auto;
+        min-height: 500px;
+      }
+
+      .motion-ground {
+        fill: rgba(22, 163, 74, 0.13);
+      }
+
+      .motion-step {
+        fill: #bfdbfe;
+        stroke: #2563eb;
+        stroke-width: 3;
+      }
+
+      .motion-body {
+        fill: #dbeafe;
+        stroke: #172033;
+        stroke-width: 7;
+        stroke-linejoin: round;
+      }
+
+      .motion-line,
+      .motion-foot {
+        fill: none;
+        stroke: #172033;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .motion-line {
+        stroke-width: 12;
+      }
+
+      .motion-foot {
+        stroke-width: 9;
+      }
+
+      .motion-head {
+        fill: #fef3c7;
+        stroke: #172033;
+        stroke-width: 7;
+      }
+
+      .motion-eye,
+      .motion-face path {
+        fill: #172033;
+        stroke: #172033;
+        stroke-width: 4;
+        stroke-linecap: round;
+      }
+
+      .motion-joint {
+        fill: #ffffff;
+        stroke: #172033;
+        stroke-width: 5;
+      }
+
+      .motion-waist-cue {
+        fill: none;
+        stroke: #172033;
+        stroke-width: 5;
+        stroke-linecap: round;
+      }
+
+      .motion-air {
+        fill: none;
+        stroke: #0ea5e9;
+        stroke-width: 7;
+        stroke-linecap: round;
+        stroke-dasharray: 30 20;
+        opacity: 0;
+      }
+
+      [data-motion-part].is-focus {
+        stroke: #ea580c;
+        fill: #fed7aa;
+      }
+
+      .motion-air.is-focus {
+        stroke: #0284c7;
+        fill: none;
+      }
+
+      .symbolic-scene {
+        display: none;
+        opacity: 0;
+      }
+
+      .symbolic-scene.is-active {
+        display: block;
+        opacity: 1;
+      }
+
+      .scene-title-text {
+        fill: #172033;
+        font-size: 22px;
+        font-weight: 950;
+        text-anchor: middle;
+      }
+
+      .pulse-line {
+        fill: none;
+        stroke: #16a34a;
+        stroke-width: 8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        animation: pulseLine 1.4s ease-in-out infinite;
+      }
+
+      .shield {
+        fill: #dbeafe;
+        stroke: #2563eb;
+        stroke-width: 7;
+      }
+
+      .heart {
+        fill: #fb7185;
+        stroke: #be123c;
+        stroke-width: 5;
+        animation: heartBeat 1.1s ease-in-out infinite;
+        transform-origin: 180px 142px;
+      }
+
+      .gauge-track {
+        fill: none;
+        stroke: #d7dee8;
+        stroke-width: 18;
+        stroke-linecap: round;
+      }
+
+      .gauge-fill {
+        fill: none;
+        stroke: #047857;
+        stroke-width: 18;
+        stroke-linecap: round;
+        stroke-dasharray: 190;
+        animation: gaugeRise 1.7s ease-in-out infinite;
+      }
+
+      .energy-ring {
+        fill: none;
+        stroke: #f59e0b;
+        stroke-width: 5;
+        stroke-dasharray: 16 14;
+        animation: spinRing 3.6s linear infinite;
+        transform-origin: 180px 188px;
+      }
+
+      .stress-cloud {
+        fill: #fee2e2;
+        stroke: #dc2626;
+        stroke-width: 6;
+        animation: dissolveCloud 1.8s ease-in-out infinite;
+      }
+
+      .breath-line {
+        fill: none;
+        stroke: #0ea5e9;
+        stroke-width: 7;
+        stroke-linecap: round;
+        stroke-dasharray: 28 18;
+        animation: breatheOut 1.8s ease-in-out infinite;
+      }
+
+      .balance-arc {
+        fill: none;
+        stroke: #ea580c;
+        stroke-width: 8;
+        stroke-linecap: round;
+      }
+
+      .balance-pointer {
+        stroke: #172033;
+        stroke-width: 8;
+        stroke-linecap: round;
+        animation: pointerSettle 1.6s ease-in-out infinite;
+        transform-origin: 180px 220px;
+      }
+
+      .posture-guide {
+        stroke: #2563eb;
+        stroke-width: 5;
+        stroke-dasharray: 12 10;
+      }
+
+      .score-strip,
+      .report-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .score-card {
+        min-width: 0;
+        border: 1px solid #dbe6f4;
+        border-radius: 12px;
+        background: #ffffff;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .score-card span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .score-card strong {
+        display: block;
+        margin-top: 3px;
+        color: var(--ink);
+        font-size: 22px;
+        font-weight: 950;
+      }
+
+      .mission-panel {
+        padding: 18px;
+      }
+
+      .mission-panel.is-current-task {
+        border: 4px solid #2563eb;
+        box-shadow: 0 0 0 7px rgba(37, 99, 235, 0.14), 0 22px 60px rgba(15, 23, 42, 0.14);
+      }
+
+      .mission-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .mission-head h1 {
+        margin: 0;
+        font-size: clamp(26px, 4vw, 40px);
+        line-height: 1.1;
+        letter-spacing: 0;
+      }
+
+      .item-meta {
+        display: inline-flex;
+        min-height: 32px;
+        align-items: center;
+        border-radius: 999px;
+        background: #ecfdf5;
+        color: #047857;
+        font-size: 13px;
+        font-weight: 950;
+        padding: 6px 11px;
+      }
+
+      .typing-target {
+        display: grid;
+        min-height: 178px;
+        place-items: center;
+        gap: 10px;
+        margin-top: 14px;
+        border: 4px solid #2563eb;
+        border-radius: 16px;
+        background: #eff6ff;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .typing-target > span {
+        color: #1d4ed8;
+        font-size: 13px;
+        font-weight: 950;
+      }
+
+      .target-expression {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.08em 0.1em;
+        justify-content: center;
+        color: #0f172a;
+        font-size: clamp(34px, 6vw, 64px);
+        font-weight: 950;
+        line-height: 1.18;
+        letter-spacing: 0;
+      }
+
+      .target-expression.is-long-target {
+        font-size: clamp(25px, 4.6vw, 44px);
+      }
+
+      .target-expression.is-answer-revealed {
+        color: #166534;
+      }
+
+      .target-chunk {
+        display: inline-flex;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+      }
+
+      .target-gap {
+        flex-basis: 0.4em;
+        width: 0.4em;
+      }
+
+      .target-char {
+        display: inline-flex;
+        min-width: 0.68em;
+        min-height: 1.08em;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+      }
+
+      .target-char.is-next {
+        background: var(--yellow-soft);
+        box-shadow: inset 0 0 0 3px #f59e0b;
+      }
+
+      .target-char.is-wrong {
+        background: var(--red-soft);
+        color: #991b1b;
+        box-shadow: inset 0 -7px 0 rgba(220, 38, 38, 0.28), inset 0 0 0 3px #dc2626;
+      }
+
+      .target-char.is-revealed-correct {
+        background: var(--green-soft);
+        color: #166534;
+        box-shadow: inset 0 0 0 3px #16a34a;
+      }
+
+      .cue-box,
+      .note-box {
+        margin: 12px 0 0;
+        border-radius: 12px;
+        background: #f8fafc;
+        color: #334155;
+        font-size: 16px;
+        font-weight: 850;
+        line-height: 1.55;
+        padding: 12px 14px;
+      }
+
+      .note-box {
+        margin-top: 8px;
+        background: #fff7ed;
+        color: #9a3412;
+        font-size: 14px;
+      }
+
+      .input-wrap {
+        margin-top: 14px;
+      }
+
+      #typingInput {
+        width: 100%;
+        min-height: 74px;
+        border: 4px solid #172033;
+        border-radius: 14px;
+        background: #ffffff;
+        color: var(--ink);
+        font-size: clamp(25px, 4vw, 38px);
+        font-weight: 950;
+        letter-spacing: 0;
+        padding: 12px 14px;
+        outline: none;
+      }
+
+      #typingInput:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.18);
+      }
+
+      .feedback {
+        min-height: 42px;
+        margin-top: 10px;
+        border-radius: 12px;
+        background: #f8fafc;
+        color: var(--muted);
+        font-size: 15px;
+        font-weight: 950;
+        line-height: 1.35;
+        padding: 11px 12px;
+      }
+
+      .feedback.is-good {
+        background: var(--green-soft);
+        color: #166534;
+      }
+
+      .feedback.is-bad {
+        background: var(--red-soft);
+        color: #991b1b;
+      }
+
+      .feedback.is-warn {
+        background: var(--yellow-soft);
+        color: #92400e;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+        margin-top: 10px;
+      }
+
+      .report-panel {
+        grid-column: 1 / -1;
+        padding: 18px;
+      }
+
+      .report-panel h2 {
+        margin: 0 0 12px;
+        font-size: 28px;
+        letter-spacing: 0;
+      }
+
+      .review-list {
+        display: grid;
+        gap: 8px;
+        margin: 12px 0 0;
+        padding-left: 22px;
+        color: #334155;
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      @keyframes pulseLine {
+        0%,
+        100% { opacity: 0.55; transform: translateX(-5px); }
+        50% { opacity: 1; transform: translateX(5px); }
+      }
+
+      @keyframes heartBeat {
+        0%,
+        100% { transform: scale(1); }
+        40% { transform: scale(1.12); }
+      }
+
+      @keyframes gaugeRise {
+        0% { stroke-dashoffset: 150; }
+        50% { stroke-dashoffset: 42; }
+        100% { stroke-dashoffset: 82; }
+      }
+
+      @keyframes spinRing {
+        to { transform: rotate(360deg); }
+      }
+
+      @keyframes dissolveCloud {
+        0%,
+        100% { opacity: 0.85; transform: translateY(0) scale(1); }
+        55% { opacity: 0.25; transform: translateY(-16px) scale(0.9); }
+      }
+
+      @keyframes breatheOut {
+        0% { opacity: 0.25; stroke-dashoffset: 40; }
+        50% { opacity: 1; stroke-dashoffset: -24; }
+        100% { opacity: 0.25; stroke-dashoffset: -58; }
+      }
+
+      @keyframes pointerSettle {
+        0%,
+        100% { transform: rotate(-16deg); }
+        55% { transform: rotate(10deg); }
+      }
+
+      @media (max-width: 860px) {
+        .page {
+          width: min(100vw - 20px, 1180px);
+          padding-top: 10px;
+        }
+
+        .topbar {
+          grid-template-columns: 1fr;
+        }
+
+        .nav-link,
+        .status-pill {
+          justify-self: center;
+        }
+
+        .progress-dots {
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 5px;
+        }
+
+        .progress-dot {
+          min-height: 34px;
+          font-size: 11px;
+          padding: 3px;
+        }
+
+        .learning-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .visual-panel {
+          position: relative;
+          top: auto;
+          padding: 12px;
+        }
+
+        .motion-panel,
+        .motion-stage {
+          min-height: 320px;
+        }
+
+        .mission-panel {
+          padding: 12px;
+        }
+
+        .typing-target {
+          min-height: 142px;
+          padding: 14px 8px;
+        }
+
+        .score-strip,
+        .report-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.001ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <a class="nav-link" href="../apps/standalone-pages/korean-keyboard-writing-hub.html">타이핑 허브</a>
+        <div class="topbar-title" aria-label="12과 어휘 표현 애니메이션 타이핑">
+          <span>Vocabulary animation</span>
+          <strong>12과 어휘 표현 애니메이션 타이핑</strong>
+        </div>
+        <span class="status-pill">보고 입력하기</span>
+      </header>
+
+      <div class="progress-dots" id="progressDots" aria-label="학습 진행 단계"></div>
+
+      <div class="learning-grid">
+        <section class="visual-panel" aria-label="현재 표현 애니메이션">
+          <div class="visual-head">
+            <span class="stage-label" id="stageTitle">준비</span>
+            <span class="visual-caption" id="visualCaption">표현을 애니메이션으로 확인하세요</span>
+          </div>
+          <aside class="motion-panel" id="motionPanel" data-motion-id="ready" data-scene-id="ready" aria-label="현재 표현 애니메이션">
+            <svg id="motionStage" class="motion-stage" data-motion-id="ready" data-scene-id="ready" viewBox="0 0 360 390" role="img" aria-labelledby="motionSvgTitle motionSvgDesc">
+              <title id="motionSvgTitle">12과 어휘 표현 애니메이션</title>
+              <desc id="motionSvgDesc">현재 타이핑할 12과 어휘 표현과 연결된 동작 또는 상징 장면입니다.</desc>
+              <rect width="360" height="390" fill="transparent"></rect>
+
+              <g id="symbolicScenes">
+                <g class="symbolic-scene" data-scene="health-maintain">
+                  <path class="shield" d="M180 58 L260 88 L248 178 C239 240 211 284 180 306 C149 284 121 240 112 178 L100 88 Z"></path>
+                  <path class="heart" d="M180 166 C156 141 120 156 125 190 C130 224 180 250 180 250 C180 250 230 224 235 190 C240 156 204 141 180 166 Z"></path>
+                  <path class="pulse-line" d="M78 317 L125 317 L140 292 L163 335 L189 286 L210 317 L282 317"></path>
+                  <text class="scene-title-text" x="180" y="354">건강 상태 유지</text>
+                </g>
+
+                <g class="symbolic-scene" data-scene="stamina-build">
+                  <path class="gauge-track" d="M88 238 A104 104 0 0 1 272 238"></path>
+                  <path class="gauge-fill" d="M88 238 A104 104 0 0 1 272 238"></path>
+                  <circle class="energy-ring" cx="180" cy="188" r="88"></circle>
+                  <path class="shield" d="M180 120 L230 138 L222 196 C216 236 197 262 180 276 C163 262 144 236 138 196 L130 138 Z"></path>
+                  <text class="scene-title-text" x="180" y="330">체력이 자라요</text>
+                </g>
+
+                <g class="symbolic-scene" data-scene="stress-relief">
+                  <path class="stress-cloud" d="M104 169 C92 139 119 113 149 125 C160 95 203 95 215 126 C248 117 277 143 263 177 C286 198 268 234 235 230 L126 230 C92 236 75 197 104 169 Z"></path>
+                  <text x="181" y="187" text-anchor="middle" font-size="46" font-weight="950" fill="#991b1b">!</text>
+                  <path class="breath-line" d="M64 286 C116 247 174 254 230 286"></path>
+                  <path class="breath-line" d="M82 324 C132 293 190 300 248 326"></path>
+                  <text class="scene-title-text" x="180" y="360">스트레스 풀기</text>
+                </g>
+
+                <g class="symbolic-scene" data-scene="obesity-prevent">
+                  <path class="balance-arc" d="M86 232 A96 96 0 0 1 274 232"></path>
+                  <line class="balance-pointer" x1="180" y1="220" x2="180" y2="132"></line>
+                  <circle cx="180" cy="220" r="18" fill="#fff7ed" stroke="#ea580c" stroke-width="6"></circle>
+                  <rect x="98" y="248" width="164" height="42" rx="21" fill="#dcfce7" stroke="#16a34a" stroke-width="5"></rect>
+                  <text x="180" y="277" text-anchor="middle" font-size="24" font-weight="950" fill="#166534">균형</text>
+                  <text class="scene-title-text" x="180" y="342">미리 예방하기</text>
+                </g>
+
+                <g class="symbolic-scene" data-scene="posture-correct">
+                  <line class="posture-guide" x1="180" y1="60" x2="180" y2="326"></line>
+                  <text class="scene-title-text" x="180" y="360">바른 자세</text>
+                </g>
+              </g>
+
+              <g id="sceneSteps" class="scene-steps" data-motion-part="stairs">
+                <rect class="motion-step" x="224" y="305" width="90" height="18" rx="3"></rect>
+                <rect class="motion-step" x="248" y="278" width="86" height="18" rx="3"></rect>
+                <rect class="motion-step" x="272" y="251" width="72" height="18" rx="3"></rect>
+              </g>
+              <path id="motionAir" class="motion-air" data-motion-part="air" d="M50 105 C96 76, 128 84, 154 110 M42 145 C92 118, 124 124, 154 150"></path>
+              <rect class="motion-ground" x="0" y="326" width="360" height="64"></rect>
+              <g id="motionFigure">
+                <path id="motionBody" class="motion-body" data-motion-part="torso"></path>
+                <path id="motionNeck" class="motion-line" data-motion-part="head"></path>
+                <path id="leftArmPath" class="motion-line" data-motion-part="arms"></path>
+                <path id="rightArmPath" class="motion-line" data-motion-part="arms"></path>
+                <path id="leftLegPath" class="motion-line" data-motion-part="legs"></path>
+                <path id="rightLegPath" class="motion-line" data-motion-part="legs"></path>
+                <path id="leftFootPath" class="motion-foot" data-motion-part="heels"></path>
+                <path id="rightFootPath" class="motion-foot" data-motion-part="heels"></path>
+                <circle id="headCircle" class="motion-head" data-motion-part="head" r="28"></circle>
+                <circle id="leftHand" class="motion-joint" data-motion-part="hands" r="8"></circle>
+                <circle id="rightHand" class="motion-joint" data-motion-part="hands" r="8"></circle>
+                <path id="waistJoint" class="motion-waist-cue" data-motion-part="waist"></path>
+                <circle id="leftHeel" class="motion-joint" data-motion-part="heels" r="6"></circle>
+                <circle id="rightHeel" class="motion-joint" data-motion-part="heels" r="6"></circle>
+                <circle id="leftToe" class="motion-joint" data-motion-part="heels" r="5"></circle>
+                <circle id="rightToe" class="motion-joint" data-motion-part="heels" r="5"></circle>
+                <g id="motionFace" class="motion-face" data-motion-part="head">
+                  <circle id="leftEye" class="motion-eye" r="3"></circle>
+                  <circle id="rightEye" class="motion-eye" r="3"></circle>
+                  <path id="nosePath"></path>
+                </g>
+              </g>
+            </svg>
+          </aside>
+          <div class="score-strip" aria-label="학습 상태">
+            <div class="score-card"><span>연습 표현</span><strong id="practicedMetric">0</strong></div>
+            <div class="score-card"><span>정확 입력</span><strong id="correctMetric">0</strong></div>
+            <div class="score-card"><span>오타</span><strong id="mistakeMetric">0</strong></div>
+            <div class="score-card"><span>회상</span><strong id="recallMetric">0</strong></div>
+          </div>
+        </section>
+
+        <section class="mission-panel is-current-task" aria-label="현재 타이핑 미션">
+          <div class="mission-head">
+            <h1 id="missionTitle">한/영 확인</h1>
+            <span class="item-meta" id="itemMeta">시작</span>
+          </div>
+          <div class="typing-target" id="targetCard">
+            <span id="targetLabel">출발 단어</span>
+            <strong class="target-expression" id="targetText">어휘</strong>
+          </div>
+          <p class="cue-box" id="cueText">한글 입력 모드로 시작합니다. 아래 칸에 어휘를 입력하세요.</p>
+          <p class="note-box" id="noteText">이 페이지는 애니메이션을 보고 12과 표현을 확인 입력하는 연습입니다.</p>
+          <div class="input-wrap">
+            <input id="typingInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="어휘">
+            <div class="feedback" id="feedbackText" aria-live="polite">정확히 입력하면 핵심 어휘로 이동합니다.</div>
+            <div class="actions">
+              <button class="ghost-button" id="restartButton" type="button">처음부터</button>
+              <button class="ghost-button" id="reportButton" type="button">리포트 보기</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="report-panel" id="reportPanel" hidden aria-label="학습 리포트">
+          <h2>학습 리포트</h2>
+          <div class="report-grid">
+            <div class="score-card"><span>연습 표현</span><strong id="finalPracticed">0</strong></div>
+            <div class="score-card"><span>정확 입력</span><strong id="finalCorrect">0</strong></div>
+            <div class="score-card"><span>오타</span><strong id="finalMistakes">0</strong></div>
+            <div class="score-card"><span>회상 성공</span><strong id="finalRecall">0</strong></div>
+          </div>
+          <ol class="review-list" id="reviewList"></ol>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const STORAGE_KEY = "c12_vocab_animation_typing_v1";
+        const WARMUP_TARGET = "어휘";
+        const INITIALS = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+        const PHASES = [
+          { id: "ready", label: "준비", title: "한/영 확인" },
+          { id: "core", label: "핵심", title: "핵심 어휘" },
+          { id: "expansion", label: "확장", title: "확장 표현" },
+          { id: "recall", label: "회상", title: "회상 챌린지" },
+          { id: "result", label: "리포트", title: "학습 리포트" }
+        ];
+
+        const VOCAB_ANIMATION_ITEMS = [
+          { id: "core-health-maintain", section: "core", target: "건강을 유지하다", cueKo: "좋은 건강 상태를 계속 지키다", note: "생활 속 운동의 목적을 말할 때 쓰는 표현입니다.", visualType: "symbol", sceneId: "health-maintain", motionId: "ready", focusParts: [] },
+          { id: "core-stamina-build", section: "core", target: "체력을 기르다", cueKo: "몸의 힘과 오래 버티는 힘을 키우다", note: "운동을 꾸준히 해서 힘이 좋아지는 상황입니다.", visualType: "symbol", sceneId: "stamina-build", motionId: "ready", focusParts: [] },
+          { id: "core-stress-relief", section: "core", target: "스트레스를 해소하다", cueKo: "쌓인 스트레스를 풀다", note: "걷기나 스트레칭의 효과를 말할 때 좋습니다.", visualType: "symbol", sceneId: "stress-relief", motionId: "ready", focusParts: [] },
+          { id: "core-obesity-prevent", section: "core", target: "비만을 예방하다", cueKo: "살이 지나치게 찌지 않도록 미리 막다", note: "건강 관리의 효과를 설명하는 표현입니다.", visualType: "symbol", sceneId: "obesity-prevent", motionId: "ready", focusParts: [] },
+          { id: "core-stairs-use", section: "core", target: "계단을 이용하다", cueKo: "엘리베이터 대신 계단을 쓰다", note: "생활 속에서 쉽게 할 수 있는 운동 방법입니다.", visualType: "motion", sceneId: "stairs", motionId: "stairs-use", focusParts: ["stairs", "legs"] },
+          { id: "core-walking", section: "core", target: "걷기 운동을 하다", cueKo: "걸으면서 운동하다", note: "특별한 도구 없이 할 수 있는 생활 운동입니다.", visualType: "motion", sceneId: "walking", motionId: "walking", focusParts: ["legs"] },
+          { id: "core-posture-correct", section: "core", target: "자세를 교정하다", cueKo: "몸의 자세를 바르게 고치다", note: "몸통이 기준선에 맞춰지는 장면으로 확인합니다.", visualType: "motion", sceneId: "posture-correct", motionId: "posture-correct", focusParts: ["torso"] },
+          { id: "core-stretching", section: "core", target: "스트레칭을 하다", cueKo: "몸을 늘이고 풀어 주다", note: "목, 어깨, 팔, 다리를 부드럽게 움직이는 운동입니다.", visualType: "motion", sceneId: "stretching", motionId: "stretching", focusParts: ["arms", "torso"] },
+          { id: "exp-stairs-climb", section: "expansion", target: "계단을 오르다", cueKo: "계단 위쪽으로 올라가다", note: "다리가 다음 계단으로 올라가는 움직임입니다.", visualType: "motion", sceneId: "stairs", motionId: "stairs-climb", focusParts: ["stairs", "legs"] },
+          { id: "exp-elevator-instead", section: "expansion", target: "엘리베이터 대신 계단을 이용하다", cueKo: "승강기를 타지 않고 계단을 쓰다", note: "생활 속 운동을 권유할 때 쓰기 좋은 긴 표현입니다.", visualType: "motion", sceneId: "stairs", motionId: "stairs-instead", focusParts: ["stairs", "legs"] },
+          { id: "exp-fresh-walk", section: "expansion", target: "맑은 공기를 마시며 걷기 운동을 하다", displayChunks: ["맑은 공기를 마시며", "걷기 운동을 하다"], cueKo: "좋은 공기를 마시면서 걷다", note: "걷기 운동을 하다가 한 덩어리로 보이도록 묶었습니다.", visualType: "motion", sceneId: "fresh-walk", motionId: "fresh-walk", focusParts: ["legs", "air"] },
+          { id: "exp-neck-turn", section: "expansion", target: "고개를 천천히 돌리다", cueKo: "목을 무리하지 않고 돌리다", note: "몸통은 고정하고 머리 방향만 바뀝니다.", visualType: "motion", sceneId: "neck-turn", motionId: "neck-turn", focusParts: ["head"] },
+          { id: "exp-hands-waist", section: "expansion", target: "두 손을 허리에 대다", cueKo: "손 두 개를 허리 위에 놓다", note: "양손이 허리 양쪽에 닿는 자세입니다.", visualType: "motion", sceneId: "hands-waist", motionId: "hands-waist", focusParts: ["hands", "waist"] },
+          { id: "exp-lean-back", section: "expansion", target: "몸을 뒤로 젖히다", cueKo: "몸을 뒤쪽으로 기울이다", note: "허리를 기준으로 가슴과 머리가 뒤로 기울어집니다.", visualType: "motion", sceneId: "lean-back", motionId: "lean-back", focusParts: ["torso"] },
+          { id: "exp-heel-lift", section: "expansion", target: "발뒤꿈치를 들다", cueKo: "뒤꿈치를 바닥에서 올리다", note: "발끝은 바닥에 남고 뒤꿈치만 올라갑니다.", visualType: "motion", sceneId: "heel-lift", motionId: "heel-lift", focusParts: ["heels", "legs"] },
+          { id: "exp-arm-stretch", section: "expansion", target: "팔을 쭉 뻗다", cueKo: "팔을 길게 펴다", note: "팔꿈치가 펴지고 손이 어깨 바깥쪽으로 나갑니다.", visualType: "motion", sceneId: "arm-stretch", motionId: "arm-stretch", focusParts: ["arms", "hands"] }
+        ];
+
+        const CORE_ITEMS = VOCAB_ANIMATION_ITEMS.filter((item) => item.section === "core");
+        const EXPANSION_ITEMS = VOCAB_ANIMATION_ITEMS.filter((item) => item.section === "expansion");
+        const RECALL_IDS = [
+          "core-health-maintain",
+          "core-stress-relief",
+          "core-stairs-use",
+          "core-posture-correct",
+          "exp-stairs-climb",
+          "exp-neck-turn",
+          "exp-heel-lift",
+          "exp-arm-stretch"
+        ];
+        const RECALL_ITEMS = RECALL_IDS.map((id, order) => {
+          const source = VOCAB_ANIMATION_ITEMS.find((item) => item.id === id);
+          return Object.assign({}, source, {
+            id: "recall-" + source.id,
+            originalId: source.id,
+            mode: order % 2 === 0 ? "initial" : "mask"
+          });
+        });
+
+        const els = {
+          progressDots: document.getElementById("progressDots"),
+          stageTitle: document.getElementById("stageTitle"),
+          visualCaption: document.getElementById("visualCaption"),
+          missionTitle: document.getElementById("missionTitle"),
+          itemMeta: document.getElementById("itemMeta"),
+          targetLabel: document.getElementById("targetLabel"),
+          targetText: document.getElementById("targetText"),
+          cueText: document.getElementById("cueText"),
+          noteText: document.getElementById("noteText"),
+          typingInput: document.getElementById("typingInput"),
+          feedbackText: document.getElementById("feedbackText"),
+          practicedMetric: document.getElementById("practicedMetric"),
+          correctMetric: document.getElementById("correctMetric"),
+          mistakeMetric: document.getElementById("mistakeMetric"),
+          recallMetric: document.getElementById("recallMetric"),
+          reportPanel: document.getElementById("reportPanel"),
+          finalPracticed: document.getElementById("finalPracticed"),
+          finalCorrect: document.getElementById("finalCorrect"),
+          finalMistakes: document.getElementById("finalMistakes"),
+          finalRecall: document.getElementById("finalRecall"),
+          reviewList: document.getElementById("reviewList"),
+          restartButton: document.getElementById("restartButton"),
+          reportButton: document.getElementById("reportButton"),
+          motionPanel: document.getElementById("motionPanel"),
+          motionStage: document.getElementById("motionStage"),
+          motionAir: document.getElementById("motionAir"),
+          sceneSteps: document.getElementById("sceneSteps"),
+          motionFigure: document.getElementById("motionFigure")
+        };
+
+        const motionEls = {
+          air: document.getElementById("motionAir"),
+          body: document.getElementById("motionBody"),
+          neck: document.getElementById("motionNeck"),
+          head: document.getElementById("headCircle"),
+          leftEye: document.getElementById("leftEye"),
+          rightEye: document.getElementById("rightEye"),
+          nose: document.getElementById("nosePath"),
+          leftArm: document.getElementById("leftArmPath"),
+          rightArm: document.getElementById("rightArmPath"),
+          leftLeg: document.getElementById("leftLegPath"),
+          rightLeg: document.getElementById("rightLegPath"),
+          leftFoot: document.getElementById("leftFootPath"),
+          rightFoot: document.getElementById("rightFootPath"),
+          leftHand: document.getElementById("leftHand"),
+          rightHand: document.getElementById("rightHand"),
+          waist: document.getElementById("waistJoint"),
+          leftHeel: document.getElementById("leftHeel"),
+          rightHeel: document.getElementById("rightHeel"),
+          leftToe: document.getElementById("leftToe"),
+          rightToe: document.getElementById("rightToe")
+        };
+
+        const state = {
+          phaseIndex: 0,
+          itemIndex: 0,
+          recallIndex: 0,
+          practiced: 0,
+          correct: 0,
+          mistakes: 0,
+          recallSuccess: 0,
+          mismatch: null,
+          revealAnswer: null,
+          practicedTargets: [],
+          mistakeTargets: {},
+          composing: false
+        };
+
+        let advanceTimer = 0;
+        let lastRenderKey = "";
+        let motionFrame = 0;
+        let motionStart = 0;
+        let currentMotionId = "ready";
+        let currentSceneId = "ready";
+        let currentPose = null;
+        const reducedMotionQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+
+        const POINT_KEYS = ["head", "neck", "chest", "waist", "leftShoulder", "rightShoulder", "leftElbow", "rightElbow", "leftHand", "rightHand", "leftHip", "rightHip", "leftKnee", "rightKnee", "leftAnkle", "rightAnkle", "leftHeel", "rightHeel", "leftToe", "rightToe"];
+        const SCALARS = ["faceDir", "airOpacity", "airOffset"];
+        const BASE = {
+          head: { x: 180, y: 78 }, neck: { x: 180, y: 112 }, chest: { x: 180, y: 145 }, waist: { x: 180, y: 228 },
+          leftShoulder: { x: 148, y: 145 }, rightShoulder: { x: 212, y: 145 },
+          leftElbow: { x: 120, y: 200 }, rightElbow: { x: 240, y: 200 },
+          leftHand: { x: 98, y: 252 }, rightHand: { x: 262, y: 252 },
+          leftHip: { x: 160, y: 232 }, rightHip: { x: 200, y: 232 },
+          leftKnee: { x: 140, y: 288 }, rightKnee: { x: 220, y: 288 },
+          leftAnkle: { x: 124, y: 320 }, rightAnkle: { x: 236, y: 320 },
+          leftHeel: { x: 112, y: 326 }, rightHeel: { x: 224, y: 326 },
+          leftToe: { x: 138, y: 326 }, rightToe: { x: 250, y: 326 },
+          faceDir: 0, airOpacity: 0, airOffset: 0
+        };
+
+        function normalize(value) {
+          return String(value || "").replace(/\s+/g, " ").trim();
+        }
+
+        function hasEnglish(value) {
+          return /[A-Za-z]/.test(value);
+        }
+
+        function clonePose(pose) {
+          const source = pose || BASE;
+          const copy = {};
+          POINT_KEYS.forEach((key) => { copy[key] = { x: source[key].x, y: source[key].y }; });
+          SCALARS.forEach((key) => { copy[key] = Number(source[key] || 0); });
+          return copy;
+        }
+
+        function makePose(overrides, offset) {
+          const dx = offset && offset.x ? offset.x : 0;
+          const dy = offset && offset.y ? offset.y : 0;
+          const pose = {};
+          POINT_KEYS.forEach((key) => { pose[key] = { x: BASE[key].x + dx, y: BASE[key].y + dy }; });
+          SCALARS.forEach((key) => { pose[key] = BASE[key]; });
+          Object.keys(overrides || {}).forEach((key) => {
+            pose[key] = POINT_KEYS.indexOf(key) !== -1 ? { x: overrides[key].x, y: overrides[key].y } : overrides[key];
+          });
+          return pose;
+        }
+
+        const WALK_A = makePose({
+          leftHand: { x: 104, y: 230 }, rightHand: { x: 276, y: 268 },
+          leftKnee: { x: 154, y: 286 }, leftAnkle: { x: 166, y: 318 }, leftHeel: { x: 152, y: 326 }, leftToe: { x: 178, y: 325 },
+          rightKnee: { x: 214, y: 288 }, rightAnkle: { x: 224, y: 320 }, rightHeel: { x: 211, y: 326 }, rightToe: { x: 238, y: 326 }
+        });
+        const WALK_B = makePose({
+          leftHand: { x: 82, y: 268 }, rightHand: { x: 257, y: 226 },
+          leftKnee: { x: 146, y: 288 }, leftAnkle: { x: 114, y: 320 }, leftHeel: { x: 101, y: 326 }, leftToe: { x: 129, y: 326 },
+          rightKnee: { x: 210, y: 286 }, rightAnkle: { x: 199, y: 318 }, rightHeel: { x: 187, y: 326 }, rightToe: { x: 214, y: 325 }
+        });
+        const STAIRS_A = makePose({
+          rightKnee: { x: 216, y: 262 }, rightAnkle: { x: 238, y: 296 }, rightHeel: { x: 224, y: 303 }, rightToe: { x: 252, y: 303 },
+          leftHand: { x: 104, y: 230 }, rightHand: { x: 272, y: 256 }
+        }, { x: -12, y: 3 });
+        const STAIRS_B = makePose({
+          leftKnee: { x: 177, y: 260 }, leftAnkle: { x: 210, y: 296 }, leftHeel: { x: 196, y: 303 }, leftToe: { x: 224, y: 303 },
+          rightKnee: { x: 238, y: 236 }, rightAnkle: { x: 266, y: 270 }, rightHeel: { x: 252, y: 277 }, rightToe: { x: 280, y: 277 },
+          leftHand: { x: 132, y: 222 }, rightHand: { x: 296, y: 232 }
+        }, { x: 18, y: -22 });
+        const STRETCH_A = makePose({ leftElbow: { x: 143, y: 88 }, rightElbow: { x: 217, y: 88 }, leftHand: { x: 162, y: 42 }, rightHand: { x: 198, y: 42 } });
+        const STRETCH_B = makePose({ head: { x: 180, y: 70 }, chest: { x: 180, y: 134 }, waist: { x: 180, y: 222 }, leftElbow: { x: 139, y: 76 }, rightElbow: { x: 221, y: 76 }, leftHand: { x: 160, y: 28 }, rightHand: { x: 200, y: 28 } });
+        const NECK_LEFT = makePose({ head: { x: 166, y: 78 }, faceDir: -1 });
+        const NECK_RIGHT = makePose({ head: { x: 194, y: 78 }, faceDir: 1 });
+        const HANDS_WAIST = makePose({ leftElbow: { x: 120, y: 196 }, rightElbow: { x: 240, y: 196 }, leftHand: { x: 151, y: 228 }, rightHand: { x: 209, y: 228 } });
+        const LEAN_BACK = makePose({ head: { x: 209, y: 74 }, neck: { x: 203, y: 108 }, chest: { x: 197, y: 140 }, leftShoulder: { x: 164, y: 138 }, rightShoulder: { x: 229, y: 146 }, faceDir: 0.35 });
+        const HEEL_LIFT = makePose({ head: { x: 180, y: 69 }, neck: { x: 180, y: 103 }, chest: { x: 180, y: 136 }, waist: { x: 180, y: 220 }, leftAnkle: { x: 125, y: 306 }, rightAnkle: { x: 235, y: 306 }, leftHeel: { x: 113, y: 305 }, rightHeel: { x: 227, y: 305 } });
+        const ARM_A = makePose({ leftElbow: { x: 105, y: 145 }, rightElbow: { x: 255, y: 145 }, leftHand: { x: 72, y: 147 }, rightHand: { x: 288, y: 147 } });
+        const ARM_B = makePose({ leftElbow: { x: 90, y: 142 }, rightElbow: { x: 270, y: 142 }, leftHand: { x: 48, y: 143 }, rightHand: { x: 312, y: 143 } });
+        const FRESH_A = makePose(Object.assign({}, WALK_A, { airOpacity: 0.92, airOffset: 0 }));
+        const FRESH_B = makePose(Object.assign({}, WALK_B, { airOpacity: 0.55, airOffset: 34 }));
+        const POSTURE_SLOUCH = makePose({ head: { x: 162, y: 84 }, neck: { x: 166, y: 119 }, chest: { x: 172, y: 152 }, waist: { x: 184, y: 228 }, leftShoulder: { x: 137, y: 153 }, rightShoulder: { x: 204, y: 149 }, faceDir: -0.25 });
+        const POSTURE_UPRIGHT = makePose({ head: { x: 180, y: 72 }, neck: { x: 180, y: 106 }, chest: { x: 180, y: 140 }, waist: { x: 180, y: 224 } });
+
+        const MOTIONS = {
+          ready: { posterFrame: 0, frames: [{ duration: 1200, pose: makePose() }] },
+          walking: { posterFrame: 1, frames: [{ duration: 620, pose: WALK_A }, { duration: 620, pose: WALK_B }] },
+          "fresh-walk": { posterFrame: 1, frames: [{ duration: 620, pose: FRESH_A }, { duration: 620, pose: FRESH_B }] },
+          "stairs-use": { posterFrame: 1, frames: [{ duration: 760, pose: STAIRS_A }, { duration: 760, pose: STAIRS_B }] },
+          "stairs-climb": { posterFrame: 1, frames: [{ duration: 760, pose: STAIRS_A }, { duration: 760, pose: STAIRS_B }] },
+          "stairs-instead": { posterFrame: 1, frames: [{ duration: 760, pose: STAIRS_A }, { duration: 760, pose: STAIRS_B }] },
+          stretching: { posterFrame: 1, frames: [{ duration: 760, pose: STRETCH_A }, { duration: 760, pose: STRETCH_B }] },
+          "neck-turn": { posterFrame: 1, frames: [{ duration: 720, pose: NECK_LEFT }, { duration: 720, pose: NECK_RIGHT }] },
+          "hands-waist": { posterFrame: 0, frames: [{ duration: 900, pose: HANDS_WAIST }, { duration: 900, pose: HANDS_WAIST }] },
+          "lean-back": { posterFrame: 1, frames: [{ duration: 780, pose: makePose() }, { duration: 780, pose: LEAN_BACK }] },
+          "heel-lift": { posterFrame: 1, frames: [{ duration: 560, pose: makePose() }, { duration: 560, pose: HEEL_LIFT }] },
+          "arm-stretch": { posterFrame: 1, frames: [{ duration: 650, pose: ARM_A }, { duration: 650, pose: ARM_B }] },
+          "posture-correct": { posterFrame: 1, frames: [{ duration: 820, pose: POSTURE_SLOUCH }, { duration: 820, pose: POSTURE_UPRIGHT }] }
+        };
+
+        function getPhaseId() {
+          return PHASES[state.phaseIndex].id;
+        }
+
+        function getPhaseItems() {
+          const phase = getPhaseId();
+          if (phase === "core") return CORE_ITEMS;
+          if (phase === "expansion") return EXPANSION_ITEMS;
+          return [];
+        }
+
+        function getCurrentItem() {
+          const phase = getPhaseId();
+          if (phase === "core" || phase === "expansion") return getPhaseItems()[state.itemIndex];
+          if (phase === "recall") return RECALL_ITEMS[state.recallIndex];
+          return null;
+        }
+
+        function getTarget() {
+          const item = getCurrentItem();
+          if (getPhaseId() === "ready") return WARMUP_TARGET;
+          return item ? item.target : "";
+        }
+
+        function isPunctuation(char) {
+          return /[.?!,]/.test(char);
+        }
+
+        function isRevealedCharacter(char) {
+          return /[0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ]/.test(char);
+        }
+
+        function getInitialConsonants(value) {
+          return Array.from(value || "").map((char) => {
+            const code = char.charCodeAt(0);
+            if (code >= 0xac00 && code <= 0xd7a3) return INITIALS[Math.floor((code - 0xac00) / 588)];
+            if (/\s/.test(char)) return " ";
+            if (isPunctuation(char)) return char;
+            return isRevealedCharacter(char) ? "?" : char;
+          }).join("");
+        }
+
+        function maskByLength(value) {
+          const chars = Array.from(value || "");
+          let revealed = 0;
+          return chars.map((char) => {
+            if (!isRevealedCharacter(char)) return char;
+            revealed += 1;
+            return revealed <= 2 ? char : "?";
+          }).join("");
+        }
+
+        function recallDisplay(item) {
+          if (!item) return "";
+          return item.mode === "initial" ? getInitialConsonants(item.target) : maskByLength(item.target);
+        }
+
+        function compare(input, target) {
+          const inputChars = Array.from(normalize(input));
+          const targetChars = Array.from(target || "");
+          const wrongIndices = [];
+          const min = Math.min(inputChars.length, targetChars.length);
+          for (let index = 0; index < min; index += 1) {
+            if (inputChars[index] !== targetChars[index]) wrongIndices.push(index);
+          }
+          const exact = wrongIndices.length === 0 && inputChars.length === targetChars.length;
+          const prefix = wrongIndices.length === 0 && inputChars.length < targetChars.length;
+          const extra = inputChars.length > targetChars.length;
+          return { exact, prefix, extra, wrongIndices, index: wrongIndices[0] == null ? inputChars.length : wrongIndices[0] };
+        }
+
+        function setMismatch(input) {
+          const item = getCurrentItem();
+          const target = getTarget();
+          const analysis = compare(input, target);
+          const targetChars = Array.from(target);
+          const inputChars = Array.from(normalize(input));
+          const matchedIndices = [];
+          targetChars.forEach((char, index) => {
+            if (inputChars[index] === char && char !== " ") matchedIndices.push(index);
+          });
+          const fallback = Math.max(targetChars.length - 1, 0);
+          const indices = analysis.wrongIndices.length ? analysis.wrongIndices : [analysis.extra ? fallback : Math.min(analysis.index, fallback)];
+          const itemId = item ? item.id : "warmup";
+          state.mismatch = { itemId, input: normalize(input), indices, matchedIndices, extra: analysis.extra };
+          if (item) state.mistakeTargets[item.originalId || item.id] = (state.mistakeTargets[item.originalId || item.id] || 0) + 1;
+          return analysis;
+        }
+
+        function visibleFeedbackText(displayText, item) {
+          if (!item || !state.mismatch || state.mismatch.itemId !== item.id) return displayText;
+          const clueChars = Array.from(displayText);
+          const targetChars = Array.from(item.target);
+          const inputChars = Array.from(state.mismatch.input || "");
+          return targetChars.map((char, index) => {
+            if (char === " ") return " ";
+            return inputChars[index] === char ? char : clueChars[index] || "?";
+          }).join("");
+        }
+
+        function chunkText(item, displayText) {
+          if (item && Array.isArray(item.displayChunks) && item.displayChunks.join(" ") === displayText) return item.displayChunks;
+          return String(displayText || "").split(" ");
+        }
+
+        function renderTarget(displayText, item, options) {
+          const input = normalize(els.typingInput.value);
+          const target = item ? item.target : displayText;
+          const itemId = item ? item.id : "warmup";
+          const analysis = compare(input, target);
+          const wrong = new Set();
+          const revealed = new Set();
+          let nextIndex = null;
+          if (state.revealAnswer === itemId) {
+            options = Object.assign({}, options, { answerRevealed: true });
+          } else if (state.mismatch && state.mismatch.itemId === itemId) {
+            state.mismatch.indices.forEach((index) => wrong.add(index));
+            (state.mismatch.matchedIndices || []).forEach((index) => revealed.add(index));
+          } else if (input && !analysis.exact) {
+            if (analysis.prefix) nextIndex = analysis.index;
+            else (analysis.wrongIndices.length ? analysis.wrongIndices : [Math.max(Array.from(target).length - 1, 0)]).forEach((index) => wrong.add(index));
+          } else if (!input) {
+            nextIndex = 0;
+          }
+
+          const chunks = chunkText(item, displayText);
+          let charIndex = 0;
+          els.targetText.className = "target-expression";
+          els.targetText.classList.toggle("is-long-target", Array.from(displayText || "").length > 16);
+          els.targetText.classList.toggle("is-answer-revealed", Boolean(options && options.answerRevealed));
+          els.targetText.innerHTML = chunks.map((chunk, chunkIndex) => {
+            const gap = chunkIndex === 0 ? "" : '<span class="target-gap"> </span>';
+            if (chunkIndex > 0) charIndex += 1;
+            const chars = Array.from(chunk).map((char) => {
+              const classes = ["target-char"];
+              if (nextIndex === charIndex) classes.push("is-next");
+              if (wrong.has(charIndex)) classes.push("is-wrong");
+              if (revealed.has(charIndex)) classes.push("is-revealed-correct");
+              const html = '<span class="' + classes.join(" ") + '" data-char-index="' + charIndex + '">' + escapeHtml(char) + "</span>";
+              charIndex += 1;
+              return html;
+            }).join("");
+            return gap + '<span class="target-chunk">' + chars + "</span>";
+          }).join("");
+        }
+
+        function escapeHtml(value) {
+          return String(value == null ? "" : value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+        }
+
+        function setFeedback(message, kind) {
+          els.feedbackText.textContent = message;
+          els.feedbackText.classList.toggle("is-good", kind === "good");
+          els.feedbackText.classList.toggle("is-bad", kind === "bad");
+          els.feedbackText.classList.toggle("is-warn", kind === "warn");
+        }
+
+        function clearTimers() {
+          window.clearTimeout(advanceTimer);
+          advanceTimer = 0;
+        }
+
+        function renderProgress() {
+          els.progressDots.innerHTML = PHASES.map((phase, index) => {
+            const classes = ["progress-dot"];
+            if (index === state.phaseIndex) classes.push("is-current");
+            if (index < state.phaseIndex) classes.push("is-done");
+            return '<button class="' + classes.join(" ") + '" type="button" disabled>' + (index + 1) + ". " + phase.label + "</button>";
+          }).join("");
+        }
+
+        function renderMetrics() {
+          els.practicedMetric.textContent = String(state.practiced);
+          els.correctMetric.textContent = String(state.correct);
+          els.mistakeMetric.textContent = String(state.mistakes);
+          els.recallMetric.textContent = String(state.recallSuccess);
+        }
+
+        function render() {
+          const phase = PHASES[state.phaseIndex];
+          const item = getCurrentItem();
+          const renderKey = phase.id + ":" + (item ? item.id : "warmup") + ":" + state.revealAnswer;
+          els.stageTitle.textContent = phase.label;
+          els.missionTitle.textContent = phase.title;
+          els.reportPanel.hidden = phase.id !== "result";
+          els.typingInput.parentElement.hidden = phase.id === "result";
+          if (renderKey !== lastRenderKey) els.typingInput.value = "";
+          lastRenderKey = renderKey;
+
+          if (phase.id === "ready") {
+            els.itemMeta.textContent = "시작";
+            els.targetLabel.textContent = "출발 단어";
+            els.cueText.textContent = "한글 입력 모드로 시작합니다. 아래 칸에 어휘를 입력하세요.";
+            els.noteText.textContent = "이 페이지는 애니메이션을 보고 12과 표현을 확인 입력하는 연습입니다.";
+            els.visualCaption.textContent = "표현을 애니메이션으로 확인하세요";
+            renderTarget(WARMUP_TARGET, null);
+            renderVisual(null);
+          } else if (phase.id === "core" || phase.id === "expansion") {
+            const items = getPhaseItems();
+            els.itemMeta.textContent = (state.itemIndex + 1) + " / " + items.length;
+            els.targetLabel.textContent = phase.id === "core" ? "핵심 어휘" : "확장 표현";
+            els.cueText.textContent = item.cueKo;
+            els.noteText.textContent = item.note;
+            els.visualCaption.textContent = item.visualType === "symbol" ? "상징 장면으로 뜻을 확인하세요" : "몸 움직임으로 표현을 확인하세요";
+            renderTarget(item.target, item);
+            renderVisual(item);
+          } else if (phase.id === "recall") {
+            els.itemMeta.textContent = (state.recallIndex + 1) + " / " + RECALL_ITEMS.length;
+            els.targetLabel.textContent = item.mode === "initial" ? "초성 회상" : "부분 가림 회상";
+            els.cueText.textContent = item.cueKo + " · Enter로 확인";
+            els.noteText.textContent = "정답이면 전체 표현을 잠깐 보여 준 뒤 다음 문제로 넘어갑니다.";
+            els.visualCaption.textContent = "단서와 애니메이션을 함께 보며 떠올리세요";
+            if (state.revealAnswer === item.id) renderTarget(item.target, item, { answerRevealed: true });
+            else renderTarget(visibleFeedbackText(recallDisplay(item), item), item);
+            renderVisual(item);
+          } else {
+            renderReport();
+          }
+
+          renderProgress();
+          renderMetrics();
+          focusInput();
+        }
+
+        function focusInput() {
+          if (getPhaseId() === "result" || state.composing) return;
+          window.requestAnimationFrame(() => els.typingInput.focus({ preventScroll: true }));
+        }
+
+        function goCore() {
+          state.phaseIndex = 1;
+          state.itemIndex = 0;
+          state.mismatch = null;
+          state.revealAnswer = null;
+          setFeedback("핵심 어휘입니다. 애니메이션을 보고 그대로 입력하세요.", "good");
+          render();
+        }
+
+        function nextPracticeItem() {
+          const phase = getPhaseId();
+          const items = getPhaseItems();
+          state.mismatch = null;
+          state.revealAnswer = null;
+          if (state.itemIndex < items.length - 1) {
+            state.itemIndex += 1;
+            setFeedback("좋아요. 다음 표현입니다.", "good");
+            render();
+            return;
+          }
+          if (phase === "core") {
+            state.phaseIndex = 2;
+            state.itemIndex = 0;
+            setFeedback("확장 표현으로 이동합니다.", "good");
+            render();
+            return;
+          }
+          state.phaseIndex = 3;
+          state.recallIndex = 0;
+          setFeedback("회상 챌린지입니다. 단서를 보고 입력한 뒤 Enter를 누르세요.", "good");
+          render();
+        }
+
+        function completePracticeItem(item) {
+          state.practiced += 1;
+          state.correct += 1;
+          state.practicedTargets.push(item.target);
+          state.mismatch = null;
+          state.revealAnswer = item.id;
+          els.typingInput.value = "";
+          renderTarget(item.target, item, { answerRevealed: true });
+          renderMetrics();
+          setFeedback("정확해요. 표현을 확인하고 다음으로 넘어갑니다.", "good");
+          advanceTimer = window.setTimeout(nextPracticeItem, 520);
+        }
+
+        function nextRecallItem() {
+          state.mismatch = null;
+          state.revealAnswer = null;
+          if (state.recallIndex < RECALL_ITEMS.length - 1) {
+            state.recallIndex += 1;
+            setFeedback("좋아요. 다음 회상 문제입니다.", "good");
+            render();
+            return;
+          }
+          showReport();
+        }
+
+        function submitRecall() {
+          const item = getCurrentItem();
+          if (!item) return;
+          const value = normalize(els.typingInput.value);
+          if (hasEnglish(value)) {
+            setFeedback("한/영 키 확인: 지금은 한글 입력 모드가 필요합니다.", "bad");
+            return;
+          }
+          if (value === item.target) {
+            state.recallSuccess += 1;
+            state.correct += 1;
+            state.revealAnswer = item.id;
+            state.mismatch = null;
+            els.typingInput.value = "";
+            renderTarget(item.target, item, { answerRevealed: true });
+            renderMetrics();
+            setFeedback("정확해요. 정답을 확인하고 다음으로 넘어갑니다.", "good");
+            advanceTimer = window.setTimeout(nextRecallItem, 850);
+            return;
+          }
+          state.mistakes += 1;
+          setMismatch(value);
+          render();
+          setFeedback("다시 입력하세요. 맞은 글자와 틀린 위치를 확인하세요.", "bad");
+        }
+
+        function handleInput() {
+          if (state.composing || state.revealAnswer) return;
+          clearTimers();
+          const phase = getPhaseId();
+          const value = normalize(els.typingInput.value);
+          if (hasEnglish(value)) {
+            setFeedback("한/영 키 확인: 지금은 한글 입력 모드가 필요합니다.", "bad");
+            renderTarget(phase === "ready" ? WARMUP_TARGET : getTarget(), getCurrentItem());
+            return;
+          }
+          if (phase === "ready") {
+            if (value === WARMUP_TARGET) {
+              setFeedback("좋아요. 핵심 어휘로 이동합니다.", "good");
+              advanceTimer = window.setTimeout(goCore, 280);
+            } else {
+              renderTarget(WARMUP_TARGET, null);
+              setFeedback('"어휘"를 입력하세요.', "warn");
+            }
+            return;
+          }
+          if (phase === "core" || phase === "expansion") {
+            const item = getCurrentItem();
+            if (item && value === item.target) {
+              completePracticeItem(item);
+              return;
+            }
+            const analysis = compare(value, item ? item.target : "");
+            if (value && !analysis.prefix && !analysis.exact) {
+              state.mistakes += 1;
+              setMismatch(value);
+              setFeedback("틀린 위치를 확인하세요.", "bad");
+            } else {
+              state.mismatch = null;
+              setFeedback("목표 표현을 그대로 입력하세요.", "");
+            }
+            renderTarget(item ? item.target : "", item);
+            renderMetrics();
+          }
+        }
+
+        function showReport() {
+          state.phaseIndex = 4;
+          state.mismatch = null;
+          state.revealAnswer = null;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            ts: Date.now(),
+            practiced: state.practiced,
+            correct: state.correct,
+            mistakes: state.mistakes,
+            recallSuccess: state.recallSuccess,
+            mistakeTargets: state.mistakeTargets
+          }));
+          setFeedback("학습 리포트가 준비되었습니다.", "good");
+          render();
+        }
+
+        function renderReport() {
+          els.itemMeta.textContent = "완료";
+          els.targetLabel.textContent = "학습 완료";
+          els.cueText.textContent = "오늘 연습한 표현을 다시 확인하세요.";
+          els.noteText.textContent = "오타가 있었던 표현을 먼저 재연습하면 좋습니다.";
+          els.visualCaption.textContent = "학습 리포트";
+          els.finalPracticed.textContent = String(state.practiced);
+          els.finalCorrect.textContent = String(state.correct);
+          els.finalMistakes.textContent = String(state.mistakes);
+          els.finalRecall.textContent = String(state.recallSuccess);
+          const mistakeIds = Object.keys(state.mistakeTargets).sort((a, b) => state.mistakeTargets[b] - state.mistakeTargets[a]);
+          const review = mistakeIds.map((id) => VOCAB_ANIMATION_ITEMS.find((item) => item.id === id)).filter(Boolean).slice(0, 3);
+          const fallback = VOCAB_ANIMATION_ITEMS.slice(-3);
+          const items = review.length ? review : fallback;
+          els.reviewList.innerHTML = items.map((item) => "<li>" + escapeHtml(item.target) + "</li>").join("");
+          renderTarget("학습 완료", null);
+          renderVisual(null);
+        }
+
+        function resetPage() {
+          clearTimers();
+          Object.assign(state, {
+            phaseIndex: 0,
+            itemIndex: 0,
+            recallIndex: 0,
+            practiced: 0,
+            correct: 0,
+            mistakes: 0,
+            recallSuccess: 0,
+            mismatch: null,
+            revealAnswer: null,
+            practicedTargets: [],
+            mistakeTargets: {},
+            composing: false
+          });
+          lastRenderKey = "";
+          setFeedback("정확히 입력하면 핵심 어휘로 이동합니다.", "");
+          render();
+        }
+
+        function number(value) {
+          return String(Math.round(Number(value) * 10) / 10);
+        }
+
+        function point(pointValue) {
+          return number(pointValue.x) + " " + number(pointValue.y);
+        }
+
+        function setPath(node, value) {
+          if (node) node.setAttribute("d", value);
+        }
+
+        function setCircle(node, pointValue) {
+          if (!node) return;
+          node.setAttribute("cx", number(pointValue.x));
+          node.setAttribute("cy", number(pointValue.y));
+        }
+
+        function ease(t) {
+          return 0.5 - Math.cos(t * Math.PI) / 2;
+        }
+
+        function lerp(a, b, t) {
+          return a + (b - a) * t;
+        }
+
+        function interpolate(a, b, t) {
+          const eased = ease(t);
+          const pose = {};
+          POINT_KEYS.forEach((key) => {
+            pose[key] = { x: lerp(a[key].x, b[key].x, eased), y: lerp(a[key].y, b[key].y, eased) };
+          });
+          SCALARS.forEach((key) => { pose[key] = lerp(Number(a[key] || 0), Number(b[key] || 0), eased); });
+          return pose;
+        }
+
+        function prefersReducedMotion() {
+          return Boolean(reducedMotionQuery && reducedMotionQuery.matches);
+        }
+
+        function poseAt(definition, elapsed) {
+          const frames = definition.frames;
+          if (frames.length < 2) return clonePose(frames[0].pose);
+          const total = frames.reduce((sum, frame) => sum + frame.duration, 0);
+          let remaining = elapsed % total;
+          for (let index = 0; index < frames.length; index += 1) {
+            const frame = frames[index];
+            if (remaining <= frame.duration) return interpolate(frame.pose, frames[(index + 1) % frames.length].pose, remaining / frame.duration);
+            remaining -= frame.duration;
+          }
+          return clonePose(frames[0].pose);
+        }
+
+        function posterPose(definition) {
+          return clonePose(definition.frames[Math.min(definition.posterFrame || 0, definition.frames.length - 1)].pose);
+        }
+
+        function drawPose(pose) {
+          currentPose = clonePose(pose);
+          const body = ["M", point(pose.leftShoulder), "C", point({ x: pose.chest.x - 20, y: pose.chest.y - 22 }), point({ x: pose.chest.x + 20, y: pose.chest.y - 22 }), point(pose.rightShoulder), "L", point(pose.rightHip), "C", point({ x: pose.waist.x + 20, y: pose.waist.y + 18 }), point({ x: pose.waist.x - 20, y: pose.waist.y + 18 }), point(pose.leftHip), "Z"].join(" ");
+          setPath(motionEls.body, body);
+          setPath(motionEls.neck, "M " + point({ x: pose.head.x, y: pose.head.y + 27 }) + " L " + point(pose.neck) + " L " + point(pose.chest));
+          setPath(motionEls.leftArm, "M " + point(pose.leftShoulder) + " L " + point(pose.leftElbow) + " L " + point(pose.leftHand));
+          setPath(motionEls.rightArm, "M " + point(pose.rightShoulder) + " L " + point(pose.rightElbow) + " L " + point(pose.rightHand));
+          setPath(motionEls.leftLeg, "M " + point(pose.leftHip) + " L " + point(pose.leftKnee) + " L " + point(pose.leftAnkle));
+          setPath(motionEls.rightLeg, "M " + point(pose.rightHip) + " L " + point(pose.rightKnee) + " L " + point(pose.rightAnkle));
+          setPath(motionEls.leftFoot, "M " + point(pose.leftHeel) + " L " + point(pose.leftToe));
+          setPath(motionEls.rightFoot, "M " + point(pose.rightHeel) + " L " + point(pose.rightToe));
+          setPath(motionEls.waist, "M " + point({ x: pose.leftHip.x + 4, y: pose.leftHip.y + 2 }) + " C " + point({ x: pose.waist.x - 11, y: pose.waist.y + 9 }) + " " + point({ x: pose.waist.x + 11, y: pose.waist.y + 9 }) + " " + point({ x: pose.rightHip.x - 4, y: pose.rightHip.y + 2 }));
+          [motionEls.head, motionEls.leftHand, motionEls.rightHand, motionEls.leftHeel, motionEls.rightHeel, motionEls.leftToe, motionEls.rightToe].forEach((node, index) => {
+            const points = [pose.head, pose.leftHand, pose.rightHand, pose.leftHeel, pose.rightHeel, pose.leftToe, pose.rightToe];
+            setCircle(node, points[index]);
+          });
+          const faceDir = Number(pose.faceDir || 0);
+          const eyeShift = faceDir * 8;
+          setCircle(motionEls.leftEye, { x: pose.head.x - 9 + eyeShift, y: pose.head.y - 5 });
+          setCircle(motionEls.rightEye, { x: pose.head.x + 9 + eyeShift, y: pose.head.y - 5 });
+          setPath(motionEls.nose, "M " + point({ x: pose.head.x + eyeShift * 0.65, y: pose.head.y + 2 }) + " L " + point({ x: pose.head.x + eyeShift + 5 * Math.sign(faceDir || 1), y: pose.head.y + 9 }));
+          if (motionEls.air) {
+            motionEls.air.style.opacity = pose.airOpacity > 0 ? String(Math.max(0.35, Math.min(1, pose.airOpacity))) : "";
+            motionEls.air.style.strokeDashoffset = pose.airOpacity > 0 ? String(-pose.airOffset) : "";
+          }
+        }
+
+        function animateMotion(now) {
+          const definition = MOTIONS[currentMotionId] || MOTIONS.ready;
+          if (prefersReducedMotion()) {
+            stopMotion();
+            drawPose(posterPose(definition));
+            return;
+          }
+          drawPose(poseAt(definition, now - motionStart));
+          motionFrame = requestAnimationFrame(animateMotion);
+        }
+
+        function stopMotion() {
+          if (motionFrame) cancelAnimationFrame(motionFrame);
+          motionFrame = 0;
+        }
+
+        function startMotion(id, force) {
+          const nextId = MOTIONS[id] ? id : "ready";
+          const same = currentMotionId === nextId;
+          const definition = MOTIONS[nextId] || MOTIONS.ready;
+          if (same && motionFrame && !force && !prefersReducedMotion()) return;
+          stopMotion();
+          currentMotionId = nextId;
+          if (!same || !motionStart) motionStart = performance.now();
+          if (prefersReducedMotion() || definition.frames.length < 2) {
+            drawPose(posterPose(definition));
+            return;
+          }
+          drawPose(poseAt(definition, performance.now() - motionStart));
+          motionFrame = requestAnimationFrame(animateMotion);
+        }
+
+        function renderVisual(item) {
+          const motionId = item && item.motionId ? item.motionId : "ready";
+          const sceneId = item && item.sceneId ? item.sceneId : "ready";
+          const focus = new Set(item && item.focusParts ? item.focusParts : []);
+          const symbolicOnly = item && item.visualType === "symbol";
+          currentSceneId = sceneId;
+          els.motionPanel.dataset.motionId = motionId;
+          els.motionPanel.dataset.sceneId = sceneId;
+          els.motionStage.dataset.motionId = motionId;
+          els.motionStage.dataset.sceneId = sceneId;
+          els.motionFigure.style.display = symbolicOnly ? "none" : "";
+          els.sceneSteps.style.display = focus.has("stairs") ? "" : "none";
+          document.querySelectorAll("[data-scene]").forEach((node) => {
+            node.classList.toggle("is-active", node.dataset.scene === sceneId);
+          });
+          document.querySelectorAll("[data-motion-part]").forEach((node) => {
+            node.classList.toggle("is-focus", focus.has(node.dataset.motionPart));
+          });
+          startMotion(motionId);
+        }
+
+        if (reducedMotionQuery) {
+          const onReduceChange = () => startMotion(currentMotionId || "ready", true);
+          if (reducedMotionQuery.addEventListener) reducedMotionQuery.addEventListener("change", onReduceChange);
+          else if (reducedMotionQuery.addListener) reducedMotionQuery.addListener(onReduceChange);
+        }
+
+        window.__C12_VOCAB_ANIMATION_TYPING__ = {
+          getState() {
+            return {
+              motionId: currentMotionId,
+              sceneId: currentSceneId,
+              reducedMotion: prefersReducedMotion(),
+              pose: clonePose(currentPose || BASE),
+              phase: getPhaseId(),
+              item: getCurrentItem() ? getCurrentItem().target : null,
+              score: {
+                practiced: state.practiced,
+                correct: state.correct,
+                mistakes: state.mistakes,
+                recallSuccess: state.recallSuccess
+              }
+            };
+          },
+          items: VOCAB_ANIMATION_ITEMS.map((item) => item.target)
+        };
+
+        document.addEventListener("compositionstart", () => { state.composing = true; clearTimers(); });
+        document.addEventListener("compositionend", () => { state.composing = false; handleInput(); focusInput(); });
+        els.typingInput.addEventListener("input", handleInput);
+        els.typingInput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" && getPhaseId() === "recall") {
+            event.preventDefault();
+            submitRecall();
+          }
+        });
+        els.restartButton.addEventListener("click", resetPage);
+        els.reportButton.addEventListener("click", showReport);
+
+        render();
+      }());
+    </script>
+  </body>
+</html>
