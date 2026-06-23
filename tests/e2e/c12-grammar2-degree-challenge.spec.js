@@ -6,7 +6,7 @@ async function blockExternalRequests(page) {
   await page.route('https://cdnjs.cloudflare.com/**', (route) => route.abort());
 }
 
-async function openChallenge(page, viewport = { width: 390, height: 844 }) {
+async function openActivity(page, viewport = { width: 390, height: 844 }) {
   await page.setViewportSize(viewport);
   await blockExternalRequests(page);
   await page.goto('/c12/grammar2-degree-challenge.html', { waitUntil: 'domcontentloaded' });
@@ -18,12 +18,7 @@ async function expectNoHorizontalOverflow(page) {
   )).toBe(true);
 }
 
-async function startChallenge(page) {
-  await page.locator('#startBtn').click();
-  await expect(page.locator('#screenGame')).toHaveClass(/active/);
-}
-
-test('c12 grammar2 degree challenge opens responsively', async ({ page }) => {
+test('c12 grammar2 thermometer degree activity opens responsively', async ({ page }) => {
   const viewports = [
     { width: 390, height: 844 },
     { width: 820, height: 1180 },
@@ -31,102 +26,101 @@ test('c12 grammar2 degree challenge opens responsively', async ({ page }) => {
   ];
 
   for (const viewport of viewports) {
-    await openChallenge(page, viewport);
+    await openActivity(page, viewport);
 
-    await expect(page.locator('h1').first()).toContainText('얼마나 온도계 챌린지');
-    await expect(page.locator('#startBtn')).toBeVisible();
-    await expect(page.locator('#thermometer')).toHaveCount(1);
+    await expect(page.locator('h1').first()).toContainText('온도계 정도 활동');
+    await expect(page.locator('#stageExplore')).toHaveClass(/is-active/);
+    await expect(page.locator('#thermometer')).toHaveAttribute('role', 'slider');
+    await expect(page.locator('.usage-note')).toContainText('전통적으로는 부정적인 표현에 주로 썼습니다');
 
-    const dataLength = await page.evaluate(() => window.__c12Grammar2DegreeChallengeData.length);
-    expect(dataLength).toBe(12);
+    const dataShape = await page.evaluate(() => ({
+      verbs: window.__c12Grammar2DegreeActivityData.items.verbs.length,
+      adjectives: window.__c12Grammar2DegreeActivityData.items.adjectives.length,
+      choice: window.__c12Grammar2DegreeActivityData.choicePractice.length,
+      typing: window.__c12Grammar2DegreeActivityData.typingPractice.length
+    }));
+    expect(dataShape).toEqual({ verbs: 5, adjectives: 5, choice: 15, typing: 10 });
     await expectNoHorizontalOverflow(page);
   }
 });
 
-test('c12 hub links to the grammar2 degree challenge', async ({ page }) => {
+test('c12 hub links to the thermometer degree activity', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await blockExternalRequests(page);
   await page.goto('/c12/index.html', { waitUntil: 'domcontentloaded' });
 
-  const link = page.getByRole('link', { name: /얼마나 온도계 챌린지/ });
+  const link = page.getByRole('link', { name: /온도계 정도 활동/ });
   await expect(link).toBeVisible();
-  await expect(link).toContainText('감정의 강도를 올리며 강조 문장 만들기');
+  await expect(link).toContainText('온도계를 움직이며 정도 표현 바꾸기');
 
   await link.click();
   await expect(page).toHaveURL(/\/c12\/grammar2-degree-challenge\.html$/);
-  await expect(page.locator('h1').first()).toContainText('얼마나 온도계 챌린지');
+  await expect(page.locator('h1').first()).toContainText('온도계 정도 활동');
 });
 
-test('c12 grammar2 degree challenge gives feedback for a round 1 answer', async ({ page }) => {
-  await openChallenge(page);
-  await startChallenge(page);
+test('thermometer click and item chips change the expression', async ({ page }) => {
+  await openActivity(page, { width: 1280, height: 900 });
 
-  const answer = await page.evaluate(() => window.__c12Grammar2DegreeChallengeData[0].answer);
-  await page.getByRole('button', { name: answer, exact: true }).click();
+  await page.locator('#verbModeBtn').click();
+  await page.getByRole('button', { name: /기다리다/ }).click();
+  await expect(page.locator('#expressionText')).toContainText('버스를 얼마나 오래 기다렸는지 몰라요.');
 
-  await expect(page.locator('#feedbackBox')).toBeVisible();
-  await expect(page.locator('#feedbackBox')).toContainText('정답입니다.');
-  await expect(page.locator('#feedbackBox')).toContainText('왜 이 형태인지');
-  await expect(page.locator('#nextBtn')).toBeVisible();
+  const box = await page.locator('#thermometer').boundingBox();
+  expect(box).not.toBeNull();
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height - 24);
+
+  await expect(page.locator('#thermometer')).toHaveAttribute('aria-valuenow', '1');
+  await expect(page.locator('#expressionText')).toContainText('버스를 기다렸어요.');
+
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height - 24);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2, box.y + 18, { steps: 6 });
+  await page.mouse.up();
+
+  await expect(page.locator('#thermometer')).toHaveAttribute('aria-valuenow', '5');
+  await expect(page.locator('#expressionText')).toContainText('버스를 얼마나 오래 기다렸는지 몰라요.');
 });
 
-test('c12 grammar2 degree challenge assembles a round 3 sentence with word chips', async ({ page }) => {
-  await openChallenge(page, { width: 820, height: 1180 });
+test('15 expression choices advance to typing practice', async ({ page }) => {
+  await openActivity(page);
+  await page.locator('#goChoiceBtn').click();
 
-  await page.evaluate(() => window.__c12Grammar2DegreeChallenge.goToQuestion(8));
-  await expect(page.locator('#screenGame')).toHaveClass(/active/);
-  await expect(page.locator('#questionType')).toContainText('단어 칩 조립');
-
-  const tokens = await page.evaluate(() => window.__c12Grammar2DegreeChallengeData[8].tokens);
-  for (const token of tokens) {
-    await page.locator('#wordBank').getByRole('button', { name: token, exact: true }).click();
+  for (let index = 0; index < 15; index += 1) {
+    await page.evaluate(() => window.__c12Grammar2DegreeActivity.answerChoiceCorrectly());
+    await expect(page.locator('#choiceFeedback')).toBeVisible();
+    await page.locator('#choiceNextBtn').click();
   }
 
-  await page.locator('#checkBuildBtn').click();
-  await expect(page.locator('#feedbackBox')).toBeVisible();
-  await expect(page.locator('#feedbackBox')).toContainText('정답입니다.');
-  await expect(page.locator('#feedbackBox')).toContainText('어제 이사해서 얼마나 피곤했는지 몰라요.');
+  await expect(page.locator('#stageTyping')).toHaveClass(/is-active/);
+  await expect(page.locator('#typingProgress')).toContainText('1 / 10');
+  await expect(page.locator('#choiceFinalScore')).toHaveCount(1);
 });
 
-test('c12 grammar2 degree challenge can finish all questions', async ({ page }) => {
-  await openChallenge(page);
-  await startChallenge(page);
+test('typing practice accepts grammar forms and completes in the same screen', async ({ page }) => {
+  await openActivity(page);
+  await page.evaluate(() => window.__c12Grammar2DegreeActivity.goToStage('typing'));
 
-  for (let index = 0; index < 12; index += 1) {
-    await page.evaluate(() => window.__c12Grammar2DegreeChallenge.answerCurrentCorrectly());
-    await expect(page.locator('#feedbackBox')).toBeVisible();
-    await page.locator('#nextBtn').click();
+  for (let index = 0; index < 10; index += 1) {
+    const answer = await page.evaluate(() => (
+      window.__c12Grammar2DegreeActivityData.typingPractice[
+        window.__c12Grammar2DegreeActivity.getState().typingIndex
+      ].answers[0]
+    ));
+    await page.locator('#typingInput').fill(answer);
+    await page.locator('#typingCheckBtn').click();
+    await expect(page.locator('#typingFeedback')).toBeVisible();
+    await page.locator('#typingNextBtn').click();
   }
 
-  await expect(page.locator('#screenResult')).toHaveClass(/active/);
-  await expect(page.locator('#finalScore')).toContainText('12 / 12');
+  await expect(page.locator('#summaryBody')).toBeVisible();
+  await expect(page.locator('#typingFinalScore')).toContainText('10 / 10');
   await expect(page.locator('#restartBtn')).toBeVisible();
 });
 
-test('c12 grammar2 degree challenge keeps the expected challenge data shape', async ({ page }) => {
-  await openChallenge(page);
+test('primary visible UI avoids old activity wording', async ({ page }) => {
+  await openActivity(page, { width: 1280, height: 900 });
 
-  const unexpectedKeys = await page.evaluate(() => {
-    const allowedKeys = new Set([
-      'id',
-      'round',
-      'roundTitle',
-      'type',
-      'scene',
-      'simple',
-      'prompt',
-      'hintKo',
-      'answer',
-      'sentence',
-      'options',
-      'tokens',
-      'choices',
-      'explainKo'
-    ]);
-
-    return window.__c12Grammar2DegreeChallengeData.flatMap((question) => (
-      Object.keys(question).filter((key) => !allowedKeys.has(key))
-    ));
-  });
-  expect(unexpectedKeys).toEqual([]);
+  const visibleText = await page.locator('body').evaluate((body) => body.innerText);
+  expect(visibleText).not.toContain('퀴즈');
+  expect(visibleText).not.toContain('챌린지');
 });

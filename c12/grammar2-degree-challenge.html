@@ -10,36 +10,42 @@
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>12과 문법2 보조활동 | 얼마나 온도계 챌린지</title>
-    <script src="https://cdn.tailwindcss.com" defer></script>
+    <title>12과 문법2 보조활동 | 온도계 정도 활동</title>
     <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
     <style>
         :root {
-            --ink: #172033;
-            --muted: #617086;
-            --line: #d8e0ea;
+            --ink: #182033;
+            --muted: #64748b;
+            --line: #d9e2ec;
             --panel: #ffffff;
-            --soft: #f6f9fc;
-            --amber: #d97706;
-            --amber-dark: #92400e;
+            --bg: #f6f8fb;
             --teal: #0f766e;
+            --green: #15803d;
             --blue: #1d4ed8;
+            --amber: #d97706;
             --rose: #be123c;
-            --green: #047857;
-            --shadow: 0 16px 36px rgba(23, 32, 51, .09);
+            --violet: #6d28d9;
+            --shadow: 0 18px 44px rgba(24, 32, 51, .1);
         }
 
         * {
             box-sizing: border-box;
         }
 
+        html {
+            min-height: 100%;
+        }
+
         body {
             margin: 0;
             min-height: 100vh;
             overflow-x: hidden;
-            font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             color: var(--ink);
-            background: linear-gradient(180deg, #f8fbff 0%, #fff8ed 52%, #f5fbfa 100%);
+            background:
+                linear-gradient(180deg, rgba(246, 248, 251, .94), rgba(255, 251, 243, .92)),
+                radial-gradient(circle at 24% 0%, rgba(20, 184, 166, .14), transparent 34%),
+                radial-gradient(circle at 86% 28%, rgba(245, 158, 11, .16), transparent 32%);
+            font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
         button,
@@ -65,23 +71,15 @@
             display: none !important;
         }
 
-        .screen {
-            display: none;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
         .top-nav {
             position: sticky;
             top: 0;
-            z-index: 50;
+            z-index: 40;
             display: flex;
             align-items: center;
-            gap: 12px;
-            min-height: 58px;
-            padding: 0 max(14px, calc((100vw - 1080px) / 2 + 18px));
+            gap: 10px;
+            min-height: 50px;
+            padding: 0 max(12px, calc((100vw - 1180px) / 2 + 14px));
             border-bottom: 1px solid rgba(148, 163, 184, .28);
             background: rgba(255, 255, 255, .9);
             backdrop-filter: blur(12px);
@@ -90,574 +88,924 @@
         .top-nav a,
         .top-nav span {
             color: #475569;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 900;
             text-decoration: none;
             white-space: nowrap;
         }
 
         .top-nav a:hover {
-            color: var(--amber-dark);
+            color: var(--teal);
         }
 
-        .top-nav .divider {
-            color: #cbd5e1;
+        .activity-shell {
+            width: min(1180px, calc(100% - 22px));
+            margin: 12px auto 30px;
         }
 
-        .page-shell {
-            width: min(1080px, calc(100% - 24px));
-            margin: 16px auto 40px;
-        }
-
-        .panel {
-            min-width: 0;
-            border: 1px solid rgba(148, 163, 184, .3);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, .94);
-            box-shadow: var(--shadow);
-        }
-
-        .hero {
+        .activity-head {
             display: grid;
             grid-template-columns: minmax(0, 1fr) auto;
-            gap: 16px;
-            align-items: start;
-            padding: 18px;
-        }
-
-        .eyebrow {
-            margin: 0 0 7px;
-            color: var(--teal);
-            font-size: 11px;
-            font-weight: 900;
-            letter-spacing: 0;
-            text-transform: uppercase;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
         h1,
         h2,
+        h3,
         p {
             margin-top: 0;
         }
 
         h1 {
-            margin-bottom: 8px;
-            font-size: 30px;
-            line-height: 1.2;
+            margin-bottom: 4px;
+            font-size: clamp(22px, 3vw, 32px);
+            line-height: 1.16;
             letter-spacing: 0;
         }
 
-        h2 {
-            margin-bottom: 8px;
-            font-size: 20px;
-            line-height: 1.25;
-            letter-spacing: 0;
-        }
-
-        .lead {
-            margin-bottom: 0;
+        .head-note {
+            margin: 0;
             color: var(--muted);
-            font-size: 15px;
-            line-height: 1.72;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.55;
         }
 
-        .tag-row {
+        .step-tabs {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 14px;
+            gap: 6px;
+            justify-content: flex-end;
         }
 
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            min-height: 30px;
-            padding: 5px 10px;
-            border: 1px solid #c7d2fe;
-            border-radius: 999px;
-            background: #eef2ff;
-            color: #3730a3;
-            font-size: 12px;
-            font-weight: 900;
-        }
-
-        .primary-btn,
-        .secondary-btn,
-        .choice-btn,
-        .word-chip,
-        .slot-btn {
-            border: 0;
-            transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
-        }
-
-        .primary-btn:hover,
-        .secondary-btn:hover,
-        .choice-btn:hover:not(:disabled),
-        .word-chip:hover:not(:disabled),
-        .slot-btn:hover:not(:disabled) {
-            transform: translateY(-1px);
-        }
-
-        .primary-btn,
-        .secondary-btn {
+        .step-tab {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 52px;
-            padding: 0 18px;
+            min-height: 36px;
+            padding: 0 12px;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
-            font-size: 15px;
-            font-weight: 900;
-            text-decoration: none;
-        }
-
-        .primary-btn {
-            background: #172033;
-            color: #ffffff;
-            box-shadow: 0 12px 24px rgba(23, 32, 51, .18);
-        }
-
-        .secondary-btn {
-            border: 1px solid var(--line);
-            background: #ffffff;
-            color: #334155;
-        }
-
-        .intro-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .info-strip {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 14px;
-            border: 1px solid rgba(148, 163, 184, .26);
-            border-radius: 8px;
-            background: #ffffff;
-        }
-
-        .info-strip strong {
-            display: block;
-            margin-bottom: 3px;
-            font-size: 14px;
-        }
-
-        .info-strip span {
-            color: var(--muted);
+            background: rgba(255, 255, 255, .88);
+            color: #475569;
             font-size: 13px;
-            line-height: 1.5;
+            font-weight: 950;
         }
 
-        .action-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 14px;
+        .step-tab.is-active {
+            border-color: #0f766e;
+            background: #ccfbf1;
+            color: #134e4a;
         }
 
-        .game-layout {
+        .workspace {
             display: grid;
-            grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
-            gap: 14px;
-            align-items: start;
+            grid-template-columns: minmax(0, 1fr) minmax(170px, 230px);
+            gap: 12px;
+            align-items: stretch;
         }
 
-        .game-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 12px;
+        .work-panel,
+        .thermo-rail {
+            min-width: 0;
+            border: 1px solid rgba(148, 163, 184, .32);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .95);
+            box-shadow: var(--shadow);
+        }
+
+        .work-panel {
+            min-height: min(650px, calc(100vh - 130px));
             padding: 14px;
         }
 
-        .progress-wrap {
-            min-width: min(260px, 100%);
+        .thermo-rail {
+            position: sticky;
+            top: 62px;
+            align-self: start;
+            min-height: min(650px, calc(100vh - 130px));
+            padding: 12px;
         }
 
-        .meta-line {
+        .stage-panel {
+            display: none;
+            min-height: 100%;
+        }
+
+        .stage-panel.is-active {
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr);
+            gap: 12px;
+        }
+
+        .stage-top {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             align-items: center;
-            margin-bottom: 8px;
-            color: #475569;
-            font-size: 13px;
-            font-weight: 900;
+            justify-content: space-between;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .round-chip {
+        .stage-label {
             display: inline-flex;
             align-items: center;
             min-height: 28px;
             padding: 4px 9px;
             border-radius: 999px;
-            background: #ccfbf1;
-            color: #115e59;
+            background: #eff6ff;
+            color: #1e3a8a;
             font-size: 12px;
-            font-weight: 900;
+            font-weight: 950;
         }
 
-        .progress-track {
-            height: 8px;
-            overflow: hidden;
-            border-radius: 999px;
-            background: #e2e8f0;
+        .stage-title {
+            margin: 6px 0 0;
+            font-size: 21px;
+            line-height: 1.26;
+            letter-spacing: 0;
         }
 
-        .progress-fill {
-            height: 100%;
-            width: 0;
-            border-radius: 999px;
-            background: linear-gradient(90deg, #14b8a6, #f59e0b);
-            transition: width .25s ease;
+        .mini-status {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: flex-end;
         }
 
-        .score-pill {
+        .mini-pill {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            min-height: 38px;
-            padding: 0 12px;
-            border-radius: 999px;
-            background: #fff7ed;
-            color: var(--amber-dark);
-            font-size: 13px;
-            font-weight: 900;
-            white-space: nowrap;
-        }
-
-        .thermo-panel,
-        .question-panel {
-            padding: 16px;
-        }
-
-        .thermometer {
-            display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .heat-segment {
-            display: flex;
-            min-height: 74px;
-            flex-direction: column;
-            justify-content: flex-end;
-            gap: 7px;
-            padding: 8px;
-            border: 1px solid #e2e8f0;
+            min-height: 30px;
+            padding: 4px 10px;
             border-radius: 8px;
             background: #f8fafc;
-        }
-
-        .heat-bar {
-            display: block;
-            min-height: 12px;
-            border-radius: 999px;
-            background: #cbd5e1;
-        }
-
-        .heat-segment.is-active .heat-bar {
-            background: linear-gradient(180deg, #fbbf24, #d97706);
-        }
-
-        .heat-segment strong {
-            color: #64748b;
+            color: #334155;
             font-size: 12px;
-            text-align: center;
+            font-weight: 950;
         }
 
-        .heat-segment.is-active strong {
-            color: var(--amber-dark);
+        .stage-body {
+            min-height: 0;
         }
 
-        .simple-line {
-            margin: 14px 0 0;
-            padding: 12px;
-            border-left: 4px solid #14b8a6;
-            border-radius: 8px;
-            background: #f0fdfa;
-            color: #134e4a;
-            font-size: 15px;
-            font-weight: 900;
-            line-height: 1.55;
-        }
-
-        .sentence-preview {
-            margin: 12px 0 0;
-            padding: 12px;
-            border: 1px solid #fed7aa;
-            border-radius: 8px;
-            background: #fff7ed;
-            color: #7c2d12;
-            font-size: 17px;
-            font-weight: 900;
-            line-height: 1.55;
-        }
-
-        .question-title {
-            margin-bottom: 6px;
-            color: var(--blue);
-            font-size: 12px;
-            font-weight: 900;
-        }
-
-        .question-text {
-            margin-bottom: 8px;
-            font-size: 21px;
-            font-weight: 900;
-            line-height: 1.42;
-        }
-
-        .hint {
-            margin-bottom: 0;
-            color: var(--muted);
-            font-size: 13px;
-            line-height: 1.65;
-        }
-
-        .choice-list {
+        .explore-grid {
             display: grid;
-            gap: 10px;
-            margin-top: 14px;
+            grid-template-columns: minmax(210px, .86fr) minmax(0, 1.14fr);
+            gap: 12px;
+            min-height: 100%;
         }
 
-        .choice-btn {
-            width: 100%;
-            min-height: 58px;
-            padding: 12px 14px;
-            border: 1px solid #cbd5e1;
+        .selector-column,
+        .expression-column,
+        .question-card,
+        .summary-card {
+            min-width: 0;
+            border: 1px solid #dbe3ee;
             border-radius: 8px;
             background: #ffffff;
-            color: #1f2937;
-            font-size: 15px;
-            font-weight: 900;
-            line-height: 1.5;
+        }
+
+        .selector-column,
+        .expression-column {
+            padding: 12px;
+        }
+
+        .segmented {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .segmented button,
+        .item-chip,
+        .choice-btn,
+        .primary-btn,
+        .secondary-btn {
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease;
+        }
+
+        .segmented button:hover,
+        .item-chip:hover,
+        .choice-btn:hover:not(:disabled),
+        .primary-btn:hover,
+        .secondary-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .segmented button {
+            min-height: 42px;
+            background: #f8fafc;
+            color: #334155;
+            font-weight: 950;
+        }
+
+        .segmented button.is-active {
+            border-color: #0f766e;
+            background: #ccfbf1;
+            color: #134e4a;
+        }
+
+        .item-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .item-chip {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+            min-height: 58px;
+            padding: 8px 10px;
+            background: #ffffff;
+            color: var(--ink);
             text-align: left;
         }
 
-        .choice-btn.is-correct {
-            border-color: #10b981;
-            background: #ecfdf5;
-            color: #065f46;
+        .item-chip.is-active {
+            border-color: #d97706;
+            background: #fff7ed;
+            box-shadow: 0 10px 20px rgba(217, 119, 6, .12);
         }
 
-        .choice-btn.is-wrong {
-            border-color: #fb7185;
-            background: #fff1f2;
-            color: #9f1239;
+        .item-chip strong {
+            display: block;
+            font-size: 17px;
+            line-height: 1.24;
         }
 
-        .builder {
-            margin-top: 14px;
+        .item-chip span {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 850;
         }
 
-        .slot-row,
-        .word-bank {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+        .chip-form {
+            color: #0f766e !important;
+            white-space: nowrap;
         }
 
-        .slot-row {
-            min-height: 58px;
-            padding: 10px;
-            border: 1px dashed #94a3b8;
+        .expression-card {
+            display: grid;
+            grid-template-rows: auto auto minmax(0, 1fr) auto;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .degree-badge {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            min-height: 34px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: #fee2e2;
+            color: #991b1b;
+            font-size: 13px;
+            font-weight: 950;
+        }
+
+        .current-word {
+            margin: 0;
+            color: #475569;
+            font-size: 15px;
+            font-weight: 900;
+            line-height: 1.5;
+        }
+
+        .expression-output {
+            display: grid;
+            align-content: center;
+            min-height: 170px;
+            padding: 14px;
+            border: 2px solid #fde68a;
             border-radius: 8px;
-            background: #f8fafc;
+            background: #fffbeb;
         }
 
-        .slot-btn,
-        .word-chip {
-            min-height: 42px;
-            padding: 8px 12px;
-            border-radius: 8px;
+        .expression-output strong {
+            display: block;
+            color: #78350f;
+            font-size: clamp(24px, 4vw, 44px);
+            line-height: 1.18;
+            letter-spacing: 0;
+        }
+
+        .expression-output span {
+            display: block;
+            margin-top: 8px;
+            color: #92400e;
             font-size: 14px;
             font-weight: 900;
         }
 
-        .slot-btn {
-            border: 1px solid #bae6fd;
-            background: #eff6ff;
-            color: #1e40af;
+        .degree-list {
+            display: grid;
+            gap: 6px;
         }
 
-        .word-bank {
-            margin-top: 12px;
+        .degree-line {
+            display: grid;
+            grid-template-columns: 42px minmax(0, 1fr);
+            gap: 8px;
+            align-items: center;
+            min-height: 38px;
+            padding: 6px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 850;
         }
 
-        .word-chip {
-            border: 1px solid #d8e0ea;
+        .degree-line.is-active {
+            border-color: #f59e0b;
+            background: #fff7ed;
+            color: #7c2d12;
+        }
+
+        .usage-note {
+            margin: 0;
+            padding: 9px 10px;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            background: #fffbeb;
+            color: #854d0e;
+            font-size: 12px;
+            font-weight: 850;
+            line-height: 1.55;
+        }
+
+        .usage-note strong {
+            color: #713f12;
+            font-weight: 950;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .primary-btn,
+        .secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 46px;
+            padding: 0 15px;
+            font-weight: 950;
+            text-decoration: none;
+        }
+
+        .primary-btn {
+            border-color: #182033;
+            background: #182033;
+            color: #ffffff;
+            box-shadow: 0 12px 22px rgba(24, 32, 51, .18);
+        }
+
+        .secondary-btn {
             background: #ffffff;
             color: #334155;
         }
 
-        .word-chip.is-used {
-            border-color: #cbd5e1;
-            background: #e2e8f0;
-            color: #64748b;
+        .question-card,
+        .summary-card {
+            padding: 14px;
         }
 
-        .builder-actions {
-            display: flex;
-            flex-wrap: wrap;
+        .question-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(230px, .58fr);
+            gap: 12px;
+            height: 100%;
+        }
+
+        .prompt-area {
+            display: grid;
+            align-content: start;
+            gap: 10px;
+        }
+
+        .prompt-main {
+            margin: 0;
+            font-size: clamp(22px, 3vw, 34px);
+            font-weight: 950;
+            line-height: 1.25;
+            letter-spacing: 0;
+        }
+
+        .prompt-cue,
+        .feedback {
+            margin: 0;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 900;
+            line-height: 1.55;
+        }
+
+        .prompt-cue {
+            border: 1px solid #dbeafe;
+            background: #eff6ff;
+            color: #1e3a8a;
+        }
+
+        .choice-list {
+            display: grid;
             gap: 8px;
-            margin-top: 12px;
+            align-content: start;
+        }
+
+        .choice-btn {
+            min-height: 56px;
+            padding: 10px 12px;
+            background: #ffffff;
+            color: var(--ink);
+            text-align: left;
+            font-size: 16px;
+            font-weight: 950;
+            line-height: 1.36;
+        }
+
+        .choice-btn.is-correct {
+            border-color: #16a34a;
+            background: #dcfce7;
+            color: #14532d;
+        }
+
+        .choice-btn.is-wrong {
+            border-color: #e11d48;
+            background: #ffe4e6;
+            color: #881337;
         }
 
         .feedback {
-            margin-top: 14px;
-            padding: 14px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: #334155;
         }
 
         .feedback.ok {
-            border-color: #a7f3d0;
-            background: #ecfdf5;
+            border-color: #86efac;
+            background: #f0fdf4;
+            color: #14532d;
         }
 
         .feedback.no {
             border-color: #fecdd3;
             background: #fff1f2;
+            color: #881337;
         }
 
-        .feedback strong {
-            color: var(--ink);
-        }
-
-        .feedback p {
-            margin-bottom: 7px;
-            color: #334155;
-            font-size: 13px;
-            line-height: 1.62;
-        }
-
-        .feedback p:last-child {
-            margin-bottom: 0;
-        }
-
-        .feedback .state-ok {
-            color: var(--green);
-            font-size: 15px;
-            font-weight: 900;
-        }
-
-        .feedback .state-no {
-            color: var(--rose);
-            font-size: 15px;
-            font-weight: 900;
-        }
-
-        .result-grid {
+        .typing-card {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 12px;
+            gap: 10px;
+            align-content: start;
         }
 
-        .result-stat {
-            padding: 16px;
-            border: 1px solid var(--line);
+        .typing-frame {
+            padding: 14px;
+            border: 2px solid #c7d2fe;
+            border-radius: 8px;
+            background: #eef2ff;
+        }
+
+        .typing-frame p {
+            margin: 0;
+            color: #312e81;
+            font-size: clamp(22px, 3vw, 36px);
+            font-weight: 950;
+            line-height: 1.28;
+            letter-spacing: 0;
+        }
+
+        .answer-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px;
+        }
+
+        #typingInput {
+            min-width: 0;
+            min-height: 52px;
+            padding: 0 14px;
+            border: 2px solid #cbd5e1;
             border-radius: 8px;
             background: #ffffff;
+            color: var(--ink);
+            font-size: 20px;
+            font-weight: 950;
         }
 
-        .result-stat span {
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 900;
+        #typingInput:focus {
+            outline: 3px solid rgba(20, 184, 166, .25);
+            border-color: #14b8a6;
         }
 
-        .result-stat strong {
+        .summary-card {
+            display: grid;
+            gap: 12px;
+            align-content: start;
+            min-height: 100%;
+        }
+
+        .summary-score {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .score-box {
+            min-height: 92px;
+            padding: 12px;
+            border: 1px solid #dbe3ee;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .score-box span {
             display: block;
-            margin-top: 5px;
-            font-size: 28px;
-            color: var(--amber-dark);
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 950;
+        }
+
+        .score-box strong {
+            display: block;
+            margin-top: 8px;
+            color: #0f172a;
+            font-size: 30px;
+            line-height: 1;
         }
 
         .review-list {
             display: grid;
-            gap: 10px;
-            margin-top: 14px;
+            gap: 7px;
         }
 
         .review-item {
-            padding: 12px;
+            padding: 9px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 850;
+            line-height: 1.5;
+        }
+
+        .thermo-rail h2 {
+            margin: 0 0 6px;
+            font-size: 17px;
+            line-height: 1.25;
+            letter-spacing: 0;
+        }
+
+        .thermo-live {
+            min-height: 44px;
+            margin: 0 0 10px;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1.45;
+        }
+
+        .thermometer-wrap {
+            display: grid;
+            grid-template-columns: minmax(74px, 1fr) 54px;
+            gap: 8px;
+            align-items: stretch;
+            min-height: 410px;
+        }
+
+        .thermometer {
+            position: relative;
+            display: block;
+            width: 100%;
+            min-height: 410px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            touch-action: none;
+        }
+
+        .thermometer:focus-visible {
+            outline: 3px solid rgba(29, 78, 216, .28);
+            outline-offset: 4px;
+        }
+
+        .tube {
+            position: absolute;
+            inset: 10px 18px 58px;
+            border: 2px solid #94a3b8;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #f8fafc, #e2e8f0);
+            overflow: hidden;
+        }
+
+        .mercury {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 0%;
+            border-radius: 999px 999px 0 0;
+            background: linear-gradient(180deg, #ef4444 0%, #f97316 46%, #f59e0b 100%);
+            transition: height .16s ease;
+        }
+
+        .bulb {
+            position: absolute;
+            left: 50%;
+            bottom: 8px;
+            width: 82px;
+            height: 82px;
+            border: 2px solid #94a3b8;
+            border-radius: 50%;
+            background: #fff7ed;
+            transform: translateX(-50%);
+        }
+
+        .bulb::after {
+            content: "";
+            position: absolute;
+            inset: 13px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 28%, #fed7aa, #ef4444 72%);
+        }
+
+        .thermo-handle {
+            position: absolute;
+            left: 50%;
+            bottom: calc(58px + 0%);
+            width: 74px;
+            min-height: 38px;
+            border: 2px solid #7c2d12;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #7c2d12;
+            font-size: 15px;
+            font-weight: 950;
+            box-shadow: 0 12px 20px rgba(124, 45, 18, .18);
+            transform: translate(-50%, 50%);
+            transition: bottom .16s ease;
+            pointer-events: none;
+        }
+
+        .thermo-scale {
+            display: grid;
+            grid-template-rows: repeat(5, 1fr);
+            gap: 4px;
+        }
+
+        .scale-mark {
+            display: grid;
+            align-content: center;
+            justify-items: center;
+            min-height: 0;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             background: #f8fafc;
-            color: #334155;
-            font-size: 13px;
-            line-height: 1.55;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 950;
+            text-align: center;
         }
 
-        @media (max-width: 760px) {
-            .hero,
-            .game-layout,
-            .result-grid,
-            .intro-grid {
+        .scale-mark.is-active {
+            border-color: #f97316;
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .scale-mark strong {
+            display: block;
+            font-size: 16px;
+        }
+
+        .rail-actions {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .rail-actions button {
+            min-width: 0;
+            min-height: 34px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 950;
+        }
+
+        .rail-actions button.is-active {
+            border-color: #f97316;
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        @media (max-width: 880px) {
+            .activity-head {
                 grid-template-columns: 1fr;
             }
 
-            h1 {
-                font-size: 25px;
+            .step-tabs {
+                justify-content: flex-start;
             }
 
-            .game-top {
-                align-items: flex-start;
-                flex-direction: column;
+            .workspace {
+                grid-template-columns: minmax(0, 1fr) 112px;
+                gap: 8px;
             }
 
-            .thermometer {
-                gap: 6px;
+            .work-panel {
+                padding: 10px;
             }
 
-            .heat-segment {
-                min-height: 60px;
-                padding: 6px;
+            .thermo-rail {
+                top: 58px;
+                padding: 8px;
             }
 
-            .heat-segment strong {
+            .thermo-rail h2 {
+                font-size: 14px;
+            }
+
+            .thermo-live {
+                min-height: 36px;
                 font-size: 11px;
             }
 
-            .question-text {
-                font-size: 19px;
+            .thermometer-wrap {
+                grid-template-columns: 1fr;
+                min-height: 360px;
+            }
+
+            .thermometer {
+                min-height: 360px;
+            }
+
+            .thermo-scale {
+                display: none;
+            }
+
+            .tube {
+                inset: 8px 26px 54px;
+            }
+
+            .bulb {
+                width: 70px;
+                height: 70px;
+            }
+
+            .thermo-handle {
+                width: 62px;
+                min-height: 34px;
+                font-size: 13px;
+            }
+
+            .rail-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .rail-actions button {
+                min-height: 30px;
+            }
+
+            .explore-grid,
+            .question-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .expression-output {
+                min-height: 138px;
             }
         }
 
-        @media (max-width: 420px) {
-            .page-shell {
-                width: min(100% - 16px, 1080px);
-            }
-
+        @media (max-width: 520px) {
             .top-nav {
                 gap: 8px;
                 overflow-x: auto;
+                padding-inline: 10px;
             }
 
-            .top-nav a,
-            .top-nav span {
+            .activity-shell {
+                width: min(100% - 12px, 1180px);
+                margin-top: 8px;
+            }
+
+            .workspace {
+                grid-template-columns: minmax(0, 1fr) 94px;
+                gap: 6px;
+            }
+
+            .work-panel {
+                min-height: calc(100vh - 126px);
+                padding: 8px;
+            }
+
+            .thermo-rail {
+                min-height: calc(100vh - 126px);
+                padding: 6px;
+            }
+
+            .stage-title {
+                font-size: 18px;
+            }
+
+            .stage-label,
+            .mini-pill {
+                font-size: 11px;
+            }
+
+            .selector-column,
+            .expression-column,
+            .question-card,
+            .summary-card {
+                padding: 9px;
+            }
+
+            .item-chip {
+                grid-template-columns: 1fr;
+                min-height: 52px;
+            }
+
+            .item-chip strong {
+                font-size: 15px;
+            }
+
+            .expression-output strong {
+                font-size: 23px;
+            }
+
+            .degree-line {
+                grid-template-columns: 30px minmax(0, 1fr);
                 font-size: 12px;
             }
 
-            .hero,
-            .game-top,
-            .thermo-panel,
-            .question-panel {
-                padding: 12px;
+            .prompt-main,
+            .typing-frame p {
+                font-size: 21px;
             }
 
             .choice-btn {
+                min-height: 50px;
+                padding: 8px 9px;
                 font-size: 14px;
+            }
+
+            .answer-row {
+                grid-template-columns: 1fr;
+            }
+
+            #typingInput {
+                min-height: 50px;
+                font-size: 18px;
+            }
+
+            .summary-score {
+                grid-template-columns: 1fr;
+            }
+
+            .thermo-live {
+                display: none;
+            }
+
+            .thermometer-wrap {
+                min-height: 330px;
+            }
+
+            .thermometer {
+                min-height: 330px;
+            }
+
+            .tube {
+                inset: 6px 19px 46px;
+            }
+
+            .bulb {
+                width: 58px;
+                height: 58px;
+            }
+
+            .thermo-handle {
+                width: 56px;
+                min-height: 32px;
             }
         }
     </style>
@@ -670,689 +1018,1019 @@
 
     <nav class="top-nav" aria-label="상단 이동">
         <a href="../index.html">메인</a>
-        <span class="divider">|</span>
+        <span>|</span>
         <a href="index.html">12과 목록</a>
-        <span class="divider">|</span>
+        <span>|</span>
         <a href="grammar2.html">문법 2</a>
-        <span class="divider">|</span>
-        <span>얼마나 온도계 챌린지</span>
+        <span>|</span>
+        <span>온도계 정도 활동</span>
     </nav>
 
-    <main id="page" class="page-shell">
-        <section class="panel hero">
+    <main id="activity" class="activity-shell">
+        <header class="activity-head">
             <div>
-                <p class="eyebrow">Grammar 2 Support</p>
-                <h1 class="safe">얼마나 온도계 챌린지</h1>
-                <p class="lead safe">상황의 강도를 최고 단계까지 올려 `얼마나 -(으)ㄴ/는지 몰라요` 문장으로 말해 봅니다.</p>
-                <div class="tag-row" aria-label="활동 정보">
-                    <span class="tag">12문항</span>
-                    <span class="tag">3라운드</span>
-                    <span class="tag">즉시 피드백</span>
-                    <span class="tag">문장 산출</span>
-                </div>
+                <h1 class="safe">온도계 정도 활동</h1>
+                <p class="head-note safe">단어를 고르고 오른쪽 온도계를 움직여 표현 변화를 확인하세요.</p>
             </div>
-        </section>
-
-        <section id="screenStart" class="screen active">
-            <div class="intro-grid">
-                <article class="panel info-strip">
-                    <div>
-                        <strong>강도 올리기</strong>
-                        <span class="safe">`너무/정말`보다 감정이 큰 표현으로 바꿉니다.</span>
-                    </div>
-                    <span class="round-chip">1단계</span>
-                </article>
-                <article class="panel info-strip">
-                    <div>
-                        <strong>문장 만들기</strong>
-                        <span class="safe">상황에 맞는 문장을 고르고, 활용형을 확인하고, 단어를 조립합니다.</span>
-                    </div>
-                    <span class="round-chip">2-3단계</span>
-                </article>
+            <div class="step-tabs" aria-label="활동 단계">
+                <button id="tabExplore" class="step-tab is-active" type="button">탐색</button>
+                <button id="tabChoice" class="step-tab" type="button">표현 선택</button>
+                <button id="tabTyping" class="step-tab" type="button">타이핑</button>
             </div>
-            <div class="panel hero" style="margin-top:12px;">
-                <div>
-                    <p class="eyebrow">Target Pattern</p>
-                    <h2 class="safe">얼마나 + 설명 + 지 몰라요</h2>
-                    <p class="lead safe">예: 한국어 공부가 얼마나 어려운지 몰라요.</p>
-                </div>
-                <div class="action-row" style="margin-top:0;">
-                    <button id="startBtn" class="primary-btn" type="button">시작하기</button>
-                </div>
-            </div>
-        </section>
+        </header>
 
-        <section id="screenGame" class="screen">
-            <div class="panel game-top">
-                <div class="progress-wrap">
-                    <div class="meta-line">
-                        <span id="roundChip" class="round-chip">1라운드</span>
-                        <span id="progressText">1 / 12</span>
-                        <span id="roundText">상황 문장 고르기</span>
-                    </div>
-                    <div class="progress-track" aria-hidden="true">
-                        <div id="progressFill" class="progress-fill"></div>
-                    </div>
-                </div>
-                <div class="score-pill">정답 <span id="scoreText">0</span> / <span id="totalText">12</span></div>
-            </div>
-
-            <div class="game-layout">
-                <section class="panel thermo-panel" aria-label="강도 온도계">
-                    <p class="eyebrow">Degree Thermometer</p>
-                    <h2 id="sceneTitle" class="safe">상황</h2>
-                    <p id="sceneText" class="lead safe"></p>
-                    <div id="thermometer" class="thermometer" aria-label="5단계 온도계"></div>
-                    <p id="simpleLine" class="simple-line safe"></p>
-                    <p id="targetPreview" class="sentence-preview safe"></p>
-                </section>
-
-                <section class="panel question-panel">
-                    <p id="questionType" class="question-title"></p>
-                    <p id="questionText" class="question-text safe"></p>
-                    <p id="questionHint" class="hint safe"></p>
-
-                    <div id="choiceList" class="choice-list"></div>
-
-                    <div id="builder" class="builder hidden">
-                        <div id="slotRow" class="slot-row" aria-label="선택한 단어"></div>
-                        <div id="wordBank" class="word-bank" aria-label="단어 칩"></div>
-                        <div class="builder-actions">
-                            <button id="undoBtn" class="secondary-btn" type="button">한 칸 지우기</button>
-                            <button id="resetBuildBtn" class="secondary-btn" type="button">처음부터</button>
-                            <button id="checkBuildBtn" class="primary-btn" type="button">정답 확인</button>
+        <div class="workspace">
+            <section class="work-panel" aria-label="활동 영역">
+                <article id="stageExplore" class="stage-panel is-active">
+                    <div class="stage-top">
+                        <div>
+                            <span class="stage-label">1단계</span>
+                            <h2 class="stage-title safe">단어 선택 + 온도계 조절</h2>
+                        </div>
+                        <div class="mini-status">
+                            <span id="exploreKindStatus" class="mini-pill">형용사</span>
+                            <span id="exploreDegreeStatus" class="mini-pill">5단계</span>
                         </div>
                     </div>
-
-                    <div id="feedbackBox" class="feedback hidden"></div>
-                    <div class="action-row">
-                        <button id="nextBtn" class="primary-btn hidden" type="button">다음 문제</button>
+                    <div class="stage-body explore-grid">
+                        <section class="selector-column" aria-label="단어 선택">
+                            <div class="segmented">
+                                <button id="adjectiveModeBtn" class="is-active" type="button">형용사</button>
+                                <button id="verbModeBtn" type="button">동사</button>
+                            </div>
+                            <div id="itemList" class="item-list"></div>
+                        </section>
+                        <section class="expression-column" aria-label="표현 변화">
+                            <div class="expression-card">
+                                <span id="degreeBadge" class="degree-badge">5단계</span>
+                                <p id="currentWord" class="current-word safe"></p>
+                                <div class="expression-output" aria-live="polite">
+                                    <strong id="expressionText" class="safe"></strong>
+                                    <span id="formHint" class="safe"></span>
+                                </div>
+                                <div id="degreeList" class="degree-list"></div>
+                                <p class="usage-note safe"><strong>주의사항</strong> `너무`는 현대 한국어에서 긍정·부정에 모두 쓰이지만, 전통적으로는 부정적인 표현에 주로 썼습니다.</p>
+                                <div class="action-row">
+                                    <button id="goChoiceBtn" class="primary-btn" type="button">표현 선택으로</button>
+                                </div>
+                            </div>
+                        </section>
                     </div>
-                </section>
-            </div>
-        </section>
+                </article>
 
-        <section id="screenResult" class="screen">
-            <div class="panel hero">
-                <div>
-                    <p class="eyebrow">Result</p>
-                    <h1 class="safe">온도계 챌린지 완료</h1>
-                    <p id="resultComment" class="lead safe"></p>
-                </div>
-                <div class="action-row" style="margin-top:0;">
-                    <button id="restartBtn" class="primary-btn" type="button">다시 하기</button>
-                </div>
-            </div>
-            <div class="result-grid">
-                <article class="result-stat">
-                    <span>최종 점수</span>
-                    <strong id="finalScore">0 / 12</strong>
+                <article id="stageChoice" class="stage-panel">
+                    <div class="stage-top">
+                        <div>
+                            <span class="stage-label">2단계</span>
+                            <h2 class="stage-title safe">온도계를 보고 알맞은 표현 고르기</h2>
+                        </div>
+                        <div class="mini-status">
+                            <span id="choiceProgress" class="mini-pill">1 / 15</span>
+                            <span id="choiceScore" class="mini-pill">정답 0</span>
+                        </div>
+                    </div>
+                    <div class="stage-body question-card">
+                        <div class="question-grid">
+                            <div class="prompt-area">
+                                <span id="choiceDegreeBadge" class="degree-badge">5단계</span>
+                                <p id="choicePrompt" class="prompt-main safe"></p>
+                                <p id="choiceCue" class="prompt-cue safe"></p>
+                                <div id="choiceFeedback" class="feedback hidden" aria-live="polite"></div>
+                                <div class="action-row">
+                                    <button id="choiceNextBtn" class="primary-btn hidden" type="button">다음</button>
+                                </div>
+                            </div>
+                            <div id="choiceList" class="choice-list" aria-label="보기"></div>
+                        </div>
+                    </div>
                 </article>
-                <article class="result-stat">
-                    <span>복습 포인트</span>
-                    <strong id="reviewPoint">형태 확인</strong>
+
+                <article id="stageTyping" class="stage-panel">
+                    <div class="stage-top">
+                        <div>
+                            <span class="stage-label">3단계</span>
+                            <h2 class="stage-title safe">빈칸에 올바른 문법형 입력</h2>
+                        </div>
+                        <div class="mini-status">
+                            <span id="typingProgress" class="mini-pill">1 / 10</span>
+                            <span id="typingScore" class="mini-pill">정답 0</span>
+                        </div>
+                    </div>
+                    <div id="typingBody" class="stage-body question-card typing-card">
+                        <span id="typingDegreeBadge" class="degree-badge">5단계</span>
+                        <div class="typing-frame">
+                            <p id="typingPrompt" class="safe"></p>
+                        </div>
+                        <p id="typingCue" class="prompt-cue safe"></p>
+                        <div class="answer-row">
+                            <input id="typingInput" type="text" autocomplete="off" spellcheck="false" aria-label="올바른 문법형 입력" />
+                            <button id="typingCheckBtn" class="primary-btn" type="button">확인</button>
+                        </div>
+                        <div id="typingFeedback" class="feedback hidden" aria-live="polite"></div>
+                        <div class="action-row">
+                            <button id="typingNextBtn" class="primary-btn hidden" type="button">다음</button>
+                        </div>
+                    </div>
+                    <div id="summaryBody" class="stage-body summary-card hidden">
+                        <span class="stage-label">완료</span>
+                        <h2 class="stage-title safe">정도 표현 연습 완료</h2>
+                        <div class="summary-score">
+                            <div class="score-box">
+                                <span>표현 선택</span>
+                                <strong id="choiceFinalScore">0 / 15</strong>
+                            </div>
+                            <div class="score-box">
+                                <span>타이핑</span>
+                                <strong id="typingFinalScore">0 / 10</strong>
+                            </div>
+                        </div>
+                        <div id="reviewList" class="review-list"></div>
+                        <div class="action-row">
+                            <button id="restartBtn" class="secondary-btn" type="button">처음부터</button>
+                            <a class="secondary-btn" href="grammar2.html">문법 2</a>
+                            <a class="secondary-btn" href="index.html">12과 목록</a>
+                        </div>
+                    </div>
                 </article>
-            </div>
-            <div id="reviewList" class="review-list"></div>
-            <div class="action-row">
-                <a class="secondary-btn" href="grammar2.html">문법 2 본문</a>
-                <a class="secondary-btn" href="index.html">12과 허브</a>
-            </div>
-        </section>
+            </section>
+
+            <aside class="thermo-rail" aria-label="온도계 조절">
+                <h2>정도 온도계</h2>
+                <p id="thermoLive" class="thermo-live" aria-live="polite">5단계: 얼마나 ...인지 몰라요</p>
+                <div class="thermometer-wrap">
+                    <button id="thermometer" class="thermometer" type="button" role="slider" aria-label="정도 단계" aria-valuemin="1" aria-valuemax="5" aria-valuenow="5" aria-valuetext="5단계" tabindex="0">
+                        <span class="tube" aria-hidden="true"><span id="mercury" class="mercury"></span></span>
+                        <span class="bulb" aria-hidden="true"></span>
+                        <span id="thermoHandle" class="thermo-handle" aria-hidden="true">5</span>
+                    </button>
+                    <div id="thermoScale" class="thermo-scale" aria-hidden="true"></div>
+                </div>
+                <div id="railActions" class="rail-actions" aria-label="정도 단계 바로 선택"></div>
+            </aside>
+        </div>
     </main>
 
     <script>
-        const QUESTIONS = [
-            {
-                id: 'degree_01',
-                round: 1,
-                roundTitle: '상황 문장 고르기',
-                type: 'choice',
-                scene: '공부가 아주 어려운 상황',
-                simple: '한국어 공부가 정말 어려워요.',
-                prompt: '강도 5 문장으로 가장 자연스러운 것을 고르세요.',
-                hintKo: '형용사 `어렵다`는 ㅂ 불규칙으로 `어려운지`가 됩니다.',
-                answer: '한국어 공부가 얼마나 어려운지 몰라요.',
-                options: [
-                    '한국어 공부가 얼마나 어려운지 몰라요.',
-                    '한국어 공부가 얼마나 어려워요?',
-                    '한국어 공부가 얼마나 어렵는지 몰라요.'
-                ],
-                explainKo: '`얼마나 + 어려운지 + 몰라요`로 정도가 매우 큼을 강조합니다.'
-            },
-            {
-                id: 'degree_02',
-                round: 1,
-                roundTitle: '상황 문장 고르기',
-                type: 'choice',
-                scene: '케이크가 아주 맛있는 상황',
-                simple: '이 케이크가 정말 맛있어요.',
-                prompt: '강도 5 문장으로 가장 자연스러운 것을 고르세요.',
-                hintKo: '`맛있다`는 `맛있는지`로 써요.',
-                answer: '이 케이크가 얼마나 맛있는지 몰라요.',
-                options: [
-                    '이 케이크가 얼마나 맛있은지 몰라요.',
-                    '이 케이크가 얼마나 맛있는지 몰라요.',
-                    '이 케이크가 얼마나 맛있어요 몰라요.'
-                ],
-                explainKo: '`있다/없다`가 들어간 형용사는 `-는지`를 써서 `맛있는지`가 됩니다.'
-            },
-            {
-                id: 'degree_03',
-                round: 1,
-                roundTitle: '상황 문장 고르기',
-                type: 'choice',
-                scene: '친구가 선물을 받고 아주 좋아하는 상황',
-                simple: '친구가 선물을 받고 정말 좋아해요.',
-                prompt: '강도 5 문장으로 가장 자연스러운 것을 고르세요.',
-                hintKo: '동사 `좋아하다`는 `좋아하는지`가 됩니다.',
-                answer: '친구가 선물을 받고 얼마나 좋아하는지 몰라요.',
-                options: [
-                    '친구가 선물을 받고 얼마나 좋아한지 몰라요.',
-                    '친구가 선물을 받고 얼마나 좋아하는지 몰라요.',
-                    '친구가 선물을 받고 얼마나 좋은지 몰라요.'
-                ],
-                explainKo: '동작을 말하는 `좋아하다` 뒤에는 `-는지`를 붙입니다.'
-            },
-            {
-                id: 'degree_04',
-                round: 1,
-                roundTitle: '상황 문장 고르기',
-                type: 'choice',
-                scene: '오늘 날씨가 아주 더운 상황',
-                simple: '오늘 날씨가 너무 더워요.',
-                prompt: '강도 5 문장으로 가장 자연스러운 것을 고르세요.',
-                hintKo: '`덥다`는 ㅂ 불규칙으로 `더운지`가 됩니다.',
-                answer: '오늘 날씨가 얼마나 더운지 몰라요.',
-                options: [
-                    '오늘 날씨가 얼마나 더운지 몰라요.',
-                    '오늘 날씨가 얼마나 덥는지 몰라요.',
-                    '오늘 날씨가 얼마나 더워서 몰라요.'
-                ],
-                explainKo: '`덥다`는 `더운지`로 바뀌어 강한 정도를 나타냅니다.'
-            },
-            {
-                id: 'degree_05',
-                round: 2,
-                roundTitle: '활용형 고르기',
-                type: 'blank',
-                scene: '제주도 바다가 아주 아름다운 상황',
-                simple: '제주도 바다가 정말 아름다워요.',
-                prompt: '제주도 바다가 얼마나 ____ 몰라요.',
-                hintKo: '`아름답다`의 ㅂ 불규칙을 확인하세요.',
-                answer: '아름다운지',
-                sentence: '제주도 바다가 얼마나 아름다운지 몰라요.',
-                options: ['아름다운지', '아름답는지', '아름다웠는지'],
-                explainKo: '`아름답다`는 ㅂ이 우로 바뀌어 `아름다운지`가 됩니다.'
-            },
-            {
-                id: 'degree_06',
-                round: 2,
-                roundTitle: '활용형 고르기',
-                type: 'blank',
-                scene: '요즘 일이 아주 많은 상황',
-                simple: '요즘 일이 너무 많아요.',
-                prompt: '요즘 일이 얼마나 ____ 몰라요.',
-                hintKo: '`많다`는 받침 있는 형용사입니다.',
-                answer: '많은지',
-                sentence: '요즘 일이 얼마나 많은지 몰라요.',
-                options: ['많는지', '많은지', '많았는지'],
-                explainKo: '받침 있는 형용사는 `-은지`를 붙여 `많은지`가 됩니다.'
-            },
-            {
-                id: 'degree_07',
-                round: 2,
-                roundTitle: '활용형 고르기',
-                type: 'blank',
-                scene: '아이가 아주 예쁜 상황',
-                simple: '아이가 정말 예뻐요.',
-                prompt: '아이가 얼마나 ____ 몰라요.',
-                hintKo: '`예쁘다`는 받침 없는 형용사입니다.',
-                answer: '예쁜지',
-                sentence: '아이가 얼마나 예쁜지 몰라요.',
-                options: ['예쁘는지', '예쁜지', '예쁠지'],
-                explainKo: '받침 없는 형용사는 `-ㄴ지`를 붙여 `예쁜지`가 됩니다.'
-            },
-            {
-                id: 'degree_08',
-                round: 2,
-                roundTitle: '활용형 고르기',
-                type: 'blank',
-                scene: '방이 아주 깨끗한 상황',
-                simple: '방이 정말 깨끗해요.',
-                prompt: '방이 얼마나 ____ 몰라요.',
-                hintKo: '`깨끗하다`는 하다 형용사입니다.',
-                answer: '깨끗한지',
-                sentence: '방이 얼마나 깨끗한지 몰라요.',
-                options: ['깨끗하는지', '깨끗한지', '깨끗했는지'],
-                explainKo: '`깨끗하다`는 현재 상태를 말할 때 `깨끗한지`가 됩니다.'
-            },
-            {
-                id: 'degree_09',
-                round: 3,
-                roundTitle: '단어 칩 조립',
-                type: 'build',
-                scene: '어제 이사해서 아주 피곤했던 상황',
-                simple: '어제 이사해서 정말 피곤했어요.',
-                prompt: '단어를 순서대로 눌러 강도 5 문장을 만드세요.',
-                hintKo: '과거 상태는 `피곤했는지`를 씁니다.',
-                answer: '어제 이사해서 얼마나 피곤했는지 몰라요.',
-                tokens: ['어제', '이사해서', '얼마나', '피곤했는지', '몰라요.'],
-                choices: ['얼마나', '어제', '피곤했는지', '정말', '이사해서', '몰라요.'],
-                explainKo: '어제의 상태를 강조하므로 `-았/었는지` 형태인 `피곤했는지`가 맞습니다.'
-            },
-            {
-                id: 'degree_10',
-                round: 3,
-                roundTitle: '단어 칩 조립',
-                type: 'build',
-                scene: '선생님이 아주 친절한 사람인 상황',
-                simple: '선생님이 정말 친절한 사람이에요.',
-                prompt: '단어를 순서대로 눌러 강도 5 문장을 만드세요.',
-                hintKo: '명사 `사람이다`는 `사람인지`가 됩니다.',
-                answer: '선생님이 얼마나 친절한 사람인지 몰라요.',
-                tokens: ['선생님이', '얼마나', '친절한', '사람인지', '몰라요.'],
-                choices: ['사람인지', '얼마나', '선생님이', '친절한', '사람이에요', '몰라요.'],
-                explainKo: '명사 뒤에는 `-(이)ㄴ지`를 붙여 `사람인지`로 말합니다.'
-            },
-            {
-                id: 'degree_11',
-                round: 3,
-                roundTitle: '단어 칩 조립',
-                type: 'build',
-                scene: '공연이 아주 멋있는 상황',
-                simple: '그 공연이 정말 멋있어요.',
-                prompt: '단어를 순서대로 눌러 강도 5 문장을 만드세요.',
-                hintKo: '`멋있다`는 `멋있는지`로 씁니다.',
-                answer: '그 공연이 얼마나 멋있는지 몰라요.',
-                tokens: ['그', '공연이', '얼마나', '멋있는지', '몰라요.'],
-                choices: ['그', '공연이', '멋있어요', '얼마나', '몰라요.', '멋있는지'],
-                explainKo: '`있다`가 들어간 형용사라 `멋있는지`가 자연스럽습니다.'
-            },
-            {
-                id: 'degree_12',
-                round: 3,
-                roundTitle: '단어 칩 조립',
-                type: 'build',
-                scene: '친구가 도와줘서 아주 고마운 상황',
-                simple: '친구가 도와줘서 정말 고마워요.',
-                prompt: '단어를 순서대로 눌러 강도 5 문장을 만드세요.',
-                hintKo: '`고맙다`는 ㅂ 불규칙으로 `고마운지`가 됩니다.',
-                answer: '친구가 도와줘서 얼마나 고마운지 몰라요.',
-                tokens: ['친구가', '도와줘서', '얼마나', '고마운지', '몰라요.'],
-                choices: ['친구가', '고마운지', '도와줘서', '몰라요.', '얼마나', '고맙는지'],
-                explainKo: '`고맙다`는 ㅂ이 우로 바뀌어 `고마운지`가 됩니다.'
-            }
-        ];
+        (function () {
+            "use strict";
 
-        const screenStart = document.getElementById('screenStart');
-        const screenGame = document.getElementById('screenGame');
-        const screenResult = document.getElementById('screenResult');
-        const startBtn = document.getElementById('startBtn');
-        const roundChip = document.getElementById('roundChip');
-        const progressText = document.getElementById('progressText');
-        const roundText = document.getElementById('roundText');
-        const progressFill = document.getElementById('progressFill');
-        const scoreText = document.getElementById('scoreText');
-        const totalText = document.getElementById('totalText');
-        const sceneTitle = document.getElementById('sceneTitle');
-        const sceneText = document.getElementById('sceneText');
-        const thermometer = document.getElementById('thermometer');
-        const simpleLine = document.getElementById('simpleLine');
-        const targetPreview = document.getElementById('targetPreview');
-        const questionType = document.getElementById('questionType');
-        const questionText = document.getElementById('questionText');
-        const questionHint = document.getElementById('questionHint');
-        const choiceList = document.getElementById('choiceList');
-        const builder = document.getElementById('builder');
-        const slotRow = document.getElementById('slotRow');
-        const wordBank = document.getElementById('wordBank');
-        const undoBtn = document.getElementById('undoBtn');
-        const resetBuildBtn = document.getElementById('resetBuildBtn');
-        const checkBuildBtn = document.getElementById('checkBuildBtn');
-        const feedbackBox = document.getElementById('feedbackBox');
-        const nextBtn = document.getElementById('nextBtn');
-        const restartBtn = document.getElementById('restartBtn');
-        const finalScore = document.getElementById('finalScore');
-        const reviewPoint = document.getElementById('reviewPoint');
-        const resultComment = document.getElementById('resultComment');
-        const reviewList = document.getElementById('reviewList');
+            const DEGREE_LABELS = {
+                1: "보통",
+                2: "조금 더",
+                3: "정말",
+                4: "너무",
+                5: "얼마나"
+            };
 
-        const state = {
-            index: 0,
-            score: 0,
-            answered: false,
-            selectedIndices: [],
-            logs: []
-        };
-
-        totalText.textContent = String(QUESTIONS.length);
-
-        function escapeHtml(value) {
-            return String(value == null ? '' : value)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        function normalize(value) {
-            return String(value || '').replace(/[\s.,!?~]/g, '').toLowerCase();
-        }
-
-        function currentQuestion() {
-            return QUESTIONS[state.index];
-        }
-
-        function showScreen(name) {
-            screenStart.classList.toggle('active', name === 'start');
-            screenGame.classList.toggle('active', name === 'game');
-            screenResult.classList.toggle('active', name === 'result');
-        }
-
-        function getTargetSentence(question) {
-            return question.sentence || question.answer;
-        }
-
-        function renderThermometer() {
-            thermometer.innerHTML = '';
-            for (let step = 1; step <= 5; step += 1) {
-                const segment = document.createElement('div');
-                segment.className = 'heat-segment is-active';
-                segment.innerHTML = '<span class="heat-bar" style="height:' + (10 + step * 8) + 'px"></span><strong>' + step + '</strong>';
-                thermometer.appendChild(segment);
-            }
-        }
-
-        function renderChoices(question) {
-            choiceList.innerHTML = '';
-            choiceList.classList.remove('hidden');
-            builder.classList.add('hidden');
-
-            question.options.forEach(function(option) {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'choice-btn safe';
-                button.textContent = question.type === 'blank' ? option : option;
-                button.addEventListener('click', function() {
-                    answerQuestion(option, button);
-                });
-                choiceList.appendChild(button);
-            });
-        }
-
-        function selectedWords(question) {
-            return state.selectedIndices.map(function(index) {
-                return question.choices[index];
-            });
-        }
-
-        function renderBuilder(question) {
-            choiceList.innerHTML = '';
-            choiceList.classList.add('hidden');
-            builder.classList.remove('hidden');
-            slotRow.innerHTML = '';
-            wordBank.innerHTML = '';
-
-            const words = selectedWords(question);
-            if (!words.length) {
-                const placeholder = document.createElement('span');
-                placeholder.className = 'hint';
-                placeholder.textContent = '단어를 순서대로 선택하세요.';
-                slotRow.appendChild(placeholder);
-            } else {
-                words.forEach(function(word, selectedIndex) {
-                    const button = document.createElement('button');
-                    button.type = 'button';
-                    button.className = 'slot-btn safe';
-                    button.textContent = word;
-                    button.addEventListener('click', function() {
-                        if (state.answered) {
-                            return;
+            const DATA = {
+                items: {
+                    verbs: [
+                        {
+                            id: "like",
+                            kind: "verb",
+                            word: "좋아하다",
+                            scene: "친구가 선물을 받고",
+                            targetForm: "좋아하는지",
+                            forms: [
+                                "친구가 선물을 받고 좋아해요.",
+                                "친구가 선물을 받고 꽤 좋아해요.",
+                                "친구가 선물을 받고 정말 좋아해요.",
+                                "친구가 선물을 받고 너무 좋아해요.",
+                                "친구가 선물을 받고 얼마나 좋아하는지 몰라요."
+                            ],
+                            hint: "동사 현재: 좋아하다 -> 좋아하는지"
+                        },
+                        {
+                            id: "wait",
+                            kind: "verb",
+                            word: "기다리다",
+                            scene: "버스를",
+                            targetForm: "오래 기다렸는지",
+                            forms: [
+                                "버스를 기다렸어요.",
+                                "버스를 오래 기다렸어요.",
+                                "버스를 정말 오래 기다렸어요.",
+                                "버스를 너무 오래 기다렸어요.",
+                                "버스를 얼마나 오래 기다렸는지 몰라요."
+                            ],
+                            hint: "동사 과거: 오래 기다리다 -> 오래 기다렸는지"
+                        },
+                        {
+                            id: "worry",
+                            kind: "verb",
+                            word: "걱정하다",
+                            scene: "엄마가 아이를",
+                            targetForm: "걱정하는지",
+                            forms: [
+                                "엄마가 아이를 걱정해요.",
+                                "엄마가 아이를 조금 걱정해요.",
+                                "엄마가 아이를 정말 걱정해요.",
+                                "엄마가 아이를 너무 걱정해요.",
+                                "엄마가 아이를 얼마나 걱정하는지 몰라요."
+                            ],
+                            hint: "동사 현재: 걱정하다 -> 걱정하는지"
+                        },
+                        {
+                            id: "sweat",
+                            kind: "verb",
+                            word: "땀이 나다",
+                            scene: "운동을 하면 땀이",
+                            targetForm: "많이 나는지",
+                            forms: [
+                                "운동을 하면 땀이 나요.",
+                                "운동을 하면 땀이 꽤 나요.",
+                                "운동을 하면 땀이 정말 많이 나요.",
+                                "운동을 하면 땀이 너무 많이 나요.",
+                                "운동을 하면 땀이 얼마나 많이 나는지 몰라요."
+                            ],
+                            hint: "동사 현재: 많이 나다 -> 많이 나는지"
+                        },
+                        {
+                            id: "eat",
+                            kind: "verb",
+                            word: "먹다",
+                            scene: "동생이 저녁을",
+                            targetForm: "많이 먹는지",
+                            forms: [
+                                "동생이 저녁을 먹어요.",
+                                "동생이 저녁을 꽤 먹어요.",
+                                "동생이 저녁을 정말 많이 먹어요.",
+                                "동생이 저녁을 너무 많이 먹어요.",
+                                "동생이 저녁을 얼마나 많이 먹는지 몰라요."
+                            ],
+                            hint: "동사 현재: 많이 먹다 -> 많이 먹는지"
                         }
-                        state.selectedIndices = state.selectedIndices.slice(0, selectedIndex);
-                        renderBuilder(question);
-                    });
-                    slotRow.appendChild(button);
-                });
-            }
-
-            question.choices.forEach(function(word, index) {
-                const used = state.selectedIndices.includes(index);
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'word-chip safe' + (used ? ' is-used' : '');
-                button.textContent = word;
-                button.disabled = used || state.answered;
-                button.addEventListener('click', function() {
-                    if (state.answered) {
-                        return;
+                    ],
+                    adjectives: [
+                        {
+                            id: "delicious",
+                            kind: "adjective",
+                            word: "맛있다",
+                            scene: "이 케이크가",
+                            targetForm: "맛있는지",
+                            forms: [
+                                "이 케이크가 맛있어요.",
+                                "이 케이크가 꽤 맛있어요.",
+                                "이 케이크가 정말 맛있어요.",
+                                "이 케이크가 너무 맛있어요.",
+                                "이 케이크가 얼마나 맛있는지 몰라요."
+                            ],
+                            hint: "있다/없다 형용사: 맛있다 -> 맛있는지"
+                        },
+                        {
+                            id: "difficult",
+                            kind: "adjective",
+                            word: "어렵다",
+                            scene: "한국어 공부가",
+                            targetForm: "어려운지",
+                            forms: [
+                                "한국어 공부가 어려워요.",
+                                "한국어 공부가 조금 어려워요.",
+                                "한국어 공부가 정말 어려워요.",
+                                "한국어 공부가 너무 어려워요.",
+                                "한국어 공부가 얼마나 어려운지 몰라요."
+                            ],
+                            hint: "ㅂ 불규칙 형용사: 어렵다 -> 어려운지"
+                        },
+                        {
+                            id: "pretty",
+                            kind: "adjective",
+                            word: "예쁘다",
+                            scene: "아기가",
+                            targetForm: "예쁜지",
+                            forms: [
+                                "아기가 예뻐요.",
+                                "아기가 꽤 예뻐요.",
+                                "아기가 정말 예뻐요.",
+                                "아기가 너무 예뻐요.",
+                                "아기가 얼마나 예쁜지 몰라요."
+                            ],
+                            hint: "받침 없는 형용사: 예쁘다 -> 예쁜지"
+                        },
+                        {
+                            id: "many",
+                            kind: "adjective",
+                            word: "많다",
+                            scene: "요즘 일이",
+                            targetForm: "많은지",
+                            forms: [
+                                "요즘 일이 많아요.",
+                                "요즘 일이 조금 많아요.",
+                                "요즘 일이 정말 많아요.",
+                                "요즘 일이 너무 많아요.",
+                                "요즘 일이 얼마나 많은지 몰라요."
+                            ],
+                            hint: "받침 있는 형용사: 많다 -> 많은지"
+                        },
+                        {
+                            id: "beautiful",
+                            kind: "adjective",
+                            word: "아름답다",
+                            scene: "제주도 바다가",
+                            targetForm: "아름다운지",
+                            forms: [
+                                "제주도 바다가 아름다워요.",
+                                "제주도 바다가 꽤 아름다워요.",
+                                "제주도 바다가 정말 아름다워요.",
+                                "제주도 바다가 너무 아름다워요.",
+                                "제주도 바다가 얼마나 아름다운지 몰라요."
+                            ],
+                            hint: "ㅂ 불규칙 형용사: 아름답다 -> 아름다운지"
+                        }
+                    ]
+                },
+                choicePractice: [
+                    {
+                        id: "c01",
+                        itemId: "delicious",
+                        degree: 1,
+                        prompt: "온도계 1단계에 맞는 표현은?",
+                        cue: "맛있다 / 보통 정도",
+                        answer: "이 케이크가 맛있어요.",
+                        options: ["이 케이크가 맛있어요.", "이 케이크가 너무 맛있어요.", "이 케이크가 얼마나 맛있는지 몰라요."]
+                    },
+                    {
+                        id: "c02",
+                        itemId: "delicious",
+                        degree: 3,
+                        prompt: "온도계 3단계에 맞는 표현은?",
+                        cue: "맛있다 / 정말",
+                        answer: "이 케이크가 정말 맛있어요.",
+                        options: ["이 케이크가 정말 맛있어요.", "이 케이크가 꽤 맛있어요.", "이 케이크가 얼마나 맛있은지 몰라요."]
+                    },
+                    {
+                        id: "c03",
+                        itemId: "delicious",
+                        degree: 5,
+                        prompt: "온도계 5단계에 맞는 표현은?",
+                        cue: "맛있다 / 목표 문법형",
+                        answer: "이 케이크가 얼마나 맛있는지 몰라요.",
+                        options: ["이 케이크가 얼마나 맛있은지 몰라요.", "이 케이크가 얼마나 맛있는지 몰라요.", "이 케이크가 얼마나 맛있어요 몰라요."]
+                    },
+                    {
+                        id: "c04",
+                        itemId: "difficult",
+                        degree: 4,
+                        prompt: "온도계 4단계에 맞는 표현은?",
+                        cue: "어렵다 / 너무",
+                        answer: "한국어 공부가 너무 어려워요.",
+                        options: ["한국어 공부가 조금 어려워요.", "한국어 공부가 너무 어려워요.", "한국어 공부가 얼마나 어려운지 몰라요."]
+                    },
+                    {
+                        id: "c05",
+                        itemId: "difficult",
+                        degree: 5,
+                        prompt: "온도계 5단계에 맞는 표현은?",
+                        cue: "어렵다 / ㅂ 불규칙",
+                        answer: "한국어 공부가 얼마나 어려운지 몰라요.",
+                        options: ["한국어 공부가 얼마나 어려운지 몰라요.", "한국어 공부가 얼마나 어렵는지 몰라요.", "한국어 공부가 얼마나 어렵은지 몰라요."]
+                    },
+                    {
+                        id: "c06",
+                        itemId: "pretty",
+                        degree: 5,
+                        prompt: "온도계 5단계에 맞는 표현은?",
+                        cue: "예쁘다 / 형용사",
+                        answer: "아기가 얼마나 예쁜지 몰라요.",
+                        options: ["아기가 얼마나 예쁘는지 몰라요.", "아기가 얼마나 예쁜지 몰라요.", "아기가 얼마나 예뻐요 몰라요."]
+                    },
+                    {
+                        id: "c07",
+                        itemId: "many",
+                        degree: 3,
+                        prompt: "온도계 3단계에 맞는 표현은?",
+                        cue: "많다 / 정말",
+                        answer: "요즘 일이 정말 많아요.",
+                        options: ["요즘 일이 정말 많아요.", "요즘 일이 너무 많아요.", "요즘 일이 얼마나 많은지 몰라요."]
+                    },
+                    {
+                        id: "c08",
+                        itemId: "beautiful",
+                        degree: 5,
+                        prompt: "온도계 5단계에 맞는 표현은?",
+                        cue: "아름답다 / ㅂ 불규칙",
+                        answer: "제주도 바다가 얼마나 아름다운지 몰라요.",
+                        options: ["제주도 바다가 얼마나 아름다운지 몰라요.", "제주도 바다가 얼마나 아름답는지 몰라요.", "제주도 바다가 얼마나 아름다워요 몰라요."]
+                    },
+                    {
+                        id: "c09",
+                        itemId: "like",
+                        degree: 5,
+                        prompt: "온도계 5단계에 맞는 표현은?",
+                        cue: "좋아하다 / 동사 현재",
+                        answer: "친구가 선물을 받고 얼마나 좋아하는지 몰라요.",
+                        options: ["친구가 선물을 받고 얼마나 좋아한지 몰라요.", "친구가 선물을 받고 얼마나 좋아하는지 몰라요.", "친구가 선물을 받고 얼마나 좋은지 몰라요."]
+                    },
+                    {
+                        id: "c10",
+                        itemId: "like",
+                        degree: 3,
+                        prompt: "온도계 3단계에 맞는 표현은?",
+                        cue: "좋아하다 / 정말",
+                        answer: "친구가 선물을 받고 정말 좋아해요.",
+                        options: ["친구가 선물을 받고 정말 좋아해요.", "친구가 선물을 받고 너무 좋아해요.", "친구가 선물을 받고 얼마나 좋아하는지 몰라요."]
+                    },
+                    {
+                        id: "c11",
+                        itemId: "wait",
+                        degree: 4,
+                        prompt: "온도계 4단계에 맞는 표현은?",
+                        cue: "기다리다 / 너무 오래",
+                        answer: "버스를 너무 오래 기다렸어요.",
+                        options: ["버스를 오래 기다렸어요.", "버스를 너무 오래 기다렸어요.", "버스를 얼마나 오래 기다렸는지 몰라요."]
+                    },
+                    {
+                        id: "c12",
+                        itemId: "wait",
+                        degree: 5,
+                        prompt: "온도계 5단계에 맞는 표현은?",
+                        cue: "기다리다 / 과거",
+                        answer: "버스를 얼마나 오래 기다렸는지 몰라요.",
+                        options: ["버스를 얼마나 오래 기다렸는지 몰라요.", "버스를 얼마나 오래 기다리는지 몰라요.", "버스를 얼마나 오래 기다린지 몰라요."]
+                    },
+                    {
+                        id: "c13",
+                        itemId: "worry",
+                        degree: 5,
+                        prompt: "온도계 5단계에 맞는 표현은?",
+                        cue: "걱정하다 / 동사 현재",
+                        answer: "엄마가 아이를 얼마나 걱정하는지 몰라요.",
+                        options: ["엄마가 아이를 얼마나 걱정한지 몰라요.", "엄마가 아이를 얼마나 걱정하는지 몰라요.", "엄마가 아이를 얼마나 걱정한 사람인지 몰라요."]
+                    },
+                    {
+                        id: "c14",
+                        itemId: "sweat",
+                        degree: 5,
+                        prompt: "온도계 5단계에 맞는 표현은?",
+                        cue: "땀이 나다 / 많이",
+                        answer: "운동을 하면 땀이 얼마나 많이 나는지 몰라요.",
+                        options: ["운동을 하면 땀이 얼마나 많이 나는지 몰라요.", "운동을 하면 땀이 얼마나 많이 난지 몰라요.", "운동을 하면 땀이 얼마나 많이 나요 몰라요."]
+                    },
+                    {
+                        id: "c15",
+                        itemId: "eat",
+                        degree: 5,
+                        prompt: "온도계 5단계에 맞는 표현은?",
+                        cue: "먹다 / 많이",
+                        answer: "동생이 저녁을 얼마나 많이 먹는지 몰라요.",
+                        options: ["동생이 저녁을 얼마나 많이 먹은지 몰라요.", "동생이 저녁을 얼마나 많이 먹는지 몰라요.", "동생이 저녁을 얼마나 많이 먹어요 몰라요."]
                     }
-                    state.selectedIndices.push(index);
-                    renderBuilder(question);
+                ],
+                typingPractice: [
+                    { id: "t01", itemId: "like", prompt: "친구가 선물을 받고 얼마나 ____ 몰라요.", cue: "좋아하다", answers: ["좋아하는지"] },
+                    { id: "t02", itemId: "wait", prompt: "버스를 얼마나 ____ 몰라요.", cue: "오래 기다리다 / 과거", answers: ["오래 기다렸는지"] },
+                    { id: "t03", itemId: "worry", prompt: "엄마가 아이를 얼마나 ____ 몰라요.", cue: "걱정하다", answers: ["걱정하는지"] },
+                    { id: "t04", itemId: "sweat", prompt: "운동을 하면 땀이 얼마나 ____ 몰라요.", cue: "많이 나다", answers: ["많이 나는지"] },
+                    { id: "t05", itemId: "eat", prompt: "동생이 저녁을 얼마나 ____ 몰라요.", cue: "많이 먹다", answers: ["많이 먹는지"] },
+                    { id: "t06", itemId: "delicious", prompt: "이 케이크가 얼마나 ____ 몰라요.", cue: "맛있다", answers: ["맛있는지"] },
+                    { id: "t07", itemId: "difficult", prompt: "한국어 공부가 얼마나 ____ 몰라요.", cue: "어렵다", answers: ["어려운지"] },
+                    { id: "t08", itemId: "pretty", prompt: "아기가 얼마나 ____ 몰라요.", cue: "예쁘다", answers: ["예쁜지"] },
+                    { id: "t09", itemId: "many", prompt: "요즘 일이 얼마나 ____ 몰라요.", cue: "많다", answers: ["많은지"] },
+                    { id: "t10", itemId: "beautiful", prompt: "제주도 바다가 얼마나 ____ 몰라요.", cue: "아름답다", answers: ["아름다운지"] }
+                ]
+            };
+
+            const state = {
+                stage: "explore",
+                degree: 5,
+                exploreKind: "adjectives",
+                selectedItemId: "delicious",
+                choiceIndex: 0,
+                choiceScore: 0,
+                choiceAnswered: false,
+                choiceLogs: [],
+                typingIndex: 0,
+                typingScore: 0,
+                typingAnswered: false,
+                typingLogs: [],
+                complete: false
+            };
+
+            const refs = {
+                tabs: {
+                    explore: document.getElementById("tabExplore"),
+                    choice: document.getElementById("tabChoice"),
+                    typing: document.getElementById("tabTyping")
+                },
+                stages: {
+                    explore: document.getElementById("stageExplore"),
+                    choice: document.getElementById("stageChoice"),
+                    typing: document.getElementById("stageTyping")
+                },
+                adjectiveModeBtn: document.getElementById("adjectiveModeBtn"),
+                verbModeBtn: document.getElementById("verbModeBtn"),
+                itemList: document.getElementById("itemList"),
+                exploreKindStatus: document.getElementById("exploreKindStatus"),
+                exploreDegreeStatus: document.getElementById("exploreDegreeStatus"),
+                degreeBadge: document.getElementById("degreeBadge"),
+                currentWord: document.getElementById("currentWord"),
+                expressionText: document.getElementById("expressionText"),
+                formHint: document.getElementById("formHint"),
+                degreeList: document.getElementById("degreeList"),
+                goChoiceBtn: document.getElementById("goChoiceBtn"),
+                choiceProgress: document.getElementById("choiceProgress"),
+                choiceScore: document.getElementById("choiceScore"),
+                choiceDegreeBadge: document.getElementById("choiceDegreeBadge"),
+                choicePrompt: document.getElementById("choicePrompt"),
+                choiceCue: document.getElementById("choiceCue"),
+                choiceFeedback: document.getElementById("choiceFeedback"),
+                choiceNextBtn: document.getElementById("choiceNextBtn"),
+                choiceList: document.getElementById("choiceList"),
+                typingProgress: document.getElementById("typingProgress"),
+                typingScore: document.getElementById("typingScore"),
+                typingDegreeBadge: document.getElementById("typingDegreeBadge"),
+                typingBody: document.getElementById("typingBody"),
+                summaryBody: document.getElementById("summaryBody"),
+                typingPrompt: document.getElementById("typingPrompt"),
+                typingCue: document.getElementById("typingCue"),
+                typingInput: document.getElementById("typingInput"),
+                typingCheckBtn: document.getElementById("typingCheckBtn"),
+                typingFeedback: document.getElementById("typingFeedback"),
+                typingNextBtn: document.getElementById("typingNextBtn"),
+                choiceFinalScore: document.getElementById("choiceFinalScore"),
+                typingFinalScore: document.getElementById("typingFinalScore"),
+                reviewList: document.getElementById("reviewList"),
+                restartBtn: document.getElementById("restartBtn"),
+                thermometer: document.getElementById("thermometer"),
+                mercury: document.getElementById("mercury"),
+                thermoHandle: document.getElementById("thermoHandle"),
+                thermoScale: document.getElementById("thermoScale"),
+                thermoLive: document.getElementById("thermoLive"),
+                railActions: document.getElementById("railActions")
+            };
+
+            function esc(value) {
+                return String(value == null ? "" : value)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#39;");
+            }
+
+            function normalize(value) {
+                return String(value || "")
+                    .toLowerCase()
+                    .replace(/[\s.,!?~`"'“”‘’()]/g, "");
+            }
+
+            function allItems() {
+                return DATA.items.verbs.concat(DATA.items.adjectives);
+            }
+
+            function itemById(id) {
+                return allItems().find(function (item) {
+                    return item.id === id;
+                }) || DATA.items.adjectives[0];
+            }
+
+            function currentExploreItem() {
+                return itemById(state.selectedItemId);
+            }
+
+            function currentChoice() {
+                return DATA.choicePractice[state.choiceIndex];
+            }
+
+            function currentTyping() {
+                return DATA.typingPractice[state.typingIndex];
+            }
+
+            function degreeText(value) {
+                return value + "단계: " + DEGREE_LABELS[value];
+            }
+
+            function setDegree(value, options) {
+                const next = Math.max(1, Math.min(5, Math.round(Number(value) || 1)));
+                state.degree = next;
+                renderThermometer();
+                if (!options || options.updateExplore !== false) {
+                    renderExplore();
+                }
+            }
+
+            function setDegreeFromPointer(event) {
+                const rect = refs.thermometer.getBoundingClientRect();
+                const raw = (rect.bottom - event.clientY) / rect.height;
+                setDegree(1 + raw * 4);
+            }
+
+            function showStage(stage) {
+                state.stage = stage;
+                Object.keys(refs.stages).forEach(function (key) {
+                    refs.stages[key].classList.toggle("is-active", key === stage);
+                    refs.tabs[key].classList.toggle("is-active", key === stage);
                 });
-                wordBank.appendChild(button);
-            });
-
-            undoBtn.disabled = state.answered || state.selectedIndices.length === 0;
-            resetBuildBtn.disabled = state.answered || state.selectedIndices.length === 0;
-            checkBuildBtn.disabled = state.answered || state.selectedIndices.length === 0;
-        }
-
-        function renderQuestion() {
-            const question = currentQuestion();
-            state.answered = false;
-            state.selectedIndices = [];
-            feedbackBox.classList.add('hidden');
-            feedbackBox.className = 'feedback hidden';
-            feedbackBox.innerHTML = '';
-            nextBtn.classList.add('hidden');
-            scoreText.textContent = String(state.score);
-            roundChip.textContent = question.round + '라운드';
-            progressText.textContent = (state.index + 1) + ' / ' + QUESTIONS.length;
-            roundText.textContent = question.roundTitle;
-            progressFill.style.width = Math.round(((state.index + 1) / QUESTIONS.length) * 100) + '%';
-
-            sceneTitle.textContent = question.scene;
-            sceneText.textContent = '상황: ' + question.scene;
-            simpleLine.textContent = '보통 강조: ' + question.simple;
-            targetPreview.textContent = '강도 5: ' + getTargetSentence(question);
-            questionType.textContent = question.roundTitle;
-            questionText.textContent = question.prompt;
-            questionHint.textContent = '힌트: ' + question.hintKo;
-
-            renderThermometer();
-
-            if (question.type === 'build') {
-                renderBuilder(question);
-            } else {
-                renderChoices(question);
+                if (stage === "explore") {
+                    setDegree(state.degree);
+                } else if (stage === "choice") {
+                    renderChoice();
+                } else if (stage === "typing") {
+                    renderTyping();
+                }
             }
-        }
 
-        function lockInputs() {
-            Array.from(choiceList.querySelectorAll('button')).forEach(function(button) {
-                button.disabled = true;
-            });
-            Array.from(wordBank.querySelectorAll('button')).forEach(function(button) {
-                button.disabled = true;
-            });
-            undoBtn.disabled = true;
-            resetBuildBtn.disabled = true;
-            checkBuildBtn.disabled = true;
-        }
+            function renderThermometer() {
+                const percent = ((state.degree - 1) / 4) * 100;
+                refs.mercury.style.height = percent + "%";
+                refs.thermoHandle.style.bottom = "calc(58px + " + percent + "%)";
+                refs.thermoHandle.textContent = String(state.degree);
+                refs.thermometer.setAttribute("aria-valuenow", String(state.degree));
+                refs.thermometer.setAttribute("aria-valuetext", degreeText(state.degree));
+                refs.thermoLive.textContent = degreeText(state.degree) + (state.degree === 5 ? " / 얼마나 ...인지 몰라요" : "");
 
-        function showFeedback(ok, userAnswer, correctAnswer, question) {
-            feedbackBox.className = 'feedback ' + (ok ? 'ok' : 'no');
-            feedbackBox.innerHTML = '' +
-                '<p class="' + (ok ? 'state-ok' : 'state-no') + '">' + (ok ? '정답입니다.' : '오답입니다.') + '</p>' +
-                '<p><strong>내 답:</strong> ' + escapeHtml(userAnswer || '(무응답)') + '</p>' +
-                '<p><strong>정답:</strong> ' + escapeHtml(correctAnswer) + '</p>' +
-                '<p><strong>왜 이 형태인지:</strong> ' + escapeHtml(question.explainKo) + '</p>';
-            feedbackBox.classList.remove('hidden');
-            nextBtn.classList.remove('hidden');
-        }
-
-        function answerQuestion(answer, clickedButton) {
-            if (state.answered) {
-                return;
+                Array.from(refs.thermoScale.children).forEach(function (mark) {
+                    mark.classList.toggle("is-active", Number(mark.dataset.degree) === state.degree);
+                });
+                Array.from(refs.railActions.children).forEach(function (button) {
+                    button.classList.toggle("is-active", Number(button.dataset.degree) === state.degree);
+                });
             }
-            const question = currentQuestion();
-            const correctAnswer = question.answer;
-            const ok = normalize(answer) === normalize(correctAnswer);
 
-            state.answered = true;
-            if (ok) {
-                state.score += 1;
+            function renderScale() {
+                refs.thermoScale.innerHTML = "";
+                refs.railActions.innerHTML = "";
+                [5, 4, 3, 2, 1].forEach(function (degree) {
+                    const mark = document.createElement("div");
+                    mark.className = "scale-mark";
+                    mark.dataset.degree = String(degree);
+                    mark.innerHTML = "<strong>" + degree + "</strong><span>" + esc(DEGREE_LABELS[degree]) + "</span>";
+                    refs.thermoScale.appendChild(mark);
+                });
+                [1, 2, 3, 4, 5].forEach(function (degree) {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.dataset.degree = String(degree);
+                    button.textContent = String(degree);
+                    button.addEventListener("click", function () {
+                        setDegree(degree);
+                    });
+                    refs.railActions.appendChild(button);
+                });
             }
-            state.logs.push({
-                id: question.id,
-                ok: ok,
-                user: answer,
-                correct: correctAnswer,
-                prompt: question.prompt
-            });
 
-            Array.from(choiceList.querySelectorAll('button')).forEach(function(button) {
-                if (normalize(button.textContent) === normalize(correctAnswer)) {
-                    button.classList.add('is-correct');
-                } else if (button === clickedButton) {
-                    button.classList.add('is-wrong');
+            function renderItemList() {
+                const items = DATA.items[state.exploreKind];
+                refs.itemList.innerHTML = "";
+                items.forEach(function (item) {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "item-chip safe" + (item.id === state.selectedItemId ? " is-active" : "");
+                    button.innerHTML = "" +
+                        "<span><strong>" + esc(item.word) + "</strong><span>" + esc(item.scene) + "</span></span>" +
+                        "<span class=\"chip-form\">" + esc(item.targetForm) + "</span>";
+                    button.addEventListener("click", function () {
+                        state.selectedItemId = item.id;
+                        renderExplore();
+                    });
+                    refs.itemList.appendChild(button);
+                });
+            }
+
+            function renderExplore() {
+                const item = currentExploreItem();
+                refs.adjectiveModeBtn.classList.toggle("is-active", state.exploreKind === "adjectives");
+                refs.verbModeBtn.classList.toggle("is-active", state.exploreKind === "verbs");
+                refs.exploreKindStatus.textContent = state.exploreKind === "adjectives" ? "형용사" : "동사";
+                refs.exploreDegreeStatus.textContent = state.degree + "단계";
+                refs.degreeBadge.textContent = degreeText(state.degree);
+                refs.currentWord.textContent = item.word + " / " + item.scene;
+                refs.expressionText.textContent = item.forms[state.degree - 1];
+                refs.formHint.textContent = state.degree === 5 ? item.hint : DEGREE_LABELS[state.degree] + " 정도 표현";
+
+                renderItemList();
+                refs.degreeList.innerHTML = "";
+                item.forms.forEach(function (text, index) {
+                    const degree = index + 1;
+                    const line = document.createElement("div");
+                    line.className = "degree-line safe" + (degree === state.degree ? " is-active" : "");
+                    line.innerHTML = "<strong>" + degree + "</strong><span>" + esc(text) + "</span>";
+                    refs.degreeList.appendChild(line);
+                });
+            }
+
+            function renderChoice() {
+                state.complete = false;
+                refs.choiceFeedback.className = "feedback hidden";
+                refs.choiceFeedback.innerHTML = "";
+                refs.choiceNextBtn.classList.add("hidden");
+                refs.choiceList.innerHTML = "";
+
+                const question = currentChoice();
+                if (!question) {
+                    showStage("typing");
+                    return;
+                }
+
+                setDegree(question.degree, { updateExplore: false });
+                refs.choiceProgress.textContent = (state.choiceIndex + 1) + " / " + DATA.choicePractice.length;
+                refs.choiceScore.textContent = "정답 " + state.choiceScore;
+                refs.choiceDegreeBadge.textContent = degreeText(question.degree);
+                refs.choicePrompt.textContent = question.prompt;
+                refs.choiceCue.textContent = question.cue;
+                state.choiceAnswered = false;
+
+                question.options.forEach(function (option) {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "choice-btn safe";
+                    button.textContent = option;
+                    button.addEventListener("click", function () {
+                        answerChoice(option, button);
+                    });
+                    refs.choiceList.appendChild(button);
+                });
+            }
+
+            function answerChoice(answer, clickedButton) {
+                if (state.choiceAnswered) return;
+                const question = currentChoice();
+                const ok = normalize(answer) === normalize(question.answer);
+                state.choiceAnswered = true;
+                if (ok) state.choiceScore += 1;
+                state.choiceLogs.push({
+                    id: question.id,
+                    ok: ok,
+                    user: answer,
+                    correct: question.answer
+                });
+
+                Array.from(refs.choiceList.children).forEach(function (button) {
+                    button.disabled = true;
+                    if (normalize(button.textContent) === normalize(question.answer)) {
+                        button.classList.add("is-correct");
+                    } else if (button === clickedButton) {
+                        button.classList.add("is-wrong");
+                    }
+                });
+
+                refs.choiceScore.textContent = "정답 " + state.choiceScore;
+                refs.choiceFeedback.className = "feedback " + (ok ? "ok" : "no");
+                refs.choiceFeedback.innerHTML = ok
+                    ? "좋아요. 온도계 단계와 표현이 맞습니다."
+                    : "다시 확인: <strong>" + esc(question.answer) + "</strong>";
+                refs.choiceNextBtn.textContent = state.choiceIndex >= DATA.choicePractice.length - 1 ? "타이핑으로" : "다음";
+                refs.choiceNextBtn.classList.remove("hidden");
+            }
+
+            function nextChoice() {
+                if (state.choiceIndex >= DATA.choicePractice.length - 1) {
+                    state.typingIndex = 0;
+                    state.typingAnswered = false;
+                    showStage("typing");
+                    return;
+                }
+                state.choiceIndex += 1;
+                renderChoice();
+            }
+
+            function renderTyping() {
+                refs.typingBody.classList.toggle("hidden", state.complete);
+                refs.summaryBody.classList.toggle("hidden", !state.complete);
+                if (state.complete) {
+                    renderSummary();
+                    return;
+                }
+
+                const question = currentTyping();
+                setDegree(5, { updateExplore: false });
+                refs.typingProgress.textContent = (state.typingIndex + 1) + " / " + DATA.typingPractice.length;
+                refs.typingScore.textContent = "정답 " + state.typingScore;
+                refs.typingDegreeBadge.textContent = degreeText(5);
+                refs.typingPrompt.textContent = question.prompt;
+                refs.typingCue.textContent = question.cue;
+                refs.typingInput.value = "";
+                refs.typingInput.disabled = false;
+                refs.typingCheckBtn.disabled = false;
+                refs.typingFeedback.className = "feedback hidden";
+                refs.typingFeedback.innerHTML = "";
+                refs.typingNextBtn.classList.add("hidden");
+                state.typingAnswered = false;
+                window.setTimeout(function () {
+                    refs.typingInput.focus();
+                }, 0);
+            }
+
+            function answerTyping() {
+                if (state.typingAnswered) return;
+                const question = currentTyping();
+                const user = refs.typingInput.value;
+                const ok = question.answers.some(function (answer) {
+                    return normalize(answer) === normalize(user);
+                });
+                state.typingAnswered = true;
+                if (ok) state.typingScore += 1;
+                state.typingLogs.push({
+                    id: question.id,
+                    ok: ok,
+                    user: user,
+                    correct: question.answers[0]
+                });
+
+                refs.typingScore.textContent = "정답 " + state.typingScore;
+                refs.typingInput.disabled = true;
+                refs.typingCheckBtn.disabled = true;
+                refs.typingFeedback.className = "feedback " + (ok ? "ok" : "no");
+                refs.typingFeedback.innerHTML = ok
+                    ? "맞습니다."
+                    : "정답: <strong>" + esc(question.answers[0]) + "</strong>";
+                refs.typingNextBtn.textContent = state.typingIndex >= DATA.typingPractice.length - 1 ? "완료" : "다음";
+                refs.typingNextBtn.classList.remove("hidden");
+            }
+
+            function nextTyping() {
+                if (state.typingIndex >= DATA.typingPractice.length - 1) {
+                    state.complete = true;
+                    renderTyping();
+                    return;
+                }
+                state.typingIndex += 1;
+                renderTyping();
+            }
+
+            function renderSummary() {
+                refs.choiceFinalScore.textContent = state.choiceScore + " / " + DATA.choicePractice.length;
+                refs.typingFinalScore.textContent = state.typingScore + " / " + DATA.typingPractice.length;
+                refs.reviewList.innerHTML = "";
+
+                const wrong = state.choiceLogs.concat(state.typingLogs).filter(function (log) {
+                    return !log.ok;
+                });
+
+                if (!wrong.length) {
+                    const item = document.createElement("div");
+                    item.className = "review-item safe";
+                    item.textContent = "모든 표현을 정확하게 골랐습니다. 이제 직접 경험 문장으로 말해 보세요.";
+                    refs.reviewList.appendChild(item);
+                    return;
+                }
+
+                wrong.slice(0, 8).forEach(function (log) {
+                    const item = document.createElement("div");
+                    item.className = "review-item safe";
+                    item.innerHTML = "<strong>정답:</strong> " + esc(log.correct) + "<br><strong>내 답:</strong> " + esc(log.user || "(비어 있음)");
+                    refs.reviewList.appendChild(item);
+                });
+            }
+
+            function resetActivity() {
+                state.stage = "explore";
+                state.degree = 5;
+                state.exploreKind = "adjectives";
+                state.selectedItemId = "delicious";
+                state.choiceIndex = 0;
+                state.choiceScore = 0;
+                state.choiceAnswered = false;
+                state.choiceLogs = [];
+                state.typingIndex = 0;
+                state.typingScore = 0;
+                state.typingAnswered = false;
+                state.typingLogs = [];
+                state.complete = false;
+                renderExplore();
+                showStage("explore");
+            }
+
+            function bindEvents() {
+                refs.adjectiveModeBtn.addEventListener("click", function () {
+                    state.exploreKind = "adjectives";
+                    state.selectedItemId = DATA.items.adjectives[0].id;
+                    renderExplore();
+                });
+                refs.verbModeBtn.addEventListener("click", function () {
+                    state.exploreKind = "verbs";
+                    state.selectedItemId = DATA.items.verbs[0].id;
+                    renderExplore();
+                });
+                refs.goChoiceBtn.addEventListener("click", function () {
+                    state.choiceIndex = 0;
+                    state.choiceScore = 0;
+                    state.choiceLogs = [];
+                    showStage("choice");
+                });
+                refs.tabs.explore.addEventListener("click", function () {
+                    showStage("explore");
+                });
+                refs.tabs.choice.addEventListener("click", function () {
+                    showStage("choice");
+                });
+                refs.tabs.typing.addEventListener("click", function () {
+                    showStage("typing");
+                });
+                refs.choiceNextBtn.addEventListener("click", nextChoice);
+                refs.typingCheckBtn.addEventListener("click", answerTyping);
+                refs.typingNextBtn.addEventListener("click", nextTyping);
+                refs.typingInput.addEventListener("keydown", function (event) {
+                    if (event.key === "Enter") {
+                        if (!state.typingAnswered) {
+                            answerTyping();
+                        } else {
+                            nextTyping();
+                        }
+                    }
+                });
+                refs.restartBtn.addEventListener("click", resetActivity);
+
+                refs.thermometer.addEventListener("pointerdown", function (event) {
+                    refs.thermometer.setPointerCapture(event.pointerId);
+                    setDegreeFromPointer(event);
+                });
+                refs.thermometer.addEventListener("pointermove", function (event) {
+                    if (refs.thermometer.hasPointerCapture(event.pointerId)) {
+                        setDegreeFromPointer(event);
+                    }
+                });
+                refs.thermometer.addEventListener("pointerup", function (event) {
+                    if (refs.thermometer.hasPointerCapture(event.pointerId)) {
+                        refs.thermometer.releasePointerCapture(event.pointerId);
+                    }
+                });
+                refs.thermometer.addEventListener("keydown", function (event) {
+                    if (event.key === "ArrowUp" || event.key === "ArrowRight") {
+                        event.preventDefault();
+                        setDegree(state.degree + 1);
+                    } else if (event.key === "ArrowDown" || event.key === "ArrowLeft") {
+                        event.preventDefault();
+                        setDegree(state.degree - 1);
+                    } else if (event.key === "Home") {
+                        event.preventDefault();
+                        setDegree(1);
+                    } else if (event.key === "End") {
+                        event.preventDefault();
+                        setDegree(5);
+                    }
+                });
+            }
+
+            renderScale();
+            bindEvents();
+            resetActivity();
+
+            const api = {
+                setDegree: setDegree,
+                selectItem: function (kind, id) {
+                    if (kind === "verbs" || kind === "adjectives") {
+                        state.exploreKind = kind;
+                    }
+                    if (id && itemById(id)) {
+                        state.selectedItemId = id;
+                    }
+                    renderExplore();
+                },
+                goToStage: showStage,
+                answerChoiceCorrectly: function () {
+                    const question = currentChoice();
+                    if (!question) return;
+                    const buttons = Array.from(refs.choiceList.children);
+                    const button = buttons.find(function (candidate) {
+                        return normalize(candidate.textContent) === normalize(question.answer);
+                    });
+                    if (button) answerChoice(button.textContent, button);
+                },
+                answerTypingCorrectly: function () {
+                    const question = currentTyping();
+                    if (!question) return;
+                    refs.typingInput.value = question.answers[0];
+                    answerTyping();
+                },
+                nextChoice: nextChoice,
+                nextTyping: nextTyping,
+                getState: function () {
+                    return {
+                        stage: state.stage,
+                        degree: state.degree,
+                        exploreKind: state.exploreKind,
+                        selectedItemId: state.selectedItemId,
+                        expression: refs.expressionText.textContent,
+                        choiceIndex: state.choiceIndex,
+                        choiceScore: state.choiceScore,
+                        typingIndex: state.typingIndex,
+                        typingScore: state.typingScore,
+                        complete: state.complete
+                    };
+                }
+            };
+
+            window.__c12Grammar2DegreeActivityData = DATA;
+            window.__c12Grammar2DegreeActivity = api;
+            window.__c12Grammar2DegreeChallengeData = DATA;
+            window.__c12Grammar2DegreeChallenge = Object.assign({}, api, {
+                start: function () {
+                    showStage("choice");
+                },
+                goToQuestion: function (index) {
+                    state.choiceIndex = Math.max(0, Math.min(DATA.choicePractice.length - 1, Number(index) || 0));
+                    showStage("choice");
+                },
+                answerCurrentCorrectly: function () {
+                    if (state.stage === "typing") {
+                        api.answerTypingCorrectly();
+                    } else {
+                        api.answerChoiceCorrectly();
+                    }
                 }
             });
-
-            lockInputs();
-            showFeedback(ok, answer, correctAnswer, question);
-            scoreText.textContent = String(state.score);
-        }
-
-        function checkBuildAnswer() {
-            if (state.answered) {
-                return;
-            }
-            const question = currentQuestion();
-            const answer = selectedWords(question).join(' ');
-            const correctAnswer = question.answer;
-            const ok = normalize(answer) === normalize(correctAnswer);
-
-            state.answered = true;
-            if (ok) {
-                state.score += 1;
-            }
-            state.logs.push({
-                id: question.id,
-                ok: ok,
-                user: answer,
-                correct: correctAnswer,
-                prompt: question.prompt
-            });
-            lockInputs();
-            showFeedback(ok, answer, correctAnswer, question);
-            scoreText.textContent = String(state.score);
-        }
-
-        function renderResult() {
-            const wrong = state.logs.filter(function(log) {
-                return !log.ok;
-            });
-            finalScore.textContent = state.score + ' / ' + QUESTIONS.length;
-            reviewPoint.textContent = wrong.length ? '오답 복습' : '말하기 확장';
-            resultComment.textContent = state.score >= 10
-                ? '강한 정도 표현을 안정적으로 만들었습니다. 이제 자기 경험으로 한 문장을 말해 보세요.'
-                : '헷갈린 활용형을 다시 확인하면 문장 산출이 더 자연스러워집니다.';
-
-            reviewList.innerHTML = '';
-            if (!wrong.length) {
-                const item = document.createElement('div');
-                item.className = 'review-item';
-                item.textContent = '모든 문항을 맞혔습니다. 예: 요즘 제가 얼마나 바쁜지 몰라요.';
-                reviewList.appendChild(item);
-            } else {
-                wrong.forEach(function(log) {
-                    const item = document.createElement('div');
-                    item.className = 'review-item safe';
-                    item.innerHTML = '<strong>정답:</strong> ' + escapeHtml(log.correct) + '<br><strong>내 답:</strong> ' + escapeHtml(log.user || '(무응답)');
-                    reviewList.appendChild(item);
-                });
-            }
-            showScreen('result');
-        }
-
-        function startGame() {
-            state.index = 0;
-            state.score = 0;
-            state.answered = false;
-            state.selectedIndices = [];
-            state.logs = [];
-            showScreen('game');
-            renderQuestion();
-        }
-
-        function nextQuestion() {
-            if (state.index >= QUESTIONS.length - 1) {
-                renderResult();
-                return;
-            }
-            state.index += 1;
-            renderQuestion();
-        }
-
-        startBtn.addEventListener('click', startGame);
-        nextBtn.addEventListener('click', nextQuestion);
-        restartBtn.addEventListener('click', startGame);
-        undoBtn.addEventListener('click', function() {
-            const question = currentQuestion();
-            state.selectedIndices.pop();
-            renderBuilder(question);
-        });
-        resetBuildBtn.addEventListener('click', function() {
-            const question = currentQuestion();
-            state.selectedIndices = [];
-            renderBuilder(question);
-        });
-        checkBuildBtn.addEventListener('click', checkBuildAnswer);
-
-        window.__c12Grammar2DegreeChallengeData = QUESTIONS;
-        window.__c12Grammar2DegreeChallenge = {
-            start: startGame,
-            goToQuestion: function(index) {
-                state.index = Math.max(0, Math.min(QUESTIONS.length - 1, Number(index) || 0));
-                state.answered = false;
-                state.selectedIndices = [];
-                showScreen('game');
-                renderQuestion();
-            },
-            getState: function() {
-                return {
-                    index: state.index,
-                    score: state.score,
-                    answered: state.answered,
-                    selectedWords: selectedWords(currentQuestion()),
-                    logs: state.logs.slice()
-                };
-            },
-            answerCurrentCorrectly: function() {
-                const question = currentQuestion();
-                if (question.type === 'build') {
-                    state.selectedIndices = question.tokens.map(function(token) {
-                        return question.choices.indexOf(token);
-                    }).filter(function(index) {
-                        return index >= 0;
-                    });
-                    renderBuilder(question);
-                    checkBuildAnswer();
-                } else {
-                    const buttons = Array.from(choiceList.querySelectorAll('button'));
-                    const target = buttons.find(function(button) {
-                        return normalize(button.textContent) === normalize(question.answer);
-                    });
-                    if (target) {
-                        answerQuestion(target.textContent, target);
-                    }
-                }
-            }
-        };
+        })();
     </script>
 </body>
 </html>
