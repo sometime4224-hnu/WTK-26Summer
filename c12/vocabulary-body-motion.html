@@ -500,7 +500,7 @@
 
         .side-panel {
             display: grid;
-            grid-template-rows: auto minmax(0, 1fr) auto;
+            grid-template-rows: auto minmax(0, 1fr);
             min-height: 620px;
             overflow: hidden;
         }
@@ -558,6 +558,10 @@
 
         .mission-feedback.is-done {
             color: #15803d;
+        }
+
+        .mission-head.is-complete {
+            animation: mission-head-complete 1.05s ease both;
         }
 
         .mission-list {
@@ -621,6 +625,10 @@
             background: #dcfce7;
         }
 
+        .mission-chip.is-just-completed {
+            animation: mission-chip-complete 0.7s ease both;
+        }
+
         .mission-chip__label {
             min-width: 0;
             overflow: hidden;
@@ -633,17 +641,6 @@
             color: #64748b;
             font-size: 11px;
             font-weight: 900;
-        }
-
-        .mission-actions {
-            display: flex;
-            gap: 8px;
-            padding: 12px;
-            border-top: 1px solid #edf2f7;
-        }
-
-        .mission-actions .text-btn {
-            flex: 1 1 0;
         }
 
         .discover-panel {
@@ -706,6 +703,169 @@
             line-height: 32px;
         }
 
+        .completion-reaction {
+            position: absolute;
+            left: 50%;
+            top: 18px;
+            z-index: 8;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            max-width: min(92%, 360px);
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            background: rgba(240, 253, 244, 0.96);
+            box-shadow: 0 18px 36px rgba(21, 128, 61, 0.18);
+            padding: 10px 14px;
+            color: #166534;
+            font-size: 15px;
+            font-weight: 900;
+            line-height: 1.3;
+            pointer-events: none;
+            transform: translate(-50%, -10px) scale(0.94);
+            opacity: 0;
+        }
+
+        .completion-reaction[hidden] {
+            display: none;
+        }
+
+        .completion-reaction.is-visible {
+            animation: completion-reaction-pop 1.45s ease both;
+        }
+
+        .completion-reaction__icon {
+            display: inline-grid;
+            flex: 0 0 auto;
+            place-items: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            background: #16a34a;
+            color: #fff;
+            font-size: 15px;
+            box-shadow: 0 0 0 6px rgba(22, 163, 74, 0.12);
+        }
+
+        .completion-reaction__icon::before {
+            content: "\2713";
+        }
+
+        .completion-reaction__text {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .completion-reaction__spark {
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #f97316;
+            opacity: 0;
+        }
+
+        .completion-reaction__spark:nth-child(3) {
+            left: 22px;
+            top: -8px;
+        }
+
+        .completion-reaction__spark:nth-child(4) {
+            right: 26px;
+            top: -10px;
+            background: #2563eb;
+        }
+
+        .completion-reaction.is-visible .completion-reaction__spark {
+            animation: completion-spark 0.72s ease-out both;
+        }
+
+        .stage-wrap.is-complete::after {
+            content: "";
+            position: absolute;
+            inset: 10px;
+            border: 2px solid rgba(34, 197, 94, 0.32);
+            border-radius: 8px;
+            pointer-events: none;
+            animation: stage-complete-ring 0.9s ease both;
+        }
+
+        @keyframes completion-reaction-pop {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -10px) scale(0.94);
+            }
+            18% {
+                opacity: 1;
+                transform: translate(-50%, 0) scale(1.03);
+            }
+            76% {
+                opacity: 1;
+                transform: translate(-50%, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -8px) scale(0.98);
+            }
+        }
+
+        @keyframes completion-spark {
+            0% {
+                opacity: 0;
+                transform: translate(0, 10px) scale(0.7);
+            }
+            30% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(0, -18px) scale(1.35);
+            }
+        }
+
+        @keyframes stage-complete-ring {
+            0% {
+                opacity: 0;
+                transform: scale(0.96);
+            }
+            22% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.025);
+            }
+        }
+
+        @keyframes mission-head-complete {
+            0% {
+                background: #fff;
+            }
+            25% {
+                background: #f0fdf4;
+            }
+            100% {
+                background: #fff;
+            }
+        }
+
+        @keyframes mission-chip-complete {
+            0% {
+                transform: scale(1);
+            }
+            35% {
+                transform: scale(1.025);
+                box-shadow: 0 10px 24px rgba(22, 163, 74, 0.18);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: none;
+            }
+        }
+
         @media (max-width: 900px) {
             .motion-shell {
                 width: min(100vw - 18px, 760px);
@@ -741,7 +901,7 @@
             }
 
             .side-panel {
-                grid-template-rows: auto auto auto;
+                grid-template-rows: auto auto;
             }
 
             .mission-list {
@@ -794,10 +954,6 @@
 
             .mission-list {
                 max-height: 232px;
-            }
-
-            .mission-actions {
-                flex-direction: column;
             }
         }
 
@@ -864,9 +1020,6 @@
                 <button id="resetPoseBtn" class="icon-btn" type="button" aria-label="직립 자세로 되돌리기" title="직립 자세로 되돌리기">
                     <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
                 </button>
-                <button id="nextMissionTopBtn" class="text-btn" type="button">
-                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> 다음
-                </button>
             </div>
         </section>
 
@@ -894,6 +1047,12 @@
                         </g>
                         <g id="handleLayer" aria-label="드래그 핸들"></g>
                     </svg>
+                    <div id="completionReaction" class="completion-reaction" role="status" aria-live="polite" aria-atomic="true" hidden>
+                        <span class="completion-reaction__icon" aria-hidden="true"></span>
+                        <span id="completionReactionText" class="completion-reaction__text">완료!</span>
+                        <span class="completion-reaction__spark" aria-hidden="true"></span>
+                        <span class="completion-reaction__spark" aria-hidden="true"></span>
+                    </div>
                     <div id="sideDetail" class="side-detail" hidden aria-hidden="true">
                         <div class="side-metric"><span>몸통</span><strong id="tiltMetric">0</strong></div>
                         <div class="side-metric"><span>가슴</span><strong id="heelMetric">0</strong></div>
@@ -912,10 +1071,6 @@
                     <p id="missionFeedback" class="mission-feedback" aria-live="polite">목표 표현을 만들면 자동으로 완료됩니다.</p>
                 </header>
                 <div id="missionList" class="mission-list"></div>
-                <div class="mission-actions">
-                    <button id="prevMissionBtn" class="text-btn" type="button"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> 이전</button>
-                    <button id="nextMissionBtn" class="text-btn" type="button">다음 <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-                </div>
             </aside>
         </div>
 
@@ -1056,9 +1211,12 @@
             expressionText: document.getElementById("expressionText"),
             expressionFeedback: document.getElementById("expressionFeedback"),
             missionCount: document.getElementById("missionCount"),
+            missionHead: document.querySelector(".mission-head"),
             missionTitle: document.getElementById("missionTitle"),
             missionFeedback: document.getElementById("missionFeedback"),
             missionList: document.getElementById("missionList"),
+            completionReaction: document.getElementById("completionReaction"),
+            completionReactionText: document.getElementById("completionReactionText"),
             discoveryList: document.getElementById("discoveryList"),
             discoveryCount: document.getElementById("discoveryCount"),
             stageHint: document.getElementById("stageHint"),
@@ -1068,11 +1226,10 @@
             armMetric: document.getElementById("armMetric"),
             frontViewBtn: document.getElementById("frontViewBtn"),
             sideViewBtn: document.getElementById("sideViewBtn"),
-            resetPoseBtn: document.getElementById("resetPoseBtn"),
-            nextMissionTopBtn: document.getElementById("nextMissionTopBtn"),
-            prevMissionBtn: document.getElementById("prevMissionBtn"),
-            nextMissionBtn: document.getElementById("nextMissionBtn")
+            resetPoseBtn: document.getElementById("resetPoseBtn")
         };
+
+        let completionReactionTimer = 0;
 
         const MOTION_RULES = [
             ...CONTACT_TARGETS.map((target) => ({
@@ -1238,9 +1395,6 @@
             els.frontViewBtn.addEventListener("click", () => setViewMode("front"));
             els.sideViewBtn.addEventListener("click", () => setViewMode("side"));
             els.resetPoseBtn.addEventListener("click", resetPose);
-            els.nextMissionTopBtn.addEventListener("click", nextMission);
-            els.nextMissionBtn.addEventListener("click", nextMission);
-            els.prevMissionBtn.addEventListener("click", previousMission);
             els.stage.addEventListener("pointerdown", handlePointerDown);
             els.stage.addEventListener("pointermove", handlePointerMove);
             els.stage.addEventListener("pointerup", endDrag);
@@ -1316,7 +1470,7 @@
             const part = state.draggingPart;
             const point = svgPoint(event.clientX, event.clientY);
             movePart(part, point);
-            render();
+            render({ deferMissionCompletion: true });
         }
 
         function endDrag(event) {
@@ -1329,6 +1483,7 @@
                 }
             }
             state.draggingPart = null;
+            render({ focusMatchedMission: true, showCompletionReaction: true });
         }
 
         function svgPoint(clientX, clientY) {
@@ -1490,23 +1645,13 @@
             render();
         }
 
-        function nextMission() {
-            state.activeMissionIndex = (state.activeMissionIndex + 1) % MISSIONS.length;
-            render();
-        }
-
-        function previousMission() {
-            state.activeMissionIndex = (state.activeMissionIndex - 1 + MISSIONS.length) % MISSIONS.length;
-            render();
-        }
-
         function startMission(idOrIndex) {
             const index = typeof idOrIndex === "number"
                 ? idOrIndex
                 : MISSIONS.findIndex((mission) => mission.id === idOrIndex || mission.ruleId === idOrIndex);
             if (index < 0) return false;
             state.activeMissionIndex = index;
-            render();
+            render({ focusMatchedMission: false });
             return true;
         }
 
@@ -1517,12 +1662,13 @@
             return true;
         }
 
-        function render() {
+        function render(options = {}) {
             const skeleton = getCurrentSkeleton();
             const derived = skeleton.pose;
             updateViewModeUi();
             drawPose(derived);
             const matches = detectExpressions();
+            const completedNow = syncMissionCompletion(matches, options);
             updateExpression(matches);
             updateMission(matches);
             updateDiscovery(matches);
@@ -1530,6 +1676,9 @@
             updateTargetZones(derived);
             updateGuides(derived);
             updateSideDetail(skeleton);
+            if (completedNow.length && options.showCompletionReaction) {
+                showCompletionReaction(completedNow[0]);
+            }
         }
 
         function updateViewModeUi() {
@@ -1731,16 +1880,49 @@
             });
         }
 
+        function syncMissionCompletion(matches, options = {}) {
+            const matchedMissions = matchedMissionsFor(matches);
+            if (options.focusMatchedMission !== false && matchedMissions.length) {
+                state.activeMissionIndex = matchedMissions[0].index;
+            }
+            if (options.deferMissionCompletion) return [];
+
+            const completion = matchedMissions[0];
+            if (!completion || state.completedMissions.has(completion.mission.id)) return [];
+            state.completedMissions.add(completion.mission.id);
+            return [completion];
+        }
+
+        function matchedMissionsFor(matches) {
+            const seen = new Set();
+            return matches.flatMap((expression) => {
+                const index = MISSIONS.findIndex((mission) => mission.ruleId === expression.id);
+                if (index < 0) return [];
+                const mission = MISSIONS[index];
+                if (seen.has(mission.id)) return [];
+                seen.add(mission.id);
+                return [{ mission, index, expression }];
+            });
+        }
+
         function updateMission(matches) {
             const mission = MISSIONS[state.activeMissionIndex];
-            const isDone = matches.some((match) => match.id === mission.ruleId);
-            if (isDone) state.completedMissions.add(mission.id);
+            const currentMatch = matches.find((match) => match.id === mission.ruleId);
+            const isCompleted = state.completedMissions.has(mission.id);
+            const isPendingDrop = Boolean(state.draggingPart && currentMatch && !isCompleted);
+            const isDone = isCompleted || Boolean(currentMatch);
             els.missionCount.textContent = `${state.activeMissionIndex + 1} / ${MISSIONS.length}`;
             els.missionTitle.textContent = mission.label;
             els.missionFeedback.classList.toggle("is-done", isDone);
-            els.missionFeedback.textContent = isDone
-                ? "완료되었습니다. 같은 동사로 다른 부위도 만들어 보세요."
-                : "목표 표현을 만들면 자동으로 완료됩니다.";
+            if (isPendingDrop) {
+                els.missionFeedback.textContent = "좋아요. 이대로 놓으면 자동으로 완료됩니다.";
+            } else if (currentMatch) {
+                els.missionFeedback.textContent = `완료! '${currentMatch.label}' 표현이 만들어졌습니다.`;
+            } else if (isCompleted) {
+                els.missionFeedback.textContent = "완료한 미션입니다. 다른 표현도 계속 만들어 보세요.";
+            } else {
+                els.missionFeedback.textContent = "표현이 맞으면 드롭하는 순간 자동으로 완료됩니다.";
+            }
         }
 
         function updateMissionButtons() {
@@ -1753,6 +1935,36 @@
                 button.classList.toggle("is-done", done);
                 button.setAttribute("aria-current", active ? "true" : "false");
             });
+        }
+
+        function showCompletionReaction(completion) {
+            if (!completion?.mission || !els.completionReaction || !els.completionReactionText) return;
+            const label = completion.expression?.label || completion.mission.label;
+            const chip = els.missionList.querySelector(`.mission-chip[data-mission-id="${completion.mission.id}"]`);
+
+            els.completionReactionText.textContent = `완료! ${label}`;
+            els.completionReaction.hidden = false;
+            window.clearTimeout(completionReactionTimer);
+
+            els.completionReaction.classList.remove("is-visible");
+            els.stageWrap.classList.remove("is-complete");
+            els.missionHead?.classList.remove("is-complete");
+            chip?.classList.remove("is-just-completed");
+
+            void els.completionReaction.offsetWidth;
+
+            els.completionReaction.classList.add("is-visible");
+            els.stageWrap.classList.add("is-complete");
+            els.missionHead?.classList.add("is-complete");
+            chip?.classList.add("is-just-completed");
+
+            completionReactionTimer = window.setTimeout(() => {
+                els.completionReaction.classList.remove("is-visible");
+                els.stageWrap.classList.remove("is-complete");
+                els.missionHead?.classList.remove("is-complete");
+                chip?.classList.remove("is-just-completed");
+                els.completionReaction.hidden = true;
+            }, 1500);
         }
 
         function updateDiscovery() {

@@ -457,6 +457,38 @@ test("c12 body motion lab completes missions and stores discoveries", async ({ p
   await expectNoHorizontalOverflow(page);
 });
 
+test("c12 body motion lab auto-completes a matching mission on drop", async ({ page }) => {
+  await openMotionLab(page, { width: 390, height: 844 });
+
+  await expect(page.locator("#nextMissionTopBtn, #prevMissionBtn, #nextMissionBtn")).toHaveCount(0);
+
+  const target = await page.evaluate(() => {
+    const svg = document.querySelector("#poseStage");
+    const point = svg.createSVGPoint();
+    point.x = 180;
+    point.y = 105;
+    const screenPoint = point.matrixTransform(svg.getScreenCTM());
+    return { x: screenPoint.x, y: screenPoint.y };
+  });
+  const handle = await page.locator('.drag-handle[data-part="rightHand"]').boundingBox();
+  expect(handle).not.toBeNull();
+
+  await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(target.x, target.y, { steps: 10 });
+  await expect(page.locator("#missionFeedback")).toContainText("이대로 놓으면");
+  await page.mouse.up();
+
+  const state = await page.evaluate(() => window.__C12_BODY_MOTION_LAB__.getState());
+  expect(state.activeMission.id).toBe("touch-head");
+  expect(state.completedMissions).toContain("touch-head");
+  expect(state.completedMissions).not.toContain("arm-stretch");
+  await expect(page.locator("#missionTitle")).toHaveText("손을 머리에 대다");
+  await expect(page.locator("#missionFeedback")).toContainText("완료");
+  await expect(page.locator("#completionReaction")).toContainText("완료! 손을 머리에 대다");
+  await expectNoHorizontalOverflow(page);
+});
+
 test("c12 body motion lab has a side view with detailed posture cues", async ({ page }) => {
   await openMotionLab(page, { width: 390, height: 844 });
 
