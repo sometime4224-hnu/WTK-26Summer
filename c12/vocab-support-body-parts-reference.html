@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>12과 어휘 보조 | 신체부위 삽화</title>
+  <style>
+    :root {
+      --topbar-height: 42px;
+      --rail-width: 96px;
+      --ink: #111827;
+      --muted: #64748b;
+      --line: #d8e0ea;
+      --page: #f5f7fb;
+      --surface: #ffffff;
+      --accent: #0f766e;
+      --focus: #f97316;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: var(--page);
+      color: var(--ink);
+      font-family: "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+      letter-spacing: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    img {
+      display: block;
+    }
+
+    .topbar {
+      height: var(--topbar-height);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.96);
+      white-space: nowrap;
+    }
+
+    .topbar a,
+    .topbar span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .topbar a:first-child {
+      color: var(--accent);
+    }
+
+    .viewer {
+      position: relative;
+      height: calc(100dvh - var(--topbar-height));
+      display: grid;
+      grid-template-columns: var(--rail-width) minmax(0, 1fr);
+      overflow: hidden;
+      background: var(--page);
+    }
+
+    .gallery {
+      height: 100%;
+      overflow-y: auto;
+      padding: 10px 8px;
+      border-right: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.86);
+      scrollbar-width: thin;
+    }
+
+    .gallery__list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .thumb {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1122 / 1402;
+      overflow: hidden;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      padding: 0;
+      background: var(--surface);
+      cursor: pointer;
+      box-shadow: 0 5px 16px rgba(15, 23, 42, 0.08);
+    }
+
+    .thumb[aria-current="true"] {
+      border-color: var(--focus);
+      box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.16), 0 8px 20px rgba(15, 23, 42, 0.12);
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .canvas {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 10px 10px 10px 14px;
+      background: #eef2f7;
+    }
+
+    .main-image {
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: calc(100dvh - var(--topbar-height) - 20px);
+      object-fit: contain;
+      background: #fff;
+      box-shadow: 0 12px 34px rgba(15, 23, 42, 0.12);
+    }
+
+    .fullscreen-btn {
+      position: fixed;
+      right: max(14px, env(safe-area-inset-right));
+      bottom: max(14px, env(safe-area-inset-bottom));
+      z-index: 10;
+      width: 48px;
+      height: 48px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid rgba(15, 23, 42, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--ink);
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.2);
+    }
+
+    .fullscreen-btn:hover,
+    .fullscreen-btn:focus-visible {
+      border-color: var(--accent);
+      color: var(--accent);
+      outline: 0;
+    }
+
+    .fullscreen-btn svg {
+      width: 25px;
+      height: 25px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+
+    .viewer:fullscreen,
+    .viewer.is-fallback-fullscreen {
+      height: 100dvh;
+      grid-template-columns: var(--rail-width) minmax(0, 1fr);
+      background: #0f172a;
+    }
+
+    .viewer:fullscreen .canvas,
+    .viewer.is-fallback-fullscreen .canvas {
+      padding: 10px 10px 10px 14px;
+      background: #0f172a;
+    }
+
+    .viewer:fullscreen .main-image,
+    .viewer.is-fallback-fullscreen .main-image {
+      max-height: calc(100dvh - 20px);
+      box-shadow: none;
+    }
+
+    .viewer:fullscreen .gallery,
+    .viewer.is-fallback-fullscreen .gallery {
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    body:has(.viewer.is-fallback-fullscreen) .topbar {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      :root {
+        --topbar-height: 38px;
+        --rail-width: 66px;
+      }
+
+      .topbar {
+        padding-inline: 9px;
+      }
+
+      .topbar a,
+      .topbar span {
+        font-size: 12px;
+      }
+
+      .gallery {
+        padding: 8px 6px;
+      }
+
+      .gallery__list {
+        gap: 7px;
+      }
+
+      .thumb {
+        border-radius: 7px;
+      }
+
+      .canvas {
+        padding: 8px;
+      }
+
+      .main-image {
+        max-height: calc(100dvh - var(--topbar-height) - 16px);
+      }
+
+      .fullscreen-btn {
+        width: 42px;
+        height: 42px;
+      }
+
+      .fullscreen-btn svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .viewer:fullscreen .canvas,
+      .viewer.is-fallback-fullscreen .canvas {
+        padding: 8px;
+      }
+
+      .viewer:fullscreen .main-image,
+      .viewer.is-fallback-fullscreen .main-image {
+        max-height: calc(100dvh - 16px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="topbar" aria-label="상단 이동">
+    <a href="index.html">&lt; 12과</a>
+    <span>/</span>
+    <a href="vocabulary.html">어휘</a>
+    <span>/ 신체부위 삽화</span>
+  </nav>
+
+  <main class="viewer" id="viewer">
+    <aside class="gallery" aria-label="삽화 갤러리">
+      <div class="gallery__list" id="galleryList"></div>
+    </aside>
+
+    <section class="canvas" aria-label="선택한 신체부위 삽화">
+      <img
+        class="main-image"
+        id="mainImage"
+        src="../assets/c12/vocabulary/images/body-parts-reference/full/body-parts-01.webp"
+        width="1122"
+        height="1402"
+        alt="신체 부위 삽화 1"
+        decoding="async"
+        fetchpriority="high"
+      />
+    </section>
+
+    <button class="fullscreen-btn" id="fullscreenBtn" type="button" aria-label="전체화면" title="전체화면">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 3H4a1 1 0 0 0-1 1v4" />
+        <path d="M16 3h4a1 1 0 0 1 1 1v4" />
+        <path d="M8 21H4a1 1 0 0 1-1-1v-4" />
+        <path d="M16 21h4a1 1 0 0 0 1-1v-4" />
+      </svg>
+      <span class="sr-only">전체화면</span>
+    </button>
+  </main>
+
+  <script>
+    const images = [
+      {
+        full: "../assets/c12/vocabulary/images/body-parts-reference/full/body-parts-01.webp",
+        thumb: "../assets/c12/vocabulary/images/body-parts-reference/thumbs/body-parts-01.webp",
+        alt: "신체 부위 삽화 1"
+      },
+      {
+        full: "../assets/c12/vocabulary/images/body-parts-reference/full/body-parts-02.webp",
+        thumb: "../assets/c12/vocabulary/images/body-parts-reference/thumbs/body-parts-02.webp",
+        alt: "신체 부위 삽화 2"
+      },
+      {
+        full: "../assets/c12/vocabulary/images/body-parts-reference/full/body-parts-03.webp",
+        thumb: "../assets/c12/vocabulary/images/body-parts-reference/thumbs/body-parts-03.webp",
+        alt: "신체 부위 삽화 3"
+      },
+      {
+        full: "../assets/c12/vocabulary/images/body-parts-reference/full/body-parts-04.webp",
+        thumb: "../assets/c12/vocabulary/images/body-parts-reference/thumbs/body-parts-04.webp",
+        alt: "신체 부위 삽화 4"
+      },
+      {
+        full: "../assets/c12/vocabulary/images/body-parts-reference/full/body-parts-05.webp",
+        thumb: "../assets/c12/vocabulary/images/body-parts-reference/thumbs/body-parts-05.webp",
+        alt: "신체 부위 삽화 5"
+      }
+    ];
+
+    const viewer = document.getElementById("viewer");
+    const galleryList = document.getElementById("galleryList");
+    const mainImage = document.getElementById("mainImage");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    let currentIndex = 0;
+
+    function renderGallery() {
+      const fragment = document.createDocumentFragment();
+
+      images.forEach((image, index) => {
+        const button = document.createElement("button");
+        button.className = "thumb";
+        button.type = "button";
+        button.setAttribute("aria-label", `${image.alt} 보기`);
+        button.setAttribute("aria-current", index === currentIndex ? "true" : "false");
+        button.dataset.index = String(index);
+
+        const thumb = document.createElement("img");
+        thumb.src = image.thumb;
+        thumb.width = 192;
+        thumb.height = 240;
+        thumb.alt = "";
+        thumb.loading = index < 2 ? "eager" : "lazy";
+        thumb.decoding = "async";
+
+        button.appendChild(thumb);
+        button.addEventListener("click", () => setImage(index));
+        fragment.appendChild(button);
+      });
+
+      galleryList.appendChild(fragment);
+    }
+
+    function setImage(index) {
+      currentIndex = (index + images.length) % images.length;
+      const image = images[currentIndex];
+      mainImage.src = image.full;
+      mainImage.alt = image.alt;
+
+      galleryList.querySelectorAll(".thumb").forEach((button, buttonIndex) => {
+        button.setAttribute("aria-current", buttonIndex === currentIndex ? "true" : "false");
+      });
+    }
+
+    async function toggleFullscreen() {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        return;
+      }
+
+      if (viewer.requestFullscreen) {
+        await viewer.requestFullscreen();
+        return;
+      }
+
+      viewer.classList.toggle("is-fallback-fullscreen");
+      syncFullscreenButton();
+    }
+
+    function syncFullscreenButton() {
+      const isFullscreen = Boolean(document.fullscreenElement) || viewer.classList.contains("is-fallback-fullscreen");
+      fullscreenBtn.setAttribute("aria-pressed", String(isFullscreen));
+      fullscreenBtn.title = isFullscreen ? "전체화면 종료" : "전체화면";
+      fullscreenBtn.setAttribute("aria-label", fullscreenBtn.title);
+    }
+
+    fullscreenBtn.addEventListener("click", () => {
+      toggleFullscreen().catch(() => {
+        viewer.classList.toggle("is-fallback-fullscreen");
+        syncFullscreenButton();
+      });
+    });
+
+    document.addEventListener("fullscreenchange", syncFullscreenButton);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight") setImage(currentIndex + 1);
+      if (event.key === "ArrowLeft") setImage(currentIndex - 1);
+      if (event.key === "Escape" && viewer.classList.contains("is-fallback-fullscreen")) {
+        viewer.classList.remove("is-fallback-fullscreen");
+        syncFullscreenButton();
+      }
+    });
+
+    renderGallery();
+    syncFullscreenButton();
+  </script>
+</body>
+</html>
