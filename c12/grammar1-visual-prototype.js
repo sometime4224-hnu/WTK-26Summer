@@ -133,6 +133,7 @@
                     <p class="support-panel__desc">이미지로 의미를 잡은 뒤, 카드 게임과 말하기 활동으로 바로 이어 갈 수 있습니다.</p>
                 </div>
                 <div class="support-links">
+                    <a class="resource-link" href="grammar1-form-typing.html">활용형 쓰기</a>
                     <a class="resource-link" href="grammar1-card-game.html">문법 카드 게임</a>
                     <a class="resource-link" href="grammar1-reason.html">이유 문법 비교</a>
                     <a class="resource-link" href="grammar1-2-speaking.html">문법1·2 융합 말하기</a>

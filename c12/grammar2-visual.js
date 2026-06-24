@@ -133,6 +133,7 @@
                     <p class="support-panel__desc">이미지로 강한 정도의 느낌을 잡은 뒤, 온도계 챌린지와 말하기 활동으로 바로 이어 갈 수 있습니다.</p>
                 </div>
                 <div class="support-links">
+                    <a class="resource-link" href="grammar2-form-typing.html">활용형 쓰기</a>
                     <a class="resource-link" href="grammar2-degree-challenge.html">온도계 챌린지</a>
                     <a class="resource-link" href="grammar1-2-speaking.html">문법1·2 융합 말하기</a>
                     <a class="resource-link" href="grammar2-classic.html">기존 버전</a>
