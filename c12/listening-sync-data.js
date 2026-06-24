@@ -108,6 +108,14 @@
                 title: "복근 운동 상담 컷툰",
                 copy: "Track 31의 지시문은 3.08-6.70초, 실제 지문은 7.80초부터 시작합니다."
             },
+            cuttoonFullscreen: {
+                enabled: true,
+                title: "듣기 2 전체화면",
+                openLabel: "전체화면 듣기",
+                playLabel: "재생",
+                pauseLabel: "일시정지",
+                closeLabel: "닫기"
+            },
             cuttoonPanels: [
                 panel(`${track31Panels}01${webp}`, 7.8, 18.74, "몸이 많이 좋아짐", "남자가 운동 후 몸이 좋아졌다고 말합니다."),
                 panel(`${track31Panels}02${webp}`, 19.88, 26.96, "달리기와 근육 운동", "하루도 빠짐없이 달리기와 근육 운동을 했습니다."),

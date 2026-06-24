@@ -2483,6 +2483,14 @@
         return Boolean(lesson && Array.isArray(lesson.cuttoonPanels) && lesson.cuttoonPanels.length);
     }
 
+    function lessonHasCuttoonFullscreen(lesson) {
+        return Boolean(lessonHasCuttoonPanels(lesson) && lesson.cuttoonFullscreen && lesson.cuttoonFullscreen.enabled);
+    }
+
+    function getCuttoonFullscreenLabel(lesson, key, fallback) {
+        return getLocalizedField((lesson && lesson.cuttoonFullscreen) || {}, key, fallback);
+    }
+
     function getCuttoonPanelRange(panel) {
         const start = Number(panel && panel.start);
         const end = Number(panel && panel.end);
@@ -2532,11 +2540,36 @@
                 "Canh hien tai duoc danh dau theo am thanh. Bam vao tranh hoac cum tu de den doan do."
             )
         );
+        const fullscreenEnabled = lessonHasCuttoonFullscreen(lesson);
+        const fullscreenTitle = fullscreenEnabled
+            ? getCuttoonFullscreenLabel(lesson, "title", `${title} 전체화면`)
+            : "";
+        const fullscreenOpenLabel = fullscreenEnabled
+            ? getCuttoonFullscreenLabel(lesson, "openLabel", "전체화면 듣기")
+            : "";
+        const fullscreenCloseLabel = fullscreenEnabled
+            ? getCuttoonFullscreenLabel(lesson, "closeLabel", "닫기")
+            : "";
+        const fullscreenPlayLabel = fullscreenEnabled
+            ? getCuttoonFullscreenLabel(lesson, "playLabel", "재생")
+            : "";
 
         return `
             <section class="lw-section lw-cuttoon-sync lw-progress-target" id="cuttoon-section-${escapeHtml(lesson.id)}">
-                <h3>${escapeHtml(title)}</h3>
-                <p class="lw-section-copy">${escapeHtml(copy)}</p>
+                <div class="lw-cuttoon-head">
+                    <div>
+                        <h3>${escapeHtml(title)}</h3>
+                        <p class="lw-section-copy">${escapeHtml(copy)}</p>
+                    </div>
+                    ${fullscreenEnabled ? `
+                        <button
+                            type="button"
+                            class="lw-cuttoon-fullscreen-open"
+                            data-action="open-cuttoon-fullscreen"
+                            data-lesson-id="${escapeHtml(lesson.id)}"
+                        >${escapeHtml(fullscreenOpenLabel)}</button>
+                    ` : ""}
+                </div>
                 <div class="lw-cuttoon-stage">
                     <figure class="lw-cuttoon-main">
                         ${firstImage ? `<img id="cuttoon-main-image-${escapeHtml(lesson.id)}" src="${escapeHtml(firstImage)}" alt="${escapeHtml(firstPanel.alt || firstPanel.title || title)}" loading="lazy" decoding="async">` : ""}
@@ -2570,6 +2603,36 @@
                         }).join("")}
                     </div>
                 </div>
+                ${fullscreenEnabled ? `
+                    <div class="lw-cuttoon-fullscreen" id="cuttoon-fullscreen-${escapeHtml(lesson.id)}" hidden role="dialog" aria-modal="true" aria-label="${escapeHtml(fullscreenTitle)}">
+                        <div class="lw-cuttoon-fullscreen__stage">
+                            ${firstImage ? `<img class="lw-cuttoon-fullscreen__image" id="cuttoon-fullscreen-image-${escapeHtml(lesson.id)}" src="${escapeHtml(firstImage)}" alt="${escapeHtml(firstPanel.alt || firstPanel.title || fullscreenTitle)}" decoding="async">` : ""}
+                            <div class="lw-cuttoon-fullscreen__shade" aria-hidden="true"></div>
+                            <div class="lw-cuttoon-fullscreen__caption">
+                                <span id="cuttoon-fullscreen-time-${escapeHtml(lesson.id)}">${escapeHtml(renderCuttoonPanelTime(firstPanel))}</span>
+                                <strong id="cuttoon-fullscreen-title-${escapeHtml(lesson.id)}">${escapeHtml(firstPanel.title || "")}</strong>
+                                <em id="cuttoon-fullscreen-note-${escapeHtml(lesson.id)}">${escapeHtml(firstPanel.note || "")}</em>
+                            </div>
+                            <div class="lw-cuttoon-fullscreen__progress" aria-hidden="true">
+                                <span id="cuttoon-fullscreen-progress-${escapeHtml(lesson.id)}"></span>
+                            </div>
+                            <button
+                                type="button"
+                                class="lw-cuttoon-fullscreen__close"
+                                data-action="close-cuttoon-fullscreen"
+                                data-lesson-id="${escapeHtml(lesson.id)}"
+                                aria-label="${escapeHtml(fullscreenCloseLabel)}"
+                            >${escapeHtml(fullscreenCloseLabel)}</button>
+                            <button
+                                type="button"
+                                class="lw-cuttoon-fullscreen__play"
+                                data-action="toggle-cuttoon-fullscreen-audio"
+                                data-lesson-id="${escapeHtml(lesson.id)}"
+                                aria-label="${escapeHtml(fullscreenPlayLabel)}"
+                            ><span aria-hidden="true"></span></button>
+                        </div>
+                    </div>
+                ` : ""}
             </section>
         `;
     }
@@ -3264,6 +3327,53 @@
         }
     }
 
+    function updateCuttoonFullscreenPlayback(lessonId) {
+        const lesson = lessonMap.get(lessonId);
+        if (!lessonHasCuttoonFullscreen(lesson)) return;
+        const audio = document.getElementById(`audio-${lessonId}`);
+        const button = document.querySelector(`[data-action="toggle-cuttoon-fullscreen-audio"][data-lesson-id="${lessonId}"]`);
+        if (!button) return;
+        const isPlaying = Boolean(audio && !audio.paused && !audio.ended);
+        const playLabel = getCuttoonFullscreenLabel(lesson, "playLabel", "재생");
+        const pauseLabel = getCuttoonFullscreenLabel(lesson, "pauseLabel", "일시정지");
+        button.classList.toggle("is-playing", isPlaying);
+        button.setAttribute("aria-label", isPlaying ? pauseLabel : playLabel);
+    }
+
+    function updateCuttoonFullscreenPanel(lessonId, panel, activeIndex, currentTime) {
+        const lesson = lessonMap.get(lessonId);
+        if (!lessonHasCuttoonFullscreen(lesson) || !panel) return;
+
+        const image = document.getElementById(`cuttoon-fullscreen-image-${lessonId}`);
+        if (image && panel.imageSrc && image.getAttribute("src") !== panel.imageSrc) {
+            image.setAttribute("src", panel.imageSrc);
+            image.setAttribute("alt", panel.alt || panel.title || "");
+        }
+
+        const title = document.getElementById(`cuttoon-fullscreen-title-${lessonId}`);
+        if (title) title.textContent = panel.title || "";
+        const note = document.getElementById(`cuttoon-fullscreen-note-${lessonId}`);
+        if (note) note.textContent = panel.note || "";
+        const time = document.getElementById(`cuttoon-fullscreen-time-${lessonId}`);
+        if (time) time.textContent = renderCuttoonPanelTime(panel);
+
+        const progress = document.getElementById(`cuttoon-fullscreen-progress-${lessonId}`);
+        if (progress) {
+            const audio = document.getElementById(`audio-${lessonId}`);
+            const duration = audio && Number.isFinite(audio.duration) && audio.duration > 0
+                ? audio.duration
+                : Number(lesson.audioAnalysis && lesson.audioAnalysis.duration) || Number(lesson.cuttoonPanels[lesson.cuttoonPanels.length - 1].end) || 1;
+            const safeTime = Number.isFinite(currentTime) ? currentTime : Number(panel.start) || 0;
+            const percent = Math.max(0, Math.min(100, (safeTime / duration) * 100));
+            progress.style.width = `${percent.toFixed(2)}%`;
+        }
+
+        document.querySelectorAll(`[data-lesson-id="${lessonId}"][data-cuttoon-fullscreen-dot]`).forEach((dot) => {
+            dot.classList.toggle("is-active", Number(dot.dataset.cuttoonFullscreenDot) === activeIndex);
+        });
+        updateCuttoonFullscreenPlayback(lessonId);
+    }
+
     function updateCuttoonSyncUI(lessonId, currentTime = null, options = {}) {
         const lesson = lessonMap.get(lessonId);
         if (!lessonHasCuttoonPanels(lesson)) return;
@@ -3274,7 +3384,10 @@
             : (audio && Number.isFinite(audio.currentTime) ? audio.currentTime : Number(lesson.cuttoonPanels[0].start) || 0);
         const activeIndex = getCuttoonActivePanelIndex(lesson, safeTime);
         const previousIndex = cuttoonPanelState.get(lessonId);
-        if (!options.force && previousIndex === activeIndex) return;
+        if (!options.force && previousIndex === activeIndex) {
+            updateCuttoonFullscreenPanel(lessonId, lesson.cuttoonPanels[activeIndex], activeIndex, safeTime);
+            return;
+        }
 
         if (Number.isInteger(previousIndex)) {
             const previousCard = document.querySelector(`[data-lesson-id="${lessonId}"][data-cuttoon-panel-index="${previousIndex}"]`);
@@ -3307,6 +3420,7 @@
         const time = document.getElementById(`cuttoon-main-time-${lessonId}`);
         if (time) time.textContent = renderCuttoonPanelTime(panel);
 
+        updateCuttoonFullscreenPanel(lessonId, panel, activeIndex, safeTime);
         cuttoonPanelState.set(lessonId, activeIndex);
     }
 
@@ -5044,6 +5158,57 @@
         renderApp(pageConfig, { preserveRuntime: true });
     }
 
+    function openCuttoonFullscreen(lessonId) {
+        const lesson = lessonMap.get(lessonId);
+        const overlay = document.getElementById(`cuttoon-fullscreen-${lessonId}`);
+        if (!lessonHasCuttoonFullscreen(lesson) || !overlay) return;
+        overlay.hidden = false;
+        document.body.classList.add("lw-cuttoon-fullscreen-open");
+        setQuickDockLesson(lessonId, { save: false });
+        updateAudioSyncUI(lessonId, { force: true, scroll: false });
+        updateCuttoonFullscreenPlayback(lessonId);
+        const playButton = overlay.querySelector('[data-action="toggle-cuttoon-fullscreen-audio"]');
+        if (playButton) window.setTimeout(() => playButton.focus(), 40);
+    }
+
+    function closeCuttoonFullscreen(lessonId = null) {
+        const overlay = lessonId
+            ? document.getElementById(`cuttoon-fullscreen-${lessonId}`)
+            : document.querySelector(".lw-cuttoon-fullscreen:not([hidden])");
+        if (!overlay) return;
+        overlay.hidden = true;
+        if (!document.querySelector(".lw-cuttoon-fullscreen:not([hidden])")) {
+            document.body.classList.remove("lw-cuttoon-fullscreen-open");
+        }
+    }
+
+    async function toggleCuttoonFullscreenAudio(lessonId) {
+        const lesson = lessonMap.get(lessonId);
+        const audio = document.getElementById(`audio-${lessonId}`);
+        if (!lessonHasCuttoonFullscreen(lesson) || !audio) return;
+
+        if (!audio.paused && !audio.ended) {
+            audio.pause();
+            clearPlaybackState("audio", lessonId);
+            updateCuttoonFullscreenPlayback(lessonId);
+            return;
+        }
+
+        cancelSpeech();
+        pauseAllAudio();
+        setQuickDockLesson(lessonId, { save: false });
+        setPlaybackState("audio", lessonId, { mode: "audio" });
+        updateAudioSyncUI(lessonId, { force: true, scroll: false });
+        try {
+            await audio.play();
+            setStatus(`listen-status-${lessonId}`, getInstructionText().audioPlaying, "info");
+        } catch (error) {
+            setStatus(`listen-status-${lessonId}`, getInstructionText().audioUnsupported, "warn");
+        } finally {
+            updateCuttoonFullscreenPlayback(lessonId);
+        }
+    }
+
     async function seekAudioTo(lessonId, rawTime, options = {}) {
         const lesson = lessonMap.get(lessonId);
         const audio = document.getElementById(`audio-${lessonId}`);
@@ -5084,6 +5249,9 @@
         if (action === "set-stage") return void setStage(lessonId, Number(button.dataset.stage));
         if (action === "set-speed") return void setSpeed(lessonId, Number(button.dataset.speed));
         if (action === "seek-audio") return void seekAudioTo(lessonId, Number(button.dataset.seekTime));
+        if (action === "open-cuttoon-fullscreen") return void openCuttoonFullscreen(lessonId);
+        if (action === "close-cuttoon-fullscreen") return void closeCuttoonFullscreen(lessonId);
+        if (action === "toggle-cuttoon-fullscreen-audio") return void toggleCuttoonFullscreenAudio(lessonId);
         if (action === "quick-play") return void playQuickLesson();
         if (action === "quick-stop") return void stopQuickLesson();
         if (action === "toggle-quick-dock") return void setQuickDockCollapsed(!quickDockCollapsed);
@@ -6037,6 +6205,10 @@
     }
 
     function handleKeyboardActivation(event) {
+        if (event.key === "Escape") {
+            closeCuttoonFullscreen();
+            return;
+        }
         if (event.key !== "Enter" && event.key !== " ") return;
         const target = event.target instanceof Element
             ? event.target.closest('[data-action="seek-audio"][role="button"]')

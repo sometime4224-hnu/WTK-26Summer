@@ -1365,6 +1365,37 @@
     overflow: hidden;
 }
 
+.lw-cuttoon-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.lw-cuttoon-head .lw-section-copy {
+    margin-bottom: 0;
+}
+
+.lw-cuttoon-fullscreen-open {
+    flex: 0 0 auto;
+    border: 1px solid color-mix(in srgb, var(--lw-accent) 34%, white);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--lw-accent) 92%, #111827);
+    color: #fff;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 12px 22px color-mix(in srgb, var(--lw-accent) 16%, transparent);
+}
+
+.lw-cuttoon-fullscreen-open:hover,
+.lw-cuttoon-fullscreen-open:focus-visible {
+    transform: translateY(-1px);
+    outline: none;
+    box-shadow: 0 14px 26px color-mix(in srgb, var(--lw-accent) 24%, transparent);
+}
+
 .lw-cuttoon-stage {
     display: grid;
     gap: 14px;
@@ -1485,6 +1516,170 @@
     color: #64748b;
     font-size: 11px;
     font-style: normal;
+}
+
+body.lw-cuttoon-fullscreen-open {
+    overflow: hidden;
+}
+
+.lw-cuttoon-fullscreen[hidden] {
+    display: none;
+}
+
+.lw-cuttoon-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: #050505;
+    color: #fff;
+}
+
+.lw-cuttoon-fullscreen__stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.08), transparent 38%),
+        #050505;
+}
+
+.lw-cuttoon-fullscreen__image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.lw-cuttoon-fullscreen__shade {
+    position: absolute;
+    inset: auto 0 0;
+    height: 34%;
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.72) 100%);
+    pointer-events: none;
+}
+
+.lw-cuttoon-fullscreen__caption {
+    position: absolute;
+    left: clamp(18px, 4vw, 54px);
+    right: clamp(112px, 14vw, 180px);
+    bottom: clamp(22px, 5vw, 58px);
+    display: grid;
+    gap: 7px;
+    max-width: 760px;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.65);
+}
+
+.lw-cuttoon-fullscreen__caption span {
+    color: color-mix(in srgb, var(--lw-soft) 80%, white);
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.lw-cuttoon-fullscreen__caption strong {
+    color: #fff;
+    font-size: clamp(24px, 4vw, 46px);
+    line-height: 1.14;
+}
+
+.lw-cuttoon-fullscreen__caption em {
+    color: rgba(255, 255, 255, 0.84);
+    font-size: clamp(13px, 1.6vw, 18px);
+    font-style: normal;
+    line-height: 1.55;
+}
+
+.lw-cuttoon-fullscreen__progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.lw-cuttoon-fullscreen__progress span {
+    display: block;
+    width: 0%;
+    height: 100%;
+    background: color-mix(in srgb, var(--lw-accent) 72%, white);
+    transition: width 0.12s linear;
+}
+
+.lw-cuttoon-fullscreen__close {
+    position: absolute;
+    top: max(16px, env(safe-area-inset-top));
+    right: max(16px, env(safe-area-inset-right));
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.48);
+    color: #fff;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+}
+
+.lw-cuttoon-fullscreen__play {
+    position: absolute;
+    right: max(22px, env(safe-area-inset-right));
+    bottom: max(24px, env(safe-area-inset-bottom));
+    display: grid;
+    place-items: center;
+    width: clamp(62px, 8vw, 84px);
+    height: clamp(62px, 8vw, 84px);
+    border: 0;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--lw-accent-dark);
+    cursor: pointer;
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34);
+}
+
+.lw-cuttoon-fullscreen__play span {
+    display: block;
+    width: 0;
+    height: 0;
+    margin-left: 5px;
+    border-top: 14px solid transparent;
+    border-bottom: 14px solid transparent;
+    border-left: 21px solid currentColor;
+}
+
+.lw-cuttoon-fullscreen__play.is-playing span {
+    position: relative;
+    width: 22px;
+    height: 28px;
+    margin-left: 0;
+    border: 0;
+}
+
+.lw-cuttoon-fullscreen__play.is-playing span::before,
+.lw-cuttoon-fullscreen__play.is-playing span::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 7px;
+    height: 28px;
+    border-radius: 2px;
+    background: currentColor;
+}
+
+.lw-cuttoon-fullscreen__play.is-playing span::before {
+    left: 2px;
+}
+
+.lw-cuttoon-fullscreen__play.is-playing span::after {
+    right: 2px;
+}
+
+.lw-cuttoon-fullscreen__close:hover,
+.lw-cuttoon-fullscreen__close:focus-visible,
+.lw-cuttoon-fullscreen__play:hover,
+.lw-cuttoon-fullscreen__play:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.7);
+    outline-offset: 3px;
 }
 
 .lw-line-top {
@@ -2285,12 +2480,26 @@ body.lw-compact-mode .lw-summary-block {
 }
 
 @media (max-width: 640px) {
+    .lw-cuttoon-head {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .lw-cuttoon-fullscreen-open {
+        width: 100%;
+    }
+
     .lw-cuttoon-strip {
         grid-auto-columns: minmax(116px, 42vw);
     }
 
     .lw-cuttoon-main figcaption strong {
         font-size: 16px;
+    }
+
+    .lw-cuttoon-fullscreen__caption {
+        right: 24px;
+        bottom: 106px;
     }
 
     body.lw-compact-mode .lw-shell {

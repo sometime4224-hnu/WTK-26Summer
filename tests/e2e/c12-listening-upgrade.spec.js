@@ -68,6 +68,7 @@ test('c12 listening workbooks render transcript lines and PDF quiz prompts', asy
   await expect(page.locator('body')).toContainText('자기 전에 가볍게 스트레칭을 한다.');
   await expect(page.locator('body')).toContainText('Seoul Univ_3B_Trk_30.mp3');
   await expect(page.locator('.lw-cuttoon-card')).toHaveCount(9);
+  await expect(page.locator('[data-action="open-cuttoon-fullscreen"]')).toHaveCount(0);
   const listen1Sync = await page.evaluate(() => {
     const lesson = window.LISTENING_WORKBOOK_CONFIG.lessons[0];
     return {
@@ -93,6 +94,7 @@ test('c12 listening workbooks render transcript lines and PDF quiz prompts', asy
   await expect(page.locator('body')).toContainText('여자 친구가 생겼다.');
   await expect(page.locator('body')).toContainText('Seoul Univ_3B_Trk_31.mp3');
   await expect(page.locator('.lw-cuttoon-card')).toHaveCount(8);
+  await expect(page.locator('[data-action="open-cuttoon-fullscreen"][data-lesson-id="track31"]')).toBeVisible();
   const listen2Sync = await page.evaluate(() => {
     const lesson = window.LISTENING_WORKBOOK_CONFIG.lessons[0];
     return {
@@ -130,6 +132,37 @@ test('c12 listening audio sync highlights cuttoon panels and supports seek click
 
   await page.locator('.lw-line-chunk[data-action="seek-audio"]').first().click();
   await expect.poll(() => page.locator('audio').evaluate((audio) => audio.currentTime)).toBeLessThan(10);
+});
+
+test('c12 listening2 fullscreen cuttoon mode keeps synced playback controls', async ({ page }) => {
+  await blockExternalRequests(page);
+  await page.goto('/c12/listening2.html', { waitUntil: 'domcontentloaded' });
+
+  await page.locator('[data-action="open-cuttoon-fullscreen"][data-lesson-id="track31"]').click();
+  const overlay = page.locator('#cuttoon-fullscreen-track31');
+  await expect(overlay).toBeVisible();
+
+  const playButton = page.locator('[data-action="toggle-cuttoon-fullscreen-audio"][data-lesson-id="track31"]');
+  await expect(playButton).toBeVisible();
+  const overlayBox = await overlay.boundingBox();
+  const playBox = await playButton.boundingBox();
+  expect(overlayBox).not.toBeNull();
+  expect(playBox).not.toBeNull();
+  expect(playBox.x + playBox.width / 2).toBeGreaterThan(overlayBox.x + overlayBox.width * 0.72);
+  expect(playBox.y + playBox.height / 2).toBeGreaterThan(overlayBox.y + overlayBox.height * 0.72);
+
+  await page.locator('audio').evaluate((audio) => {
+    audio.currentTime = 45;
+    audio.dispatchEvent(new Event('timeupdate'));
+  });
+  await expect(page.locator('#cuttoon-fullscreen-title-track31')).toContainText('운동과 음식 조언');
+
+  await playButton.click();
+  await expect.poll(() => page.locator('audio').evaluate((audio) => audio.paused)).toBe(false);
+  await expect(playButton).toHaveClass(/is-playing/);
+
+  await page.locator('[data-action="close-cuttoon-fullscreen"][data-lesson-id="track31"]').click();
+  await expect(overlay).toBeHidden();
 });
 
 const quizPages = [
