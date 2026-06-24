@@ -34,6 +34,19 @@ async function expectSlotPanel(page, slotIndex, panelId) {
   await expect(page.locator(`.drop-slot[data-slot-index="${slotIndex}"] .picture-card`)).toHaveAttribute('data-panel-id', panelId);
 }
 
+async function expectNoVietnameseListeningUi(page) {
+  await expect(page.locator('[data-action="set-instruction-language"]')).toHaveCount(0);
+  await expect(page.locator('[data-quiz-language="vi"]')).toHaveCount(0);
+  await expect(page.locator('[data-stage="3"]')).toHaveCount(0);
+
+  const visibleText = await page.locator('body').evaluate((body) => body.innerText);
+  expect(visibleText).not.toContain('Tiếng Việt');
+  expect(visibleText).not.toContain('한국어 + 베트남어');
+  expect(visibleText).not.toContain('sưng');
+  expect(visibleText).not.toContain('cơ bụng');
+  expect(visibleText).not.toContain('Kiểm tra');
+}
+
 test('c12 hub links to upgraded listening student quiz pages', async ({ page }) => {
   await blockExternalRequests(page);
   await page.goto('/c12/index.html', { waitUntil: 'domcontentloaded' });
@@ -47,6 +60,7 @@ test('c12 listening workbooks render transcript lines and PDF quiz prompts', asy
   await blockExternalRequests(page);
 
   await page.goto('/c12/listening1.html', { waitUntil: 'domcontentloaded' });
+  await expectNoVietnameseListeningUi(page);
   await expect(page.locator('.lw-line-card')).toHaveCount(8);
   await expect(page.locator('.lw-line-card').first()).toContainText('문장 1');
   await expect(page.locator('body')).toContainText('건강 상담');
@@ -71,6 +85,7 @@ test('c12 listening workbooks render transcript lines and PDF quiz prompts', asy
   expect(listen1Sync.panels).toBe(9);
 
   await page.goto('/c12/listening2.html', { waitUntil: 'domcontentloaded' });
+  await expectNoVietnameseListeningUi(page);
   await expect(page.locator('.lw-line-card')).toHaveCount(9);
   await expect(page.locator('.lw-line-card').first()).toContainText('문장 1');
   await expect(page.locator('body')).toContainText('복근');

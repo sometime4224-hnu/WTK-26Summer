@@ -926,8 +926,17 @@
             .replace(/[.,!?~'"“”‘’\-()/]/g, "");
     }
 
+    function getTranslationScaffoldConfig(config = pageConfig) {
+        return (config && config.translationScaffold) || {};
+    }
+
+    function shouldHideTranslationContent(config = pageConfig) {
+        const scaffold = getTranslationScaffoldConfig(config);
+        return Boolean(scaffold.hideTranslations || scaffold.disableTranslations || (config && config.hideTranslations));
+    }
+
     function hasInstructionLanguageToggle(config = pageConfig) {
-        return Boolean(config && config.instructionLanguage && config.instructionLanguage.enabled);
+        return Boolean(config && !shouldHideTranslationContent(config) && config.instructionLanguage && config.instructionLanguage.enabled);
     }
 
     function readInstructionLanguage(config = pageConfig) {
@@ -951,7 +960,7 @@
 
     function chooseLocalizedText(koValue, viValue, fallback = "") {
         const base = koValue == null ? fallback : koValue;
-        if (getInstructionLanguage() === "vi" && viValue != null && viValue !== "") {
+        if (!shouldHideTranslationContent() && getInstructionLanguage() === "vi" && viValue != null && viValue !== "") {
             return viValue;
         }
         return base == null ? "" : base;
@@ -962,16 +971,13 @@
         return chooseLocalizedText(source[key], source[`${key}Vi`], fallback);
     }
 
-    function getTranslationScaffoldConfig(config = pageConfig) {
-        return (config && config.translationScaffold) || {};
-    }
-
     function usesMinimalTranslationScaffold(config = pageConfig) {
         const scaffold = getTranslationScaffoldConfig(config);
         return scaffold.mode === "minimal" || scaffold.minimal === true;
     }
 
     function shouldLocalizeLearnerContent(config = pageConfig) {
+        if (shouldHideTranslationContent(config)) return false;
         const scaffold = getTranslationScaffoldConfig(config);
         if (typeof scaffold.localizeLearnerContent === "boolean") {
             return scaffold.localizeLearnerContent;
@@ -988,6 +994,9 @@
     }
 
     function getSubtitleHelpText() {
+        if (shouldHideTranslationContent()) {
+            return "자막은 1회 청취 후 핵심어, 2회 후 전체 대본이 열립니다.";
+        }
         if (!usesMinimalTranslationScaffold()) {
             return getInstructionText().subtitleHelp;
         }
@@ -1832,40 +1841,44 @@
         const returnLabel = chooseLocalizedText("앞면으로 돌아가기", "Quay lai mat truoc");
         const hintLabel = chooseLocalizedText("문맥 힌트", "Goi y ngu canh");
         const buttonLabel = chooseLocalizedText("어휘 카드 뒤집기", "Lat the tu vung");
+        const hideTranslations = shouldHideTranslationContent();
         return `
             <div class="lw-vocab-grid">
-                ${(lesson.preListening.vocab || []).map((item, index) => `
-                    <article class="lw-vocab-card" data-open="false" id="vocab-${escapeHtml(lesson.id)}-${index}">
-                        <button
-                            type="button"
-                            class="lw-vocab-flip"
-                            data-action="toggle-vocab"
-                            data-lesson-id="${escapeHtml(lesson.id)}"
-                            data-vocab-index="${index}"
-                            aria-pressed="false"
-                            aria-label="${escapeHtml(buttonLabel)}"
-                        >
-                            <span class="lw-vocab-flip__inner">
-                                <span class="lw-vocab-face lw-vocab-face--front">
-                                    <span class="lw-vocab-badge">${escapeHtml(frontLabel)}</span>
-                                    <span class="lw-vocab-ko">${escapeHtml(item.ko)}</span>
-                                    <span class="lw-vocab-tip">${escapeHtml(flipLabel)}</span>
+                ${(lesson.preListening.vocab || []).map((item, index) => {
+                    const backText = hideTranslations ? (item.hint || item.ko || "") : (item.vi || "");
+                    return `
+                        <article class="lw-vocab-card" data-open="false" id="vocab-${escapeHtml(lesson.id)}-${index}">
+                            <button
+                                type="button"
+                                class="lw-vocab-flip"
+                                data-action="toggle-vocab"
+                                data-lesson-id="${escapeHtml(lesson.id)}"
+                                data-vocab-index="${index}"
+                                aria-pressed="false"
+                                aria-label="${escapeHtml(buttonLabel)}"
+                            >
+                                <span class="lw-vocab-flip__inner">
+                                    <span class="lw-vocab-face lw-vocab-face--front">
+                                        <span class="lw-vocab-badge">${escapeHtml(frontLabel)}</span>
+                                        <span class="lw-vocab-ko">${escapeHtml(item.ko)}</span>
+                                        <span class="lw-vocab-tip">${escapeHtml(flipLabel)}</span>
+                                    </span>
+                                    <span class="lw-vocab-face lw-vocab-face--back">
+                                        <span class="lw-vocab-badge">${escapeHtml(backLabel)}</span>
+                                        <span class="lw-vocab-vi">${escapeHtml(backText)}</span>
+                                        ${!hideTranslations && item.hint ? `
+                                            <span class="lw-vocab-context">
+                                                <strong>${escapeHtml(hintLabel)}</strong>
+                                                <span>${escapeHtml(item.hint)}</span>
+                                            </span>
+                                        ` : ""}
+                                        <span class="lw-vocab-tip">${escapeHtml(returnLabel)}</span>
+                                    </span>
                                 </span>
-                                <span class="lw-vocab-face lw-vocab-face--back">
-                                    <span class="lw-vocab-badge">${escapeHtml(backLabel)}</span>
-                                    <span class="lw-vocab-vi">${escapeHtml(item.vi || "")}</span>
-                                    ${item.hint ? `
-                                        <span class="lw-vocab-context">
-                                            <strong>${escapeHtml(hintLabel)}</strong>
-                                            <span>${escapeHtml(item.hint)}</span>
-                                        </span>
-                                    ` : ""}
-                                    <span class="lw-vocab-tip">${escapeHtml(returnLabel)}</span>
-                                </span>
-                            </span>
-                        </button>
-                    </article>
-                `).join("")}
+                            </button>
+                        </article>
+                    `;
+                }).join("")}
             </div>
         `;
     }
