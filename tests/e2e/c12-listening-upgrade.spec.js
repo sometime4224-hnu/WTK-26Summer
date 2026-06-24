@@ -146,8 +146,39 @@ test('c12 listening2 fullscreen cuttoon mode keeps synced playback controls', as
   await expect(playButton).toBeVisible();
   const overlayBox = await overlay.boundingBox();
   const playBox = await playButton.boundingBox();
+  const viewport = page.viewportSize();
   expect(overlayBox).not.toBeNull();
   expect(playBox).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  expect(Math.abs(overlayBox.x)).toBeLessThan(2);
+  expect(Math.abs(overlayBox.y)).toBeLessThan(2);
+  expect(overlayBox.width).toBeGreaterThan(viewport.width - 2);
+  expect(overlayBox.height).toBeGreaterThan(viewport.height - 2);
+
+  const imageInfo = await page.locator('#cuttoon-fullscreen-image-track31').evaluate((image) => {
+    const rect = image.getBoundingClientRect();
+    const style = getComputedStyle(image);
+    return {
+      naturalWidth: image.naturalWidth,
+      naturalHeight: image.naturalHeight,
+      rect: {
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height
+      },
+      opacity: Number(style.opacity),
+      visibility: style.visibility
+    };
+  });
+  expect(imageInfo.naturalWidth).toBeGreaterThan(0);
+  expect(imageInfo.naturalHeight).toBeGreaterThan(0);
+  expect(Math.abs(imageInfo.rect.x)).toBeLessThan(2);
+  expect(Math.abs(imageInfo.rect.y)).toBeLessThan(2);
+  expect(imageInfo.rect.width).toBeGreaterThan(viewport.width - 2);
+  expect(imageInfo.rect.height).toBeGreaterThan(viewport.height - 2);
+  expect(imageInfo.opacity).toBeGreaterThan(0.9);
+  expect(imageInfo.visibility).toBe('visible');
   expect(playBox.x + playBox.width / 2).toBeGreaterThan(overlayBox.x + overlayBox.width * 0.72);
   expect(playBox.y + playBox.height / 2).toBeGreaterThan(overlayBox.y + overlayBox.height * 0.72);
 
