@@ -35,6 +35,17 @@ async function catchmindGroupLabel(page) {
   return text.split("·").pop().trim();
 }
 
+async function anyCanvasHasInk(page) {
+  return page.locator("canvas").evaluateAll((canvases) => canvases.some((canvas) => {
+    const ctx = canvas.getContext("2d");
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    for (let index = 0; index < data.length; index += 4) {
+      if (data[index] < 245 || data[index + 1] < 245 || data[index + 2] < 245) return true;
+    }
+    return false;
+  }));
+}
+
 test.describe("typing party multiplayer MVP", () => {
   test("loads the start screen in mock mode", async ({ page }) => {
     await page.goto("/apps/typing-party/index.html?mock=1&reset=1");
@@ -259,14 +270,12 @@ test.describe("typing party multiplayer MVP", () => {
     await expect.poll(async () => drawer.locator(".drawing-cursor").first().evaluate((node) => getComputedStyle(node).width)).toBe("30px");
     await drawer.locator('[data-action="select-drawing-tool"][data-tool="pen"]').click();
     await drawStroke(drawer);
-    await expect.poll(async () => host.locator("canvas").evaluateAll((canvases) => canvases.some((canvas) => {
-      const ctx = canvas.getContext("2d");
-      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-      for (let index = 0; index < data.length; index += 4) {
-        if (data[index] < 245 || data[index + 1] < 245 || data[index + 2] < 245) return true;
-      }
-      return false;
-    }))).toBe(true);
+    await expect.poll(async () => anyCanvasHasInk(host)).toBe(true);
+
+    await drawer.keyboard.press("Control+Z");
+    await expect.poll(async () => anyCanvasHasInk(host)).toBe(false);
+    await drawStroke(drawer);
+    await expect.poll(async () => anyCanvasHasInk(host)).toBe(true);
 
     await guesser.locator('[data-testid="catchmind-guess-input"]').fill(answer);
     await guesser.locator('[data-testid="catchmind-submit-guess"]').click();

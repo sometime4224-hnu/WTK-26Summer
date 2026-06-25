@@ -1158,14 +1158,14 @@ function renderDrawingControls(sessionId, groupId, drawingId) {
   return `
     <div class="drawing-tools" data-testid="drawing-tools">
       <div class="drawing-tool-row">
-        <button class="secondary-button ${state.drawingTool === "pen" ? "is-selected" : ""}" type="button" data-action="select-drawing-tool" data-tool="pen">펜</button>
-        <button class="secondary-button ${state.drawingTool === "eraser" ? "is-selected" : ""}" type="button" data-action="select-drawing-tool" data-tool="eraser">지우개</button>
+        <button class="secondary-button drawing-tool-button ${state.drawingTool === "pen" ? "is-selected" : ""}" type="button" data-action="select-drawing-tool" data-tool="pen" title="펜으로 그리기"><span class="drawing-icon" aria-hidden="true">✎</span>펜</button>
+        <button class="secondary-button drawing-tool-button ${state.drawingTool === "eraser" ? "is-selected" : ""}" type="button" data-action="select-drawing-tool" data-tool="eraser" title="지우개로 지우기"><span class="drawing-icon" aria-hidden="true">⌫</span>지우개</button>
         <div class="drawing-swatches">${colors}</div>
         <div class="drawing-sizes">${sizes}</div>
       </div>
       <div class="drawing-tool-row">
-        <button class="secondary-button" type="button" data-action="undo-drawing-stroke" data-session-id="${escapeHtml(sessionId)}" data-group-id="${escapeHtml(groupId)}" data-drawing-id="${escapeHtml(drawingId)}" data-testid="drawing-undo">되돌리기</button>
-        <button class="danger-button" type="button" data-action="clear-drawing" data-session-id="${escapeHtml(sessionId)}" data-group-id="${escapeHtml(groupId)}" data-drawing-id="${escapeHtml(drawingId)}" data-testid="drawing-clear">전체 지우기</button>
+        <button class="secondary-button drawing-tool-button" type="button" data-action="undo-drawing-stroke" data-session-id="${escapeHtml(sessionId)}" data-group-id="${escapeHtml(groupId)}" data-drawing-id="${escapeHtml(drawingId)}" data-testid="drawing-undo" title="마지막 획 되돌리기 Ctrl+Z"><span class="drawing-icon" aria-hidden="true">↶</span>되돌리기</button>
+        <button class="danger-button drawing-tool-button" type="button" data-action="clear-drawing" data-session-id="${escapeHtml(sessionId)}" data-group-id="${escapeHtml(groupId)}" data-drawing-id="${escapeHtml(drawingId)}" data-testid="drawing-clear" title="그림 전체 지우기"><span class="drawing-icon" aria-hidden="true">⊘</span>전체 지우기</button>
       </div>
     </div>
   `;
@@ -2060,8 +2060,9 @@ async function undoDrawingStroke(sessionId, groupId, drawingId) {
   const drawing = drawingFor(sessionId, groupId, drawingId);
   const ownStrokes = strokesForDrawing(drawing).filter((stroke) => stroke.uid === state.client.uid);
   const last = ownStrokes[ownStrokes.length - 1];
-  if (!last) return;
+  if (!last) return false;
   await state.client.removeDrawingStroke(state.roomCode, sessionId, groupId, drawingId, last.id);
+  return true;
 }
 
 async function clearDrawing(sessionId, groupId, drawingId) {
@@ -2264,6 +2265,28 @@ function isTypingTarget(target) {
   return target?.isContentEditable || ["INPUT", "TEXTAREA", "SELECT", "BUTTON", "A"].includes(tagName);
 }
 
+function isTextEntryTarget(target) {
+  const tagName = target?.tagName;
+  return target?.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(tagName);
+}
+
+function activeDrawableCanvas() {
+  return [...document.querySelectorAll('[data-drawing-canvas][data-can-draw="1"]')]
+    .find((canvas) => canvas.offsetParent !== null) || null;
+}
+
+function handleDrawingUndoKeydown(event) {
+  if (state.role !== "student" || state.room?.meta?.status !== "groupGame") return;
+  if (!event.ctrlKey || event.altKey || event.metaKey || String(event.key || "").toLowerCase() !== "z") return;
+  if (isTextEntryTarget(event.target)) return;
+
+  const canvas = activeDrawableCanvas();
+  if (!canvas) return;
+  event.preventDefault();
+  undoDrawingStroke(canvas.dataset.sessionId, canvas.dataset.groupId, canvas.dataset.drawingId)
+    .catch((error) => setStartStatus(error.message));
+}
+
 function handleActivityStartKeydown(event) {
   if (state.role !== "student" || state.room?.meta?.status !== "activity") return;
   if (event.key !== "Enter" || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
@@ -2337,6 +2360,7 @@ function bindEvents() {
   });
 
   document.addEventListener("keydown", handleActivityStartKeydown);
+  document.addEventListener("keydown", handleDrawingUndoKeydown);
   document.addEventListener("keydown", handleWorldKeydown);
   document.addEventListener("pointerdown", handleDrawingPointerDown);
   document.addEventListener("pointermove", handleDrawingPointerMove);
