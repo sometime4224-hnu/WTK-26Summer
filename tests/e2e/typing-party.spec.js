@@ -2,6 +2,8 @@ const { test, expect } = require("@playwright/test");
 
 async function createHostRoom(page) {
   await page.goto("/apps/typing-party/index.html?mock=1&reset=1");
+  await page.locator('[data-testid="teacher-pin-input"]').fill("3b67");
+  await page.locator('[data-testid="unlock-teacher"]').click();
   await page.locator('[data-testid="create-room"]').click();
   await expect(page.locator('[data-testid="room-code-display"]')).toHaveText(/[A-Z0-9]{6}/);
   return page.locator('[data-testid="room-code-display"]').textContent();
@@ -22,9 +24,24 @@ test.describe("typing party multiplayer MVP", () => {
 
     await expect(page).toHaveTitle("타이핑 파티");
     await expect(page.locator("#pageTitle")).toContainText("방 코드");
-    await expect(page.locator('[data-testid="create-room"]')).toBeVisible();
+    await expect(page.locator('[data-testid="create-room"]')).toBeHidden();
+    await expect(page.locator('[data-testid="teacher-pin-input"]')).toBeVisible();
     await expect(page.locator('[data-testid="join-room"]')).toBeVisible();
     await expect(page.locator("#connectionChip")).toHaveText("Mock");
+  });
+
+  test("unlocks the teacher room creation panel with the classroom PIN", async ({ page }) => {
+    await page.goto("/apps/typing-party/index.html?mock=1&reset=1");
+
+    await expect(page.locator('[data-testid="create-room"]')).toBeHidden();
+    await page.locator('[data-testid="teacher-pin-input"]').fill("0000");
+    await page.locator('[data-testid="unlock-teacher"]').click();
+    await expect(page.locator("#startStatus")).toContainText("맞지 않습니다");
+
+    await page.locator('[data-testid="teacher-pin-input"]').fill("3b67");
+    await page.locator('[data-testid="unlock-teacher"]').click();
+    await expect(page.locator('[data-testid="create-room"]')).toBeVisible();
+    await expect(page.locator('[data-testid="create-room"]')).toBeEnabled();
   });
 
   test("creates a room and lets a student join", async ({ browser }) => {
@@ -123,7 +140,7 @@ test.describe("typing party multiplayer MVP", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/apps/typing-party/index.html?mock=1&reset=1");
 
-    await expect(page.locator('[data-testid="create-room"]')).toBeVisible();
+    await expect(page.locator('[data-testid="teacher-pin-input"]')).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(2);
   });

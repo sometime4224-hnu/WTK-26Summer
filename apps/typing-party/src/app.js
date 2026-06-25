@@ -17,6 +17,7 @@ import { createFirebaseClient } from "./firebase-client.js";
 const params = new URLSearchParams(window.location.search);
 const useMock = params.get("mock") === "1";
 const resetMock = params.get("reset") === "1";
+const TEACHER_PIN = "3b67";
 
 const state = {
   client: null,
@@ -26,6 +27,7 @@ const state = {
   nickname: "",
   selectedGame: "randomBox",
   selectedActivity: "keyboard-lesson",
+  teacherUnlocked: false,
   unsubscribe: null
 };
 
@@ -34,6 +36,9 @@ const els = {
   roomScreen: document.getElementById("roomScreen"),
   connectionChip: document.getElementById("connectionChip"),
   createRoomButton: document.getElementById("createRoomButton"),
+  teacherPinForm: document.getElementById("teacherPinForm"),
+  teacherPinInput: document.getElementById("teacherPinInput"),
+  teacherCreateBox: document.getElementById("teacherCreateBox"),
   joinForm: document.getElementById("joinForm"),
   roomCodeInput: document.getElementById("roomCodeInput"),
   nicknameInput: document.getElementById("nicknameInput"),
@@ -90,8 +95,15 @@ function setStartStatus(message) {
 }
 
 function setEntryDisabled(disabled) {
-  els.createRoomButton.disabled = disabled;
+  els.createRoomButton.disabled = disabled || !state.teacherUnlocked;
   els.joinForm.querySelector("button").disabled = disabled;
+}
+
+function setTeacherUnlocked(unlocked) {
+  state.teacherUnlocked = unlocked;
+  els.teacherPinForm.hidden = unlocked;
+  els.teacherCreateBox.hidden = !unlocked;
+  els.createRoomButton.disabled = !unlocked || !state.client;
 }
 
 function ensureClientReady() {
@@ -195,6 +207,10 @@ async function generateRoomCode() {
 async function createRoom() {
   setStartStatus("");
   if (!ensureClientReady()) return;
+  if (!state.teacherUnlocked) {
+    setStartStatus("교사용 PIN을 먼저 입력하세요.");
+    return;
+  }
   const roomCode = await generateRoomCode();
   const createdAt = now();
   const hostPlayer = createPlayer("선생님", "host");
@@ -798,8 +814,25 @@ async function handleAction(button) {
 }
 
 function bindEvents() {
+  els.teacherPinForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const pin = String(els.teacherPinInput.value || "").trim();
+    if (pin !== TEACHER_PIN) {
+      setTeacherUnlocked(false);
+      setStartStatus("교사 PIN이 맞지 않습니다.");
+      els.teacherPinInput.select();
+      return;
+    }
+    setStartStatus("");
+    setTeacherUnlocked(true);
+  });
+
   els.createRoomButton.addEventListener("click", async () => {
     if (!ensureClientReady()) return;
+    if (!state.teacherUnlocked) {
+      setStartStatus("교사용 PIN을 먼저 입력하세요.");
+      return;
+    }
     try {
       els.createRoomButton.disabled = true;
       await createRoom();
