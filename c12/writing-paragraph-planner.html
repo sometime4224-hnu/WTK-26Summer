@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>12과 생활 속 운동 제안 글쓰기 문단 설계</title>
+  <link rel="stylesheet" href="../shared/multilang-toggle.css">
+  <style>
+    :root {
+      --bg: #f6faf8;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8e4dc;
+      --green: #0f7a58;
+      --green-soft: #e7f7ef;
+      --blue: #2563eb;
+      --blue-soft: #eaf1ff;
+      --amber: #b45309;
+      --amber-soft: #fff8e7;
+      --rose: #be123c;
+      --rose-soft: #fff1f2;
+      --shadow: 0 16px 38px rgba(23, 32, 51, 0.08);
+      font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      height: 100vh;
+      margin: 0 auto;
+      padding: 10px 0;
+      display: grid;
+      grid-template-rows: auto auto auto minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 8px 24px rgba(23, 32, 51, 0.06);
+    }
+
+    .topbar strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 950;
+      line-height: 1.35;
+    }
+
+    .topbar span {
+      display: block;
+      margin-top: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .link-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .home-link,
+    .guide-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 12px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .guide-link {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 0;
+      align-items: flex-start;
+    }
+
+    .hero-main {
+      min-width: 0;
+      padding: 2px 0;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 820px;
+      margin-bottom: 4px;
+      font-size: clamp(22px, 2.3vw, 28px);
+      line-height: 1.14;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 780px;
+      margin-bottom: 4px;
+      color: #344054;
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.75;
+    }
+
+    .language-row {
+      margin-top: 6px;
+    }
+
+    .how-card,
+    .paragraph-section,
+    .check-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .check-list {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .check-list li {
+      min-width: 0;
+      border: 1px solid #e3ebe6;
+      border-radius: 8px;
+      padding: 6px 8px;
+      background: #fbfdfc;
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .goal-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      min-height: 32px;
+      border: 1px solid #cfe8dc;
+      border-radius: 999px;
+      padding: 0 12px;
+      background: #fbfdfc;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .how-grid {
+      display: none;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 22px 0 16px;
+    }
+
+    .pager {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 10px 26px rgba(23, 32, 51, 0.06);
+    }
+
+    .page-tabs {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .page-button,
+    .pager-button {
+      min-width: 0;
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 10px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 950;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .page-button[aria-current="page"],
+    .pager-button {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+
+    .pager-button:disabled {
+      border-color: #d7e0da;
+      background: #eef4f0;
+      color: #90a39a;
+      cursor: default;
+    }
+
+    .planner-deck {
+      min-height: 0;
+      height: 100%;
+    }
+
+    .planner-page[hidden] {
+      display: none !important;
+    }
+
+    .how-card {
+      padding: 16px;
+      box-shadow: 0 12px 28px rgba(23, 32, 51, 0.06);
+    }
+
+    .how-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: #101828;
+      font-size: 15px;
+      font-weight: 950;
+      line-height: 1.4;
+    }
+
+    .how-card p {
+      margin: 0;
+      color: #344054;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.65;
+    }
+
+    .paragraph-section {
+      height: 100%;
+      min-height: 0;
+      margin-top: 0;
+      padding: 14px;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .paragraph-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 0;
+    }
+
+    .paragraph-title {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      min-width: 0;
+    }
+
+    .number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 950;
+    }
+
+    .paragraph-section h2 {
+      margin-bottom: 5px;
+      font-size: 20px;
+      line-height: 1.35;
+    }
+
+    .paragraph-section .summary {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.65;
+    }
+
+    .target {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border-radius: 999px;
+      padding: 0 10px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .paragraph-goal {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 0;
+      border: 1px solid #cfe8dc;
+      border-radius: 8px;
+      padding: 9px 11px;
+      background: #fbfdfc;
+      color: #174838;
+      font-size: 13px;
+      font-weight: 850;
+      line-height: 1.65;
+    }
+
+    .paragraph-goal strong {
+      flex: 0 0 auto;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .question-chain {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .question-card {
+      min-width: 0;
+      border: 1px solid #dde7e1;
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfdfc;
+      overflow: hidden;
+    }
+
+    .question-card > strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 950;
+    }
+
+    .question-card h3 {
+      margin-bottom: 6px;
+      color: #101828;
+      font-size: 15px;
+      font-weight: 950;
+      line-height: 1.45;
+    }
+
+    .question-card p {
+      margin: 0;
+      color: #344054;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+    }
+
+    .answer-frame {
+      margin-top: 8px;
+      border-top: 1px solid #e5ede8;
+      padding-top: 8px;
+    }
+
+    .answer-frame strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 950;
+    }
+
+    .answer-frame p {
+      color: #172033;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .choice-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .choice-bank span {
+      border: 1px solid #d6e6dc;
+      border-radius: 999px;
+      padding: 4px 7px;
+      background: #fff;
+      color: #344054;
+      font-size: 11px;
+      font-weight: 850;
+      line-height: 1.2;
+    }
+
+    .sentence-flow {
+      margin-top: 0;
+      border: 1px dashed #9dcab6;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #fbfdfc;
+    }
+
+    .sentence-flow strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #07543c;
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .sentence-flow ol {
+      display: grid;
+      gap: 4px;
+      margin: 0;
+      padding-left: 20px;
+      color: #174838;
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.65;
+    }
+
+    .check-panel {
+      height: 100%;
+      margin-top: 0;
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .check-panel h2 {
+      margin-bottom: 12px;
+      font-size: 20px;
+      line-height: 1.35;
+    }
+
+    .paper-box {
+      display: inline-block;
+      width: 17px;
+      height: 17px;
+      margin-right: 8px;
+      border: 2px solid #93b6a4;
+      border-radius: 3px;
+      background: #fff;
+      vertical-align: -3px;
+    }
+
+    [data-lang].scaffold-lang {
+      display: none;
+      overflow-wrap: anywhere;
+    }
+
+    [data-lang].scaffold-lang.lang-visible {
+      display: inline;
+    }
+
+    [data-lang].scaffold-lang.lang-visible[dir="rtl"] {
+      display: block;
+      direction: rtl;
+      text-align: right;
+      unicode-bidi: isolate;
+    }
+
+    @media (max-width: 1040px) {
+      .question-chain {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 920px) {
+      .hero {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: min(100% - 20px, 1180px);
+        padding-top: 6px;
+        gap: 6px;
+      }
+
+      .topbar,
+      .paragraph-head,
+      .paragraph-goal {
+        flex-direction: column;
+      }
+
+      .topbar {
+        align-items: stretch;
+      }
+
+      .link-row {
+        justify-content: flex-start;
+      }
+
+      .home-link,
+      .guide-link {
+        white-space: normal;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .lead {
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .question-chain {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .how-card,
+      .paragraph-section,
+      .check-panel {
+        padding: 8px;
+      }
+
+      .topbar strong {
+        font-size: 14px;
+      }
+
+      .topbar span,
+      .home-link,
+      .guide-link {
+        font-size: 11px;
+      }
+
+      .topbar span {
+        display: none;
+      }
+
+      .hero-main {
+        padding: 0;
+      }
+
+      .eyebrow,
+      .summary,
+      .paragraph-goal strong,
+      .question-card > strong,
+      .question-card p {
+        display: none;
+      }
+
+      .language-row {
+        margin-top: 4px;
+      }
+
+      .multilang-bar {
+        gap: 4px;
+        padding: 4px 0;
+      }
+
+      .multilang-btn {
+        min-height: 28px;
+        padding: 0 8px;
+        font-size: 10px;
+      }
+
+      .pager {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 6px;
+      }
+
+      .page-tabs {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        order: -1;
+      }
+
+      .page-button,
+      .pager-button {
+        min-height: 30px;
+        padding: 0 6px;
+        font-size: 10px;
+      }
+
+      .paragraph-section h2 {
+        font-size: 17px;
+      }
+
+      .paragraph-head {
+        margin-bottom: 0;
+      }
+
+      .paragraph-title {
+        gap: 7px;
+      }
+
+      .number {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+      }
+
+      .target {
+        min-height: 24px;
+        padding: 0 8px;
+        font-size: 10px;
+      }
+
+      .paragraph-goal {
+        padding: 7px 8px;
+        font-size: 11px;
+        line-height: 1.45;
+      }
+
+      .question-card {
+        padding: 7px;
+      }
+
+      .question-card h3 {
+        margin-bottom: 5px;
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .choice-bank {
+        gap: 4px;
+        margin-top: 5px;
+      }
+
+      .choice-bank span {
+        padding: 3px 5px;
+        font-size: 9px;
+      }
+
+      .answer-frame {
+        margin-top: 6px;
+        padding-top: 6px;
+      }
+
+      .answer-frame strong {
+        display: none;
+      }
+
+      .answer-frame p {
+        font-size: 10px;
+        line-height: 1.35;
+      }
+
+      .sentence-flow {
+        padding: 7px 9px;
+      }
+
+      .sentence-flow strong {
+        margin-bottom: 4px;
+        font-size: 10px;
+      }
+
+      .sentence-flow ol {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 3px 12px;
+        padding-left: 16px;
+        font-size: 10px;
+        line-height: 1.35;
+      }
+
+      .check-panel h2 {
+        font-size: 18px;
+      }
+
+      .check-list li {
+        font-size: 11px;
+        padding: 7px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <script>
+    window.MULTILANG_CONFIG = {
+      langs: ["vi", "mn", "ar", "kk", "th", "en", "ja", "zh"],
+      defaultLang: "none",
+      ignoreStoredLang: true
+    };
+  </script>
+
+  <main class="page">
+    <header class="topbar">
+      <div>
+        <strong>12과 생활 속 운동 제안 글쓰기 문단 설계</strong>
+        <span>질문에 답한 내용을 원고지 문장으로 이어 씁니다.</span>
+      </div>
+      <div class="link-row">
+        <a class="home-link" href="index.html">12과 목록</a>
+        <a class="guide-link" href="writing-topic-guide.html">전체 가이드</a>
+      </div>
+    </header>
+
+    <section class="hero" aria-labelledby="pageTitle">
+      <div class="hero-main">
+        <p class="eyebrow">C12 Paragraph Planner</p>
+        <h1 id="pageTitle">4문단 질문 설계</h1>
+        <p class="lead" data-scaffold="lead">질문에 답하고 원고지에 이어 씁니다.</p>
+        <div class="language-row" data-multilang-bar></div>
+      </div>
+
+      <div class="goal-badge" aria-label="원고지 목표">400~500자 · 4문단</div>
+    </section>
+
+    <section class="how-grid" aria-label="문단 설계 사용 방법">
+      <article class="how-card">
+        <strong>1. 질문에 짧게 답하기</strong>
+        <p data-scaffold="how1">완성 문장을 먼저 만들려고 하지 말고, 질문마다 필요한 말을 고릅니다.</p>
+      </article>
+      <article class="how-card">
+        <strong>2. 문장 틀에 넣기</strong>
+        <p data-scaffold="how2">고른 말을 문장 틀에 넣으면 한 문장씩 자연스럽게 만들어집니다.</p>
+      </article>
+      <article class="how-card">
+        <strong>3. 원고지에서 이어 쓰기</strong>
+        <p data-scaffold="how3">질문 순서대로 문장을 이어 쓰고, 반복되는 말은 마지막에 줄입니다.</p>
+      </article>
+    </section>
+
+    <nav class="pager" aria-label="문단 설계 쪽 넘기기">
+      <button class="pager-button" type="button" data-page-prev>이전</button>
+      <div class="page-tabs">
+        <button class="page-button" type="button" data-page-button="0" aria-current="page">1문단</button>
+        <button class="page-button" type="button" data-page-button="1">2문단</button>
+        <button class="page-button" type="button" data-page-button="2">3문단</button>
+        <button class="page-button" type="button" data-page-button="3">4문단</button>
+        <button class="page-button" type="button" data-page-button="4">점검</button>
+      </div>
+      <button class="pager-button" type="button" data-page-next>다음</button>
+    </nav>
+
+    <div class="planner-deck">
+    <section class="paragraph-section planner-page" data-planner-page="0" data-planner-paragraph aria-labelledby="p1Title">
+      <div class="paragraph-head">
+        <div class="paragraph-title">
+          <span class="number">1</span>
+          <div>
+            <h2 id="p1Title">도입: 운동을 못하는 이유</h2>
+            <p class="summary" data-scaffold="p1Summary">독자가 “나도 그렇다”라고 느끼도록 운동을 못하는 상황을 먼저 씁니다.</p>
+          </div>
+        </div>
+        <span class="target">80~100자</span>
+      </div>
+      <div class="paragraph-goal"><strong>원고지 목표</strong><span data-scaffold="p1Goal">누가, 왜 운동을 못하는지 1~2가지 이유로 도입을 만듭니다.</span></div>
+      <div class="question-chain">
+        <article class="question-card">
+          <strong>질문 1</strong>
+          <h3>누가 운동을 못하나요?</h3>
+          <p data-scaffold="p1q1">운동이 필요하지만 바쁘거나 피곤한 사람을 떠올립니다.</p>
+          <div class="choice-bank"><span>학생</span><span>직장인</span><span>바쁜 사람</span><span>오래 앉아 있는 사람</span></div>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>요즘 사람들은 ... 때문에 운동할 시간이 부족합니다.</p></div>
+        </article>
+        <article class="question-card">
+          <strong>질문 2</strong>
+          <h3>왜 운동할 시간이 부족한가요?</h3>
+          <p data-scaffold="p1q2">이유를 1~2개만 고르면 도입이 길어지지 않습니다.</p>
+          <div class="choice-bank"><span>바쁜 생활</span><span>긴 공부 시간</span><span>늦은 퇴근</span><span>피곤함</span></div>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>특히 ... 때는 몸을 움직이기 어렵습니다.</p></div>
+        </article>
+        <article class="question-card">
+          <strong>질문 3</strong>
+          <h3>그 결과 어떤 문제가 생기나요?</h3>
+          <p data-scaffold="p1q3">몸이 무겁거나 스트레스가 쌓이는 모습을 한 가지 씁니다.</p>
+          <div class="choice-bank"><span>몸이 무겁다</span><span>스트레스가 쌓이다</span><span>체력이 약해지다</span></div>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>그러면 ...기 쉽습니다.</p></div>
+        </article>
+        <article class="question-card">
+          <strong>질문 4</strong>
+          <h3>왜 생활 속 운동이 필요할까요?</h3>
+          <p data-scaffold="p1q4">다음 문단에서 운동 방법을 제안할 준비를 합니다.</p>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>그래서 생활 속에서 할 수 있는 작은 운동이 필요합니다.</p></div>
+        </article>
+      </div>
+      <div class="sentence-flow">
+        <strong>답을 붙이는 순서</strong>
+        <ol>
+          <li data-scaffold="p1Flow1">누가 운동을 못하는지 씁니다.</li>
+          <li data-scaffold="p1Flow2">이유를 1~2개 붙입니다.</li>
+          <li data-scaffold="p1Flow3">몸이나 마음의 문제를 짧게 씁니다.</li>
+          <li data-scaffold="p1Flow4">생활 속 운동이 필요하다는 말로 2문단을 준비합니다.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="paragraph-section planner-page" data-planner-page="1" data-planner-paragraph aria-labelledby="p2Title" hidden>
+      <div class="paragraph-head">
+        <div class="paragraph-title">
+          <span class="number">2</span>
+          <div>
+            <h2 id="p2Title">생활 속 운동 방법</h2>
+            <p class="summary" data-scaffold="p2Summary">특별한 운동보다 바로 할 수 있는 방법을 구체적으로 제안합니다.</p>
+          </div>
+        </div>
+        <span class="target">110~130자</span>
+      </div>
+      <div class="paragraph-goal"><strong>원고지 목표</strong><span data-scaffold="p2Goal">언제, 어디에서, 어떻게 할 수 있는 운동인지 2개 이상 씁니다.</span></div>
+      <div class="question-chain">
+        <article class="question-card">
+          <strong>질문 1</strong>
+          <h3>첫 번째 운동 방법은 무엇인가요?</h3>
+          <p data-scaffold="p2q1">가장 쉽게 시작할 수 있는 방법을 먼저 고릅니다.</p>
+          <div class="choice-bank"><span>계단 이용하기</span><span>가까운 거리 걷기</span><span>스트레칭</span></div>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>먼저 ... 보세요.</p></div>
+        </article>
+        <article class="question-card">
+          <strong>질문 2</strong>
+          <h3>언제, 어디에서 할 수 있나요?</h3>
+          <p data-scaffold="p2q2">방법만 쓰지 말고 상황을 함께 쓰면 글이 구체적입니다.</p>
+          <div class="choice-bank"><span>쉬는 시간</span><span>등하교길</span><span>출퇴근길</span><span>집</span></div>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>... 때 ... 하면 좋습니다.</p></div>
+        </article>
+        <article class="question-card">
+          <strong>질문 3</strong>
+          <h3>두 번째 운동 방법은 무엇인가요?</h3>
+          <p data-scaffold="p2q3">두 번째 방법은 첫 번째 방법과 다른 움직임이면 좋습니다.</p>
+          <div class="choice-bank"><span>한 정거장 먼저 내리기</span><span>목과 어깨 풀기</span><span>다리 움직이기</span></div>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>또 ... 수도 있습니다.</p></div>
+        </article>
+        <article class="question-card">
+          <strong>질문 4</strong>
+          <h3>왜 이 방법이 부담이 적나요?</h3>
+          <p data-scaffold="p2q4">시간이나 준비물이 많이 필요 없다는 점을 씁니다.</p>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>이 방법은 ... 때문에 쉽게 시작할 수 있습니다.</p></div>
+        </article>
+      </div>
+      <div class="sentence-flow">
+        <strong>답을 붙이는 순서</strong>
+        <ol>
+          <li data-scaffold="p2Flow1">첫 번째 방법을 씁니다.</li>
+          <li data-scaffold="p2Flow2">그 방법을 할 수 있는 시간과 장소를 붙입니다.</li>
+          <li data-scaffold="p2Flow3">두 번째 방법을 씁니다.</li>
+          <li data-scaffold="p2Flow4">쉽게 시작할 수 있는 이유를 덧붙입니다.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="paragraph-section planner-page" data-planner-page="2" data-planner-paragraph aria-labelledby="p3Title" hidden>
+      <div class="paragraph-head">
+        <div class="paragraph-title">
+          <span class="number">3</span>
+          <div>
+            <h2 id="p3Title">운동의 효과</h2>
+            <p class="summary" data-scaffold="p3Summary">앞 문단의 운동 방법을 하면 몸과 마음이 어떻게 좋아지는지 씁니다.</p>
+          </div>
+        </div>
+        <span class="target">100~120자</span>
+      </div>
+      <div class="paragraph-goal"><strong>원고지 목표</strong><span data-scaffold="p3Goal">몸에 좋은 점 1개, 마음이나 생활에 좋은 점 1개 이상을 씁니다.</span></div>
+      <div class="question-chain">
+        <article class="question-card">
+          <strong>질문 1</strong>
+          <h3>몸은 어떻게 좋아지나요?</h3>
+          <p data-scaffold="p3q1">운동을 하면 몸에서 달라지는 점을 먼저 씁니다.</p>
+          <div class="choice-bank"><span>몸이 가벼워지다</span><span>체력이 좋아지다</span><span>자세가 좋아지다</span></div>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>이렇게 하면 ... 수 있습니다.</p></div>
+        </article>
+        <article class="question-card">
+          <strong>질문 2</strong>
+          <h3>마음은 어떻게 좋아지나요?</h3>
+          <p data-scaffold="p3q2">기분, 스트레스, 자신감 중 하나를 고릅니다.</p>
+          <div class="choice-bank"><span>스트레스가 풀리다</span><span>기분이 좋아지다</span><span>자신감이 생기다</span></div>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>또한 ... 집니다.</p></div>
+        </article>
+        <article class="question-card">
+          <strong>질문 3</strong>
+          <h3>건강에는 어떤 도움이 되나요?</h3>
+          <p data-scaffold="p3q3">오래 앉아 있는 습관을 줄이거나 건강을 지키는 점을 씁니다.</p>
+          <div class="choice-bank"><span>건강을 지키다</span><span>피로를 줄이다</span><span>생활 습관이 좋아지다</span></div>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>그래서 ...에 도움이 됩니다.</p></div>
+        </article>
+        <article class="question-card">
+          <strong>질문 4</strong>
+          <h3>왜 계속할 만한가요?</h3>
+          <p data-scaffold="p3q4">효과가 있어서 꾸준히 할 이유가 생긴다는 말로 정리합니다.</p>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>작은 운동도 계속하면 ... 것입니다.</p></div>
+        </article>
+      </div>
+      <div class="sentence-flow">
+        <strong>답을 붙이는 순서</strong>
+        <ol>
+          <li data-scaffold="p3Flow1">몸에 좋은 효과를 씁니다.</li>
+          <li data-scaffold="p3Flow2">마음에 좋은 효과를 붙입니다.</li>
+          <li data-scaffold="p3Flow3">건강이나 생활 습관에 도움이 되는 점을 씁니다.</li>
+          <li data-scaffold="p3Flow4">꾸준히 할 이유를 짧게 정리합니다.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="paragraph-section planner-page" data-planner-page="3" data-planner-paragraph aria-labelledby="p4Title" hidden>
+      <div class="paragraph-head">
+        <div class="paragraph-title">
+          <span class="number">4</span>
+          <div>
+            <h2 id="p4Title">마지막 제안과 정리</h2>
+            <p class="summary" data-scaffold="p4Summary">독자가 부담 없이 시작할 수 있도록 부드럽게 권하고 마무리합니다.</p>
+          </div>
+        </div>
+        <span class="target">80~100자</span>
+      </div>
+      <div class="paragraph-goal"><strong>원고지 목표</strong><span data-scaffold="p4Goal">작은 실천을 권하고, 매일 조금씩 하면 좋아질 것이라고 응원합니다.</span></div>
+      <div class="question-chain">
+        <article class="question-card">
+          <strong>질문 1</strong>
+          <h3>무엇부터 시작하라고 권할까요?</h3>
+          <p data-scaffold="p4q1">처음부터 많이 하라는 말보다 작은 시작을 권합니다.</p>
+          <div class="choice-bank"><span>가벼운 스트레칭</span><span>10분 걷기</span><span>계단 이용하기</span></div>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>처음에는 힘들 수 있지만 ...부터 해 보세요.</p></div>
+        </article>
+        <article class="question-card">
+          <strong>질문 2</strong>
+          <h3>얼마나 자주 하면 좋을까요?</h3>
+          <p data-scaffold="p4q2">무리하지 않는 횟수나 시간을 씁니다.</p>
+          <div class="choice-bank"><span>매일 조금씩</span><span>쉬는 시간마다</span><span>하루 10분</span></div>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>매일 조금씩 하면 ... 것입니다.</p></div>
+        </article>
+        <article class="question-card">
+          <strong>질문 3</strong>
+          <h3>어떤 말로 응원할까요?</h3>
+          <p data-scaffold="p4q3">독자가 해 볼 수 있다고 느끼게 씁니다.</p>
+          <div class="choice-bank"><span>부담 없이</span><span>천천히</span><span>꾸준히</span></div>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>작은 변화도 ...에 도움이 됩니다.</p></div>
+        </article>
+        <article class="question-card">
+          <strong>질문 4</strong>
+          <h3>마지막 문장은 어떻게 끝낼까요?</h3>
+          <p data-scaffold="p4q4">제안 글답게 부드러운 권유로 끝냅니다.</p>
+          <div class="answer-frame"><strong>문장으로 바꾸기</strong><p>오늘부터 생활 속 작은 운동을 시작해 보세요.</p></div>
+        </article>
+      </div>
+      <div class="sentence-flow">
+        <strong>답을 붙이는 순서</strong>
+        <ol>
+          <li data-scaffold="p4Flow1">작은 운동부터 시작하자고 권합니다.</li>
+          <li data-scaffold="p4Flow2">얼마나 자주 하면 좋은지 씁니다.</li>
+          <li data-scaffold="p4Flow3">꾸준히 하면 좋아질 점을 말합니다.</li>
+          <li data-scaffold="p4Flow4">부드러운 권유로 글을 마무리합니다.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="check-panel planner-page" data-planner-page="4" aria-label="문단 설계 최종 확인" hidden>
+      <h2>원고지에 쓰기 전 확인</h2>
+      <ul class="check-list">
+        <li><span class="paper-box" aria-hidden="true"></span><span data-scaffold="check1">각 문단의 질문에 모두 답했나요?</span></li>
+        <li><span class="paper-box" aria-hidden="true"></span><span data-scaffold="check2">1문단은 운동을 못하는 이유로 시작하나요?</span></li>
+        <li><span class="paper-box" aria-hidden="true"></span><span data-scaffold="check3">2문단은 운동 방법을 2개 이상 제안하나요?</span></li>
+        <li><span class="paper-box" aria-hidden="true"></span><span data-scaffold="check4">3문단은 효과를 2개 이상 설명하나요?</span></li>
+        <li><span class="paper-box" aria-hidden="true"></span><span data-scaffold="check5">4문단은 부드러운 권유로 끝나나요?</span></li>
+      </ul>
+    </section>
+    </div>
+  </main>
+
+  <script src="../shared/multilang-toggle.js"></script>
+  <script src="../shared/site-copyright.js"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      function tr(en, ar, ja, zh, vi, mn, kk, th) {
+        return { en, ar, ja, zh, vi, mn, kk, th };
+      }
+
+      const translations = {
+        lead: tr(
+          "Answer the questions, then write on manuscript paper.",
+          "أجب عن الأسئلة، ثم اكتب على ورق المخطوط.",
+          "質問に答えてから原稿用紙に書きます。",
+          "先回答问题，再写到稿纸上。",
+          "Trả lời câu hỏi rồi viết lên giấy.",
+          "Асуултад хариулаад цаасан дээр бичнэ.",
+          "Сұрақтарға жауап беріп, қағазға жазыңыз.",
+          "ตอบคำถามแล้วเขียนลงบนกระดาษ"
+        ),
+        how1: tr(
+          "Do not try to make perfect sentences first. Choose the words you need for each question.",
+          "لا تحاول صنع جمل كاملة أولا. اختر الكلمات اللازمة لكل سؤال.",
+          "最初から完璧な文を作ろうとせず、質問ごとに必要な言葉を選びます。",
+          "不要一开始就想写完整句子。先为每个问题选择需要的词语。",
+          "Đừng cố viết câu hoàn chỉnh trước. Hãy chọn từ cần thiết cho từng câu hỏi.",
+          "Эхлээд төгс өгүүлбэр хийх гэж бүү оролд. Асуулт бүрт хэрэгтэй үгийг сонго.",
+          "Алдымен мінсіз сөйлем құруға тырыспаңыз. Әр сұраққа керек сөздерді таңдаңыз.",
+          "อย่าเพิ่งพยายามเขียนประโยคสมบูรณ์ ให้เลือกคำที่จำเป็นสำหรับแต่ละคำถามก่อน"
+        ),
+        how2: tr(
+          "Put the chosen words into the sentence frames, and one sentence will form naturally.",
+          "ضع الكلمات المختارة في قوالب الجمل، وستتكون الجملة بشكل طبيعي.",
+          "選んだ言葉を文型に入れると、文が自然にできます。",
+          "把选好的词语放进句型里，句子就会自然形成。",
+          "Đưa từ đã chọn vào mẫu câu, một câu sẽ tự nhiên được tạo thành.",
+          "Сонгосон үгээ өгүүлбэрийн загварт оруулахад өгүүлбэр аяндаа бүтнэ.",
+          "Таңдаған сөздерді сөйлем үлгісіне қойсаңыз, сөйлем табиғи түрде құралады.",
+          "ใส่คำที่เลือกลงในรูปประโยค แล้วประโยคจะเกิดขึ้นอย่างเป็นธรรมชาติ"
+        ),
+        how3: tr(
+          "Write the sentences in question order on manuscript paper, then reduce repeated words at the end.",
+          "اكتب الجمل على ورق المخطوط حسب ترتيب الأسئلة، ثم قلل الكلمات المكررة في النهاية.",
+          "質問の順番に文を原稿用紙へ書き、最後に繰り返しを減らします。",
+          "按问题顺序把句子写在稿纸上，最后减少重复的话。",
+          "Viết câu lên giấy theo thứ tự câu hỏi, rồi cuối cùng giảm từ lặp lại.",
+          "Асуултын дарааллаар өгүүлбэрээ цаасан дээр бичээд, эцэст нь давтсан үгийг багасгана.",
+          "Сөйлемдерді сұрақ ретімен қағазға жазып, соңында қайталанған сөздерді азайтыңыз.",
+          "เขียนประโยคลงบนกระดาษตามลำดับคำถาม แล้วลดคำที่ซ้ำในตอนท้าย"
+        ),
+        p1Summary: tr(
+          "First write a situation where readers can think, \"That is like me.\"",
+          "اكتب أولا موقفا يجعل القارئ يشعر أنه يشبه حاله.",
+          "読者が「自分もそうだ」と感じる状況を先に書きます。",
+          "先写一种让读者觉得“我也是这样”的情况。",
+          "Trước hết viết tình huống để người đọc thấy giống mình.",
+          "Уншигч “надтай адил” гэж мэдрэх нөхцөлийг эхлээд бич.",
+          "Оқырман “мен де солаймын” деп сезетін жағдайды алдымен жазыңыз.",
+          "เขียนสถานการณ์ที่ผู้อ่านรู้สึกว่าเหมือนตนเองก่อน"
+        ),
+        p1Goal: tr(
+          "Make the introduction with one or two reasons about who cannot exercise and why.",
+          "اكتب المقدمة بسبب أو سببين: من لا يستطيع ممارسة الرياضة ولماذا.",
+          "誰が、なぜ運動できないのかを1〜2つの理由で導入にします。",
+          "用1~2个理由写出谁为什么不能运动，作为开头。",
+          "Tạo đoạn mở đầu bằng 1-2 lý do: ai không thể vận động và vì sao.",
+          "Хэн, яагаад дасгал хийж чаддаггүйг 1-2 шалтгаанаар оршил болго.",
+          "Кімнің неге жаттыға алмайтынын 1-2 себеппен кіріспе етіңіз.",
+          "เขียนบทนำด้วยเหตุผล 1-2 ข้อว่าใครออกกำลังกายไม่ได้และเพราะอะไร"
+        ),
+        p1q1: tr(
+          "Think of someone who needs exercise but is busy or tired.",
+          "تخيل شخصا يحتاج إلى الرياضة لكنه مشغول أو متعب.",
+          "運動が必要でも忙しい人や疲れている人を思い浮かべます。",
+          "想一想需要运动但很忙或很累的人。",
+          "Hãy nghĩ đến người cần vận động nhưng bận hoặc mệt.",
+          "Дасгал хэрэгтэй ч завгүй эсвэл ядарсан хүнийг бод.",
+          "Жаттығу қажет, бірақ бос емес немесе шаршаған адамды елестетіңіз.",
+          "นึกถึงคนที่ควรออกกำลังกายแต่ยุ่งหรือเหนื่อย"
+        ),
+        p1q2: tr(
+          "Choose only one or two reasons so the introduction does not get too long.",
+          "اختر سببا أو سببين فقط حتى لا تطول المقدمة.",
+          "導入が長くならないように、理由は1〜2つだけ選びます。",
+          "只选择1~2个理由，这样开头不会太长。",
+          "Chỉ chọn 1-2 lý do để đoạn mở đầu không quá dài.",
+          "Оршил хэт урт болохгүйгээр 1-2 шалтгаан л сонго.",
+          "Кіріспе ұзарып кетпеуі үшін тек 1-2 себеп таңдаңыз.",
+          "เลือกเหตุผลเพียง 1-2 ข้อ เพื่อให้บทนำไม่ยาวเกินไป"
+        ),
+        p1q3: tr(
+          "Write one sign, such as a heavy body or built-up stress.",
+          "اكتب علامة واحدة مثل ثقل الجسم أو تراكم التوتر.",
+          "体が重い、ストレスがたまるなどの様子を一つ書きます。",
+          "写一个表现，比如身体沉重或压力积累。",
+          "Viết một biểu hiện như cơ thể nặng nề hoặc căng thẳng tích tụ.",
+          "Бие хүнд болох эсвэл стресс хуримтлагдах зэрэг нэг шинжийг бич.",
+          "Дененің ауырлауы не стресстің жиналуы сияқты бір белгіні жазыңыз.",
+          "เขียนอาการหนึ่งอย่าง เช่น ตัวหนักหรือมีความเครียดสะสม"
+        ),
+        p1q4: tr(
+          "Get ready to suggest exercise methods in the next paragraph.",
+          "استعد لاقتراح طرق الرياضة في الفقرة التالية.",
+          "次の段落で運動方法を提案する準備をします。",
+          "为下一段提出运动方法做准备。",
+          "Chuẩn bị để đề xuất cách vận động ở đoạn sau.",
+          "Дараагийн догол мөрөнд дасгалын арга санал болгоход бэлд.",
+          "Келесі абзацта жаттығу әдістерін ұсынуға дайындалыңыз.",
+          "เตรียมเสนอวิธีออกกำลังกายในย่อหน้าถัดไป"
+        ),
+        p1Flow1: tr("Write who cannot exercise.", "اكتب من لا يستطيع ممارسة الرياضة.", "誰が運動できないのかを書きます。", "写谁不能运动。", "Viết ai không thể vận động.", "Хэн дасгал хийж чаддаггүйг бич.", "Кім жаттыға алмайтынын жазыңыз.", "เขียนว่าใครออกกำลังกายไม่ได้"),
+        p1Flow2: tr("Add one or two reasons.", "أضف سببا أو سببين.", "理由を1〜2つ付けます。", "加上1~2个理由。", "Thêm 1-2 lý do.", "1-2 шалтгаан нэм.", "1-2 себеп қосыңыз.", "เพิ่มเหตุผล 1-2 ข้อ"),
+        p1Flow3: tr("Briefly write a body or mind problem.", "اكتب مشكلة في الجسم أو النفس باختصار.", "体や心の問題を短く書きます。", "简短写身体或心理上的问题。", "Viết ngắn gọn vấn đề về cơ thể hoặc tinh thần.", "Бие эсвэл сэтгэлийн асуудлыг товч бич.", "Дене не көңіл-күй мәселесін қысқа жазыңыз.", "เขียนปัญหาทางร่างกายหรือจิตใจสั้น ๆ"),
+        p1Flow4: tr("Prepare paragraph 2 by saying daily-life exercise is needed.", "مهّد للفقرة الثانية بقول إن الرياضة في الحياة اليومية ضرورية.", "生活の中の運動が必要だと言って第2段落につなげます。", "用“生活中的运动是必要的”连接到第二段。", "Dẫn sang đoạn 2 bằng cách nói rằng cần vận động trong đời sống.", "Өдөр тутмын дасгал хэрэгтэй гэж хэлж 2-р догол мөрт холбо.", "Күнделікті жаттығу қажет екенін айтып, 2-абзацқа дайындаңыз.", "เชื่อมไปย่อหน้า 2 ด้วยการบอกว่าการออกกำลังกายในชีวิตประจำวันจำเป็น"),
+        p2Summary: tr(
+          "Suggest specific methods that people can do right away, not special sports.",
+          "اقترح طرقا محددة يمكن فعلها فورا، لا رياضات خاصة.",
+          "特別な運動ではなく、すぐできる方法を具体的に提案します。",
+          "不要写特别的运动，而要具体建议马上能做的方法。",
+          "Đề xuất cách cụ thể có thể làm ngay, không phải môn thể thao đặc biệt.",
+          "Онцгой спорт биш, шууд хийж болох аргыг тодорхой санал болго.",
+          "Арнайы спорт емес, бірден жасауға болатын нақты әдістерді ұсыныңыз.",
+          "เสนอวิธีที่ทำได้ทันทีอย่างชัดเจน ไม่ใช่กีฬาแบบพิเศษ"
+        ),
+        p2Goal: tr(
+          "Write at least two exercises, including when, where, and how people can do them.",
+          "اكتب تمرينين على الأقل، مع متى وأين وكيف يمكن فعلها.",
+          "いつ、どこで、どのようにできる運動かを2つ以上書きます。",
+          "写两个以上的运动，并说明什么时候、在哪里、怎样做。",
+          "Viết ít nhất 2 cách vận động, gồm khi nào, ở đâu, làm thế nào.",
+          "Хэзээ, хаана, хэрхэн хийхийг оруулаад дор хаяж 2 дасгал бич.",
+          "Қашан, қайда, қалай жасалатынын қосып, кемінде 2 жаттығу жазыңыз.",
+          "เขียนการออกกำลังกายอย่างน้อย 2 วิธี พร้อมบอกว่าเมื่อไร ที่ไหน และทำอย่างไร"
+        ),
+        p2q1: tr("Choose the easiest method to start with first.", "اختر أولا أسهل طريقة للبدء.", "一番始めやすい方法を先に選びます。", "先选择最容易开始的方法。", "Chọn cách dễ bắt đầu nhất trước.", "Эхлэхэд хамгийн амар аргыг эхлээд сонго.", "Алдымен бастауға ең оңай әдісті таңдаңыз.", "เลือกวิธีที่เริ่มได้ง่ายที่สุดก่อน"),
+        p2q2: tr("Write the situation too, not only the method, so the text becomes specific.", "اكتب الموقف أيضا، لا الطريقة فقط، حتى يصبح النص محددا.", "方法だけでなく状況も書くと、文章が具体的になります。", "不只写方法，也写情况，这样文章更具体。", "Không chỉ viết cách làm, hãy viết cả tình huống để bài cụ thể hơn.", "Зөвхөн аргыг биш, нөхцөлийг хамт бичвэл бичвэр тодорхой болно.", "Тек әдісті емес, жағдайды да жазсаңыз, мәтін нақты болады.", "อย่าเขียนแค่วิธี ให้เขียนสถานการณ์ด้วยเพื่อให้เนื้อหาชัดเจน"),
+        p2q3: tr("It is good if the second method uses a different movement from the first.", "من الجيد أن تكون الطريقة الثانية حركة مختلفة عن الأولى.", "二つ目の方法は、一つ目と違う動きだとよいです。", "第二个方法最好和第一个方法动作不同。", "Cách thứ hai nên là chuyển động khác với cách thứ nhất.", "Хоёр дахь арга нь эхнийхээс өөр хөдөлгөөн байвал сайн.", "Екінші әдіс біріншіден басқа қимыл болса жақсы.", "วิธีที่สองควรเป็นการเคลื่อนไหวที่ต่างจากวิธีแรก"),
+        p2q4: tr("Write that it does not need much time or equipment.", "اكتب أنه لا يحتاج إلى وقت أو أدوات كثيرة.", "時間や道具があまり必要ないことを書きます。", "写明它不需要很多时间或准备物品。", "Viết rằng cách này không cần nhiều thời gian hay dụng cụ.", "Их цаг эсвэл хэрэгсэл хэрэггүй гэдгийг бич.", "Көп уақыт не құрал қажет емес екенін жазыңыз.", "เขียนว่าวิธีนี้ไม่ต้องใช้เวลาหรืออุปกรณ์มาก"),
+        p2Flow1: tr("Write the first method.", "اكتب الطريقة الأولى.", "一つ目の方法を書きます。", "写第一个方法。", "Viết cách thứ nhất.", "Эхний аргыг бич.", "Бірінші әдісті жазыңыз.", "เขียนวิธีแรก"),
+        p2Flow2: tr("Add the time and place where people can do it.", "أضف الوقت والمكان اللذين يمكن فعلها فيهما.", "その方法ができる時間と場所を付けます。", "加上可以做这个方法的时间和地点。", "Thêm thời gian và nơi có thể thực hiện cách đó.", "Тэр аргыг хийж болох цаг, газрыг нэм.", "Оны жасауға болатын уақыт пен орынды қосыңыз.", "เพิ่มเวลาและสถานที่ที่ทำวิธีนั้นได้"),
+        p2Flow3: tr("Write the second method.", "اكتب الطريقة الثانية.", "二つ目の方法を書きます。", "写第二个方法。", "Viết cách thứ hai.", "Хоёр дахь аргыг бич.", "Екінші әдісті жазыңыз.", "เขียนวิธีที่สอง"),
+        p2Flow4: tr("Add why it is easy to start.", "أضف لماذا يسهل البدء بها.", "始めやすい理由を付け加えます。", "补充为什么容易开始。", "Thêm lý do vì sao dễ bắt đầu.", "Эхлэхэд яагаад амар гэдгийг нэм.", "Неге бастау оңай екенін қосыңыз.", "เพิ่มเหตุผลว่าทำไมจึงเริ่มได้ง่าย"),
+        p3Summary: tr(
+          "Write how the body and mind improve when people do the exercises from the previous paragraph.",
+          "اكتب كيف يتحسن الجسم والنفس عند ممارسة طرق الفقرة السابقة.",
+          "前の段落の運動方法をすると、体と心がどうよくなるかを書きます。",
+          "写做上一段的运动方法后，身体和心情会怎样变好。",
+          "Viết cơ thể và tinh thần tốt lên thế nào khi làm các cách ở đoạn trước.",
+          "Өмнөх догол мөрийн дасгалыг хийхэд бие, сэтгэл хэрхэн сайжрахыг бич.",
+          "Алдыңғы абзацтағы жаттығуларды жасағанда дене мен көңіл-күй қалай жақсаратынын жазыңыз.",
+          "เขียนว่าถ้าทำวิธีในย่อหน้าก่อน ร่างกายและจิตใจจะดีขึ้นอย่างไร"
+        ),
+        p3Goal: tr(
+          "Write at least one good point for the body and one good point for the mind or daily life.",
+          "اكتب فائدة واحدة على الأقل للجسم وفائدة واحدة للنفس أو الحياة اليومية.",
+          "体に良い点を1つ、心や生活に良い点を1つ以上書きます。",
+          "写至少一个对身体好的方面，以及一个对心情或生活好的方面。",
+          "Viết ít nhất 1 điểm tốt cho cơ thể và 1 điểm tốt cho tinh thần hoặc đời sống.",
+          "Биеийн сайн тал 1, сэтгэл эсвэл амьдралын сайн тал 1-ээс дээш бич.",
+          "Дене үшін 1 жақсы жақ, көңіл-күй не өмір үшін кемінде 1 жақсы жақ жазыңыз.",
+          "เขียนข้อดีต่อร่างกายอย่างน้อย 1 ข้อ และข้อดีต่อจิตใจหรือชีวิตประจำวันอย่างน้อย 1 ข้อ"
+        ),
+        p3q1: tr("First write what changes in the body when people exercise.", "اكتب أولا ما الذي يتغير في الجسم عند ممارسة الرياضة.", "運動すると体で変わる点を先に書きます。", "先写运动后身体会有什么变化。", "Trước hết viết cơ thể thay đổi thế nào khi vận động.", "Дасгал хийхэд биед юу өөрчлөгдөхийг эхлээд бич.", "Жаттығу жасағанда денеде не өзгеретінін алдымен жазыңыз.", "เขียนก่อนว่าเมื่อออกกำลังกาย ร่างกายเปลี่ยนไปอย่างไร"),
+        p3q2: tr("Choose one of mood, stress, or confidence.", "اختر واحدا من المزاج أو التوتر أو الثقة.", "気分、ストレス、自信の中から一つ選びます。", "从心情、压力、自信中选择一个。", "Chọn một trong các ý: tâm trạng, căng thẳng, sự tự tin.", "Сэтгэл санаа, стресс, өөртөө итгэлээс нэгийг сонго.", "Көңіл-күй, стресс немесе сенімділіктің бірін таңдаңыз.", "เลือกอย่างใดอย่างหนึ่ง: อารมณ์ ความเครียด หรือความมั่นใจ"),
+        p3q3: tr("Write how it reduces long sitting or helps protect health.", "اكتب كيف يقلل الجلوس الطويل أو يساعد في الحفاظ على الصحة.", "長く座る習慣を減らすことや健康を守る点を書きます。", "写它怎样减少久坐习惯或帮助保持健康。", "Viết cách nó giảm thói quen ngồi lâu hoặc giúp giữ sức khỏe.", "Удаан суух зуршлыг багасгах эсвэл эрүүл мэндээ хамгаалахад туслахыг бич.", "Ұзақ отыруды азайтуын немесе денсаулықты сақтауға көмектесуін жазыңыз.", "เขียนว่าสิ่งนี้ช่วยลดการนั่งนานหรือช่วยรักษาสุขภาพอย่างไร"),
+        p3q4: tr("Finish by saying the effects give a reason to keep going.", "اختم بقول إن الفوائد تعطي سببا للاستمرار.", "効果があるので続ける理由ができる、とまとめます。", "最后写因为有效果，所以有理由坚持下去。", "Kết lại rằng vì có tác dụng nên có lý do để tiếp tục.", "Үр дүнтэй тул үргэлжлүүлэх шалтгаан бий гэж дүгнэ.", "Әсері болғандықтан, жалғастыруға себеп бар деп қорытындылаңыз.", "สรุปว่าผลดีเหล่านี้ทำให้มีเหตุผลที่จะทำต่อไป"),
+        p3Flow1: tr("Write a good effect for the body.", "اكتب فائدة جيدة للجسم.", "体に良い効果を書きます。", "写对身体好的效果。", "Viết tác dụng tốt cho cơ thể.", "Биед сайн үр нөлөөг бич.", "Дене үшін жақсы әсерді жазыңыз.", "เขียนผลดีต่อร่างกาย"),
+        p3Flow2: tr("Add a good effect for the mind.", "أضف فائدة جيدة للنفس.", "心に良い効果を付けます。", "加上对心情好的效果。", "Thêm tác dụng tốt cho tinh thần.", "Сэтгэлд сайн үр нөлөөг нэм.", "Көңіл-күйге жақсы әсерді қосыңыз.", "เพิ่มผลดีต่อจิตใจ"),
+        p3Flow3: tr("Write how it helps health or daily habits.", "اكتب كيف يساعد الصحة أو العادات اليومية.", "健康や生活習慣に役立つ点を書きます。", "写它怎样帮助健康或生活习惯。", "Viết nó giúp sức khỏe hoặc thói quen sinh hoạt như thế nào.", "Эрүүл мэнд эсвэл амьдралын дадалд хэрхэн туслахыг бич.", "Денсаулыққа не күнделікті әдетке қалай көмектесетінін жазыңыз.", "เขียนว่าสิ่งนี้ช่วยสุขภาพหรือนิสัยในชีวิตประจำวันอย่างไร"),
+        p3Flow4: tr("Briefly summarize why people should keep doing it.", "لخص باختصار لماذا ينبغي الاستمرار فيها.", "続ける理由を短くまとめます。", "简短总结为什么应该坚持。", "Tóm tắt ngắn gọn lý do nên tiếp tục.", "Яагаад үргэлжлүүлэх ёстойг товч дүгнэ.", "Неге жалғастыру керек екенін қысқа қорытындылаңыз.", "สรุปสั้น ๆ ว่าทำไมควรทำต่อเนื่อง"),
+        p4Summary: tr(
+          "End by gently encouraging readers to start without pressure.",
+          "اختم بتشجيع القارئ بلطف على البدء دون ضغط.",
+          "読者が負担なく始められるように、やさしく勧めて終わります。",
+          "最后温和地劝读者轻松开始。",
+          "Kết thúc bằng lời khuyên nhẹ nhàng để người đọc bắt đầu không áp lực.",
+          "Уншигч дарамтгүй эхлэхээр зөөлөн уриалаад дуусга.",
+          "Оқырман қысымсыз бастай алатындай жұмсақ кеңеспен аяқтаңыз.",
+          "จบด้วยการชวนผู้อ่านอย่างนุ่มนวลให้เริ่มโดยไม่กดดัน"
+        ),
+        p4Goal: tr(
+          "Suggest a small action and encourage readers that doing a little every day will help.",
+          "اقترح عملا صغيرا وشجع القارئ بأن القليل كل يوم سيساعده.",
+          "小さな実践を勧め、毎日少しずつすればよくなると応援します。",
+          "建议一个小行动，并鼓励读者每天做一点会有帮助。",
+          "Đề xuất một việc nhỏ và khích lệ rằng mỗi ngày làm một chút sẽ tốt hơn.",
+          "Жижиг үйлдэл санал болгож, өдөр бүр бага багаар хийвэл тус болно гэж урамшуул.",
+          "Шағын әрекет ұсынып, күн сайын аздап жасаса көмектесетінін айтып жігерлендіріңіз.",
+          "เสนอการลงมือทำเล็ก ๆ และให้กำลังใจว่าทำทีละนิดทุกวันจะช่วยได้"
+        ),
+        p4q1: tr("Suggest a small start instead of telling readers to do a lot from the beginning.", "اقترح بداية صغيرة بدلا من أن تطلب الكثير من البداية.", "最初からたくさんするより、小さく始めるよう勧めます。", "不要一开始就要求做很多，而是建议从小处开始。", "Khuyên bắt đầu từ việc nhỏ thay vì làm nhiều ngay từ đầu.", "Эхнээсээ их хийхээс илүү жижиг эхлэлийг санал болго.", "Басында көп істеуді емес, шағын бастауды ұсыныңыз.", "แนะนำให้เริ่มจากสิ่งเล็ก ๆ แทนที่จะให้ทำมากตั้งแต่แรก"),
+        p4q2: tr("Write a frequency or time that is not too much.", "اكتب عددا أو وقتا لا يكون مرهقا.", "無理のない回数や時間を書きます。", "写一个不勉强的次数或时间。", "Viết số lần hoặc thời gian không quá sức.", "Хэт их биш давтамж эсвэл хугацааг бич.", "Шамадан тыс емес жиілік не уақытты жазыңыз.", "เขียนจำนวนครั้งหรือเวลาที่ไม่ฝืนเกินไป"),
+        p4q3: tr("Write so readers feel that they can try it.", "اكتب بحيث يشعر القارئ أنه يستطيع التجربة.", "読者が「やってみられる」と感じるように書きます。", "写得让读者觉得自己可以试一试。", "Viết để người đọc cảm thấy mình có thể thử.", "Уншигч хийж үзэж чадна гэж мэдрэхээр бич.", "Оқырман жасап көре аламын деп сезетіндей жазыңыз.", "เขียนให้ผู้อ่านรู้สึกว่าสามารถลองทำได้"),
+        p4q4: tr("Finish like a suggestion text, with a gentle recommendation.", "اختم كنص اقتراح، بدعوة لطيفة.", "提案文らしく、やさしい勧めで終わります。", "像建议文一样，用柔和的劝说结束。", "Kết thúc như một bài đề xuất, bằng lời khuyên nhẹ nhàng.", "Санал болгох бичвэр шиг зөөлөн зөвлөж дуусга.", "Ұсыныс мәтіні сияқты жұмсақ кеңеспен аяқтаңыз.", "จบเหมือนงานเขียนเสนอแนะ ด้วยคำชวนที่นุ่มนวล"),
+        p4Flow1: tr("Suggest starting with a small exercise.", "اقترح البدء بتمرين صغير.", "小さな運動から始めようと勧めます。", "建议从小运动开始。", "Khuyên bắt đầu từ vận động nhỏ.", "Жижиг дасгалаас эхлэхийг санал болго.", "Шағын жаттығудан бастауды ұсыныңыз.", "ชวนให้เริ่มจากการออกกำลังกายเล็ก ๆ"),
+        p4Flow2: tr("Write how often it is good to do it.", "اكتب كم مرة من الجيد فعلها.", "どのくらいの頻度でするとよいかを書きます。", "写多久做一次比较好。", "Viết nên làm thường xuyên như thế nào.", "Хэр олон удаа хийвэл сайн гэдгийг бич.", "Қаншалықты жиі жасаған жақсы екенін жазыңыз.", "เขียนว่าควรทำบ่อยแค่ไหน"),
+        p4Flow3: tr("Say what will improve if readers keep doing it.", "قل ما الذي سيتحسن إذا استمر القارئ.", "続けるとよくなる点を言います。", "说明坚持做会有什么变好。", "Nói điều sẽ tốt lên nếu tiếp tục.", "Үргэлжлүүлбэл юу сайжрахыг хэл.", "Жалғастырса не жақсаратынын айтыңыз.", "บอกว่าสิ่งใดจะดีขึ้นถ้าทำต่อเนื่อง"),
+        p4Flow4: tr("Finish the text with a gentle suggestion.", "اختم النص باقتراح لطيف.", "やさしい勧めで文章を終えます。", "用温和的建议结束文章。", "Kết thúc bài bằng lời đề xuất nhẹ nhàng.", "Бичвэрээ зөөлөн санал болгож төгсгө.", "Мәтінді жұмсақ ұсыныспен аяқтаңыз.", "จบงานเขียนด้วยคำแนะนำที่นุ่มนวล"),
+        check1: tr("Did you answer all the questions in each paragraph?", "هل أجبت عن كل أسئلة كل فقرة؟", "各段落の質問にすべて答えましたか。", "每一段的问题都回答了吗？", "Bạn đã trả lời tất cả câu hỏi trong từng đoạn chưa?", "Догол мөр бүрийн бүх асуултад хариулсан уу?", "Әр абзацтағы барлық сұрақтарға жауап бердіңіз бе?", "ตอบคำถามของแต่ละย่อหน้าครบแล้วหรือยัง"),
+        check2: tr("Does paragraph 1 start with reasons people cannot exercise?", "هل تبدأ الفقرة الأولى بأسباب عدم ممارسة الرياضة؟", "1段落目は運動できない理由から始まりますか。", "第一段是从不能运动的理由开始的吗？", "Đoạn 1 có bắt đầu bằng lý do không thể vận động không?", "1-р догол мөр дасгал хийж чаддаггүй шалтгаанаар эхэлсэн үү?", "1-абзац жаттыға алмау себептерімен бастала ма?", "ย่อหน้า 1 เริ่มด้วยเหตุผลที่ออกกำลังกายไม่ได้หรือไม่"),
+        check3: tr("Does paragraph 2 suggest at least two exercise methods?", "هل تقترح الفقرة الثانية طريقتين للرياضة على الأقل؟", "2段落目は運動方法を2つ以上提案していますか。", "第二段提出了两个以上的运动方法吗？", "Đoạn 2 có đề xuất ít nhất 2 cách vận động không?", "2-р догол мөр дор хаяж 2 дасгалын арга санал болгосон уу?", "2-абзац кемінде 2 жаттығу әдісін ұсына ма?", "ย่อหน้า 2 เสนอวิธีออกกำลังกายอย่างน้อย 2 วิธีหรือไม่"),
+        check4: tr("Does paragraph 3 explain at least two effects?", "هل تشرح الفقرة الثالثة فائدتين على الأقل؟", "3段落目は効果を2つ以上説明していますか。", "第三段说明了两个以上的效果吗？", "Đoạn 3 có giải thích ít nhất 2 tác dụng không?", "3-р догол мөр дор хаяж 2 үр нөлөөг тайлбарласан уу?", "3-абзац кемінде 2 әсерді түсіндіре ме?", "ย่อหน้า 3 อธิบายผลดีอย่างน้อย 2 ข้อหรือไม่"),
+        check5: tr("Does paragraph 4 end with a gentle suggestion?", "هل تنتهي الفقرة الرابعة باقتراح لطيف؟", "4段落目はやさしい勧めで終わりますか。", "第四段以柔和的建议结束了吗？", "Đoạn 4 có kết thúc bằng lời khuyên nhẹ nhàng không?", "4-р догол мөр зөөлөн санал болгож төгссөн үү?", "4-абзац жұмсақ ұсыныспен аяқтала ма?", "ย่อหน้า 4 จบด้วยคำแนะนำที่นุ่มนวลหรือไม่")
+      };
+
+      function addTranslations(element, texts) {
+        Object.entries(texts).forEach(([lang, text]) => {
+          const span = document.createElement("span");
+          span.className = "scaffold-lang";
+          span.dataset.lang = lang;
+          if (lang === "ar") span.dir = "rtl";
+          span.textContent = text;
+          element.appendChild(span);
+        });
+      }
+
+      function buildScaffolds() {
+        document.querySelectorAll("[data-scaffold]").forEach((element) => {
+          const key = element.dataset.scaffold;
+          const texts = translations[key];
+          if (!texts || element.dataset.scaffoldReady === "true") return;
+
+          const ko = document.createElement("span");
+          ko.className = "scaffold-ko";
+          ko.textContent = element.textContent.trim();
+          element.textContent = "";
+          element.appendChild(ko);
+          addTranslations(element, texts);
+          element.dataset.scaffoldReady = "true";
+        });
+      }
+
+      function syncScaffoldLanguage() {
+        const activeLang = window.MultilangToggle?.getLang?.() || document.body.dataset.activeLang || "none";
+        document.querySelectorAll("[data-scaffold]").forEach((element) => {
+          const ko = element.querySelector(":scope > .scaffold-ko");
+          if (!ko) return;
+          const hasTranslation = activeLang !== "none" && Boolean(element.querySelector(`:scope > [data-lang="${activeLang}"]`));
+          ko.hidden = hasTranslation;
+        });
+      }
+
+      const pages = Array.from(document.querySelectorAll("[data-planner-page]"));
+      const pageButtons = Array.from(document.querySelectorAll("[data-page-button]"));
+      const prevButton = document.querySelector("[data-page-prev]");
+      const nextButton = document.querySelector("[data-page-next]");
+      let currentPage = 0;
+
+      function showPage(index) {
+        currentPage = Math.max(0, Math.min(index, pages.length - 1));
+
+        pages.forEach((page, pageIndex) => {
+          page.hidden = pageIndex !== currentPage;
+        });
+
+        pageButtons.forEach((button, buttonIndex) => {
+          if (buttonIndex === currentPage) {
+            button.setAttribute("aria-current", "page");
+          } else {
+            button.removeAttribute("aria-current");
+          }
+        });
+
+        if (prevButton) prevButton.disabled = currentPage === 0;
+        if (nextButton) nextButton.disabled = currentPage === pages.length - 1;
+      }
+
+      pageButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          showPage(Number(button.dataset.pageButton));
+        });
+      });
+
+      if (prevButton) {
+        prevButton.addEventListener("click", () => showPage(currentPage - 1));
+      }
+
+      if (nextButton) {
+        nextButton.addEventListener("click", () => showPage(currentPage + 1));
+      }
+
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft") showPage(currentPage - 1);
+        if (event.key === "ArrowRight") showPage(currentPage + 1);
+      });
+
+      const languageObserver = new MutationObserver(syncScaffoldLanguage);
+      languageObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ["data-active-lang"]
+      });
+
+      buildScaffolds();
+      window.MultilangToggle?.refresh?.();
+      syncScaffoldLanguage();
+      showPage(0);
+
+      window.__C12_WRITING_PARAGRAPH_PLANNER__ = {
+        syncScaffoldLanguage,
+        showPage
+      };
+    })();
+  </script>
+</body>
+</html>

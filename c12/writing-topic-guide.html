@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>12과 400~500자 생활 속 운동 제안 글쓰기 가이드</title>
+  <link rel="stylesheet" href="../shared/multilang-toggle.css">
+  <style>
+    :root {
+      --bg: #f6faf8;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8e4dc;
+      --green: #0f7a58;
+      --green-soft: #e7f7ef;
+      --blue: #2563eb;
+      --blue-soft: #eaf1ff;
+      --amber: #b45309;
+      --amber-soft: #fff7df;
+      --rose: #be123c;
+      --rose-soft: #fff1f2;
+      --shadow: 0 16px 38px rgba(23, 32, 51, 0.08);
+      font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 22px 0 38px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 8px 24px rgba(23, 32, 51, 0.06);
+    }
+
+    .topbar strong {
+      display: block;
+      font-size: 18px;
+      font-weight: 950;
+      line-height: 1.35;
+    }
+
+    .topbar span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .home-link,
+    .stage-button,
+    .step-next {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 14px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+      text-decoration: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .home-link:hover,
+    .stage-button:hover,
+    .step-next:hover {
+      border-color: #b7d7c7;
+      box-shadow: 0 6px 14px rgba(23, 32, 51, 0.08);
+    }
+
+    .stage-button[aria-expanded="true"],
+    .step-next {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+      gap: 18px;
+      margin-top: 22px;
+      align-items: stretch;
+    }
+
+    .hero-main {
+      min-width: 0;
+      padding: 10px 0;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 820px;
+      margin-bottom: 12px;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.16;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin-bottom: 18px;
+      color: #344054;
+      font-size: 17px;
+      font-weight: 750;
+      line-height: 1.75;
+    }
+
+    .scenario {
+      border: 1px solid #b7e2cf;
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--green-soft);
+    }
+
+    .scenario strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #07543c;
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .scenario p {
+      margin: 0;
+      color: #174838;
+      font-size: 15px;
+      font-weight: 850;
+      line-height: 1.75;
+    }
+
+    .language-row {
+      margin-top: 12px;
+    }
+
+    .goal-board {
+      display: grid;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .goal-board h2 {
+      margin-bottom: 0;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
+    .goal-list,
+    .plain-list,
+    .phrase-list,
+    .check-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .goal-list li,
+    .plain-list li,
+    .phrase-list li,
+    .check-list li {
+      min-width: 0;
+      border: 1px solid #e3ebe6;
+      border-radius: 8px;
+      padding: 9px 10px;
+      background: #fbfdfc;
+      font-size: 13px;
+      font-weight: 850;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .goal-list strong {
+      color: var(--green);
+      font-weight: 950;
+    }
+
+    .stage-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 24px 0 18px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .stage-panel {
+      padding: 2px 0 8px;
+    }
+
+    .stage-panel[hidden] {
+      display: none;
+    }
+
+    .stage-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .stage-head h2 {
+      margin-bottom: 6px;
+      font-size: 26px;
+      line-height: 1.3;
+    }
+
+    .stage-head p {
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.7;
+    }
+
+    .stage-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      border-radius: 999px;
+      padding: 0 11px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .stage-goal {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: -2px 0 14px;
+      border: 1px solid #cfe8dc;
+      border-radius: 8px;
+      padding: 12px 14px;
+      background: #fbfdfc;
+      color: #174838;
+      font-size: 14px;
+      font-weight: 850;
+      line-height: 1.65;
+    }
+
+    .stage-goal strong {
+      flex: 0 0 auto;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .idea-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .idea-card,
+    .paragraph-card,
+    .teacher-card {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: var(--panel);
+      box-shadow: 0 12px 28px rgba(23, 32, 51, 0.06);
+    }
+
+    .idea-card strong,
+    .teacher-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: #101828;
+      font-size: 15px;
+      font-weight: 950;
+      line-height: 1.4;
+    }
+
+    .idea-card p,
+    .teacher-card p {
+      margin: 0;
+      color: #344054;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.65;
+    }
+
+    .accent-green {
+      border-color: #b7e2cf;
+      background: #fbfdfc;
+    }
+
+    .accent-blue {
+      border-color: #c7d7fe;
+      background: #fbfdff;
+    }
+
+    .accent-amber {
+      border-color: #f3d690;
+      background: #fffdf5;
+    }
+
+    .accent-rose {
+      border-color: #fecdd3;
+      background: #fffafa;
+    }
+
+    .think-line {
+      margin-top: 10px;
+      border-top: 1px solid #e5ede8;
+      padding-top: 10px;
+      color: #475467;
+      font-size: 13px;
+      font-weight: 850;
+      line-height: 1.55;
+    }
+
+    .phrase-ko {
+      display: block;
+    }
+
+    [data-lang].scaffold-lang,
+    [data-lang].phrase-gloss {
+      display: none;
+    }
+
+    [data-lang].scaffold-lang.lang-visible {
+      display: inline;
+    }
+
+    [data-lang].phrase-gloss.lang-visible {
+      display: block;
+    }
+
+    [data-lang].scaffold-lang,
+    [data-lang].phrase-gloss {
+      overflow-wrap: anywhere;
+    }
+
+    [data-lang].scaffold-lang.lang-visible[dir="rtl"],
+    [data-lang].phrase-gloss.lang-visible[dir="rtl"] {
+      display: block;
+      direction: rtl;
+      text-align: right;
+      unicode-bidi: isolate;
+    }
+
+    .phrase-gloss {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .teacher-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .paragraph-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .paragraph-card {
+      display: grid;
+      gap: 12px;
+    }
+
+    .paragraph-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .paragraph-title {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      min-width: 0;
+    }
+
+    .number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 950;
+    }
+
+    .paragraph-card h3 {
+      margin-bottom: 4px;
+      font-size: 20px;
+      line-height: 1.35;
+    }
+
+    .question {
+      margin: 0;
+      color: #233044;
+      font-size: 17px;
+      font-weight: 900;
+      line-height: 1.6;
+    }
+
+    .target {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border-radius: 999px;
+      padding: 0 10px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .guide-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .guide-box {
+      min-width: 0;
+      border: 1px solid #dde7e1;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfdfc;
+    }
+
+    .guide-box strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .guide-box p {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 850;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+    }
+
+    .writing-note {
+      border: 1px dashed #9dcab6;
+      border-radius: 8px;
+      padding: 13px 14px;
+      background: #fbfdfc;
+      color: #174838;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.7;
+    }
+
+    .support-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 0.55fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .phrase-panel,
+    .check-panel {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: var(--panel);
+      box-shadow: 0 12px 28px rgba(23, 32, 51, 0.06);
+    }
+
+    .phrase-panel h3,
+    .check-panel h3 {
+      margin-bottom: 12px;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    .check-list li {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+    }
+
+    .paper-box {
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      border: 2px solid #93b6a4;
+      border-radius: 3px;
+      background: #fff;
+    }
+
+    .stage-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+
+    .planner-cta {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .planner-cta .step-next {
+      justify-self: start;
+      text-decoration: none;
+    }
+
+    @media (max-width: 960px) {
+      .hero,
+      .support-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .idea-grid,
+      .guide-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: min(100% - 20px, 1180px);
+        padding-top: 10px;
+      }
+
+      .topbar,
+      .stage-head,
+      .paragraph-head,
+      .stage-goal {
+        flex-direction: column;
+      }
+
+      .topbar {
+        align-items: stretch;
+      }
+
+      .home-link {
+        align-self: flex-start;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+
+      .lead {
+        font-size: 15px;
+      }
+
+      .idea-grid,
+      .teacher-row,
+      .guide-row {
+        grid-template-columns: 1fr;
+      }
+
+      .stage-nav {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .stage-button,
+      .step-next {
+        width: 100%;
+        white-space: normal;
+        text-align: center;
+      }
+
+      .goal-board,
+      .idea-card,
+      .paragraph-card,
+      .teacher-card,
+      .phrase-panel,
+      .check-panel {
+        padding: 14px;
+      }
+    }
+
+    @media print {
+      .topbar,
+      .language-row,
+      .stage-nav,
+      .stage-actions {
+        display: none !important;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .page {
+        width: 100%;
+        padding: 0;
+      }
+
+      .hero,
+      .support-layout {
+        display: block;
+      }
+
+      .stage-panel[hidden] {
+        display: block;
+      }
+
+      .goal-board,
+      .idea-card,
+      .paragraph-card,
+      .teacher-card,
+      .phrase-panel,
+      .check-panel {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <script>
+    window.MULTILANG_CONFIG = {
+      langs: ["vi", "mn", "ar", "kk", "th", "en", "ja", "zh"],
+      defaultLang: "none",
+      ignoreStoredLang: true
+    };
+  </script>
+
+  <main class="page">
+    <header class="topbar">
+      <div>
+        <strong>12과 400~500자 생활 속 운동 제안 글쓰기 가이드</strong>
+        <span>페이지는 생각을 이끌어 주고, 글은 종이 원고지에 씁니다.</span>
+      </div>
+      <a class="home-link" href="index.html">12과 목록</a>
+    </header>
+
+    <section class="hero" aria-labelledby="pageTitle">
+      <div class="hero-main">
+        <p class="eyebrow">C12 Writing Guide</p>
+        <h1 id="pageTitle">원고지에 쓰기 전에 생활 속 운동 제안 내용을 생각합니다.</h1>
+        <p class="lead" data-scaffold="heroLead">이 페이지에 글을 쓰지 않습니다. 질문을 보고 말로 답하거나 마음속으로 고른 뒤, 종이 원고지에 400~500자로 정리합니다.</p>
+        <section class="scenario" aria-label="쓰기 주제">
+          <strong>쓰기 주제</strong>
+          <p data-scaffold="scenarioBody">생활 속에서 운동하기 어려운 사람들에게 쉽게 실천할 수 있는 운동 방법을 제안하는 글을 씁니다.</p>
+        </section>
+        <div class="language-row" data-multilang-bar></div>
+      </div>
+
+      <aside class="goal-board" aria-label="원고지 글쓰기 목표">
+        <h2>원고지 목표</h2>
+        <ul class="goal-list">
+          <li><strong>400~500자</strong>로 씁니다.</li>
+          <li><strong>4문단</strong>으로 나누어 씁니다.</li>
+          <li>운동 방법을 <strong>2개 이상</strong> 넣습니다.</li>
+          <li>운동 효과를 <strong>2개 이상</strong> 넣습니다.</li>
+          <li>마지막에는 부드럽게 실천을 제안합니다.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <nav class="stage-nav" aria-label="쓰기 준비 단계">
+      <button class="stage-button" type="button" data-stage-button="stage-1" aria-controls="stage-1" aria-expanded="true">1. 주제 확인</button>
+      <button class="stage-button" type="button" data-stage-button="stage-2" aria-controls="stage-2" aria-expanded="false">2. 이유 떠올리기</button>
+      <button class="stage-button" type="button" data-stage-button="stage-3" aria-controls="stage-3" aria-expanded="false">3. 방법 고르기</button>
+      <button class="stage-button" type="button" data-stage-button="stage-4" aria-controls="stage-4" aria-expanded="false">4. 효과 연결하기</button>
+      <button class="stage-button" type="button" data-stage-button="stage-5" aria-controls="stage-5" aria-expanded="false">문단 설계</button>
+      <button class="stage-button" type="button" data-stage-button="stage-6" aria-controls="stage-6" aria-expanded="false">최종 점검</button>
+    </nav>
+
+    <section class="stage-panel" id="stage-1" data-stage-panel aria-labelledby="stage1Title">
+      <div class="stage-head">
+        <div>
+          <p class="eyebrow">Step 1</p>
+          <h2 id="stage1Title">주제를 한 문장으로 확인합니다.</h2>
+          <p data-scaffold="stage1Intro">내 글을 읽을 사람은 운동을 하고 싶지만 시간이 없거나 피곤해서 시작하지 못하는 사람입니다.</p>
+        </div>
+        <span class="stage-tag">말로 먼저 답하기</span>
+      </div>
+      <div class="stage-goal"><strong>원고지 목표</strong><span data-scaffold="stage1Goal">1문단을 쓰기 전에 글을 보여 줄 사람과 제안하는 태도를 정합니다.</span></div>
+      <div class="idea-grid">
+        <article class="idea-card accent-green">
+          <strong>누구에게 보여 줄 글인가요?</strong>
+          <p data-scaffold="s1AudienceDesc">운동을 해야 한다고 생각하지만 바쁘거나 피곤해서 실천하지 못하는 사람에게 보여 줍니다.</p>
+          <div class="think-line" data-scaffold="s1AudienceThink">원고지에 쓰기 전: 어떤 사람을 떠올릴지 정합니다.</div>
+        </article>
+        <article class="idea-card accent-blue">
+          <strong>무엇을 제안하나요?</strong>
+          <p data-scaffold="s1ProposalDesc">특별한 운동이 아니라 생활 속에서 쉽게 할 수 있는 운동 방법을 제안합니다.</p>
+          <div class="think-line" data-scaffold="s1ProposalThink">원고지에 쓰기 전: 쉬운 운동 방법을 2개 이상 고릅니다.</div>
+        </article>
+        <article class="idea-card accent-amber">
+          <strong>어떤 태도로 쓰나요?</strong>
+          <p data-scaffold="s1ToneDesc">명령하듯 말하지 않고, 부담 없이 시작할 수 있게 부드럽게 권합니다.</p>
+          <div class="think-line" data-scaffold="s1ToneThink">원고지에 쓰기 전: “해 보세요”, “좋습니다” 같은 표현을 떠올립니다.</div>
+        </article>
+      </div>
+      <div class="stage-actions">
+        <button class="step-next" type="button" data-next-stage="stage-2">다음 단계 보기</button>
+      </div>
+    </section>
+
+    <section class="stage-panel" id="stage-2" data-stage-panel aria-labelledby="stage2Title" hidden>
+      <div class="stage-head">
+        <div>
+          <p class="eyebrow">Step 2</p>
+          <h2 id="stage2Title">운동을 못하는 이유를 떠올립니다.</h2>
+          <p data-scaffold="stage2Intro">글의 도입에는 “왜 운동을 못하는지”를 예로 들어 독자가 공감할 수 있게 씁니다.</p>
+        </div>
+        <span class="stage-tag">도입 내용 준비</span>
+      </div>
+      <div class="stage-goal"><strong>원고지 목표</strong><span data-scaffold="stage2Goal">1문단에 넣을 운동을 못하는 이유를 1~2개 고릅니다.</span></div>
+      <div class="idea-grid">
+        <article class="idea-card">
+          <strong>바쁜 생활</strong>
+          <p data-scaffold="s2BusyDesc">하루 일정이 많아서 운동할 시간을 따로 내기 어렵습니다.</p>
+          <div class="think-line" data-scaffold="s2BusyThink">원고지에 쓸 말: 바쁜 생활 때문에 운동을 미루는 사람이 많습니다.</div>
+        </article>
+        <article class="idea-card">
+          <strong>긴 공부 시간</strong>
+          <p data-scaffold="s2StudyDesc">오래 앉아서 공부하다 보면 몸을 움직일 기회가 줄어듭니다.</p>
+          <div class="think-line" data-scaffold="s2StudyThink">원고지에 쓸 말: 공부 시간이 길면 몸이 쉽게 피곤해집니다.</div>
+        </article>
+        <article class="idea-card">
+          <strong>늦은 퇴근</strong>
+          <p data-scaffold="s2WorkDesc">일이 늦게 끝나면 운동하러 갈 힘과 시간이 부족합니다.</p>
+          <div class="think-line" data-scaffold="s2WorkThink">원고지에 쓸 말: 늦게 퇴근하면 운동을 시작하기 어렵습니다.</div>
+        </article>
+        <article class="idea-card">
+          <strong>피곤함</strong>
+          <p data-scaffold="s2TiredDesc">몸이 피곤하면 쉬고 싶은 마음이 커져서 운동을 미루게 됩니다.</p>
+          <div class="think-line" data-scaffold="s2TiredThink">원고지에 쓸 말: 피곤해서 운동보다 휴식을 먼저 생각합니다.</div>
+        </article>
+        <article class="idea-card">
+          <strong>오래 앉아 있기</strong>
+          <p data-scaffold="s2SittingDesc">교실이나 사무실에 오래 앉아 있으면 몸이 무겁고 굳습니다.</p>
+          <div class="think-line" data-scaffold="s2SittingThink">원고지에 쓸 말: 오래 앉아 있으면 몸을 움직이는 습관이 줄어듭니다.</div>
+        </article>
+        <article class="idea-card accent-rose">
+          <strong>도입 문장 틀</strong>
+          <p>요즘 사람들은 ... 때문에 운동할 시간이 부족합니다.</p>
+          <div class="think-line" data-scaffold="s2FrameThink">원고지에 쓰기 전: 이유를 1~2개 골라 첫 문단에 넣습니다.</div>
+        </article>
+      </div>
+      <div class="stage-actions">
+        <button class="step-next" type="button" data-next-stage="stage-3">다음 단계 보기</button>
+      </div>
+    </section>
+
+    <section class="stage-panel" id="stage-3" data-stage-panel aria-labelledby="stage3Title" hidden>
+      <div class="stage-head">
+        <div>
+          <p class="eyebrow">Step 3</p>
+          <h2 id="stage3Title">생활 속 운동 방법을 고릅니다.</h2>
+          <p data-scaffold="stage3Intro">시간이 없을 때도 할 수 있는 방법을 골라 2문단에 씁니다. 방법은 2개 이상 넣는 것이 좋습니다.</p>
+        </div>
+        <span class="stage-tag">방법 2개 이상</span>
+      </div>
+      <div class="stage-goal"><strong>원고지 목표</strong><span data-scaffold="stage3Goal">2문단에 넣을 생활 속 운동 방법을 2개 이상 고릅니다.</span></div>
+      <div class="idea-grid">
+        <article class="idea-card">
+          <strong>계단 이용하기</strong>
+          <p data-scaffold="s3StairsDesc">엘리베이터 대신 계단을 이용하면 따로 시간을 내지 않아도 몸을 움직일 수 있습니다.</p>
+          <div class="think-line"><span data-scaffold="frameLabel">문장 틀</span>: 먼저 엘리베이터 대신 계단을 이용해 보세요.</div>
+        </article>
+        <article class="idea-card">
+          <strong>가까운 거리 걷기</strong>
+          <p data-scaffold="s3WalkDesc">가까운 곳에 갈 때는 차를 타기보다 걸어가면 자연스럽게 운동이 됩니다.</p>
+          <div class="think-line"><span data-scaffold="frameLabel">문장 틀</span>: 가까운 거리는 걸어가는 것이 좋습니다.</div>
+        </article>
+        <article class="idea-card">
+          <strong>쉬는 시간 스트레칭</strong>
+          <p data-scaffold="s3StretchDesc">공부나 일을 하다가 잠깐 일어나 목, 어깨, 허리를 풀 수 있습니다.</p>
+          <div class="think-line"><span data-scaffold="frameLabel">문장 틀</span>: 쉬는 시간마다 가볍게 스트레칭을 해 보세요.</div>
+        </article>
+        <article class="idea-card">
+          <strong>한 정거장 먼저 내리기</strong>
+          <p data-scaffold="s3StopDesc">버스나 지하철을 한 정거장 먼저 내려 걸으면 걷는 시간을 늘릴 수 있습니다.</p>
+          <div class="think-line"><span data-scaffold="frameLabel">문장 틀</span>: 한 정거장 먼저 내려서 걸어 보세요.</div>
+        </article>
+        <article class="idea-card">
+          <strong>앉아서 다리 움직이기</strong>
+          <p data-scaffold="s3LegDesc">의자에 앉아 있을 때 다리를 들었다 내리면 작은 운동을 할 수 있습니다.</p>
+          <div class="think-line"><span data-scaffold="frameLabel">문장 틀</span>: 오래 앉아 있을 때는 다리를 가볍게 움직이면 좋습니다.</div>
+        </article>
+        <article class="idea-card accent-blue">
+          <strong>방법 연결 표현</strong>
+          <p>먼저 ... 보세요. 또 ... 하면 좋습니다. 그리고 ... 수도 있습니다.</p>
+          <div class="think-line" data-scaffold="s3FrameThink">원고지에 쓰기 전: 내가 쓸 운동 방법 2~3개를 고릅니다.</div>
+        </article>
+      </div>
+      <div class="stage-actions">
+        <button class="step-next" type="button" data-next-stage="stage-4">다음 단계 보기</button>
+      </div>
+    </section>
+
+    <section class="stage-panel" id="stage-4" data-stage-panel aria-labelledby="stage4Title" hidden>
+      <div class="stage-head">
+        <div>
+          <p class="eyebrow">Step 4</p>
+          <h2 id="stage4Title">운동의 좋은 점을 연결합니다.</h2>
+          <p data-scaffold="stage4Intro">3문단에는 생활 속 운동을 하면 몸과 마음이 어떻게 좋아지는지 씁니다.</p>
+        </div>
+        <span class="stage-tag">효과 2개 이상</span>
+      </div>
+      <div class="stage-goal"><strong>원고지 목표</strong><span data-scaffold="stage4Goal">3문단에 넣을 운동의 좋은 점을 2개 이상 고릅니다.</span></div>
+      <div class="idea-grid">
+        <article class="idea-card">
+          <strong>몸이 가벼워집니다</strong>
+          <p data-scaffold="s4LightDesc">가볍게 움직이면 굳어 있던 몸이 풀리고 움직임이 편해집니다.</p>
+          <div class="think-line"><span data-scaffold="frameLabel">문장 틀</span>: 이렇게 하면 몸이 가벼워질 수 있습니다.</div>
+        </article>
+        <article class="idea-card">
+          <strong>스트레스가 풀립니다</strong>
+          <p data-scaffold="s4StressDesc">걷거나 스트레칭을 하면 답답한 마음이 줄고 기분이 좋아집니다.</p>
+          <div class="think-line"><span data-scaffold="frameLabel">문장 틀</span>: 또한 스트레스가 풀립니다.</div>
+        </article>
+        <article class="idea-card">
+          <strong>체력이 좋아집니다</strong>
+          <p data-scaffold="s4StaminaDesc">작은 운동도 매일 계속하면 몸에 힘이 생기고 쉽게 지치지 않습니다.</p>
+          <div class="think-line"><span data-scaffold="frameLabel">문장 틀</span>: 매일 조금씩 하면 체력이 좋아집니다.</div>
+        </article>
+        <article class="idea-card">
+          <strong>건강을 지킬 수 있습니다</strong>
+          <p data-scaffold="s4HealthDesc">생활 속 운동은 오래 앉아 있는 습관을 줄이고 건강 관리에 도움이 됩니다.</p>
+          <div class="think-line"><span data-scaffold="frameLabel">문장 틀</span>: 건강을 지키는 데 도움이 됩니다.</div>
+        </article>
+        <article class="idea-card">
+          <strong>자세가 좋아집니다</strong>
+          <p data-scaffold="s4PostureDesc">목과 어깨를 자주 풀면 자세를 바르게 하는 데 도움이 됩니다.</p>
+          <div class="think-line"><span data-scaffold="frameLabel">문장 틀</span>: 자세도 조금씩 좋아질 수 있습니다.</div>
+        </article>
+        <article class="idea-card accent-amber">
+          <strong>효과 연결 표현</strong>
+          <p>이렇게 하면 ... 수 있습니다. 또한 ... 집니다. 그래서 ...에 도움이 됩니다.</p>
+          <div class="think-line" data-scaffold="s4FrameThink">원고지에 쓰기 전: 방법과 어울리는 효과 2개를 고릅니다.</div>
+        </article>
+      </div>
+      <div class="stage-actions">
+        <button class="step-next" type="button" data-next-stage="stage-5">문단 설계 보기</button>
+      </div>
+    </section>
+
+    <section class="stage-panel" id="stage-5" data-stage-panel aria-labelledby="stage5Title" hidden>
+      <div class="stage-head">
+        <div>
+          <p class="eyebrow">문단 설계</p>
+          <h2 id="stage5Title">4문단으로 원고지 글을 설계합니다.</h2>
+          <p data-scaffold="stage5Intro">각 문단의 질문에 답한다고 생각하며 원고지에 문장을 씁니다. 아래 문장 틀은 그대로 베껴 쓰기보다 내 내용에 맞게 바꿉니다.</p>
+        </div>
+        <span class="stage-tag">400~500자 설계</span>
+      </div>
+      <div class="stage-goal"><strong>원고지 목표</strong><span data-scaffold="stage5Goal">1~4문단에 들어갈 내용을 확인하고, 원고지에는 400~500자로 나누어 씁니다.</span></div>
+      <article class="teacher-card accent-blue planner-cta">
+        <strong>문단 설계 단독 페이지</strong>
+        <p data-scaffold="plannerCta">질문에 대한 답을 순서대로 고르면 1~4문단의 내용이 자연스럽게 정리됩니다.</p>
+        <a class="step-next" href="writing-paragraph-planner.html">문단 설계 페이지 열기</a>
+      </article>
+      <div class="paragraph-grid" aria-label="문단별 질문 가이드">
+        <article class="paragraph-card" data-paragraph-card>
+          <div class="paragraph-head">
+            <div class="paragraph-title">
+              <span class="number">1</span>
+              <div>
+                <h3>도입: 운동을 못하는 이유</h3>
+                <p class="question">운동을 못하는 이유에는 무엇이 있나요?</p>
+              </div>
+            </div>
+            <span class="target">80~100자</span>
+          </div>
+          <div class="guide-row">
+            <div class="guide-box"><strong>쓸 내용</strong><p data-scaffold="p1Content">바쁜 생활, 긴 공부 시간, 늦은 퇴근, 피곤함 중 1~2개를 고릅니다.</p></div>
+            <div class="guide-box"><strong>문장 틀</strong><p>요즘 사람들은 ... 때문에 운동할 시간이 부족합니다.</p></div>
+            <div class="guide-box"><strong>짧은 예시</strong><p data-scaffold="p1Example">오래 앉아 공부하거나 일해서 몸을 움직일 시간이 부족합니다.</p></div>
+          </div>
+          <div class="writing-note" data-scaffold="p1Note">원고지에는 “누가, 왜 운동을 못하는지”를 먼저 씁니다.</div>
+        </article>
+
+        <article class="paragraph-card" data-paragraph-card>
+          <div class="paragraph-head">
+            <div class="paragraph-title">
+              <span class="number">2</span>
+              <div>
+                <h3>생활 속 운동 방법</h3>
+                <p class="question">생활 속에서 쉽게 할 수 있는 운동은 무엇인가요?</p>
+              </div>
+            </div>
+            <span class="target">110~130자</span>
+          </div>
+          <div class="guide-row">
+            <div class="guide-box"><strong>쓸 내용</strong><p data-scaffold="p2Content">걷기, 계단 이용하기, 스트레칭처럼 바로 할 수 있는 방법을 2개 이상 씁니다.</p></div>
+            <div class="guide-box"><strong>문장 틀</strong><p>먼저 ... 보세요. 또 ... 하면 좋습니다.</p></div>
+            <div class="guide-box"><strong>짧은 예시</strong><p data-scaffold="p2Example">가까운 거리는 걸어가고 쉬는 시간에는 스트레칭을 해 보세요.</p></div>
+          </div>
+          <div class="writing-note" data-scaffold="p2Note">원고지에는 “언제, 어디에서, 어떻게 할 수 있는지”를 구체적으로 씁니다.</div>
+        </article>
+
+        <article class="paragraph-card" data-paragraph-card>
+          <div class="paragraph-head">
+            <div class="paragraph-title">
+              <span class="number">3</span>
+              <div>
+                <h3>운동의 효과</h3>
+                <p class="question">그 운동을 하면 어떤 점이 좋아지나요?</p>
+              </div>
+            </div>
+            <span class="target">100~120자</span>
+          </div>
+          <div class="guide-row">
+            <div class="guide-box"><strong>쓸 내용</strong><p data-scaffold="p3Content">몸, 마음, 건강, 체력 중에서 좋아지는 점을 2개 이상 고릅니다.</p></div>
+            <div class="guide-box"><strong>문장 틀</strong><p>이렇게 하면 ... 수 있습니다. 또한 ... 집니다.</p></div>
+            <div class="guide-box"><strong>짧은 예시</strong><p data-scaffold="p3Example">몸이 가벼워지고 스트레스가 풀려 건강을 지킬 수 있습니다.</p></div>
+          </div>
+          <div class="writing-note" data-scaffold="p3Note">원고지에는 앞 문단의 운동 방법과 연결되는 효과를 씁니다.</div>
+        </article>
+
+        <article class="paragraph-card" data-paragraph-card>
+          <div class="paragraph-head">
+            <div class="paragraph-title">
+              <span class="number">4</span>
+              <div>
+                <h3>마지막 제안과 정리</h3>
+                <p class="question">마지막에 어떻게 실천을 권할까요?</p>
+              </div>
+            </div>
+            <span class="target">80~100자</span>
+          </div>
+          <div class="guide-row">
+            <div class="guide-box"><strong>쓸 내용</strong><p data-scaffold="p4Content">처음부터 많이 하려고 하지 말고 작은 운동부터 시작하자고 권합니다.</p></div>
+            <div class="guide-box"><strong>문장 틀</strong><p>처음에는 힘들 수 있지만 ... 해 보세요. 매일 조금씩 하면 ... 것입니다.</p></div>
+            <div class="guide-box"><strong>짧은 예시</strong><p data-scaffold="p4Example">작은 운동부터 생활 속에서 시작하면 꾸준히 계속할 수 있습니다.</p></div>
+          </div>
+          <div class="writing-note" data-scaffold="p4Note">원고지에는 독자가 부담 없이 시작할 수 있도록 부드럽게 마무리합니다.</div>
+        </article>
+      </div>
+      <div class="stage-actions">
+        <button class="step-next" type="button" data-next-stage="stage-6">최종 점검 보기</button>
+      </div>
+    </section>
+
+    <section class="stage-panel" id="stage-6" data-stage-panel aria-labelledby="stage6Title" hidden>
+      <div class="stage-head">
+        <div>
+          <p class="eyebrow">최종 점검</p>
+          <h2 id="stage6Title">원고지에 쓰기 전 마지막으로 확인합니다.</h2>
+          <p data-scaffold="stage6Intro">체크는 페이지에서 하지 않습니다. 원고지에 쓴 글을 읽으며 직접 확인합니다.</p>
+        </div>
+        <span class="stage-tag">최종 점검</span>
+      </div>
+      <div class="stage-goal"><strong>원고지 목표</strong><span data-scaffold="stage6Goal">원고지에 쓴 글이 400~500자, 4문단, 방법 2개 이상, 효과 2개 이상인지 확인합니다.</span></div>
+      <div class="support-layout">
+        <section class="check-panel" aria-label="원고지 최종 점검표">
+          <h3>최종 점검표</h3>
+          <ul class="check-list">
+            <li><span class="paper-box" aria-hidden="true"></span><span>400~500자인가요?</span></li>
+            <li><span class="paper-box" aria-hidden="true"></span><span>4문단으로 나누었나요?</span></li>
+            <li><span class="paper-box" aria-hidden="true"></span><span>운동을 못하는 이유를 예로 들었나요?</span></li>
+            <li><span class="paper-box" aria-hidden="true"></span><span>운동 방법을 2개 이상 썼나요?</span></li>
+            <li><span class="paper-box" aria-hidden="true"></span><span>운동 효과를 2개 이상 썼나요?</span></li>
+            <li><span class="paper-box" aria-hidden="true"></span><span>마지막에 부드러운 실천 제안이 있나요?</span></li>
+          </ul>
+        </section>
+
+        <section class="phrase-panel" aria-label="표현 도움">
+          <h3>표현 도움</h3>
+          <ul class="phrase-list">
+            <li data-gloss="phraseTime">운동할 시간이 없더라도</li>
+            <li data-gloss="phraseEasy">생활 속에서 쉽게 할 수 있는 운동</li>
+            <li data-gloss="phraseWalk">가까운 거리는 걸어가다</li>
+            <li data-gloss="phraseStretch">쉬는 시간마다 몸을 풀다</li>
+            <li data-gloss="phraseLight">틈틈이 가벼운 운동을 하다</li>
+            <li data-gloss="phraseStress">스트레스가 풀리다</li>
+            <li data-gloss="phraseHealth">건강을 지킬 수 있다</li>
+            <li data-gloss="phraseSmall">작은 운동부터 시작하는 것이 좋다</li>
+          </ul>
+        </section>
+      </div>
+      <div class="teacher-row">
+        <article class="teacher-card accent-green">
+          <strong>쓰기 시작 전 말하기</strong>
+          <p data-scaffold="talkBeforeWriting">“나는 어떤 이유와 어떤 운동 방법을 쓸까?”를 짝과 한 번 말한 뒤 원고지에 씁니다.</p>
+        </article>
+        <article class="teacher-card accent-blue">
+          <strong>원고지에서 다듬기</strong>
+          <p data-scaffold="reviseOnPaper">같은 말이 반복되면 줄이고, “먼저”, “또”, “이렇게 하면”, “따라서” 같은 연결 표현을 넣습니다.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/multilang-toggle.js"></script>
+  <script src="../shared/site-copyright.js"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      function tr(en, ja, zh, ar, vi, mn, kk, th) {
+        return { en, ja, zh, ar, vi, mn, kk, th };
+      }
+
+      const scaffoldTranslations = {
+        heroLead: tr(
+          "Do not type your essay on this page. Look at the questions, answer them aloud or choose ideas in your mind, and then organize 400-500 characters on manuscript paper.",
+          "このページには作文を入力しません。質問を見て口で答えたり、心の中で選んだりしてから、原稿用紙に400〜500字でまとめます。",
+          "不要在本页输入文章。看问题后先口头回答或在心里选择内容，然后在稿纸上整理成400~500字。",
+          "لا تكتب المقال في هذه الصفحة. انظر إلى الأسئلة، وأجب عنها شفهيا أو اختر الأفكار في ذهنك، ثم نظمها في 400-500 حرف على ورق المخطوط.",
+          "Không viết bài trên trang này. Hãy nhìn câu hỏi, trả lời bằng lời hoặc chọn ý trong đầu, rồi sắp xếp thành 400-500 chữ trên giấy viết.",
+          "Энэ хуудсан дээр зохион бичлэг бичихгүй. Асуултыг харж амаар хариулах эсвэл санаагаа сонгоод, дараа нь эх бичгийн цаасан дээр 400-500 тэмдэгтээр цэгцэлнэ.",
+          "Бұл бетке мәтін жазбайсыз. Сұрақтарға ауызша жауап беріп немесе ойша идея таңдағаннан кейін, қағазға 400-500 таңба етіп жазыңыз.",
+          "ไม่ต้องพิมพ์งานเขียนในหน้านี้ ให้ดูคำถาม ตอบออกเสียงหรือเลือกความคิดในใจ แล้วเขียน 400-500 ตัวอักษรลงบนกระดาษเขียน"
+        ),
+        scenarioBody: tr(
+          "Write a suggestion text for people who find it hard to exercise in daily life, introducing easy exercise methods they can try.",
+          "日常生活の中で運動しにくい人に、簡単に実践できる運動方法を提案する文章を書きます。",
+          "给生活中难以运动的人写一篇建议文，介绍容易实践的运动方法。",
+          "اكتب نصا يقترح طرقا سهلة لممارسة الرياضة على الأشخاص الذين يصعب عليهم ممارسة الرياضة في حياتهم اليومية.",
+          "Viết bài đề xuất phương pháp vận động dễ thực hiện cho những người khó tập thể dục trong đời sống hằng ngày.",
+          "Өдөр тутмын амьдралдаа дасгал хийхэд хэцүү хүмүүст амархан хийж болох дасгалын аргыг санал болгосон бичвэр бичнэ.",
+          "Күнделікті өмірде жаттығу жасауға қиналатын адамдарға оңай орындайтын жаттығу әдістерін ұсынатын мәтін жазыңыз.",
+          "เขียนข้อความเสนอวิธีออกกำลังกายที่ทำได้ง่ายให้กับคนที่ออกกำลังกายในชีวิตประจำวันได้ยาก"
+        ),
+        stage1Intro: tr(
+          "The reader is someone who wants to exercise but cannot start because they have no time or feel tired.",
+          "この文章を読む人は、運動したいけれど時間がなかったり疲れていたりして始められない人です。",
+          "读这篇文章的人，是想运动但因为没时间或疲惫而无法开始的人。",
+          "قارئ النص هو شخص يريد ممارسة الرياضة، لكنه لا يستطيع البدء لأنه لا يملك وقتا أو لأنه متعب.",
+          "Người đọc bài là người muốn tập thể dục nhưng chưa bắt đầu được vì không có thời gian hoặc mệt mỏi.",
+          "Энэ бичвэрийг унших хүн нь дасгал хийхийг хүсдэг боловч цаггүй эсвэл ядарсан учраас эхэлж чаддаггүй хүн юм.",
+          "Бұл мәтінді оқитын адам жаттығу жасағысы келеді, бірақ уақыты жоқ немесе шаршағандықтан бастай алмайды.",
+          "ผู้อ่านคือคนที่อยากออกกำลังกาย แต่เริ่มไม่ได้เพราะไม่มีเวลาหรือเหนื่อย"
+        ),
+        stage1Goal: tr("Before writing paragraph 1, decide who will read the text and what tone you will use.", "第1段落を書く前に、誰に見せる文章か、どんな態度で勧めるかを決めます。", "写第一段前，先决定给谁看，以及用什么态度建议。", "قبل كتابة الفقرة الأولى، حدد من سيقرأ النص وبأي نبرة ستقترح.", "Trước khi viết đoạn 1, hãy xác định người đọc và thái độ đề xuất.", "1-р догол мөрийг бичихээс өмнө хэнд үзүүлэх, ямар өнгөөр санал болгохоо шийднэ.", "1-абзацты жазар алдында мәтінді кім оқитынын және қандай тон қолданатыныңызды шешіңіз.", "ก่อนเขียนย่อหน้า 1 ให้กำหนดว่าใครจะอ่านและจะใช้ท่าทีแบบใด"),
+        s1AudienceDesc: tr(
+          "Show it to people who think they should exercise but cannot practice because they are busy or tired.",
+          "運動しなければならないと思っていても、忙しかったり疲れていたりして実践できない人に見せます。",
+          "给那些认为应该运动，但因为忙或累而无法实践的人看。",
+          "اعرضه على أشخاص يعتقدون أنهم يجب أن يمارسوا الرياضة، لكنهم لا يستطيعون بسبب الانشغال أو التعب.",
+          "Cho những người nghĩ rằng mình nên tập thể dục nhưng bận rộn hoặc mệt nên chưa thực hiện được xem.",
+          "Дасгал хийх ёстой гэж боддог ч завгүй эсвэл ядарсан тул хийж чаддаггүй хүмүүст үзүүлнэ.",
+          "Жаттығу жасау керек деп ойлайтын, бірақ бос емес немесе шаршағандықтан орындай алмайтын адамдарға көрсетіңіз.",
+          "ให้คนที่คิดว่าควรออกกำลังกายแต่ทำไม่ได้เพราะยุ่งหรือเหนื่อยอ่าน"
+        ),
+        s1AudienceThink: tr(
+          "Before writing on manuscript paper: choose what kind of person you will think about.",
+          "原稿用紙に書く前に、どんな人を思い浮かべるか決めます。",
+          "写到稿纸前：先决定要想到什么样的人。",
+          "قبل الكتابة على ورق المخطوط: حدد نوع الشخص الذي ستفكر فيه.",
+          "Trước khi viết lên giấy: chọn xem mình sẽ nghĩ đến kiểu người nào.",
+          "Эх бичгийн цаасан дээр бичихээс өмнө ямар хүнийг төсөөлөхөө сонгоно.",
+          "Қағазға жазар алдында қандай адамды елестететініңізді таңдаңыз.",
+          "ก่อนเขียนลงกระดาษ ให้เลือกว่าจะนึกถึงคนแบบใด"
+        ),
+        s1ProposalDesc: tr(
+          "Suggest exercise methods that are easy to do in daily life, not special or difficult workouts.",
+          "特別な運動ではなく、生活の中で簡単にできる運動方法を提案します。",
+          "建议的不是特别的运动，而是在生活中容易做到的运动方法。",
+          "اقترح طرقا سهلة يمكن ممارستها في الحياة اليومية، لا تمارين خاصة أو صعبة.",
+          "Đề xuất các cách vận động dễ làm trong đời sống, không phải bài tập đặc biệt hay khó.",
+          "Онцгой дасгал биш, өдөр тутам амархан хийж болох дасгалын аргыг санал болгоно.",
+          "Ерекше не қиын жаттығу емес, күнделікті өмірде оңай жасалатын әдістерді ұсыныңыз.",
+          "เสนอวิธีออกกำลังกายที่ทำได้ง่ายในชีวิตประจำวัน ไม่ใช่การออกกำลังกายพิเศษหรือยาก"
+        ),
+        s1ProposalThink: tr(
+          "Before writing on manuscript paper: choose at least two easy exercise methods.",
+          "原稿用紙に書く前に、簡単な運動方法を2つ以上選びます。",
+          "写到稿纸前：选择两个以上容易的运动方法。",
+          "قبل الكتابة على ورق المخطوط: اختر طريقتين سهلتين على الأقل للرياضة.",
+          "Trước khi viết lên giấy: chọn ít nhất 2 cách vận động dễ làm.",
+          "Эх бичгийн цаасан дээр бичихээс өмнө амархан хийх 2-оос дээш аргыг сонгоно.",
+          "Қағазға жазар алдында кемінде екі оңай жаттығу әдісін таңдаңыз.",
+          "ก่อนเขียนลงกระดาษ ให้เลือกวิธีออกกำลังกายง่าย ๆ อย่างน้อย 2 วิธี"
+        ),
+        s1ToneDesc: tr(
+          "Do not sound like an order. Recommend gently so the reader can start without pressure.",
+          "命令するように言わず、負担なく始められるようにやさしく勧めます。",
+          "不要像命令一样说，而是温和地建议，让读者能没有负担地开始。",
+          "لا تتحدث بصيغة الأمر. اقترح بلطف حتى يستطيع القارئ البدء دون ضغط.",
+          "Không nói như ra lệnh. Hãy khuyên nhẹ nhàng để người đọc có thể bắt đầu mà không áp lực.",
+          "Тушааж байгаа мэт биш, уншигч дарамтгүй эхэлж чадахаар зөөлөн зөвлөнө.",
+          "Бұйрық сияқты айтпаңыз. Оқырман қиналмай бастай алатындай жұмсақ ұсыныңыз.",
+          "อย่าพูดเหมือนสั่ง ให้แนะนำอย่างนุ่มนวลเพื่อให้ผู้อ่านเริ่มได้โดยไม่กดดัน"
+        ),
+        s1ToneThink: tr(
+          "Before writing on manuscript paper: think of expressions such as “해 보세요” and “좋습니다.”",
+          "原稿用紙に書く前に、「해 보세요」「좋습니다」のような表現を思い浮かべます。",
+          "写到稿纸前：想一想“해 보세요”“좋습니다”这样的表达。",
+          "قبل الكتابة على ورق المخطوط: فكر في تعبيرات مثل “해 보세요” و “좋습니다”.",
+          "Trước khi viết lên giấy: nghĩ đến các cách nói như “해 보세요”, “좋습니다”.",
+          "Эх бичгийн цаасан дээр бичихээс өмнө “해 보세요”, “좋습니다” зэрэг хэллэгийг бодно.",
+          "Қағазға жазар алдында “해 보세요”, “좋습니다” сияқты тіркестерді ойлаңыз.",
+          "ก่อนเขียนลงกระดาษ ให้นึกถึงสำนวนอย่าง “해 보세요”, “좋습니다”"
+        ),
+        stage2Intro: tr(
+          "In the introduction, give examples of why people cannot exercise so the reader can relate.",
+          "導入では、人々がなぜ運動できないのかを例に挙げ、読者が共感できるように書きます。",
+          "在开头举例说明人们为什么不能运动，让读者产生共鸣。",
+          "في المقدمة، اذكر أمثلة على أسباب عدم ممارسة الناس للرياضة حتى يتعاطف القارئ.",
+          "Ở phần mở đầu, nêu ví dụ vì sao mọi người không tập thể dục được để người đọc đồng cảm.",
+          "Оршил хэсэгт хүмүүс яагаад дасгал хийж чаддаггүйг жишээгээр бичиж, уншигчид ойлгомжтой болгоно.",
+          "Кіріспеде адамдар неге жаттығу жасай алмайтынын мысалмен жазып, оқырманға түсінікті етіңіз.",
+          "ในคำนำ ให้ยกตัวอย่างว่าทำไมผู้คนจึงออกกำลังกายไม่ได้ เพื่อให้ผู้อ่านเข้าใจและเห็นด้วย"
+        ),
+        stage2Goal: tr("Choose one or two reasons why people cannot exercise and use them in paragraph 1.", "運動できない理由を1〜2つ選び、第1段落に使います。", "选择1~2个不能运动的理由，用在第一段。", "اختر سببا أو سببين لعدم ممارسة الرياضة واستخدمهما في الفقرة الأولى.", "Chọn 1-2 lý do không tập thể dục được và dùng trong đoạn 1.", "Дасгал хийж чаддаггүй 1-2 шалтгааныг сонгож 1-р догол мөрөнд ашиглана.", "Жаттығу жасай алмаудың 1-2 себебін таңдап, 1-абзацта қолданыңыз.", "เลือกเหตุผลที่ออกกำลังกายไม่ได้ 1-2 ข้อ แล้วใช้ในย่อหน้า 1"),
+        s2BusyDesc: tr("Their schedule is full, so it is hard to set aside time for exercise.", "一日の予定が多く、運動の時間を別に作るのが難しいです。", "一天的安排很多，所以很难专门抽出时间运动。", "جدوله اليومي مزدحم، لذلك يصعب تخصيص وقت للرياضة.", "Lịch trình trong ngày nhiều nên khó dành riêng thời gian để tập thể dục.", "Өдрийн ажил их тул дасгал хийх цаг гаргахад хэцүү.", "Күн тәртібі тығыз болғандықтан, жаттығуға арнайы уақыт бөлу қиын.", "ตารางในแต่ละวันแน่น จึงหาเวลาออกกำลังกายโดยเฉพาะได้ยาก"),
+        s2BusyThink: tr("Words for the paper: Many people put off exercise because their lives are busy.", "原稿用紙に書く言葉：忙しい生活のため、運動を後回しにする人が多いです。", "写到稿纸上的话：很多人因为生活忙碌而推迟运动。", "عبارة للورقة: كثير من الناس يؤجلون الرياضة بسبب الحياة المزدحمة.", "Câu có thể viết: Nhiều người trì hoãn tập thể dục vì cuộc sống bận rộn.", "Цаасан дээр бичих үг: Завгүй амьдралаас болж олон хүн дасгалаа хойшлуулдаг.", "Қағазға жазатын сөз: Көп адам бос емес өмір салдарынан жаттығуды кейінге қалдырады.", "คำที่เขียนได้: หลายคนเลื่อนการออกกำลังกายเพราะชีวิตยุ่ง"),
+        s2StudyDesc: tr("When people study for a long time while sitting, they have fewer chances to move.", "長く座って勉強していると、体を動かす機会が減ります。", "长时间坐着学习时，活动身体的机会会减少。", "عندما يدرس الشخص جالسا مدة طويلة، تقل فرصه في تحريك جسمه.", "Khi ngồi học lâu, cơ hội vận động cơ thể giảm đi.", "Удаан сууж хичээл хийхэд биеэ хөдөлгөх боломж багасдаг.", "Ұзақ отырып оқығанда, денені қозғалту мүмкіндігі азаяды.", "เมื่อนั่งเรียนเป็นเวลานาน โอกาสขยับร่างกายจะลดลง"),
+        s2StudyThink: tr("Words for the paper: Long study hours can make the body tired easily.", "原稿用紙に書く言葉：勉強時間が長いと、体が疲れやすくなります。", "写到稿纸上的话：学习时间长，身体容易疲劳。", "عبارة للورقة: ساعات الدراسة الطويلة تجعل الجسم يتعب بسهولة.", "Câu có thể viết: Thời gian học dài khiến cơ thể dễ mệt.", "Цаасан дээр бичих үг: Хичээлийн цаг урт бол бие амархан ядардаг.", "Қағазға жазатын сөз: Оқу уақыты ұзақ болса, дене тез шаршайды.", "คำที่เขียนได้: เวลาเรียนยาวทำให้ร่างกายเหนื่อยง่าย"),
+        s2WorkDesc: tr("When work ends late, people do not have enough time or energy to exercise.", "仕事が遅く終わると、運動に行く力と時間が足りません。", "下班晚时，运动的体力和时间都不够。", "عندما ينتهي العمل متأخرا، لا يبقى وقت أو طاقة كافية للرياضة.", "Khi tan làm muộn, không còn đủ thời gian và sức lực để tập thể dục.", "Ажил орой дуусвал дасгал хийх цаг, хүч хүрэлцдэггүй.", "Жұмыс кеш аяқталса, жаттығуға уақыт та, күш те жетпейді.", "เมื่อเลิกงานดึก ก็ไม่มีทั้งเวลาและแรงพอที่จะออกกำลังกาย"),
+        s2WorkThink: tr("Words for the paper: If people get off work late, it is hard to start exercising.", "原稿用紙に書く言葉：遅く退勤すると、運動を始めるのが難しいです。", "写到稿纸上的话：下班晚的话，很难开始运动。", "عبارة للورقة: إذا انتهى العمل متأخرا، يصبح البدء بالرياضة صعبا.", "Câu có thể viết: Khi tan làm muộn, việc bắt đầu tập thể dục trở nên khó.", "Цаасан дээр бичих үг: Орой тарвал дасгал эхлэхэд хэцүү.", "Қағазға жазатын сөз: Жұмыстан кеш шықса, жаттығуды бастау қиын.", "คำที่เขียนได้: ถ้าเลิกงานดึก การเริ่มออกกำลังกายก็ยาก"),
+        s2TiredDesc: tr("When the body is tired, people want to rest first and postpone exercise.", "体が疲れていると、まず休みたい気持ちが大きくなり、運動を後回しにします。", "身体疲惫时，会更想先休息，于是推迟运动。", "عندما يكون الجسم متعبا، تزداد الرغبة في الراحة فيؤجل الشخص الرياضة.", "Khi cơ thể mệt, người ta muốn nghỉ ngơi trước nên hoãn tập thể dục.", "Бие ядарсан үед амрах хүсэл их болж, дасгалаа хойшлуулдаг.", "Дене шаршағанда, адам алдымен демалғысы келіп, жаттығуды кейінге қалдырады.", "เมื่อร่างกายเหนื่อย คนเราจะอยากพักก่อนและเลื่อนการออกกำลังกายออกไป"),
+        s2TiredThink: tr("Words for the paper: Because they are tired, they think about rest before exercise.", "原稿用紙に書く言葉：疲れているので、運動より休みを先に考えます。", "写到稿纸上的话：因为疲惫，所以比起运动会先想到休息。", "عبارة للورقة: بسبب التعب، يفكرون في الراحة قبل الرياضة.", "Câu có thể viết: Vì mệt nên họ nghĩ đến nghỉ ngơi trước khi tập thể dục.", "Цаасан дээр бичих үг: Ядарсан тул дасгалаас өмнө амрахыг боддог.", "Қағазға жазатын сөз: Шаршағандықтан, жаттығудан бұрын демалысты ойлайды.", "คำที่เขียนได้: เพราะเหนื่อย จึงคิดถึงการพักผ่อนก่อนออกกำลังกาย"),
+        s2SittingDesc: tr("Sitting in a classroom or office for a long time can make the body heavy and stiff.", "教室や事務室に長く座っていると、体が重く硬くなります。", "在教室或办公室坐很久，身体会变重、变僵硬。", "الجلوس طويلا في الصف أو المكتب يجعل الجسم ثقيلا ومتصلبا.", "Ngồi lâu trong lớp học hoặc văn phòng làm cơ thể nặng nề và cứng lại.", "Анги эсвэл оффист удаан суухад бие хүндэрч, хөшдөг.", "Сыныпта немесе кеңседе ұзақ отырса, дене ауырлап, қатып қалады.", "การนั่งนานในห้องเรียนหรือสำนักงานทำให้ร่างกายหนักและตึง"),
+        s2SittingThink: tr("Words for the paper: Sitting for a long time reduces the habit of moving the body.", "原稿用紙に書く言葉：長く座っていると、体を動かす習慣が減ります。", "写到稿纸上的话：坐得太久，会减少活动身体的习惯。", "عبارة للورقة: الجلوس مدة طويلة يقلل عادة تحريك الجسم.", "Câu có thể viết: Ngồi lâu làm giảm thói quen vận động cơ thể.", "Цаасан дээр бичих үг: Удаан суух нь биеэ хөдөлгөх зуршлыг багасгадаг.", "Қағазға жазатын сөз: Ұзақ отыру денені қозғалту әдетін азайтады.", "คำที่เขียนได้: การนั่งนานทำให้นิสัยการขยับร่างกายลดลง"),
+        s2FrameThink: tr("Before writing on manuscript paper: choose one or two reasons and put them in the first paragraph.", "原稿用紙に書く前に、理由を1〜2つ選んで第1段落に入れます。", "写到稿纸前：选择1~2个理由，放进第一段。", "قبل الكتابة على ورق المخطوط: اختر سببا أو سببين وضعهما في الفقرة الأولى.", "Trước khi viết lên giấy: chọn 1-2 lý do và đưa vào đoạn 1.", "Эх бичгийн цаасан дээр бичихээс өмнө 1-2 шалтгааныг сонгож эхний догол мөрөнд оруулна.", "Қағазға жазар алдында 1-2 себеп таңдап, бірінші абзацқа енгізіңіз.", "ก่อนเขียนลงกระดาษ ให้เลือกเหตุผล 1-2 ข้อแล้วใส่ในย่อหน้าแรก"),
+        stage3Intro: tr("Choose methods that people can do even when they have no time, and write them in paragraph 2. It is good to include at least two methods.", "時間がない時にもできる方法を選び、第2段落に書きます。方法は2つ以上入れるとよいです。", "选择没时间时也能做的方法，写在第二段。最好写两个以上的方法。", "اختر طرقا يمكن فعلها حتى عند ضيق الوقت واكتبها في الفقرة الثانية. من الأفضل ذكر طريقتين على الأقل.", "Chọn những cách có thể làm dù không có thời gian và viết vào đoạn 2. Nên đưa vào ít nhất 2 cách.", "Цаггүй байсан ч хийж болох аргуудыг сонгож 2-р догол мөрөнд бичнэ. 2-оос дээш арга оруулах нь сайн.", "Уақыт болмаса да жасауға болатын әдістерді таңдап, 2-абзацқа жазыңыз. Кемінде 2 әдіс қосқан жақсы.", "เลือกวิธีที่ทำได้แม้ไม่มีเวลา แล้วเขียนในย่อหน้าที่ 2 ควรใส่อย่างน้อย 2 วิธี"),
+        stage3Goal: tr("Choose at least two daily-life exercise methods for paragraph 2.", "第2段落に入れる生活の中の運動方法を2つ以上選びます。", "选择两个以上写进第二段的生活中运动方法。", "اختر طريقتين على الأقل للرياضة اليومية للفقرة الثانية.", "Chọn ít nhất 2 cách vận động trong đời sống cho đoạn 2.", "2-р догол мөрөнд оруулах өдөр тутмын дасгалын 2-оос дээш аргыг сонгоно.", "2-абзацқа арналған күнделікті жаттығудың кемінде 2 әдісін таңдаңыз.", "เลือกวิธีออกกำลังกายในชีวิตประจำวันอย่างน้อย 2 วิธีสำหรับย่อหน้า 2"),
+        s3StairsDesc: tr("Using stairs instead of the elevator lets people move their bodies without setting aside extra time.", "エレベーターの代わりに階段を使うと、別に時間を作らなくても体を動かせます。", "用楼梯代替电梯，不用另外抽时间也能活动身体。", "استخدام الدرج بدلا من المصعد يساعد على تحريك الجسم دون تخصيص وقت إضافي.", "Dùng cầu thang thay vì thang máy giúp vận động cơ thể mà không cần dành thêm thời gian.", "Лифтний оронд шатаар явахад нэмэлт цаг гаргахгүйгээр биеэ хөдөлгөж болно.", "Лифт орнына баспалдақ қолданса, қосымша уақыт бөлмей-ақ денені қозғалтуға болады.", "ใช้บันไดแทนลิฟต์ทำให้ขยับร่างกายได้โดยไม่ต้องหาเวลาเพิ่ม"),
+        s3WalkDesc: tr("When going somewhere nearby, walking instead of riding naturally becomes exercise.", "近い所へ行く時は、車に乗るより歩くと自然に運動になります。", "去近的地方时，比起坐车，走路自然就成了运动。", "عند الذهاب إلى مكان قريب، يكون المشي بدلا من الركوب رياضة طبيعية.", "Khi đi nơi gần, đi bộ thay vì đi xe sẽ tự nhiên trở thành vận động.", "Ойрхон газар явахдаа унаа унахын оронд алхвал аяндаа дасгал болно.", "Жақын жерге барғанда көлікке мінбей жаяу жүрсе, бұл табиғи жаттығу болады.", "เมื่อไปที่ใกล้ ๆ การเดินแทนการนั่งรถจะกลายเป็นการออกกำลังกายตามธรรมชาติ"),
+        s3StretchDesc: tr("While studying or working, people can stand up briefly and loosen the neck, shoulders, and back.", "勉強や仕事の途中で少し立ち上がり、首、肩、腰をほぐすことができます。", "学习或工作时，可以短暂站起来，放松脖子、肩膀和腰。", "أثناء الدراسة أو العمل، يمكن الوقوف قليلا وإرخاء الرقبة والكتفين والظهر.", "Khi học hoặc làm việc, có thể đứng dậy một chút và thả lỏng cổ, vai, lưng.", "Хичээл хийх эсвэл ажиллах үедээ түр босож хүзүү, мөр, нуруугаа суллаж болно.", "Оқу немесе жұмыс кезінде аз уақыт тұрып, мойын, иық, белді босатуға болады.", "ระหว่างเรียนหรือทำงาน สามารถลุกขึ้นสั้น ๆ เพื่อผ่อนคลายคอ ไหล่ และหลังได้"),
+        s3StopDesc: tr("Getting off one stop early on the bus or subway can increase walking time.", "バスや地下鉄を一駅前で降りて歩くと、歩く時間を増やせます。", "坐公交或地铁时提前一站下车走路，可以增加步行时间。", "النزول قبل محطة واحدة من الحافلة أو المترو يزيد وقت المشي.", "Xuống xe buýt hoặc tàu điện sớm một trạm rồi đi bộ sẽ tăng thời gian đi bộ.", "Автобус эсвэл метрогоос нэг буудлын өмнө бууж алхвал алхах хугацаа нэмэгдэнэ.", "Автобус не метрода бір аялдама бұрын түсіп жүрсе, жаяу жүру уақыты көбейеді.", "ลงรถเมล์หรือรถไฟใต้ดินก่อนหนึ่งป้ายแล้วเดิน จะเพิ่มเวลาเดินได้"),
+        s3LegDesc: tr("While sitting on a chair, lifting and lowering the legs can be a small exercise.", "椅子に座っている時、足を上げ下げすると小さな運動ができます。", "坐在椅子上时，抬起放下腿也可以做小运动。", "أثناء الجلوس على الكرسي، رفع الساقين وخفضهما يمكن أن يكون تمرينا بسيطا.", "Khi ngồi trên ghế, nâng chân lên xuống cũng có thể là vận động nhỏ.", "Сандал дээр сууж байхдаа хөлөө өргөж буулгах нь жижиг дасгал болно.", "Орындықта отырғанда аяқты көтеріп-түсіру шағын жаттығу бола алады.", "ขณะนั่งเก้าอี้ การยกขาขึ้นลงก็เป็นการออกกำลังกายเล็ก ๆ ได้"),
+        frameLabel: tr("Sentence frame", "文型", "句型", "قالب الجملة", "Mẫu câu", "Өгүүлбэрийн загвар", "Сөйлем үлгісі", "รูปประโยค"),
+        s3FrameThink: tr("Before writing on manuscript paper: choose two or three exercise methods you will use.", "原稿用紙に書く前に、自分が使う運動方法を2〜3つ選びます。", "写到稿纸前：选择自己要写的2~3个运动方法。", "قبل الكتابة على ورق المخطوط: اختر طريقتين أو ثلاث طرق للرياضة ستكتب عنها.", "Trước khi viết lên giấy: chọn 2-3 cách vận động mình sẽ viết.", "Эх бичгийн цаасан дээр бичихээс өмнө бичих 2-3 дасгалын аргыг сонгоно.", "Қағазға жазар алдында өзіңіз жазатын 2-3 жаттығу әдісін таңдаңыз.", "ก่อนเขียนลงกระดาษ ให้เลือกวิธีออกกำลังกายที่จะเขียน 2-3 วิธี"),
+        stage4Intro: tr("In paragraph 3, write how daily-life exercise makes the body and mind better.", "第3段落には、生活の中の運動で体と心がどのようによくなるかを書きます。", "第三段写生活中的运动会怎样让身体和心情变好。", "في الفقرة الثالثة، اكتب كيف تجعل الرياضة في الحياة اليومية الجسم والنفس أفضل.", "Ở đoạn 3, viết việc vận động trong đời sống giúp cơ thể và tinh thần tốt hơn như thế nào.", "3-р догол мөрөнд өдөр тутмын дасгал бие, сэтгэлийг хэрхэн сайжруулахыг бичнэ.", "3-абзацта күнделікті жаттығудың дене мен көңіл-күйді қалай жақсартатынын жазыңыз.", "ในย่อหน้าที่ 3 ให้เขียนว่าการออกกำลังกายในชีวิตประจำวันทำให้ร่างกายและจิตใจดีขึ้นอย่างไร"),
+        stage4Goal: tr("Choose at least two benefits of exercise for paragraph 3.", "第3段落に入れる運動のよい点を2つ以上選びます。", "选择两个以上写进第三段的运动好处。", "اختر فائدتين على الأقل للرياضة للفقرة الثالثة.", "Chọn ít nhất 2 lợi ích của vận động cho đoạn 3.", "3-р догол мөрөнд оруулах дасгалын 2-оос дээш сайн талыг сонгоно.", "3-абзацқа арналған жаттығудың кемінде 2 пайдасын таңдаңыз.", "เลือกข้อดีของการออกกำลังกายอย่างน้อย 2 ข้อสำหรับย่อหน้า 3"),
+        s4LightDesc: tr("Light movement loosens the stiff body and makes movement easier.", "軽く動くと、固まっていた体がほぐれ、動きやすくなります。", "轻轻活动会放松僵硬的身体，让动作更轻松。", "الحركة الخفيفة ترخي الجسم المتصلب وتجعل الحركة أسهل.", "Vận động nhẹ giúp cơ thể bớt cứng và cử động dễ hơn.", "Хөнгөн хөдөлгөөн хөшсөн биеийг суллаж, хөдөлгөөнийг хялбар болгоно.", "Жеңіл қимыл қатайған денені босатып, қозғалуды жеңілдетеді.", "การขยับเบา ๆ ช่วยคลายร่างกายที่ตึงและทำให้เคลื่อนไหวได้ง่ายขึ้น"),
+        s4StressDesc: tr("Walking or stretching can reduce a stuffy feeling and improve mood.", "歩いたりストレッチをしたりすると、もやもやした気持ちが減り、気分がよくなります。", "走路或伸展可以减少郁闷的感觉，让心情变好。", "المشي أو التمدد يقلل الشعور بالضيق ويحسن المزاج.", "Đi bộ hoặc giãn cơ giúp giảm cảm giác bức bối và tâm trạng tốt hơn.", "Алхах эсвэл сунгалт хийхэд давчдах мэдрэмж багасаж, сэтгэл санаа сайжирна.", "Жаяу жүру немесе созылу ішкі қысымды азайтып, көңіл-күйді жақсартады.", "การเดินหรือยืดเส้นช่วยลดความอึดอัดและทำให้อารมณ์ดีขึ้น"),
+        s4StaminaDesc: tr("Even small exercise builds strength if people continue it every day, so they get tired less easily.", "小さな運動でも毎日続けると体に力がつき、疲れにくくなります。", "即使是小运动，每天坚持也会增强体力，不容易疲劳。", "حتى التمارين الصغيرة تقوي الجسم إذا استمرت كل يوم، فيتعب الشخص أقل.", "Dù là vận động nhỏ, nếu làm mỗi ngày thì cơ thể khỏe hơn và ít mệt hơn.", "Жижиг дасгалыг ч өдөр бүр үргэлжлүүлбэл бие хүчтэй болж амархан ядрахгүй.", "Кішкентай жаттығуды күн сайын жалғастырса, күш артып, тез шаршамайды.", "แม้เป็นการออกกำลังกายเล็ก ๆ ถ้าทำทุกวัน ร่างกายจะแข็งแรงขึ้นและเหนื่อยน้อยลง"),
+        s4HealthDesc: tr("Daily-life exercise reduces the habit of sitting for a long time and helps manage health.", "生活の中の運動は長く座る習慣を減らし、健康管理に役立ちます。", "生活中的运动能减少久坐习惯，并有助于健康管理。", "الرياضة في الحياة اليومية تقلل عادة الجلوس الطويل وتساعد في العناية بالصحة.", "Vận động trong đời sống giúp giảm thói quen ngồi lâu và hỗ trợ chăm sóc sức khỏe.", "Өдөр тутмын дасгал удаан суух зуршлыг багасгаж, эрүүл мэндээ хамгаалахад тусална.", "Күнделікті жаттығу ұзақ отыру әдетін азайтып, денсаулықты күтуге көмектеседі.", "การออกกำลังกายในชีวิตประจำวันช่วยลดนิสัยนั่งนานและช่วยดูแลสุขภาพ"),
+        s4PostureDesc: tr("Loosening the neck and shoulders often can help improve posture.", "首や肩をよくほぐすと、姿勢を正すのに役立ちます。", "经常放松脖子和肩膀，有助于改善姿势。", "إرخاء الرقبة والكتفين كثيرا يساعد على تحسين الوضعية.", "Thường xuyên thả lỏng cổ và vai giúp cải thiện tư thế.", "Хүзүү, мөрөө байнга суллах нь байрлалаа засахад тусална.", "Мойын мен иықты жиі босату дене қалпын жақсартуға көмектеседі.", "การผ่อนคลายคอและไหล่บ่อย ๆ ช่วยให้ท่าทางดีขึ้น"),
+        s4FrameThink: tr("Before writing on manuscript paper: choose two effects that match the exercise methods.", "原稿用紙に書く前に、方法に合う効果を2つ選びます。", "写到稿纸前：选择两个与运动方法相配的效果。", "قبل الكتابة على ورق المخطوط: اختر أثرين يناسبان طرق الرياضة.", "Trước khi viết lên giấy: chọn 2 tác dụng phù hợp với cách vận động.", "Эх бичгийн цаасан дээр бичихээс өмнө аргуудтай тохирох 2 үр дүнг сонгоно.", "Қағазға жазар алдында әдістерге сай келетін екі әсерді таңдаңыз.", "ก่อนเขียนลงกระดาษ ให้เลือกผลดี 2 อย่างที่เข้ากับวิธีออกกำลังกาย"),
+        stage5Intro: tr("Think of answering each paragraph question and write sentences on manuscript paper. Do not copy the sentence frames exactly; change them to fit your own ideas.", "各段落の質問に答えるつもりで原稿用紙に文を書きます。下の文型はそのまま写さず、自分の内容に合わせて変えます。", "把每段的问题当作要回答的内容，在稿纸上写句子。下面的句型不要原样照抄，要按自己的内容修改。", "اكتب جملا على ورق المخطوط كأنك تجيب عن سؤال كل فقرة. لا تنسخ القوالب كما هي، بل غيرها لتناسب أفكارك.", "Hãy viết câu trên giấy như đang trả lời câu hỏi của từng đoạn. Không chép nguyên mẫu câu, hãy đổi cho phù hợp với ý của mình.", "Догол мөр бүрийн асуултад хариулж байна гэж бодоод цаасан дээр өгүүлбэр бичнэ. Загварыг яг хуулалгүй, өөрийн санаанд тохируулна.", "Әр абзац сұрағына жауап беріп жатқандай қағазға сөйлем жазыңыз. Үлгіні дәл көшірмей, өз ойыңызға сай өзгертіңіз.", "ให้คิดเหมือนกำลังตอบคำถามของแต่ละย่อหน้าแล้วเขียนลงกระดาษ อย่าคัดลอกรูปประโยคตรง ๆ แต่ปรับให้เข้ากับความคิดของตนเอง"),
+        stage5Goal: tr("Check what will go into paragraphs 1-4, then write 400-500 characters on manuscript paper.", "1〜4段落に入る内容を確認し、原稿用紙に400〜500字で分けて書きます。", "确认第1~4段要写的内容，然后在稿纸上分成400~500字来写。", "تحقق مما سيدخل في الفقرات 1-4، ثم اكتب 400-500 حرف على ورق المخطوط.", "Kiểm tra nội dung sẽ vào đoạn 1-4, rồi viết 400-500 chữ trên giấy.", "1-4-р догол мөрөнд орох агуулгыг шалгаад, эх бичгийн цаасан дээр 400-500 тэмдэгтээр бичнэ.", "1-4 абзацқа кіретін мазмұнды тексеріп, қағазға 400-500 таңба етіп жазыңыз.", "ตรวจสอบสิ่งที่จะใส่ในย่อหน้า 1-4 แล้วเขียน 400-500 ตัวอักษรลงบนกระดาษ"),
+        plannerCta: tr("Choose answers to the questions in order, and the content of paragraphs 1-4 will be organized naturally.", "質問への答えを順番に選ぶと、1〜4段落の内容が自然に整理されます。", "按顺序选择问题的答案，第1~4段的内容就会自然整理出来。", "اختر إجابات الأسئلة بالترتيب، وسيتم تنظيم محتوى الفقرات 1-4 بشكل طبيعي.", "Chọn câu trả lời theo thứ tự câu hỏi, nội dung đoạn 1-4 sẽ được sắp xếp tự nhiên.", "Асуултын хариуг дарааллаар нь сонговол 1-4-р догол мөрийн агуулга аяндаа цэгцэрнэ.", "Сұрақтарға жауаптарды ретімен таңдасаңыз, 1-4 абзацтың мазмұны табиғи түрде реттеледі.", "เลือกคำตอบของคำถามตามลำดับ แล้วเนื้อหาย่อหน้า 1-4 จะเรียงตัวอย่างเป็นธรรมชาติ"),
+        p1Content: tr("Choose one or two reasons, such as busy life, long study hours, late work, or tiredness.", "忙しい生活、長い勉強時間、遅い退勤、疲れの中から1〜2つ選びます。", "从生活忙碌、学习时间长、下班晚、疲惫中选择1~2个理由。", "اختر سببا أو سببين مثل الحياة المزدحمة، الدراسة الطويلة، العمل المتأخر، أو التعب.", "Chọn 1-2 lý do như cuộc sống bận rộn, thời gian học dài, tan làm muộn, mệt mỏi.", "Завгүй амьдрал, урт хичээлийн цаг, орой тарах, ядаргаа зэргээс 1-2 шалтгаан сонгоно.", "Бос емес өмір, ұзақ оқу уақыты, жұмыстан кеш шығу, шаршау сияқты 1-2 себеп таңдаңыз.", "เลือกเหตุผล 1-2 ข้อ เช่น ชีวิตยุ่ง เวลาเรียนยาว เลิกงานดึก หรือความเหนื่อย"),
+        p1Example: tr("They lack time to move because they sit for a long time studying or working.", "長く座って勉強したり働いたりするので、体を動かす時間が足りません。", "因为长时间坐着学习或工作，所以没有足够时间活动身体。", "لا يكفيهم وقت لتحريك الجسم لأنهم يجلسون طويلا للدراسة أو العمل.", "Họ thiếu thời gian vận động vì ngồi lâu học hoặc làm việc.", "Удаан сууж хичээл хийх эсвэл ажилладаг тул биеэ хөдөлгөх цаг дутагддаг.", "Ұзақ отырып оқу немесе жұмыс істеу салдарынан денені қозғалтуға уақыт жетпейді.", "เพราะนั่งเรียนหรือทำงานนาน จึงไม่มีเวลาขยับร่างกายพอ"),
+        p1Note: tr("On the manuscript paper, first write who cannot exercise and why.", "原稿用紙には、まず「誰が、なぜ運動できないのか」を書きます。", "在稿纸上，先写“谁，为什么不能运动”。", "على ورق المخطوط، اكتب أولا من لا يستطيع ممارسة الرياضة ولماذا.", "Trên giấy, trước hết viết “ai, vì sao không tập thể dục được”.", "Эх бичгийн цаасан дээр эхлээд хэн, яагаад дасгал хийж чаддаггүйг бичнэ.", "Қағазға алдымен кімнің неге жаттығу жасай алмайтынын жазыңыз.", "บนกระดาษ ให้เขียนก่อนว่าใครออกกำลังกายไม่ได้และเพราะอะไร"),
+        p2Content: tr("Write at least two methods that can be done right away, such as walking, using stairs, or stretching.", "歩く、階段を使う、ストレッチのように、すぐできる方法を2つ以上書きます。", "写两个以上马上能做的方法，比如走路、走楼梯、伸展运动。", "اكتب طريقتين على الأقل يمكن فعلهما فورا، مثل المشي أو استخدام الدرج أو التمدد.", "Viết ít nhất 2 cách có thể làm ngay như đi bộ, đi cầu thang, giãn cơ.", "Алхах, шатаар явах, сунгалт хийх зэрэг шууд хийж болох 2-оос дээш аргыг бичнэ.", "Жаяу жүру, баспалдақ қолдану, созылу сияқты бірден жасауға болатын кемінде 2 әдісті жазыңыз.", "เขียนวิธีที่ทำได้ทันทีอย่างน้อย 2 วิธี เช่น เดิน ใช้บันได หรือยืดเส้น"),
+        p2Example: tr("Try walking short distances and stretching during breaks.", "近い距離は歩き、休み時間にはストレッチをしてみてください。", "近的距离可以走路，休息时间可以做伸展运动。", "جرب المشي للمسافات القريبة والتمدد في أوقات الاستراحة.", "Hãy thử đi bộ khi quãng đường gần và giãn cơ trong giờ nghỉ.", "Ойрхон газар алхаж, амралтын үеэр сунгалт хийж үзээрэй.", "Жақын жерге жаяу барып, үзіліс кезінде созылып көріңіз.", "ลองเดินในระยะใกล้ ๆ และยืดเส้นในเวลาพัก"),
+        p2Note: tr("On the manuscript paper, write specifically when, where, and how people can do it.", "原稿用紙には、いつ、どこで、どのようにできるかを具体的に書きます。", "在稿纸上，具体写什么时候、在哪里、怎样做。", "على ورق المخطوط، اكتب بالتحديد متى وأين وكيف يمكن فعل ذلك.", "Trên giấy, viết cụ thể khi nào, ở đâu, làm như thế nào.", "Эх бичгийн цаасан дээр хэзээ, хаана, хэрхэн хийхийг тодорхой бичнэ.", "Қағазға қашан, қай жерде, қалай жасауға болатынын нақты жазыңыз.", "บนกระดาษ ให้เขียนอย่างชัดเจนว่าเมื่อไร ที่ไหน และทำอย่างไร"),
+        p3Content: tr("Choose at least two things that improve: body, mind, health, or stamina.", "体、心、健康、体力の中からよくなる点を2つ以上選びます。", "从身体、心情、健康、体力中选择两个以上会变好的方面。", "اختر شيئين على الأقل يتحسنان: الجسم أو النفس أو الصحة أو اللياقة.", "Chọn ít nhất 2 điểm tốt lên: cơ thể, tinh thần, sức khỏe, thể lực.", "Бие, сэтгэл, эрүүл мэнд, тэнхээ дундаас сайжрах 2-оос дээш зүйлийг сонгоно.", "Дене, көңіл-күй, денсаулық, төзімділік ішінен жақсаратын кемінде 2 нәрсені таңдаңыз.", "เลือกสิ่งที่ดีขึ้นอย่างน้อย 2 อย่าง เช่น ร่างกาย จิตใจ สุขภาพ หรือพละกำลัง"),
+        p3Example: tr("The body becomes lighter, stress is relieved, and people can protect their health.", "体が軽くなり、ストレスが解けて、健康を守ることができます。", "身体会变轻松，压力会减轻，也能保护健康。", "يصبح الجسم أخف، ويخف التوتر، ويمكن الحفاظ على الصحة.", "Cơ thể nhẹ nhàng hơn, căng thẳng giảm và có thể giữ sức khỏe.", "Бие хөнгөрч, стресс тайлагдаж, эрүүл мэндээ хамгаалж чадна.", "Дене жеңілдеп, стресс азайып, денсаулықты сақтауға болады.", "ร่างกายเบาขึ้น ความเครียดลดลง และรักษาสุขภาพได้"),
+        p3Note: tr("On the manuscript paper, write effects that connect to the exercise methods in the previous paragraph.", "原稿用紙には、前の段落の運動方法とつながる効果を書きます。", "在稿纸上，写出与上一段运动方法相连接的效果。", "على ورق المخطوط، اكتب آثارا مرتبطة بطرق الرياضة في الفقرة السابقة.", "Trên giấy, viết tác dụng liên quan đến cách vận động ở đoạn trước.", "Эх бичгийн цаасан дээр өмнөх догол мөрийн дасгалын аргатай холбогдох үр дүнг бичнэ.", "Қағазға алдыңғы абзацтағы жаттығу әдістерімен байланысты әсерлерді жазыңыз.", "บนกระดาษ ให้เขียนผลดีที่เชื่อมกับวิธีออกกำลังกายในย่อหน้าก่อนหน้า"),
+        p4Content: tr("Recommend starting with small exercises instead of trying to do a lot from the beginning.", "最初からたくさんしようとせず、小さな運動から始めようと勧めます。", "建议不要一开始就做很多，而是从小运动开始。", "انصح بالبدء بتمارين صغيرة بدلا من محاولة فعل الكثير منذ البداية.", "Khuyên nên bắt đầu từ vận động nhỏ, không cố làm nhiều ngay từ đầu.", "Эхнээсээ их хийх гэж оролдохгүй, жижиг дасгалаас эхлэхийг зөвлөнө.", "Бастан көп істеуге тырыспай, кішкентай жаттығудан бастауды ұсыныңыз.", "แนะนำให้เริ่มจากการออกกำลังกายเล็ก ๆ ไม่ใช่พยายามทำมากตั้งแต่แรก"),
+        p4Example: tr("If people start with small exercises in daily life, they can keep doing them steadily.", "生活の中で小さな運動から始めると、続けて行うことができます。", "如果从生活中的小运动开始，就能持续下去。", "إذا بدأ الناس بتمارين صغيرة في الحياة اليومية، يمكنهم الاستمرار بثبات.", "Nếu bắt đầu từ vận động nhỏ trong đời sống, có thể duy trì đều đặn.", "Өдөр тутамдаа жижиг дасгалаас эхэлбэл тогтмол үргэлжлүүлж чадна.", "Күнделікті өмірде шағын жаттығудан бастаса, тұрақты жалғастыруға болады.", "ถ้าเริ่มจากการออกกำลังกายเล็ก ๆ ในชีวิตประจำวัน ก็จะทำต่อเนื่องได้"),
+        p4Note: tr("On the manuscript paper, finish gently so the reader can start without pressure.", "原稿用紙には、読者が負担なく始められるようにやさしく締めくくります。", "在稿纸上，要温和地结尾，让读者能没有负担地开始。", "على ورق المخطوط، اختم بلطف حتى يستطيع القارئ البدء دون ضغط.", "Trên giấy, kết thúc nhẹ nhàng để người đọc có thể bắt đầu mà không áp lực.", "Эх бичгийн цаасан дээр уншигч дарамтгүй эхэлж чадахаар зөөлөн дуусгана.", "Қағазда оқырман қиналмай бастай алатындай жұмсақ аяқтаңыз.", "บนกระดาษ ให้จบอย่างนุ่มนวลเพื่อให้ผู้อ่านเริ่มได้โดยไม่กดดัน"),
+        stage6Intro: tr("Do not check boxes on the page. Read the text you wrote on manuscript paper and check it yourself.", "ページ上でチェックするのではありません。原稿用紙に書いた文章を読んで、自分で確認します。", "不要在页面上打勾。读自己写在稿纸上的文章，并自己检查。", "لا تضع علامات في الصفحة. اقرأ النص الذي كتبته على ورق المخطوط وتحقق منه بنفسك.", "Không đánh dấu trên trang. Hãy đọc bài đã viết trên giấy và tự kiểm tra.", "Хуудас дээр тэмдэглэхгүй. Эх бичгийн цаасан дээр бичсэнээ уншаад өөрөө шалгана.", "Бетте белгілемеңіз. Қағазға жазған мәтінді оқып, өзіңіз тексеріңіз.", "ไม่ต้องติ๊กในหน้านี้ ให้อ่านงานที่เขียนบนกระดาษแล้วตรวจด้วยตนเอง"),
+        stage6Goal: tr("Check that the paper has 400-500 characters, 4 paragraphs, at least 2 methods, and at least 2 effects.", "原稿用紙の文章が400〜500字、4段落、方法2つ以上、効果2つ以上になっているか確認します。", "检查稿纸上的文章是否有400~500字、4段、两个以上方法、两个以上效果。", "تحقق من أن النص على الورق يتكون من 400-500 حرف، و4 فقرات، وطريقتين على الأقل، وأثرين على الأقل.", "Kiểm tra bài trên giấy có 400-500 chữ, 4 đoạn, ít nhất 2 cách và ít nhất 2 tác dụng hay chưa.", "Цаасан дээрх бичвэр 400-500 тэмдэгт, 4 догол мөр, 2-оос дээш арга, 2-оос дээш үр дүнтэй эсэхийг шалгана.", "Қағаздағы мәтін 400-500 таңба, 4 абзац, кемінде 2 әдіс және 2 әсер қамтығанын тексеріңіз.", "ตรวจว่างานบนกระดาษมี 400-500 ตัวอักษร 4 ย่อหน้า วิธีอย่างน้อย 2 วิธี และผลดีอย่างน้อย 2 อย่างหรือไม่"),
+        talkBeforeWriting: tr("Say once to a partner, “What reason and what exercise method will I write?” Then write on manuscript paper.", "「どんな理由とどんな運動方法を書こうか」をペアに一度言ってから、原稿用紙に書きます。", "先和同伴说一次“我要写什么理由和什么运动方法？”，然后写到稿纸上。", "قل لشريكك مرة واحدة: «ما السبب وطريقة الرياضة التي سأكتب عنها؟» ثم اكتب على ورق المخطوط.", "Nói với bạn một lần: “Mình sẽ viết lý do nào và cách vận động nào?” rồi viết lên giấy.", "“Би ямар шалтгаан, ямар дасгалын аргыг бичих вэ?” гэж хосдоо нэг удаа хэлээд цаасан дээр бичнэ.", "Жұбыңызға бір рет: «Қандай себеп пен қандай жаттығу әдісін жазамын?» деп айтып, содан кейін қағазға жазыңыз.", "พูดกับคู่หนึ่งครั้งว่า “ฉันจะเขียนเหตุผลอะไรและวิธีออกกำลังกายอะไร” แล้วจึงเขียนลงกระดาษ"),
+        reviseOnPaper: tr("If the same words repeat, reduce them and add connecting expressions such as “먼저”, “또”, “이렇게 하면”, and “따라서”.", "同じ言葉が繰り返されたら減らし、「먼저」「또」「이렇게 하면」「따라서」のようなつなぎ表現を入れます。", "如果重复同样的话，就删减一些，并加入“먼저”“또”“이렇게 하면”“따라서”等连接表达。", "إذا تكررت الكلمات نفسها، قللها وأضف تعبيرات ربط مثل “먼저”، “또”، “이렇게 하면”، “따라서”.", "Nếu lặp lại cùng một từ, hãy giảm bớt và thêm các cách nối như “먼저”, “또”, “이렇게 하면”, “따라서”.", "Ижил үг давтагдвал багасгаж, “먼저”, “또”, “이렇게 하면”, “따라서” зэрэг холбох хэллэг нэмнэ.", "Бір сөз қайталанса, азайтып, “먼저”, “또”, “이렇게 하면”, “따라서” сияқты байланыстырушы сөздерді қосыңыз.", "ถ้าคำเดิมซ้ำ ให้ลดลงและเพิ่มคำเชื่อม เช่น “먼저”, “또”, “이렇게 하면”, “따라서”")
+      };
+
+      const phraseGlosses = {
+        phraseTime: tr("even if there is no time to exercise", "運動する時間がなくても", "即使没有时间运动", "حتى لو لم يكن هناك وقت للرياضة", "dù không có thời gian tập thể dục", "дасгал хийх цаггүй байсан ч", "жаттығуға уақыт болмаса да", "แม้ไม่มีเวลาออกกำลังกาย"),
+        phraseEasy: tr("exercise that is easy to do in daily life", "生活の中で簡単にできる運動", "生活中容易做到的运动", "رياضة يمكن ممارستها بسهولة في الحياة اليومية", "vận động dễ làm trong đời sống", "өдөр тутам амархан хийж болох дасгал", "күнделікті өмірде оңай жасалатын жаттығу", "การออกกำลังกายที่ทำได้ง่ายในชีวิตประจำวัน"),
+        phraseWalk: tr("walk when the distance is short", "近い距離は歩く", "近的距离走路去", "المشي للمسافات القريبة", "đi bộ khi quãng đường gần", "ойрхон газарт алхах", "жақын жерге жаяу бару", "เดินเมื่อระยะทางใกล้"),
+        phraseStretch: tr("loosen the body during every break", "休み時間ごとに体をほぐす", "每到休息时间活动身体", "إرخاء الجسم في كل استراحة", "thả lỏng cơ thể mỗi giờ nghỉ", "амралт бүрээр биеэ суллах", "әр үзілісте денені босату", "ผ่อนคลายร่างกายในทุกเวลาพัก"),
+        phraseLight: tr("do light exercise whenever there is a little time", "すき間時間に軽い運動をする", "利用空闲时间做轻运动", "ممارسة رياضة خفيفة في الأوقات القصيرة", "tập vận động nhẹ khi có thời gian rảnh ngắn", "завсар зайгаар хөнгөн дасгал хийх", "қысқа бос уақытта жеңіл жаттығу жасау", "ออกกำลังกายเบา ๆ เมื่อมีเวลาว่างสั้น ๆ"),
+        phraseStress: tr("stress is relieved", "ストレスが解ける", "压力得到缓解", "يخف التوتر", "căng thẳng được giải tỏa", "стресс тайлагдах", "стресс азаю", "ความเครียดคลายลง"),
+        phraseHealth: tr("can protect health", "健康を守ることができる", "可以保护健康", "يمكن الحفاظ على الصحة", "có thể giữ gìn sức khỏe", "эрүүл мэндээ хамгаалж чадна", "денсаулықты сақтай алады", "รักษาสุขภาพได้"),
+        phraseSmall: tr("it is good to start with small exercise", "小さな運動から始めるのがよい", "从小运动开始比较好", "من الجيد البدء بتمرين صغير", "nên bắt đầu từ vận động nhỏ", "жижиг дасгалаас эхлэх нь сайн", "шағын жаттығудан бастаған жақсы", "เริ่มจากการออกกำลังกายเล็ก ๆ จะดี")
+      };
+
+      const panels = Array.from(document.querySelectorAll("[data-stage-panel]"));
+      const buttons = Array.from(document.querySelectorAll("[data-stage-button]"));
+      const nextButtons = Array.from(document.querySelectorAll("[data-next-stage]"));
+
+      function addTranslationSpans(container, translations, className) {
+        Object.entries(translations).forEach(([lang, text]) => {
+          if (!text) return;
+          const span = document.createElement("span");
+          span.className = className;
+          span.dataset.lang = lang;
+          if (lang === "ar") span.dir = "rtl";
+          span.textContent = text;
+          container.appendChild(span);
+        });
+      }
+
+      function buildScaffolds() {
+        document.querySelectorAll("[data-scaffold]").forEach((element) => {
+          if (element.dataset.scaffoldReady === "true") return;
+          const translations = scaffoldTranslations[element.dataset.scaffold];
+          if (!translations) return;
+
+          const koreanText = element.textContent.trim();
+          element.textContent = "";
+
+          const koreanSpan = document.createElement("span");
+          koreanSpan.className = "scaffold-ko";
+          koreanSpan.textContent = koreanText;
+          element.appendChild(koreanSpan);
+
+          addTranslationSpans(element, translations, "scaffold-lang");
+          element.dataset.scaffoldReady = "true";
+        });
+
+        document.querySelectorAll("[data-gloss]").forEach((element) => {
+          if (element.dataset.glossReady === "true") return;
+          const translations = phraseGlosses[element.dataset.gloss];
+          if (!translations) return;
+
+          const koreanText = element.textContent.trim();
+          element.textContent = "";
+
+          const koreanSpan = document.createElement("span");
+          koreanSpan.className = "phrase-ko";
+          koreanSpan.textContent = koreanText;
+          element.appendChild(koreanSpan);
+
+          addTranslationSpans(element, translations, "phrase-gloss");
+          element.dataset.glossReady = "true";
+        });
+      }
+
+      function syncScaffoldLanguage() {
+        const activeLang = window.MultilangToggle?.getLang?.() || document.body.dataset.activeLang || "none";
+        document.querySelectorAll("[data-scaffold]").forEach((element) => {
+          const koreanSpan = element.querySelector(":scope > .scaffold-ko");
+          if (!koreanSpan) return;
+          const hasTranslation = activeLang !== "none" && Boolean(element.querySelector(`:scope > [data-lang="${activeLang}"]`));
+          koreanSpan.hidden = hasTranslation;
+        });
+      }
+
+      function showStage(stageId) {
+        panels.forEach((panel) => {
+          panel.hidden = panel.id !== stageId;
+        });
+
+        buttons.forEach((button) => {
+          const active = button.dataset.stageButton === stageId;
+          button.setAttribute("aria-expanded", String(active));
+        });
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          showStage(button.dataset.stageButton);
+        });
+      });
+
+      nextButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          showStage(button.dataset.nextStage);
+          const target = document.getElementById(button.dataset.nextStage);
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+      });
+
+      const languageObserver = new MutationObserver(syncScaffoldLanguage);
+      languageObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ["data-active-lang"]
+      });
+
+      buildScaffolds();
+      window.MultilangToggle?.refresh?.();
+      syncScaffoldLanguage();
+      showStage("stage-1");
+
+      window.__C12_WRITING_TOPIC_GUIDE__ = {
+        showStage,
+        syncScaffoldLanguage
+      };
+    })();
+  </script>
+</body>
+</html>
