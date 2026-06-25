@@ -13,6 +13,16 @@ import {
   getTrackedActivity
 } from "./game-data.js";
 import { createFirebaseClient } from "./firebase-client.js";
+import {
+  WORLD_AVATARS,
+  WORLD_EMOTES,
+  WORLD_SPAWN,
+  WORLD_STATIONS,
+  WORLD_STEP,
+  createWorldState,
+  getWorldAvatar,
+  getWorldStation
+} from "./world-data.js";
 
 const params = new URLSearchParams(window.location.search);
 const useMock = params.get("mock") === "1";
@@ -27,6 +37,10 @@ const state = {
   nickname: "",
   selectedGame: "randomBox",
   selectedActivity: "keyboard-lesson",
+  selectedWorldStation: "keyboard-plaza",
+  selectedWorldAvatar: WORLD_AVATARS[0].id,
+  lastWorldSyncAt: 0,
+  lastWorldGatherSeq: 0,
   teacherUnlocked: false,
   unsubscribe: null
 };
@@ -144,6 +158,26 @@ function currentActivity(room = state.room) {
 function currentProgress(room = state.room) {
   const runId = room?.meta?.currentActivityRunId;
   return runId ? room?.progress?.[runId] || {} : {};
+}
+
+function currentWorldState(room = state.room) {
+  return room?.world?.state || {};
+}
+
+function worldPlayer(uid = state.client?.uid, room = state.room) {
+  return uid ? room?.world?.players?.[uid] || null : null;
+}
+
+function worldPlayerEntries(room = state.room) {
+  return Object.entries(room?.world?.players || {}).sort(([, a], [, b]) => (a.enteredAt || 0) - (b.enteredAt || 0));
+}
+
+function currentWorldStation(room = state.room) {
+  return getWorldStation(currentWorldState(room).activeStationId);
+}
+
+function worldProgressFor(stationId, room = state.room) {
+  return room?.world?.progress?.[stationId] || {};
 }
 
 function buildJoinUrl(roomCode) {
@@ -282,6 +316,9 @@ function enterRoom(roomCode, role) {
   if (state.unsubscribe) state.unsubscribe();
   state.roomCode = roomCode;
   state.role = role;
+  state.selectedWorldStation = "keyboard-plaza";
+  state.lastWorldSyncAt = 0;
+  state.lastWorldGatherSeq = 0;
   showRoom();
   state.unsubscribe = state.client.subscribeRoom(roomCode, (room) => {
     if (!room) {
@@ -329,10 +366,15 @@ function renderHostControls(stage, round) {
   const activityOptions = TRACKED_ACTIVITIES
     .map((activity) => `<option value="${activity.id}" ${state.selectedActivity === activity.id ? "selected" : ""}>${activity.label}</option>`)
     .join("");
+  const worldState = currentWorldState();
+  const stationOptions = WORLD_STATIONS
+    .map((station) => `<option value="${station.id}" ${state.selectedWorldStation === station.id ? "selected" : ""}>${station.label} · ${station.goal}</option>`)
+    .join("");
 
   let body = "";
   if (stage === "lobby") {
     body = `
+      <button class="primary-button" type="button" data-action="start-world" data-testid="start-world">키보드 캠퍼스 월드 열기</button>
       <label>
         <span>게임 선택</span>
         <select id="gameTypeSelect" data-testid="game-select">${gameOptions}</select>
@@ -343,6 +385,17 @@ function renderHostControls(stage, round) {
         <select id="activitySelect" data-testid="activity-select">${activityOptions}</select>
       </label>
       <button class="secondary-button" type="button" data-action="start-activity" data-testid="start-activity">선택 활동 띄우기</button>
+    `;
+  } else if (stage === "world") {
+    body = `
+      <label>
+        <span>열 스테이션</span>
+        <select id="worldStationSelect" data-testid="world-station-select">${stationOptions}</select>
+      </label>
+      <button class="primary-button" type="button" data-action="open-world-station" data-testid="open-world-station">스테이션 열기</button>
+      <button class="secondary-button" type="button" data-action="gather-world" data-testid="gather-world">모두 모으기</button>
+      <button class="secondary-button" type="button" data-action="toggle-world-lock" data-testid="world-lock-toggle">${worldState.movementLocked ? "이동 잠금 해제" : "이동 잠금"}</button>
+      <button class="secondary-button" type="button" data-action="next-lobby" data-testid="close-world">활동 종료 · 대기실</button>
     `;
   } else if (stage === "activity") {
     const activity = currentActivity();
@@ -622,6 +675,293 @@ function renderActivityPanel(activity, runId) {
   `;
 }
 
+function clampWorldPosition(value) {
+  return Math.max(4, Math.min(96, Math.round(Number(value) || 0)));
+}
+
+function renderWorldMap({ interactive = false } = {}) {
+  const worldState = currentWorldState();
+  const activeStationId = worldState.activeStationId || WORLD_STATIONS[0].id;
+  const portals = WORLD_STATIONS.map((station) => {
+    const isOpen = station.id === activeStationId;
+    const actionAttrs = interactive && isOpen ? `data-action="enter-world-station"` : "";
+    return `
+      <button
+        class="world-portal ${isOpen ? "is-open" : ""}"
+        type="button"
+        style="--x: ${station.x}; --y: ${station.y};"
+        data-station-id="${escapeHtml(station.id)}"
+        data-testid="world-portal-${escapeHtml(station.id)}"
+        ${actionAttrs}
+        ${interactive && isOpen ? "" : "disabled"}
+      >
+        <span>${escapeHtml(station.shortLabel)}</span>
+        <b>${escapeHtml(station.goal)}</b>
+      </button>
+    `;
+  }).join("");
+
+  const avatars = worldPlayerEntries()
+    .map(([uid, player]) => {
+      const avatar = getWorldAvatar(player.avatarId);
+      const x = clampWorldPosition(player.x || WORLD_SPAWN.x);
+      const y = clampWorldPosition(player.y || WORLD_SPAWN.y);
+      const bubble = player.help ? "도움 요청" : player.emote || "";
+      return `
+        <div
+          class="world-avatar ${player.help ? "needs-help" : ""}"
+          style="--x: ${x}; --y: ${y}; --avatar-color: ${avatar.color}; --avatar-soft: ${avatar.soft};"
+          data-world-nickname="${escapeHtml(player.nickname || "참가자")}"
+          data-testid="world-player"
+        >
+          ${bubble ? `<span class="world-bubble">${escapeHtml(bubble)}</span>` : ""}
+          <span class="world-face">${escapeHtml(avatar.initial)}</span>
+          <strong>${escapeHtml(player.nickname || "참가자")}</strong>
+        </div>
+      `;
+    })
+    .join("");
+
+  return `
+    <div class="world-map" data-testid="world-map">
+      <div class="world-lane world-lane--horizontal"></div>
+      <div class="world-lane world-lane--vertical"></div>
+      <div class="world-map-label">Keyboard Campus</div>
+      ${portals}
+      ${avatars}
+    </div>
+  `;
+}
+
+function renderAvatarPicker() {
+  const buttons = WORLD_AVATARS.map((avatar) => `
+    <button
+      class="avatar-choice ${state.selectedWorldAvatar === avatar.id ? "is-selected" : ""}"
+      type="button"
+      data-action="select-world-avatar"
+      data-avatar-id="${escapeHtml(avatar.id)}"
+      style="--avatar-color: ${avatar.color}; --avatar-soft: ${avatar.soft};"
+    >
+      <span>${escapeHtml(avatar.initial)}</span>
+      <b>${escapeHtml(avatar.label)}</b>
+    </button>
+  `).join("");
+
+  return `
+    <section class="world-card world-avatar-picker" data-testid="world-avatar-picker">
+      <span class="category-badge">아바타 선택</span>
+      <h2>키보드 캠퍼스에 들어가기</h2>
+      <p class="field-note">마음에 드는 색을 고르고 월드에 입장하세요.</p>
+      <div class="avatar-choice-grid">${buttons}</div>
+      <button class="primary-button" type="button" data-action="enter-world-avatar" data-testid="world-avatar-enter">월드 입장</button>
+    </section>
+  `;
+}
+
+function renderWorldTask(station, progress) {
+  const isCompleted = progress.status === "completed";
+  const statusText = isCompleted ? "완료" : progress.status === "working" ? "진행 중" : "대기";
+  const keyboardPractice = getTrackedActivity("keyboard-practice");
+
+  let body = "";
+  if (station.type === "typing") {
+    body = `
+      <form class="world-task-form" id="worldTypingForm">
+        <label>
+          <span>입력 미션</span>
+          <input id="worldTypingAnswer" autocomplete="off" placeholder="${escapeHtml(station.answer)}" ${isCompleted ? "disabled" : ""}>
+        </label>
+        <button class="primary-button" type="submit" data-testid="world-typing-submit" ${isCompleted ? "disabled" : ""}>확인</button>
+      </form>
+      ${keyboardPractice ? `<a class="secondary-button" href="${escapeHtml(keyboardPractice.path)}" target="_blank" rel="noopener">자판 연습 새 탭</a>` : ""}
+    `;
+  } else if (station.type === "hotkey") {
+    body = `
+      <div class="world-hotkey-pad" tabindex="0" data-testid="world-hotkey-pad">
+        <span>${escapeHtml(station.taskText)}</span>
+        <strong>${escapeHtml(station.hotkey)}</strong>
+      </div>
+      <p class="field-note">이 화면에서 ${escapeHtml(station.hotkey)}를 누르면 완료됩니다.</p>
+    `;
+  } else {
+    body = `
+      <p class="field-note">${escapeHtml(station.taskText)}</p>
+      <button class="secondary-button" type="button" data-action="complete-world-social" data-testid="world-social-complete" ${isCompleted ? "disabled" : ""}>참여 체크</button>
+    `;
+  }
+
+  return `
+    <section class="world-card world-task-card" data-testid="world-active-station">
+      <div class="world-card-head">
+        <div>
+          <span class="category-badge">${escapeHtml(station.goal)}</span>
+          <h2>${escapeHtml(station.label)}</h2>
+        </div>
+        <span class="progress-status progress-status--${escapeHtml(progress.status || "waiting")}">${statusText}</span>
+      </div>
+      <p>${escapeHtml(station.prompt)}</p>
+      ${body}
+    </section>
+  `;
+}
+
+function renderWorldStudentTools(player) {
+  const emotes = WORLD_EMOTES.map((emote) => `
+    <button class="secondary-button" type="button" data-action="world-emote" data-emote="${escapeHtml(emote.label)}" data-testid="world-emote-${escapeHtml(emote.id)}">${escapeHtml(emote.label)}</button>
+  `).join("");
+
+  return `
+    <section class="world-card world-tools">
+      <div>
+        <span class="category-badge">상호작용</span>
+        <h2>안전 반응 보내기</h2>
+      </div>
+      <div class="world-action-row">
+        ${emotes}
+        <button class="danger-button" type="button" data-action="toggle-world-help" data-testid="world-help">${player.help ? "도움 해결" : "도움 요청"}</button>
+      </div>
+      <div class="world-move-pad" aria-label="이동 패드">
+        <button class="secondary-button" type="button" data-action="move-world" data-dir="up" data-testid="world-move-up">위</button>
+        <button class="secondary-button" type="button" data-action="move-world" data-dir="left" data-testid="world-move-left">왼쪽</button>
+        <button class="secondary-button" type="button" data-action="move-world" data-dir="down" data-testid="world-move-down">아래</button>
+        <button class="secondary-button" type="button" data-action="move-world" data-dir="right" data-testid="world-move-right">오른쪽</button>
+      </div>
+    </section>
+  `;
+}
+
+function renderWorldHostMonitor() {
+  const activeStation = currentWorldStation();
+  const activeProgress = worldProgressFor(activeStation.id);
+  const students = playerEntries().filter(([, player]) => player.role !== "host");
+  const rows = students.length
+    ? students.map(([uid, player]) => {
+      const world = worldPlayer(uid);
+      const progress = activeProgress[uid] || {};
+      const total = Number(progress.total || 0);
+      const completed = Number(progress.completed || 0);
+      const percent = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
+      return `
+        <tr>
+          <td><strong>${escapeHtml(player.nickname)}</strong></td>
+          <td>${world ? escapeHtml(world.status || "월드 입장") : "아바타 대기"}</td>
+          <td>${world?.help ? `<span class="progress-status progress-status--working">도움 요청</span>` : "-"}</td>
+          <td>${escapeHtml(progress.detail || "-")}</td>
+          <td>${total > 0 ? `${completed} / ${total}` : "-"}</td>
+          <td><div class="mini-meter"><span style="width: ${percent}%"></span></div></td>
+          <td>${formatAgo(world?.updatedAt || progress.updatedAt)}</td>
+        </tr>
+      `;
+    }).join("")
+    : `<tr><td colspan="7">학생이 월드에 들어오면 위치와 진행 상태가 표시됩니다.</td></tr>`;
+
+  return `
+    <section class="world-card world-monitor" data-testid="world-progress-monitor">
+      <div class="world-card-head">
+        <div>
+          <span class="category-badge">교사용 관찰</span>
+          <h2>${escapeHtml(activeStation.label)} 진행 현황</h2>
+        </div>
+      </div>
+      <div class="progress-table-wrap">
+        <table class="progress-table">
+          <thead>
+            <tr>
+              <th>학생</th>
+              <th>월드 상태</th>
+              <th>도움</th>
+              <th>현재 미션</th>
+              <th>진도</th>
+              <th>막대</th>
+              <th>업데이트</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
+function applyWorldCommands() {
+  if (state.role !== "student") return;
+  const player = worldPlayer();
+  const worldState = currentWorldState();
+  const gatherSeq = Number(worldState.gatherSeq || 0);
+  if (!player || !gatherSeq || gatherSeq <= state.lastWorldGatherSeq) return;
+
+  state.lastWorldGatherSeq = gatherSeq;
+  updateWorldPlayer({
+    x: clampWorldPosition(worldState.gatherAt?.x || WORLD_SPAWN.x),
+    y: clampWorldPosition(worldState.gatherAt?.y || WORLD_SPAWN.y),
+    direction: "down",
+    status: "집합 위치로 이동"
+  }).catch((error) => setStartStatus(error.message));
+}
+
+function renderWorldPanel() {
+  applyWorldCommands();
+  const worldState = currentWorldState();
+  const station = currentWorldStation();
+  const message = worldState.teacherMessage || "교사가 스테이션을 열면 포털이 활성화됩니다.";
+  const map = renderWorldMap({ interactive: state.role === "student" && Boolean(worldPlayer()) });
+
+  if (state.role === "host") {
+    els.promptPanel.innerHTML = `
+      <section class="world-shell" data-testid="world-host">
+        <div class="activity-monitor__head">
+          <div>
+            <span class="category-badge">키보드 캠퍼스</span>
+            <h2>${escapeHtml(station.label)}</h2>
+            <p>${escapeHtml(message)}</p>
+          </div>
+          <span class="stage-chip">${worldState.movementLocked ? "이동 잠금" : "이동 가능"}</span>
+        </div>
+        ${map}
+        ${renderWorldHostMonitor()}
+      </section>
+    `;
+    return;
+  }
+
+  const player = worldPlayer();
+  if (!player) {
+    els.promptPanel.innerHTML = `
+      <section class="world-shell" data-testid="world-student">
+        <div class="activity-monitor__head">
+          <div>
+            <span class="category-badge">키보드 캠퍼스</span>
+            <h2>${escapeHtml(station.label)}</h2>
+            <p>${escapeHtml(message)}</p>
+          </div>
+        </div>
+        ${map}
+        ${renderAvatarPicker()}
+      </section>
+    `;
+    return;
+  }
+
+  const progress = worldProgressFor(station.id)[state.client.uid] || {};
+  els.promptPanel.innerHTML = `
+    <section class="world-shell" data-testid="world-student">
+      <div class="activity-monitor__head">
+        <div>
+          <span class="category-badge">지금 열린 포털</span>
+          <h2>${escapeHtml(station.label)}</h2>
+          <p>${escapeHtml(message)}</p>
+        </div>
+        <span class="stage-chip">${worldState.movementLocked ? "이동 잠금" : "이동 가능"}</span>
+      </div>
+      ${map}
+      <div class="world-student-grid">
+        ${renderWorldTask(station, progress)}
+        ${renderWorldStudentTools(player)}
+      </div>
+    </section>
+  `;
+}
+
 function renderRoom() {
   const room = state.room;
   if (!room?.meta) return;
@@ -634,18 +974,28 @@ function renderRoom() {
   els.roomTitle.textContent = state.role === "host" ? "교사용 진행 화면" : "학생 참가 화면";
   els.roomSubtitle.textContent = stage === "lobby"
     ? "참가자를 기다리는 중입니다."
+    : stage === "world"
+      ? `${currentWorldStation(room).label} 포털이 열려 있습니다.`
     : stage === "activity"
       ? `${activity?.label || "개인 활동"} 진행 중입니다.`
       : `${getGameLabel(round?.gameType)} 진행 중입니다.`;
   els.roomCodeDisplay.textContent = state.roomCode;
   els.joinLink.href = joinUrl;
   els.joinLink.textContent = "입장 링크";
-  els.roundKicker.textContent = stage === "activity" ? "Tracked Activity" : round ? getGameLabel(round.gameType) : "Lobby";
+  els.roundKicker.textContent = stage === "world" ? "Keyboard Campus" : stage === "activity" ? "Tracked Activity" : round ? getGameLabel(round.gameType) : "Lobby";
   els.stageTitle.textContent = STAGES[stage] || STAGES.lobby;
   els.stageChip.textContent = stage;
 
   renderPlayers();
   renderHostControls(stage, round);
+  if (stage === "world") {
+    delete els.promptPanel.dataset.activityRunId;
+    renderWorldPanel();
+    els.submitPanel.innerHTML = "";
+    els.submissionsPanel.innerHTML = "";
+    els.resultsPanel.innerHTML = "";
+    return;
+  }
   if (stage === "activity") {
     renderActivityPanel(activity, room.meta.currentActivityRunId);
     els.submitPanel.innerHTML = "";
@@ -696,6 +1046,164 @@ async function startActivity() {
     "meta/currentActivityRunId": runId,
     "meta/currentRoundId": "",
     "meta/phaseStartedAt": now()
+  });
+}
+
+async function startWorld() {
+  if (state.role !== "host") return;
+  const existingWorldState = currentWorldState();
+  const nextWorldState = createWorldState(existingWorldState);
+  state.selectedWorldStation = nextWorldState.activeStationId;
+  await state.client.updateRoom(state.roomCode, {
+    "meta/status": "world",
+    "meta/currentRoundId": "",
+    "meta/currentActivityId": "",
+    "meta/currentActivityRunId": "",
+    "meta/phaseStartedAt": now(),
+    "world/state": nextWorldState
+  });
+}
+
+async function openWorldStation() {
+  if (state.role !== "host") return;
+  const station = getWorldStation(state.selectedWorldStation);
+  const worldState = currentWorldState();
+  await state.client.updateRoom(state.roomCode, {
+    "world/state/activeStationId": station.id,
+    "world/state/stationSeq": Number(worldState.stationSeq || 0) + 1,
+    "world/state/teacherMessage": `${station.label} 포털이 열렸습니다.`,
+    "world/state/updatedAt": now()
+  });
+}
+
+async function gatherWorldPlayers() {
+  if (state.role !== "host") return;
+  const worldState = currentWorldState();
+  await state.client.updateRoom(state.roomCode, {
+    "world/state/gatherSeq": Number(worldState.gatherSeq || 0) + 1,
+    "world/state/gatherAt": { ...WORLD_SPAWN },
+    "world/state/teacherMessage": "선생님이 모두를 자판 광장 앞으로 모았습니다.",
+    "world/state/updatedAt": now()
+  });
+}
+
+async function toggleWorldLock() {
+  if (state.role !== "host") return;
+  const worldState = currentWorldState();
+  const movementLocked = !worldState.movementLocked;
+  await state.client.updateRoom(state.roomCode, {
+    "world/state/movementLocked": movementLocked,
+    "world/state/teacherMessage": movementLocked ? "잠시 이동을 멈추고 선생님 화면을 봅니다." : "다시 이동할 수 있습니다.",
+    "world/state/updatedAt": now()
+  });
+}
+
+async function updateWorldPlayer(updates) {
+  const existing = worldPlayer() || {};
+  const avatar = getWorldAvatar(updates.avatarId || existing.avatarId || state.selectedWorldAvatar);
+  await state.client.setWorldPlayer(state.roomCode, {
+    uid: state.client.uid,
+    nickname: state.nickname || "참가자",
+    avatarId: avatar.id,
+    x: clampWorldPosition(updates.x ?? existing.x ?? WORLD_SPAWN.x),
+    y: clampWorldPosition(updates.y ?? existing.y ?? WORLD_SPAWN.y),
+    direction: updates.direction || existing.direction || "down",
+    status: String(updates.status || existing.status || "월드 입장").slice(0, 40),
+    emote: String(updates.emote ?? existing.emote ?? "").slice(0, 20),
+    help: Boolean(updates.help ?? existing.help ?? false),
+    enteredAt: existing.enteredAt || now(),
+    updatedAt: now()
+  });
+}
+
+async function enterWorldAvatar() {
+  if (state.role !== "student") return;
+  await updateWorldPlayer({
+    avatarId: state.selectedWorldAvatar,
+    x: WORLD_SPAWN.x + Math.floor(Math.random() * 5) - 2,
+    y: WORLD_SPAWN.y + Math.floor(Math.random() * 5) - 2,
+    direction: "down",
+    status: "월드 입장",
+    emote: "",
+    help: false
+  });
+}
+
+async function setWorldProgress(station, status, detail, completed = 0) {
+  await state.client.setWorldProgress(state.roomCode, station.id, {
+    uid: state.client.uid,
+    nickname: state.nickname || "참가자",
+    stationId: station.id,
+    stationLabel: station.label,
+    status,
+    detail: String(detail || "").slice(0, 80),
+    completed,
+    total: 1,
+    updatedAt: now()
+  });
+}
+
+async function enterWorldStation(stationId) {
+  if (state.role !== "student") return;
+  const station = getWorldStation(stationId);
+  const worldState = currentWorldState();
+  if (worldState.activeStationId !== station.id || !worldPlayer()) return;
+  await Promise.all([
+    setWorldProgress(station, "working", `${station.shortLabel} 미션 확인`, 0),
+    updateWorldPlayer({ status: `${station.shortLabel} 미션 중`, help: false })
+  ]);
+}
+
+async function completeWorldStation(station, detail = station.successDetail) {
+  if (state.role !== "student" || !worldPlayer()) return;
+  await Promise.all([
+    setWorldProgress(station, "completed", detail, 1),
+    updateWorldPlayer({ status: `${station.shortLabel} 완료`, emote: "완료", help: false })
+  ]);
+}
+
+async function moveWorldPlayer(direction) {
+  const player = worldPlayer();
+  const worldState = currentWorldState();
+  if (state.role !== "student" || !player || worldState.movementLocked) return;
+  const timestamp = now();
+  if (timestamp - state.lastWorldSyncAt < 120) return;
+  state.lastWorldSyncAt = timestamp;
+
+  const next = {
+    x: player.x || WORLD_SPAWN.x,
+    y: player.y || WORLD_SPAWN.y
+  };
+  if (direction === "left") next.x -= WORLD_STEP;
+  if (direction === "right") next.x += WORLD_STEP;
+  if (direction === "up") next.y -= WORLD_STEP;
+  if (direction === "down") next.y += WORLD_STEP;
+
+  await updateWorldPlayer({
+    x: next.x,
+    y: next.y,
+    direction,
+    status: "이동 중"
+  });
+}
+
+async function toggleWorldHelp() {
+  const player = worldPlayer();
+  if (state.role !== "student" || !player) return;
+  const help = !player.help;
+  await updateWorldPlayer({
+    help,
+    status: help ? "도움 요청" : "도움 해결",
+    emote: help ? "" : player.emote
+  });
+}
+
+async function sendWorldEmote(label) {
+  if (state.role !== "student" || !worldPlayer()) return;
+  await updateWorldPlayer({
+    emote: label,
+    help: false,
+    status: `${label} 보내기`
   });
 }
 
@@ -766,6 +1274,21 @@ async function submitAnswer(event) {
   setFieldNote("제출 완료. 투표 전까지 다시 제출할 수 있습니다.", "good");
 }
 
+async function submitWorldTyping(event) {
+  event.preventDefault();
+  const station = currentWorldStation();
+  const input = document.getElementById("worldTypingAnswer");
+  if (!input || station.type !== "typing") return;
+  const value = String(input.value || "").trim();
+  if (value !== station.answer) {
+    setStartStatus(`'${station.answer}'를 정확히 입력해 보세요.`);
+    input.select();
+    return;
+  }
+  setStartStatus("");
+  await completeWorldStation(station, station.successDetail);
+}
+
 async function reportActivityProgress(payload) {
   const room = state.room;
   if (!room?.meta || state.role !== "student" || room.meta.status !== "activity") return;
@@ -797,6 +1320,20 @@ async function removeRoom() {
 async function handleAction(button) {
   const action = button.dataset.action;
   try {
+    if (action === "start-world") await startWorld();
+    if (action === "open-world-station") await openWorldStation();
+    if (action === "gather-world") await gatherWorldPlayers();
+    if (action === "toggle-world-lock") await toggleWorldLock();
+    if (action === "select-world-avatar") {
+      state.selectedWorldAvatar = button.dataset.avatarId || WORLD_AVATARS[0].id;
+      renderWorldPanel();
+    }
+    if (action === "enter-world-avatar") await enterWorldAvatar();
+    if (action === "enter-world-station") await enterWorldStation(button.dataset.stationId);
+    if (action === "move-world") await moveWorldPlayer(button.dataset.dir);
+    if (action === "toggle-world-help") await toggleWorldHelp();
+    if (action === "world-emote") await sendWorldEmote(button.dataset.emote || "");
+    if (action === "complete-world-social") await completeWorldStation(currentWorldStation());
     if (action === "start-round") await startRound();
     if (action === "start-activity") await startActivity();
     if (action === "open-submit") await setStage("submit");
@@ -811,6 +1348,35 @@ async function handleAction(button) {
   } catch (error) {
     setStartStatus(error.message);
   }
+}
+
+function handleWorldKeydown(event) {
+  if (state.role !== "student" || state.room?.meta?.status !== "world") return;
+  const key = String(event.key || "").toLowerCase();
+  const directionByKey = {
+    arrowleft: "left",
+    a: "left",
+    arrowright: "right",
+    d: "right",
+    arrowup: "up",
+    w: "up",
+    arrowdown: "down",
+    s: "down"
+  };
+
+  if (!event.ctrlKey && directionByKey[key]) {
+    const tagName = event.target?.tagName;
+    if (["INPUT", "TEXTAREA", "SELECT"].includes(tagName)) return;
+    event.preventDefault();
+    moveWorldPlayer(directionByKey[key]).catch((error) => setStartStatus(error.message));
+    return;
+  }
+
+  if (!event.ctrlKey || !worldPlayer()) return;
+  const station = currentWorldStation();
+  if (station.type !== "hotkey" || key !== station.key) return;
+  event.preventDefault();
+  completeWorldStation(station, station.successDetail).catch((error) => setStartStatus(error.message));
 }
 
 function bindEvents() {
@@ -856,6 +1422,7 @@ function bindEvents() {
 
   document.addEventListener("submit", (event) => {
     if (event.target.id === "answerForm") submitAnswer(event);
+    if (event.target.id === "worldTypingForm") submitWorldTyping(event);
   });
 
   document.addEventListener("change", (event) => {
@@ -865,7 +1432,12 @@ function bindEvents() {
     if (event.target.id === "activitySelect") {
       state.selectedActivity = event.target.value;
     }
+    if (event.target.id === "worldStationSelect") {
+      state.selectedWorldStation = event.target.value;
+    }
   });
+
+  document.addEventListener("keydown", handleWorldKeydown);
 
   window.addEventListener("message", (event) => {
     if (!event.data || event.data.type !== "typing-party-progress") return;

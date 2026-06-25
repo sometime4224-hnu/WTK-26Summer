@@ -110,6 +110,25 @@ export async function createMockClient({ reset = false } = {}) {
       });
     },
 
+    async setWorldPlayer(roomCode, playerState) {
+      mutate((rooms) => {
+        if (!rooms[roomCode]) rooms[roomCode] = {};
+        if (!rooms[roomCode].world) rooms[roomCode].world = {};
+        if (!rooms[roomCode].world.players) rooms[roomCode].world.players = {};
+        rooms[roomCode].world.players[uid] = playerState;
+      });
+    },
+
+    async setWorldProgress(roomCode, stationId, progress) {
+      mutate((rooms) => {
+        if (!rooms[roomCode]) rooms[roomCode] = {};
+        if (!rooms[roomCode].world) rooms[roomCode].world = {};
+        if (!rooms[roomCode].world.progress) rooms[roomCode].world.progress = {};
+        if (!rooms[roomCode].world.progress[stationId]) rooms[roomCode].world.progress[stationId] = {};
+        rooms[roomCode].world.progress[stationId][uid] = progress;
+      });
+    },
+
     async removeRoom(roomCode) {
       mutate((rooms) => {
         delete rooms[roomCode];

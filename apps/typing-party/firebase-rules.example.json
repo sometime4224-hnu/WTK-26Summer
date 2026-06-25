@@ -40,6 +40,23 @@
                 ".write": "auth != null && auth.uid === $uid"
               }
             }
+          },
+          "world": {
+            "state": {
+              ".write": "auth != null && data.parent().parent().child('meta/hostUid').val() === auth.uid"
+            },
+            "players": {
+              "$uid": {
+                ".write": "auth != null && auth.uid === $uid"
+              }
+            },
+            "progress": {
+              "$stationId": {
+                "$uid": {
+                  ".write": "auth != null && auth.uid === $uid"
+                }
+              }
+            }
           }
         }
       }

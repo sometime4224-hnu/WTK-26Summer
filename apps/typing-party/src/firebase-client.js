@@ -71,6 +71,14 @@ export async function createFirebaseClient() {
       await set(ref(database, `${roomPath(roomCode)}/progress/${runId}/${uid}`), progress);
     },
 
+    async setWorldPlayer(roomCode, playerState) {
+      await set(ref(database, `${roomPath(roomCode)}/world/players/${uid}`), playerState);
+    },
+
+    async setWorldProgress(roomCode, stationId, progress) {
+      await set(ref(database, `${roomPath(roomCode)}/world/progress/${stationId}/${uid}`), progress);
+    },
+
     async removeRoom(roomCode) {
       await remove(ref(database, roomPath(roomCode)));
     },

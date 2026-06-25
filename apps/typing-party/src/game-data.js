@@ -5,6 +5,7 @@ export const ROUND_SECONDS = 90;
 
 export const STAGES = {
   lobby: "대기실",
+  world: "키보드 캠퍼스",
   activity: "개인 활동",
   prompt: "미션 공개",
   submit: "입력 중",

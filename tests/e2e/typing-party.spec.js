@@ -136,11 +136,53 @@ test.describe("typing party multiplayer MVP", () => {
     await context.close();
   });
 
+  test("opens the keyboard campus world with movement, stations, and safe reactions", async ({ browser }) => {
+    const context = await browser.newContext();
+    const host = await context.newPage();
+    const roomCode = await createHostRoom(host);
+    const student = await joinStudent(context, roomCode, "지우");
+
+    await host.locator('[data-testid="start-world"]').click();
+    await expect(host.locator('[data-testid="stage-title"]')).toHaveText("키보드 캠퍼스");
+    await expect(student.locator('[data-testid="world-avatar-picker"]')).toBeVisible();
+
+    await student.locator('[data-action="select-world-avatar"][data-avatar-id="mint"]').click();
+    await student.locator('[data-testid="world-avatar-enter"]').click();
+    const hostAvatar = host.locator('[data-world-nickname="지우"]');
+    await expect(hostAvatar).toBeVisible();
+
+    const beforeMove = await hostAvatar.evaluate((node) => getComputedStyle(node).getPropertyValue("--x").trim());
+    await student.keyboard.press("ArrowRight");
+    await expect.poll(async () => hostAvatar.evaluate((node) => getComputedStyle(node).getPropertyValue("--x").trim())).not.toBe(beforeMove);
+
+    await host.locator('[data-testid="world-station-select"]').selectOption("copy-lab");
+    await host.locator('[data-testid="open-world-station"]').click();
+    await expect(student.locator('[data-testid="world-active-station"]')).toContainText("복사 연구소");
+    await student.locator('[data-testid="world-portal-copy-lab"]').click();
+    await student.keyboard.press("Control+C");
+    await expect(host.locator('[data-testid="world-progress-monitor"]')).toContainText("Ctrl+C 복사 완료");
+    await expect(host.locator('[data-testid="world-progress-monitor"]')).toContainText("완료");
+
+    await student.locator('[data-testid="world-emote-cheer"]').click();
+    await expect(hostAvatar).toContainText("응원");
+    await student.locator('[data-testid="world-help"]').click();
+    await expect(host.locator('[data-testid="world-progress-monitor"]')).toContainText("도움 요청");
+
+    await host.locator('[data-testid="world-lock-toggle"]').click();
+    await expect(student.locator('[data-testid="world-student"] .stage-chip')).toContainText("이동 잠금");
+    const lockedX = await hostAvatar.evaluate((node) => getComputedStyle(node).getPropertyValue("--x").trim());
+    await student.keyboard.press("ArrowRight");
+    await student.waitForTimeout(180);
+    await expect.poll(async () => hostAvatar.evaluate((node) => getComputedStyle(node).getPropertyValue("--x").trim())).toBe(lockedX);
+    await context.close();
+  });
+
   test("fits on a phone viewport without horizontal overflow", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/apps/typing-party/index.html?mock=1&reset=1");
+    await createHostRoom(page);
 
-    await expect(page.locator('[data-testid="teacher-pin-input"]')).toBeVisible();
+    await page.locator('[data-testid="start-world"]').click();
+    await expect(page.locator('[data-testid="world-map"]')).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(2);
   });
