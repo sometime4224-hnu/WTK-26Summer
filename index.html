@@ -330,6 +330,45 @@
             font-weight: 800;
         }
 
+        .hub-card__stack {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .hub-card__action {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 48px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(251, 146, 60, 0.22);
+            background: rgba(255, 255, 255, 0.72);
+            color: inherit;
+            text-decoration: none;
+            font-weight: 900;
+        }
+
+        .hub-card__action:hover {
+            border-color: rgba(251, 146, 60, 0.42);
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        .hub-card__action.is-disabled {
+            filter: grayscale(1);
+            opacity: 0.56;
+            cursor: not-allowed;
+        }
+
+        .hub-card__action-note {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
         @media (max-width: 760px) {
             .shell {
                 width: min(100% - 20px, 1160px);
@@ -435,11 +474,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
             <div class="hub-grid">
-                <a href="review/index.html" data-hub="review" class="hub-card hub-card--review">
+                <article class="hub-card hub-card--review" aria-labelledby="reviewHubCardTitle">
                     <span class="hub-card__pill"><i class="fa-solid fa-list-check"></i> 복습 퀴즈</span>
-                    <h3>복습 퀴즈 허브</h3>
-                    <span class="hub-card__foot">퀴즈 고르러 가기 <i class="fa-solid fa-arrow-right"></i></span>
-                </a>
+                    <h3 id="reviewHubCardTitle">복습 퀴즈 허브</h3>
+                    <div class="hub-card__stack" aria-label="복습 퀴즈 허브 선택">
+                        <span class="hub-card__action is-disabled" aria-disabled="true" title="수업 진도에 따라 열립니다.">
+                            <span>복습 퀴즈 허브</span>
+                            <span class="hub-card__action-note">준비 중</span>
+                        </span>
+                        <a href="exam/midterm-vocab-grammar-practice-3b-2026-summer/index.html" class="hub-card__action">
+                            <span>어휘 문법 연습 시험</span>
+                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                        <a href="exam/midterm-speaking-prep-3b-2026-summer.html" class="hub-card__action">
+                            <span>중간 말하기 준비</span>
+                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </article>
                 <a href="apps/index.html" data-hub="programs" class="hub-card hub-card--programs">
                     <span class="hub-card__pill"><i class="fa-solid fa-cubes"></i> 공용 프로그램</span>
                     <h3>프로그램 허브</h3>
