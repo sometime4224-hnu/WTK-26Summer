@@ -150,23 +150,23 @@ test.describe("typing party multiplayer MVP", () => {
     await student.waitForLoadState("domcontentloaded");
     await expect(student).toHaveURL(/activity\.html/);
     await expect(student.locator('[data-testid="activity-runner-frame"]')).toBeVisible();
-    await expect(student.frameLocator('[data-testid="activity-runner-frame"]').locator("#missionTitle")).toContainText("초급 쓰기");
+    await expect(student.frameLocator('[data-testid="activity-runner-frame"]').locator("#missionTitle")).toContainText("첫 만남 짧은 어휘");
     await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("하준");
 
     await student.evaluate(() => {
       window.postMessage({
         type: "typing-party-progress",
         status: "working",
-        stageTitle: "초급 쓰기",
-        detail: "문장 작성 중",
+        stageTitle: "첫 만남 짧은 어휘",
+        detail: "단어 소나기 진행 중",
         completed: 2,
-        total: 5
+        total: 12
       }, "*");
     });
 
     await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("작성 중");
-    await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("초급 쓰기");
-    await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("2 / 5");
+    await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("첫 만남 짧은 어휘");
+    await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("2 / 12");
 
     await host.locator('[data-testid="close-activity"]').click();
     await expect(student).toHaveURL(/index\.html/);

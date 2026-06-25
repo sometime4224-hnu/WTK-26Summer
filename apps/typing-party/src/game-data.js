@@ -88,9 +88,9 @@ export const TRACKED_ACTIVITIES = [
   },
   {
     id: "c12-writing-shower",
-    label: "12과 쓰기 소나기",
+    label: "12과 단어 소나기",
     path: "activities/c12/writing-shower.html",
-    summary: "초급, 중급, 고급 빗방울 질문 답변"
+    summary: "10~12과 어휘와 표현을 치는 낙하 타이핑 게임"
   }
 ];
 
