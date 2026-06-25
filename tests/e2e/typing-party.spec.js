@@ -323,6 +323,22 @@ test.describe("typing party multiplayer MVP", () => {
     await context.close();
   });
 
+  test("loads the local demo page with seeded teacher and student previews", async ({ page }) => {
+    await page.goto("/apps/typing-party/demo.html");
+    await expect(page).toHaveTitle("타이핑 파티 데모");
+    await expect(page.locator("#hostFrame")).toBeVisible();
+
+    const host = page.frameLocator("#hostFrame");
+    const student = page.frameLocator("#studentFrameA");
+    await expect(host.locator('[data-testid="stage-title"]')).toHaveText("대기실");
+    await expect(host.locator('[data-testid="player-list"]')).toContainText("지아");
+    await expect(student.locator('[data-testid="stage-title"]')).toHaveText("대기실");
+
+    await host.locator('[data-testid="start-catchmind"]').click();
+    await expect(host.locator('[data-testid="group-game-host"]')).toBeVisible();
+    await expect(student.locator('[data-testid="catchmind-student"]')).toBeVisible();
+  });
+
   test("is linked from both typing hubs", async ({ page }) => {
     await page.goto("/apps/index.html");
     const appHubLink = page.locator('a[href="typing-party/index.html"]');

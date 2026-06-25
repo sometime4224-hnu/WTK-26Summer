@@ -36,6 +36,7 @@ import {
 const params = new URLSearchParams(window.location.search);
 const useMock = params.get("mock") === "1";
 const resetMock = params.get("reset") === "1";
+const mockUid = params.get("uid") || "";
 const TEACHER_PIN = "3b67";
 const ACTIVITY_PROGRESS_CHANNEL = "typingParty.activity.progress.v1";
 
@@ -84,6 +85,7 @@ const els = {
   stageTitle: document.getElementById("stageTitle"),
   stageChip: document.getElementById("stageChip"),
   hostControls: document.getElementById("hostControls"),
+  roomStatus: document.getElementById("roomStatus"),
   promptPanel: document.getElementById("promptPanel"),
   submitPanel: document.getElementById("submitPanel"),
   submissionsPanel: document.getElementById("submissionsPanel"),
@@ -122,6 +124,9 @@ function setConnection(message, kind = "") {
 
 function setStartStatus(message) {
   els.startStatus.textContent = message || "";
+  if (els.roomStatus) {
+    els.roomStatus.textContent = message || "";
+  }
 }
 
 function setEntryDisabled(disabled) {
@@ -2337,7 +2342,7 @@ function bindEvents() {
 async function initClient() {
   if (useMock) {
     const { createMockClient } = await import("./mock-realtime.js");
-    return createMockClient({ reset: resetMock });
+    return createMockClient({ reset: resetMock, uid: mockUid });
   }
   return createFirebaseClient();
 }
@@ -2365,6 +2370,11 @@ async function init() {
   if (room?.meta?.hostUid === state.client.uid) {
     state.nickname = "선생님";
     enterRoom(roomFromUrl, "host");
+    return;
+  }
+  const autoJoinNickname = normalizeNickname(params.get("nickname"));
+  if (useMock && params.get("autojoin") === "1" && room && autoJoinNickname) {
+    await joinRoom(roomFromUrl, autoJoinNickname);
     return;
   }
   if (room) {
