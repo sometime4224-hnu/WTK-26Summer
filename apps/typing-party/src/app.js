@@ -144,7 +144,7 @@ function setTeacherUnlocked(unlocked) {
 
 function ensureClientReady() {
   if (state.client) return true;
-  setStartStatus("Firebase 연결을 준비하는 중입니다. 잠시 후 다시 눌러 주세요.");
+  setStartStatus("서버 연결을 준비하는 중입니다. 잠시 후 다시 눌러 주세요.");
   return false;
 }
 
@@ -2416,7 +2416,7 @@ async function init() {
   try {
     setConnection("연결 중");
     state.client = await initClient();
-    setConnection(useMock ? "Mock" : "Firebase", "ready");
+    setConnection(useMock ? "테스트 모드" : "서버 준비", "ready");
     setEntryDisabled(false);
   } catch (error) {
     setConnection("설정 필요", "error");

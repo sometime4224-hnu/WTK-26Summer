@@ -55,7 +55,7 @@ test.describe("typing party multiplayer MVP", () => {
     await expect(page.locator('[data-testid="create-room"]')).toBeHidden();
     await expect(page.locator('[data-testid="teacher-pin-input"]')).toBeVisible();
     await expect(page.locator('[data-testid="join-room"]')).toBeVisible();
-    await expect(page.locator("#connectionChip")).toHaveText("Mock");
+    await expect(page.locator("#connectionChip")).toHaveText("테스트 모드");
   });
 
   test("unlocks the teacher room creation panel with the classroom PIN", async ({ page }) => {
