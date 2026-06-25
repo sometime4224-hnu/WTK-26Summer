@@ -30,6 +30,10 @@ function setByPath(target, path, value) {
     if (!cursor[part] || typeof cursor[part] !== "object") cursor[part] = {};
     cursor = cursor[part];
   });
+  if (value === null) {
+    delete cursor[parts[parts.length - 1]];
+    return;
+  }
   cursor[parts[parts.length - 1]] = value;
 }
 
@@ -130,6 +134,52 @@ export async function createMockClient({ reset = false, uid: requestedUid = "" }
         if (!rooms[roomCode].world.progress) rooms[roomCode].world.progress = {};
         if (!rooms[roomCode].world.progress[stationId]) rooms[roomCode].world.progress[stationId] = {};
         rooms[roomCode].world.progress[stationId][uid] = progress;
+      });
+    },
+
+    async setDrawingStroke(roomCode, sessionId, groupId, drawingId, strokeId, stroke) {
+      mutate((rooms) => {
+        if (!rooms[roomCode]) rooms[roomCode] = {};
+        setByPath(rooms[roomCode], `drawings/${sessionId}/${groupId}/${drawingId}/strokes/${strokeId}`, stroke);
+      });
+    },
+
+    async removeDrawingStroke(roomCode, sessionId, groupId, drawingId, strokeId) {
+      mutate((rooms) => {
+        if (!rooms[roomCode]) rooms[roomCode] = {};
+        setByPath(rooms[roomCode], `drawings/${sessionId}/${groupId}/${drawingId}/strokes/${strokeId}`, null);
+      });
+    },
+
+    async clearGroupDrawing(roomCode, sessionId, groupId, drawingId) {
+      mutate((rooms) => {
+        if (!rooms[roomCode]) rooms[roomCode] = {};
+        setByPath(rooms[roomCode], `drawings/${sessionId}/${groupId}/${drawingId}`, {
+          clearedAt: Date.now(),
+          clearedBy: uid,
+          strokes: {}
+        });
+      });
+    },
+
+    async setGroupGuess(roomCode, sessionId, groupId, guess) {
+      mutate((rooms) => {
+        if (!rooms[roomCode]) rooms[roomCode] = {};
+        setByPath(rooms[roomCode], `groupGuesses/${sessionId}/${groupId}/${uid}`, guess);
+      });
+    },
+
+    async setGroupProgress(roomCode, sessionId, groupId, progress) {
+      mutate((rooms) => {
+        if (!rooms[roomCode]) rooms[roomCode] = {};
+        setByPath(rooms[roomCode], `groupProgress/${sessionId}/${groupId}/${uid}`, progress);
+      });
+    },
+
+    async setGroupPhoneEntry(roomCode, sessionId, groupId, entry) {
+      mutate((rooms) => {
+        if (!rooms[roomCode]) rooms[roomCode] = {};
+        setByPath(rooms[roomCode], `groupPhone/${sessionId}/${groupId}/${uid}`, entry);
       });
     },
 

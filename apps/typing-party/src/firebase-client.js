@@ -79,6 +79,34 @@ export async function createFirebaseClient() {
       await set(ref(database, `${roomPath(roomCode)}/world/progress/${stationId}/${uid}`), progress);
     },
 
+    async setDrawingStroke(roomCode, sessionId, groupId, drawingId, strokeId, stroke) {
+      await set(ref(database, `${roomPath(roomCode)}/drawings/${sessionId}/${groupId}/${drawingId}/strokes/${strokeId}`), stroke);
+    },
+
+    async removeDrawingStroke(roomCode, sessionId, groupId, drawingId, strokeId) {
+      await remove(ref(database, `${roomPath(roomCode)}/drawings/${sessionId}/${groupId}/${drawingId}/strokes/${strokeId}`));
+    },
+
+    async clearGroupDrawing(roomCode, sessionId, groupId, drawingId) {
+      await set(ref(database, `${roomPath(roomCode)}/drawings/${sessionId}/${groupId}/${drawingId}`), {
+        clearedAt: Date.now(),
+        clearedBy: uid,
+        strokes: {}
+      });
+    },
+
+    async setGroupGuess(roomCode, sessionId, groupId, guess) {
+      await set(ref(database, `${roomPath(roomCode)}/groupGuesses/${sessionId}/${groupId}/${uid}`), guess);
+    },
+
+    async setGroupProgress(roomCode, sessionId, groupId, progress) {
+      await set(ref(database, `${roomPath(roomCode)}/groupProgress/${sessionId}/${groupId}/${uid}`), progress);
+    },
+
+    async setGroupPhoneEntry(roomCode, sessionId, groupId, entry) {
+      await set(ref(database, `${roomPath(roomCode)}/groupPhone/${sessionId}/${groupId}/${uid}`), entry);
+    },
+
     async removeRoom(roomCode) {
       await remove(ref(database, roomPath(roomCode)));
     },

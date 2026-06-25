@@ -12,6 +12,15 @@ import {
   getShortGameLabel,
   getTrackedActivity
 } from "./game-data.js";
+import {
+  CATCHMIND_SECONDS,
+  DRAWING_COLORS,
+  DRAWING_SIZES,
+  GROUP_GAME_MAX_SIZE,
+  getPartyWord,
+  getPartyWordByIndex,
+  isCorrectGuess
+} from "./group-game-data.js";
 import { createFirebaseClient } from "./firebase-client.js";
 import {
   WORLD_AVATARS,
@@ -40,6 +49,11 @@ const state = {
   selectedActivity: "keyboard-lesson",
   selectedWorldStation: "keyboard-plaza",
   selectedWorldAvatar: WORLD_AVATARS[0].id,
+  drawingTool: "pen",
+  drawingColor: DRAWING_COLORS[0],
+  drawingSize: DRAWING_SIZES[0],
+  activeStroke: null,
+  lastDrawingPointerAt: 0,
   lastWorldSyncAt: 0,
   lastWorldGatherSeq: 0,
   activityProgressChannel: null,
@@ -182,6 +196,54 @@ function worldProgressFor(stationId, room = state.room) {
   return room?.world?.progress?.[stationId] || {};
 }
 
+function currentGroupSession(room = state.room) {
+  const sessionId = room?.meta?.currentGroupSessionId;
+  return sessionId ? room?.groupSessions?.[sessionId] || null : null;
+}
+
+function groupEntries(room = state.room) {
+  return Object.entries(room?.groups || {}).sort(([, a], [, b]) => (a.index || 0) - (b.index || 0));
+}
+
+function groupForPlayer(uid = state.client?.uid, room = state.room) {
+  if (!uid) return null;
+  return groupEntries(room).map(([, group]) => group).find((group) => (group.memberUids || []).includes(uid)) || null;
+}
+
+function sessionGroup(groupId, session = currentGroupSession()) {
+  return groupId ? session?.groups?.[groupId] || null : null;
+}
+
+function groupGuessesFor(sessionId, groupId, room = state.room) {
+  return room?.groupGuesses?.[sessionId]?.[groupId] || {};
+}
+
+function groupProgressFor(sessionId, groupId, room = state.room) {
+  return room?.groupProgress?.[sessionId]?.[groupId] || {};
+}
+
+function groupPhoneFor(sessionId, groupId, room = state.room) {
+  return room?.groupPhone?.[sessionId]?.[groupId] || {};
+}
+
+function drawingFor(sessionId, groupId, drawingId, room = state.room) {
+  return room?.drawings?.[sessionId]?.[groupId]?.[drawingId] || { strokes: {} };
+}
+
+function strokesForDrawing(drawing) {
+  return Object.entries(drawing?.strokes || {})
+    .map(([id, stroke]) => ({ id, ...stroke }))
+    .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+}
+
+function correctGuessFor(sessionId, groupId, word, room = state.room) {
+  const guesses = Object.values(groupGuessesFor(sessionId, groupId, room));
+  return guesses
+    .flatMap((guess) => guess.attempts || [])
+    .filter((attempt) => attempt.isCorrect || isCorrectGuess(attempt.text, word))
+    .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))[0] || null;
+}
+
 function buildJoinUrl(roomCode) {
   const url = new URL(window.location.href);
   url.searchParams.set("room", roomCode);
@@ -258,6 +320,9 @@ async function createRoom() {
       gameType: "randomBox",
       currentActivityId: "",
       currentActivityRunId: "",
+      currentGroupSessionId: "",
+      groupGameType: "",
+      groupRoundIndex: 0,
       currentRoundId: "",
       roundIndex: 0,
       limitSeconds: ROUND_SECONDS,
@@ -369,6 +434,7 @@ function renderHostControls(stage, round) {
     .map((activity) => `<option value="${activity.id}" ${state.selectedActivity === activity.id ? "selected" : ""}>${activity.label}</option>`)
     .join("");
   const worldState = currentWorldState();
+  const groupSession = currentGroupSession();
   const stationOptions = WORLD_STATIONS
     .map((station) => `<option value="${station.id}" ${state.selectedWorldStation === station.id ? "selected" : ""}>${station.label} · ${station.goal}</option>`)
     .join("");
@@ -381,7 +447,11 @@ function renderHostControls(stage, round) {
         <span>게임 선택</span>
         <select id="gameTypeSelect" data-testid="game-select">${gameOptions}</select>
       </label>
-      <button class="primary-button" type="button" data-action="start-round" data-testid="start-round">라운드 준비</button>
+      <button class="primary-button" type="button" data-action="start-round" data-testid="start-round">선택 게임 시작</button>
+      <div class="group-quick-actions">
+        <button class="secondary-button" type="button" data-action="start-catchmind" data-testid="start-catchmind">캐치마인드 시작</button>
+        <button class="secondary-button" type="button" data-action="start-gartic-phone" data-testid="start-gartic-phone">갈틱폰 시작</button>
+      </div>
       <label>
         <span>개인 활동 선택</span>
         <select id="activitySelect" data-testid="activity-select">${activityOptions}</select>
@@ -405,6 +475,23 @@ function renderHostControls(stage, round) {
       <p class="field-note">${escapeHtml(activity?.label || "개인 활동")} 진행 상황을 관찰하는 중입니다.</p>
       <button class="primary-button" type="button" data-action="next-lobby" data-testid="close-activity">활동 종료 · 대기실</button>
     `;
+  } else if (stage === "groupGame") {
+    if (groupSession?.type === "typingGarticPhone") {
+      const nextLabel = groupSession.phonePhase === "reveal" ? "새 갈틱폰 시작" : "다음 단계";
+      body = `
+        <p class="field-note">${escapeHtml(getGameLabel(groupSession.type))} 그룹 세션이 진행 중입니다.</p>
+        <button class="primary-button" type="button" data-action="advance-gartic-phone" data-testid="advance-gartic-phone">${nextLabel}</button>
+        <button class="secondary-button" type="button" data-action="start-gartic-phone" data-testid="restart-gartic-phone">그룹 다시 묶기</button>
+        <button class="secondary-button" type="button" data-action="next-lobby" data-testid="close-group-game">대기실로 돌아가기</button>
+      `;
+    } else {
+      body = `
+        <p class="field-note">${escapeHtml(getGameLabel(groupSession?.type || "typingCatchmind"))} 그룹 세션이 진행 중입니다.</p>
+        <button class="primary-button" type="button" data-action="next-catchmind-round" data-testid="next-catchmind-round">다음 캐치마인드 라운드</button>
+        <button class="secondary-button" type="button" data-action="start-catchmind" data-testid="restart-catchmind">그룹 다시 묶기</button>
+        <button class="secondary-button" type="button" data-action="next-lobby" data-testid="close-group-game">대기실로 돌아가기</button>
+      `;
+    }
   } else if (stage === "prompt") {
     body = `
       <p class="field-note">${escapeHtml(getGameLabel(round?.gameType))} 미션이 공개되었습니다.</p>
@@ -976,12 +1063,388 @@ function renderWorldPanel() {
   `;
 }
 
+function groupLabel(index) {
+  return `${String.fromCharCode(65 + index)}팀`;
+}
+
+function studentEntries(room = state.room) {
+  return playerEntries(room).filter(([, player]) => player.role !== "host");
+}
+
+function shuffledEntries(entries) {
+  return entries
+    .map((entry) => ({ entry, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map((item) => item.entry);
+}
+
+function createBalancedGroups(entries, maxSize = GROUP_GAME_MAX_SIZE) {
+  const students = shuffledEntries(entries);
+  const groupCount = Math.max(1, Math.ceil(students.length / maxSize));
+  const groups = Array.from({ length: groupCount }, (_, index) => ({
+    id: `g${index + 1}`,
+    index,
+    label: groupLabel(index),
+    memberUids: [],
+    createdAt: now()
+  }));
+
+  students.forEach(([uid], index) => {
+    groups[index % groupCount].memberUids.push(uid);
+  });
+  return groups;
+}
+
+function membersForGroup(group, room = state.room) {
+  return (group?.memberUids || [])
+    .map((uid) => [uid, room?.players?.[uid]])
+    .filter(([, player]) => Boolean(player));
+}
+
+function memberName(uid, room = state.room) {
+  return room?.players?.[uid]?.nickname || "참가자";
+}
+
+function adjacentUid(group, uid, offset) {
+  const uids = group?.memberUids || [];
+  const index = uids.indexOf(uid);
+  if (index < 0 || !uids.length) return "";
+  return uids[(index + offset + uids.length) % uids.length];
+}
+
+function buildDrawingCanvas(sessionId, groupId, drawingId, canDraw = false, label = "그림") {
+  return `
+    <div class="drawing-board ${canDraw ? "is-interactive" : ""}">
+      <canvas
+        data-drawing-canvas="1"
+        data-session-id="${escapeHtml(sessionId)}"
+        data-group-id="${escapeHtml(groupId)}"
+        data-drawing-id="${escapeHtml(drawingId)}"
+        data-can-draw="${canDraw ? "1" : "0"}"
+        aria-label="${escapeHtml(label)}"
+      ></canvas>
+    </div>
+  `;
+}
+
+function renderDrawingControls(sessionId, groupId, drawingId) {
+  const colors = DRAWING_COLORS.map((color) => `
+    <button
+      class="drawing-swatch ${state.drawingColor === color ? "is-selected" : ""}"
+      type="button"
+      style="--swatch: ${color};"
+      data-action="select-drawing-color"
+      data-color="${escapeHtml(color)}"
+      aria-label="색상 선택"
+    ></button>
+  `).join("");
+  const sizes = DRAWING_SIZES.map((size) => `
+    <button
+      class="secondary-button drawing-size-button ${state.drawingSize === size ? "is-selected" : ""}"
+      type="button"
+      data-action="select-drawing-size"
+      data-size="${size}"
+    >${size}</button>
+  `).join("");
+
+  return `
+    <div class="drawing-tools" data-testid="drawing-tools">
+      <div class="drawing-tool-row">
+        <button class="secondary-button ${state.drawingTool === "pen" ? "is-selected" : ""}" type="button" data-action="select-drawing-tool" data-tool="pen">펜</button>
+        <button class="secondary-button ${state.drawingTool === "eraser" ? "is-selected" : ""}" type="button" data-action="select-drawing-tool" data-tool="eraser">지우개</button>
+        <div class="drawing-swatches">${colors}</div>
+        <div class="drawing-sizes">${sizes}</div>
+      </div>
+      <div class="drawing-tool-row">
+        <button class="secondary-button" type="button" data-action="undo-drawing-stroke" data-session-id="${escapeHtml(sessionId)}" data-group-id="${escapeHtml(groupId)}" data-drawing-id="${escapeHtml(drawingId)}" data-testid="drawing-undo">되돌리기</button>
+        <button class="danger-button" type="button" data-action="clear-drawing" data-session-id="${escapeHtml(sessionId)}" data-group-id="${escapeHtml(groupId)}" data-drawing-id="${escapeHtml(drawingId)}" data-testid="drawing-clear">전체 지우기</button>
+      </div>
+    </div>
+  `;
+}
+
+function guessAttempts(guessRecord) {
+  return (guessRecord?.attempts || []).slice(-5);
+}
+
+function renderCatchmindHost(session) {
+  const cards = groupEntries()
+    .filter(([groupId]) => session.groups?.[groupId])
+    .map(([groupId, group]) => {
+      const sGroup = session.groups[groupId];
+      const word = getPartyWord(sGroup.promptId);
+      const correct = correctGuessFor(session.id, groupId, word);
+      const guesses = Object.values(groupGuessesFor(session.id, groupId));
+      const attempts = guesses.reduce((sum, guess) => sum + (guess.attempts?.length || 0), 0);
+      const status = correct ? `정답 · ${correct.nickname || "참가자"}` : "진행 중";
+      const members = membersForGroup(group)
+        .map(([, player]) => `<span class="mini-member">${escapeHtml(player.nickname)}</span>`)
+        .join("");
+      return `
+        <article class="group-card" data-testid="catchmind-group-card">
+          <div class="group-card-head">
+            <div>
+              <span class="category-badge">${escapeHtml(group.label)} · ${membersForGroup(group).length}명</span>
+              <h2>${escapeHtml(word.answer)}</h2>
+              <p>${escapeHtml(word.lesson)} · ${escapeHtml(word.clue)}</p>
+            </div>
+            <span class="progress-status progress-status--${correct ? "completed" : "working"}">${escapeHtml(status)}</span>
+          </div>
+          ${buildDrawingCanvas(session.id, groupId, sGroup.drawingId, false, `${group.label} 그림`)}
+          <div class="group-meta-grid">
+            <span>출제자 <strong>${escapeHtml(memberName(sGroup.drawerUid))}</strong></span>
+            <span>시도 <strong>${attempts}</strong></span>
+            <span>소요 <strong>${correct ? `${Math.max(1, Math.round((correct.createdAt - session.phaseStartedAt) / 1000))}초` : "-"}</strong></span>
+          </div>
+          <div class="mini-member-row">${members}</div>
+        </article>
+      `;
+    })
+    .join("");
+
+  return `
+    <section class="group-game-shell" data-testid="group-game-host">
+      <div class="activity-monitor__head">
+        <div>
+          <span class="category-badge">타이핑 캐치마인드</span>
+          <h2>그룹별 그림 추측 라운드</h2>
+          <p>출제자만 정답을 보고, 같은 그룹 학생들이 타이핑으로 맞힙니다.</p>
+        </div>
+        <span class="stage-chip">라운드 ${session.roundIndex}</span>
+      </div>
+      <div class="group-card-grid">${cards}</div>
+    </section>
+  `;
+}
+
+function renderCatchmindStudent(session) {
+  const group = groupForPlayer();
+  const sGroup = sessionGroup(group?.id, session);
+  if (!group || !sGroup) {
+    return `<div class="empty-note">이번 그룹 게임에 아직 배정되지 않았습니다.</div>`;
+  }
+
+  const word = getPartyWord(sGroup.promptId);
+  const isDrawer = sGroup.drawerUid === state.client.uid;
+  const correct = correctGuessFor(session.id, group.id, word);
+  const myGuess = groupGuessesFor(session.id, group.id)[state.client.uid] || {};
+  const attempts = guessAttempts(myGuess);
+  const attemptList = attempts.length
+    ? attempts.map((attempt) => `<li class="${attempt.isCorrect ? "is-correct" : ""}">${escapeHtml(attempt.text)} ${attempt.isCorrect ? "· 정답" : ""}</li>`).join("")
+    : `<li>아직 입력한 추측이 없습니다.</li>`;
+
+  const answerBlock = isDrawer
+    ? `
+      <div class="catchmind-answer" data-testid="catchmind-drawer-answer">
+        <span class="category-badge">${escapeHtml(word.lesson)}</span>
+        <strong>${escapeHtml(word.answer)}</strong>
+        <p>${escapeHtml(word.clue)}</p>
+      </div>
+    `
+    : `
+      <div class="catchmind-answer">
+        <span class="category-badge">${escapeHtml(group.label)}</span>
+        <strong>${correct ? `정답: ${word.answer}` : "그림을 보고 맞혀 보세요"}</strong>
+        <p>${correct ? `${correct.nickname || "친구"} 님이 맞혔습니다.` : `${memberName(sGroup.drawerUid)} 님이 그리고 있습니다.`}</p>
+      </div>
+    `;
+
+  const inputBlock = isDrawer
+    ? renderDrawingControls(session.id, group.id, sGroup.drawingId)
+    : `
+      <form class="answer-form" id="catchmindGuessForm">
+        <label>
+          <span>추측 입력</span>
+          <input id="catchmindGuessInput" autocomplete="off" placeholder="정답을 타이핑하세요" data-testid="catchmind-guess-input" ${correct ? "disabled" : ""}>
+        </label>
+        <button class="primary-button" type="submit" data-testid="catchmind-submit-guess" ${correct ? "disabled" : ""}>맞히기</button>
+      </form>
+      <ul class="guess-list">${attemptList}</ul>
+    `;
+
+  return `
+    <section class="group-game-shell" data-testid="catchmind-student">
+      <div class="activity-monitor__head">
+        <div>
+          <span class="category-badge">타이핑 캐치마인드 · ${escapeHtml(group.label)}</span>
+          <h2>${isDrawer ? "내가 그릴 차례" : "친구 그림 맞히기"}</h2>
+          <p>${membersForGroup(group).map(([, player]) => player.nickname).join(", ")}</p>
+        </div>
+        <span class="stage-chip">${correct ? "완료" : "진행 중"}</span>
+      </div>
+      <div class="catchmind-layout">
+        <section class="group-card">
+          ${answerBlock}
+          ${buildDrawingCanvas(session.id, group.id, sGroup.drawingId, isDrawer && !correct, "캐치마인드 그림판")}
+          ${inputBlock}
+        </section>
+      </div>
+    </section>
+  `;
+}
+
+function renderPhonePromptForm(session, group, existing) {
+  return `
+    <section class="group-card" data-testid="gartic-phone-prompt">
+      <span class="category-badge">${escapeHtml(group.label)} · 1단계</span>
+      <h2>시작 문장 쓰기</h2>
+      <p class="field-note">친구가 그림으로 표현할 수 있는 짧은 문장을 씁니다.</p>
+      <form class="answer-form" id="phonePromptForm">
+        <textarea id="phonePromptInput" maxlength="80" placeholder="예: 버스에서 라면을 먹는 사장님" data-testid="phone-prompt-input">${escapeHtml(existing?.prompt || "")}</textarea>
+        <button class="primary-button" type="submit" data-testid="phone-submit-prompt">문장 제출</button>
+      </form>
+    </section>
+  `;
+}
+
+function renderPhoneDrawStep(session, group, existing) {
+  const sourceUid = adjacentUid(group, state.client.uid, -1);
+  const source = groupPhoneFor(session.id, group.id)[sourceUid] || {};
+  const drawingId = `phone_${state.client.uid}`;
+  return `
+    <section class="group-card" data-testid="gartic-phone-draw">
+      <span class="category-badge">${escapeHtml(group.label)} · 2단계</span>
+      <h2>문장을 그림으로 바꾸기</h2>
+      <div class="catchmind-answer">
+        <strong>${escapeHtml(source.prompt || "친구 문장을 기다리는 중입니다.")}</strong>
+        <p>${escapeHtml(memberName(sourceUid))} 님의 문장입니다.</p>
+      </div>
+      ${buildDrawingCanvas(session.id, group.id, drawingId, Boolean(source.prompt), "갈틱폰 그림")}
+      ${source.prompt ? renderDrawingControls(session.id, group.id, drawingId) : ""}
+      <p class="field-note">${existing?.drawnAt ? "그림 저장됨" : "획을 그리면 자동 저장됩니다."}</p>
+    </section>
+  `;
+}
+
+function renderPhoneGuessStep(session, group, existing) {
+  const sourceUid = adjacentUid(group, state.client.uid, -1);
+  const drawingId = `phone_${sourceUid}`;
+  return `
+    <section class="group-card" data-testid="gartic-phone-guess">
+      <span class="category-badge">${escapeHtml(group.label)} · 3단계</span>
+      <h2>그림을 문장으로 추측하기</h2>
+      <p class="field-note">${escapeHtml(memberName(sourceUid))} 님의 그림을 보고 문장을 씁니다.</p>
+      ${buildDrawingCanvas(session.id, group.id, drawingId, false, "갈틱폰 추측 그림")}
+      <form class="answer-form" id="phoneGuessForm">
+        <textarea id="phoneGuessInput" maxlength="80" placeholder="그림을 보고 떠오르는 문장" data-testid="phone-guess-input">${escapeHtml(existing?.guess || "")}</textarea>
+        <button class="primary-button" type="submit" data-testid="phone-submit-guess">추측 제출</button>
+      </form>
+    </section>
+  `;
+}
+
+function renderPhoneReveal(session, group) {
+  const phone = groupPhoneFor(session.id, group.id);
+  const cards = (group.memberUids || []).map((uid) => {
+    const drawerUid = adjacentUid(group, uid, 1);
+    const guesserUid = adjacentUid(group, uid, 2);
+    const original = phone[uid]?.prompt || "문장 없음";
+    const guess = phone[guesserUid]?.guess || "추측 없음";
+    return `
+      <article class="phone-chain-card" data-testid="phone-chain-card">
+        <span class="category-badge">${escapeHtml(memberName(uid))}의 시작</span>
+        <strong>${escapeHtml(original)}</strong>
+        ${buildDrawingCanvas(session.id, group.id, `phone_${drawerUid}`, false, "갈틱폰 공개 그림")}
+        <p><b>${escapeHtml(memberName(guesserUid))}의 추측</b> ${escapeHtml(guess)}</p>
+      </article>
+    `;
+  }).join("");
+
+  return `
+    <section class="group-game-shell" data-testid="gartic-phone-reveal">
+      <div class="activity-monitor__head">
+        <div>
+          <span class="category-badge">타이핑 갈틱폰 · ${escapeHtml(group.label)}</span>
+          <h2>변신 결과 공개</h2>
+          <p>문장이 그림을 거쳐 어떻게 바뀌었는지 봅니다.</p>
+        </div>
+      </div>
+      <div class="phone-chain-grid">${cards}</div>
+    </section>
+  `;
+}
+
+function renderGarticPhoneStudent(session) {
+  const group = groupForPlayer();
+  if (!group) return `<div class="empty-note">이번 갈틱폰에 아직 배정되지 않았습니다.</div>`;
+  const existing = groupPhoneFor(session.id, group.id)[state.client.uid] || {};
+  if (session.phonePhase === "draw") return renderPhoneDrawStep(session, group, existing);
+  if (session.phonePhase === "guess") return renderPhoneGuessStep(session, group, existing);
+  if (session.phonePhase === "reveal") return renderPhoneReveal(session, group);
+  return renderPhonePromptForm(session, group, existing);
+}
+
+function renderGarticPhoneHost(session) {
+  const phaseLabel = {
+    prompt: "문장 작성",
+    draw: "그림 변환",
+    guess: "문장 추측",
+    reveal: "최종 공개"
+  }[session.phonePhase || "prompt"];
+  const cards = groupEntries()
+    .filter(([groupId]) => session.groups?.[groupId])
+    .map(([groupId, group]) => {
+      const phone = groupPhoneFor(session.id, groupId);
+      const promptCount = Object.values(phone).filter((item) => item.prompt).length;
+      const guessCount = Object.values(phone).filter((item) => item.guess).length;
+      const drawingCount = (group.memberUids || []).filter((uid) => strokesForDrawing(drawingFor(session.id, groupId, `phone_${uid}`)).length).length;
+      return `
+        <article class="group-card" data-testid="gartic-phone-group-card">
+          <div class="group-card-head">
+            <div>
+              <span class="category-badge">${escapeHtml(group.label)} · ${membersForGroup(group).length}명</span>
+              <h2>${escapeHtml(phaseLabel)}</h2>
+              <p>${membersForGroup(group).map(([, player]) => player.nickname).join(", ")}</p>
+            </div>
+            <span class="progress-status progress-status--working">${escapeHtml(phaseLabel)}</span>
+          </div>
+          <div class="group-meta-grid">
+            <span>문장 <strong>${promptCount}</strong></span>
+            <span>그림 <strong>${drawingCount}</strong></span>
+            <span>추측 <strong>${guessCount}</strong></span>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+
+  return `
+    <section class="group-game-shell" data-testid="gartic-phone-host">
+      <div class="activity-monitor__head">
+        <div>
+          <span class="category-badge">타이핑 갈틱폰</span>
+          <h2>${escapeHtml(phaseLabel)}</h2>
+          <p>같은 그룹 안에서 문장, 그림, 추측을 차례로 넘깁니다.</p>
+        </div>
+        <span class="stage-chip">라운드 ${session.roundIndex}</span>
+      </div>
+      <div class="group-card-grid">${cards}</div>
+    </section>
+  `;
+}
+
+function renderGroupGamePanel() {
+  const session = currentGroupSession();
+  if (!session) {
+    els.promptPanel.innerHTML = `<div class="empty-note">그룹 게임 세션을 찾을 수 없습니다.</div>`;
+    return;
+  }
+
+  if (session.type === "typingGarticPhone") {
+    els.promptPanel.innerHTML = state.role === "host" ? renderGarticPhoneHost(session) : renderGarticPhoneStudent(session);
+  } else {
+    els.promptPanel.innerHTML = state.role === "host" ? renderCatchmindHost(session) : renderCatchmindStudent(session);
+  }
+  requestAnimationFrame(renderDrawingCanvases);
+}
+
 function renderRoom() {
   const room = state.room;
   if (!room?.meta) return;
   const stage = room.meta.status || "lobby";
   const round = currentRound(room);
   const activity = currentActivity(room);
+  const groupSession = currentGroupSession(room);
   const joinUrl = buildJoinUrl(state.roomCode);
 
   els.roleLabel.textContent = state.role === "host" ? "Teacher" : "Student";
@@ -992,11 +1455,13 @@ function renderRoom() {
       ? `${currentWorldStation(room).label} 포털이 열려 있습니다.`
     : stage === "activity"
       ? `${activity?.label || "개인 활동"} 진행 중입니다.`
+    : stage === "groupGame"
+      ? `${getGameLabel(groupSession?.type || "typingCatchmind")} 그룹 게임 중입니다.`
       : `${getGameLabel(round?.gameType)} 진행 중입니다.`;
   els.roomCodeDisplay.textContent = state.roomCode;
   els.joinLink.href = joinUrl;
   els.joinLink.textContent = "입장 링크";
-  els.roundKicker.textContent = stage === "world" ? "Keyboard Campus" : stage === "activity" ? "Tracked Activity" : round ? getGameLabel(round.gameType) : "Lobby";
+  els.roundKicker.textContent = stage === "world" ? "Keyboard Campus" : stage === "activity" ? "Tracked Activity" : stage === "groupGame" ? getGameLabel(groupSession?.type || "typingCatchmind") : round ? getGameLabel(round.gameType) : "Lobby";
   els.stageTitle.textContent = STAGES[stage] || STAGES.lobby;
   els.stageChip.textContent = stage;
 
@@ -1017,6 +1482,14 @@ function renderRoom() {
     els.resultsPanel.innerHTML = "";
     return;
   }
+  if (stage === "groupGame") {
+    delete els.promptPanel.dataset.activityRunId;
+    renderGroupGamePanel();
+    els.submitPanel.innerHTML = "";
+    els.submissionsPanel.innerHTML = "";
+    els.resultsPanel.innerHTML = "";
+    return;
+  }
   delete els.promptPanel.dataset.activityRunId;
   renderPrompt(stage, round);
   renderSubmit(stage, round);
@@ -1024,9 +1497,104 @@ function renderRoom() {
   renderResults(stage, round);
 }
 
+function groupsObjectFromList(groups) {
+  return Object.fromEntries(groups.map((group) => [group.id, group]));
+}
+
+function groupsForNewSession({ reuseGroups = false } = {}) {
+  const existing = groupEntries().map(([, group]) => group).filter((group) => group.memberUids?.length);
+  if (reuseGroups && existing.length) return existing;
+  return createBalancedGroups(studentEntries());
+}
+
+function buildSessionGroups(groups, gameType, roundIndex) {
+  return Object.fromEntries(groups.map((group, index) => {
+    const memberUids = group.memberUids || [];
+    const drawerUid = memberUids.length ? memberUids[(roundIndex - 1) % memberUids.length] : "";
+    const word = getPartyWordByIndex(roundIndex + index * 5);
+    return [group.id, {
+      groupId: group.id,
+      drawerUid,
+      drawerNickname: memberName(drawerUid),
+      promptId: word.id,
+      drawingId: gameType === "typingCatchmind" ? `catch_${group.id}_${roundIndex}` : `phone_${group.id}_${roundIndex}`,
+      startedAt: now()
+    }];
+  }));
+}
+
+async function startGroupGame(gameType, { reuseGroups = false } = {}) {
+  if (state.role !== "host") return;
+  const students = studentEntries();
+  if (!students.length) {
+    setStartStatus("학생이 1명 이상 입장해야 그룹 게임을 시작할 수 있습니다.");
+    return;
+  }
+
+  const groups = groupsForNewSession({ reuseGroups });
+  const roundIndex = Number(state.room?.meta?.groupRoundIndex || 0) + 1;
+  const sessionId = `${gameType === "typingGarticPhone" ? "gp" : "cm"}_${now()}`;
+  const timestamp = now();
+  const session = {
+    id: sessionId,
+    type: gameType,
+    roundIndex,
+    stage: "playing",
+    phonePhase: gameType === "typingGarticPhone" ? "prompt" : "",
+    maxGroupSize: GROUP_GAME_MAX_SIZE,
+    limitSeconds: gameType === "typingCatchmind" ? CATCHMIND_SECONDS : 0,
+    groupIds: groups.map((group) => group.id),
+    groups: buildSessionGroups(groups, gameType, roundIndex),
+    startedAt: timestamp,
+    phaseStartedAt: timestamp
+  };
+
+  const updates = {
+    "meta/status": "groupGame",
+    "meta/currentRoundId": "",
+    "meta/currentActivityId": "",
+    "meta/currentActivityRunId": "",
+    "meta/currentGroupSessionId": sessionId,
+    "meta/groupGameType": gameType,
+    "meta/groupRoundIndex": roundIndex,
+    "meta/phaseStartedAt": timestamp,
+    [`groupSessions/${sessionId}`]: session
+  };
+
+  Object.entries(groupsObjectFromList(groups)).forEach(([groupId, group]) => {
+    updates[`groups/${groupId}`] = group;
+  });
+
+  await state.client.updateRoom(state.roomCode, updates);
+}
+
+async function nextCatchmindRound() {
+  await startGroupGame("typingCatchmind", { reuseGroups: true });
+}
+
+async function advanceGarticPhone() {
+  if (state.role !== "host") return;
+  const session = currentGroupSession();
+  if (!session || session.type !== "typingGarticPhone") return;
+  if (session.phonePhase === "reveal") {
+    await startGroupGame("typingGarticPhone", { reuseGroups: true });
+    return;
+  }
+  const nextPhase = session.phonePhase === "prompt" ? "draw" : session.phonePhase === "draw" ? "guess" : "reveal";
+  await state.client.updateRoom(state.roomCode, {
+    [`groupSessions/${session.id}/phonePhase`]: nextPhase,
+    [`groupSessions/${session.id}/phaseStartedAt`]: now(),
+    "meta/phaseStartedAt": now()
+  });
+}
+
 async function startRound() {
   const room = state.room;
   if (!room?.meta || state.role !== "host") return;
+  if (state.selectedGame === "typingCatchmind" || state.selectedGame === "typingGarticPhone") {
+    await startGroupGame(state.selectedGame);
+    return;
+  }
   const roundIndex = Number(room.meta.roundIndex || 0) + 1;
   const roundId = `r_${now()}`;
   const gameType = state.selectedGame;
@@ -1238,6 +1806,8 @@ async function nextLobby() {
     "meta/currentRoundId": "",
     "meta/currentActivityId": "",
     "meta/currentActivityRunId": "",
+    "meta/currentGroupSessionId": "",
+    "meta/groupGameType": "",
     "meta/phaseStartedAt": now()
   });
 }
@@ -1303,6 +1873,244 @@ async function submitWorldTyping(event) {
   await completeWorldStation(station, station.successDetail);
 }
 
+function drawingCanvasKey(canvas) {
+  return `${canvas.dataset.sessionId}/${canvas.dataset.groupId}/${canvas.dataset.drawingId}`;
+}
+
+function pointForCanvas(event, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.max(0, Math.min(1000, Math.round(((event.clientX - rect.left) / rect.width) * 1000)));
+  const y = Math.max(0, Math.min(1000, Math.round(((event.clientY - rect.top) / rect.height) * 1000)));
+  return { x, y };
+}
+
+function drawingPointerId(event) {
+  return event.pointerId ?? "mouse";
+}
+
+function compactPoints(points) {
+  if (points.length <= 140) return points;
+  const step = Math.ceil(points.length / 140);
+  return points.filter((_, index) => index % step === 0 || index === points.length - 1);
+}
+
+function drawStroke(ctx, stroke, width, height) {
+  const points = stroke?.points || [];
+  if (points.length < 1) return;
+  ctx.save();
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.lineWidth = Number(stroke.size || 4);
+  if (stroke.tool === "eraser") {
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.strokeStyle = "rgba(0,0,0,1)";
+  } else {
+    ctx.globalCompositeOperation = "source-over";
+    ctx.strokeStyle = stroke.color || DRAWING_COLORS[0];
+  }
+  ctx.beginPath();
+  points.forEach((point, index) => {
+    const x = (Number(point.x || 0) / 1000) * width;
+    const y = (Number(point.y || 0) / 1000) * height;
+    if (index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  if (points.length === 1) {
+    const point = points[0];
+    ctx.arc((point.x / 1000) * width, (point.y / 1000) * height, ctx.lineWidth / 2, 0, Math.PI * 2);
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.fill();
+  } else {
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function renderDrawingCanvases() {
+  document.querySelectorAll("[data-drawing-canvas]").forEach((canvas) => {
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const ratio = window.devicePixelRatio || 1;
+    const width = Math.round(rect.width * ratio);
+    const height = Math.round(rect.height * ratio);
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+    const drawing = drawingFor(canvas.dataset.sessionId, canvas.dataset.groupId, canvas.dataset.drawingId);
+    strokesForDrawing(drawing).forEach((stroke) => drawStroke(ctx, stroke, width, height));
+    if (state.activeStroke?.key === drawingCanvasKey(canvas)) {
+      drawStroke(ctx, state.activeStroke, width, height);
+    }
+  });
+}
+
+function handleDrawingPointerDown(event) {
+  const canvas = event.target.closest?.("[data-drawing-canvas]");
+  if (!canvas || canvas.dataset.canDraw !== "1") return;
+  if (event.type === "mousedown" && now() - state.lastDrawingPointerAt < 500) return;
+  if (event.type === "pointerdown") state.lastDrawingPointerAt = now();
+  event.preventDefault();
+  if (event.pointerId !== undefined) canvas.setPointerCapture?.(event.pointerId);
+  state.activeStroke = {
+    key: drawingCanvasKey(canvas),
+    pointerId: drawingPointerId(event),
+    sessionId: canvas.dataset.sessionId,
+    groupId: canvas.dataset.groupId,
+    drawingId: canvas.dataset.drawingId,
+    uid: state.client.uid,
+    nickname: state.nickname || "참가자",
+    tool: state.drawingTool,
+    color: state.drawingColor,
+    size: state.drawingSize,
+    points: [pointForCanvas(event, canvas)],
+    createdAt: now()
+  };
+  renderDrawingCanvases();
+}
+
+function handleDrawingPointerMove(event) {
+  if (!state.activeStroke || state.activeStroke.pointerId !== drawingPointerId(event)) return;
+  const canvas = [...document.querySelectorAll("[data-drawing-canvas]")].find((item) =>
+    item.dataset.sessionId === state.activeStroke.sessionId
+    && item.dataset.groupId === state.activeStroke.groupId
+    && item.dataset.drawingId === state.activeStroke.drawingId
+  );
+  if (!canvas) return;
+  event.preventDefault();
+  const nextPoint = pointForCanvas(event, canvas);
+  const previous = state.activeStroke.points[state.activeStroke.points.length - 1];
+  const distance = Math.hypot(nextPoint.x - previous.x, nextPoint.y - previous.y);
+  if (distance < 3) return;
+  state.activeStroke.points.push(nextPoint);
+  renderDrawingCanvases();
+}
+
+async function handleDrawingPointerEnd(event) {
+  if (!state.activeStroke || state.activeStroke.pointerId !== drawingPointerId(event)) return;
+  const stroke = {
+    uid: state.activeStroke.uid,
+    nickname: state.activeStroke.nickname,
+    tool: state.activeStroke.tool,
+    color: state.activeStroke.color,
+    size: state.activeStroke.size,
+    points: compactPoints(state.activeStroke.points),
+    createdAt: now()
+  };
+  const { sessionId, groupId, drawingId } = state.activeStroke;
+  state.activeStroke = null;
+  renderDrawingCanvases();
+  if (stroke.points.length < 1) return;
+  const strokeId = `s_${now()}_${Math.random().toString(36).slice(2, 7)}`;
+  await state.client.setDrawingStroke(state.roomCode, sessionId, groupId, drawingId, strokeId, stroke);
+  const session = currentGroupSession();
+  if (session?.type === "typingGarticPhone") {
+    await state.client.setGroupPhoneEntry(state.roomCode, sessionId, groupId, {
+      ...(groupPhoneFor(sessionId, groupId)[state.client.uid] || {}),
+      uid: state.client.uid,
+      nickname: state.nickname || "참가자",
+      drawnAt: now(),
+      updatedAt: now()
+    });
+  }
+}
+
+async function undoDrawingStroke(sessionId, groupId, drawingId) {
+  const drawing = drawingFor(sessionId, groupId, drawingId);
+  const ownStrokes = strokesForDrawing(drawing).filter((stroke) => stroke.uid === state.client.uid);
+  const last = ownStrokes[ownStrokes.length - 1];
+  if (!last) return;
+  await state.client.removeDrawingStroke(state.roomCode, sessionId, groupId, drawingId, last.id);
+}
+
+async function clearDrawing(sessionId, groupId, drawingId) {
+  await state.client.clearGroupDrawing(state.roomCode, sessionId, groupId, drawingId);
+}
+
+async function submitCatchmindGuess(event) {
+  event.preventDefault();
+  const session = currentGroupSession();
+  const group = groupForPlayer();
+  const sGroup = sessionGroup(group?.id, session);
+  const input = document.getElementById("catchmindGuessInput");
+  if (!session || !group || !sGroup || !input) return;
+  const text = String(input.value || "").trim();
+  if (!text) return;
+  const word = getPartyWord(sGroup.promptId);
+  const previous = groupGuessesFor(session.id, group.id)[state.client.uid] || {};
+  const attempt = {
+    text,
+    isCorrect: isCorrectGuess(text, word),
+    nickname: state.nickname || "참가자",
+    uid: state.client.uid,
+    createdAt: now()
+  };
+  const attempts = [...(previous.attempts || []), attempt].slice(-12);
+  await Promise.all([
+    state.client.setGroupGuess(state.roomCode, session.id, group.id, {
+      uid: state.client.uid,
+      nickname: state.nickname || "참가자",
+      sessionId: session.id,
+      groupId: group.id,
+      text,
+      isCorrect: attempt.isCorrect,
+      attempts,
+      updatedAt: now()
+    }),
+    state.client.setGroupProgress(state.roomCode, session.id, group.id, {
+      uid: state.client.uid,
+      nickname: state.nickname || "참가자",
+      status: attempt.isCorrect ? "completed" : "working",
+      detail: attempt.isCorrect ? "정답" : "추측 중",
+      completed: attempt.isCorrect ? 1 : 0,
+      total: 1,
+      updatedAt: now()
+    })
+  ]);
+  input.value = "";
+}
+
+async function submitPhonePrompt(event) {
+  event.preventDefault();
+  const session = currentGroupSession();
+  const group = groupForPlayer();
+  const input = document.getElementById("phonePromptInput");
+  if (!session || !group || !input) return;
+  const prompt = String(input.value || "").trim().slice(0, 80);
+  if (!prompt) return;
+  await state.client.setGroupPhoneEntry(state.roomCode, session.id, group.id, {
+    ...(groupPhoneFor(session.id, group.id)[state.client.uid] || {}),
+    uid: state.client.uid,
+    nickname: state.nickname || "참가자",
+    prompt,
+    promptAt: now(),
+    updatedAt: now()
+  });
+}
+
+async function submitPhoneGuess(event) {
+  event.preventDefault();
+  const session = currentGroupSession();
+  const group = groupForPlayer();
+  const input = document.getElementById("phoneGuessInput");
+  if (!session || !group || !input) return;
+  const guess = String(input.value || "").trim().slice(0, 80);
+  if (!guess) return;
+  await state.client.setGroupPhoneEntry(state.roomCode, session.id, group.id, {
+    ...(groupPhoneFor(session.id, group.id)[state.client.uid] || {}),
+    uid: state.client.uid,
+    nickname: state.nickname || "참가자",
+    guess,
+    guessAt: now(),
+    updatedAt: now()
+  });
+}
+
 async function reportActivityProgress(payload) {
   const room = state.room;
   if (!room?.meta || state.role !== "student" || room.meta.status !== "activity") return;
@@ -1348,6 +2156,25 @@ async function handleAction(button) {
     if (action === "toggle-world-help") await toggleWorldHelp();
     if (action === "world-emote") await sendWorldEmote(button.dataset.emote || "");
     if (action === "complete-world-social") await completeWorldStation(currentWorldStation());
+    if (action === "start-catchmind") await startGroupGame("typingCatchmind");
+    if (action === "start-gartic-phone") await startGroupGame("typingGarticPhone");
+    if (action === "next-catchmind-round") await nextCatchmindRound();
+    if (action === "advance-gartic-phone") await advanceGarticPhone();
+    if (action === "select-drawing-tool") {
+      state.drawingTool = button.dataset.tool || "pen";
+      renderGroupGamePanel();
+    }
+    if (action === "select-drawing-color") {
+      state.drawingColor = button.dataset.color || DRAWING_COLORS[0];
+      state.drawingTool = "pen";
+      renderGroupGamePanel();
+    }
+    if (action === "select-drawing-size") {
+      state.drawingSize = Number(button.dataset.size || DRAWING_SIZES[0]);
+      renderGroupGamePanel();
+    }
+    if (action === "undo-drawing-stroke") await undoDrawingStroke(button.dataset.sessionId, button.dataset.groupId, button.dataset.drawingId);
+    if (action === "clear-drawing") await clearDrawing(button.dataset.sessionId, button.dataset.groupId, button.dataset.drawingId);
     if (action === "start-round") await startRound();
     if (action === "start-activity") await startActivity();
     if (action === "open-submit") await setStage("submit");
@@ -1453,6 +2280,9 @@ function bindEvents() {
   document.addEventListener("submit", (event) => {
     if (event.target.id === "answerForm") submitAnswer(event);
     if (event.target.id === "worldTypingForm") submitWorldTyping(event);
+    if (event.target.id === "catchmindGuessForm") submitCatchmindGuess(event);
+    if (event.target.id === "phonePromptForm") submitPhonePrompt(event);
+    if (event.target.id === "phoneGuessForm") submitPhoneGuess(event);
   });
 
   document.addEventListener("change", (event) => {
@@ -1469,6 +2299,19 @@ function bindEvents() {
 
   document.addEventListener("keydown", handleActivityStartKeydown);
   document.addEventListener("keydown", handleWorldKeydown);
+  document.addEventListener("pointerdown", handleDrawingPointerDown);
+  document.addEventListener("pointermove", handleDrawingPointerMove);
+  document.addEventListener("pointerup", (event) => {
+    handleDrawingPointerEnd(event).catch((error) => setStartStatus(error.message));
+  });
+  document.addEventListener("pointercancel", (event) => {
+    handleDrawingPointerEnd(event).catch((error) => setStartStatus(error.message));
+  });
+  document.addEventListener("mousedown", handleDrawingPointerDown);
+  document.addEventListener("mousemove", handleDrawingPointerMove);
+  document.addEventListener("mouseup", (event) => {
+    handleDrawingPointerEnd(event).catch((error) => setStartStatus(error.message));
+  });
 
   window.addEventListener("message", (event) => {
     if (!event.data || event.data.type !== "typing-party-progress") return;

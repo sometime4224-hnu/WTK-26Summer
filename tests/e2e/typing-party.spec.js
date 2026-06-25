@@ -18,6 +18,23 @@ async function joinStudent(context, roomCode, nickname = "민수") {
   return student;
 }
 
+async function drawStroke(page, selector = 'canvas[data-can-draw="1"]') {
+  const canvas = page.locator(selector).first();
+  await expect(canvas).toBeVisible();
+  await canvas.scrollIntoViewIfNeeded();
+  const box = await canvas.boundingBox();
+  await page.mouse.move(box.x + box.width * 0.2, box.y + box.height * 0.25);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width * 0.72, box.y + box.height * 0.35);
+  await page.mouse.move(box.x + box.width * 0.42, box.y + box.height * 0.72);
+  await page.mouse.up();
+}
+
+async function catchmindGroupLabel(page) {
+  const text = await page.locator('[data-testid="catchmind-student"] .category-badge').first().textContent();
+  return text.split("·").pop().trim();
+}
+
 test.describe("typing party multiplayer MVP", () => {
   test("loads the start screen in mock mode", async ({ page }) => {
     await page.goto("/apps/typing-party/index.html?mock=1&reset=1");
@@ -183,6 +200,105 @@ test.describe("typing party multiplayer MVP", () => {
     await context.close();
   });
 
+  test("runs a grouped typing catchmind round with balanced groups, drawing, and a correct guess", async ({ browser }) => {
+    const context = await browser.newContext();
+    const host = await context.newPage();
+    const roomCode = await createHostRoom(host);
+    const names = ["지아", "민수", "수빈", "하준", "지우", "도윤", "서연"];
+    const students = [];
+    for (const name of names) {
+      students.push(await joinStudent(context, roomCode, name));
+    }
+
+    await host.locator('[data-testid="start-catchmind"]').click();
+    await expect(host.locator('[data-testid="stage-title"]')).toHaveText("그룹 게임");
+    await expect(host.locator('[data-testid="catchmind-group-card"]')).toHaveCount(2);
+
+    const sizes = await host.locator('[data-testid="catchmind-group-card"] .category-badge').evaluateAll((nodes) =>
+      nodes.map((node) => Number((node.textContent || "").match(/·\s*(\d+)명/)?.[1] || 0))
+    );
+    expect(Math.max(...sizes)).toBeLessThanOrEqual(6);
+    expect(sizes.reduce((sum, size) => sum + size, 0)).toBe(7);
+
+    for (const student of students) {
+      await expect(student.locator('[data-testid="catchmind-student"]')).toBeVisible();
+    }
+
+    let drawer = null;
+    let drawerGroup = "";
+    for (const student of students) {
+      if (await student.locator('[data-testid="catchmind-drawer-answer"]').count()) {
+        drawer = student;
+        drawerGroup = await catchmindGroupLabel(student);
+        break;
+      }
+    }
+    expect(drawer).toBeTruthy();
+
+    let guesser = null;
+    for (const student of students) {
+      if (student === drawer) continue;
+      if (await student.locator('[data-testid="catchmind-guess-input"]').count()) {
+        const group = await catchmindGroupLabel(student);
+        if (group === drawerGroup) {
+          guesser = student;
+          break;
+        }
+      }
+    }
+    expect(guesser).toBeTruthy();
+    await expect(guesser.locator('[data-testid="catchmind-drawer-answer"]')).toHaveCount(0);
+
+    const answer = (await drawer.locator('[data-testid="catchmind-drawer-answer"] strong').textContent()).trim();
+    await drawStroke(drawer);
+    await expect.poll(async () => host.locator("canvas").evaluateAll((canvases) => canvases.some((canvas) => {
+      const ctx = canvas.getContext("2d");
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      for (let index = 0; index < data.length; index += 4) {
+        if (data[index] < 245 || data[index + 1] < 245 || data[index + 2] < 245) return true;
+      }
+      return false;
+    }))).toBe(true);
+
+    await guesser.locator('[data-testid="catchmind-guess-input"]').fill(answer);
+    await guesser.locator('[data-testid="catchmind-submit-guess"]').click();
+    await expect(host.locator('[data-testid="group-game-host"]')).toContainText("정답");
+    await expect(guesser.locator('[data-testid="catchmind-student"]')).toContainText(`정답: ${answer}`);
+    await context.close();
+  });
+
+  test("runs the typing gartic phone prompt, draw, guess, and reveal phases", async ({ browser }) => {
+    const context = await browser.newContext();
+    const host = await context.newPage();
+    const roomCode = await createHostRoom(host);
+    const students = [];
+    for (const name of ["가온", "나래", "다온"]) {
+      students.push(await joinStudent(context, roomCode, name));
+    }
+
+    await host.locator('[data-testid="start-gartic-phone"]').click();
+    await expect(host.locator('[data-testid="gartic-phone-host"]')).toContainText("문장 작성");
+    for (const [index, student] of students.entries()) {
+      await expect(student.locator('[data-testid="gartic-phone-prompt"]')).toBeVisible();
+      await student.locator('[data-testid="phone-prompt-input"]').fill(`라면을 든 친구 ${index + 1}`);
+      await student.locator('[data-testid="phone-submit-prompt"]').click();
+    }
+
+    await host.locator('[data-testid="advance-gartic-phone"]').click();
+    await expect(students[0].locator('[data-testid="gartic-phone-draw"]')).toBeVisible();
+    await drawStroke(students[0]);
+
+    await host.locator('[data-testid="advance-gartic-phone"]').click();
+    await expect(students[0].locator('[data-testid="gartic-phone-guess"]')).toBeVisible();
+    await students[0].locator('[data-testid="phone-guess-input"]').fill("라면을 들고 뛰는 친구");
+    await students[0].locator('[data-testid="phone-submit-guess"]').click();
+
+    await host.locator('[data-testid="advance-gartic-phone"]').click();
+    await expect(students[0].locator('[data-testid="gartic-phone-reveal"]')).toBeVisible();
+    await expect(students[0].locator('[data-testid="phone-chain-card"]').first()).toBeVisible();
+    await context.close();
+  });
+
   test("fits on a phone viewport without horizontal overflow", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await createHostRoom(page);
@@ -191,6 +307,20 @@ test.describe("typing party multiplayer MVP", () => {
     await expect(page.locator('[data-testid="world-map"]')).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(2);
+  });
+
+  test("keeps grouped game controls within a phone viewport", async ({ browser }) => {
+    const context = await browser.newContext();
+    const host = await context.newPage();
+    await host.setViewportSize({ width: 390, height: 844 });
+    const roomCode = await createHostRoom(host);
+    await joinStudent(context, roomCode, "모바일");
+
+    await host.locator('[data-testid="start-catchmind"]').click();
+    await expect(host.locator('[data-testid="group-game-host"]')).toBeVisible();
+    const overflow = await host.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(2);
+    await context.close();
   });
 
   test("is linked from both typing hubs", async ({ page }) => {

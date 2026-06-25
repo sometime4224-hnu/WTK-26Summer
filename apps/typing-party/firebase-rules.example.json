@@ -57,6 +57,52 @@
                 }
               }
             }
+          },
+          "groups": {
+            "$groupId": {
+              ".write": "auth != null && data.parent().child('meta/hostUid').val() === auth.uid"
+            }
+          },
+          "groupSessions": {
+            "$sessionId": {
+              ".write": "auth != null && data.parent().child('meta/hostUid').val() === auth.uid"
+            }
+          },
+          "drawings": {
+            "$sessionId": {
+              "$groupId": {
+                "$drawingId": {
+                  ".write": "auth != null && (root.child('typingParty/rooms/' + $roomCode + '/groupSessions/' + $sessionId + '/groups/' + $groupId + '/drawerUid').val() === auth.uid || $drawingId === 'phone_' + auth.uid)"
+                }
+              }
+            }
+          },
+          "groupGuesses": {
+            "$sessionId": {
+              "$groupId": {
+                "$uid": {
+                  ".write": "auth != null && auth.uid === $uid"
+                }
+              }
+            }
+          },
+          "groupProgress": {
+            "$sessionId": {
+              "$groupId": {
+                "$uid": {
+                  ".write": "auth != null && auth.uid === $uid"
+                }
+              }
+            }
+          },
+          "groupPhone": {
+            "$sessionId": {
+              "$groupId": {
+                "$uid": {
+                  ".write": "auth != null && auth.uid === $uid"
+                }
+              }
+            }
           }
         }
       }

@@ -7,6 +7,7 @@ export const STAGES = {
   lobby: "대기실",
   world: "키보드 캠퍼스",
   activity: "개인 활동",
+  groupGame: "그룹 게임",
   prompt: "미션 공개",
   submit: "입력 중",
   vote: "투표",
@@ -23,6 +24,16 @@ export const GAME_TYPES = {
     id: "escapeMission",
     label: "타이핑 탈출 미션",
     shortLabel: "탈출 미션"
+  },
+  typingCatchmind: {
+    id: "typingCatchmind",
+    label: "타이핑 캐치마인드",
+    shortLabel: "캐치마인드"
+  },
+  typingGarticPhone: {
+    id: "typingGarticPhone",
+    label: "타이핑 갈틱폰",
+    shortLabel: "갈틱폰"
   }
 };
 

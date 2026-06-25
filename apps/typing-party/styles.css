@@ -1014,6 +1014,179 @@ textarea {
   grid-column: 3;
 }
 
+.group-quick-actions,
+.group-card-grid,
+.phone-chain-grid,
+.catchmind-layout,
+.group-game-shell,
+.group-card,
+.drawing-tools,
+.guess-list {
+  display: grid;
+  gap: 12px;
+}
+
+.group-quick-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.group-card-grid,
+.phone-chain-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.group-card,
+.phone-chain-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(215, 224, 234, 0.95);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.phone-chain-card {
+  display: grid;
+  gap: 10px;
+}
+
+.group-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.group-card-head h2,
+.catchmind-answer strong,
+.phone-chain-card strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--ink);
+  font-size: clamp(1.2rem, 2.6vw, 1.7rem);
+  font-weight: 950;
+  line-height: 1.18;
+}
+
+.group-card-head p,
+.catchmind-answer p,
+.phone-chain-card p {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.45;
+}
+
+.drawing-board {
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+}
+
+.drawing-board canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 220px;
+  touch-action: none;
+  background: #ffffff;
+}
+
+.drawing-board.is-interactive {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.drawing-tool-row,
+.drawing-swatches,
+.drawing-sizes,
+.mini-member-row,
+.group-meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.drawing-swatch {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  background: var(--swatch);
+}
+
+.drawing-swatch.is-selected,
+.drawing-size-button.is-selected,
+.drawing-tools .secondary-button.is-selected {
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+}
+
+.drawing-size-button {
+  min-width: 42px;
+}
+
+.catchmind-answer {
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+  border: 1px dashed #94a3b8;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.group-meta-grid {
+  justify-content: space-between;
+  padding: 10px;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.group-meta-grid strong {
+  color: var(--ink);
+}
+
+.mini-member {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--teal-soft);
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.guess-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guess-list li {
+  padding: 8px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.guess-list li.is-correct {
+  border-color: #bbf7d0;
+  background: var(--green-soft);
+  color: var(--green);
+}
+
 .empty-note {
   padding: 12px;
   border: 1px dashed #cbd5e1;
@@ -1027,7 +1200,10 @@ textarea {
   .entry-grid,
   .room-hero,
   .room-layout,
-  .submission-grid {
+  .submission-grid,
+  .group-card-grid,
+  .phone-chain-grid,
+  .group-quick-actions {
     grid-template-columns: 1fr;
   }
 
@@ -1105,5 +1281,19 @@ textarea {
   .world-action-row .secondary-button,
   .world-action-row .danger-button {
     flex: 1 1 96px;
+  }
+
+  .group-card-head,
+  .activity-monitor__head {
+    align-items: stretch;
+  }
+
+  .drawing-board canvas {
+    min-height: 200px;
+  }
+
+  .drawing-tool-row .secondary-button,
+  .drawing-tool-row .danger-button {
+    flex: 1 1 88px;
   }
 }
