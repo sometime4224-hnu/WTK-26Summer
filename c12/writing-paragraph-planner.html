@@ -86,7 +86,8 @@
     }
 
     .home-link,
-    .guide-link {
+    .guide-link,
+    .mode-link {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -105,6 +106,19 @@
     .guide-link {
       border-color: var(--green);
       background: var(--green);
+      color: #fff;
+    }
+
+    .mode-link {
+      border-color: #c7d7fe;
+      background: var(--blue-soft);
+      color: var(--blue);
+      cursor: pointer;
+    }
+
+    .mode-link[aria-pressed="true"] {
+      border-color: var(--blue);
+      background: var(--blue);
       color: #fff;
     }
 
@@ -525,9 +539,188 @@
       unicode-bidi: isolate;
     }
 
+    body.pc-mode {
+      height: auto;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    body.pc-mode .page {
+      width: min(1120px, calc(100% - 48px));
+      height: auto;
+      min-height: 100vh;
+      grid-template-rows: auto auto auto auto;
+      gap: 16px;
+      padding: 14px 0 56px;
+    }
+
+    body.pc-mode .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    body.pc-mode .hero {
+      align-items: flex-start;
+      padding: 4px 0;
+    }
+
+    body.pc-mode h1 {
+      max-width: none;
+      font-size: clamp(32px, 4vw, 48px);
+      line-height: 1.12;
+    }
+
+    body.pc-mode .lead {
+      max-width: 900px;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    body.pc-mode .how-grid {
+      display: grid;
+      margin: 0;
+    }
+
+    body.pc-mode .planner-deck {
+      height: auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    body.pc-mode .paragraph-section,
+    body.pc-mode .check-panel {
+      height: auto;
+      min-height: 0;
+      overflow: visible;
+      padding: 24px;
+    }
+
+    body.pc-mode .paragraph-section {
+      grid-template-rows: auto auto auto auto;
+      gap: 16px;
+    }
+
+    body.pc-mode .paragraph-section h2 {
+      font-size: 30px;
+    }
+
+    body.pc-mode .summary,
+    body.pc-mode .paragraph-goal,
+    body.pc-mode .question-card p,
+    body.pc-mode .sentence-flow,
+    body.pc-mode .check-list li {
+      font-size: 17px;
+      line-height: 1.65;
+    }
+
+    body.pc-mode .paragraph-goal {
+      padding: 14px 16px;
+    }
+
+    body.pc-mode .target,
+    body.pc-mode .goal-badge {
+      min-height: 36px;
+      font-size: 15px;
+    }
+
+    body.pc-mode .number {
+      width: 46px;
+      height: 46px;
+      font-size: 20px;
+    }
+
+    body.pc-mode .question-chain {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    body.pc-mode .question-card {
+      padding: 18px;
+    }
+
+    body.pc-mode .question-card > strong,
+    body.pc-mode .answer-frame strong {
+      font-size: 14px;
+    }
+
+    body.pc-mode .question-card h3 {
+      font-size: 22px;
+      line-height: 1.35;
+    }
+
+    body.pc-mode .choice-bank span {
+      padding: 7px 10px;
+      font-size: 14px;
+    }
+
+    body.pc-mode .answer-frame p {
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    body.pc-mode .sentence-flow {
+      padding: 16px 18px;
+    }
+
+    body.pc-mode .sentence-flow ol {
+      gap: 8px 28px;
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    body.pc-mode .check-panel h2 {
+      font-size: 30px;
+    }
+
+    body.pc-mode .check-list {
+      gap: 10px;
+    }
+
+    body.pc-mode .check-list li {
+      padding: 12px 14px;
+    }
+
+    body.pc-mode .paper-box {
+      width: 22px;
+      height: 22px;
+    }
+
     @media (max-width: 1040px) {
       .question-chain {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 641px) and (max-width: 1040px) {
+      body:not(.pc-mode) {
+        height: auto;
+        min-height: 100vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      body:not(.pc-mode) .page {
+        height: auto;
+        min-height: 100vh;
+        grid-template-rows: auto auto auto auto;
+        padding-bottom: 18px;
+      }
+
+      body:not(.pc-mode) .planner-deck {
+        height: auto;
+      }
+
+      body:not(.pc-mode) .paragraph-section,
+      body:not(.pc-mode) .check-panel {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+      }
+
+      body:not(.pc-mode) .paragraph-section {
+        grid-template-rows: auto auto auto auto;
       }
     }
 
@@ -559,7 +752,8 @@
       }
 
       .home-link,
-      .guide-link {
+      .guide-link,
+      .mode-link {
         white-space: normal;
       }
 
@@ -589,7 +783,8 @@
 
       .topbar span,
       .home-link,
-      .guide-link {
+      .guide-link,
+      .mode-link {
         font-size: 11px;
       }
 
@@ -752,6 +947,7 @@
       <div class="link-row">
         <a class="home-link" href="index.html">12과 목록</a>
         <a class="guide-link" href="writing-topic-guide.html">전체 가이드</a>
+        <button class="mode-link" type="button" data-pc-mode-toggle aria-pressed="false">PC 크게 보기</button>
       </div>
     </header>
 
@@ -1262,15 +1458,11 @@
       const pageButtons = Array.from(document.querySelectorAll("[data-page-button]"));
       const prevButton = document.querySelector("[data-page-prev]");
       const nextButton = document.querySelector("[data-page-next]");
+      const pcModeButton = document.querySelector("[data-pc-mode-toggle]");
       let currentPage = 0;
+      let pcMode = false;
 
-      function showPage(index) {
-        currentPage = Math.max(0, Math.min(index, pages.length - 1));
-
-        pages.forEach((page, pageIndex) => {
-          page.hidden = pageIndex !== currentPage;
-        });
-
+      function updatePageControls() {
         pageButtons.forEach((button, buttonIndex) => {
           if (buttonIndex === currentPage) {
             button.setAttribute("aria-current", "page");
@@ -1283,23 +1475,57 @@
         if (nextButton) nextButton.disabled = currentPage === pages.length - 1;
       }
 
+      function scrollCurrentPageIntoView() {
+        if (!pcMode || !pages[currentPage]) return;
+        pages[currentPage].scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }
+
+      function showPage(index, options = {}) {
+        currentPage = Math.max(0, Math.min(index, pages.length - 1));
+
+        pages.forEach((page, pageIndex) => {
+          page.hidden = pcMode ? false : pageIndex !== currentPage;
+        });
+
+        updatePageControls();
+
+        if (options.scroll) scrollCurrentPageIntoView();
+      }
+
+      function setPcMode(enabled) {
+        pcMode = Boolean(enabled);
+        document.body.classList.toggle("pc-mode", pcMode);
+        if (pcModeButton) {
+          pcModeButton.setAttribute("aria-pressed", String(pcMode));
+          pcModeButton.textContent = pcMode ? "한 화면 보기" : "PC 크게 보기";
+        }
+        showPage(currentPage, { scroll: pcMode });
+      }
+
       pageButtons.forEach((button) => {
         button.addEventListener("click", () => {
-          showPage(Number(button.dataset.pageButton));
+          showPage(Number(button.dataset.pageButton), { scroll: pcMode });
         });
       });
 
       if (prevButton) {
-        prevButton.addEventListener("click", () => showPage(currentPage - 1));
+        prevButton.addEventListener("click", () => showPage(currentPage - 1, { scroll: pcMode }));
       }
 
       if (nextButton) {
-        nextButton.addEventListener("click", () => showPage(currentPage + 1));
+        nextButton.addEventListener("click", () => showPage(currentPage + 1, { scroll: pcMode }));
+      }
+
+      if (pcModeButton) {
+        pcModeButton.addEventListener("click", () => setPcMode(!pcMode));
       }
 
       window.addEventListener("keydown", (event) => {
-        if (event.key === "ArrowLeft") showPage(currentPage - 1);
-        if (event.key === "ArrowRight") showPage(currentPage + 1);
+        if (event.key === "ArrowLeft") showPage(currentPage - 1, { scroll: pcMode });
+        if (event.key === "ArrowRight") showPage(currentPage + 1, { scroll: pcMode });
       });
 
       const languageObserver = new MutationObserver(syncScaffoldLanguage);
@@ -1315,7 +1541,8 @@
 
       window.__C12_WRITING_PARAGRAPH_PLANNER__ = {
         syncScaffoldLanguage,
-        showPage
+        showPage,
+        setPcMode
       };
     })();
   </script>

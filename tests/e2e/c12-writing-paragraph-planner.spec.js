@@ -9,6 +9,7 @@ test.describe("C12 writing paragraph planner", () => {
     await expect(page).toHaveTitle("12과 생활 속 운동 제안 글쓰기 문단 설계");
     await expect(page.locator("h1")).toContainText("4문단 질문 설계");
     await expect(page.locator(".goal-badge")).toHaveText("400~500자 · 4문단");
+    await expect(page.locator("[data-pc-mode-toggle]")).toHaveText("PC 크게 보기");
     await expect(page.locator("[data-page-button]")).toHaveText(["1문단", "2문단", "3문단", "4문단", "점검"]);
     await expect(page.locator('[data-page-button="0"]')).toHaveAttribute("aria-current", "page");
     await expect(page.locator("textarea")).toHaveCount(0);
@@ -29,6 +30,68 @@ test.describe("C12 writing paragraph planner", () => {
     ]);
     await expect(page.locator(".question-card h3")).toHaveCount(16);
     await expect(page.locator('[data-scaffold="p1q1"] .scaffold-ko')).toContainText("운동이 필요하지만");
+  });
+
+  test("offers a large PC scroll mode without replacing the slide mode", async ({ page }) => {
+    await expect(page.locator('[data-planner-page="1"]')).toBeHidden();
+
+    await page.locator("[data-pc-mode-toggle]").click();
+    await expect(page.locator("[data-pc-mode-toggle]")).toHaveText("한 화면 보기");
+    await expect(page.locator("[data-pc-mode-toggle]")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator('[data-planner-page="0"]')).toBeVisible();
+    await expect(page.locator('[data-planner-page="1"]')).toBeVisible();
+    await expect(page.locator('[data-planner-page="2"]')).toBeVisible();
+    await expect(page.locator('[data-planner-page="3"]')).toBeVisible();
+    await expect(page.locator('[data-planner-page="4"]')).toBeVisible();
+
+    const pcModeState = await page.evaluate(() => ({
+      bodyClass: document.body.classList.contains("pc-mode"),
+      overflowY: getComputedStyle(document.body).overflowY,
+      canScroll: document.documentElement.scrollHeight > document.documentElement.clientHeight
+    }));
+    expect(pcModeState).toEqual({
+      bodyClass: true,
+      overflowY: "auto",
+      canScroll: true
+    });
+
+    await page.evaluate(() => {
+      document.body.style.zoom = "1.3";
+      window.scrollTo(0, document.documentElement.scrollHeight);
+    });
+    const scrolled = await page.evaluate(() => window.scrollY > 0);
+    expect(scrolled).toBe(true);
+
+    await page.evaluate(() => {
+      document.body.style.zoom = "";
+      window.scrollTo(0, 0);
+    });
+    await page.locator("[data-pc-mode-toggle]").click();
+    await expect(page.locator("[data-pc-mode-toggle]")).toHaveText("PC 크게 보기");
+    await expect(page.locator('[data-planner-page="0"]')).toBeVisible();
+    await expect(page.locator('[data-planner-page="1"]')).toBeHidden();
+  });
+
+  test("allows tablet slide mode to scroll when browser chrome reduces height", async ({ page }) => {
+    await page.setViewportSize({ width: 820, height: 600 });
+    await page.goto("/c12/writing-paragraph-planner.html");
+    await page.locator('[data-page-button="3"]').click();
+
+    const tabletState = await page.evaluate(() => ({
+      overflowX: getComputedStyle(document.body).overflowX,
+      overflowY: getComputedStyle(document.body).overflowY,
+      canScroll: document.documentElement.scrollHeight > document.documentElement.clientHeight,
+      horizontalOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth
+    }));
+
+    expect(tabletState.overflowX).toBe("hidden");
+    expect(tabletState.overflowY).toBe("auto");
+    expect(tabletState.canScroll).toBe(true);
+    expect(tabletState.horizontalOverflow).toBeLessThanOrEqual(2);
+
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    const scrolled = await page.evaluate(() => window.scrollY > 0);
+    expect(scrolled).toBe(true);
   });
 
   test("keeps Korean questions and sentence frames when scaffold language changes", async ({ page }) => {
