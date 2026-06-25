@@ -86,6 +86,17 @@ function setStartStatus(message) {
   els.startStatus.textContent = message || "";
 }
 
+function setEntryDisabled(disabled) {
+  els.createRoomButton.disabled = disabled;
+  els.joinForm.querySelector("button").disabled = disabled;
+}
+
+function ensureClientReady() {
+  if (state.client) return true;
+  setStartStatus("Firebase 연결을 준비하는 중입니다. 잠시 후 다시 눌러 주세요.");
+  return false;
+}
+
 function setFieldNote(message, kind = "") {
   const note = document.getElementById("answerNote");
   if (!note) return;
@@ -171,6 +182,7 @@ async function generateRoomCode() {
 
 async function createRoom() {
   setStartStatus("");
+  if (!ensureClientReady()) return;
   const roomCode = await generateRoomCode();
   const createdAt = now();
   const hostPlayer = createPlayer("선생님", "host");
@@ -203,6 +215,7 @@ async function createRoom() {
 }
 
 async function joinRoom(roomCodeValue, nicknameValue) {
+  if (!ensureClientReady()) return;
   const roomCode = normalizeRoomCode(roomCodeValue);
   const nickname = normalizeNickname(nicknameValue);
   if (roomCode.length !== 6) {
@@ -606,6 +619,7 @@ async function handleAction(button) {
 
 function bindEvents() {
   els.createRoomButton.addEventListener("click", async () => {
+    if (!ensureClientReady()) return;
     try {
       els.createRoomButton.disabled = true;
       await createRoom();
@@ -618,6 +632,7 @@ function bindEvents() {
 
   els.joinForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (!ensureClientReady()) return;
     await joinRoom(els.roomCodeInput.value, els.nicknameInput.value);
   });
 
@@ -651,6 +666,7 @@ async function initClient() {
 
 async function init() {
   bindEvents();
+  setEntryDisabled(true);
   const roomFromUrl = normalizeRoomCode(params.get("room"));
   if (roomFromUrl) els.roomCodeInput.value = roomFromUrl;
 
@@ -658,11 +674,11 @@ async function init() {
     setConnection("연결 중");
     state.client = await initClient();
     setConnection(useMock ? "Mock" : "Firebase", "ready");
+    setEntryDisabled(false);
   } catch (error) {
     setConnection("설정 필요", "error");
     setStartStatus(error.message);
-    els.createRoomButton.disabled = true;
-    els.joinForm.querySelector("button").disabled = true;
+    setEntryDisabled(true);
     return;
   }
 
