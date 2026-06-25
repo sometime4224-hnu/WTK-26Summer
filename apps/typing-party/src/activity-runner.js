@@ -13,7 +13,9 @@ const state = {
   client: null,
   activity: null,
   nickname: params.get("nickname") || "참가자",
-  channel: "BroadcastChannel" in window ? new BroadcastChannel(CHANNEL_NAME) : null
+  channel: "BroadcastChannel" in window ? new BroadcastChannel(CHANNEL_NAME) : null,
+  unsubscribeRoom: null,
+  returning: false
 };
 
 const els = {
@@ -39,7 +41,12 @@ function setStatus(message, kind = "") {
 function buildReturnUrl() {
   const url = new URL("index.html", window.location.href);
   if (roomCode) url.searchParams.set("room", roomCode);
+  if (state.nickname) {
+    url.searchParams.set("nickname", state.nickname);
+    url.searchParams.set("autojoin", "1");
+  }
   if (useMock) url.searchParams.set("mock", "1");
+  if (useMock && mockUid) url.searchParams.set("uid", mockUid);
   return url.href;
 }
 
@@ -77,6 +84,29 @@ function relayProgress(payload) {
   if (state.channel) state.channel.postMessage(message);
 }
 
+function returnToRoom(reason = "대기실로 돌아가는 중") {
+  if (state.returning) return;
+  state.returning = true;
+  if (state.unsubscribeRoom) state.unsubscribeRoom();
+  setStatus(reason, "ready");
+  window.location.replace(buildReturnUrl());
+}
+
+function subscribeRoomControl() {
+  if (!state.client || !roomCode) return;
+  if (state.unsubscribeRoom) state.unsubscribeRoom();
+  state.unsubscribeRoom = state.client.subscribeRoom(roomCode, (room) => {
+    if (!room?.meta) {
+      returnToRoom("방으로 돌아가는 중");
+      return;
+    }
+    const currentRunId = room.meta.currentActivityRunId || "";
+    if (room.meta.status !== "activity" || currentRunId !== runId) {
+      returnToRoom("활동 종료");
+    }
+  });
+}
+
 async function reportProgress(payload) {
   if (!state.client || !state.activity || !roomCode || !runId) return;
   const progress = {
@@ -111,6 +141,7 @@ async function init() {
   try {
     state.client = await initClient();
     await hydrateNickname();
+    els.returnLink.href = buildReturnUrl();
     await reportProgress({
       status: "opened",
       stageTitle: state.activity.label,
@@ -118,6 +149,7 @@ async function init() {
       completed: 0,
       total: 0
     });
+    subscribeRoomControl();
     els.frame.src = buildActivityUrl(state.activity);
   } catch (error) {
     setStatus("설정 필요", "error");

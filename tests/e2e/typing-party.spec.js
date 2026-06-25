@@ -167,6 +167,11 @@ test.describe("typing party multiplayer MVP", () => {
     await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("작성 중");
     await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("초급 쓰기");
     await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("2 / 5");
+
+    await host.locator('[data-testid="close-activity"]').click();
+    await expect(student).toHaveURL(/index\.html/);
+    await expect(student.locator('[data-testid="stage-title"]')).toHaveText("대기실");
+    await expect(student.locator('[data-testid="activity-launch"]')).toHaveCount(0);
     await context.close();
   });
 

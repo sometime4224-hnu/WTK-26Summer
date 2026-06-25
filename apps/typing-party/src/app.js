@@ -2433,7 +2433,7 @@ async function init() {
     return;
   }
   const autoJoinNickname = normalizeNickname(params.get("nickname"));
-  if (useMock && params.get("autojoin") === "1" && room && autoJoinNickname) {
+  if (params.get("autojoin") === "1" && room && autoJoinNickname) {
     await joinRoom(roomFromUrl, autoJoinNickname);
     return;
   }
