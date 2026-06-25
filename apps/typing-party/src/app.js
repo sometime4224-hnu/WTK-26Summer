@@ -16,6 +16,7 @@ import {
   CATCHMIND_SECONDS,
   DRAWING_COLORS,
   DRAWING_SIZES,
+  ERASER_DEFAULT_SIZE,
   GROUP_GAME_MAX_SIZE,
   getPartyWord,
   getPartyWordByIndex,
@@ -1128,6 +1129,7 @@ function buildDrawingCanvas(sessionId, groupId, drawingId, canDraw = false, labe
         data-can-draw="${canDraw ? "1" : "0"}"
         aria-label="${escapeHtml(label)}"
       ></canvas>
+      <span class="drawing-cursor" aria-hidden="true"></span>
     </div>
   `;
 }
@@ -1149,7 +1151,8 @@ function renderDrawingControls(sessionId, groupId, drawingId) {
       type="button"
       data-action="select-drawing-size"
       data-size="${size}"
-    >${size}</button>
+      aria-label="굵기 ${size}"
+    ><span style="--preview-size: ${Math.max(8, Math.min(30, size))}px"></span></button>
   `).join("");
 
   return `
@@ -1889,6 +1892,31 @@ function pointForCanvas(event, canvas) {
   return { x, y };
 }
 
+function updateDrawingCursor(event, canvas) {
+  const board = canvas?.closest?.(".drawing-board");
+  if (!board || canvas.dataset.canDraw !== "1") return;
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+    board.classList.remove("is-cursor-visible");
+    return;
+  }
+  const size = Math.max(4, Number(state.drawingSize || DRAWING_SIZES[0]));
+  board.style.setProperty("--cursor-x", `${x}px`);
+  board.style.setProperty("--cursor-y", `${y}px`);
+  board.style.setProperty("--cursor-size", `${size}px`);
+  board.style.setProperty("--cursor-color", state.drawingTool === "eraser" ? "#be123c" : state.drawingColor);
+  board.classList.add("is-cursor-visible");
+  board.classList.toggle("is-eraser-cursor", state.drawingTool === "eraser");
+}
+
+function hideDrawingCursor(event) {
+  const board = event.target?.closest?.(".drawing-board");
+  if (!board || board.contains(event.relatedTarget)) return;
+  board.classList.remove("is-cursor-visible");
+}
+
 function drawingPointerId(event) {
   return event.pointerId ?? "mouse";
 }
@@ -1899,13 +1927,13 @@ function compactPoints(points) {
   return points.filter((_, index) => index % step === 0 || index === points.length - 1);
 }
 
-function drawStroke(ctx, stroke, width, height) {
+function drawStroke(ctx, stroke, width, height, scale = 1) {
   const points = stroke?.points || [];
   if (points.length < 1) return;
   ctx.save();
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  ctx.lineWidth = Number(stroke.size || 4);
+  ctx.lineWidth = Number(stroke.size || 4) * scale;
   if (stroke.tool === "eraser") {
     ctx.globalCompositeOperation = "destination-out";
     ctx.strokeStyle = "rgba(0,0,0,1)";
@@ -1948,9 +1976,9 @@ function renderDrawingCanvases() {
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, width, height);
     const drawing = drawingFor(canvas.dataset.sessionId, canvas.dataset.groupId, canvas.dataset.drawingId);
-    strokesForDrawing(drawing).forEach((stroke) => drawStroke(ctx, stroke, width, height));
+    strokesForDrawing(drawing).forEach((stroke) => drawStroke(ctx, stroke, width, height, ratio));
     if (state.activeStroke?.key === drawingCanvasKey(canvas)) {
-      drawStroke(ctx, state.activeStroke, width, height);
+      drawStroke(ctx, state.activeStroke, width, height, ratio);
     }
   });
 }
@@ -1961,6 +1989,7 @@ function handleDrawingPointerDown(event) {
   if (event.type === "mousedown" && now() - state.lastDrawingPointerAt < 500) return;
   if (event.type === "pointerdown") state.lastDrawingPointerAt = now();
   event.preventDefault();
+  updateDrawingCursor(event, canvas);
   if (event.pointerId !== undefined) canvas.setPointerCapture?.(event.pointerId);
   state.activeStroke = {
     key: drawingCanvasKey(canvas),
@@ -1980,6 +2009,8 @@ function handleDrawingPointerDown(event) {
 }
 
 function handleDrawingPointerMove(event) {
+  const hoverCanvas = event.target.closest?.("[data-drawing-canvas]");
+  if (hoverCanvas) updateDrawingCursor(event, hoverCanvas);
   if (!state.activeStroke || state.activeStroke.pointerId !== drawingPointerId(event)) return;
   const canvas = [...document.querySelectorAll("[data-drawing-canvas]")].find((item) =>
     item.dataset.sessionId === state.activeStroke.sessionId
@@ -2167,6 +2198,9 @@ async function handleAction(button) {
     if (action === "advance-gartic-phone") await advanceGarticPhone();
     if (action === "select-drawing-tool") {
       state.drawingTool = button.dataset.tool || "pen";
+      if (state.drawingTool === "eraser" && state.drawingSize < ERASER_DEFAULT_SIZE) {
+        state.drawingSize = ERASER_DEFAULT_SIZE;
+      }
       renderGroupGamePanel();
     }
     if (action === "select-drawing-color") {
@@ -2306,6 +2340,7 @@ function bindEvents() {
   document.addEventListener("keydown", handleWorldKeydown);
   document.addEventListener("pointerdown", handleDrawingPointerDown);
   document.addEventListener("pointermove", handleDrawingPointerMove);
+  document.addEventListener("pointerout", hideDrawingCursor);
   document.addEventListener("pointerup", (event) => {
     handleDrawingPointerEnd(event).catch((error) => setStartStatus(error.message));
   });
@@ -2314,6 +2349,7 @@ function bindEvents() {
   });
   document.addEventListener("mousedown", handleDrawingPointerDown);
   document.addEventListener("mousemove", handleDrawingPointerMove);
+  document.addEventListener("mouseout", hideDrawingCursor);
   document.addEventListener("mouseup", (event) => {
     handleDrawingPointerEnd(event).catch((error) => setStartStatus(error.message));
   });

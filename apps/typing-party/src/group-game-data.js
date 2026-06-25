@@ -2,7 +2,8 @@ export const GROUP_GAME_MAX_SIZE = 6;
 export const CATCHMIND_SECONDS = 120;
 
 export const DRAWING_COLORS = ["#172033", "#2563eb", "#0f766e", "#b45309", "#be123c"];
-export const DRAWING_SIZES = [4, 8, 13];
+export const ERASER_DEFAULT_SIZE = 30;
+export const DRAWING_SIZES = [4, 8, 13, ERASER_DEFAULT_SIZE];
 
 export const PARTY_WORD_POOL = [
   { id: "c10-confess", lesson: "10과", answer: "고백하다", aliases: ["고백"], clue: "좋아하는 마음을 말로 전하기", difficulty: "easy", drawable: true },

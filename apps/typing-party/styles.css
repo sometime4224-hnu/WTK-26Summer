@@ -1079,6 +1079,7 @@ textarea {
 }
 
 .drawing-board {
+  position: relative;
   overflow: hidden;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
@@ -1091,6 +1092,7 @@ textarea {
   width: 100%;
   aspect-ratio: 4 / 3;
   min-height: 220px;
+  cursor: crosshair;
   touch-action: none;
   background: #ffffff;
 }
@@ -1098,6 +1100,35 @@ textarea {
 .drawing-board.is-interactive {
   border-color: #2563eb;
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.drawing-board.is-interactive canvas {
+  cursor: none;
+}
+
+.drawing-cursor {
+  position: absolute;
+  left: var(--cursor-x, -80px);
+  top: var(--cursor-y, -80px);
+  z-index: 2;
+  width: var(--cursor-size, 8px);
+  height: var(--cursor-size, 8px);
+  border: 2px solid var(--cursor-color, #172033);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.84), 0 8px 18px rgba(15, 23, 42, 0.16);
+}
+
+.drawing-board.is-cursor-visible .drawing-cursor {
+  opacity: 1;
+}
+
+.drawing-board.is-eraser-cursor .drawing-cursor {
+  background: rgba(255, 241, 242, 0.42);
+  border-style: dashed;
 }
 
 .drawing-tool-row,
@@ -1128,6 +1159,16 @@ textarea {
 
 .drawing-size-button {
   min-width: 42px;
+  gap: 6px;
+}
+
+.drawing-size-button span {
+  display: inline-block;
+  width: var(--preview-size);
+  height: var(--preview-size);
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.08);
 }
 
 .catchmind-answer {

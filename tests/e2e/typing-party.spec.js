@@ -250,6 +250,14 @@ test.describe("typing party multiplayer MVP", () => {
     await expect(guesser.locator('[data-testid="catchmind-drawer-answer"]')).toHaveCount(0);
 
     const answer = (await drawer.locator('[data-testid="catchmind-drawer-answer"] strong').textContent()).trim();
+    await drawer.locator('[data-action="select-drawing-tool"][data-tool="eraser"]').click();
+    await expect(drawer.locator('[data-action="select-drawing-size"][data-size="30"]')).toHaveClass(/is-selected/);
+    const cursorCanvas = drawer.locator('canvas[data-can-draw="1"]').first();
+    await cursorCanvas.scrollIntoViewIfNeeded();
+    const cursorBox = await cursorCanvas.boundingBox();
+    await drawer.mouse.move(cursorBox.x + cursorBox.width * 0.5, cursorBox.y + cursorBox.height * 0.5);
+    await expect.poll(async () => drawer.locator(".drawing-cursor").first().evaluate((node) => getComputedStyle(node).width)).toBe("30px");
+    await drawer.locator('[data-action="select-drawing-tool"][data-tool="pen"]').click();
     await drawStroke(drawer);
     await expect.poll(async () => host.locator("canvas").evaluateAll((canvases) => canvases.some((canvas) => {
       const ctx = canvas.getContext("2d");
