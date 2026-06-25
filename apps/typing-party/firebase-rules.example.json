@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "typingParty": {
+      "rooms": {
+        "$roomCode": {
+          ".read": "auth != null",
+          ".write": "auth != null && ((!data.exists() && newData.child('meta/hostUid').val() === auth.uid) || (data.exists() && data.child('meta/hostUid').val() === auth.uid && !newData.exists()))",
+          "meta": {
+            ".write": "auth != null && data.parent().child('meta/hostUid').val() === auth.uid"
+          },
+          "rounds": {
+            "$roundId": {
+              ".write": "auth != null && data.parent().parent().child('meta/hostUid').val() === auth.uid"
+            }
+          },
+          "players": {
+            "$uid": {
+              ".write": "auth != null && (auth.uid === $uid || data.parent().parent().child('meta/hostUid').val() === auth.uid)"
+            }
+          },
+          "submissions": {
+            "$roundId": {
+              "$uid": {
+                ".write": "auth != null && auth.uid === $uid"
+              }
+            }
+          },
+          "votes": {
+            "$roundId": {
+              "$category": {
+                "$uid": {
+                  ".write": "auth != null && auth.uid === $uid"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

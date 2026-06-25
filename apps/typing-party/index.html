@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>타이핑 파티</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="party-shell">
+      <header class="party-topbar">
+        <a class="nav-link" href="../index.html">허브</a>
+        <div class="brand-title">
+          <span>Typing Party</span>
+          <strong>타이핑 파티</strong>
+        </div>
+        <span class="connection-chip" id="connectionChip">준비</span>
+      </header>
+
+      <section class="start-screen" id="startScreen" aria-labelledby="pageTitle">
+        <div class="intro-panel">
+          <div>
+            <span class="eyebrow">실시간 교실 게임</span>
+            <h1 id="pageTitle">방 코드로 같이 쓰고 같이 웃기</h1>
+            <p class="lead">랜덤박스 문장 배틀과 타이핑 탈출 미션을 방 하나에서 바로 진행합니다.</p>
+          </div>
+          <div class="mode-strip" aria-label="게임 종류">
+            <span>랜덤박스</span>
+            <span>탈출 미션</span>
+            <span>투표</span>
+          </div>
+        </div>
+
+        <div class="entry-grid">
+          <section class="entry-panel" aria-labelledby="hostTitle">
+            <span class="eyebrow">Teacher</span>
+            <h2 id="hostTitle">교사용 방 만들기</h2>
+            <p>방을 열고 학생들이 들어오면 라운드를 시작합니다.</p>
+            <button class="primary-button" id="createRoomButton" type="button" data-testid="create-room">방 만들기</button>
+          </section>
+
+          <section class="entry-panel" aria-labelledby="joinTitle">
+            <span class="eyebrow">Student</span>
+            <h2 id="joinTitle">방 코드로 입장</h2>
+            <form class="join-form" id="joinForm">
+              <label>
+                <span>방 코드</span>
+                <input id="roomCodeInput" name="roomCode" maxlength="6" autocomplete="off" inputmode="latin" placeholder="ABC123" data-testid="room-code-input">
+              </label>
+              <label>
+                <span>닉네임</span>
+                <input id="nicknameInput" name="nickname" maxlength="12" autocomplete="off" placeholder="이름 또는 별명" data-testid="nickname-input">
+              </label>
+              <button class="primary-button" type="submit" data-testid="join-room">입장</button>
+            </form>
+          </section>
+        </div>
+
+        <p class="status-line" id="startStatus" role="status"></p>
+      </section>
+
+      <section class="room-screen" id="roomScreen" hidden>
+        <section class="room-hero" aria-label="방 정보">
+          <div>
+            <span class="eyebrow" id="roleLabel">Room</span>
+            <h1 id="roomTitle">타이핑 파티</h1>
+            <p id="roomSubtitle">참가자와 라운드를 준비합니다.</p>
+          </div>
+          <div class="room-code-box">
+            <span>방 코드</span>
+            <strong id="roomCodeDisplay" data-testid="room-code-display">------</strong>
+            <a id="joinLink" href="#" target="_blank" rel="noopener" data-testid="join-link">입장 링크</a>
+          </div>
+        </section>
+
+        <div class="room-layout">
+          <aside class="side-panel" aria-labelledby="playersTitle">
+            <div class="panel-head">
+              <div>
+                <span class="eyebrow">Players</span>
+                <h2 id="playersTitle">참가자</h2>
+              </div>
+              <strong id="playerCount">0</strong>
+            </div>
+            <div class="player-list" id="playerList" data-testid="player-list"></div>
+          </aside>
+
+          <section class="main-panel" aria-live="polite">
+            <div class="panel-head">
+              <div>
+                <span class="eyebrow" id="roundKicker">Lobby</span>
+                <h2 id="stageTitle" data-testid="stage-title">대기실</h2>
+              </div>
+              <span class="stage-chip" id="stageChip">lobby</span>
+            </div>
+
+            <div class="host-controls" id="hostControls" hidden data-testid="host-controls"></div>
+            <div class="prompt-panel" id="promptPanel" data-testid="prompt-panel"></div>
+            <div class="submit-panel" id="submitPanel"></div>
+            <div class="submissions-panel" id="submissionsPanel" data-testid="submissions-panel"></div>
+            <div class="results-panel" id="resultsPanel" data-testid="results-panel"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="src/app.js"></script>
+    <script src="../../shared/site-copyright.js"></script>
+    <script src="../../shared/page-qr.js"></script>
+  </body>
+</html>
