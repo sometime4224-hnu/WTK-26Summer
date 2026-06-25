@@ -28,6 +28,7 @@ const params = new URLSearchParams(window.location.search);
 const useMock = params.get("mock") === "1";
 const resetMock = params.get("reset") === "1";
 const TEACHER_PIN = "3b67";
+const ACTIVITY_PROGRESS_CHANNEL = "typingParty.activity.progress.v1";
 
 const state = {
   client: null,
@@ -41,6 +42,7 @@ const state = {
   selectedWorldAvatar: WORLD_AVATARS[0].id,
   lastWorldSyncAt: 0,
   lastWorldGatherSeq: 0,
+  activityProgressChannel: null,
   teacherUnlocked: false,
   unsubscribe: null
 };
@@ -588,11 +590,16 @@ function formatAgo(timestamp) {
   return `${Math.round(seconds / 60)}분 전`;
 }
 
-function buildActivityUrl(activity, runId) {
-  const url = new URL(activity.path, window.location.href);
-  url.searchParams.set("partyRoom", state.roomCode);
+function buildActivityRunnerUrl(activity, runId) {
+  const url = new URL("activity.html", window.location.href);
+  url.searchParams.set("room", state.roomCode);
+  url.searchParams.set("activity", activity.id);
   url.searchParams.set("activityRun", runId || "");
-  if (useMock) url.searchParams.set("mock", "1");
+  url.searchParams.set("nickname", state.nickname || "참가자");
+  if (useMock) {
+    url.searchParams.set("mock", "1");
+    url.searchParams.set("uid", state.client.uid);
+  }
   return url.href;
 }
 
@@ -654,23 +661,30 @@ function renderActivityPanel(activity, runId) {
     return;
   }
 
-  const frameUrl = buildActivityUrl(activity, runId);
-  if (els.promptPanel.dataset.activityRunId === runId && els.promptPanel.querySelector(".activity-frame")) {
+  const runnerUrl = buildActivityRunnerUrl(activity, runId);
+  if (els.promptPanel.dataset.activityRunId === runId && els.promptPanel.querySelector(".activity-launch-card")) {
     return;
   }
 
   els.promptPanel.dataset.activityRunId = runId || "";
   els.promptPanel.innerHTML = `
-    <section class="activity-student" data-testid="activity-student">
+    <section class="activity-student activity-launch-card" data-testid="activity-student">
       <div class="activity-monitor__head">
         <div>
           <span class="category-badge">지금 할 활동</span>
           <h2>${escapeHtml(activity.label)}</h2>
           <p>${escapeHtml(activity.summary)}</p>
         </div>
-        <a class="secondary-button" href="${escapeHtml(frameUrl)}" target="_blank" rel="noopener">새 탭</a>
+        <div class="activity-launch-actions">
+          <a class="primary-button activity-enter-button" href="${escapeHtml(runnerUrl)}" data-testid="activity-launch" data-enter-activity-start="1">ENTER를 눌러 시작</a>
+          <a class="secondary-button" href="${escapeHtml(runnerUrl)}" target="_blank" rel="noopener" data-testid="activity-launch-new">새 탭으로 열기</a>
+        </div>
       </div>
-      <iframe class="activity-frame" data-testid="activity-frame" src="${escapeHtml(frameUrl)}" title="${escapeHtml(activity.label)}"></iframe>
+      <div class="activity-open-card">
+        <span class="category-badge">Full Activity</span>
+        <strong>${escapeHtml(activity.label)}</strong>
+        <p>Enter 키를 누르면 기존 활동 화면이 넓은 실행 화면으로 열립니다.</p>
+      </div>
     </section>
   `;
 }
@@ -1379,6 +1393,22 @@ function handleWorldKeydown(event) {
   completeWorldStation(station, station.successDetail).catch((error) => setStartStatus(error.message));
 }
 
+function isTypingTarget(target) {
+  const tagName = target?.tagName;
+  return target?.isContentEditable || ["INPUT", "TEXTAREA", "SELECT", "BUTTON", "A"].includes(tagName);
+}
+
+function handleActivityStartKeydown(event) {
+  if (state.role !== "student" || state.room?.meta?.status !== "activity") return;
+  if (event.key !== "Enter" || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
+  if (isTypingTarget(event.target)) return;
+
+  const launch = document.querySelector("[data-enter-activity-start]");
+  if (!launch?.href) return;
+  event.preventDefault();
+  window.location.href = launch.href;
+}
+
 function bindEvents() {
   els.teacherPinForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -1437,12 +1467,24 @@ function bindEvents() {
     }
   });
 
+  document.addEventListener("keydown", handleActivityStartKeydown);
   document.addEventListener("keydown", handleWorldKeydown);
 
   window.addEventListener("message", (event) => {
     if (!event.data || event.data.type !== "typing-party-progress") return;
     reportActivityProgress(event.data).catch((error) => setStartStatus(error.message));
   });
+
+  if ("BroadcastChannel" in window) {
+    state.activityProgressChannel = new BroadcastChannel(ACTIVITY_PROGRESS_CHANNEL);
+    state.activityProgressChannel.addEventListener("message", (event) => {
+      const message = event.data || {};
+      if (message.type !== "typing-party-progress-relay") return;
+      if (message.roomCode !== state.roomCode) return;
+      if (message.runId !== state.room?.meta?.currentActivityRunId) return;
+      reportActivityProgress(message.payload || {}).catch((error) => setStartStatus(error.message));
+    });
+  }
 
   els.roomCodeInput.addEventListener("input", () => {
     els.roomCodeInput.value = normalizeRoomCode(els.roomCodeInput.value);

@@ -6,6 +6,10 @@ function createUid() {
   return `mock_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36).slice(-4)}`;
 }
 
+function normalizeUid(value) {
+  return String(value || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 96);
+}
+
 function readRooms() {
   try {
     return JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "{}");
@@ -29,16 +33,16 @@ function setByPath(target, path, value) {
   cursor[parts[parts.length - 1]] = value;
 }
 
-export async function createMockClient({ reset = false } = {}) {
+export async function createMockClient({ reset = false, uid: requestedUid = "" } = {}) {
   if (reset) {
     window.localStorage.removeItem(STORAGE_KEY);
   }
 
-  let uid = window.sessionStorage.getItem(UID_KEY);
+  let uid = normalizeUid(requestedUid) || window.sessionStorage.getItem(UID_KEY);
   if (!uid) {
     uid = createUid();
-    window.sessionStorage.setItem(UID_KEY, uid);
   }
+  window.sessionStorage.setItem(UID_KEY, uid);
 
   const channel = "BroadcastChannel" in window ? new BroadcastChannel(CHANNEL_NAME) : null;
 

@@ -115,8 +115,14 @@ test.describe("typing party multiplayer MVP", () => {
     await host.locator('[data-testid="activity-select"]').selectOption("c12-writing-shower");
     await host.locator('[data-testid="start-activity"]').click();
     await expect(host.locator('[data-testid="stage-title"]')).toHaveText("개인 활동");
-    await expect(student.locator('[data-testid="activity-frame"]')).toBeVisible();
-    await expect(student.frameLocator('[data-testid="activity-frame"]').locator("#missionTitle")).toContainText("초급 쓰기");
+    await expect(student.locator('[data-testid="activity-launch"]')).toBeVisible();
+    await expect(student.locator('[data-testid="activity-launch"]')).toContainText("ENTER를 눌러 시작");
+
+    await student.keyboard.press("Enter");
+    await student.waitForLoadState("domcontentloaded");
+    await expect(student).toHaveURL(/activity\.html/);
+    await expect(student.locator('[data-testid="activity-runner-frame"]')).toBeVisible();
+    await expect(student.frameLocator('[data-testid="activity-runner-frame"]').locator("#missionTitle")).toContainText("초급 쓰기");
     await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("하준");
 
     await student.evaluate(() => {
