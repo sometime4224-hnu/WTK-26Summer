@@ -101,6 +101,15 @@ export async function createMockClient({ reset = false } = {}) {
       });
     },
 
+    async setProgress(roomCode, runId, progress) {
+      mutate((rooms) => {
+        if (!rooms[roomCode]) rooms[roomCode] = {};
+        if (!rooms[roomCode].progress) rooms[roomCode].progress = {};
+        if (!rooms[roomCode].progress[runId]) rooms[roomCode].progress[runId] = {};
+        rooms[roomCode].progress[runId][uid] = progress;
+      });
+    },
+
     async removeRoom(roomCode) {
       mutate((rooms) => {
         delete rooms[roomCode];

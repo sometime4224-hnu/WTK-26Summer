@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12과 쓰기 표현 조립 연습</title>
+    <link rel="stylesheet" href="../../../../shared/multilang-toggle.css">
+    <style>
+      :root {
+        --ink: #172033;
+        --muted: #64748b;
+        --line: #d7e0ea;
+        --soft: #f7f9fc;
+        --paper: #ffffff;
+        --blue: #2563eb;
+        --green: #059669;
+        --orange: #ea580c;
+        --red: #dc2626;
+        --shadow: 0 18px 50px rgba(15, 23, 42, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, rgba(234, 88, 12, 0.09), transparent 32%),
+          var(--soft);
+        color: var(--ink);
+        font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+
+      button,
+      textarea {
+        font: inherit;
+      }
+
+      .app {
+        width: min(1180px, calc(100% - 28px));
+        margin: 0 auto;
+        padding: 18px 0 34px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+
+      .topbar strong {
+        display: block;
+        font-size: clamp(20px, 3vw, 32px);
+        font-weight: 950;
+      }
+
+      .topbar span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .home-link {
+        flex: 0 0 auto;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 10px 14px;
+        background: #fff;
+        color: var(--ink);
+        font-size: 13px;
+        font-weight: 900;
+        text-decoration: none;
+      }
+
+      .progress {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .progress button {
+        min-height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0 12px;
+        background: #fff;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 950;
+        cursor: pointer;
+      }
+
+      .progress button.is-current {
+        border-color: var(--orange);
+        background: #fff7ed;
+        color: #c2410c;
+        box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.14);
+      }
+
+      .progress button.is-done {
+        border-color: #86efac;
+        background: #ecfdf5;
+        color: #047857;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 370px;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .mission,
+      .basket,
+      .preview {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--paper);
+      }
+
+      .mission {
+        position: relative;
+        min-width: 0;
+        border: 2px solid #fdba74;
+        padding: clamp(18px, 3.5vw, 34px);
+        box-shadow: var(--shadow);
+      }
+
+      .mission.is-current-task::before {
+        content: "";
+        position: absolute;
+        inset: -8px;
+        z-index: -1;
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(234, 88, 12, 0.2), rgba(5, 150, 105, 0.16));
+      }
+
+      .stage-meta {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        border-radius: 999px;
+        padding: 0 12px;
+        background: #172033;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 950;
+      }
+
+      h1 {
+        margin: 12px 0 6px;
+        font-size: clamp(30px, 6.5vw, 60px);
+        line-height: 1.04;
+        letter-spacing: 0;
+      }
+
+      .mission-prompt {
+        margin: 0 0 16px;
+        color: #334155;
+        font-size: clamp(16px, 2.4vw, 22px);
+        font-weight: 850;
+        line-height: 1.5;
+      }
+
+      .scenario {
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 14px;
+        background: #eff6ff;
+        color: #1e3a8a;
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1.65;
+      }
+
+      .scenario strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #172554;
+        font-size: 16px;
+      }
+
+      .language-row {
+        margin: 12px 0;
+      }
+
+      .requirement {
+        margin: 14px 0 10px;
+        border-left: 5px solid var(--orange);
+        padding: 10px 12px;
+        background: #fff7ed;
+        color: #9a3412;
+        font-size: 14px;
+        font-weight: 900;
+        line-height: 1.55;
+      }
+
+      .token-section {
+        margin-top: 14px;
+      }
+
+      .token-section strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 950;
+      }
+
+      .token-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .token {
+        border: 1px solid #cbd5e1;
+        border-radius: 999px;
+        padding: 8px 11px;
+        background: #fff;
+        color: var(--ink);
+        font-size: 13px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .token:hover,
+      .token:focus-visible {
+        border-color: var(--blue);
+        background: #eff6ff;
+        outline: none;
+      }
+
+      .answer {
+        width: 100%;
+        min-height: 150px;
+        margin-top: 16px;
+        border: 3px solid #172033;
+        border-radius: 8px;
+        padding: 14px 16px;
+        background: #fff;
+        color: var(--ink);
+        font-size: clamp(18px, 3vw, 24px);
+        font-weight: 800;
+        line-height: 1.55;
+        resize: vertical;
+        outline: none;
+      }
+
+      .answer:focus {
+        border-color: var(--orange);
+        box-shadow: 0 0 0 5px rgba(234, 88, 12, 0.16);
+      }
+
+      .feedback {
+        min-height: 34px;
+        margin-top: 10px;
+        border-radius: 8px;
+        padding: 9px 12px;
+        background: #eef2ff;
+        color: #3730a3;
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .feedback.is-error {
+        background: #fef2f2;
+        color: #b91c1c;
+      }
+
+      .feedback.is-good {
+        background: #ecfdf5;
+        color: #047857;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .actions button {
+        min-height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0 14px;
+        background: #fff;
+        color: var(--ink);
+        font-weight: 950;
+        cursor: pointer;
+      }
+
+      .actions button.primary {
+        border-color: var(--orange);
+        background: var(--orange);
+        color: #fff;
+      }
+
+      .side-stack {
+        display: grid;
+        gap: 14px;
+      }
+
+      .basket,
+      .preview {
+        padding: 16px;
+      }
+
+      .basket h2,
+      .preview h2 {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 0 0 10px;
+        font-size: 18px;
+      }
+
+      .small-note {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .basket-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .basket-item {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px;
+        background: #f8fafc;
+      }
+
+      .basket-item strong {
+        display: block;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 950;
+      }
+
+      .basket-item p {
+        margin: 5px 0 0;
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.5;
+      }
+
+      .empty {
+        border: 1px dashed #cbd5e1;
+        border-radius: 8px;
+        padding: 12px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1.5;
+      }
+
+      .paragraph-preview {
+        min-height: 220px;
+        white-space: pre-wrap;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 14px;
+        background: #f8fafc;
+        color: #172033;
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1.75;
+      }
+
+      .final-area {
+        min-height: 280px;
+      }
+
+      @media (max-width: 880px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .app {
+          width: min(100% - 16px, 1180px);
+          padding-top: 10px;
+        }
+
+        .topbar {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .home-link {
+          align-self: flex-start;
+        }
+
+        .mission {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      window.MULTILANG_CONFIG = {
+        langs: ["vi", "mn", "ar", "kk", "th", "en", "ja", "zh"],
+        defaultLang: "none",
+        ignoreStoredLang: true
+      };
+    </script>
+
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <strong>12과 쓰기 표현 조립 연습</strong>
+          <span>표현을 골라 문장을 만들고, 생활 속 운동 답글 문단으로 다듬습니다.</span>
+        </div>
+        <a class="home-link" href="../../../../c12/index.html">12과 목록</a>
+      </header>
+
+      <nav class="progress" id="progressDots" aria-label="표현 조립 진행 단계"></nav>
+
+      <div class="layout">
+        <section class="mission is-current-task" aria-labelledby="stageTitle">
+          <span class="stage-meta" id="stageMeta">1단계</span>
+          <h1 id="stageTitle">상황 파악</h1>
+          <p class="mission-prompt" id="missionPrompt">고민 글의 상황을 확인합니다.</p>
+
+          <section class="scenario" id="scenarioBox">
+            <strong>고민 상황</strong>
+            요즘 바빠서 운동을 못 했더니 건강이 나빠지고 살도 찐 것 같아 걱정하는 사람에게 답글을 씁니다.
+          </section>
+
+          <div class="language-row" data-multilang-bar></div>
+          <div id="translationBox"></div>
+
+          <div class="requirement" id="requirementText">상황을 읽고 다음 단계로 이동합니다.</div>
+
+          <div class="token-section">
+            <strong>문장 시작</strong>
+            <div class="token-list" id="starterList"></div>
+          </div>
+          <div class="token-section">
+            <strong>표현 은행</strong>
+            <div class="token-list" id="expressionBank"></div>
+          </div>
+
+          <textarea class="answer" id="answerInput" autocomplete="off" spellcheck="false"></textarea>
+          <div class="feedback" id="feedbackText" aria-live="polite">문장을 저장하면 오른쪽 바구니에 쌓입니다.</div>
+
+          <div class="actions">
+            <button id="prevButton" type="button">이전</button>
+            <button id="saveButton" class="primary" type="button">저장하고 다음</button>
+            <button id="copyButton" type="button">복사</button>
+            <button id="resetButton" type="button">초기화</button>
+          </div>
+        </section>
+
+        <aside class="side-stack">
+          <section class="basket" aria-label="문장 바구니">
+            <h2>문장 바구니 <span class="small-note" id="basketCount">0개</span></h2>
+            <div class="basket-list" id="basketList"></div>
+          </section>
+
+          <section class="preview" aria-label="답글 문단 미리보기">
+            <h2>답글 미리보기 <span class="small-note" id="previewCount">0/5</span></h2>
+            <div class="paragraph-preview" id="paragraphPreview"></div>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <script src="writing-expression-data.js"></script>
+    <script src="../../../../shared/multilang-toggle.js"></script>
+    <script>
+      (function () {
+        "use strict";
+
+        const STORAGE_KEY = "c12_writing_expression_assembly_v1";
+        const DATA = window.C12_WRITING_TOPIC_DATA;
+        const LANGS = DATA.langs;
+
+        function tx(en, vi, ar) {
+          return {
+            vi: vi || en,
+            mn: en,
+            ar: ar || en,
+            kk: en,
+            th: en,
+            en,
+            ja: en,
+            zh: en
+          };
+        }
+
+        const SCENARIO_TRANSLATIONS = tx(
+          "Write a reply to someone who is busy, cannot exercise, and worries about health and weight.",
+          "Viết trả lời cho người bận rộn, không tập thể dục được và lo về sức khỏe, cân nặng.",
+          "اكتب ردا لشخص مشغول لا يستطيع ممارسة الرياضة ويقلق بشأن صحته ووزنه."
+        );
+
+        const EXPRESSIONS = DATA.assemblyGroups;
+
+        const ASSEMBLY_STEPS = [
+          {
+            id: "situation",
+            label: "상황",
+            title: "상황 파악",
+            meta: "1단계",
+            prompt: "고민 글의 핵심 상황을 한 문장으로 정리합니다.",
+            role: "문제 정리",
+            minLength: 16,
+            requiredAny: ["바빠서", "운동", "걱정"],
+            starters: ["요즘 바빠서", "운동을 못 해서", "건강과 체중이"],
+            bank: ["건강이 나빠진 것 같아서", "살도 찐 것 같아서", "걱정이 많을 것 같습니다"],
+            help: tx("Summarize the problem before giving advice.", "Tóm tắt vấn đề trước khi khuyên.", "لخص المشكلة قبل تقديم النصيحة.")
+          },
+          {
+            id: "empathy",
+            label: "공감",
+            title: "공감 문장 조립",
+            meta: "2단계",
+            prompt: "상대의 어려움을 먼저 인정하는 문장을 만듭니다.",
+            role: "공감",
+            minLength: 14,
+            requiredAny: EXPRESSIONS.empathy,
+            starters: ["글을 읽어 보니", "요즘", "운동할 시간이 없으면"],
+            bank: EXPRESSIONS.empathy,
+            help: tx("Start with empathy so the advice feels softer.", "Bắt đầu bằng sự đồng cảm để lời khuyên nhẹ nhàng hơn.", "ابدأ بالتعاطف ليصبح النصح ألطف.")
+          },
+          {
+            id: "method1",
+            label: "방법1",
+            title: "생활 운동 방법 1",
+            meta: "3단계",
+            prompt: "시간이 없어도 할 수 있는 생활 속 운동을 권합니다.",
+            role: "생활 운동 권유 1",
+            minLength: 18,
+            requiredAny: EXPRESSIONS.method,
+            starters: ["먼저", "예를 들어", "운동할 시간이 없더라도"],
+            bank: EXPRESSIONS.method.concat(["계단을 이용하다", "걷기 운동을 하다"]),
+            help: tx("Suggest one easy daily exercise.", "Gợi ý một bài vận động hằng ngày dễ làm.", "اقترح تمرينا يوميا سهلا.")
+          },
+          {
+            id: "method2",
+            label: "방법2",
+            title: "생활 운동 방법 2",
+            meta: "4단계",
+            prompt: "다른 방법을 하나 더 제안해 답글을 구체화합니다.",
+            role: "생활 운동 권유 2",
+            minLength: 18,
+            requiredAny: EXPRESSIONS.method,
+            starters: ["또", "특히", "쉬는 시간에는"],
+            bank: EXPRESSIONS.method.concat(["제자리 뛰기를 하다", "의자에 앉아서 다리를 들었다 내리다"]),
+            help: tx("Add a second method to make the reply concrete.", "Thêm cách thứ hai để bài trả lời cụ thể hơn.", "أضف طريقة ثانية ليكون الرد أكثر تحديدا.")
+          },
+          {
+            id: "effect",
+            label: "효과",
+            title: "운동 효과 문장 조립",
+            meta: "5단계",
+            prompt: "권유한 방법으로 기대할 수 있는 효과를 씁니다.",
+            role: "효과",
+            minLength: 18,
+            requiredAny: EXPRESSIONS.effect,
+            starters: ["이렇게 하면", "꾸준히 하면", "조금씩 계속하면"],
+            bank: EXPRESSIONS.effect,
+            help: tx("Connect the method to a positive effect.", "Liên kết phương pháp với hiệu quả tích cực.", "اربط الطريقة بنتيجة إيجابية.")
+          },
+          {
+            id: "advice",
+            label: "권유",
+            title: "권유 문장 조립",
+            meta: "6단계",
+            prompt: "부드러운 마지막 조언을 만듭니다.",
+            role: "마무리 권유",
+            minLength: 18,
+            requiredAny: EXPRESSIONS.advice,
+            starters: ["그러니까", "처음에는 힘들 수 있지만", "건강을 위해서는"],
+            bank: EXPRESSIONS.advice,
+            help: tx("Finish with a gentle recommendation.", "Kết thúc bằng một lời khuyên nhẹ nhàng.", "اختم بنصيحة لطيفة.")
+          },
+          {
+            id: "final",
+            label: "문단",
+            title: "답글 문단 다듬기",
+            meta: "7단계",
+            prompt: "저장한 문장을 자연스럽게 이어 최종 답글을 완성합니다.",
+            role: "최종 답글",
+            minLength: 80,
+            requiredAny: ["운동", "건강"],
+            starters: [],
+            bank: ["예를 들어", "그래서", "이렇게 하면", "처음에는 힘들 수 있지만"],
+            help: tx("Revise the saved sentences into one short reply paragraph.", "Sửa các câu đã lưu thành một đoạn trả lời ngắn.", "نقح الجمل المحفوظة في فقرة رد قصيرة.")
+          }
+        ];
+
+        const state = loadState();
+        const els = {
+          progressDots: document.getElementById("progressDots"),
+          stageMeta: document.getElementById("stageMeta"),
+          stageTitle: document.getElementById("stageTitle"),
+          missionPrompt: document.getElementById("missionPrompt"),
+          translationBox: document.getElementById("translationBox"),
+          requirementText: document.getElementById("requirementText"),
+          starterList: document.getElementById("starterList"),
+          expressionBank: document.getElementById("expressionBank"),
+          answerInput: document.getElementById("answerInput"),
+          feedbackText: document.getElementById("feedbackText"),
+          prevButton: document.getElementById("prevButton"),
+          saveButton: document.getElementById("saveButton"),
+          copyButton: document.getElementById("copyButton"),
+          resetButton: document.getElementById("resetButton"),
+          basketCount: document.getElementById("basketCount"),
+          basketList: document.getElementById("basketList"),
+          previewCount: document.getElementById("previewCount"),
+          paragraphPreview: document.getElementById("paragraphPreview")
+        };
+
+        function defaultState() {
+          return {
+            stepIndex: 0,
+            answers: {},
+            finalDraft: ""
+          };
+        }
+
+        function loadState() {
+          try {
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+            if (!saved || typeof saved !== "object") return defaultState();
+            return Object.assign(defaultState(), saved);
+          } catch {
+            return defaultState();
+          }
+        }
+
+        function saveState() {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function normalize(value) {
+          return String(value || "").trim().replace(/\s+/g, " ");
+        }
+
+        function charLength(value) {
+          return Array.from(normalize(value)).filter((char) => char !== " ").length;
+        }
+
+        function currentStep() {
+          return ASSEMBLY_STEPS[state.stepIndex] || ASSEMBLY_STEPS[0];
+        }
+
+        function escapeHtml(value) {
+          return String(value || "").replace(/[&<>"']/g, (char) => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+          }[char]));
+        }
+
+        function setFeedback(message, type) {
+          els.feedbackText.className = "feedback" + (type ? " is-" + type : "");
+          els.feedbackText.textContent = message;
+        }
+
+        function renderTranslations(step) {
+          const scenarioBoxes = LANGS.map((lang) => {
+            const dir = lang === "ar" ? ' dir="rtl"' : "";
+            const scenario = SCENARIO_TRANSLATIONS[lang] || SCENARIO_TRANSLATIONS.en;
+            const help = step.help[lang] || step.help.en;
+            return `<div class="lang-box" data-lang="${lang}" lang="${lang}"${dir}>${escapeHtml(scenario)}<br>${escapeHtml(help)}</div>`;
+          }).join("");
+          els.translationBox.innerHTML = scenarioBoxes;
+          if (window.MultilangToggle) window.MultilangToggle.refresh();
+        }
+
+        function insertText(text) {
+          const input = els.answerInput;
+          const start = input.selectionStart || input.value.length;
+          const end = input.selectionEnd || input.value.length;
+          const prefix = input.value.slice(0, start);
+          const suffix = input.value.slice(end);
+          const spacer = prefix && !/\s$/.test(prefix) ? " " : "";
+          const tailSpacer = suffix && !/^\s|[.,!?]/.test(suffix) ? " " : "";
+          input.value = prefix + spacer + text + tailSpacer + suffix;
+          input.focus();
+          const pos = (prefix + spacer + text).length;
+          input.setSelectionRange(pos, pos);
+        }
+
+        function composedParagraph() {
+          const ordered = ["empathy", "situation", "method1", "method2", "effect", "advice"];
+          const sentences = ordered.map((id) => normalize(state.answers[id])).filter(Boolean);
+          return normalize(state.finalDraft) || sentences.join(" ");
+        }
+
+        function validate(step, text) {
+          if (step.id === "final") {
+            if (charLength(text) < step.minLength) return `조금 더 다듬어 보세요. 목표 ${step.minLength}자 이상입니다.`;
+            return "";
+          }
+          if (charLength(text) < step.minLength) return `조금 더 써 보세요. 목표 ${step.minLength}자 이상입니다.`;
+          const hasRequired = step.requiredAny.some((phrase) => text.includes(phrase) || phrase.includes(text));
+          if (!hasRequired) return `표현 은행에서 이 단계에 맞는 표현을 하나 이상 넣어 보세요.`;
+          return "";
+        }
+
+        function saveCurrent() {
+          const step = currentStep();
+          const text = normalize(els.answerInput.value);
+          const error = validate(step, text);
+          if (error) {
+            setFeedback(error, "error");
+            return;
+          }
+          if (step.id === "final") {
+            state.finalDraft = text;
+            setFeedback("최종 답글을 저장했습니다.", "good");
+          } else {
+            state.answers[step.id] = text;
+            setFeedback("문장을 바구니에 저장했습니다.", "good");
+          }
+          if (state.stepIndex < ASSEMBLY_STEPS.length - 1) {
+            state.stepIndex += 1;
+          }
+          saveState();
+          render();
+        }
+
+        function goToStep(index) {
+          state.stepIndex = Math.max(0, Math.min(index, ASSEMBLY_STEPS.length - 1));
+          saveState();
+          render();
+        }
+
+        function renderTokens(container, list) {
+          container.innerHTML = list.map((text) => `<button class="token" type="button" data-insert="${escapeHtml(text)}">${escapeHtml(text)}</button>`).join("");
+        }
+
+        function renderBasket() {
+          const entries = ASSEMBLY_STEPS.filter((step) => step.id !== "final" && state.answers[step.id]).map((step) => ({
+            role: step.role,
+            text: state.answers[step.id]
+          }));
+          els.basketCount.textContent = `${entries.length}개`;
+          els.previewCount.textContent = `${Math.min(entries.length, 5)}/5`;
+          if (!entries.length) {
+            els.basketList.innerHTML = '<div class="empty">저장한 문장이 아직 없습니다.</div>';
+          } else {
+            els.basketList.innerHTML = entries.map((entry) => `
+              <article class="basket-item">
+                <strong>${escapeHtml(entry.role)}</strong>
+                <p>${escapeHtml(entry.text)}</p>
+              </article>
+            `).join("");
+          }
+          const preview = composedParagraph();
+          els.paragraphPreview.textContent = preview || "문장을 저장하면 이곳에 답글 문단이 만들어집니다.";
+        }
+
+        function render() {
+          const step = currentStep();
+          els.stageMeta.textContent = step.meta;
+          els.stageTitle.textContent = step.title;
+          els.missionPrompt.textContent = step.prompt;
+          els.progressDots.innerHTML = ASSEMBLY_STEPS.map((entry, index) => {
+            const classes = [];
+            if (index === state.stepIndex) classes.push("is-current");
+            if (index < state.stepIndex) classes.push("is-done");
+            return `<button class="${classes.join(" ")}" type="button" data-step-index="${index}">${index + 1}. ${entry.label}</button>`;
+          }).join("");
+          renderTranslations(step);
+          els.requirementText.textContent = step.id === "final"
+            ? "저장된 문장을 자연스럽게 이어 쓰고, 필요하면 표현을 바꾸어 다듬습니다."
+            : `${step.role}: ${step.requiredAny.slice(0, 3).join(" / ")} 중 하나 이상을 사용합니다.`;
+          renderTokens(els.starterList, step.starters);
+          renderTokens(els.expressionBank, step.bank);
+          els.prevButton.disabled = state.stepIndex === 0;
+          els.copyButton.disabled = !normalize(composedParagraph());
+          if (step.id === "final") {
+            els.answerInput.classList.add("final-area");
+            els.answerInput.value = state.finalDraft || composedParagraph();
+          } else {
+            els.answerInput.classList.remove("final-area");
+            els.answerInput.value = state.answers[step.id] || "";
+          }
+          renderBasket();
+          saveState();
+          window.setTimeout(() => els.answerInput.focus(), 0);
+        }
+
+        els.starterList.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-insert]");
+          if (button) insertText(button.dataset.insert);
+        });
+        els.expressionBank.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-insert]");
+          if (button) insertText(button.dataset.insert);
+        });
+        els.saveButton.addEventListener("click", saveCurrent);
+        els.answerInput.addEventListener("keydown", (event) => {
+          if (event.ctrlKey && event.key === "Enter") {
+            event.preventDefault();
+            saveCurrent();
+          }
+        });
+        els.prevButton.addEventListener("click", () => goToStep(state.stepIndex - 1));
+        els.copyButton.addEventListener("click", async () => {
+          const text = composedParagraph();
+          if (!text) return;
+          try {
+            await navigator.clipboard.writeText(text);
+            setFeedback("답글 문단을 복사했습니다.", "good");
+          } catch {
+            els.answerInput.value = text;
+            els.answerInput.select();
+            setFeedback("복사 권한이 없어 문단을 선택했습니다.", "error");
+          }
+        });
+        els.resetButton.addEventListener("click", () => {
+          localStorage.removeItem(STORAGE_KEY);
+          Object.assign(state, defaultState());
+          render();
+        });
+        els.progressDots.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-step-index]");
+          if (button) goToStep(Number(button.dataset.stepIndex));
+        });
+
+        window.__C12_WRITING_EXPRESSION_ASSEMBLY__ = {
+          get state() { return JSON.parse(JSON.stringify(state)); },
+          steps: ASSEMBLY_STEPS,
+          expressions: EXPRESSIONS,
+          get paragraph() { return composedParagraph(); }
+        };
+
+        render();
+      })();
+    </script>
+      <script src="../activity-tracker.js"></script>
+  </body>
+</html>

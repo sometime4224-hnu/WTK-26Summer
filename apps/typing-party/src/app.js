@@ -5,10 +5,12 @@ import {
   ROOM_LIMIT,
   ROUND_SECONDS,
   STAGES,
+  TRACKED_ACTIVITIES,
   VOTE_CATEGORIES,
   createPrompt,
   getGameLabel,
-  getShortGameLabel
+  getShortGameLabel,
+  getTrackedActivity
 } from "./game-data.js";
 import { createFirebaseClient } from "./firebase-client.js";
 
@@ -23,6 +25,7 @@ const state = {
   role: "",
   nickname: "",
   selectedGame: "randomBox",
+  selectedActivity: "keyboard-lesson",
   unsubscribe: null
 };
 
@@ -122,6 +125,15 @@ function currentSubmissions(room = state.room, round = currentRound(room)) {
     .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 }
 
+function currentActivity(room = state.room) {
+  return getTrackedActivity(room?.meta?.currentActivityId);
+}
+
+function currentProgress(room = state.room) {
+  const runId = room?.meta?.currentActivityRunId;
+  return runId ? room?.progress?.[runId] || {} : {};
+}
+
 function buildJoinUrl(roomCode) {
   const url = new URL(window.location.href);
   url.searchParams.set("room", roomCode);
@@ -192,6 +204,8 @@ async function createRoom() {
       hostUid: state.client.uid,
       status: "lobby",
       gameType: "randomBox",
+      currentActivityId: "",
+      currentActivityRunId: "",
       currentRoundId: "",
       roundIndex: 0,
       limitSeconds: ROUND_SECONDS,
@@ -296,6 +310,9 @@ function renderHostControls(stage, round) {
   const gameOptions = Object.values(GAME_TYPES)
     .map((game) => `<option value="${game.id}" ${state.selectedGame === game.id ? "selected" : ""}>${game.label}</option>`)
     .join("");
+  const activityOptions = TRACKED_ACTIVITIES
+    .map((activity) => `<option value="${activity.id}" ${state.selectedActivity === activity.id ? "selected" : ""}>${activity.label}</option>`)
+    .join("");
 
   let body = "";
   if (stage === "lobby") {
@@ -305,6 +322,17 @@ function renderHostControls(stage, round) {
         <select id="gameTypeSelect" data-testid="game-select">${gameOptions}</select>
       </label>
       <button class="primary-button" type="button" data-action="start-round" data-testid="start-round">라운드 준비</button>
+      <label>
+        <span>개인 활동 선택</span>
+        <select id="activitySelect" data-testid="activity-select">${activityOptions}</select>
+      </label>
+      <button class="secondary-button" type="button" data-action="start-activity" data-testid="start-activity">선택 활동 띄우기</button>
+    `;
+  } else if (stage === "activity") {
+    const activity = currentActivity();
+    body = `
+      <p class="field-note">${escapeHtml(activity?.label || "개인 활동")} 진행 상황을 관찰하는 중입니다.</p>
+      <button class="primary-button" type="button" data-action="next-lobby" data-testid="close-activity">활동 종료 · 대기실</button>
     `;
   } else if (stage === "prompt") {
     body = `
@@ -476,25 +504,140 @@ function renderResults(stage, round) {
   `;
 }
 
+function statusLabel(status) {
+  if (status === "completed") return "완료";
+  if (status === "working") return "작성 중";
+  if (status === "opened") return "열람";
+  return "대기";
+}
+
+function formatAgo(timestamp) {
+  if (!timestamp) return "-";
+  const seconds = Math.max(0, Math.round((now() - timestamp) / 1000));
+  if (seconds < 5) return "방금";
+  if (seconds < 60) return `${seconds}초 전`;
+  return `${Math.round(seconds / 60)}분 전`;
+}
+
+function buildActivityUrl(activity, runId) {
+  const url = new URL(activity.path, window.location.href);
+  url.searchParams.set("partyRoom", state.roomCode);
+  url.searchParams.set("activityRun", runId || "");
+  if (useMock) url.searchParams.set("mock", "1");
+  return url.href;
+}
+
+function renderActivityPanel(activity, runId) {
+  if (!activity) {
+    els.promptPanel.innerHTML = `<div class="empty-note">활동을 찾을 수 없습니다.</div>`;
+    return;
+  }
+
+  if (state.role === "host") {
+    const progress = currentProgress();
+    const students = playerEntries().filter(([, player]) => player.role !== "host");
+    const rows = students.length
+      ? students.map(([uid, player]) => {
+        const item = progress[uid] || {};
+        const total = Number(item.total || 0);
+        const completed = Number(item.completed || 0);
+        const percent = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
+        return `
+          <tr>
+            <td><strong>${escapeHtml(player.nickname)}</strong></td>
+            <td><span class="progress-status progress-status--${escapeHtml(item.status || "waiting")}">${statusLabel(item.status)}</span></td>
+            <td>${escapeHtml(item.stageTitle || "-")}</td>
+            <td>${total > 0 ? `${completed} / ${total}` : "-"}</td>
+            <td><div class="mini-meter"><span style="width: ${percent}%"></span></div></td>
+            <td>${formatAgo(item.updatedAt)}</td>
+          </tr>
+        `;
+      }).join("")
+      : `<tr><td colspan="6">학생이 입장하면 진행 상태가 여기에 표시됩니다.</td></tr>`;
+
+    els.promptPanel.innerHTML = `
+      <section class="activity-monitor" data-testid="activity-monitor">
+        <div class="activity-monitor__head">
+          <div>
+            <span class="category-badge">개인 활동</span>
+            <h2>${escapeHtml(activity.label)}</h2>
+            <p>${escapeHtml(activity.summary)}</p>
+          </div>
+          <a class="secondary-button" href="${escapeHtml(activity.path)}" target="_blank" rel="noopener">사본 열기</a>
+        </div>
+        <div class="progress-table-wrap">
+          <table class="progress-table">
+            <thead>
+              <tr>
+                <th>학생</th>
+                <th>상태</th>
+                <th>현재 화면</th>
+                <th>진도</th>
+                <th>막대</th>
+                <th>업데이트</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </section>
+    `;
+    return;
+  }
+
+  const frameUrl = buildActivityUrl(activity, runId);
+  if (els.promptPanel.dataset.activityRunId === runId && els.promptPanel.querySelector(".activity-frame")) {
+    return;
+  }
+
+  els.promptPanel.dataset.activityRunId = runId || "";
+  els.promptPanel.innerHTML = `
+    <section class="activity-student" data-testid="activity-student">
+      <div class="activity-monitor__head">
+        <div>
+          <span class="category-badge">지금 할 활동</span>
+          <h2>${escapeHtml(activity.label)}</h2>
+          <p>${escapeHtml(activity.summary)}</p>
+        </div>
+        <a class="secondary-button" href="${escapeHtml(frameUrl)}" target="_blank" rel="noopener">새 탭</a>
+      </div>
+      <iframe class="activity-frame" data-testid="activity-frame" src="${escapeHtml(frameUrl)}" title="${escapeHtml(activity.label)}"></iframe>
+    </section>
+  `;
+}
+
 function renderRoom() {
   const room = state.room;
   if (!room?.meta) return;
   const stage = room.meta.status || "lobby";
   const round = currentRound(room);
+  const activity = currentActivity(room);
   const joinUrl = buildJoinUrl(state.roomCode);
 
   els.roleLabel.textContent = state.role === "host" ? "Teacher" : "Student";
   els.roomTitle.textContent = state.role === "host" ? "교사용 진행 화면" : "학생 참가 화면";
-  els.roomSubtitle.textContent = stage === "lobby" ? "참가자를 기다리는 중입니다." : `${getGameLabel(round?.gameType)} 진행 중입니다.`;
+  els.roomSubtitle.textContent = stage === "lobby"
+    ? "참가자를 기다리는 중입니다."
+    : stage === "activity"
+      ? `${activity?.label || "개인 활동"} 진행 중입니다.`
+      : `${getGameLabel(round?.gameType)} 진행 중입니다.`;
   els.roomCodeDisplay.textContent = state.roomCode;
   els.joinLink.href = joinUrl;
   els.joinLink.textContent = "입장 링크";
-  els.roundKicker.textContent = round ? getGameLabel(round.gameType) : "Lobby";
+  els.roundKicker.textContent = stage === "activity" ? "Tracked Activity" : round ? getGameLabel(round.gameType) : "Lobby";
   els.stageTitle.textContent = STAGES[stage] || STAGES.lobby;
   els.stageChip.textContent = stage;
 
   renderPlayers();
   renderHostControls(stage, round);
+  if (stage === "activity") {
+    renderActivityPanel(activity, room.meta.currentActivityRunId);
+    els.submitPanel.innerHTML = "";
+    els.submissionsPanel.innerHTML = "";
+    els.resultsPanel.innerHTML = "";
+    return;
+  }
+  delete els.promptPanel.dataset.activityRunId;
   renderPrompt(stage, round);
   renderSubmit(stage, round);
   renderSubmissions(stage, round);
@@ -527,6 +670,19 @@ async function startRound() {
   });
 }
 
+async function startActivity() {
+  const activity = getTrackedActivity(state.selectedActivity);
+  if (!activity || state.role !== "host") return;
+  const runId = `a_${now()}`;
+  await state.client.updateRoom(state.roomCode, {
+    "meta/status": "activity",
+    "meta/currentActivityId": activity.id,
+    "meta/currentActivityRunId": runId,
+    "meta/currentRoundId": "",
+    "meta/phaseStartedAt": now()
+  });
+}
+
 async function setStage(nextStage) {
   const round = currentRound();
   if (!round || state.role !== "host") return;
@@ -542,6 +698,8 @@ async function nextLobby() {
   await state.client.updateRoom(state.roomCode, {
     "meta/status": "lobby",
     "meta/currentRoundId": "",
+    "meta/currentActivityId": "",
+    "meta/currentActivityRunId": "",
     "meta/phaseStartedAt": now()
   });
 }
@@ -592,6 +750,27 @@ async function submitAnswer(event) {
   setFieldNote("제출 완료. 투표 전까지 다시 제출할 수 있습니다.", "good");
 }
 
+async function reportActivityProgress(payload) {
+  const room = state.room;
+  if (!room?.meta || state.role !== "student" || room.meta.status !== "activity") return;
+  const activity = currentActivity(room);
+  const runId = room.meta.currentActivityRunId;
+  if (!activity || !runId || !state.client?.setProgress) return;
+
+  await state.client.setProgress(state.roomCode, runId, {
+    uid: state.client.uid,
+    nickname: state.nickname || "참가자",
+    activityId: activity.id,
+    runId,
+    status: payload.status || "opened",
+    stageTitle: String(payload.stageTitle || activity.label).slice(0, 80),
+    detail: String(payload.detail || "").slice(0, 120),
+    completed: Math.max(0, Number(payload.completed || 0)),
+    total: Math.max(0, Number(payload.total || 0)),
+    updatedAt: now()
+  });
+}
+
 async function removeRoom() {
   if (state.role !== "host") return;
   if (!window.confirm("이 방을 삭제할까요?")) return;
@@ -603,6 +782,7 @@ async function handleAction(button) {
   const action = button.dataset.action;
   try {
     if (action === "start-round") await startRound();
+    if (action === "start-activity") await startActivity();
     if (action === "open-submit") await setStage("submit");
     if (action === "open-vote") await setStage("vote");
     if (action === "show-results") await setStage("results");
@@ -649,6 +829,14 @@ function bindEvents() {
     if (event.target.id === "gameTypeSelect") {
       state.selectedGame = event.target.value;
     }
+    if (event.target.id === "activitySelect") {
+      state.selectedActivity = event.target.value;
+    }
+  });
+
+  window.addEventListener("message", (event) => {
+    if (!event.data || event.data.type !== "typing-party-progress") return;
+    reportActivityProgress(event.data).catch((error) => setStartStatus(error.message));
   });
 
   els.roomCodeInput.addEventListener("input", () => {

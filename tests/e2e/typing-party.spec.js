@@ -89,6 +89,36 @@ test.describe("typing party multiplayer MVP", () => {
     await context.close();
   });
 
+  test("lets the teacher launch a copied typing activity and observe progress", async ({ browser }) => {
+    const context = await browser.newContext();
+    const host = await context.newPage();
+    const roomCode = await createHostRoom(host);
+    const student = await joinStudent(context, roomCode, "하준");
+
+    await host.locator('[data-testid="activity-select"]').selectOption("c12-writing-shower");
+    await host.locator('[data-testid="start-activity"]').click();
+    await expect(host.locator('[data-testid="stage-title"]')).toHaveText("개인 활동");
+    await expect(student.locator('[data-testid="activity-frame"]')).toBeVisible();
+    await expect(student.frameLocator('[data-testid="activity-frame"]').locator("#missionTitle")).toContainText("초급 쓰기");
+    await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("하준");
+
+    await student.evaluate(() => {
+      window.postMessage({
+        type: "typing-party-progress",
+        status: "working",
+        stageTitle: "초급 쓰기",
+        detail: "문장 작성 중",
+        completed: 2,
+        total: 5
+      }, "*");
+    });
+
+    await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("작성 중");
+    await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("초급 쓰기");
+    await expect(host.locator('[data-testid="activity-monitor"]')).toContainText("2 / 5");
+    await context.close();
+  });
+
   test("fits on a phone viewport without horizontal overflow", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/apps/typing-party/index.html?mock=1&reset=1");

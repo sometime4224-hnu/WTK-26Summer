@@ -5,6 +5,7 @@ export const ROUND_SECONDS = 90;
 
 export const STAGES = {
   lobby: "대기실",
+  activity: "개인 활동",
   prompt: "미션 공개",
   submit: "입력 중",
   vote: "투표",
@@ -28,6 +29,57 @@ export const VOTE_CATEGORIES = [
   { id: "funny", label: "가장 웃김" },
   { id: "clever", label: "가장 기발함" },
   { id: "chaos", label: "가장 황당함" }
+];
+
+export const TRACKED_ACTIVITIES = [
+  {
+    id: "keyboard-lesson",
+    label: "한글 자판 25분 수업",
+    path: "activities/korean-keyboard-practice-lesson/index.html",
+    summary: "자판 확인, 홈키, 자모, 음절, 단어 리듬 입력"
+  },
+  {
+    id: "keyboard-practice",
+    label: "한글 자판 연습",
+    path: "activities/korean-keyboard-practice/index.html",
+    summary: "자리 찾기, 음절 입력, 단어 입력"
+  },
+  {
+    id: "c12-writing",
+    label: "12과 표현 타이핑 연습",
+    path: "activities/c12/writing-keyboard-builder.html",
+    summary: "핵심 어휘, 확장 표현, 문법 문장, 회상 입력"
+  },
+  {
+    id: "c12-expression-learning",
+    label: "12과 쓰기 주제 표현 학습",
+    path: "activities/c12/writing-expression-learning.html",
+    summary: "공감, 방법, 효과, 권유 표현 입력"
+  },
+  {
+    id: "c12-expression-assembly",
+    label: "12과 쓰기 표현 조립 연습",
+    path: "activities/c12/writing-expression-assembly.html",
+    summary: "표현 칩 조립과 짧은 답글 문단 작성"
+  },
+  {
+    id: "c12-motion-typing",
+    label: "12과 동작 표현 타이핑 연습",
+    path: "activities/c12/writing-motion-typing.html",
+    summary: "생활 운동 동작 표현 입력"
+  },
+  {
+    id: "c12-motion-typing-game",
+    label: "12과 어휘 표현 애니메이션 타이핑",
+    path: "activities/c12/writing-motion-typing-game.html",
+    summary: "건강 어휘와 생활 동작 표현 애니메이션 입력"
+  },
+  {
+    id: "c12-writing-shower",
+    label: "12과 쓰기 소나기",
+    path: "activities/c12/writing-shower.html",
+    summary: "초급, 중급, 고급 빗방울 질문 답변"
+  }
 ];
 
 const RANDOM_BOX_PROMPTS = [
@@ -100,4 +152,8 @@ export function getGameLabel(gameType) {
 
 export function getShortGameLabel(gameType) {
   return GAME_TYPES[gameType]?.shortLabel || GAME_TYPES.randomBox.shortLabel;
+}
+
+export function getTrackedActivity(activityId) {
+  return TRACKED_ACTIVITIES.find((activity) => activity.id === activityId) || null;
 }

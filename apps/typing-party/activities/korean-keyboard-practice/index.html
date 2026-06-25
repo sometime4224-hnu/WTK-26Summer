@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>한글 자판 연습</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="keyboard-shell">
+      <header class="keyboard-topbar">
+        <a class="nav-link" href="../../index.html">허브</a>
+        <div class="brand-title" aria-label="한글 자판 연습">
+          <span>PC 수업</span>
+          <strong>한글 자판 연습</strong>
+        </div>
+        <button class="reset-button" id="resetPractice" type="button">처음부터</button>
+      </header>
+
+      <section class="lesson-layout" aria-label="한글 자판과 오늘 미션">
+        <section class="keyboard-panel" aria-labelledby="keyboardTitle">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">두벌식 기본 자리</span>
+              <h1 id="keyboardTitle">기본 자판 안내</h1>
+            </div>
+            <div class="mode-badge" id="currentKeyBadge">홈키</div>
+          </div>
+
+          <div class="keyboard-board" id="keyboardBoard" aria-label="한국어 두벌식 키보드"></div>
+        </section>
+
+        <section class="practice-section" aria-labelledby="practiceTitle">
+          <div class="practice-head">
+            <div>
+              <span class="eyebrow">실습</span>
+              <h2 id="practiceTitle">오늘 미션</h2>
+            </div>
+            <div class="practice-tabs" role="tablist" aria-label="연습 단계">
+              <button class="practice-tab is-active" id="tab-find" type="button" role="tab" aria-selected="true" data-mode="find">자리 찾기</button>
+              <button class="practice-tab" id="tab-syllable" type="button" role="tab" aria-selected="false" data-mode="syllable">음절 입력</button>
+              <button class="practice-tab" id="tab-word" type="button" role="tab" aria-selected="false" data-mode="word">단어 입력</button>
+            </div>
+          </div>
+
+          <div class="practice-card">
+            <div class="target-area">
+              <span id="practiceModeLabel">자리 찾기</span>
+              <strong id="targetDisplay">ㄹ</strong>
+              <p id="targetHint">왼손 검지 · F 자리</p>
+            </div>
+
+            <div class="input-area">
+              <div class="key-capture" id="keyCapture" tabindex="0" role="button" aria-label="물리 키 입력 영역">
+                <span>키보드에서 목표 자리를 누르세요.</span>
+              </div>
+              <textarea id="answerInput" class="answer-input" rows="2" autocomplete="off" autocapitalize="off" spellcheck="false" hidden></textarea>
+            </div>
+
+            <div class="feedback-strip" id="feedbackStrip" aria-live="polite">목표 키를 보고 손가락을 먼저 올려 보세요.</div>
+
+            <div class="progress-row" aria-label="연습 진행">
+              <div>
+                <span>완료</span>
+                <strong><b id="completedCount">0</b> / <b id="totalCount">14</b></strong>
+              </div>
+              <div>
+                <span>시도</span>
+                <strong id="attemptCount">0</strong>
+              </div>
+              <button class="next-button" id="nextButton" type="button">다음</button>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="posture-panel" aria-labelledby="postureTitle">
+        <div class="panel-head panel-head--stack">
+          <span class="eyebrow">파지법</span>
+          <h2 id="postureTitle">손가락 자리</h2>
+        </div>
+
+        <div class="hand-map" aria-label="왼손 오른손 손가락 자리">
+          <div class="hand-block">
+            <span class="hand-label">왼손</span>
+            <div class="finger-strip">
+              <span class="finger-chip finger-pinky" data-finger="left-pinky">새끼</span>
+              <span class="finger-chip finger-ring" data-finger="left-ring">약지</span>
+              <span class="finger-chip finger-middle" data-finger="left-middle">중지</span>
+              <span class="finger-chip finger-index" data-finger="left-index">검지</span>
+            </div>
+          </div>
+          <div class="hand-block">
+            <span class="hand-label">오른손</span>
+            <div class="finger-strip">
+              <span class="finger-chip finger-index" data-finger="right-index">검지</span>
+              <span class="finger-chip finger-middle" data-finger="right-middle">중지</span>
+              <span class="finger-chip finger-ring" data-finger="right-ring">약지</span>
+              <span class="finger-chip finger-pinky" data-finger="right-pinky">새끼</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="home-guide" aria-label="홈키 안내">
+          <span>홈키</span>
+          <strong>ㅁ ㄴ ㅇ ㄹ / ㅓ ㅏ ㅣ</strong>
+        </div>
+
+        <div class="reach-list" id="reachList" aria-label="현재 키 손가락 안내">
+          <span>지금 자리</span>
+          <strong>ㄹ</strong>
+          <p>왼손 검지로 F 자리를 누릅니다.</p>
+        </div>
+      </aside>
+
+      <section class="next-writing-panel" aria-labelledby="nextWritingTitle">
+        <div>
+          <span class="eyebrow">다음 활동</span>
+          <h2 id="nextWritingTitle">12과 표현 타이핑 연습</h2>
+          <p>방금 익힌 한글 자판으로 12과 목표 어휘와 문법 표현을 정확히 입력합니다.</p>
+        </div>
+        <a class="next-writing-link" href="../c12/writing-keyboard-builder.html">표현 연습 시작</a>
+      </section>
+    </main>
+
+    <script src="src/app.js"></script>
+    <script src="../../../../shared/site-copyright.js"></script>
+    <script src="../../../../shared/page-qr.js"></script>
+      <script src="../activity-tracker.js"></script>
+  </body>
+</html>

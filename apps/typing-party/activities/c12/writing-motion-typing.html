@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12과 동작 표현 타이핑 연습</title>
+    <link rel="stylesheet" href="../../../../shared/multilang-toggle.css">
+    <style>
+      :root {
+        --ink: #0f172a;
+        --muted: #64748b;
+        --line: #dbe4f0;
+        --blue: #2563eb;
+        --blue-soft: #dbeafe;
+        --green: #15803d;
+        --green-soft: #dcfce7;
+        --orange: #ea580c;
+        --red: #dc2626;
+        --red-soft: #fee2e2;
+        --yellow-soft: #fef3c7;
+        --panel: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: linear-gradient(180deg, #f8fafc 0%, #eef6ff 52%, #ecfdf5 100%);
+        color: var(--ink);
+        font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", system-ui, sans-serif;
+        overflow-wrap: anywhere;
+        word-break: keep-all;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .page-shell {
+        width: min(1280px, calc(100vw - 28px));
+        margin: 0 auto 40px;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 10px;
+        min-height: 46px;
+        padding: 8px 0;
+        background: rgba(248, 250, 252, 0.92);
+        backdrop-filter: blur(14px);
+      }
+
+      .home-link,
+      .reset-button,
+      .ghost-button {
+        min-height: 38px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #1e293b;
+        font-size: 13px;
+        font-weight: 900;
+        text-decoration: none;
+      }
+
+      .home-link,
+      .reset-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 12px;
+      }
+
+      .topbar-title {
+        min-width: 0;
+        overflow: hidden;
+        color: var(--ink);
+        font-size: 15px;
+        font-weight: 950;
+        line-height: 1.2;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .topbar-title span {
+        margin-right: 6px;
+        color: var(--orange);
+      }
+
+      .progress-dots {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 6px;
+        margin: 12px 0;
+      }
+
+      .progress-dot {
+        min-width: 0;
+        min-height: 38px;
+        padding: 6px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 950;
+        line-height: 1.15;
+      }
+
+      .progress-dot.is-current {
+        border-color: var(--ink);
+        background: var(--ink);
+        color: #ffffff;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.22);
+      }
+
+      .progress-dot.is-done {
+        border-color: #86efac;
+        background: var(--green-soft);
+        color: var(--green);
+      }
+
+      .workspace-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(360px, 0.48fr);
+        gap: 16px;
+        align-items: start;
+      }
+
+      .mission-panel,
+      .motion-panel {
+        border-radius: 12px;
+        background: var(--panel);
+        box-shadow: 0 22px 50px rgba(15, 23, 42, 0.12);
+      }
+
+      .mission-panel {
+        min-width: 0;
+        padding: clamp(18px, 3vw, 32px);
+        border: 4px solid var(--blue);
+      }
+
+      .mission-panel.is-current-task {
+        box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.12), 0 28px 70px rgba(37, 99, 235, 0.18);
+      }
+
+      .mission-head {
+        display: grid;
+        gap: 8px;
+      }
+
+      .stage-meta {
+        color: var(--orange);
+        font-size: 14px;
+        font-weight: 950;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(32px, 4.6vw, 60px);
+        letter-spacing: 0;
+        line-height: 1.08;
+      }
+
+      .mission-prompt {
+        max-width: 760px;
+        margin: 0;
+        color: #334155;
+        font-size: clamp(16px, 2vw, 22px);
+        font-weight: 850;
+        line-height: 1.52;
+      }
+
+      .language-row {
+        margin: 14px 0 4px;
+      }
+
+      .typing-target {
+        display: grid;
+        gap: 8px;
+        min-height: 218px;
+        align-content: center;
+        justify-items: center;
+        margin-top: 12px;
+        padding: 16px;
+        border: 2px solid rgba(37, 99, 235, 0.42);
+        border-radius: 10px;
+        background: rgba(219, 234, 254, 0.62);
+        text-align: center;
+      }
+
+      .typing-target > span {
+        color: var(--blue);
+        font-size: 13px;
+        font-weight: 950;
+      }
+
+      .typing-target strong.target-expression {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: center;
+        gap: 0 0.08em;
+        max-width: 100%;
+        color: var(--ink);
+        font-size: clamp(32px, 5.6vw, 64px);
+        font-weight: 950;
+        line-height: 1.08;
+        overflow-wrap: normal;
+        word-break: normal;
+      }
+
+      .typing-target strong.target-expression.is-hidden-target {
+        color: #334155;
+        font-size: clamp(30px, 5vw, 54px);
+      }
+
+      .typing-target strong.target-expression.is-long-target {
+        font-size: 50px;
+      }
+
+      .target-chunk {
+        display: inline-flex;
+        flex-wrap: nowrap;
+        white-space: pre;
+      }
+
+      .target-gap {
+        display: inline-block;
+        width: 0.32em;
+        flex: 0 0 0.32em;
+      }
+
+      .target-char {
+        position: relative;
+        display: inline-block;
+        min-width: 0.45em;
+        border-radius: 8px;
+        padding: 0 0.015em;
+        transition: background-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+      }
+
+      .target-char.is-punctuation {
+        background: #dbeafe;
+        color: #1d4ed8;
+        box-shadow: inset 0 -0.08em 0 rgba(37, 99, 235, 0.45);
+      }
+
+      .target-char.is-next {
+        background: var(--yellow-soft);
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+      }
+
+      .target-char.is-wrong {
+        background: var(--red-soft);
+        color: #991b1b;
+        box-shadow: inset 0 -0.16em 0 #ef4444, 0 0 0 3px rgba(239, 68, 68, 0.18);
+      }
+
+      .target-char.is-revealed-correct,
+      .target-expression.is-answer-revealed .target-char {
+        background: #dcfce7;
+        color: #166534;
+        box-shadow: inset 0 -0.12em 0 rgba(22, 163, 74, 0.38);
+      }
+
+      .target-char.is-extra-error::after {
+        position: absolute;
+        right: -0.18em;
+        bottom: -0.22em;
+        color: var(--red);
+        content: "+";
+        font-size: 0.36em;
+        font-weight: 950;
+      }
+
+      .punctuation-note {
+        margin: 0;
+        padding: 7px 10px;
+        border: 1px solid #bfdbfe;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 13px;
+        font-weight: 950;
+        line-height: 1.2;
+      }
+
+      .cue {
+        margin: 0;
+        color: #334155;
+        font-size: clamp(16px, 2vw, 21px);
+        font-weight: 850;
+        line-height: 1.45;
+      }
+
+      .note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.5;
+      }
+
+      .translation-panel {
+        width: min(100%, 760px);
+      }
+
+      .hint-panel {
+        display: grid;
+        gap: 4px;
+        width: min(100%, 760px);
+        padding: 10px 12px;
+        border: 1px dashed #f59e0b;
+        border-radius: 8px;
+        background: #fffbeb;
+        color: #92400e;
+        text-align: left;
+      }
+
+      .hint-panel span {
+        font-size: 12px;
+        font-weight: 950;
+      }
+
+      .hint-panel strong {
+        font-size: 15px;
+        line-height: 1.45;
+      }
+
+      .spotlight-input {
+        margin-top: 16px;
+        padding: 10px;
+        border: 4px solid #0f172a;
+        border-radius: 14px;
+        background: #fefce8;
+        box-shadow: 0 18px 42px rgba(15, 23, 42, 0.18);
+      }
+
+      input {
+        width: 100%;
+        min-height: 78px;
+        border: 0;
+        border-radius: 12px;
+        background: #ffffff;
+        color: var(--ink);
+        font-size: clamp(25px, 4.4vw, 48px);
+        font-weight: 950;
+        line-height: 1.14;
+        text-align: center;
+        outline: none;
+      }
+
+      input:focus {
+        box-shadow: inset 0 0 0 4px #facc15;
+      }
+
+      .status-line {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 12px;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #f8fafc;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 900;
+        line-height: 1.45;
+      }
+
+      .status-line.is-good {
+        border-color: #86efac;
+        background: var(--green-soft);
+        color: #166534;
+      }
+
+      .status-line.is-bad {
+        border-color: #fecaca;
+        background: #fef2f2;
+        color: #991b1b;
+      }
+
+      .status-line.is-warn {
+        border-color: #fde68a;
+        background: #fffbeb;
+        color: #92400e;
+      }
+
+      kbd {
+        padding: 2px 6px;
+        border: 1px solid #cbd5e1;
+        border-bottom-width: 2px;
+        border-radius: 5px;
+        background: #ffffff;
+        color: #0f172a;
+        font-size: 12px;
+        font-weight: 950;
+      }
+
+      .assist-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .ghost-button {
+        flex: 1 1 130px;
+        padding: 0 14px;
+      }
+
+      .ghost-button[hidden] {
+        display: none;
+      }
+
+      .ghost-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+
+      .report-panel {
+        display: grid;
+        gap: 14px;
+        margin-top: 16px;
+      }
+
+      .report-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .report-card {
+        padding: 16px;
+        border: 1px solid #dbe4f0;
+        border-radius: 8px;
+        background: #f8fafc;
+        text-align: center;
+      }
+
+      .report-card strong {
+        display: block;
+        color: var(--blue);
+        font-size: 34px;
+        font-weight: 950;
+      }
+
+      .review-list {
+        display: grid;
+        gap: 8px;
+        margin: 0;
+        padding-left: 20px;
+        color: #334155;
+        font-weight: 850;
+      }
+
+      .motion-panel {
+        position: sticky;
+        top: 68px;
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid rgba(37, 99, 235, 0.22);
+      }
+
+      .motion-panel__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .motion-panel__head span {
+        color: var(--orange);
+        font-size: 12px;
+        font-weight: 950;
+      }
+
+      .motion-panel__head strong {
+        font-size: 18px;
+        font-weight: 950;
+      }
+
+      .motion-caption {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.45;
+      }
+
+      .motion-stage {
+        width: 100%;
+        aspect-ratio: 360 / 430;
+        min-height: 410px;
+        border-radius: 10px;
+        background:
+          linear-gradient(180deg, #eef6ff 0%, #ffffff 58%, #e7f8ed 100%);
+        overflow: hidden;
+      }
+
+      .motion-ground {
+        fill: #bbf7d0;
+      }
+
+      .motion-step {
+        fill: #dbeafe;
+        stroke: #60a5fa;
+        stroke-width: 2;
+        opacity: 0.44;
+      }
+
+      .motion-air {
+        fill: none;
+        stroke: #38bdf8;
+        stroke-width: 5;
+        stroke-linecap: round;
+        stroke-dasharray: 8 10;
+        opacity: 0;
+      }
+
+      .motion-line {
+        fill: none;
+        stroke: #334155;
+        stroke-width: 13;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .motion-foot {
+        fill: none;
+        stroke: #334155;
+        stroke-width: 9;
+        stroke-linecap: round;
+      }
+
+      .motion-body {
+        fill: #f8fafc;
+        stroke: #334155;
+        stroke-width: 7;
+      }
+
+      .motion-head {
+        fill: #fff7ed;
+        stroke: #334155;
+        stroke-width: 7;
+      }
+
+      .motion-joint {
+        fill: #ffffff;
+        stroke: #334155;
+        stroke-width: 4;
+      }
+
+      .motion-waist-cue {
+        fill: none;
+        stroke: #64748b;
+        stroke-width: 5;
+        stroke-linecap: round;
+        opacity: 0.62;
+      }
+
+      .motion-face {
+        fill: none;
+        stroke: #334155;
+        stroke-width: 3.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .motion-eye {
+        fill: #334155;
+      }
+
+      [data-motion-part].is-focus {
+        stroke: #ea580c;
+        filter: drop-shadow(0 0 9px rgba(234, 88, 12, 0.52));
+      }
+
+      .motion-head.is-focus,
+      .motion-body.is-focus,
+      .motion-joint.is-focus,
+      .motion-waist-cue.is-focus {
+        stroke: #ea580c;
+        opacity: 1;
+      }
+
+      .motion-head.is-focus,
+      .motion-body.is-focus,
+      .motion-joint.is-focus {
+        fill: #ffedd5;
+      }
+
+      .scene-steps.is-focus .motion-step {
+        opacity: 1;
+        stroke: #ea580c;
+        filter: drop-shadow(0 0 8px rgba(234, 88, 12, 0.42));
+      }
+
+      .motion-air.is-focus {
+        opacity: 1;
+        stroke: #0284c7;
+      }
+
+      .motion-foot.is-focus {
+        stroke: #ea580c;
+      }
+
+      .motion-figure {
+        filter: drop-shadow(0 11px 18px rgba(15, 23, 42, 0.16));
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+        }
+      }
+
+      @media (max-width: 920px) {
+        .page-shell {
+          width: min(100vw - 16px, 760px);
+        }
+
+        .workspace-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .motion-panel {
+          position: static;
+          order: -1;
+          padding: 12px;
+        }
+
+        .motion-stage {
+          min-height: 240px;
+          max-height: 320px;
+        }
+
+        .topbar {
+          grid-template-columns: auto minmax(0, 1fr) auto;
+          gap: 6px;
+        }
+
+        .topbar-title {
+          font-size: 13px;
+        }
+
+        .progress-dot {
+          min-height: 32px;
+          padding: 4px 2px;
+          font-size: 9px;
+        }
+
+        .mission-panel {
+          padding: 14px;
+          border-width: 3px;
+        }
+
+        .typing-target {
+          min-height: 176px;
+        }
+
+        .typing-target strong.target-expression.is-long-target {
+          font-size: 30px;
+        }
+
+        .target-char {
+          min-width: 0.4em;
+        }
+
+        input {
+          min-height: 66px;
+          font-size: 28px;
+        }
+
+        .report-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="topbar">
+        <a class="home-link" href="../../../../c12/index.html">12과</a>
+        <div class="topbar-title" aria-label="12과 동작 표현 타이핑 연습">
+          <span>PC 입력</span>
+          <strong>12과 동작 표현 타이핑 연습</strong>
+        </div>
+        <button class="reset-button" id="resetTrainer" type="button">처음부터</button>
+      </header>
+
+      <div class="progress-dots" id="progressDots" aria-label="동작 표현 타이핑 진행 단계"></div>
+
+      <div class="workspace-grid">
+        <section class="mission-panel is-current-task" id="missionPanel" aria-labelledby="stageTitle">
+          <div class="mission-head">
+            <span class="stage-meta" id="stageMeta">1단계</span>
+            <h1 id="stageTitle">한/영 확인</h1>
+            <p class="mission-prompt" id="missionPrompt">한글 입력 모드로 짧게 시작합니다. 아래 칸에 동작을 입력하세요.</p>
+          </div>
+
+          <div class="language-row" data-multilang-bar></div>
+
+          <div class="typing-target" id="targetCard">
+            <span id="itemMeta">시작 확인</span>
+            <strong id="targetText">동작</strong>
+            <p class="punctuation-note" id="punctuationNote" hidden>문장부호도 똑같이 입력하세요.</p>
+            <p class="cue" id="cueKo">한글 입력 모드인지 확인합니다.</p>
+            <p class="note" id="noteText">정확히 입력하면 동작 표현으로 이동합니다.</p>
+            <div class="translation-panel" id="translationPanel" aria-label="선택 언어 보조 설명"></div>
+            <div class="hint-panel" id="hintPanel" hidden>
+              <span>힌트</span>
+              <strong id="hintText"></strong>
+            </div>
+          </div>
+
+          <div class="spotlight-input" id="inputWrap">
+            <input id="typingInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="동작">
+          </div>
+
+          <section class="report-panel" id="reportPanel" aria-label="학습 리포트" hidden>
+            <div class="report-grid">
+              <div class="report-card"><span>연습 항목</span><strong id="totalMetric">0</strong></div>
+              <div class="report-card"><span>정답 처리</span><strong id="correctMetric">0</strong></div>
+              <div class="report-card"><span>힌트 사용</span><strong id="hintMetric">0</strong></div>
+            </div>
+            <div>
+              <h2>재연습 추천 표현</h2>
+              <ul class="review-list" id="reviewList"></ul>
+            </div>
+          </section>
+
+          <div class="status-line" id="statusLine" aria-live="polite">
+            <span id="feedbackText">한글 입력 모드에서 "동작"을 입력하세요.</span>
+            <span id="shortcutText"><kbd>자동</kbd> 정확히 입력하면 이동</span>
+          </div>
+
+          <div class="assist-actions">
+            <button class="ghost-button" id="prevButton" type="button">이전</button>
+            <button class="ghost-button" id="hintButton" type="button">Ctrl+H 힌트</button>
+            <button class="ghost-button" id="checkButton" type="button">확인</button>
+            <button class="ghost-button" id="retryButton" type="button" hidden>재연습</button>
+          </div>
+        </section>
+
+        <aside class="motion-panel" id="motionPanel" data-motion-id="ready" aria-label="현재 동작 애니메이션">
+          <div class="motion-panel__head">
+            <div>
+              <span>Motion cue</span>
+              <strong id="motionTitle">동작 준비</strong>
+            </div>
+            <span id="motionSource">준비</span>
+          </div>
+          <p class="motion-caption" id="motionCaption">한글 입력 모드를 확인하면 동작 표현 애니메이션이 함께 바뀝니다.</p>
+          <svg id="motionStage" class="motion-stage" data-motion-id="ready" viewBox="0 0 360 430" role="img" aria-labelledby="motionSvgTitle motionSvgDesc">
+            <title id="motionSvgTitle">동작 표현 애니메이션</title>
+            <desc id="motionSvgDesc">현재 타이핑할 동작 표현을 보여 주는 단순화된 사람 뼈대 애니메이션입니다.</desc>
+            <rect width="360" height="430" fill="transparent"></rect>
+            <g class="scene-steps" data-motion-part="stairs">
+              <rect class="motion-step" x="224" y="332" width="90" height="20" rx="3"></rect>
+              <rect class="motion-step" x="248" y="302" width="86" height="20" rx="3"></rect>
+              <rect class="motion-step" x="272" y="272" width="72" height="20" rx="3"></rect>
+            </g>
+            <path id="motionAir" class="motion-air" data-motion-part="air" d="M54 130 C98 96, 128 98, 154 122 M42 171 C92 136, 122 142, 154 166"></path>
+            <rect class="motion-ground" x="0" y="352" width="360" height="78" rx="0"></rect>
+            <g id="motionFigure" class="motion-figure">
+              <path id="motionBody" class="motion-body" data-motion-part="torso"></path>
+              <path id="motionNeck" class="motion-line" data-motion-part="head"></path>
+              <path id="leftArmPath" class="motion-line" data-motion-part="arms"></path>
+              <path id="rightArmPath" class="motion-line" data-motion-part="arms"></path>
+              <path id="leftLegPath" class="motion-line" data-motion-part="legs"></path>
+              <path id="rightLegPath" class="motion-line" data-motion-part="legs"></path>
+              <path id="leftFootPath" class="motion-foot" data-motion-part="heels"></path>
+              <path id="rightFootPath" class="motion-foot" data-motion-part="heels"></path>
+              <circle id="headCircle" class="motion-head" data-motion-part="head" r="30"></circle>
+              <circle id="leftHand" class="motion-joint" data-motion-part="hands" r="9"></circle>
+              <circle id="rightHand" class="motion-joint" data-motion-part="hands" r="9"></circle>
+              <path id="waistJoint" class="motion-waist-cue" data-motion-part="waist"></path>
+              <circle id="leftHeel" class="motion-joint" data-motion-part="heels" r="7"></circle>
+              <circle id="rightHeel" class="motion-joint" data-motion-part="heels" r="7"></circle>
+              <circle id="leftToe" class="motion-joint" data-motion-part="heels" r="5"></circle>
+              <circle id="rightToe" class="motion-joint" data-motion-part="heels" r="5"></circle>
+              <g id="motionFace" class="motion-face" data-motion-part="head">
+                <circle id="leftEye" class="motion-eye" r="3"></circle>
+                <circle id="rightEye" class="motion-eye" r="3"></circle>
+                <path id="nosePath"></path>
+              </g>
+            </g>
+          </svg>
+        </aside>
+      </div>
+    </main>
+
+    <script>
+      window.MULTILANG_CONFIG = {
+        langs: ["vi", "mn", "ar", "kk", "th", "en", "ja", "zh"],
+        defaultLang: "none"
+      };
+
+      (function () {
+        "use strict";
+
+        const STORAGE_KEY = "c12_motion_expression_typing_trainer_v1";
+        const WARMUP_TARGET = "동작";
+        const LANGS = ["vi", "mn", "ar", "kk", "th", "en", "ja", "zh"];
+        const WARMUP_TRANSLATIONS = {
+          vi: "Kiểm tra chế độ gõ tiếng Hàn.",
+          mn: "Солонгосоор бичих горимыг шалгана.",
+          ar: "تحقق من وضع إدخال الكورية.",
+          kk: "Корейше енгізу режимін тексеріңіз.",
+          th: "ตรวจสอบโหมดพิมพ์ภาษาเกาหลี",
+          en: "Check that Korean input mode is on.",
+          ja: "韓国語入力モードを確認します。",
+          zh: "确认韩语输入模式。"
+        };
+
+        function tr(vi, mn, ar, kk, th, en, ja, zh) {
+          return { vi, mn, ar, kk, th, en, ja, zh };
+        }
+
+        const MOTION_TYPING_ITEMS = [
+          { id: "core-stairs-use", source: "core", target: "계단을 이용하다", cueKo: "엘리베이터 대신 계단을 쓰다", translations: tr("Sử dụng cầu thang", "Шатаар явах", "استخدام الدرج", "Баспалдақты пайдалану", "ใช้บันได", "Use the stairs", "階段を利用する", "使用楼梯"), note: "생활 속에서 쉽게 할 수 있는 이동 동작입니다.", motion: { id: "stairs-use", title: "계단 이용", source: "핵심", caption: "계단을 선택해 몸을 움직이는 장면입니다.", focusParts: ["stairs", "legs"] } },
+          { id: "core-walking", source: "core", target: "걷기 운동을 하다", cueKo: "걸으면서 운동하다", translations: tr("Tập đi bộ", "Алхах дасгал хийх", "ممارسة رياضة المشي", "Жаяу жүру жаттығуын жасау", "ออกกำลังกายด้วยการเดิน", "Do walking exercise", "ウォーキングをする", "进行步行运动"), note: "가장 기본적인 생활 운동 표현입니다.", motion: { id: "walking", title: "걷기 운동", source: "핵심", caption: "두 다리가 번갈아 움직이며 걷는 모습을 봅니다.", focusParts: ["legs"] } },
+          { id: "core-stretching", source: "core", target: "스트레칭을 하다", cueKo: "몸을 늘이고 풀어 주다", translations: tr("Tập giãn cơ", "Сунгалтын дасгал хийх", "ممارسة تمارين التمدد", "Созылу жаттығуын хийх", "ยืดเหยียดร่างกาย", "Do stretching", "ストレッチをする", "做拉伸运动"), note: "몸을 풀어 주는 동작 전체를 말합니다.", motion: { id: "stretching", title: "스트레칭", source: "핵심", caption: "팔과 몸통을 길게 펴는 동작입니다.", focusParts: ["arms", "torso"] } },
+          { id: "exp-stairs-climb", source: "expansion", target: "계단을 오르다", cueKo: "계단 위쪽으로 올라가다", translations: tr("Leo cầu thang", "Шатаар өгсөх", "صعود الدرج", "Баспалдақпен көтерілу", "ขึ้นบันได", "Climb the stairs", "階段を上る", "爬楼梯"), note: "계단을 이용하다보다 동작이 더 구체적입니다.", motion: { id: "stairs-climb", title: "계단 오르기", source: "확장", caption: "몸이 위쪽으로 이동하는 계단 동작입니다.", focusParts: ["stairs", "legs"] } },
+          { id: "exp-elevator", source: "expansion", target: "엘리베이터 대신 계단을 이용하다", cueKo: "승강기를 타지 않고 계단을 쓰다", translations: tr("Dùng cầu thang thay vì thang máy", "Цахилгаан шатны оронд шатаар явах", "استخدام الدرج بدل المصعد", "Лифттің орнына баспалдақты пайдалану", "ใช้บันไดแทนลิฟต์", "Use the stairs instead of the elevator", "エレベーターの代わりに階段を使う", "不用电梯而走楼梯"), note: "권유문에 바로 넣기 좋은 생활 동작 표현입니다.", motion: { id: "stairs-instead", title: "계단 선택", source: "확장", caption: "엘리베이터 대신 계단 쪽으로 움직이는 선택을 보여 줍니다.", focusParts: ["stairs", "legs"] } },
+          { id: "exp-fresh-walk", source: "expansion", target: "맑은 공기를 마시며 걷기 운동을 하다", displayChunks: ["맑은 공기를 마시며", "걷기 운동을 하다"], cueKo: "좋은 공기를 마시면서 걷다", translations: tr("Đi bộ trong không khí trong lành", "Цэвэр агаарт алхах дасгал хийх", "المشي مع استنشاق هواء نقي", "Таза ауа жұтып жүріп жүру", "เดินออกกำลังกายพร้อมสูดอากาศบริสุทธิ์", "Walk while breathing fresh air", "澄んだ空気を吸いながら歩く", "呼吸清新空气并步行运动"), note: "걷기 운동에 상황을 덧붙인 확장 표현입니다.", motion: { id: "fresh-walk", title: "맑은 공기 속 걷기", source: "확장", caption: "걷는 동작과 공기 흐름을 함께 봅니다.", focusParts: ["legs", "air"] } },
+          { id: "exp-neck", source: "expansion", target: "고개를 천천히 돌리다", cueKo: "목을 무리하지 않고 돌리다", translations: tr("Xoay cổ chậm rãi", "Толгойгоо аажуухан эргүүлэх", "إدارة الرأس ببطء", "Басты жай айналдыру", "ค่อย ๆ หมุนศีรษะ", "Turn your head slowly", "首をゆっくり回す", "慢慢转动头部"), note: "목 스트레칭 방법을 설명하는 표현입니다.", motion: { id: "neck-turn", title: "고개 돌리기", source: "확장", caption: "머리와 목이 좌우로 천천히 움직입니다.", focusParts: ["head"] } },
+          { id: "exp-waist", source: "expansion", target: "두 손을 허리에 대다", cueKo: "손 두 개를 허리 위에 놓다", translations: tr("Đặt hai tay lên eo", "Хоёр гараа бэлхүүс дээр тавих", "وضع اليدين على الخصر", "Екі қолды белге қою", "วางมือทั้งสองข้างที่เอว", "Put both hands on your waist", "両手を腰に当てる", "双手放在腰上"), note: "운동 순서를 설명할 때 유용한 준비 동작입니다.", motion: { id: "hands-waist", title: "손을 허리에 대기", source: "확장", caption: "양손이 허리 쪽에 닿는 동작입니다.", focusParts: ["hands", "waist"] } },
+          { id: "exp-bend-back", source: "expansion", target: "몸을 뒤로 젖히다", cueKo: "몸을 뒤쪽으로 기울이다", translations: tr("Ngả người ra sau", "Биеэ арагш гэдийлгэх", "إمالة الجسم إلى الخلف", "Денені артқа шалқайту", "เอนตัวไปด้านหลัง", "Lean your body backward", "体を後ろに反らす", "身体向后仰"), note: "몸통의 방향 변화를 나타내는 동작 표현입니다.", motion: { id: "lean-back", title: "몸 뒤로 젖히기", source: "확장", caption: "몸통이 뒤쪽으로 기울어지는 모습을 봅니다.", focusParts: ["torso"] } },
+          { id: "exp-heel", source: "expansion", target: "발뒤꿈치를 들다", cueKo: "뒤꿈치를 바닥에서 올리다", translations: tr("Nhấc gót chân", "Өсгийгөө өргөх", "رفع الكعبين", "Өкшені көтеру", "ยกส้นเท้า", "Lift your heels", "かかとを上げる", "抬起脚后跟"), note: "짧은 운동 동작으로 바로 따라 할 수 있습니다.", motion: { id: "heel-lift", title: "발뒤꿈치 들기", source: "확장", caption: "발끝은 두고 뒤꿈치가 올라가는 동작입니다.", focusParts: ["heels", "legs"] } },
+          { id: "exp-arm", source: "expansion", target: "팔을 쭉 뻗다", cueKo: "팔을 길게 펴다", translations: tr("Duỗi thẳng tay", "Гараа шулуун сунгах", "مدّ الذراعين جيدًا", "Қолды созу", "เหยียดแขนให้ตรง", "Stretch your arm out", "腕をまっすぐ伸ばす", "伸直手臂"), note: "팔의 방향과 길어지는 느낌을 말합니다.", motion: { id: "arm-stretch", title: "팔 뻗기", source: "확장", caption: "팔이 몸에서 멀어지며 길게 펴집니다.", focusParts: ["arms", "hands"] } }
+        ];
+
+        const RECALL_STAGE_IDS = ["recall1", "recall2"];
+        const RECALL1_ITEMS = MOTION_TYPING_ITEMS.map((item) => Object.assign({}, item, { id: "recall1-" + item.id, source: "recall1" }));
+        const RECALL2_ITEMS = MOTION_TYPING_ITEMS.map((item) => Object.assign({}, item, { id: "recall2-" + item.id, source: "recall2" }));
+        const STAGES = [
+          { id: "warmup", label: "한/영", title: "한/영 확인", meta: "1단계", prompt: "한글 입력 모드로 짧게 시작합니다. 아래 칸에 동작을 입력하세요." },
+          { id: "motion", label: "동작", title: "동작 표현", meta: "2단계", prompt: "동작 애니메이션을 보며 표현을 정확히 따라 칩니다." },
+          { id: "recall1", label: "회상1", title: "회상 1: 초성 회상", meta: "3단계", prompt: "초성 단서를 보고 동작 표현을 다시 떠올려 입력합니다." },
+          { id: "recall2", label: "회상2", title: "회상 2: 부분 가림 회상", meta: "4단계", prompt: "앞 1~2글자만 보고 나머지 ? 자리를 기억으로 채웁니다." },
+          { id: "report", label: "리포트", title: "학습 리포트", meta: "5단계", prompt: "오늘 타이핑으로 익힌 동작 표현을 확인합니다." }
+        ];
+        const INDEXED_STAGE_IDS = ["motion", "recall1", "recall2"];
+        const DEFAULT_ITEM_INDEX_BY_STAGE = INDEXED_STAGE_IDS.reduce((acc, stageId) => {
+          acc[stageId] = 0;
+          return acc;
+        }, {});
+        const INITIALS = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+
+        const state = {
+          stageIndex: 0,
+          itemIndexByStage: Object.assign({}, DEFAULT_ITEM_INDEX_BY_STAGE),
+          results: {},
+          hintVisible: false,
+          mismatch: null,
+          revealAnswer: null,
+          composing: false
+        };
+
+        let advanceTimer = 0;
+        let lastRenderKey = "";
+
+        const els = {
+          progressDots: document.getElementById("progressDots"),
+          stageMeta: document.getElementById("stageMeta"),
+          stageTitle: document.getElementById("stageTitle"),
+          missionPrompt: document.getElementById("missionPrompt"),
+          targetCard: document.getElementById("targetCard"),
+          itemMeta: document.getElementById("itemMeta"),
+          targetText: document.getElementById("targetText"),
+          punctuationNote: document.getElementById("punctuationNote"),
+          cueKo: document.getElementById("cueKo"),
+          noteText: document.getElementById("noteText"),
+          translationPanel: document.getElementById("translationPanel"),
+          hintPanel: document.getElementById("hintPanel"),
+          hintText: document.getElementById("hintText"),
+          typingInput: document.getElementById("typingInput"),
+          reportPanel: document.getElementById("reportPanel"),
+          totalMetric: document.getElementById("totalMetric"),
+          correctMetric: document.getElementById("correctMetric"),
+          hintMetric: document.getElementById("hintMetric"),
+          reviewList: document.getElementById("reviewList"),
+          statusLine: document.getElementById("statusLine"),
+          feedbackText: document.getElementById("feedbackText"),
+          shortcutText: document.getElementById("shortcutText"),
+          prevButton: document.getElementById("prevButton"),
+          hintButton: document.getElementById("hintButton"),
+          checkButton: document.getElementById("checkButton"),
+          retryButton: document.getElementById("retryButton"),
+          resetTrainer: document.getElementById("resetTrainer"),
+          motionPanel: document.getElementById("motionPanel"),
+          motionStage: document.getElementById("motionStage"),
+          motionTitle: document.getElementById("motionTitle"),
+          motionSource: document.getElementById("motionSource"),
+          motionCaption: document.getElementById("motionCaption")
+        };
+
+        const motionEls = {
+          air: document.getElementById("motionAir"),
+          body: document.getElementById("motionBody"),
+          neck: document.getElementById("motionNeck"),
+          head: document.getElementById("headCircle"),
+          face: document.getElementById("motionFace"),
+          leftEye: document.getElementById("leftEye"),
+          rightEye: document.getElementById("rightEye"),
+          nose: document.getElementById("nosePath"),
+          leftArm: document.getElementById("leftArmPath"),
+          rightArm: document.getElementById("rightArmPath"),
+          leftLeg: document.getElementById("leftLegPath"),
+          rightLeg: document.getElementById("rightLegPath"),
+          leftFoot: document.getElementById("leftFootPath"),
+          rightFoot: document.getElementById("rightFootPath"),
+          leftHand: document.getElementById("leftHand"),
+          rightHand: document.getElementById("rightHand"),
+          waist: document.getElementById("waistJoint"),
+          leftHeel: document.getElementById("leftHeel"),
+          rightHeel: document.getElementById("rightHeel"),
+          leftToe: document.getElementById("leftToe"),
+          rightToe: document.getElementById("rightToe")
+        };
+
+        const POINT_KEYS = [
+          "head", "neck", "chest", "waist",
+          "leftShoulder", "rightShoulder", "leftElbow", "rightElbow", "leftHand", "rightHand",
+          "leftHip", "rightHip", "leftKnee", "rightKnee",
+          "leftAnkle", "rightAnkle", "leftHeel", "rightHeel", "leftToe", "rightToe"
+        ];
+        const POSE_SCALARS = ["faceDir", "airOpacity", "airOffset"];
+        const BASE_POSE = {
+          head: { x: 180, y: 88 },
+          neck: { x: 180, y: 124 },
+          chest: { x: 180, y: 160 },
+          waist: { x: 180, y: 248 },
+          leftShoulder: { x: 145, y: 158 },
+          rightShoulder: { x: 215, y: 158 },
+          leftElbow: { x: 116, y: 218 },
+          rightElbow: { x: 244, y: 218 },
+          leftHand: { x: 94, y: 274 },
+          rightHand: { x: 266, y: 274 },
+          leftHip: { x: 158, y: 252 },
+          rightHip: { x: 202, y: 252 },
+          leftKnee: { x: 138, y: 318 },
+          rightKnee: { x: 222, y: 318 },
+          leftAnkle: { x: 122, y: 352 },
+          rightAnkle: { x: 238, y: 352 },
+          leftHeel: { x: 112, y: 359 },
+          rightHeel: { x: 228, y: 359 },
+          leftToe: { x: 136, y: 359 },
+          rightToe: { x: 252, y: 359 },
+          faceDir: 0,
+          airOpacity: 0,
+          airOffset: 0
+        };
+
+        function basePoint(key, dx, dy) {
+          const point = BASE_POSE[key];
+          return { x: point.x + (dx || 0), y: point.y + (dy || 0) };
+        }
+
+        function makePose(overrides, offset) {
+          const dx = offset && offset.x ? offset.x : 0;
+          const dy = offset && offset.y ? offset.y : 0;
+          const pose = {};
+          POINT_KEYS.forEach((key) => {
+            pose[key] = basePoint(key, dx, dy);
+          });
+          POSE_SCALARS.forEach((key) => {
+            pose[key] = BASE_POSE[key];
+          });
+          Object.keys(overrides || {}).forEach((key) => {
+            const value = overrides[key];
+            pose[key] = POINT_KEYS.indexOf(key) !== -1 ? { x: value.x, y: value.y } : value;
+          });
+          return pose;
+        }
+
+        function clonePose(pose) {
+          const source = pose || BASE_POSE;
+          const copy = {};
+          POINT_KEYS.forEach((key) => {
+            copy[key] = { x: source[key].x, y: source[key].y };
+          });
+          POSE_SCALARS.forEach((key) => {
+            copy[key] = Number(source[key] || 0);
+          });
+          return copy;
+        }
+
+        function shiftedOverrides(overrides, dx, dy) {
+          const shifted = {};
+          Object.keys(overrides || {}).forEach((key) => {
+            const value = overrides[key];
+            shifted[key] = POINT_KEYS.indexOf(key) !== -1 ? { x: value.x + dx, y: value.y + dy } : value;
+          });
+          return shifted;
+        }
+
+        const WALK_A = makePose({
+          chest: basePoint("chest", -3, 2),
+          waist: basePoint("waist", -3, 3),
+          leftShoulder: basePoint("leftShoulder", -3, 2),
+          rightShoulder: basePoint("rightShoulder", -3, 2),
+          leftHip: basePoint("leftHip", -3, 3),
+          rightHip: basePoint("rightHip", -3, 3),
+          leftElbow: { x: 125, y: 214 },
+          leftHand: { x: 104, y: 250 },
+          rightElbow: { x: 249, y: 225 },
+          rightHand: { x: 275, y: 292 },
+          leftKnee: { x: 154, y: 313 },
+          leftAnkle: { x: 165, y: 350 },
+          leftHeel: { x: 152, y: 358 },
+          leftToe: { x: 177, y: 357 },
+          rightKnee: { x: 212, y: 315 },
+          rightAnkle: { x: 224, y: 352 },
+          rightHeel: { x: 211, y: 359 },
+          rightToe: { x: 238, y: 359 }
+        });
+        const WALK_B = makePose({
+          chest: basePoint("chest", 3, -2),
+          waist: basePoint("waist", 3, -1),
+          leftShoulder: basePoint("leftShoulder", 3, -2),
+          rightShoulder: basePoint("rightShoulder", 3, -2),
+          leftHip: basePoint("leftHip", 3, -1),
+          rightHip: basePoint("rightHip", 3, -1),
+          leftElbow: { x: 111, y: 227 },
+          leftHand: { x: 82, y: 292 },
+          rightElbow: { x: 236, y: 210 },
+          rightHand: { x: 257, y: 246 },
+          leftKnee: { x: 146, y: 314 },
+          leftAnkle: { x: 114, y: 352 },
+          leftHeel: { x: 101, y: 359 },
+          leftToe: { x: 129, y: 359 },
+          rightKnee: { x: 210, y: 312 },
+          rightAnkle: { x: 199, y: 350 },
+          rightHeel: { x: 187, y: 358 },
+          rightToe: { x: 214, y: 357 }
+        });
+        const STAIRS_A = makePose({
+          leftKnee: { x: 132, y: 320 },
+          leftAnkle: { x: 123, y: 352 },
+          leftHeel: { x: 110, y: 359 },
+          leftToe: { x: 136, y: 359 },
+          rightKnee: { x: 216, y: 292 },
+          rightAnkle: { x: 238, y: 326 },
+          rightHeel: { x: 224, y: 333 },
+          rightToe: { x: 252, y: 333 },
+          leftElbow: { x: 126, y: 212 },
+          leftHand: { x: 104, y: 252 },
+          rightElbow: { x: 250, y: 220 },
+          rightHand: { x: 272, y: 278 }
+        }, { x: -12, y: 3 });
+        const STAIRS_B = makePose({
+          leftKnee: { x: 177, y: 286 },
+          leftAnkle: { x: 210, y: 326 },
+          leftHeel: { x: 196, y: 333 },
+          leftToe: { x: 224, y: 333 },
+          rightKnee: { x: 238, y: 264 },
+          rightAnkle: { x: 266, y: 296 },
+          rightHeel: { x: 252, y: 303 },
+          rightToe: { x: 280, y: 303 },
+          leftElbow: { x: 155, y: 198 },
+          leftHand: { x: 132, y: 244 },
+          rightElbow: { x: 275, y: 203 },
+          rightHand: { x: 296, y: 254 }
+        }, { x: 18, y: -24 });
+        const STRETCH_A = makePose({
+          head: basePoint("head", 0, -4),
+          neck: basePoint("neck", 0, -7),
+          chest: basePoint("chest", 0, -8),
+          leftShoulder: basePoint("leftShoulder", -3, -9),
+          rightShoulder: basePoint("rightShoulder", 3, -9),
+          leftElbow: { x: 143, y: 92 },
+          rightElbow: { x: 217, y: 92 },
+          leftHand: { x: 162, y: 45 },
+          rightHand: { x: 198, y: 45 }
+        });
+        const STRETCH_B = makePose({
+          head: basePoint("head", 0, -8),
+          neck: basePoint("neck", 0, -11),
+          chest: basePoint("chest", 0, -13),
+          waist: basePoint("waist", 0, -6),
+          leftShoulder: basePoint("leftShoulder", -5, -14),
+          rightShoulder: basePoint("rightShoulder", 5, -14),
+          leftElbow: { x: 139, y: 80 },
+          rightElbow: { x: 221, y: 80 },
+          leftHand: { x: 160, y: 30 },
+          rightHand: { x: 200, y: 30 }
+        });
+        const NECK_LEFT = makePose({ head: basePoint("head", -15, 0), faceDir: -1 });
+        const NECK_RIGHT = makePose({ head: basePoint("head", 15, 0), faceDir: 1 });
+        const HANDS_WAIST = makePose({
+          leftElbow: { x: 120, y: 212 },
+          rightElbow: { x: 240, y: 212 },
+          leftHand: { x: 151, y: 247 },
+          rightHand: { x: 209, y: 247 }
+        });
+        const HANDS_WAIST_B = makePose({
+          chest: basePoint("chest", 0, -2),
+          leftShoulder: basePoint("leftShoulder", 0, -2),
+          rightShoulder: basePoint("rightShoulder", 0, -2),
+          leftElbow: { x: 118, y: 210 },
+          rightElbow: { x: 242, y: 210 },
+          leftHand: { x: 150, y: 246 },
+          rightHand: { x: 210, y: 246 }
+        });
+        const LEAN_BACK = makePose({
+          head: { x: 210, y: 84 },
+          neck: { x: 204, y: 120 },
+          chest: { x: 197, y: 155 },
+          leftShoulder: { x: 164, y: 151 },
+          rightShoulder: { x: 229, y: 160 },
+          leftElbow: { x: 132, y: 212 },
+          rightElbow: { x: 254, y: 225 },
+          leftHand: { x: 114, y: 268 },
+          rightHand: { x: 276, y: 282 },
+          faceDir: 0.35
+        });
+        const HEEL_BASE = makePose();
+        const HEEL_LIFT = makePose({
+          head: basePoint("head", 0, -9),
+          neck: basePoint("neck", 0, -9),
+          chest: basePoint("chest", 0, -9),
+          waist: basePoint("waist", 0, -8),
+          leftShoulder: basePoint("leftShoulder", 0, -9),
+          rightShoulder: basePoint("rightShoulder", 0, -9),
+          leftHip: basePoint("leftHip", 0, -8),
+          rightHip: basePoint("rightHip", 0, -8),
+          leftKnee: basePoint("leftKnee", 0, -8),
+          rightKnee: basePoint("rightKnee", 0, -8),
+          leftAnkle: { x: 125, y: 340 },
+          rightAnkle: { x: 235, y: 340 },
+          leftHeel: { x: 113, y: 338 },
+          rightHeel: { x: 227, y: 338 },
+          leftToe: basePoint("leftToe", 0, 0),
+          rightToe: basePoint("rightToe", 0, 0)
+        });
+        const ARM_STRETCH_A = makePose({
+          leftElbow: { x: 105, y: 158 },
+          rightElbow: { x: 255, y: 158 },
+          leftHand: { x: 72, y: 160 },
+          rightHand: { x: 288, y: 160 }
+        });
+        const ARM_STRETCH_B = makePose({
+          chest: basePoint("chest", 0, -3),
+          leftShoulder: basePoint("leftShoulder", -2, -3),
+          rightShoulder: basePoint("rightShoulder", 2, -3),
+          leftElbow: { x: 90, y: 155 },
+          rightElbow: { x: 270, y: 155 },
+          leftHand: { x: 48, y: 156 },
+          rightHand: { x: 312, y: 156 }
+        });
+
+        const MOTION_POSES = {
+          ready: { posterFrame: 0, frames: [{ duration: 1200, pose: makePose() }] },
+          walking: { posterFrame: 1, frames: [{ duration: 620, pose: WALK_A }, { duration: 620, pose: WALK_B }] },
+          "fresh-walk": {
+            posterFrame: 1,
+            frames: [
+              { duration: 620, pose: makePose(Object.assign(shiftedOverrides(WALK_A, 0, 0), { airOpacity: 0.92, airOffset: 0 })) },
+              { duration: 620, pose: makePose(Object.assign(shiftedOverrides(WALK_B, 0, 0), { airOpacity: 0.55, airOffset: 34 })) }
+            ]
+          },
+          "stairs-use": { posterFrame: 1, frames: [{ duration: 760, pose: STAIRS_A }, { duration: 760, pose: STAIRS_B }] },
+          "stairs-climb": { posterFrame: 1, frames: [{ duration: 760, pose: STAIRS_A }, { duration: 760, pose: STAIRS_B }] },
+          "stairs-instead": { posterFrame: 1, frames: [{ duration: 760, pose: STAIRS_A }, { duration: 760, pose: STAIRS_B }] },
+          stretching: { posterFrame: 1, frames: [{ duration: 760, pose: STRETCH_A }, { duration: 760, pose: STRETCH_B }] },
+          "neck-turn": { posterFrame: 1, frames: [{ duration: 720, pose: NECK_LEFT }, { duration: 720, pose: NECK_RIGHT }] },
+          "hands-waist": { posterFrame: 0, frames: [{ duration: 780, pose: HANDS_WAIST }, { duration: 780, pose: HANDS_WAIST_B }] },
+          "lean-back": { posterFrame: 1, frames: [{ duration: 780, pose: makePose() }, { duration: 780, pose: LEAN_BACK }] },
+          "heel-lift": { posterFrame: 1, frames: [{ duration: 560, pose: HEEL_BASE }, { duration: 560, pose: HEEL_LIFT }] },
+          "arm-stretch": { posterFrame: 1, frames: [{ duration: 650, pose: ARM_STRETCH_A }, { duration: 650, pose: ARM_STRETCH_B }] }
+        };
+
+        let motionAnimationFrame = 0;
+        let motionStartAt = 0;
+        let currentMotionId = "";
+        let currentMotionPose = clonePose(BASE_POSE);
+        const reducedMotionQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+
+        function normalize(value) {
+          return String(value || "").replace(/\s+/g, " ").trim();
+        }
+
+        function hasEnglish(value) {
+          return /[A-Za-z]/.test(value);
+        }
+
+        function isPunctuation(char) {
+          return /[.?!,]/.test(char);
+        }
+
+        function hasPunctuation(value) {
+          return Array.from(value || "").some(isPunctuation);
+        }
+
+        function isRecallStage(stageId) {
+          return RECALL_STAGE_IDS.indexOf(stageId) !== -1;
+        }
+
+        function recallShortcut() {
+          return "<kbd>Enter</kbd> 확인 <kbd>Ctrl+H</kbd> 힌트";
+        }
+
+        function isRevealedCharacter(char) {
+          return /[0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ]/.test(char);
+        }
+
+        function visibleCharCount(value) {
+          return Array.from(value || "").filter(isRevealedCharacter).length;
+        }
+
+        function getInitialConsonants(value) {
+          return Array.from(value || "").map((char) => {
+            const code = char.charCodeAt(0);
+            if (code >= 0xac00 && code <= 0xd7a3) return INITIALS[Math.floor((code - 0xac00) / 588)];
+            if (/\s/.test(char)) return " ";
+            if (isPunctuation(char)) return char;
+            return isRevealedCharacter(char) ? "?" : char;
+          }).join("");
+        }
+
+        function maskByLength(value) {
+          const chars = Array.from(value || "");
+          const revealLimit = visibleCharCount(value) <= 4 ? 1 : 2;
+          let revealed = 0;
+          return chars.map((char) => {
+            if (!isRevealedCharacter(char)) return char;
+            revealed += 1;
+            return revealed <= revealLimit ? char : "?";
+          }).join("");
+        }
+
+        function recallDisplayText(stageId, item) {
+          if (!item) return "";
+          if (stageId === "recall1") return getInitialConsonants(item.target);
+          if (stageId === "recall2") return maskByLength(item.target);
+          return item.target;
+        }
+
+        function makeRecallHint(item) {
+          if (!item) return "";
+          return "뜻/상황: " + item.cueKo + " · 사용 단서: " + item.note + " · 글자 수: " + visibleCharCount(item.target) + "자";
+        }
+
+        function compareToTarget(input, target) {
+          const inputChars = Array.from(normalize(input));
+          const targetChars = Array.from(target || "");
+          const minLength = Math.min(inputChars.length, targetChars.length);
+          const wrongIndices = [];
+          for (let index = 0; index < minLength; index += 1) {
+            if (inputChars[index] !== targetChars[index]) wrongIndices.push(index);
+          }
+          const exact = wrongIndices.length === 0 && inputChars.length === targetChars.length;
+          const extra = inputChars.length > targetChars.length;
+          const prefix = wrongIndices.length === 0 && inputChars.length < targetChars.length;
+          const rest = prefix ? targetChars.slice(inputChars.length) : [];
+          const missingPunctuation = prefix && rest.length > 0 && rest.every(isPunctuation);
+          const missingIndices = missingPunctuation ? rest.map((_, offset) => inputChars.length + offset) : [];
+          const index = wrongIndices[0] == null
+            ? extra ? Math.max(targetChars.length - 1, 0) : inputChars.length
+            : wrongIndices[0];
+          return { exact, prefix, index, extra, missingPunctuation, wrongIndices, missingIndices };
+        }
+
+        function clearMismatch() {
+          state.mismatch = null;
+          state.revealAnswer = null;
+        }
+
+        function setMismatch(item, input) {
+          const normalizedInput = normalize(input);
+          const analysis = compareToTarget(input, item ? item.target : "");
+          const fallbackIndex = Math.max(Array.from(item ? item.target : "").length - 1, 0);
+          const indices = analysis.missingPunctuation
+            ? analysis.missingIndices
+            : analysis.wrongIndices.length > 0
+              ? analysis.wrongIndices
+              : [analysis.extra ? fallbackIndex : analysis.index];
+          const targetChars = Array.from(item ? item.target : "");
+          const inputChars = Array.from(normalizedInput);
+          const matchedIndices = [];
+          targetChars.forEach((char, index) => {
+            if (inputChars[index] === char && char !== " ") matchedIndices.push(index);
+          });
+          state.mismatch = item ? { itemId: item.id, input: normalizedInput, index: analysis.index, indices, matchedIndices, extra: analysis.extra, missingPunctuation: analysis.missingPunctuation } : null;
+          return analysis;
+        }
+
+        function chunkTargetText(item, displayText) {
+          if (item && Array.isArray(item.displayChunks) && item.displayChunks.join(" ") === displayText) return item.displayChunks;
+          return String(displayText || "").split(" ");
+        }
+
+        function nearestVisibleIndex(displayText, index) {
+          const chars = Array.from(displayText || "");
+          if (chars.length === 0) return 0;
+          const bounded = Math.max(0, Math.min(index, chars.length - 1));
+          if (chars[bounded] !== " ") return bounded;
+          for (let next = bounded + 1; next < chars.length; next += 1) if (chars[next] !== " ") return next;
+          for (let previous = bounded - 1; previous >= 0; previous -= 1) if (chars[previous] !== " ") return previous;
+          return bounded;
+        }
+
+        function visibleIndices(displayText, indices) {
+          const seen = new Set();
+          return indices.map((index) => nearestVisibleIndex(displayText, index)).filter((index) => {
+            if (seen.has(index)) return false;
+            seen.add(index);
+            return true;
+          });
+        }
+
+        function targetRenderState(stageId, item, displayText) {
+          const target = item ? item.target : displayText;
+          const value = normalize(els.typingInput.value);
+          const displayLastIndex = Math.max(Array.from(displayText || "").length - 1, 0);
+          if (item && state.revealAnswer === item.id) return { answerRevealed: true };
+          if (!value) return { nextIndex: nearestVisibleIndex(displayText, 0) };
+          const analysis = compareToTarget(value, target);
+          const forced = item && state.mismatch && state.mismatch.itemId === item.id;
+          if (analysis.exact) return {};
+          const index = nearestVisibleIndex(displayText, Math.max(0, Math.min(analysis.index, displayLastIndex)));
+          const wrongIndices = visibleIndices(displayText, forced ? state.mismatch.indices : analysis.wrongIndices);
+          if (isRecallStage(stageId)) return forced ? { wrongIndices: wrongIndices.length ? wrongIndices : [index], revealedIndices: state.mismatch.matchedIndices || [], extra: analysis.extra } : { nextIndex: index };
+          if (!forced && analysis.prefix) return { nextIndex: index };
+          return { wrongIndices: wrongIndices.length ? wrongIndices : [index], extra: analysis.extra };
+        }
+
+        function recallFeedbackDisplayText(stageId, item) {
+          const clue = recallDisplayText(stageId, item);
+          if (!item || !state.mismatch || state.mismatch.itemId !== item.id) return clue;
+          const clueChars = Array.from(clue);
+          const targetChars = Array.from(item.target);
+          const inputChars = Array.from(state.mismatch.input || "");
+          return targetChars.map((char, index) => {
+            if (char === " ") return " ";
+            return inputChars[index] === char ? char : clueChars[index] || "?";
+          }).join("");
+        }
+
+        function escapeHtml(value) {
+          return String(value == null ? "" : value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+        }
+
+        function renderTargetExpression(displayText, item, options) {
+          const stageId = options && options.stageId ? options.stageId : currentStage().id;
+          const renderState = targetRenderState(stageId, item, displayText);
+          const chunks = chunkTargetText(item, displayText);
+          let charIndex = 0;
+          els.targetText.className = "target-expression";
+          els.targetText.classList.toggle("is-hidden-target", Boolean(options && options.hidden));
+          els.targetText.classList.toggle("is-answer-revealed", Boolean(renderState.answerRevealed));
+          els.targetText.classList.toggle("is-long-target", Array.from(displayText || "").length > 16);
+          els.targetText.setAttribute("aria-label", displayText || "");
+          const wrongIndexSet = new Set(renderState.wrongIndices || []);
+          const revealedIndexSet = new Set(renderState.revealedIndices || []);
+          els.targetText.innerHTML = chunks.map((chunk, chunkIndex) => {
+            const gap = chunkIndex === 0 ? "" : '<span class="target-gap" aria-hidden="true"> </span>';
+            if (chunkIndex > 0) charIndex += 1;
+            const chars = Array.from(chunk).map((char) => {
+              const classes = ["target-char"];
+              if (isPunctuation(char)) classes.push("is-punctuation");
+              if (renderState.nextIndex === charIndex) classes.push("is-next");
+              if (revealedIndexSet.has(charIndex)) classes.push("is-revealed-correct");
+              if (wrongIndexSet.has(charIndex)) classes.push("is-wrong");
+              if (renderState.extra && wrongIndexSet.has(charIndex)) classes.push("is-extra-error");
+              const html = '<span class="' + classes.join(" ") + '" data-char-index="' + charIndex + '">' + escapeHtml(char) + "</span>";
+              charIndex += 1;
+              return html;
+            }).join("");
+            return gap + '<span class="target-chunk" data-chunk="' + escapeHtml(chunk) + '">' + chars + "</span>";
+          }).join("");
+        }
+
+        function syncMultilangBlocks() {
+          if (window.MultilangToggle && typeof window.MultilangToggle.refresh === "function") window.MultilangToggle.refresh();
+        }
+
+        function renderTranslations(translations) {
+          const data = translations || {};
+          els.translationPanel.innerHTML = LANGS.map((lang) => {
+            const text = data[lang] || "";
+            const dir = lang === "ar" ? ' dir="rtl"' : "";
+            return '<p class="lang-box" data-lang="' + lang + '" lang="' + lang + '"' + dir + ">" + escapeHtml(text) + "</p>";
+          }).join("");
+          syncMultilangBlocks();
+        }
+
+        function practiceItems() {
+          return MOTION_TYPING_ITEMS.concat(RECALL1_ITEMS, RECALL2_ITEMS);
+        }
+
+        function stageItems(stageId) {
+          if (stageId === "motion") return MOTION_TYPING_ITEMS;
+          if (stageId === "recall1") return RECALL1_ITEMS;
+          if (stageId === "recall2") return RECALL2_ITEMS;
+          return [];
+        }
+
+        function currentStage() {
+          return STAGES[state.stageIndex];
+        }
+
+        function currentItem() {
+          const stage = currentStage();
+          const items = stageItems(stage.id);
+          return items[state.itemIndexByStage[stage.id] || 0] || null;
+        }
+
+        function currentItemIndex() {
+          const stage = currentStage();
+          return state.itemIndexByStage[stage.id] || 0;
+        }
+
+        function stageDone(stageId) {
+          if (stageId === "warmup") return state.stageIndex > 0;
+          if (stageId === "report") return state.stageIndex === STAGES.length - 1;
+          const items = stageItems(stageId);
+          return items.length > 0 && items.every((item) => state.results[item.id] && state.results[item.id].correct);
+        }
+
+        function setFeedback(message, kind, shortcut) {
+          els.feedbackText.textContent = message;
+          els.shortcutText.innerHTML = shortcut || "";
+          els.statusLine.classList.toggle("is-good", kind === "good");
+          els.statusLine.classList.toggle("is-bad", kind === "bad");
+          els.statusLine.classList.toggle("is-warn", kind === "warn");
+        }
+
+        function saveState() {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function loadState() {
+          try {
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+            Object.assign(state, saved);
+            state.itemIndexByStage = Object.assign({}, DEFAULT_ITEM_INDEX_BY_STAGE, saved.itemIndexByStage || {});
+            state.results = saved.results && typeof saved.results === "object" ? saved.results : {};
+            state.stageIndex = Math.max(0, Math.min(Number(state.stageIndex) || 0, STAGES.length - 1));
+            INDEXED_STAGE_IDS.forEach((stageId) => {
+              const max = Math.max(stageItems(stageId).length - 1, 0);
+              state.itemIndexByStage[stageId] = Math.max(0, Math.min(Number(state.itemIndexByStage[stageId]) || 0, max));
+            });
+            state.hintVisible = false;
+            state.mismatch = null;
+            state.revealAnswer = null;
+            state.composing = false;
+          } catch (error) {
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        }
+
+        function focusInput(selectText) {
+          if (state.composing || currentStage().id === "report") return;
+          window.requestAnimationFrame(() => {
+            els.typingInput.focus({ preventScroll: true });
+            if (selectText) els.typingInput.select();
+          });
+        }
+
+        function clearTimers() {
+          window.clearTimeout(advanceTimer);
+          advanceTimer = 0;
+        }
+
+        function recordAttempt(item, correct) {
+          const previous = state.results[item.id] || { id: item.id, target: item.target, section: item.source, attempts: 0, hint: false, correct: false };
+          state.results[item.id] = {
+            id: item.id,
+            target: item.target,
+            section: item.source,
+            attempts: previous.attempts + 1,
+            hint: previous.hint || state.hintVisible,
+            correct: previous.correct || correct
+          };
+        }
+
+        function markHintUsed() {
+          const item = currentItem();
+          if (!item || !isRecallStage(currentStage().id)) return;
+          const previous = state.results[item.id] || { id: item.id, target: item.target, section: item.source, attempts: 0, hint: false, correct: false };
+          state.results[item.id] = Object.assign({}, previous, { hint: true });
+        }
+
+        function goToStage(index, options) {
+          clearTimers();
+          state.stageIndex = Math.max(0, Math.min(index, STAGES.length - 1));
+          state.hintVisible = false;
+          clearMismatch();
+          render(options);
+        }
+
+        function advanceItem() {
+          const stage = currentStage();
+          const items = stageItems(stage.id);
+          const nextIndex = currentItemIndex() + 1;
+          state.hintVisible = false;
+          clearMismatch();
+          if (nextIndex < items.length) {
+            state.itemIndexByStage[stage.id] = nextIndex;
+            render({ selectText: true });
+            setFeedback("좋아요. 다음 표현을 입력하세요.", "good", isRecallStage(stage.id) ? recallShortcut() : "<kbd>자동</kbd> 정확히 치면 이동");
+            return;
+          }
+          goToStage(state.stageIndex + 1, { selectText: true });
+          if (currentStage().id !== "report") {
+            setFeedback(isRecallStage(currentStage().id) ? "단서를 보고 기억나는 표현을 입력하세요." : "다음 단계로 넘어갑니다.", "good", isRecallStage(currentStage().id) ? recallShortcut() : "<kbd>자동</kbd>");
+          }
+        }
+
+        function completeWarmup() {
+          clearMismatch();
+          setFeedback("좋아요. 동작 표현으로 넘어갑니다.", "good", "<kbd>자동 이동</kbd>");
+          advanceTimer = window.setTimeout(() => goToStage(1, { selectText: true }), 300);
+        }
+
+        function completeCopyItem(item) {
+          clearMismatch();
+          recordAttempt(item, true);
+          setFeedback("정확해요. 다음 표현으로 넘어갑니다.", "good", "<kbd>자동 이동</kbd>");
+          saveState();
+          advanceTimer = window.setTimeout(advanceItem, 300);
+        }
+
+        function submitRecallItem() {
+          const item = currentItem();
+          if (!item) return;
+          const value = normalize(els.typingInput.value);
+          if (hasEnglish(value)) {
+            setFeedback("한/영 키 확인: 지금은 한글 입력 모드가 필요합니다.", "bad", "<kbd>한/영</kbd> " + recallShortcut());
+            focusInput(true);
+            return;
+          }
+          if (value === item.target) {
+            clearMismatch();
+            state.revealAnswer = item.id;
+            recordAttempt(item, true);
+            els.typingInput.value = "";
+            renderTarget();
+            setFeedback("정확해요. 정답을 확인하고 다음으로 넘어갑니다.", "good", "<kbd>자동 이동</kbd>");
+            saveState();
+            advanceTimer = window.setTimeout(advanceItem, 850);
+            return;
+          }
+          recordAttempt(item, false);
+          setMismatch(item, value);
+          renderTarget();
+          setFeedback("다시 입력하세요.", "bad", recallShortcut());
+          saveState();
+          focusInput(true);
+        }
+
+        function handleTypingInput() {
+          if (state.composing) return;
+          const stage = currentStage();
+          const value = normalize(els.typingInput.value);
+          if (state.revealAnswer) return;
+          clearTimers();
+          if (hasEnglish(value)) {
+            setFeedback("한/영 키 확인: 지금은 한글 입력 모드가 필요합니다.", "bad", "<kbd>한/영</kbd>");
+            renderTarget();
+            return;
+          }
+          if (stage.id === "warmup") {
+            if (value === WARMUP_TARGET) completeWarmup();
+            else {
+              renderTarget();
+              setFeedback('"동작"을 입력하세요.', "warn", "<kbd>자동</kbd> 정확히 입력하면 이동");
+            }
+            return;
+          }
+          if (isRecallStage(stage.id)) {
+            if (state.mismatch && currentItem() && state.mismatch.itemId === currentItem().id) {
+              setMismatch(currentItem(), value);
+              renderTarget();
+            }
+            setFeedback("단서를 보고 기억나는 표현을 입력한 뒤 Enter를 누르세요.", "", recallShortcut());
+            return;
+          }
+          const item = currentItem();
+          if (item && value === item.target) {
+            completeCopyItem(item);
+            return;
+          }
+          if (item) {
+            renderTarget();
+            setFeedback("목표 표현을 그대로 입력하세요.", "", "<kbd>자동</kbd> 정확히 치면 이동");
+          }
+        }
+
+        function showHint() {
+          const item = currentItem();
+          if (!item || !isRecallStage(currentStage().id)) return;
+          state.hintVisible = true;
+          markHintUsed();
+          setFeedback("힌트를 보고 다시 입력하세요.", "warn", recallShortcut());
+          render({ preserveInput: true, preserveFocus: true });
+          focusInput();
+        }
+
+        function goPrev() {
+          if (state.stageIndex === 0) return;
+          goToStage(state.stageIndex - 1, { selectText: true });
+        }
+
+        function retryRecall() {
+          state.stageIndex = STAGES.findIndex((stage) => stage.id === "recall1");
+          state.itemIndexByStage.recall1 = 0;
+          state.itemIndexByStage.recall2 = 0;
+          state.hintVisible = false;
+          clearMismatch();
+          render({ selectText: true });
+          setFeedback("재연습할 표현을 다시 입력하세요.", "", recallShortcut());
+        }
+
+        function resetTrainer() {
+          clearTimers();
+          Object.assign(state, {
+            stageIndex: 0,
+            itemIndexByStage: Object.assign({}, DEFAULT_ITEM_INDEX_BY_STAGE),
+            results: {},
+            hintVisible: false,
+            mismatch: null,
+            revealAnswer: null,
+            composing: false
+          });
+          lastRenderKey = "";
+          localStorage.removeItem(STORAGE_KEY);
+          els.typingInput.value = "";
+          setFeedback('한글 입력 모드에서 "동작"을 입력하세요.', "", "<kbd>자동</kbd> 정확히 입력하면 이동");
+          render({ selectText: true });
+        }
+
+        function renderProgressDots() {
+          els.progressDots.innerHTML = STAGES.map((stage, index) => {
+            const classes = ["progress-dot"];
+            if (index === state.stageIndex) classes.push("is-current");
+            if (stageDone(stage.id)) classes.push("is-done");
+            return '<button class="' + classes.join(" ") + '" type="button" data-stage-index="' + index + '">' + (index + 1) + ". " + stage.label + "</button>";
+          }).join("");
+        }
+
+        function renderReport() {
+          const items = practiceItems();
+          const results = Object.values(state.results);
+          const correct = results.filter((result) => result.correct).length;
+          const hints = results.filter((result) => result.hint).length;
+          const review = items.filter((item) => {
+            const result = state.results[item.id];
+            return !result || !result.correct || result.hint || result.attempts > 1;
+          });
+          const fallback = items.filter((item) => !review.some((entry) => entry.id === item.id)).slice(-3);
+          const reviewItems = review.concat(fallback).slice(0, 3);
+          els.totalMetric.textContent = String(items.length);
+          els.correctMetric.textContent = String(correct);
+          els.hintMetric.textContent = String(hints);
+          els.reviewList.innerHTML = reviewItems.map((item) => "<li>" + item.target + "</li>").join("");
+          setFeedback("학습 리포트가 준비되었습니다.", "good", "<kbd>재연습</kbd> 또는 처음부터");
+          renderMotion(null);
+        }
+
+        function renderTarget() {
+          const stage = currentStage();
+          const item = currentItem();
+          if (stage.id === "warmup") {
+            els.itemMeta.textContent = "시작 확인";
+            renderTargetExpression(WARMUP_TARGET, null, { stageId: stage.id });
+            els.punctuationNote.hidden = true;
+            els.cueKo.textContent = "한글 입력 모드인지 확인합니다.";
+            els.noteText.textContent = "정확히 입력하면 동작 표현으로 이동합니다.";
+            renderTranslations(WARMUP_TRANSLATIONS);
+            els.hintPanel.hidden = true;
+            els.typingInput.placeholder = WARMUP_TARGET;
+            renderMotion(null);
+            return;
+          }
+          if (!item) return;
+          const items = stageItems(stage.id);
+          els.itemMeta.textContent = stage.title + " " + (currentItemIndex() + 1) + " / " + items.length;
+          els.cueKo.textContent = item.cueKo;
+          els.noteText.textContent = item.note;
+          renderTranslations(item.translations);
+          els.typingInput.placeholder = isRecallStage(stage.id) ? "기억나는 표현 입력" : "목표 표현 입력";
+          els.punctuationNote.hidden = !hasPunctuation(item.target);
+          renderMotion(item);
+          if (isRecallStage(stage.id)) {
+            if (state.revealAnswer === item.id) {
+              renderTargetExpression(item.target, item, { stageId: stage.id });
+            } else {
+              renderTargetExpression(recallFeedbackDisplayText(stage.id, item), item, { stageId: stage.id, hidden: true });
+            }
+            els.hintText.textContent = makeRecallHint(item);
+            els.hintPanel.hidden = !state.hintVisible;
+            return;
+          }
+          renderTargetExpression(item.target, item, { stageId: stage.id });
+          els.hintPanel.hidden = true;
+        }
+
+        function n(value) {
+          return String(Math.round(Number(value) * 10) / 10);
+        }
+
+        function d(point) {
+          return n(point.x) + " " + n(point.y);
+        }
+
+        function setAttrs(node, attrs) {
+          if (!node) return;
+          Object.keys(attrs).forEach((key) => {
+            node.setAttribute(key, attrs[key]);
+          });
+        }
+
+        function setCircle(node, point) {
+          setAttrs(node, { cx: n(point.x), cy: n(point.y) });
+        }
+
+        function setPath(node, value) {
+          if (node) node.setAttribute("d", value);
+        }
+
+        function lerp(a, b, t) {
+          return a + (b - a) * t;
+        }
+
+        function easeInOut(t) {
+          return 0.5 - Math.cos(t * Math.PI) / 2;
+        }
+
+        function interpolatePose(start, end, t) {
+          const eased = easeInOut(t);
+          const pose = {};
+          POINT_KEYS.forEach((key) => {
+            pose[key] = {
+              x: lerp(start[key].x, end[key].x, eased),
+              y: lerp(start[key].y, end[key].y, eased)
+            };
+          });
+          POSE_SCALARS.forEach((key) => {
+            pose[key] = lerp(Number(start[key] || 0), Number(end[key] || 0), eased);
+          });
+          return pose;
+        }
+
+        function motionDefinition(motionId) {
+          return MOTION_POSES[motionId] || MOTION_POSES.ready;
+        }
+
+        function prefersReducedMotion() {
+          return Boolean(reducedMotionQuery && reducedMotionQuery.matches);
+        }
+
+        function motionPoseAt(definition, elapsed) {
+          const frames = definition.frames || MOTION_POSES.ready.frames;
+          if (frames.length < 2) return clonePose(frames[0].pose);
+          const total = frames.reduce((sum, frame) => sum + frame.duration, 0);
+          let remaining = total ? elapsed % total : 0;
+          for (let index = 0; index < frames.length; index += 1) {
+            const frame = frames[index];
+            if (remaining <= frame.duration) {
+              const next = frames[(index + 1) % frames.length];
+              return interpolatePose(frame.pose, next.pose, remaining / frame.duration);
+            }
+            remaining -= frame.duration;
+          }
+          return clonePose(frames[0].pose);
+        }
+
+        function posterPose(definition) {
+          const index = Math.min(definition.posterFrame || 0, definition.frames.length - 1);
+          return clonePose(definition.frames[index].pose);
+        }
+
+        function renderMotionPose(pose) {
+          currentMotionPose = clonePose(pose);
+          const leftShoulder = pose.leftShoulder;
+          const rightShoulder = pose.rightShoulder;
+          const leftHip = pose.leftHip;
+          const rightHip = pose.rightHip;
+          const chest = pose.chest;
+          const waist = pose.waist;
+          const bodyPath = [
+            "M", d(leftShoulder),
+            "C", d({ x: chest.x - 22, y: chest.y - 24 }), d({ x: chest.x + 22, y: chest.y - 24 }), d(rightShoulder),
+            "L", d(rightHip),
+            "C", d({ x: waist.x + 22, y: waist.y + 20 }), d({ x: waist.x - 22, y: waist.y + 20 }), d(leftHip),
+            "Z"
+          ].join(" ");
+
+          setPath(motionEls.body, bodyPath);
+          setPath(motionEls.neck, "M " + d({ x: pose.head.x, y: pose.head.y + 29 }) + " L " + d(pose.neck) + " L " + d(chest));
+          setPath(motionEls.leftArm, "M " + d(leftShoulder) + " L " + d(pose.leftElbow) + " L " + d(pose.leftHand));
+          setPath(motionEls.rightArm, "M " + d(rightShoulder) + " L " + d(pose.rightElbow) + " L " + d(pose.rightHand));
+          setPath(motionEls.leftLeg, "M " + d(leftHip) + " L " + d(pose.leftKnee) + " L " + d(pose.leftAnkle));
+          setPath(motionEls.rightLeg, "M " + d(rightHip) + " L " + d(pose.rightKnee) + " L " + d(pose.rightAnkle));
+          setPath(motionEls.leftFoot, "M " + d(pose.leftHeel) + " L " + d(pose.leftToe));
+          setPath(motionEls.rightFoot, "M " + d(pose.rightHeel) + " L " + d(pose.rightToe));
+
+          setCircle(motionEls.head, pose.head);
+          setCircle(motionEls.leftHand, pose.leftHand);
+          setCircle(motionEls.rightHand, pose.rightHand);
+          setPath(motionEls.waist, "M " + d({ x: leftHip.x + 4, y: leftHip.y + 2 }) + " C " + d({ x: waist.x - 11, y: waist.y + 9 }) + " " + d({ x: waist.x + 11, y: waist.y + 9 }) + " " + d({ x: rightHip.x - 4, y: rightHip.y + 2 }));
+          setCircle(motionEls.leftHeel, pose.leftHeel);
+          setCircle(motionEls.rightHeel, pose.rightHeel);
+          setCircle(motionEls.leftToe, pose.leftToe);
+          setCircle(motionEls.rightToe, pose.rightToe);
+
+          const faceDir = Number(pose.faceDir || 0);
+          const eyeShift = faceDir * 8;
+          const eyeSpread = 9 - Math.abs(faceDir) * 1.6;
+          setCircle(motionEls.leftEye, { x: pose.head.x - eyeSpread + eyeShift, y: pose.head.y - 5 });
+          setCircle(motionEls.rightEye, { x: pose.head.x + eyeSpread + eyeShift, y: pose.head.y - 5 });
+          setPath(motionEls.nose, "M " + d({ x: pose.head.x + eyeShift * 0.65, y: pose.head.y + 2 }) + " L " + d({ x: pose.head.x + eyeShift + 5 * Math.sign(faceDir || 1), y: pose.head.y + 9 }));
+
+          if (motionEls.air) {
+            if (pose.airOpacity > 0) {
+              motionEls.air.style.opacity = String(Math.max(0.35, Math.min(1, pose.airOpacity)));
+              motionEls.air.style.strokeDashoffset = String(-pose.airOffset);
+            } else {
+              motionEls.air.style.opacity = "";
+              motionEls.air.style.strokeDashoffset = "";
+            }
+          }
+        }
+
+        function stopMotionAnimation() {
+          if (motionAnimationFrame) cancelAnimationFrame(motionAnimationFrame);
+          motionAnimationFrame = 0;
+        }
+
+        function animateMotion(now) {
+          const definition = motionDefinition(currentMotionId);
+          if (prefersReducedMotion()) {
+            stopMotionAnimation();
+            renderMotionPose(posterPose(definition));
+            return;
+          }
+          renderMotionPose(motionPoseAt(definition, now - motionStartAt));
+          motionAnimationFrame = requestAnimationFrame(animateMotion);
+        }
+
+        function startMotionAnimation(motionId, force) {
+          const nextMotionId = MOTION_POSES[motionId] ? motionId : "ready";
+          const sameMotion = currentMotionId === nextMotionId;
+          const definition = motionDefinition(nextMotionId);
+          if (sameMotion && motionAnimationFrame && !force && !prefersReducedMotion()) return;
+          if (sameMotion && !motionAnimationFrame && !force && prefersReducedMotion()) return;
+
+          stopMotionAnimation();
+          currentMotionId = nextMotionId;
+          if (!sameMotion || !motionStartAt) motionStartAt = performance.now();
+
+          if (prefersReducedMotion() || definition.frames.length < 2) {
+            renderMotionPose(posterPose(definition));
+            return;
+          }
+
+          renderMotionPose(motionPoseAt(definition, performance.now() - motionStartAt));
+          motionAnimationFrame = requestAnimationFrame(animateMotion);
+        }
+
+        if (reducedMotionQuery) {
+          const handleReducedMotionChange = () => startMotionAnimation(currentMotionId || "ready", true);
+          if (reducedMotionQuery.addEventListener) reducedMotionQuery.addEventListener("change", handleReducedMotionChange);
+          else if (reducedMotionQuery.addListener) reducedMotionQuery.addListener(handleReducedMotionChange);
+        }
+
+        window.__C12_MOTION_TYPING__ = {
+          getMotionState() {
+            return {
+              motionId: currentMotionId || "ready",
+              reducedMotion: prefersReducedMotion(),
+              pose: clonePose(currentMotionPose)
+            };
+          }
+        };
+
+        function renderMotion(item) {
+          const motion = item && item.motion ? item.motion : { id: "ready", title: "동작 준비", source: "준비", caption: "한글 입력 모드를 확인하면 동작 표현 애니메이션이 함께 바뀝니다.", focusParts: [] };
+          els.motionPanel.dataset.motionId = motion.id;
+          els.motionStage.dataset.motionId = motion.id;
+          els.motionTitle.textContent = motion.title;
+          els.motionSource.textContent = motion.source;
+          els.motionCaption.textContent = motion.caption;
+          const focus = new Set(motion.focusParts || []);
+          document.querySelectorAll("[data-motion-part]").forEach((node) => {
+            node.classList.toggle("is-focus", focus.has(node.dataset.motionPart));
+          });
+          startMotionAnimation(motion.id);
+        }
+
+        function render(options) {
+          const stage = currentStage();
+          const item = currentItem();
+          const renderKey = stage.id + ":" + (item ? item.id : "none");
+          const isReport = stage.id === "report";
+          els.stageMeta.textContent = stage.meta;
+          els.stageTitle.textContent = stage.title;
+          els.missionPrompt.textContent = stage.prompt;
+          els.targetCard.hidden = isReport;
+          els.typingInput.parentElement.hidden = isReport;
+          els.reportPanel.hidden = !isReport;
+          els.hintButton.hidden = !isRecallStage(stage.id);
+          els.checkButton.hidden = isReport;
+          els.retryButton.hidden = !isReport;
+          els.prevButton.disabled = state.stageIndex === 0;
+
+          if (!options || !options.preserveInput) {
+            if (renderKey !== lastRenderKey) els.typingInput.value = "";
+          }
+          lastRenderKey = renderKey;
+
+          if (isReport) renderReport();
+          else renderTarget();
+          renderProgressDots();
+          saveState();
+
+          if (!options || !options.preserveFocus) focusInput(Boolean(options && options.selectText));
+        }
+
+        function checkCurrent() {
+          const stage = currentStage();
+          const value = normalize(els.typingInput.value);
+          if (stage.id === "warmup") {
+            if (value === WARMUP_TARGET) completeWarmup();
+            else setFeedback('"동작"을 입력하세요.', "warn", "<kbd>자동</kbd> 정확히 입력하면 이동");
+            return;
+          }
+          if (isRecallStage(stage.id)) {
+            submitRecallItem();
+            return;
+          }
+          const item = currentItem();
+          if (item && value === item.target) completeCopyItem(item);
+          else if (item) {
+            const analysis = setMismatch(item, value);
+            renderTarget();
+            setFeedback(analysis.missingPunctuation ? "문장부호까지 입력하세요." : analysis.extra ? "추가 입력 확인" : "목표 표현을 그대로 입력하세요.", "warn", "<kbd>자동</kbd> 정확히 치면 이동");
+          }
+        }
+
+        document.addEventListener("click", (event) => {
+          const stageButton = event.target.closest("[data-stage-index]");
+          if (stageButton) goToStage(Number(stageButton.dataset.stageIndex), { selectText: true });
+        });
+
+        document.addEventListener("compositionstart", () => {
+          state.composing = true;
+          clearTimers();
+        });
+
+        document.addEventListener("compositionend", () => {
+          state.composing = false;
+          handleTypingInput();
+          focusInput();
+        });
+
+        els.typingInput.addEventListener("input", handleTypingInput);
+        els.typingInput.addEventListener("keydown", (event) => {
+          if (event.ctrlKey && event.key.toLowerCase() === "h") {
+            event.preventDefault();
+            showHint();
+            return;
+          }
+          if (event.key === "Enter") {
+            event.preventDefault();
+            if (isRecallStage(currentStage().id)) submitRecallItem();
+            else checkCurrent();
+          }
+        });
+        els.prevButton.addEventListener("click", goPrev);
+        els.hintButton.addEventListener("click", showHint);
+        els.checkButton.addEventListener("click", checkCurrent);
+        els.retryButton.addEventListener("click", retryRecall);
+        els.resetTrainer.addEventListener("click", resetTrainer);
+
+        loadState();
+        setFeedback('한글 입력 모드에서 "동작"을 입력하세요.', "", "<kbd>자동</kbd> 정확히 입력하면 이동");
+        render({ selectText: true });
+      })();
+    </script>
+    <script src="../../../../shared/multilang-toggle.js"></script>
+    <script src="../../../../shared/site-copyright.js"></script>
+    <script src="../../../../shared/page-qr.js"></script>
+      <script src="../activity-tracker.js"></script>
+  </body>
+</html>
