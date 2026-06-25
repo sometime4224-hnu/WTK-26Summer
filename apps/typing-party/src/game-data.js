@@ -47,50 +47,98 @@ export const TRACKED_ACTIVITIES = [
   {
     id: "keyboard-lesson",
     label: "한글 자판 25분 수업",
+    lesson: "keyboard",
+    kind: "activity",
     path: "activities/korean-keyboard-practice-lesson/index.html",
     summary: "자판 확인, 홈키, 자모, 음절, 단어 리듬 입력"
   },
   {
     id: "keyboard-practice",
     label: "한글 자판 연습",
+    lesson: "keyboard",
+    kind: "activity",
     path: "activities/korean-keyboard-practice/index.html",
     summary: "자리 찾기, 음절 입력, 단어 입력"
   },
   {
     id: "c12-writing",
     label: "12과 표현 타이핑 연습",
+    lesson: "12",
+    kind: "activity",
     path: "activities/c12/writing-keyboard-builder.html",
     summary: "핵심 어휘, 확장 표현, 문법 문장, 회상 입력"
   },
   {
     id: "c12-expression-learning",
     label: "12과 쓰기 주제 표현 학습",
+    lesson: "12",
+    kind: "activity",
     path: "activities/c12/writing-expression-learning.html",
     summary: "공감, 방법, 효과, 권유 표현 입력"
   },
   {
     id: "c12-expression-assembly",
     label: "12과 쓰기 표현 조립 연습",
+    lesson: "12",
+    kind: "activity",
     path: "activities/c12/writing-expression-assembly.html",
     summary: "표현 칩 조립과 짧은 답글 문단 작성"
   },
   {
     id: "c12-motion-typing",
     label: "12과 동작 표현 타이핑 연습",
+    lesson: "12",
+    kind: "activity",
     path: "activities/c12/writing-motion-typing.html",
     summary: "생활 운동 동작 표현 입력"
   },
   {
     id: "c12-motion-typing-game",
     label: "12과 어휘 표현 애니메이션 타이핑",
+    lesson: "12",
+    kind: "activity",
     path: "activities/c12/writing-motion-typing-game.html",
     summary: "건강 어휘와 생활 동작 표현 애니메이션 입력"
   },
   {
     id: "c12-writing-shower",
     label: "12과 단어 소나기",
+    lesson: "12",
+    kind: "activity",
     path: "activities/c12/writing-shower.html",
     summary: "10~12과 어휘와 표현을 치는 낙하 타이핑 게임"
+  },
+  {
+    id: "c12-vocabulary-cards",
+    label: "12과 어휘 카드",
+    lesson: "12",
+    kind: "resource",
+    path: "../../c12/vocabulary.html",
+    summary: "몸 상태와 운동 어휘 카드 자료"
+  },
+  {
+    id: "c12-body-motion-reference",
+    label: "12과 몸 상태·동작 자료",
+    lesson: "12",
+    kind: "resource",
+    path: "../../c12/vocabulary-body-motion.html",
+    summary: "몸 상태와 동작 표현 시각 자료"
+  },
+  {
+    id: "c12-grammar1-visual",
+    label: "12과 문법 1 자료",
+    lesson: "12",
+    kind: "resource",
+    path: "../../c12/grammar1.html",
+    summary: "V-았/었더니 시각 자료"
+  },
+  {
+    id: "c12-grammar2-visual",
+    label: "12과 문법 2 자료",
+    lesson: "12",
+    kind: "resource",
+    path: "../../c12/grammar2.html",
+    summary: "얼마나 -(으)ㄴ/는지 모르다 시각 자료"
   }
 ];
 

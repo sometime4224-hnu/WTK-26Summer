@@ -423,6 +423,23 @@ function renderPlayers() {
     : `<div class="empty-note">아직 참가자가 없습니다.</div>`;
 }
 
+function activityKindLabel(activity) {
+  return activity.kind === "resource" ? "자료" : "활동";
+}
+
+function renderC12ActivityCards() {
+  return TRACKED_ACTIVITIES
+    .filter((activity) => activity.lesson === "12")
+    .map((activity) => `
+      <button class="activity-quick-card" type="button" data-action="start-activity" data-activity-id="${escapeHtml(activity.id)}" data-testid="c12-activity-card">
+        <span class="activity-quick-card__badge">${escapeHtml(activityKindLabel(activity))}</span>
+        <strong>${escapeHtml(activity.label)}</strong>
+        <span>${escapeHtml(activity.summary)}</span>
+      </button>
+    `)
+    .join("");
+}
+
 function renderHostControls(stage, round) {
   if (state.role !== "host") {
     els.hostControls.hidden = true;
@@ -458,6 +475,15 @@ function renderHostControls(stage, round) {
         <button class="secondary-button" type="button" data-action="start-catchmind" data-testid="start-catchmind">캐치마인드 시작</button>
         <button class="secondary-button" type="button" data-action="start-gartic-phone" data-testid="start-gartic-phone">갈틱폰 시작</button>
       </div>
+      <section class="activity-quick-panel" aria-label="12과 활동 열기" data-testid="c12-activity-panel">
+        <div class="activity-quick-panel__head">
+          <div>
+            <strong>12과 활동 열기</strong>
+            <span>학생 화면에 바로 띄울 자료와 입력 활동입니다.</span>
+          </div>
+        </div>
+        <div class="activity-quick-grid">${renderC12ActivityCards()}</div>
+      </section>
       <label>
         <span>개인 활동 선택</span>
         <select id="activitySelect" data-testid="activity-select">${activityOptions}</select>
@@ -1626,9 +1652,10 @@ async function startRound() {
   });
 }
 
-async function startActivity() {
-  const activity = getTrackedActivity(state.selectedActivity);
+async function startActivity(activityId = state.selectedActivity) {
+  const activity = getTrackedActivity(activityId);
   if (!activity || state.role !== "host") return;
+  state.selectedActivity = activity.id;
   const runId = `a_${now()}`;
   await state.client.updateRoom(state.roomCode, {
     "meta/status": "activity",
@@ -2216,7 +2243,7 @@ async function handleAction(button) {
     if (action === "undo-drawing-stroke") await undoDrawingStroke(button.dataset.sessionId, button.dataset.groupId, button.dataset.drawingId);
     if (action === "clear-drawing") await clearDrawing(button.dataset.sessionId, button.dataset.groupId, button.dataset.drawingId);
     if (action === "start-round") await startRound();
-    if (action === "start-activity") await startActivity();
+    if (action === "start-activity") await startActivity(button.dataset.activityId);
     if (action === "open-submit") await setStage("submit");
     if (action === "open-vote") await setStage("vote");
     if (action === "show-results") await setStage("results");

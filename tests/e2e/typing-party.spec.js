@@ -175,6 +175,30 @@ test.describe("typing party multiplayer MVP", () => {
     await context.close();
   });
 
+  test("lets the teacher launch C12 learning materials from quick cards", async ({ browser }) => {
+    const context = await browser.newContext();
+    const host = await context.newPage();
+    const roomCode = await createHostRoom(host);
+    const student = await joinStudent(context, roomCode, "서윤");
+
+    await expect(host.locator('[data-testid="c12-activity-panel"]')).toContainText("12과 활동 열기");
+    const vocabularyCard = host.locator('[data-testid="c12-activity-card"][data-activity-id="c12-vocabulary-cards"]');
+    await expect(vocabularyCard).toContainText("12과 어휘 카드");
+    await expect(vocabularyCard).toContainText("자료");
+
+    await vocabularyCard.click();
+    await expect(host.locator('[data-testid="stage-title"]')).toHaveText("개인 활동");
+    await expect(student.locator('[data-testid="activity-student"]')).toContainText("12과 어휘 카드");
+    await expect(student.locator('[data-testid="activity-launch"]')).toContainText("ENTER를 눌러 시작");
+
+    await student.keyboard.press("Enter");
+    await student.waitForLoadState("domcontentloaded");
+    await expect(student).toHaveURL(/activity\.html/);
+    await expect(student.locator("#activityTitle")).toContainText("12과 어휘 카드");
+    await expect(student.locator('[data-testid="activity-runner-frame"]')).toHaveAttribute("src", /\/c12\/vocabulary\.html/);
+    await context.close();
+  });
+
   test("opens the keyboard campus world with movement, stations, and safe reactions", async ({ browser }) => {
     const context = await browser.newContext();
     const host = await context.newPage();
