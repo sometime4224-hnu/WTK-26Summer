@@ -35,6 +35,20 @@ test.describe("c12 word shower", () => {
     expect(model.items.map((item) => item.text)).toEqual(expect.arrayContaining(["첫눈에", "반하다", "사랑에 빠지다", "경험이 많다", "몸이 가볍다"]));
   });
 
+  test("starts with Enter and mirrors typing behind the play field", async ({ page }) => {
+    await page.locator("#answerInput").press("Enter");
+    await expect(page.locator("#boardOverlay")).toBeHidden();
+    await expect.poll(() => page.evaluate(() => window.__WORD_SHOWER__.getState().running)).toBe(true);
+
+    await page.locator("#answerInput").fill("첫눈에");
+    await expect(page.locator("#inputEcho")).toHaveText("첫눈에");
+    const layers = await page.evaluate(() => ({
+      echo: Number(getComputedStyle(document.querySelector("#inputEcho")).zIndex),
+      words: Number(getComputedStyle(document.querySelector("#fallLayer")).zIndex)
+    }));
+    expect(layers.echo).toBeLessThan(layers.words);
+  });
+
   test("starts falling words and removes a short word on correct input", async ({ page }) => {
     await page.evaluate(() => {
       window.__WORD_SHOWER__.startStage(0);
@@ -46,6 +60,7 @@ test.describe("c12 word shower", () => {
 
     await expect(page.locator("#feedbackText")).toContainText("고백 격파");
     await expect(page.locator("#comboValue")).toHaveText("1x");
+    await expect(page.locator("#inputEcho")).toHaveText("");
     await expect.poll(() => page.locator('[data-text="고백"]').count()).toBe(0);
     const score = await page.locator("#scoreValue").textContent();
     expect(Number(score)).toBeGreaterThan(0);

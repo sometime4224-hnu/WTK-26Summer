@@ -407,6 +407,11 @@
     }
   }
 
+  function syncInputEcho() {
+    if (!els.inputEcho) return;
+    els.inputEcho.textContent = els.answerInput.value.trim();
+  }
+
   function renderBoss() {
     if (!state.boss) {
       els.bossLayer.innerHTML = "";
@@ -697,19 +702,21 @@
 
   function handleSubmit(event) {
     event.preventDefault();
-    const input = normalize(els.answerInput.value);
-    if (!input) return;
     if (!state.running) {
       startStage();
       els.answerInput.value = "";
+      syncInputEcho();
       return;
     }
+    const input = normalize(els.answerInput.value);
+    if (!input) return;
     if (state.paused) return;
 
     if (state.boss) {
       const part = currentStage().bossParts[state.boss.partIndex] || "";
       if (normalize(part) === input) {
         els.answerInput.value = "";
+        syncInputEcho();
         hitBoss();
       } else {
         state.combo = 0;
@@ -725,6 +732,7 @@
       .find((item) => allAcceptedValues(item).includes(input));
     if (match) {
       els.answerInput.value = "";
+      syncInputEcho();
       hitItem(match);
     } else {
       state.combo = 0;
@@ -786,6 +794,7 @@
 
   function bindEvents() {
     els.inputForm.addEventListener("submit", handleSubmit);
+    els.answerInput.addEventListener("input", syncInputEcho);
     els.startButton.addEventListener("click", () => startStage());
     els.pauseButton.addEventListener("click", pauseStage);
     els.nextButton.addEventListener("click", nextStage);
@@ -822,6 +831,7 @@
       "densityValue",
       "gameBoard",
       "fallLayer",
+      "inputEcho",
       "impactLayer",
       "bossLayer",
       "boardOverlay",

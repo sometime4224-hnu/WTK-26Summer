@@ -374,6 +374,36 @@ button {
     linear-gradient(180deg, #eef2ff 0%, #fdf2f8 100%);
 }
 
+.input-echo {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: rgba(15, 23, 42, 0.18);
+  font-size: clamp(44px, 11vw, 132px);
+  font-weight: 950;
+  line-height: 1.05;
+  letter-spacing: 0;
+  text-align: center;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.input-echo:empty {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+.input-echo:not(:empty) {
+  opacity: 1;
+  transform: scale(1);
+}
+
 .rain-line {
   position: absolute;
   inset-inline: 0;
@@ -388,6 +418,14 @@ button {
 .boss-layer {
   position: absolute;
   inset: 0;
+}
+
+.fall-layer {
+  z-index: 2;
+}
+
+.boss-layer {
+  z-index: 3;
 }
 
 .falling-word {
