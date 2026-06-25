@@ -51,7 +51,7 @@ test.describe("typing party multiplayer MVP", () => {
     await page.goto("/apps/typing-party/index.html?mock=1&reset=1");
 
     await expect(page).toHaveTitle("타이핑 파티");
-    await expect(page.locator("#pageTitle")).toContainText("방 코드");
+    await expect(page.locator("#pageTitle")).toContainText("한글 타이핑 수업");
     await expect(page.locator('[data-testid="create-room"]')).toBeHidden();
     await expect(page.locator('[data-testid="teacher-pin-input"]')).toBeVisible();
     await expect(page.locator('[data-testid="join-room"]')).toBeVisible();
