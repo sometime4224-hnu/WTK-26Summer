@@ -96,7 +96,7 @@
       target: 9,
       spawnMs: 1600,
       maxActive: 5,
-      speed: 13.4,
+      speed: 7.0,
       items: ids(["c10-confess", "c10-date", "c10-meet", "c10-propose", "c10-love", "c10-impression", "c10-condition", "c10-charm", "c10-hall", "c10-card"])
     },
     {
@@ -107,7 +107,7 @@
       target: 10,
       spawnMs: 1420,
       maxActive: 6,
-      speed: 13.8,
+      speed: 7.2,
       items: ids(["c10-first", "c10-crush", "c10-hand", "c10-side", "c10-shoulder", "c10-arm", "c10-heart", "c10-confess", "c10-date"])
     },
     {
@@ -117,7 +117,7 @@
       type: "중간보스",
       bossTitle: "첫 만남 중간보스",
       bossParts: ["첫눈에 반하다", "사랑에 빠지다", "성격이 잘 맞다", "마음씨가 착하다"],
-      speed: 3.8
+      speed: 1.8
     },
     {
       id: "c11-short",
@@ -127,7 +127,7 @@
       target: 10,
       spawnMs: 1360,
       maxActive: 7,
-      speed: 14.0,
+      speed: 7.3,
       items: ids(["c11-work", "c11-pay", "c11-gender", "c11-age", "c11-career", "c11-skill", "c11-office", "c11-boss", "c11-junior", "c11-coworker", "c11-night", "c11-vacation", "c11-salary", "c11-benefit", "c11-interview"])
     },
     {
@@ -138,7 +138,7 @@
       target: 11,
       spawnMs: 1240,
       maxActive: 8,
-      speed: 14.3,
+      speed: 7.5,
       items: ids(["c11-honest", "c11-detail", "c11-best", "c11-career", "c11-skill", "c11-benefit", "c11-vacation", "c11-office", "c11-interview"])
     },
     {
@@ -148,7 +148,7 @@
       type: "중간보스",
       bossTitle: "면접 중간보스",
       bossParts: ["경험이 많다", "실력이 있다", "이해가 빠르다", "최선을 다하다"],
-      speed: 3.5
+      speed: 1.7
     },
     {
       id: "c12-short",
@@ -158,7 +158,7 @@
       target: 11,
       spawnMs: 1230,
       maxActive: 8,
-      speed: 14.6,
+      speed: 7.7,
       items: ids(["c12-health", "c12-stamina", "c12-posture", "c12-obesity", "c12-stairs", "c12-walk", "c12-exercise", "c12-ache", "c12-muscle", "c12-sweat", "c12-breath", "c12-cramp", "c12-energy", "c12-waist", "c12-neck"])
     },
     {
@@ -169,7 +169,7 @@
       target: 12,
       spawnMs: 1120,
       maxActive: 9,
-      speed: 14.8,
+      speed: 7.9,
       items: ids(["c12-light", "c12-heavy", "c12-hard-breath", "c12-cramp-full", "c12-refresh", "c12-stress", "c12-fresh", "c12-stairs", "c12-walk", "c12-neck", "c12-waist"])
     },
     {
@@ -179,7 +179,7 @@
       type: "중간보스",
       bossTitle: "건강 중간보스",
       bossParts: ["몸이 가볍다", "기분이 상쾌하다", "스트레스를 해소하다", "건강을 유지하다"],
-      speed: 3.3
+      speed: 1.6
     },
     {
       id: "mix-short",
@@ -189,7 +189,7 @@
       target: 13,
       spawnMs: 1040,
       maxActive: 10,
-      speed: 15.1,
+      speed: 8.2,
       items: ids(["c10-confess", "c10-first", "c10-crush", "c11-work", "c11-pay", "c11-career", "c11-benefit", "c12-health", "c12-stamina", "c12-stairs", "c12-neck", "c12-fresh"])
     },
     {
@@ -200,7 +200,7 @@
       target: 14,
       spawnMs: 940,
       maxActive: 11,
-      speed: 15.2,
+      speed: 8.4,
       items: ids(["c10-first-love", "c10-fall-love", "c10-match", "c11-many", "c11-able", "c11-fast", "c11-effort", "c12-light", "c12-heavy", "c12-refresh", "c12-stress"])
     },
     {
@@ -215,7 +215,7 @@
         "건강을 위해 계단을 이용하고 스트레칭을 합니다.",
         "몸이 가벼워지고 기분이 상쾌해져서 계속 운동하려고 해요."
       ],
-      speed: 2.4
+      speed: 1.2
     }
   ];
 
@@ -271,8 +271,8 @@
 
   function speedFor(item, stage) {
     const length = itemLength(item.text);
-    const longFactor = length >= 7 ? 0.58 : length >= 5 ? 0.78 : 1.08;
-    return Math.max(4.2, (stage.speed || 13) * longFactor + Math.random() * 1.2);
+    const longFactor = length >= 6 ? 0.56 : length >= 5 ? 0.72 : 1.08;
+    return Math.max(2.4, (stage.speed || 7) * longFactor + Math.random() * 0.8);
   }
 
   function scoreFor(item) {

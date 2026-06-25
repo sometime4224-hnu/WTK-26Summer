@@ -67,6 +67,8 @@ test.describe("c12 word shower", () => {
       };
     });
     expect(speeds.long).toBeLessThan(speeds.short);
+    expect(speeds.short).toBeLessThan(9);
+    expect(speeds.long).toBeLessThan(5.5);
   });
 
   test("clears the field for a boss and shows damage feedback", async ({ page }) => {
