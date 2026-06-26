@@ -97,12 +97,16 @@ test.describe('homework dashboard', () => {
     await expect(page.locator('tbody tr')).toContainText('박학생');
   });
 
-  test('links c12 hub to the teacher dashboard', async ({ page }) => {
+  test('keeps teacher dashboard off the c12 hub and available from the root corner', async ({ page }) => {
     await blockExternalRequests(page);
     await page.goto('/c12/index.html', { waitUntil: 'domcontentloaded' });
 
-    const link = page.locator('a[href="review-quiz-results.html"]').first();
+    await expect(page.locator('a[href="review-quiz-results.html"]')).toHaveCount(0);
+
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+
+    const link = page.locator('a[href="c12/review-quiz-results.html"].teacher-dashboard-corner');
     await expect(link).toBeVisible();
-    await expect(link).toContainText('제출 현황 보기');
+    await expect(link).toHaveAttribute('aria-label', '12과 제출 현황');
   });
 });
