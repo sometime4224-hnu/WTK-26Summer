@@ -193,6 +193,14 @@
         return String(input ? input.value : readStudentName()).trim();
     }
 
+    function shouldGateQuizStart() {
+        return Boolean(homeworkEnabled && homework.requireStudentName);
+    }
+
+    function hasRequiredStudentName() {
+        return !shouldGateQuizStart() || Boolean(getStudentName());
+    }
+
     function setHomeworkStatus(kind, text) {
         if (!homeworkEnabled) return;
         const status = document.getElementById("homeworkStatus");
@@ -208,6 +216,30 @@
         });
     }
 
+    function applyHomeworkStartGate() {
+        if (!shouldGateQuizStart()) return false;
+        const locked = !hasRequiredStudentName();
+        document.body.classList.toggle("homework-locked", locked);
+        document.querySelectorAll("#reviewQuizForm input, #reviewQuizForm textarea, #checkAllButton, #bottomCheckAllButton, #resetButton, #newAttemptButton").forEach(function (control) {
+            control.disabled = locked;
+        });
+
+        if (locked) {
+            document.body.classList.remove("checked", "ready-to-submit");
+            setHomeworkStatus("pending", "이름을 입력하면 퀴즈가 시작됩니다.");
+            const scoreSub = document.getElementById("scoreSub");
+            if (scoreSub) {
+                scoreSub.textContent = "먼저 이름을 입력하세요. 입력 후 문제를 풀 수 있습니다.";
+            }
+            const hint = document.getElementById("submitHint");
+            if (hint) {
+                hint.textContent = "이름을 입력하면 문제 입력칸과 제출 버튼이 열립니다.";
+            }
+        }
+
+        return locked;
+    }
+
     function focusStudentNameInput() {
         const input = document.getElementById("studentNameInput");
         if (!input) return;
@@ -221,7 +253,7 @@
     }
 
     function showMissingStudentName() {
-        document.body.classList.add("submission-blocked", "homework-name-blocked");
+        document.body.classList.add("submission-blocked", "homework-name-blocked", "homework-locked");
         document.getElementById("scoreMain").textContent = "미제출: 이름을 입력하세요.";
         document.getElementById("scoreSub").textContent = "온라인 제출을 위해 이름을 먼저 입력해야 합니다.";
         const alert = document.getElementById("submissionAlert");
@@ -468,13 +500,13 @@
             <section class="homework-panel" aria-labelledby="homeworkPanelTitle">
                 <div class="homework-panel__text">
                     <h2 id="homeworkPanelTitle">온라인 제출</h2>
-                    <p>이름을 입력하고 모든 문항을 푼 뒤 완료 / 제출하기를 누르면 점수와 문항별 답안이 저장됩니다.</p>
+                    <p>먼저 이름을 입력하세요. 이름이 저장되면 퀴즈 입력칸이 열리고, 제출 시 점수와 문항별 답안이 저장됩니다.</p>
                 </div>
                 <label class="student-name-field" for="studentNameInput">
                     <span>이름</span>
                     <input id="studentNameInput" type="text" maxlength="40" autocomplete="name" value="${escapeHtml(savedName)}" placeholder="이름 입력">
                 </label>
-                <p id="homeworkStatus" class="homework-status is-idle">온라인 제출 대기 중입니다.</p>
+                <p id="homeworkStatus" class="homework-status ${savedName ? "is-idle" : "is-pending"}">${savedName ? "이름이 저장되었습니다. 모든 문항을 푼 뒤 제출하세요." : "이름을 입력하면 퀴즈가 시작됩니다."}</p>
             </section>
         `;
     }
@@ -704,6 +736,10 @@
         const answered = answerCount(source);
         const total = currentAttempt.questions.length;
         const complete = answered === total;
+        if (applyHomeworkStartGate()) {
+            status.innerHTML = `진행 <strong>0/${total}</strong> · 이름 필요`;
+            return;
+        }
         status.innerHTML = complete
             ? `진행 <strong>${answered}/${total}</strong> · 제출 준비`
             : `진행 <strong>${answered}/${total}</strong>`;
@@ -843,6 +879,7 @@
         document.getElementById("scoreMain").textContent = "아직 채점하지 않았습니다.";
         document.getElementById("scoreSub").textContent = "진행 상황이 이 기기에 자동 저장됩니다.";
         setHomeworkStatus("idle", "온라인 제출 대기 중입니다.");
+        applyHomeworkStartGate();
     }
 
     function addScoreLog(score, total, answers) {
@@ -902,8 +939,9 @@
             return;
         }
 
-        if (settings.logCompletion && homeworkEnabled && homework.requireStudentName && !getStudentName()) {
+        if (settings.logCompletion && shouldGateQuizStart() && !getStudentName()) {
             showMissingStudentName();
+            applyHomeworkStartGate();
             return;
         }
 
@@ -1019,11 +1057,13 @@
             studentNameInput.addEventListener("input", function () {
                 writeText(studentNameKey, studentNameInput.value.trim());
                 if (studentNameInput.value.trim()) {
-                    document.body.classList.remove("submission-blocked", "homework-name-blocked");
+                    document.body.classList.remove("submission-blocked", "homework-name-blocked", "homework-locked");
                     const alert = document.getElementById("submissionAlert");
                     if (alert) alert.hidden = true;
                     setHomeworkStatus("idle", "이름이 저장되었습니다. 모든 문항을 푼 뒤 제출하세요.");
                     updateProgressStatus();
+                } else {
+                    applyHomeworkStartGate();
                 }
             });
         }
@@ -1059,10 +1099,12 @@
                 const studentNameInput = document.getElementById("studentNameInput");
                 if (studentNameInput) studentNameInput.value = "";
                 setHomeworkStatus("idle", "온라인 제출 대기 중입니다.");
+                applyHomeworkStartGate();
                 updateScoreLogUi();
             }
         };
         renderPage();
+        applyHomeworkStartGate();
         const progress = readProgress();
         if (progress) {
             currentProgressMeta = {

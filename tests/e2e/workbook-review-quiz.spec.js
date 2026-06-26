@@ -162,7 +162,7 @@ test.describe('workbook vocabulary and grammar review quizzes', () => {
       await expect(page.locator('#clearScoreLogsButton')).toHaveCount(0);
       await expect(page.locator('#bottomCheckAllButton')).toBeAttached();
       await expect(page.locator('#bottomCheckAllButton')).toHaveText('완료 / 제출하기');
-      await expect(page.locator('#submitHint')).toContainText('자동 저장');
+      await expect(page.locator('#submitHint')).toContainText(target.chapter === '12' ? '이름을 입력하면' : '자동 저장');
       await expect(page.locator('#studentNameInput')).toHaveCount(target.chapter === '12' ? 1 : 0);
       await expect(page.locator('.homework-panel')).toHaveCount(target.chapter === '12' ? 1 : 0);
 
@@ -320,6 +320,7 @@ test.describe('workbook vocabulary and grammar review quizzes', () => {
     await blockExternalRequests(page);
     await page.goto('/c12/review-quiz.html?seed=incomplete-c12', { waitUntil: 'load' });
     await page.evaluate(() => window.__reviewQuiz.clearStorage());
+    await page.locator('#studentNameInput').fill('미완료 학생');
 
     const missingIndex = 16;
     const missingId = await page.evaluate((targetMissingIndex) => (
@@ -349,22 +350,26 @@ test.describe('workbook vocabulary and grammar review quizzes', () => {
     expect(logs).toHaveLength(0);
   });
 
-  test('blocks c12 homework submission until the student name is entered', async ({ page }) => {
+  test('locks c12 homework quiz until the student name is entered', async ({ page }) => {
     await blockExternalRequests(page);
     await installHomeworkMock(page);
     await page.goto('/c12/review-quiz.html?seed=homework-name-c12', { waitUntil: 'load' });
     await page.evaluate(() => window.__reviewQuiz.clearStorage());
 
-    await fillAllCorrect(page);
-    await page.locator('#bottomCheckAllButton').click();
+    await expect(page.locator('body')).toHaveClass(/homework-locked/);
+    await expect(page.locator('#homeworkStatus')).toContainText('이름을 입력하면 퀴즈가 시작');
+    await expect(page.locator('#submitHint')).toContainText('이름을 입력하면');
+    await expect(page.locator('#checkAllButton')).toBeDisabled();
+    await expect(page.locator('#bottomCheckAllButton')).toBeDisabled();
+    await expect(page.locator('.question-card input').first()).toBeDisabled();
 
-    await expect(page.locator('#scoreMain')).toContainText('이름을 입력');
-    await expect(page.locator('#submissionAlert')).toContainText('이름을 입력');
-    await expect(page.locator('#homeworkStatus')).toContainText('이름을 입력');
-    await expect(page.locator('body')).toHaveClass(/homework-name-blocked/);
+    await page.locator('#studentNameInput').fill('시작 학생');
 
-    const activeId = await page.evaluate(() => document.activeElement && document.activeElement.id);
-    expect(activeId).toBe('studentNameInput');
+    await expect(page.locator('body')).not.toHaveClass(/homework-locked/);
+    await expect(page.locator('#homeworkStatus')).toContainText('이름이 저장');
+    await expect(page.locator('#checkAllButton')).toBeEnabled();
+    await expect(page.locator('#bottomCheckAllButton')).toBeEnabled();
+    await expect(page.locator('.question-card input').first()).toBeEnabled();
 
     const submissions = await page.evaluate(() => window.__homeworkSubmissions);
     expect(submissions).toHaveLength(0);
