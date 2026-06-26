@@ -5,6 +5,33 @@
   const TOTAL_STAGES = 12;
   const BOARD_BOTTOM = 91;
   const COMBO_TIMEOUT_MS = 1100;
+  const DEFAULT_SPEED_MODE = "slow";
+  const SPEED_MODES = {
+    verySlow: {
+      label: "아주 느림",
+      fallScale: 0.28,
+      jitter: 0.16,
+      minSpeed: 0.8,
+      bossScale: 0.42,
+      spawnScale: 2.05
+    },
+    slow: {
+      label: "느림",
+      fallScale: 0.4,
+      jitter: 0.25,
+      minSpeed: 1.05,
+      bossScale: 0.55,
+      spawnScale: 1.55
+    },
+    normal: {
+      label: "보통",
+      fallScale: 0.55,
+      jitter: 0.3,
+      minSpeed: 1.2,
+      bossScale: 0.7,
+      spawnScale: 1.25
+    }
+  };
 
   function word(id, lesson, text, kind = "word", aliases = []) {
     return { id, lesson, text, kind, aliases };
@@ -238,7 +265,8 @@
     cleared: {},
     boss: null,
     overlay: "ready",
-    audio: null
+    audio: null,
+    speedMode: DEFAULT_SPEED_MODE
   };
 
   function normalize(value) {
@@ -269,10 +297,19 @@
     return Array.from(normalize(text)).length;
   }
 
+  function speedConfig(mode = state.speedMode) {
+    return SPEED_MODES[mode] || SPEED_MODES[DEFAULT_SPEED_MODE];
+  }
+
   function speedFor(item, stage) {
     const length = itemLength(item.text);
     const longFactor = length >= 6 ? 0.56 : length >= 5 ? 0.72 : 1.08;
-    return Math.max(2.4, (stage.speed || 7) * longFactor + Math.random() * 0.8);
+    const config = speedConfig();
+    return Math.max(config.minSpeed, (stage.speed || 7) * longFactor * config.fallScale + Math.random() * config.jitter);
+  }
+
+  function spawnIntervalFor(stage) {
+    return (stage.spawnMs || 1400) * speedConfig().spawnScale;
   }
 
   function scoreFor(item) {
@@ -289,6 +326,7 @@
       state.score = Math.max(0, Number(saved.score || 0));
       state.bestCombo = Math.max(0, Number(saved.bestCombo || 0));
       state.cleared = saved.cleared && typeof saved.cleared === "object" ? saved.cleared : {};
+      if (SPEED_MODES[saved.speedMode]) state.speedMode = saved.speedMode;
     } catch (error) {}
   }
 
@@ -298,6 +336,7 @@
       score: state.score,
       bestCombo: state.bestCombo,
       cleared: state.cleared,
+      speedMode: state.speedMode,
       savedAt: Date.now()
     }));
     if (els.savedStatus) els.savedStatus.textContent = "저장됨";
@@ -373,13 +412,25 @@
     els.reportMiss.textContent = String(state.misses);
   }
 
+  function renderSpeedControls() {
+    if (!els.speedButtons) return;
+    els.speedButtons.querySelectorAll("[data-speed-mode]").forEach((button) => {
+      const isActive = button.dataset.speedMode === state.speedMode;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    if (els.speedStatus) {
+      els.speedStatus.textContent = `현재 속도: ${speedConfig().label}`;
+    }
+  }
+
   function renderStageInfo() {
     const stage = currentStage();
     els.missionTitle.textContent = isBossStage(stage) ? stage.bossTitle : stage.title;
     els.stageKicker.textContent = `${stage.lesson} · ${stage.type}`;
     els.stageHint.textContent = isBossStage(stage)
       ? "보스 문장을 순서대로 입력하세요. 긴 문장은 천천히 다가옵니다."
-      : "떨어지는 단어를 그대로 입력하고 Enter를 누르세요. 짧은 단어는 빠르고 긴 표현은 느립니다.";
+      : "떨어지는 단어를 그대로 입력하고 Enter를 누르세요. 짧은 단어도 천천히, 긴 표현은 더 천천히 내려옵니다.";
     const samples = isBossStage(stage) ? stage.bossParts : stage.items.map((item) => item.text);
     els.targetList.innerHTML = samples.slice(0, 12).map((item) => `<span>${escapeHtml(item)}</span>`).join("");
   }
@@ -446,10 +497,10 @@
         node.dataset.dropId = String(item.dropId);
         node.dataset.kind = item.kind;
         node.dataset.text = item.text;
-        node.dataset.speed = String(item.speed.toFixed(2));
         node.textContent = item.text;
         els.fallLayer.appendChild(node);
       }
+      node.dataset.speed = String(item.speed.toFixed(2));
       node.style.setProperty("--x", `${item.x}%`);
       node.style.setProperty("--y", `${item.y}%`);
       node.style.setProperty("--size", `${itemLength(item.text) >= 7 ? 17 : 22}px`);
@@ -462,6 +513,7 @@
     renderStageList();
     renderStageInfo();
     renderStats();
+    renderSpeedControls();
     renderActiveItems();
     renderBoss();
     renderOverlay();
@@ -615,10 +667,29 @@
     state.cleared = {};
     state.boss = null;
     state.overlay = "ready";
+    state.speedMode = DEFAULT_SPEED_MODE;
     clearActiveItems();
     setFeedback("처음부터 다시 시작합니다.");
     renderAll();
     els.answerInput.focus({ preventScroll: true });
+  }
+
+  function setSpeedMode(mode) {
+    if (!SPEED_MODES[mode]) return;
+    const changed = state.speedMode !== mode;
+    state.speedMode = mode;
+    if (state.active.length && !state.boss) {
+      const stage = currentStage();
+      state.active.forEach((item) => {
+        item.speed = speedFor(item, stage);
+      });
+      renderActiveItems();
+    }
+    renderSpeedControls();
+    saveState();
+    if (changed) {
+      setFeedback(`속도: ${speedConfig().label}`, "good");
+    }
   }
 
   function showImpact(x, y, text) {
@@ -748,7 +819,7 @@
     if (state.running && !state.paused) {
       const stage = currentStage();
       if (state.boss) {
-        state.boss.y += (stage.speed || 3) * delta;
+        state.boss.y += (stage.speed || 3) * speedConfig().bossScale * delta;
         if (state.boss.y > 67) {
           state.lives -= 1;
           state.boss.y = 12;
@@ -760,7 +831,7 @@
         renderBoss();
         renderStats();
       } else if (!isBossStage(stage)) {
-        if (timestamp - state.lastSpawnAt > stage.spawnMs && state.active.length < stage.maxActive) {
+        if (timestamp - state.lastSpawnAt > spawnIntervalFor(stage) && state.active.length < stage.maxActive) {
           spawnItem();
           state.lastSpawnAt = timestamp;
         }
@@ -803,6 +874,11 @@
       els.reportPanel.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     document.addEventListener("click", (event) => {
+      const speedButton = event.target.closest("[data-speed-mode]");
+      if (speedButton) {
+        setSpeedMode(speedButton.dataset.speedMode);
+        return;
+      }
       const stageButton = event.target.closest("[data-stage-index]");
       if (stageButton) setStage(stageButton.dataset.stageIndex);
     });
@@ -841,6 +917,8 @@
       "inputForm",
       "answerInput",
       "feedbackText",
+      "speedButtons",
+      "speedStatus",
       "startButton",
       "pauseButton",
       "nextButton",
@@ -891,12 +969,14 @@
         hits: state.hits,
         active: state.active,
         boss: state.boss,
-        cleared: state.cleared
+        cleared: state.cleared,
+        speedMode: state.speedMode
       }));
     },
     normalize,
     startStage,
     setStage,
+    setSpeedMode,
     forceSpawn(text) {
       if (!state.running || isBossStage()) startStage(state.stageIndex);
       return spawnItem(text);

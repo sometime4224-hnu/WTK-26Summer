@@ -26,6 +26,8 @@ test.describe("c12 word shower", () => {
     await expect(page.locator("#missionTitle")).toHaveText("첫 만남 짧은 어휘");
     await expect(page.locator("#progressText")).toHaveText("1 / 12");
     await expect(page.locator(".stage-chip")).toHaveCount(12);
+    await expect(page.locator(".speed-button")).toHaveCount(3);
+    await expect(page.locator('[data-speed-mode="slow"]')).toHaveAttribute("aria-pressed", "true");
 
     const model = await page.evaluate(() => ({
       stages: window.__WORD_SHOWER__.getStages(),
@@ -82,8 +84,30 @@ test.describe("c12 word shower", () => {
       };
     });
     expect(speeds.long).toBeLessThan(speeds.short);
-    expect(speeds.short).toBeLessThan(9);
-    expect(speeds.long).toBeLessThan(5.5);
+    expect(speeds.short).toBeLessThan(3.6);
+    expect(speeds.long).toBeLessThan(2.1);
+  });
+
+  test("lets students adjust the falling speed during play", async ({ page }) => {
+    const dropId = await page.evaluate(() => {
+      window.__WORD_SHOWER__.startStage(0);
+      return window.__WORD_SHOWER__.forceSpawn("고백").dropId;
+    });
+    const drop = page.locator(`[data-drop-id="${dropId}"]`);
+    const speedBefore = await drop.evaluate((node) => Number(node.dataset.speed));
+
+    await page.getByRole("button", { name: "아주 느림", exact: true }).click();
+    await expect(page.locator('[data-speed-mode="verySlow"]')).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("#feedbackText")).toHaveText("속도: 아주 느림");
+    const verySlowSpeed = await drop.evaluate((node) => Number(node.dataset.speed));
+    expect(verySlowSpeed).toBeLessThan(speedBefore);
+    expect(await page.evaluate(() => window.__WORD_SHOWER__.getState().speedMode)).toBe("verySlow");
+
+    await page.getByRole("button", { name: "보통", exact: true }).click();
+    await expect(page.locator('[data-speed-mode="normal"]')).toHaveAttribute("aria-pressed", "true");
+    const normalSpeed = await drop.evaluate((node) => Number(node.dataset.speed));
+    expect(normalSpeed).toBeGreaterThan(verySlowSpeed);
+    expect(normalSpeed).toBeLessThan(4.7);
   });
 
   test("clears the field for a boss and shows damage feedback", async ({ page }) => {
