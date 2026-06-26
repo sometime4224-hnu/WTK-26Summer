@@ -3,12 +3,21 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /homeworkAssignments/{assignmentId}/submissions/{submissionId} {
-      allow read, delete: if false;
+      allow read: if isTeacher();
+      allow delete: if false;
       allow create: if isValidSubmission(assignmentId);
       allow update: if isValidSubmission(assignmentId)
         && resource.data.anonymousUid == request.auth.uid
         && resource.data.assignmentId == assignmentId
         && resource.data.signatureHash == request.resource.data.signatureHash;
+    }
+
+    function isTeacher() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          "YOUR_TEACHER_EMAIL@example.com"
+        ];
     }
 
     function isValidSubmission(assignmentId) {
