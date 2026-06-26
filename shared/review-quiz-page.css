@@ -217,27 +217,42 @@ body.review-quiz-page {
 }
 
 .homework-panel {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(190px, 280px);
-    gap: 12px;
+    gap: 14px;
     align-items: center;
     margin: 0 0 14px;
-    padding: 14px;
-    border: 1px solid rgba(37, 99, 235, 0.26);
+    padding: 16px;
+    border: 2px solid rgba(37, 99, 235, 0.34);
     border-radius: 8px;
-    background: rgba(239, 246, 255, 0.72);
-    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+    background:
+        linear-gradient(90deg, rgba(255, 247, 237, 0.95), rgba(239, 246, 255, 0.9)),
+        #ffffff;
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.12);
 }
 
 .homework-panel__text {
     display: grid;
-    gap: 4px;
+    gap: 6px;
+}
+
+.homework-panel__badge {
+    width: fit-content;
+    min-height: 28px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: #f97316;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 950;
 }
 
 .homework-panel h2 {
     margin: 0;
-    color: var(--review-accent-strong);
-    font-size: 18px;
+    color: #9a3412;
+    font-size: 22px;
+    line-height: 1.2;
 }
 
 .homework-panel p {
@@ -250,31 +265,49 @@ body.review-quiz-page {
 
 .student-name-field {
     display: grid;
-    gap: 5px;
+    gap: 7px;
+    padding: 12px;
+    border: 1px solid rgba(249, 115, 22, 0.34);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 8px 18px rgba(124, 45, 18, 0.08);
 }
 
 .student-name-field span {
-    color: #334155;
-    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: #9a3412;
+    font-size: 14px;
     font-weight: 950;
+}
+
+.student-name-field b {
+    min-height: 24px;
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: #ffedd5;
+    color: #c2410c;
+    font-size: 11px;
 }
 
 .student-name-field input {
     width: 100%;
-    min-height: 42px;
-    border: 1px solid var(--review-line);
+    min-height: 50px;
+    border: 2px solid rgba(249, 115, 22, 0.48);
     border-radius: 8px;
-    padding: 0 11px;
+    padding: 0 13px;
     background: #fff;
     color: var(--review-ink);
     font: inherit;
-    font-size: 15px;
-    font-weight: 850;
+    font-size: 17px;
+    font-weight: 900;
 }
 
 .student-name-field input:focus {
-    border-color: var(--review-accent);
-    outline: 3px solid rgba(37, 99, 235, 0.14);
+    border-color: #ea580c;
+    outline: 4px solid rgba(249, 115, 22, 0.18);
 }
 
 .homework-status {
@@ -287,9 +320,9 @@ body.review-quiz-page {
 }
 
 .homework-status.is-pending {
-    border-color: #bfdbfe;
-    background: #eff6ff;
-    color: var(--review-accent-strong);
+    border-color: #fed7aa;
+    background: #fff7ed;
+    color: #c2410c;
 }
 
 .homework-status.is-success {
@@ -307,6 +340,17 @@ body.review-quiz-page {
 .homework-name-blocked .homework-panel {
     border-color: rgba(185, 28, 28, 0.42);
     background: #fff1f2;
+}
+
+.homework-locked .homework-panel {
+    border-color: rgba(249, 115, 22, 0.62);
+    box-shadow:
+        0 0 0 5px rgba(249, 115, 22, 0.09),
+        0 16px 34px rgba(124, 45, 18, 0.16);
+}
+
+.homework-locked .student-name-field input {
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
 }
 
 .homework-locked .review-toolbar,

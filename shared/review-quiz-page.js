@@ -499,12 +499,13 @@
         return `
             <section class="homework-panel" aria-labelledby="homeworkPanelTitle">
                 <div class="homework-panel__text">
-                    <h2 id="homeworkPanelTitle">온라인 제출</h2>
+                    <span class="homework-panel__badge">1단계</span>
+                    <h2 id="homeworkPanelTitle">먼저 이름을 입력하세요</h2>
                     <p>먼저 이름을 입력하세요. 이름이 저장되면 퀴즈 입력칸이 열리고, 제출 시 점수와 문항별 답안이 저장됩니다.</p>
                 </div>
                 <label class="student-name-field" for="studentNameInput">
-                    <span>이름</span>
-                    <input id="studentNameInput" type="text" maxlength="40" autocomplete="name" value="${escapeHtml(savedName)}" placeholder="이름 입력">
+                    <span>이름 <b>필수</b></span>
+                    <input id="studentNameInput" type="text" maxlength="40" autocomplete="name" value="${escapeHtml(savedName)}" placeholder="여기에 이름 입력">
                 </label>
                 <p id="homeworkStatus" class="homework-status ${savedName ? "is-idle" : "is-pending"}">${savedName ? "이름이 저장되었습니다. 모든 문항을 푼 뒤 제출하세요." : "이름을 입력하면 퀴즈가 시작됩니다."}</p>
             </section>
