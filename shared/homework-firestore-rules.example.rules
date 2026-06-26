@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /homeworkAssignments/{assignmentId}/submissions/{submissionId} {
+      allow read, delete: if false;
+      allow create: if isValidSubmission(assignmentId);
+      allow update: if isValidSubmission(assignmentId)
+        && resource.data.anonymousUid == request.auth.uid
+        && resource.data.assignmentId == assignmentId
+        && resource.data.signatureHash == request.resource.data.signatureHash;
+    }
+
+    function isValidSubmission(assignmentId) {
+      return request.auth != null
+        && request.resource.data.assignmentId == assignmentId
+        && request.resource.data.anonymousUid == request.auth.uid
+        && request.resource.data.studentName is string
+        && request.resource.data.studentName.size() >= 1
+        && request.resource.data.studentName.size() <= 40
+        && request.resource.data.chapter == "12"
+        && request.resource.data.total == 24
+        && request.resource.data.answered == 24
+        && request.resource.data.completed == true
+        && request.resource.data.score is int
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= 24
+        && request.resource.data.percent is int
+        && request.resource.data.percent >= 0
+        && request.resource.data.percent <= 100
+        && request.resource.data.correctQuestions is list
+        && request.resource.data.wrongQuestions is list
+        && request.resource.data.questionResults is list
+        && request.resource.data.questionResults.size() == 24
+        && request.resource.data.clientSubmittedAt is string
+        && request.resource.data.submittedAt is timestamp;
+    }
+  }
+}

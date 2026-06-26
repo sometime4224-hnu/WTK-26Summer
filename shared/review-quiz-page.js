@@ -8,6 +8,9 @@
     const storageBase = config.storageKey || `snu3b.c${config.chapter || "x"}.reviewQuiz.v1`;
     const progressKey = `${storageBase}.progress`;
     const scoreLogKey = `${storageBase}.scoreLogs`;
+    const studentNameKey = `${storageBase}.studentName`;
+    const homework = config.homework || {};
+    const homeworkEnabled = Boolean(homework.enabled && homework.assignmentId);
     let currentAttempt = null;
     let scoreLogs = [];
     let currentProgressMeta = {};
@@ -50,6 +53,22 @@
             window.localStorage.removeItem(key);
         } catch (error) {
             // Ignore storage failures; the quiz should still work in memory.
+        }
+    }
+
+    function readText(key, fallback) {
+        try {
+            return window.localStorage.getItem(key) || fallback;
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+    function writeText(key, value) {
+        try {
+            window.localStorage.setItem(key, value);
+        } catch (error) {
+            // Local storage can be unavailable in strict browser modes.
         }
     }
 
@@ -163,6 +182,59 @@
                 counts[question.correctLetter] = (counts[question.correctLetter] || 0) + 1;
                 return counts;
             }, { A: 0, B: 0, C: 0, D: 0 });
+    }
+
+    function readStudentName() {
+        return String(readText(studentNameKey, "") || "").trim();
+    }
+
+    function getStudentName() {
+        const input = document.getElementById("studentNameInput");
+        return String(input ? input.value : readStudentName()).trim();
+    }
+
+    function setHomeworkStatus(kind, text) {
+        if (!homeworkEnabled) return;
+        const status = document.getElementById("homeworkStatus");
+        if (!status) return;
+        status.className = `homework-status is-${kind || "idle"}`;
+        status.textContent = text;
+    }
+
+    function setHomeworkSubmitting(submitting) {
+        if (!homeworkEnabled) return;
+        document.querySelectorAll("#checkAllButton, #bottomCheckAllButton").forEach(function (button) {
+            button.disabled = Boolean(submitting);
+        });
+    }
+
+    function focusStudentNameInput() {
+        const input = document.getElementById("studentNameInput");
+        if (!input) return;
+        try {
+            input.scrollIntoView({ behavior: "auto", block: "center" });
+            input.focus({ preventScroll: true });
+        } catch (error) {
+            input.scrollIntoView();
+            input.focus();
+        }
+    }
+
+    function showMissingStudentName() {
+        document.body.classList.add("submission-blocked", "homework-name-blocked");
+        document.getElementById("scoreMain").textContent = "미제출: 이름을 입력하세요.";
+        document.getElementById("scoreSub").textContent = "온라인 제출을 위해 이름을 먼저 입력해야 합니다.";
+        const alert = document.getElementById("submissionAlert");
+        if (alert) {
+            alert.hidden = false;
+            alert.textContent = "미제출: 이름을 입력한 뒤 완료 / 제출하기를 다시 눌러 주세요.";
+        }
+        const hint = document.getElementById("submitHint");
+        if (hint) {
+            hint.textContent = "이름을 입력해야 제출할 수 있습니다.";
+        }
+        setHomeworkStatus("error", "이름을 입력해야 온라인 제출을 보낼 수 있습니다.");
+        focusStudentNameInput();
     }
 
     function requiredStatus(question, value) {
@@ -322,6 +394,7 @@
             const questions = currentAttempt.questions.filter(function (question) {
                 return question.type === type;
             });
+            if (!questions.length) return "";
             const info = sectionInfo(type);
             return `
                 <section class="quiz-section" data-section="${type}">
@@ -388,6 +461,24 @@
         `;
     }
 
+    function renderHomeworkPanel() {
+        if (!homeworkEnabled) return "";
+        const savedName = readStudentName();
+        return `
+            <section class="homework-panel" aria-labelledby="homeworkPanelTitle">
+                <div class="homework-panel__text">
+                    <h2 id="homeworkPanelTitle">온라인 제출</h2>
+                    <p>이름을 입력하고 모든 문항을 푼 뒤 완료 / 제출하기를 누르면 점수와 문항별 답안이 저장됩니다.</p>
+                </div>
+                <label class="student-name-field" for="studentNameInput">
+                    <span>이름</span>
+                    <input id="studentNameInput" type="text" maxlength="40" autocomplete="name" value="${escapeHtml(savedName)}" placeholder="이름 입력">
+                </label>
+                <p id="homeworkStatus" class="homework-status is-idle">온라인 제출 대기 중입니다.</p>
+            </section>
+        `;
+    }
+
     function renderPage() {
         const counts = getQuestionCounts(currentAttempt);
         const slots = getAnswerSlotCounts(currentAttempt);
@@ -396,6 +487,9 @@
             <div id="completionStamp" class="completion-stamp"${scoreLogs.length ? "" : " hidden"} aria-label="잘했어요 도장">
                 <span>잘했어요</span>
                 <b>완료</b>
+            </div>
+            <div id="submissionAlert" class="submission-alert" role="alert" hidden>
+                미제출: 안 푼 문제가 있습니다.
             </div>
 
             <header class="review-header">
@@ -418,18 +512,22 @@
                 <span class="summary-chip"><strong>${counts.total}</strong>문항</span>
                 <span class="summary-chip">객관식 <strong>${counts.mcq}</strong></span>
                 <span class="summary-chip">단답형 <strong>${counts.short}</strong></span>
-                <span class="summary-chip">비계형 <strong>${counts.scaffold}</strong></span>
+                ${counts.scaffold ? `<span class="summary-chip">비계형 <strong>${counts.scaffold}</strong></span>` : ""}
                 <span class="summary-chip">정답 위치 A/B/C/D <strong>${slots.A}/${slots.B}/${slots.C}/${slots.D}</strong></span>
                 <span class="summary-chip" id="progressStatus">진행 <strong>0/${counts.total}</strong></span>
+                <span class="summary-chip">로컬 저장 <strong>자동</strong></span>
+                ${homeworkEnabled ? '<span class="summary-chip">온라인 제출 <strong>사용</strong></span>' : ""}
             </div>
+
+            ${renderHomeworkPanel()}
 
             <div class="review-toolbar" aria-label="채점 도구">
                 <div class="score-stack">
-                    <div id="scoreMain" class="score-main">아직 채점하지 않았습니다.</div>
-                    <div id="scoreSub" class="score-sub">시도 번호 ${escapeHtml(currentAttempt.seed)}</div>
+                    <div id="scoreMain" class="score-main" aria-live="polite">아직 채점하지 않았습니다.</div>
+                    <div id="scoreSub" class="score-sub">진행 상황이 이 기기에 자동 저장됩니다.</div>
                 </div>
                 <div class="review-actions">
-                    <button id="checkAllButton" class="review-button primary" type="button">정답 확인</button>
+                    <button id="checkAllButton" class="review-button primary" type="button">완료 / 제출하기</button>
                     <button id="resetButton" class="review-button" type="button">입력 지우기</button>
                     <button id="newAttemptButton" class="review-button" type="button">새 시도</button>
                     <button id="printButton" class="review-button" type="button">인쇄</button>
@@ -439,7 +537,8 @@
             <form id="reviewQuizForm" autocomplete="off">
                 ${renderSections()}
                 <div class="bottom-check-panel">
-                    <button id="bottomCheckAllButton" class="review-button primary bottom-check-button" type="button">완료 / 정답확인</button>
+                    <p id="submitHint" class="submit-hint">진행 상황은 이 기기에 자동 저장됩니다. 모든 문항을 푼 뒤 완료 / 제출하기를 눌러 주세요.</p>
+                    <button id="bottomCheckAllButton" class="review-button primary bottom-check-button" type="button">완료 / 제출하기</button>
                 </div>
             </form>
 
@@ -483,6 +582,77 @@
             normalizedAnswers[question.id] = normalize(answers[question.id]);
         });
         return `${currentAttempt.seed}:${JSON.stringify(normalizedAnswers)}`;
+    }
+
+    function signatureHash(signature) {
+        return hashSeed(signature).toString(36);
+    }
+
+    function selectedLetterForQuestion(question, value) {
+        if (question.type !== "mcq") return "";
+        const option = (question.options || []).find(function (item) {
+            return item.text === value;
+        });
+        return option ? option.letter : "";
+    }
+
+    function buildGradeResult(answers, questionResults, score, total, answered, complete) {
+        const percent = total ? Math.round((score / total) * 100) : 0;
+        return {
+            score: score,
+            total: total,
+            percent: percent,
+            completed: complete,
+            answered: answered,
+            correctQuestions: questionResults
+                .filter(function (item) { return item.isCorrect; })
+                .map(function (item) { return item.number; }),
+            wrongQuestions: questionResults
+                .filter(function (item) { return !item.isCorrect; })
+                .map(function (item) { return item.number; }),
+            questionResults: questionResults,
+            answers: answers
+        };
+    }
+
+    function buildHomeworkPayload(result, signature) {
+        return {
+            assignmentId: homework.assignmentId,
+            assignmentTitle: config.title,
+            chapter: String(config.chapter || ""),
+            studentName: getStudentName(),
+            anonymousUid: "",
+            seed: currentAttempt.seed,
+            signatureHash: signatureHash(signature),
+            score: result.score,
+            total: result.total,
+            percent: result.percent,
+            completed: result.completed,
+            answered: result.answered,
+            correctQuestions: result.correctQuestions,
+            wrongQuestions: result.wrongQuestions,
+            questionResults: result.questionResults,
+            clientSubmittedAt: new Date().toISOString()
+        };
+    }
+
+    async function submitHomeworkResult(result, signature) {
+        if (!homeworkEnabled || !result.completed) return;
+
+        const submitter = window.HomeworkSubmitter;
+        if (!submitter || typeof submitter.submitHomework !== "function") {
+            throw new Error("온라인 제출 모듈을 찾을 수 없습니다.");
+        }
+
+        setHomeworkSubmitting(true);
+        setHomeworkStatus("pending", "온라인 제출 중입니다...");
+        try {
+            const response = await submitter.submitHomework(buildHomeworkPayload(result, signature));
+            setHomeworkStatus("success", "온라인 제출이 완료되었습니다.");
+            return response;
+        } finally {
+            setHomeworkSubmitting(false);
+        }
     }
 
     function saveProgress(extra) {
@@ -532,7 +702,28 @@
         if (!status) return;
         const source = answers || collectAnswers();
         const answered = answerCount(source);
-        status.innerHTML = `진행 <strong>${answered}/${currentAttempt.questions.length}</strong>`;
+        const total = currentAttempt.questions.length;
+        const complete = answered === total;
+        status.innerHTML = complete
+            ? `진행 <strong>${answered}/${total}</strong> · 제출 준비`
+            : `진행 <strong>${answered}/${total}</strong>`;
+        document.body.classList.toggle("ready-to-submit", complete && !document.body.classList.contains("checked"));
+
+        const hint = document.getElementById("submitHint");
+        if (hint) {
+            hint.textContent = complete
+                ? "모든 문항을 풀었습니다. 완료 / 제출하기를 눌러 점수를 저장하세요."
+                : "진행 상황은 이 기기에 자동 저장됩니다. 모든 문항을 푼 뒤 완료 / 제출하기를 눌러 주세요.";
+        }
+
+        if (!document.body.classList.contains("checked")) {
+            const scoreSub = document.getElementById("scoreSub");
+            if (scoreSub) {
+                scoreSub.textContent = complete
+                    ? "모든 문항을 풀었습니다. 완료 / 제출하기를 눌러 제출하세요."
+                    : "진행 상황이 이 기기에 자동 저장됩니다.";
+            }
+        }
     }
 
     function updateScoreLogUi() {
@@ -553,6 +744,65 @@
         }
         const textarea = card.querySelector(".scaffold-answer");
         return textarea ? textarea.value : "";
+    }
+
+    function cardForQuestion(question) {
+        return document.querySelector(`.question-card[data-question-id="${question.id}"]`);
+    }
+
+    function unansweredCards(answers) {
+        return currentAttempt.questions.reduce(function (cards, question) {
+            if (!isAnswered(question, answers[question.id])) {
+                const card = cardForQuestion(question);
+                if (card) cards.push(card);
+            }
+            return cards;
+        }, []);
+    }
+
+    function focusQuestionCard(card) {
+        const focusTarget = card.querySelector("input, textarea") || card;
+        if (!card.hasAttribute("tabindex")) card.setAttribute("tabindex", "-1");
+        try {
+            card.scrollIntoView({ behavior: "auto", block: "center" });
+            focusTarget.focus({ preventScroll: true });
+        } catch (error) {
+            card.scrollIntoView();
+            focusTarget.focus();
+        }
+    }
+
+    function showIncompleteSubmission(answers, answered, total) {
+        clearFeedbackState();
+        const missingCards = unansweredCards(answers);
+        missingCards.forEach(function (card, index) {
+            const feedback = card.querySelector(".feedback");
+            card.classList.add("is-unanswered");
+            card.classList.toggle("is-first-unanswered", index === 0);
+            if (feedback) {
+                feedback.className = "feedback missing";
+                feedback.textContent = "이 문제를 아직 풀지 않아서 제출할 수 없습니다.";
+            }
+        });
+
+        document.body.classList.add("submission-blocked");
+        document.getElementById("scoreMain").textContent = "미제출: 안 푼 문제가 있습니다.";
+        document.getElementById("scoreSub").textContent = `진행 ${answered}/${total}: 안 푼 문제 ${missingCards.length}개를 완료한 뒤 다시 제출하세요.`;
+
+        const alert = document.getElementById("submissionAlert");
+        if (alert) {
+            alert.hidden = false;
+            alert.textContent = `미제출: 안 푼 문제 ${missingCards.length}개가 있습니다. 강조된 문제를 풀어 주세요.`;
+        }
+
+        const hint = document.getElementById("submitHint");
+        if (hint) {
+            hint.textContent = "미제출 상태입니다. 강조된 문제를 모두 풀고 완료 / 제출하기를 다시 눌러 주세요.";
+        }
+
+        if (missingCards[0]) {
+            focusQuestionCard(missingCards[0]);
+        }
     }
 
     function applyFeedback(card, question, result) {
@@ -578,7 +828,7 @@
 
     function clearFeedbackState() {
         document.querySelectorAll(".question-card").forEach(function (card) {
-            card.classList.remove("is-correct", "is-wrong");
+            card.classList.remove("is-correct", "is-wrong", "is-unanswered", "is-first-unanswered");
         });
         document.querySelectorAll(".required-list li").forEach(function (item) {
             item.classList.remove("is-met", "is-missing");
@@ -587,9 +837,12 @@
             feedback.className = "feedback";
             feedback.textContent = "";
         });
-        document.body.classList.remove("checked");
+        document.body.classList.remove("checked", "ready-to-submit", "submission-blocked", "homework-name-blocked");
+        const alert = document.getElementById("submissionAlert");
+        if (alert) alert.hidden = true;
         document.getElementById("scoreMain").textContent = "아직 채점하지 않았습니다.";
-        document.getElementById("scoreSub").textContent = "진행 상황이 저장되었습니다.";
+        document.getElementById("scoreSub").textContent = "진행 상황이 이 기기에 자동 저장됩니다.";
+        setHomeworkStatus("idle", "온라인 제출 대기 중입니다.");
     }
 
     function addScoreLog(score, total, answers) {
@@ -621,18 +874,56 @@
         return true;
     }
 
-    function checkAll(options) {
+    async function checkAll(options) {
         const settings = Object.assign({ logCompletion: true, save: true }, options || {});
         const cards = Array.from(document.querySelectorAll(".question-card"));
         const answers = collectAnswers();
         const answered = answerCount(answers);
         const isComplete = answered === cards.length;
+        const signature = answerSignature(answers);
         let correct = 0;
+        const questionResults = [];
+
+        if (settings.logCompletion && !isComplete && settings.requireComplete !== false) {
+            if (settings.save) {
+                saveProgress({
+                    checked: false,
+                    lastScore: {
+                        score: null,
+                        total: cards.length,
+                        answered: answered,
+                        complete: false,
+                        submitted: false
+                    },
+                    loggedSignature: currentProgressMeta.loggedSignature || ""
+                });
+            }
+            showIncompleteSubmission(answers, answered, cards.length);
+            return;
+        }
+
+        if (settings.logCompletion && homeworkEnabled && homework.requireStudentName && !getStudentName()) {
+            showMissingStudentName();
+            return;
+        }
+
         cards.forEach(function (card) {
             const question = questionById(card.dataset.questionId);
             const result = gradeAnswer(question, answers[question.id]);
             if (result.ok) correct += 1;
             applyFeedback(card, question, result);
+            questionResults.push({
+                number: question.number,
+                id: question.id,
+                type: question.type,
+                area: question.area || "",
+                kind: question.kind || sectionInfo(question.type).title,
+                studentAnswer: answers[question.id] || "",
+                selectedLetter: selectedLetterForQuestion(question, answers[question.id]),
+                correctAnswer: result.correct || "",
+                correctLetter: question.correctLetter || "",
+                isCorrect: Boolean(result.ok)
+            });
         });
         document.body.classList.add("checked");
         document.getElementById("scoreMain").textContent = `${correct} / ${cards.length}점`;
@@ -649,6 +940,9 @@
         }
 
         document.getElementById("scoreSub").textContent = subText;
+        document.body.classList.remove("ready-to-submit");
+        const alert = document.getElementById("submissionAlert");
+        if (alert) alert.hidden = true;
         if (settings.save) {
             saveProgress({
                 checked: true,
@@ -661,6 +955,20 @@
                 loggedSignature: currentProgressMeta.loggedSignature || ""
             });
         }
+
+        const gradeResult = buildGradeResult(answers, questionResults, correct, cards.length, answered, isComplete);
+        if (settings.logCompletion && homeworkEnabled && isComplete) {
+            try {
+                await submitHomeworkResult(gradeResult, signature);
+                document.getElementById("scoreSub").textContent = "로컬 점수와 온라인 제출을 모두 저장했습니다.";
+            } catch (error) {
+                const message = error && error.message ? error.message : "알 수 없는 오류";
+                setHomeworkStatus("error", `온라인 제출 실패: ${message}`);
+                document.getElementById("scoreSub").textContent = "로컬 점수는 저장했지만 온라인 제출에 실패했습니다. 설정이나 네트워크를 확인한 뒤 다시 제출하세요.";
+            }
+        }
+
+        return gradeResult;
     }
 
     function clearInputs() {
@@ -671,7 +979,7 @@
             input.value = "";
         });
         clearFeedbackState();
-        document.getElementById("scoreSub").textContent = `시도 번호 ${currentAttempt.seed}`;
+        document.getElementById("scoreSub").textContent = "진행 상황이 이 기기에 자동 저장됩니다.";
         currentProgressMeta.checked = false;
         saveProgress({ checked: false, lastScore: null });
     }
@@ -685,8 +993,11 @@
     }
 
     function bindEvents() {
-        document.getElementById("checkAllButton").addEventListener("click", checkAll);
-        document.getElementById("bottomCheckAllButton").addEventListener("click", checkAll);
+        const submitCurrentAttempt = function () {
+            void checkAll();
+        };
+        document.getElementById("checkAllButton").addEventListener("click", submitCurrentAttempt);
+        document.getElementById("bottomCheckAllButton").addEventListener("click", submitCurrentAttempt);
         document.getElementById("resetButton").addEventListener("click", clearInputs);
         document.getElementById("newAttemptButton").addEventListener("click", newAttempt);
         document.getElementById("printButton").addEventListener("click", function () {
@@ -695,13 +1006,27 @@
 
         const form = document.getElementById("reviewQuizForm");
         const handleProgressInput = function () {
-            if (document.body.classList.contains("checked")) {
+            if (document.body.classList.contains("checked") || document.body.classList.contains("submission-blocked")) {
                 clearFeedbackState();
             }
             saveProgress({ checked: false });
         };
         form.addEventListener("input", handleProgressInput);
         form.addEventListener("change", handleProgressInput);
+
+        const studentNameInput = document.getElementById("studentNameInput");
+        if (studentNameInput) {
+            studentNameInput.addEventListener("input", function () {
+                writeText(studentNameKey, studentNameInput.value.trim());
+                if (studentNameInput.value.trim()) {
+                    document.body.classList.remove("submission-blocked", "homework-name-blocked");
+                    const alert = document.getElementById("submissionAlert");
+                    if (alert) alert.hidden = true;
+                    setHomeworkStatus("idle", "이름이 저장되었습니다. 모든 문항을 푼 뒤 제출하세요.");
+                    updateProgressStatus();
+                }
+            });
+        }
     }
 
     function init() {
@@ -723,13 +1048,17 @@
             readProgress: function () { return readJson(progressKey, null); },
             readScoreLogs: function () { return readScoreLogs(); },
             getStorageKeys: function () {
-                return { progressKey: progressKey, scoreLogKey: scoreLogKey };
+                return { progressKey: progressKey, scoreLogKey: scoreLogKey, studentNameKey: studentNameKey };
             },
             clearStorage: function () {
                 removeStorage(progressKey);
                 removeStorage(scoreLogKey);
+                removeStorage(studentNameKey);
                 scoreLogs = [];
                 currentProgressMeta = {};
+                const studentNameInput = document.getElementById("studentNameInput");
+                if (studentNameInput) studentNameInput.value = "";
+                setHomeworkStatus("idle", "온라인 제출 대기 중입니다.");
                 updateScoreLogUi();
             }
         };
