@@ -9,7 +9,8 @@ const pages = [
     resources: [
       'grammar1-card-game.html',
       'grammar1-reason.html',
-      'grammar1-2-speaking.html'
+      'grammar1-2-speaking.html',
+      'grammar1-form-typing.html'
     ]
   },
   {
@@ -20,11 +21,25 @@ const pages = [
     resources: [
       'grammar2-degree-challenge.html',
       'grammar1-2-speaking.html',
-      'grammar2-classic.html'
+      'grammar2-classic.html',
+      'grammar2-form-typing.html'
     ]
   },
-  { path: '/c12/grammar3.html', title: '-(으)ㄴ/는 모양이다' },
-  { path: '/c12/grammar4.html', title: '-아야/어야' }
+  {
+    path: '/c12/grammar3.html',
+    title: '-(으)ㄴ/는 모양이다',
+    resources: [
+      { href: 'grammar3-support-activity1.html', text: '보조활동 1' },
+      { href: 'grammar3-form-typing.html', text: '활용형·문장 타이핑' }
+    ]
+  },
+  {
+    path: '/c12/grammar4.html',
+    title: '-아야/어야',
+    resources: [
+      { href: 'grammar4-form-typing.html', text: '활용형·문장 타이핑' }
+    ]
+  }
 ];
 
 const scaffoldPages = pages.filter((page) => !page.visual);
@@ -143,11 +158,11 @@ test('c12 grammar main pages are responsive and expose the shared structure', as
   }
 });
 
-test('c12 grammar1 exposes the existing support activities only', async ({ page }) => {
+test('c12 grammar1 exposes the existing support activities', async ({ page }) => {
   await blockExternalRequests(page);
   await page.goto('/c12/grammar1.html', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.locator('.resource-link')).toHaveCount(3);
+  await expect(page.locator('.resource-link')).toHaveCount(pages[0].resources.length);
   for (const href of pages[0].resources) {
     await expect(page.locator(`.resource-link[href="${href}"]`)).toBeVisible();
   }
@@ -157,9 +172,24 @@ test('c12 grammar2 exposes the visual support activities', async ({ page }) => {
   await blockExternalRequests(page);
   await page.goto('/c12/grammar2.html', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.locator('.resource-link')).toHaveCount(3);
+  await expect(page.locator('.resource-link')).toHaveCount(pages[1].resources.length);
   for (const href of pages[1].resources) {
     await expect(page.locator(`.resource-link[href="${href}"]`)).toBeVisible();
+  }
+});
+
+test('c12 grammar3 and grammar4 expose staged typing support activities', async ({ page }) => {
+  await blockExternalRequests(page);
+
+  for (const target of pages.slice(2)) {
+    await page.goto(target.path, { waitUntil: 'domcontentloaded' });
+
+    await expect(page.locator('.resource-link')).toHaveCount(target.resources.length);
+    for (const resource of target.resources) {
+      const link = page.locator(`.resource-link[href="${resource.href}"]`);
+      await expect(link).toBeVisible();
+      await expect(link).toContainText(resource.text);
+    }
   }
 });
 
