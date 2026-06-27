@@ -199,6 +199,46 @@ test.describe("typing party multiplayer MVP", () => {
     await context.close();
   });
 
+  test("includes C12 grammar staged completion activities in the party launcher", async ({ browser }) => {
+    const context = await browser.newContext();
+    const host = await context.newPage();
+    const roomCode = await createHostRoom(host);
+    const student = await joinStudent(context, roomCode, "유나");
+
+    const grammar3Card = host.locator('[data-testid="c12-activity-card"][data-activity-id="c12-grammar3-typing"]');
+    const grammar4Card = host.locator('[data-testid="c12-activity-card"][data-activity-id="c12-grammar4-typing"]');
+    await expect(grammar3Card).toContainText("12과 문법3 활용형·문장 완성");
+    await expect(grammar3Card).toContainText("활동");
+    await expect(grammar4Card).toContainText("12과 문법4 활용형·문장 완성");
+
+    await expect(host.locator('[data-testid="activity-select"] option[value="c12-grammar3-typing"]')).toHaveText("12과 문법3 활용형·문장 완성");
+    await expect(host.locator('[data-testid="activity-select"] option[value="c12-grammar4-typing"]')).toHaveText("12과 문법4 활용형·문장 완성");
+
+    await grammar3Card.click();
+    await expect(host.locator('[data-testid="stage-title"]')).toHaveText("개인 활동");
+    await expect(student.locator('[data-testid="activity-student"]')).toContainText("12과 문법3 활용형·문장 완성");
+
+    await student.keyboard.press("Enter");
+    await student.waitForLoadState("domcontentloaded");
+    await expect(student).toHaveURL(/activity\.html/);
+    const frame = student.frameLocator('[data-testid="activity-runner-frame"]');
+    await expect(student.locator('[data-testid="activity-runner-frame"]')).toHaveAttribute("src", /activities\/c12\/grammar3-form-typing\.html/);
+    await expect(frame.locator("h1")).toContainText("활용형·문장 완성");
+    await expect(frame.locator(".choice-button")).toHaveCount(4);
+    await expect(frame.locator(".key-button")).toHaveCount(0);
+
+    await context.close();
+  });
+
+  test("loads the copied C12 grammar4 completion activity shell", async ({ page }) => {
+    await page.goto("/apps/typing-party/activities/c12/grammar4-form-typing.html");
+
+    await expect(page.locator("h1")).toContainText("-아야/어야 활용형·문장 완성");
+    await expect(page.locator(".choice-button")).toHaveCount(4);
+    await expect(page.locator(".key-button")).toHaveCount(0);
+    await expect(page.locator(".switch-link")).toHaveAttribute("href", "grammar3-form-typing.html");
+  });
+
   test("opens the keyboard campus world with movement, stations, and safe reactions", async ({ browser }) => {
     const context = await browser.newContext();
     const host = await context.newPage();

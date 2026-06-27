@@ -4,7 +4,15 @@
     const config = window.C12_GRAMMAR_FORM_TYPING_PAGE;
     if (!config || !Array.isArray(config.items)) return;
 
-    const LEVELS = [
+    const interaction = config.interaction || {};
+    const isTapMode = interaction.mode === "tap";
+    if (isTapMode) document.body.classList.add("is-touch-activity");
+
+    const LEVELS = isTapMode ? [
+        { key: "guide", label: "가이드", note: "규칙을 보고 고릅니다." },
+        { key: "partial", label: "부분 가이드", note: "힌트를 보고 고릅니다." },
+        { key: "independent", label: "독립", note: "스스로 판단합니다." }
+    ] : [
         { key: "guide", label: "가이드", note: "규칙을 보고 씁니다." },
         { key: "partial", label: "부분 가이드", note: "힌트만 보고 씁니다." },
         { key: "independent", label: "독립", note: "직접 만들어 씁니다." }
@@ -84,9 +92,21 @@
     const sentenceItems = Array.isArray(config.sentenceItems) ? config.sentenceItems : [];
     const hasSentenceStage = sentenceItems.length > 0;
     const STAGES = [
-        { key: "form", label: "활용형", note: "빈칸에 맞는 활용형만 입력합니다.", emptyMessage: "활용형을 입력하세요." }
+        {
+            key: "form",
+            label: "활용형",
+            levelLabel: isTapMode ? "활용형 선택" : "활용형 입력",
+            note: isTapMode ? "빈칸에 맞는 활용형을 고릅니다." : "빈칸에 맞는 활용형만 입력합니다.",
+            emptyMessage: isTapMode ? "활용형을 선택하세요." : "활용형을 입력하세요."
+        }
     ].concat(hasSentenceStage ? [
-        { key: "sentence", label: "문장", note: "문장 전체를 보고 그대로 입력합니다.", emptyMessage: "문장을 입력하세요." }
+        {
+            key: "sentence",
+            label: "문장",
+            levelLabel: isTapMode ? "문장 완성" : "문장 입력",
+            note: isTapMode ? "말 조각을 순서대로 골라 문장을 완성합니다." : "문장 전체를 보고 그대로 입력합니다.",
+            emptyMessage: isTapMode ? "문장을 완성하세요." : "문장을 입력하세요."
+        }
     ] : []);
 
     const DATA = {
@@ -113,6 +133,7 @@
         cueText: document.getElementById("cueText"),
         guideText: document.getElementById("guideText"),
         targetPreview: document.getElementById("targetPreview"),
+        answerRow: document.querySelector(".answer-row"),
         answerInput: document.getElementById("answerInput"),
         checkBtn: document.getElementById("checkBtn"),
         feedback: document.getElementById("feedback"),
@@ -120,8 +141,28 @@
         keyboardAid: document.getElementById("keyboardAid"),
         keyboardBoard: document.getElementById("keyboardBoard"),
         nextJamo: document.getElementById("nextJamo"),
-        nextKeyLabel: document.getElementById("nextKeyLabel")
+        nextKeyLabel: document.getElementById("nextKeyLabel"),
+        choicePanel: document.getElementById("choicePanel"),
+        sentenceBuilder: document.getElementById("sentenceBuilder")
     };
+
+    function ensureTouchControls() {
+        if (!isTapMode || !refs.feedback || !refs.feedback.parentNode) return;
+        if (!refs.choicePanel) {
+            refs.choicePanel = document.createElement("div");
+            refs.choicePanel.id = "choicePanel";
+            refs.choicePanel.className = "choice-panel hidden";
+            refs.choicePanel.setAttribute("aria-label", "활용형 선택");
+            refs.feedback.parentNode.insertBefore(refs.choicePanel, refs.feedback);
+        }
+        if (!refs.sentenceBuilder) {
+            refs.sentenceBuilder = document.createElement("section");
+            refs.sentenceBuilder.id = "sentenceBuilder";
+            refs.sentenceBuilder.className = "sentence-builder hidden";
+            refs.sentenceBuilder.setAttribute("aria-label", "문장 완성");
+            refs.feedback.parentNode.insertBefore(refs.sentenceBuilder, refs.feedback);
+        }
+    }
 
     const state = {
         grammar: config.grammar.key,
@@ -134,7 +175,8 @@
         composing: false,
         advanceTimer: 0,
         logs: [],
-        stageLogs: { form: [], sentence: [] }
+        stageLogs: { form: [], sentence: [] },
+        selectedTokens: []
     };
 
     function esc(value) {
@@ -162,6 +204,60 @@
 
     function containsAsciiLetters(value) {
         return /[A-Za-z]/.test(String(value || ""));
+    }
+
+    function uniqueValues(values) {
+        const seen = new Set();
+        return values.filter((value) => {
+            const key = normalizeExact(value);
+            if (!key || seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    }
+
+    function stableHash(value) {
+        let hash = 2166136261;
+        String(value || "").split("").forEach((char) => {
+            hash ^= char.charCodeAt(0);
+            hash = Math.imul(hash, 16777619);
+        });
+        return hash >>> 0;
+    }
+
+    function stableShuffle(values, seed) {
+        return values
+            .map((value, index) => ({
+                value,
+                rank: stableHash(`${seed}|${index}|${value}`)
+            }))
+            .sort((a, b) => a.rank - b.rank)
+            .map((entry) => entry.value);
+    }
+
+    function formChoicesFor(item) {
+        if (!item) return [];
+        if (Array.isArray(item.choices) && item.choices.length) {
+            return stableShuffle(uniqueValues([item.answer].concat(item.choices)), `${item.id}|choices`);
+        }
+
+        const accepted = new Set([item.answer].concat(item.accepted || []).map(normalizeExact));
+        const pool = uniqueValues(DATA.items
+            .map((dataItem) => dataItem.answer)
+            .filter((answer) => !accepted.has(normalizeExact(answer))));
+        const distractors = stableShuffle(pool, `${item.id}|distractors`).slice(0, 3);
+        return stableShuffle(uniqueValues([item.answer].concat(distractors)), `${item.id}|choices`);
+    }
+
+    function sentenceTokensFor(item) {
+        return normalizeExact(item && item.answer ? item.answer : "")
+            .split(" ")
+            .filter(Boolean)
+            .map((text, index) => ({ id: `${item.id}-token-${index}`, text, index }));
+    }
+
+    function selectedSentenceValue() {
+        return state.selectedTokens.map((token) => token.text).join(" ");
     }
 
     function activeStageConfig() {
@@ -247,15 +343,15 @@
                 <div class="level-item is-active">
                     <span class="level-count">2</span>
                     <div class="level-copy">
-                        <strong>문장 입력 ${done} / ${total}</strong>
-                        <span>문장부호와 띄어쓰기까지 따라 입력합니다.</span>
+                        <strong>${isTapMode ? "문장 완성" : "문장 입력"} ${done} / ${total}</strong>
+                        <span>${isTapMode ? "말 조각을 순서대로 고릅니다." : "문장부호와 띄어쓰기까지 따라 입력합니다."}</span>
                     </div>
                 </div>
                 <div class="level-item ${stageDoneCount("form") >= DATA.items.length ? "is-done" : ""}">
                     <span class="level-count">1</span>
                     <div class="level-copy">
                         <strong>활용형 ${stageDoneCount("form")} / ${DATA.items.length}</strong>
-                        <span>1단계 활용형 입력 기록입니다.</span>
+                        <span>${isTapMode ? "1단계 활용형 선택 기록입니다." : "1단계 활용형 입력 기록입니다."}</span>
                     </div>
                 </div>
             `;
@@ -302,7 +398,7 @@
     function renderTargetPreview() {
         if (!refs.targetPreview) return;
         const item = currentItem();
-        if (!item || state.stage !== "sentence") {
+        if (isTapMode || !item || state.stage !== "sentence") {
             setTargetPreviewHidden(true);
             refs.targetPreview.innerHTML = "";
             return;
@@ -328,11 +424,139 @@
         setTargetPreviewHidden(false);
     }
 
+    function syncTouchShell() {
+        if (!isTapMode) return;
+        ensureTouchControls();
+        if (refs.answerRow) refs.answerRow.classList.add("hidden");
+        if (refs.keyboardAid) refs.keyboardAid.classList.add("hidden");
+        if (refs.choicePanel) refs.choicePanel.classList.toggle("hidden", state.stage !== "form");
+        if (refs.sentenceBuilder) refs.sentenceBuilder.classList.toggle("hidden", state.stage !== "sentence");
+    }
+
+    function renderChoicePanel() {
+        if (!isTapMode || !refs.choicePanel) return;
+        const item = currentItem();
+        const choices = formChoicesFor(item);
+        refs.choicePanel.innerHTML = `
+            <div class="choice-grid">
+                ${choices.map((choice) => `
+                    <button class="choice-button" type="button" data-choice="${esc(choice)}">
+                        <span>${esc(choice)}</span>
+                    </button>
+                `).join("")}
+            </div>
+        `;
+        refs.choicePanel.querySelectorAll(".choice-button").forEach((button) => {
+            button.addEventListener("click", () => answerCurrent(button.dataset.choice || ""));
+        });
+    }
+
+    function renderSentenceBuilder() {
+        if (!isTapMode || !refs.sentenceBuilder) return;
+        const item = currentItem();
+        const tokens = sentenceTokensFor(item);
+        const selectedIds = new Set(state.selectedTokens.map((token) => token.id));
+        const bank = stableShuffle(tokens, `${item.id}|tokens`);
+
+        refs.sentenceBuilder.innerHTML = `
+            <div class="builder-target ${state.selectedTokens.length ? "" : "is-empty"}" aria-live="polite">
+                ${state.selectedTokens.length
+                    ? state.selectedTokens.map((token, index) => `
+                        <button class="selected-token" type="button" data-selected-index="${index}">
+                            ${esc(token.text)}
+                        </button>
+                    `).join("")
+                    : `<span>${esc(activeStageConfig().emptyMessage)}</span>`}
+            </div>
+            <div class="word-bank">
+                ${bank.map((token) => `
+                    <button class="word-chip" type="button" data-token-id="${esc(token.id)}" ${selectedIds.has(token.id) ? "disabled" : ""}>
+                        ${esc(token.text)}
+                    </button>
+                `).join("")}
+            </div>
+            <div class="builder-actions">
+                <button id="builderUndoBtn" class="btn secondary" type="button" ${state.selectedTokens.length ? "" : "disabled"}>되돌리기</button>
+                <button id="builderClearBtn" class="btn secondary" type="button" ${state.selectedTokens.length ? "" : "disabled"}>초기화</button>
+                <button id="builderCheckBtn" class="btn primary" type="button">확인</button>
+            </div>
+        `;
+
+        refs.sentenceBuilder.querySelectorAll(".word-chip").forEach((button) => {
+            button.addEventListener("click", () => {
+                const token = tokens.find((entry) => entry.id === button.dataset.tokenId);
+                if (!token || state.answered) return;
+                state.selectedTokens.push(token);
+                renderSentenceBuilder();
+            });
+        });
+        refs.sentenceBuilder.querySelectorAll(".selected-token").forEach((button) => {
+            button.addEventListener("click", () => {
+                if (state.answered) return;
+                const index = Number(button.dataset.selectedIndex);
+                if (!Number.isFinite(index)) return;
+                state.selectedTokens.splice(index, 1);
+                renderSentenceBuilder();
+            });
+        });
+        const undoBtn = document.getElementById("builderUndoBtn");
+        const clearBtn = document.getElementById("builderClearBtn");
+        const checkBtn = document.getElementById("builderCheckBtn");
+        if (undoBtn) {
+            undoBtn.addEventListener("click", () => {
+                if (state.answered) return;
+                state.selectedTokens.pop();
+                renderSentenceBuilder();
+            });
+        }
+        if (clearBtn) {
+            clearBtn.addEventListener("click", () => {
+                if (state.answered) return;
+                state.selectedTokens = [];
+                renderSentenceBuilder();
+            });
+        }
+        if (checkBtn) {
+            checkBtn.addEventListener("click", () => answerCurrent(selectedSentenceValue()));
+        }
+    }
+
+    function renderTouchControls() {
+        if (!isTapMode) return;
+        syncTouchShell();
+        if (state.stage === "form") {
+            renderChoicePanel();
+            return;
+        }
+        renderSentenceBuilder();
+    }
+
+    function lockTouchControls(user, ok) {
+        if (!isTapMode) return;
+        if (state.stage === "form" && refs.choicePanel) {
+            refs.choicePanel.querySelectorAll(".choice-button").forEach((button) => {
+                const choice = button.dataset.choice || "";
+                button.disabled = true;
+                button.classList.toggle("is-selected", normalizeExact(choice) === normalizeExact(user));
+                button.classList.toggle("is-correct", itemAcceptsAnswer(currentItem(), choice));
+                button.classList.toggle("is-wrong", !ok && normalizeExact(choice) === normalizeExact(user));
+            });
+            return;
+        }
+        if (refs.sentenceBuilder) {
+            refs.sentenceBuilder.classList.toggle("is-correct", ok);
+            refs.sentenceBuilder.classList.toggle("is-wrong", !ok);
+            refs.sentenceBuilder.querySelectorAll("button").forEach((button) => {
+                button.disabled = true;
+            });
+        }
+    }
+
     function renderTask() {
         const item = currentItem();
         if (!item) return;
         const stage = activeStageConfig();
-        const level = state.stage === "sentence" ? { label: "문장 입력" } : levelFor(item);
+        const level = state.stage === "sentence" ? { label: stage.levelLabel } : levelFor(item);
 
         clearAutoAdvance();
         refs.taskBody.classList.remove("hidden");
@@ -342,21 +566,28 @@
         refs.promptText.textContent = item.prompt;
         refs.cueText.textContent = item.cue;
         refs.guideText.textContent = item.guide || stage.note;
-        refs.answerInput.value = "";
-        refs.answerInput.disabled = false;
-        refs.checkBtn.disabled = false;
+        if (refs.answerInput) {
+            refs.answerInput.value = "";
+            refs.answerInput.disabled = false;
+        }
+        if (refs.checkBtn) refs.checkBtn.disabled = false;
         refs.feedback.className = "feedback hidden";
         refs.feedback.innerHTML = "";
         refs.nextBtn.classList.add("hidden");
         refs.nextBtn.textContent = state.index >= activeItems().length - 1
-            ? (state.stage === "form" && hasSentenceStage ? "문장 입력" : "완료")
+            ? (state.stage === "form" && hasSentenceStage ? (isTapMode ? "문장 완성" : "문장 입력") : "완료")
             : "다음";
         state.answered = false;
         state.complete = false;
+        state.selectedTokens = [];
         renderProgress();
         renderTargetPreview();
-        updateTypingAid();
-        window.setTimeout(() => refs.answerInput.focus(), 0);
+        if (isTapMode) {
+            renderTouchControls();
+        } else {
+            updateTypingAid();
+            window.setTimeout(() => refs.answerInput.focus(), 0);
+        }
     }
 
     function showFeedback(kind, html) {
@@ -386,13 +617,13 @@
         return accepted.some((answer) => normalize(answer) === normalize(user));
     }
 
-    function answerCurrent() {
+    function answerCurrent(forcedUser) {
         if (state.answered || state.complete) return;
         const item = currentItem();
-        const user = refs.answerInput.value;
+        const user = forcedUser != null ? forcedUser : refs.answerInput.value;
         const stage = activeStageConfig();
 
-        if (containsAsciiLetters(user)) {
+        if (!isTapMode && containsAsciiLetters(user)) {
             showFeedback("warn", "한/영 키를 확인하세요.");
             refs.answerInput.focus();
             updateTypingAid();
@@ -401,7 +632,7 @@
 
         if (!String(user || "").trim()) {
             showFeedback("warn", stage.emptyMessage);
-            refs.answerInput.focus();
+            if (!isTapMode) refs.answerInput.focus();
             updateTypingAid();
             return;
         }
@@ -419,9 +650,10 @@
             rule: item.rule
         });
 
-        refs.answerInput.disabled = true;
-        refs.checkBtn.disabled = true;
+        if (refs.answerInput) refs.answerInput.disabled = true;
+        if (refs.checkBtn) refs.checkBtn.disabled = true;
         refs.nextBtn.classList.remove("hidden");
+        lockTouchControls(user, ok);
         renderProgress();
         updateTypingAid();
 
@@ -441,7 +673,7 @@
         return wrong.map((log) => `
             <div class="review-item">
                 <strong>정답:</strong> ${esc(log.correct)}<br />
-                <strong>내 답:</strong> ${esc(log.user || "(비어 있음)")}<br />
+                <strong>${isTapMode ? "내 선택" : "내 답"}:</strong> ${esc(log.user || "(비어 있음)")}<br />
                 ${esc(log.rule)}
             </div>
         `).join("");
@@ -476,7 +708,7 @@
         refs.taskBody.classList.add("hidden");
         refs.finishCard.classList.remove("hidden");
         refs.finishCard.innerHTML = `
-            <h2>활용형 입력 완료</h2>
+            <h2>${isTapMode ? "활용형 선택 완료" : "활용형 입력 완료"}</h2>
             <div class="finish-score">
                 <span>1단계 점수</span>
                 <strong>${state.stageScores.form} / ${DATA.items.length}</strong>
@@ -486,7 +718,7 @@
             </div>
             <div class="action-row">
                 <button id="restartFormBtn" class="btn secondary" type="button">활용형 다시</button>
-                <button id="startSentenceBtn" class="btn primary" type="button">문장 입력 시작</button>
+                <button id="startSentenceBtn" class="btn primary" type="button">${isTapMode ? "문장 완성 시작" : "문장 입력 시작"}</button>
             </div>
         `;
         state.complete = true;
@@ -500,7 +732,7 @@
         refs.taskBody.classList.add("hidden");
         refs.finishCard.classList.remove("hidden");
         refs.finishCard.innerHTML = `
-            <h2>${esc(config.grammar.label)} 타이핑 완료</h2>
+            <h2>${esc(config.grammar.label)} ${isTapMode ? "연습 완료" : "타이핑 완료"}</h2>
             <div class="finish-score-grid">
                 <div class="finish-score">
                     <span>활용형</span>
@@ -651,6 +883,7 @@
     }
 
     function renderKeyboard() {
+        if (isTapMode) return;
         if (!refs.keyboardBoard) return;
         refs.keyboardBoard.innerHTML = "";
         Object.entries(ROWS).forEach(([rowName, keys]) => {
@@ -679,6 +912,10 @@
     }
 
     function updateTypingAid() {
+        if (isTapMode) {
+            renderTargetPreview();
+            return;
+        }
         if (!refs.keyboardAid) return;
         const item = currentItem();
         const target = targetForItem(item);
@@ -707,27 +944,29 @@
         renderTargetPreview();
     }
 
-    refs.checkBtn.addEventListener("click", answerCurrent);
+    if (refs.checkBtn) refs.checkBtn.addEventListener("click", () => answerCurrent());
     refs.nextBtn.addEventListener("click", nextItem);
-    refs.answerInput.addEventListener("compositionstart", () => {
-        state.composing = true;
-    });
-    refs.answerInput.addEventListener("compositionend", () => {
-        state.composing = false;
-        updateTypingAid();
-    });
-    refs.answerInput.addEventListener("input", updateTypingAid);
-    refs.answerInput.addEventListener("keydown", (event) => {
-        if (event.key !== "Enter") return;
-        if (event.isComposing || state.composing) return;
-        event.preventDefault();
-        event.stopPropagation();
-        if (state.answered) {
-            nextItem();
-            return;
-        }
-        answerCurrent();
-    });
+    if (refs.answerInput && !isTapMode) {
+        refs.answerInput.addEventListener("compositionstart", () => {
+            state.composing = true;
+        });
+        refs.answerInput.addEventListener("compositionend", () => {
+            state.composing = false;
+            updateTypingAid();
+        });
+        refs.answerInput.addEventListener("input", updateTypingAid);
+        refs.answerInput.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter") return;
+            if (event.isComposing || state.composing) return;
+            event.preventDefault();
+            event.stopPropagation();
+            if (state.answered) {
+                nextItem();
+                return;
+            }
+            answerCurrent();
+        });
+    }
     document.addEventListener("keydown", (event) => {
         if (event.key !== "Enter") return;
         if (event.isComposing || state.composing || !state.answered || state.complete) return;
@@ -749,6 +988,14 @@
         startSentence: startSentenceStage,
         answerCurrentCorrectly() {
             const item = currentItem();
+            if (isTapMode) {
+                if (state.stage === "sentence") {
+                    state.selectedTokens = sentenceTokensFor(item);
+                    renderSentenceBuilder();
+                }
+                answerCurrent(item.answer);
+                return;
+            }
             refs.answerInput.value = item.answer;
             updateTypingAid();
             answerCurrent();
@@ -761,7 +1008,7 @@
         },
         nextInputInfo() {
             const item = currentItem();
-            return nextInputInfo(targetForItem(item), refs.answerInput.value || "");
+            return nextInputInfo(targetForItem(item), refs.answerInput ? refs.answerInput.value || "" : "");
         }
     };
 

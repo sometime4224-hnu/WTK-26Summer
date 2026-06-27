@@ -69,6 +69,22 @@ export const TRACKED_ACTIVITIES = [
     summary: "핵심 어휘, 확장 표현, 문법 문장, 회상 입력"
   },
   {
+    id: "c12-grammar3-typing",
+    label: "12과 문법3 활용형·문장 완성",
+    lesson: "12",
+    kind: "activity",
+    path: "activities/c12/grammar3-form-typing.html",
+    summary: "모양이다 활용형 선택 후 말 조각으로 문장 완성"
+  },
+  {
+    id: "c12-grammar4-typing",
+    label: "12과 문법4 활용형·문장 완성",
+    lesson: "12",
+    kind: "activity",
+    path: "activities/c12/grammar4-form-typing.html",
+    summary: "-아야/어야 활용형 선택 후 말 조각으로 조건 문장 완성"
+  },
+  {
     id: "c12-expression-learning",
     label: "12과 쓰기 주제 표현 학습",
     lesson: "12",

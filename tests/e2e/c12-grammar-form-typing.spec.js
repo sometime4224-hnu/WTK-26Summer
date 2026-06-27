@@ -30,8 +30,7 @@ async function currentActivityAnswer(page) {
 }
 
 async function answerCurrentCorrectly(page) {
-  await page.locator('#answerInput').fill(await currentActivityAnswer(page));
-  await page.locator('#checkBtn').click();
+  await page.evaluate(() => window.__C12_GRAMMAR_FORM_TYPING__.answerCurrentCorrectly());
   await expect(page.locator('#feedback')).toHaveClass(/ok/);
   await page.locator('#nextBtn').click();
 }
@@ -59,10 +58,10 @@ test('c12 grammar form typing page opens responsively', async ({ page }) => {
   }
 });
 
-test('c12 grammar3 and grammar4 staged typing pages open with keyboard aid', async ({ page }) => {
+test('c12 grammar3 and grammar4 staged touch pages open without keyboard aid', async ({ page }) => {
   const targets = [
-    { path: '/c12/grammar3-form-typing.html', grammar: 'grammar3', firstKey: 'KeyQ' },
-    { path: '/c12/grammar4-form-typing.html', grammar: 'grammar4', firstKey: 'KeyD' }
+    { path: '/c12/grammar3-form-typing.html', grammar: 'grammar3' },
+    { path: '/c12/grammar4-form-typing.html', grammar: 'grammar4' }
   ];
   const viewports = [
     { width: 390, height: 844 },
@@ -73,11 +72,11 @@ test('c12 grammar3 and grammar4 staged typing pages open with keyboard aid', asy
   for (const target of targets) {
     for (const viewport of viewports) {
       await openActivity(page, target.path, viewport);
-      await expect(page.locator('h1')).toContainText('활용형·문장 타이핑');
+      await expect(page.locator('h1')).toContainText('활용형·문장 완성');
       await expect(page.locator('#stageStrip .stage-step')).toHaveCount(2);
-      await expect(page.locator('.key-button')).toHaveCount(26);
-      await expect(page.locator(`.key-button[data-code="${target.firstKey}"]`)).toHaveClass(/is-next-key/);
-      await expect(page.locator('#answerInput')).toBeVisible();
+      await expect(page.locator('.choice-button')).toHaveCount(4);
+      await expect(page.locator('.key-button')).toHaveCount(0);
+      await expect(page.locator('#answerInput')).toHaveCount(0);
       await expectNoHorizontalOverflow(page);
     }
   }
@@ -209,35 +208,39 @@ test('enter submits answers and ascii input warns about keyboard state', async (
   await expect(page.locator('#progressText')).toContainText('2 / 24');
 });
 
-test('grammar3 and grammar4 complete form stage before sentence typing stage', async ({ page }) => {
+test('grammar3 and grammar4 complete form stage before sentence assembly stage', async ({ page }) => {
   for (const path of ['/c12/grammar3-form-typing.html', '/c12/grammar4-form-typing.html']) {
     await openActivity(page, path, { width: 1280, height: 900 });
 
-    await page.locator('#answerInput').fill('abc');
-    await page.keyboard.press('Enter');
-    await expect(page.locator('#feedback')).toHaveClass(/warn/);
-    await expect(page.locator('#feedback')).toContainText('한/영 키를 확인하세요.');
+    const correct = await currentActivityAnswer(page);
+    const wrongIndex = await page.locator('.choice-button').evaluateAll((buttons, answer) => (
+      buttons.findIndex((button) => button.textContent.trim() !== answer)
+    ), correct);
+    await page.locator('.choice-button').nth(wrongIndex).click();
+    await expect(page.locator('#feedback')).toHaveClass(/bad/);
+    await expect(page.locator('#feedback')).toContainText(`정답: ${correct}`);
+    await page.evaluate(() => window.__C12_GRAMMAR_FORM_TYPING__.resetForm());
 
     for (let index = 0; index < 20; index += 1) {
       await answerCurrentCorrectly(page);
     }
 
     await expect(page.locator('#finishCard')).toBeVisible();
-    await expect(page.locator('#finishCard')).toContainText('활용형 입력 완료');
+    await expect(page.locator('#finishCard')).toContainText('활용형 선택 완료');
     await expect(page.locator('#startSentenceBtn')).toBeVisible();
     await page.locator('#startSentenceBtn').click();
 
-    await expect(page.locator('#levelBadge')).toContainText('문장 입력');
-    await expect(page.locator('#targetPreview')).toBeVisible();
-    await expect(page.locator('#targetPreview .target-char.is-next')).toHaveCount(1);
-    await expect(page.locator('.key-button.is-next-key')).toHaveCount(1);
+    await expect(page.locator('#levelBadge')).toContainText('문장 완성');
+    await expect(page.locator('#sentenceBuilder')).toBeVisible();
+    await expect(page.locator('.word-chip').first()).toBeVisible();
+    await expect(page.locator('.key-button')).toHaveCount(0);
 
     for (let index = 0; index < 8; index += 1) {
       await answerCurrentCorrectly(page);
     }
 
     await expect(page.locator('#finishCard')).toBeVisible();
-    await expect(page.locator('#finishCard')).toContainText('타이핑 완료');
+    await expect(page.locator('#finishCard')).toContainText('연습 완료');
     await expect(page.locator('#restartFormBtn')).toBeVisible();
     await expect(page.locator('#restartSentenceBtn')).toBeVisible();
     await expect(page.locator('.finish-score-grid')).toContainText('20 / 20');
@@ -268,13 +271,13 @@ test('hub and grammar pages link to the form typing activity', async ({ page }) 
   await expect(page).toHaveURL(/\/c12\/grammar2-form-typing\.html$/);
 });
 
-test('hub and grammar3/4 pages link to staged typing activities', async ({ page }) => {
+test('hub and grammar3/4 pages link to staged touch activities', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await blockExternalRequests(page);
 
   await page.goto('/c12/index.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('a[href="grammar3-form-typing.html"]')).toContainText('활용형·문장 타이핑');
-  await expect(page.locator('a[href="grammar4-form-typing.html"]')).toContainText('활용형·문장 타이핑');
+  await expect(page.locator('a[href="grammar3-form-typing.html"]')).toContainText('활용형·문장 완성');
+  await expect(page.locator('a[href="grammar4-form-typing.html"]')).toContainText('활용형·문장 완성');
 
   await page.goto('/c12/grammar3.html', { waitUntil: 'domcontentloaded' });
   const grammar3Link = page.locator('.resource-link[href="grammar3-form-typing.html"]');

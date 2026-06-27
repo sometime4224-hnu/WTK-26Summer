@@ -30,14 +30,14 @@ const pages = [
     title: '-(으)ㄴ/는 모양이다',
     resources: [
       { href: 'grammar3-support-activity1.html', text: '보조활동 1' },
-      { href: 'grammar3-form-typing.html', text: '활용형·문장 타이핑' }
+      { href: 'grammar3-form-typing.html', text: '활용형·문장 완성' }
     ]
   },
   {
     path: '/c12/grammar4.html',
     title: '-아야/어야',
     resources: [
-      { href: 'grammar4-form-typing.html', text: '활용형·문장 타이핑' }
+      { href: 'grammar4-form-typing.html', text: '활용형·문장 완성' }
     ]
   }
 ];
@@ -178,7 +178,7 @@ test('c12 grammar2 exposes the visual support activities', async ({ page }) => {
   }
 });
 
-test('c12 grammar3 and grammar4 expose staged typing support activities', async ({ page }) => {
+test('c12 grammar3 and grammar4 expose staged touch support activities', async ({ page }) => {
   await blockExternalRequests(page);
 
   for (const target of pages.slice(2)) {
