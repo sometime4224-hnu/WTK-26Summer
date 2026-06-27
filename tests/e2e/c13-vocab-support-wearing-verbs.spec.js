@@ -17,7 +17,13 @@ test.describe("c13 wearing verbs support page", () => {
   });
 
   test("uses optimized webp assets and switches the viewer", async ({ page }) => {
-    const files = ["wearing-verbs-01.webp", "wearing-verbs-02.webp", "wearing-verbs-03.webp"];
+    const files = [
+      "wearing-verbs-01.webp",
+      "wearing-verbs-02.webp",
+      "wearing-verbs-03.webp",
+      "wearing-verbs-04.webp",
+      "wearing-verbs-05.webp"
+    ];
     for (const file of files) {
       const stat = fs.statSync(path.join(assetDir, file));
       expect(stat.size).toBeLessThan(130_000);
@@ -35,6 +41,15 @@ test.describe("c13 wearing verbs support page", () => {
     await page.getByRole("tab", { name: /자주 쓰는 표현/ }).click();
     await expect(page.locator("#figure-title")).toHaveText("의류·장신구 착용 동사 3");
     await expect(page.locator("#viewer-image")).toHaveAttribute("src", /wearing-verbs-03\.webp$/);
+
+    await page.getByRole("tab", { name: /매다·메다 기억 1/ }).click();
+    await expect(page.locator("#figure-title")).toHaveText("매다·메다 쉽게 외우기 1");
+    await expect(page.locator("#viewer-image")).toHaveAttribute("src", /wearing-verbs-04\.webp$/);
+    await expect(page.locator("#viewer-image")).toHaveAttribute("height", "1125");
+
+    await page.getByRole("tab", { name: /매다·메다 기억 2/ }).click();
+    await expect(page.locator("#figure-title")).toHaveText("매다·메다 쉽게 외우기 2");
+    await expect(page.locator("#viewer-image")).toHaveAttribute("src", /wearing-verbs-05\.webp$/);
 
     const naturalWidth = await page.locator("#viewer-image").evaluate((img) => img.naturalWidth);
     expect(naturalWidth).toBe(900);
