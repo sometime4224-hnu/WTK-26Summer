@@ -6,21 +6,21 @@
         "송년회": `${imageBase}/s04_bl_n03.webp`,
         "송별회": `${imageBase}/s04_br_n04.webp`,
         "동창회": `${imageBase}/s03_tl_n05.webp`,
-        "방꾸미다": `${imageBase}/s03_tr_n06.webp`,
-        "상차리다": `${imageBase}/s03_bl_n07.webp`,
-        "선물마련하다": `${imageBase}/s03_br_n08.webp`,
-        "손님대접하다": `${imageBase}/s02_tl_n09.webp`,
+        "방을꾸미다": `${imageBase}/s03_tr_n06.webp`,
+        "상을차리다": `${imageBase}/s03_bl_n07.webp`,
+        "선물을마련하다": `${imageBase}/s03_br_n08.webp`,
+        "손님을대접하다": `${imageBase}/s02_tl_n09.webp`,
         "충분하다": `${imageBase}/s02_tr_n10.webp`,
         "모자라다": `${imageBase}/s02_bl_n11.webp`,
         "남다": `${imageBase}/s02_br_n12.webp`,
         "부족하다": `${imageBase}/s01_tl_n13.webp`,
-        "옷차려입다": `${imageBase}/s01_tr_n14.webp`,
-        "넥타이매다": `${imageBase}/s01_bl_n15.webp`,
-        "반지끼다": `${imageBase}/s01_br_n16.webp`,
-        "귀고리하다": `${imageBase}/s05_tl_n17.webp`,
-        "시계차다": `${imageBase}/s05_tr_n18.webp`,
-        "가방들다": `${imageBase}/s05_bl_n19.webp`,
-        "배낭매다": `${imageBase}/s05_br_n20.webp`
+        "옷을차려입다": `${imageBase}/s01_tr_n14.webp`,
+        "넥타이를매다": `${imageBase}/s01_bl_n15.webp`,
+        "반지를끼다": `${imageBase}/s01_br_n16.webp`,
+        "귀고리를하다": `${imageBase}/s05_tl_n17.webp`,
+        "시계를차다": `${imageBase}/s05_tr_n18.webp`,
+        "가방을들다": `${imageBase}/s05_bl_n19.webp`,
+        "배낭을메다": `${imageBase}/s05_br_n20.webp`
     };
 
     const hintCopyMap = {
@@ -29,21 +29,21 @@
         "송년회": { ko: "한 해를 마무리하며 함께 모이는 자리", vi: "tiệc cuối năm" },
         "송별회": { ko: "떠나는 사람과 작별 인사를 나누는 모임", vi: "tiệc chia tay" },
         "동창회": { ko: "같은 학교를 나온 사람들이 다시 만나는 모임", vi: "họp lớp" },
-        "방꾸미다": { ko: "방을 예쁘게 장식하다", vi: "trang trí phòng" },
-        "상차리다": { ko: "음식을 먹을 수 있게 상을 준비하다", vi: "dọn bàn ăn" },
-        "선물마련하다": { ko: "필요한 선물을 미리 준비하다", vi: "chuẩn bị quà" },
-        "손님대접하다": { ko: "손님에게 정성껏 음식을 내고 챙기다", vi: "tiếp đãi khách" },
+        "방을꾸미다": { ko: "방을 예쁘게 장식하다", vi: "trang trí phòng" },
+        "상을차리다": { ko: "음식을 먹을 수 있게 상을 준비하다", vi: "dọn bàn ăn" },
+        "선물을마련하다": { ko: "필요한 선물을 미리 준비하다", vi: "chuẩn bị quà" },
+        "손님을대접하다": { ko: "손님에게 정성껏 음식을 내고 챙기다", vi: "tiếp đãi khách" },
         "충분하다": { ko: "필요한 만큼 넉넉하다", vi: "đủ" },
         "모자라다": { ko: "필요한 양보다 적다", vi: "thiếu" },
         "남다": { ko: "쓰고도 아직 남아 있다", vi: "còn lại, thừa" },
         "부족하다": { ko: "필요한 만큼 되지 않다", vi: "thiếu, không đủ" },
-        "옷차려입다": { ko: "옷을 단정하고 예쁘게 입다", vi: "ăn mặc đẹp, diện" },
-        "넥타이매다": { ko: "목에 넥타이를 묶다", vi: "thắt cà vạt" },
-        "반지끼다": { ko: "손가락에 반지를 끼다", vi: "đeo nhẫn" },
-        "귀고리하다": { ko: "귀에 귀고리를 하다", vi: "đeo bông tai" },
-        "시계차다": { ko: "손목에 시계를 차다", vi: "đeo đồng hồ" },
-        "가방들다": { ko: "손으로 가방을 들다", vi: "cầm túi xách" },
-        "배낭매다": { ko: "어깨에 배낭을 메다", vi: "đeo ba lô" }
+        "옷을차려입다": { ko: "옷을 단정하고 예쁘게 입다", vi: "ăn mặc đẹp, diện" },
+        "넥타이를매다": { ko: "목에 넥타이를 묶다", vi: "thắt cà vạt" },
+        "반지를끼다": { ko: "손가락에 반지를 끼다", vi: "đeo nhẫn" },
+        "귀고리를하다": { ko: "귀에 귀고리를 하다", vi: "đeo bông tai" },
+        "시계를차다": { ko: "손목에 시계를 차다", vi: "đeo đồng hồ" },
+        "가방을들다": { ko: "손으로 가방을 들다", vi: "cầm túi xách" },
+        "배낭을메다": { ko: "어깨에 배낭을 메다", vi: "đeo ba lô" }
     };
 
     const sets = [
@@ -56,7 +56,7 @@
                 { id: "reunion", answer: "동창회", row: 0, col: 2, dir: "down" },
                 { id: "year-end", answer: "송년회", row: 2, col: 0, dir: "across" },
                 { id: "farewell", answer: "송별회", row: 2, col: 0, dir: "down" },
-                { id: "bag", answer: "가방들다", row: 3, col: 4, dir: "down" },
+                { id: "bag", answer: "가방을들다", row: 2, col: 4, dir: "down", display: "(가방을) 들다" },
                 { id: "housewarming", answer: "집들이", row: 5, col: 3, dir: "across" }
             ]
         },
@@ -66,45 +66,45 @@
             rows: 6,
             cols: 6,
             words: [
-                { id: "enough", answer: "충분하다", row: 2, col: 0, dir: "across" },
                 { id: "lacking", answer: "부족하다", row: 0, col: 2, dir: "down" },
                 { id: "remain", answer: "남다", row: 1, col: 3, dir: "down" },
+                { id: "enough", answer: "충분하다", row: 2, col: 0, dir: "across" },
                 { id: "short", answer: "모자라다", row: 5, col: 0, dir: "across" }
             ]
         },
         {
             id: "set-3",
             title: "준비",
-            rows: 8,
-            cols: 8,
+            rows: 9,
+            cols: 10,
             words: [
-                { id: "decorate-room", answer: "방꾸미다", row: 0, col: 3, dir: "down" },
-                { id: "set-table", answer: "상차리다", row: 3, col: 0, dir: "across" },
-                { id: "prepare-gift", answer: "선물마련하다", row: 6, col: 1, dir: "across" },
-                { id: "treat-guest", answer: "손님대접하다", row: 2, col: 5, dir: "down" }
+                { id: "set-table", answer: "상을차리다", row: 0, col: 6, dir: "down", display: "(상을) 차리다" },
+                { id: "decorate-room", answer: "방을꾸미다", row: 1, col: 5, dir: "across", display: "(방을) 꾸미다" },
+                { id: "treat-guest", answer: "손님을대접하다", row: 2, col: 2, dir: "down", display: "(손님을) 대접하다" },
+                { id: "prepare-gift", answer: "선물을마련하다", row: 4, col: 0, dir: "across", display: "(선물을) 마련하다" }
             ]
         },
         {
             id: "set-4",
             title: "차림",
             rows: 7,
-            cols: 6,
+            cols: 7,
             words: [
-                { id: "dress-up", answer: "옷차려입다", row: 2, col: 0, dir: "across" },
-                { id: "wear-watch", answer: "시계차다", row: 0, col: 1, dir: "down" },
-                { id: "wear-tie", answer: "넥타이매다", row: 5, col: 0, dir: "across" },
-                { id: "wear-backpack", answer: "배낭매다", row: 3, col: 3, dir: "down" }
+                { id: "wear-backpack", answer: "배낭을메다", row: 0, col: 5, dir: "down", display: "(배낭을) 메다" },
+                { id: "wear-watch", answer: "시계를차다", row: 2, col: 3, dir: "down", display: "(시계를) 차다" },
+                { id: "wear-tie", answer: "넥타이를매다", row: 4, col: 0, dir: "across", display: "(넥타이를) 매다" },
+                { id: "dress-up", answer: "옷을차려입다", row: 5, col: 1, dir: "across", display: "(옷을) 차려입다" }
             ]
         },
         {
             id: "set-5",
             title: "잔치",
-            rows: 5,
-            cols: 5,
+            rows: 6,
+            cols: 6,
             words: [
                 { id: "first-birthday", answer: "돌잔치", row: 0, col: 0, dir: "across" },
-                { id: "earrings", answer: "귀고리하다", row: 3, col: 0, dir: "across" },
-                { id: "ring", answer: "반지끼다", row: 0, col: 4, dir: "down" }
+                { id: "ring", answer: "반지를끼다", row: 1, col: 3, dir: "down", display: "(반지를) 끼다" },
+                { id: "earrings", answer: "귀고리를하다", row: 3, col: 0, dir: "across", display: "(귀고리를) 하다" }
             ]
         }
     ];
@@ -129,13 +129,7 @@
         mobileBankToggle: document.getElementById("mobile-bank-toggle"),
         mobileBankMeta: document.getElementById("mobile-bank-meta"),
         mobileClueClose: document.getElementById("mobile-clue-close"),
-        mobileBankClose: document.getElementById("mobile-bank-close"),
-        manualInput: {
-            addEventListener() {},
-            blur() {},
-            focus() {},
-            value: ""
-        }
+        mobileBankClose: document.getElementById("mobile-bank-close")
     };
 
     const mobileQuery = window.matchMedia("(max-width: 640px)");
@@ -147,7 +141,8 @@
         wordCursorIndex: -1,
         openSheet: "",
         touchDrag: null,
-        ignoreNextTileClick: false
+        ignoreNextTileClick: false,
+        feedbackOverride: ""
     };
 
     function currentSet() {
@@ -174,8 +169,6 @@
         return getTileById(currentSet(), state.selectedTileId);
     }
 
-    function clearManualTarget() {}
-
     function modeFolder() {
         return state.imageMode === "easy" ? "/initials/" : "/masked/";
     }
@@ -186,6 +179,41 @@
 
     function wordLabel(word) {
         return `${word.dir === "across" ? "가로" : "세로"} ${word.number}번`;
+    }
+
+    function displayAnswer(word) {
+        return word.display || word.answer;
+    }
+
+    function clearFeedbackOverride() {
+        state.feedbackOverride = "";
+    }
+
+    function showPlacementError(row, col, tileId, wordIndex = -1) {
+        state.feedbackOverride = "맞는 칸에 놓아 보세요.";
+        flashTile(tileId, "is-wrong-flash");
+        flashCell(row, col, "is-cleared-flash");
+        if (wordIndex >= 0) {
+            flashWordSlot(wordIndex, "is-wrong-flash");
+        }
+        updateBankSelection();
+    }
+
+    function tryPlaceTileAt(row, col, tileId, options = {}) {
+        const set = currentSet();
+        const cell = set.cells[row]?.[col];
+        const tile = getTileById(set, tileId);
+        if (!cell || !tile || tile.used) {
+            return false;
+        }
+
+        const activeEntry = cell.entries.find((entry) => entry.wordId === set.activeWordId) || cell.entries[0];
+        if (tile.letter !== cell.solution) {
+            showPlacementError(row, col, tile.id, activeEntry?.index ?? -1);
+            return false;
+        }
+
+        return placeTileAt(row, col, tile.id, options);
     }
 
     function setWordValue(set, word) {
@@ -397,25 +425,6 @@
         flashElement(dom.wordTrack, className, duration);
     }
 
-    function updateMobileDock() {
-        const word = activeWord();
-        const tile = selectedTile();
-        dom.mobileClueMeta.textContent = word ? wordLabel(word) : "현재 낱말 보기";
-        dom.mobileBankMeta.textContent = tile ? `선택: ${tile.letter}` : "선택한 글자 없음";
-    }
-
-    function updateBankSelection() {
-        const tile = selectedTile();
-        if (!tile) {
-            dom.bankSelection.textContent = "선택한 글자 없음 · 글자를 누르거나 빈칸을 눌러 직접 입력해 보세요. 칸을 다시 누르면 글자가 돌아옵니다.";
-            updateMobileDock();
-            return;
-        }
-
-        dom.bankSelection.textContent = `선택한 글자: ${tile.letter} · 퍼즐 칸을 누르거나 끌어다 놓아 보세요.`;
-        updateMobileDock();
-    }
-
     function syncSelectedTileState() {
         dom.letterBank.querySelectorAll("[data-tile-id]").forEach((tileButton) => {
             tileButton.classList.toggle("is-selected", tileButton.dataset.tileId === state.selectedTileId);
@@ -425,9 +434,6 @@
 
     function setSelectedTile(tileId, animate = false) {
         state.selectedTileId = tileId || "";
-        if (state.selectedTileId) {
-            clearManualTarget();
-        }
         syncSelectedTileState();
         if (animate && state.selectedTileId) {
             flashTile(state.selectedTileId, "is-pick-flash");
@@ -531,7 +537,7 @@
                     if (!tileId) {
                         return;
                     }
-                    placeTileAt(row, col, tileId);
+                    tryPlaceTileAt(row, col, tileId, { source: "drag" });
                 });
 
                 dom.grid.appendChild(wrapper);
@@ -542,69 +548,12 @@
     function updateActiveClue() {
         const word = activeWord();
         const hint = hintCopyMap[word.answer];
-        dom.activeMeta.textContent = `${wordLabel(word)} · ${state.imageMode === "easy" ? "초성" : "마스킹"}`;
+        dom.activeMeta.textContent = `${wordLabel(word)} · ${word.answer.length}칸 · ${state.imageMode === "easy" ? "초성" : "마스킹"}`;
         dom.activeText.textContent = `한글: ${hint.ko}`;
         dom.activeClueVi.textContent = `Tiếng Việt: ${hint.vi}`;
         dom.activeImage.src = clueImageFor(word);
-        dom.activeImage.alt = `${hint.ko} 단서 그림`;
+        dom.activeImage.alt = `${displayAnswer(word)} 단서 그림`;
         updateMobileDock();
-    }
-
-    function refreshSolvedWords(set, activeBefore) {
-        const wasActiveSolved = set.solvedWords.has(activeBefore);
-        set.solvedWords.clear();
-
-        set.words.forEach((word) => {
-            if (setWordValue(set, word) === word.answer) {
-                set.solvedWords.add(word.id);
-            }
-        });
-
-        if (!set.activeWordId) {
-            set.activeWordId = set.words[0].id;
-            return;
-        }
-
-        if (set.solvedWords.has(activeBefore) && !wasActiveSolved) {
-            const nextWord = set.words.find((word) => !set.solvedWords.has(word.id));
-            if (nextWord) {
-                set.activeWordId = nextWord.id;
-            }
-        }
-    }
-
-    function findAvailableTileId(letter) {
-        const set = currentSet();
-        const tile = set.letterBank.find((item) => !item.used && item.letter === letter);
-        return tile ? tile.id : "";
-    }
-
-    function openManualInput(row, col) {
-        state.manualTargetKey = cellKey(row, col);
-        renderBoard();
-        closeMobileSheet();
-        focusManualInput();
-    }
-
-    function tryManualLetter(char) {
-        const trimmed = (char || "").trim();
-        if (!trimmed || !state.manualTargetKey) {
-            return;
-        }
-
-        const [rowText, colText] = state.manualTargetKey.split("-");
-        const row = Number(rowText);
-        const col = Number(colText);
-        const tileId = findAvailableTileId(trimmed);
-
-        if (!tileId) {
-            flashCell(row, col, "is-cleared-flash");
-            focusManualInput();
-            return;
-        }
-
-        placeTileAt(row, col, tileId);
-        dom.manualInput.value = "";
     }
 
     function releaseTile(tileId) {
@@ -615,90 +564,6 @@
         }
         tile.used = false;
         tile.cellKey = "";
-    }
-
-    function clearCell(row, col) {
-        const set = currentSet();
-        const cell = set.cells[row][col];
-        if (!cell || !cell.tileId) {
-            return;
-        }
-
-        const activeBefore = set.activeWordId;
-        const releasedTileId = cell.tileId;
-        clearManualTarget();
-        releaseTile(releasedTileId);
-        cell.tileId = "";
-        cell.value = "";
-        refreshSolvedWords(set, activeBefore);
-        renderBoard();
-        renderLetterBank();
-        syncSelectedTileState();
-        updateActiveClue();
-        flashCell(row, col, "is-cleared-flash");
-        flashTile(releasedTileId, "is-pick-flash");
-    }
-
-    function placeTileAt(row, col, tileId) {
-        const set = currentSet();
-        const cell = set.cells[row][col];
-        const tile = getTileById(set, tileId);
-        if (!cell || !tile || tile.used) {
-            return;
-        }
-
-        const activeBefore = set.activeWordId;
-        clearManualTarget();
-        if (cell.tileId) {
-            releaseTile(cell.tileId);
-        }
-
-        cell.tileId = tile.id;
-        cell.value = tile.letter;
-        tile.used = true;
-        tile.cellKey = cellKey(row, col);
-        setSelectedTile("");
-        refreshSolvedWords(set, activeBefore);
-        renderBoard();
-        renderLetterBank();
-        syncSelectedTileState();
-        updateActiveClue();
-        flashCell(row, col, "is-filled-flash");
-        flashTile(tile.id, "is-place-flash");
-        closeMobileSheet();
-    }
-
-    function selectWord(wordId) {
-        const set = currentSet();
-        set.activeWordId = wordId;
-        updateActiveClue();
-        renderBoard();
-    }
-
-    function handleCellActivate(row, col, event) {
-        const set = currentSet();
-        const cell = set.cells[row][col];
-        if (!cell) {
-            return;
-        }
-
-        const candidate = cell.entries.find((entry) => entry.wordId === set.activeWordId) || cell.entries[0];
-        selectWord(candidate.wordId);
-
-        if (state.selectedTileId) {
-            event.preventDefault();
-            placeTileAt(row, col, state.selectedTileId);
-            return;
-        }
-
-        if (cell.tileId) {
-            event.preventDefault();
-            clearCell(row, col);
-            return;
-        }
-
-        event.preventDefault();
-        openManualInput(row, col);
     }
 
     function findGridCellAt(x, y) {
@@ -762,15 +627,6 @@
         }
     }
 
-    function cleanupTouchDrag() {
-        clearTouchDropTarget();
-        if (state.touchDrag && state.touchDrag.ghost) {
-            state.touchDrag.ghost.remove();
-        }
-        dom.body.classList.remove("is-dragging-letter");
-        state.touchDrag = null;
-    }
-
     function finishTouchTileDrag(x, y) {
         if (!state.touchDrag || !state.touchDrag.started) {
             cleanupTouchDrag();
@@ -788,18 +644,8 @@
 
         const row = Number(target.dataset.row);
         const col = Number(target.dataset.col);
-        placeTileAt(row, col, tileId);
+        tryPlaceTileAt(row, col, tileId, { source: "touch" });
         return true;
-    }
-
-    function renderSet() {
-        clearManualTarget();
-        renderTabs();
-        renderModeButtons();
-        renderLetterBank();
-        syncSelectedTileState();
-        updateActiveClue();
-        renderBoard();
     }
 
     function renderWordTrack() {
@@ -861,10 +707,13 @@
 
         const remaining = remainingSlotCount(set, word);
         const cursorIndex = syncWordCursor();
-        dom.wordTrackLabel.textContent = `${wordLabel(word)} 입력`;
+        const particleNote = /[을를]/.test(word.answer) ? " · 조사 포함" : "";
+        dom.wordTrackLabel.textContent = `${wordLabel(word)} 입력${particleNote}`;
 
-        if (!remaining) {
-            dom.wordTrackHint.textContent = "완성했어요. 다른 낱말도 골라 보세요.";
+        if (state.feedbackOverride) {
+            dom.wordTrackHint.textContent = state.feedbackOverride;
+        } else if (!remaining) {
+            dom.wordTrackHint.textContent = `${displayAnswer(word)} 완성! 다른 낱말도 골라 보세요.`;
         } else if (cursorIndex >= 0) {
             dom.wordTrackHint.textContent = `${cursorIndex + 1}번째 칸부터 이어서 눌러 보세요.`;
         } else {
@@ -922,6 +771,8 @@
         const wasSolved = activeWordId ? set.solvedWords.has(activeWordId) : false;
         const activeEntry = cell.entries.find((entry) => entry.wordId === activeWordId) || null;
 
+        clearFeedbackOverride();
+
         if (cell.tileId) {
             releaseTile(cell.tileId);
         }
@@ -962,6 +813,7 @@
 
     function selectWord(wordId, cursorIndex = -1) {
         const set = currentSet();
+        clearFeedbackOverride();
         set.activeWordId = wordId;
         state.wordCursorIndex = cursorIndex;
         updateActiveClue();
@@ -1002,9 +854,7 @@
 
         const target = wordCellState(set, word, targetIndex);
         if (tile.letter !== target.solution) {
-            flashTile(tile.id, "is-wrong-flash");
-            flashWordSlot(target.index, "is-wrong-flash");
-            flashCell(target.row, target.col, "is-cleared-flash");
+            showPlacementError(target.row, target.col, tile.id, target.index);
             return false;
         }
 
@@ -1015,6 +865,7 @@
     }
 
     function renderSet() {
+        clearFeedbackOverride();
         state.wordCursorIndex = -1;
         renderTabs();
         renderModeButtons();
