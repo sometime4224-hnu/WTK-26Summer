@@ -21,17 +21,86 @@
 
     <script>
     const PREP_BASE = "../assets/c13/vocabulary/images/support/prep-actions/";
+    const PREP_TRANSFORM_BEFORE = "../assets/c13/vocabulary/images/support/prep-actions-transform/before/";
+    const PREP_TRANSFORM_AFTER = "../assets/c13/vocabulary/images/support/prep-actions-transform/after/";
+    const PREP_OVERLAP_BASE = "../assets/c13/vocabulary/images/support/prep-actions-overlap/";
+    const PREP_VERBS = [
+        { id: "decorate", label: "꾸미다", summary: "공간을 보기 좋게 만들다" },
+        { id: "set", label: "차리다", summary: "먹을 수 있도록 상을 준비하다" },
+        { id: "prepare", label: "마련하다", summary: "필요한 것을 미리 준비하다" },
+        { id: "treat", label: "대접하다", summary: "사람을 정성껏 맞이하다" }
+    ];
+    const PREP_VERB_BY_ID = Object.fromEntries(PREP_VERBS.map((verb) => [verb.id, verb]));
+    function prepTransformItem(id, label, objectPhrase, answer, hint) {
+        const verb = PREP_VERB_BY_ID[answer];
+        return {
+            id,
+            label,
+            objectPhrase,
+            answer,
+            completePhrase: `${objectPhrase} ${verb.label}`,
+            beforeImage: PREP_TRANSFORM_BEFORE + id + ".webp",
+            afterImage: PREP_TRANSFORM_AFTER + id + ".webp",
+            beforeAlt: `${objectPhrase} ${verb.label} 전 장면`,
+            afterAlt: `${objectPhrase} ${verb.label} 후 장면`,
+            hint,
+            feedback: `정답: ${objectPhrase} ${verb.label}. ${hint}`,
+            wrongFeedback: `${label}에는 {choice}보다 ${verb.label}가 자연스러워요.`
+        };
+    }
+    const PREP_TRANSFORM_ITEMS = [
+        prepTransformItem("room", "방", "방을", "decorate", "공간이 보기 좋게 바뀌었습니다."),
+        prepTransformItem("living-room", "거실", "거실을", "decorate", "거실에 장식을 더해 분위기를 만들었습니다."),
+        prepTransformItem("classroom-wall", "교실 벽", "교실 벽을", "decorate", "벽을 장식해 교실 분위기를 바꾸었습니다."),
+        prepTransformItem("event-hall", "행사장", "행사장을", "decorate", "행사 분위기에 맞게 공간을 꾸몄습니다."),
+        prepTransformItem("low-table", "상", "상을", "set", "음식과 그릇을 놓아 먹을 수 있게 했습니다."),
+        prepTransformItem("meal-table", "밥상", "밥상을", "set", "밥과 반찬을 놓아 식사할 수 있게 했습니다."),
+        prepTransformItem("birthday-table", "생일상", "생일상을", "set", "생일 음식과 케이크를 올려 준비했습니다."),
+        prepTransformItem("dining-table", "식탁", "식탁을", "set", "식탁에 음식과 그릇을 놓았습니다."),
+        prepTransformItem("gift", "선물", "선물을", "prepare", "필요한 선물을 미리 준비했습니다."),
+        prepTransformItem("souvenir", "기념품", "기념품을", "prepare", "나누어 줄 물건을 미리 준비했습니다."),
+        prepTransformItem("venue", "장소", "장소를", "prepare", "모임에 필요한 공간을 미리 준비했습니다."),
+        prepTransformItem("refreshments", "다과", "다과를", "prepare", "차와 간식을 미리 준비했습니다."),
+        prepTransformItem("guest", "손님", "손님을", "treat", "음식과 차로 정성껏 맞이했습니다."),
+        prepTransformItem("older-adult", "어른", "어른을", "treat", "예의를 갖춰 음식과 차를 내었습니다."),
+        prepTransformItem("friend", "친구", "친구를", "treat", "친구에게 간식과 음료를 내었습니다."),
+        prepTransformItem("visitor", "방문객", "방문객을", "treat", "방문객에게 차와 간식을 내며 맞이했습니다.")
+    ];
+    const PREP_CHECK_PROMPTS = {
+        "low-table": "음식과 그릇을 놓아 먹을 수 있게 준비합니다.",
+        "birthday-table": "생일 음식을 차려 놓는 상황입니다.",
+        gift: "필요한 선물을 미리 준비합니다.",
+        venue: "모임에 필요한 장소를 미리 준비합니다.",
+        guest: "손님에게 음식과 정성으로 잘 맞이합니다.",
+        "older-adult": "어른에게 음식을 내고 예의를 갖춰 맞이합니다.",
+        room: "공간을 보기 좋게 장식합니다.",
+        "event-hall": "모임 분위기에 맞게 공간을 장식합니다."
+    };
+    const PREP_CHECK = ["low-table", "birthday-table", "gift", "venue", "guest", "older-adult", "room", "event-hall"].map((id) => {
+        const item = PREP_TRANSFORM_ITEMS.find((candidate) => candidate.id === id);
+        return {
+            ...item,
+            id: `check-${id}`,
+            title: `${item.objectPhrase} ___`,
+            prompt: PREP_CHECK_PROMPTS[id],
+            options: PREP_VERBS,
+            hint: "전 상태에서 알맞은 동사를 고르면 이미지가 바뀝니다."
+        };
+    });
     window.C13_SUPPORT_ACTIVITY = {
-        type: "verb-object-sort",
+        type: "verb-image-transform",
+        showLearn: false,
         title: "준비·대접 동작",
-        subtitle: "목적어와 동사를 함께 보며 꾸미다, 차리다, 마련하다, 대접하다의 차이를 익힙니다.",
+        subtitle: "동사를 목적어 이미지에 넣어 전 상태가 어떻게 바뀌는지 확인합니다.",
         learnTitle: "동사의 중심 의미",
         learnNote: "네 동사는 모두 준비와 관련이 있지만, 목적어가 달라지면 쓰임이 분명해집니다.",
-        practiceTitle: "목적어를 동사 칸에 배치하기",
-        practiceNote: "카드를 하나 고른 뒤 어울리는 동사 칸을 누르세요.",
-        checkTitle: "문장 완성 점검",
-        checkNote: "문장의 목적어와 의미를 보고 가장 자연스러운 동사를 고릅니다.",
-        options: ["꾸미다", "차리다", "마련하다", "대접하다"],
+        practiceTitle: "동사를 이미지에 넣기",
+        practiceNote: "동사를 선택하거나 끌어서 목적어 이미지에 넣으세요. 정답이면 이미지가 후 상태로 바뀝니다.",
+        contrastTitle: "같은 명사, 다른 초점",
+        contrastNote: "음식·식사·다과처럼 세 동사와 모두 어울릴 수 있는 명사는 동사에 따라 장면의 초점이 달라집니다.",
+        checkTitle: "이미지 변화 점검",
+        checkNote: "전 상태 이미지를 보고 가장 자연스러운 동사를 고릅니다.",
+        options: PREP_VERBS,
         learnCards: [
             {
                 label: "꾸미다",
@@ -66,123 +135,113 @@
                 note: "손님이나 어른에게 음식을 내고 정성껏 맞이할 때 씁니다."
             }
         ],
-        match: {
-            id: "prep-actions",
-            bankTitle: "목적어 카드",
-            bankNote: "목적어를 고른 뒤 알맞은 동사 칸에 넣으세요.",
-            targetTitle: "동사 칸",
-            targetNote: "동사의 의미와 잘 어울리는 목적어를 모아 보세요.",
-            hint: "카드를 먼저 고른 다음 어울리는 동사 칸을 누르세요.",
-            targets: [
-                { id: "decorate", label: "꾸미다", summary: "공간을 보기 좋게 만들다" },
-                { id: "set", label: "차리다", summary: "먹을 수 있도록 상을 준비하다" },
-                { id: "prepare", label: "마련하다", summary: "필요한 것을 미리 준비하다" },
-                { id: "treat", label: "대접하다", summary: "사람을 정성껏 맞이하다" }
-            ],
-            items: [
-                { id: "room", label: "방", answer: "decorate", image: PREP_BASE + "room.webp", alt: "방" },
-                { id: "living-room", label: "거실", answer: "decorate", image: PREP_BASE + "living-room.webp", alt: "거실" },
-                { id: "classroom-wall", label: "교실 벽", answer: "decorate", image: PREP_BASE + "classroom-wall.webp", alt: "교실 벽" },
-                { id: "event-hall", label: "행사장", answer: "decorate", image: PREP_BASE + "event-hall.webp", alt: "행사장" },
-                { id: "low-table", label: "상", answer: "set", image: PREP_BASE + "low-table.webp", alt: "상" },
-                { id: "meal-table", label: "밥상", answer: "set", image: PREP_BASE + "meal-table.webp", alt: "밥상" },
-                { id: "birthday-table", label: "생일상", answer: "set", image: PREP_BASE + "birthday-table.webp", alt: "생일상" },
-                { id: "dining-table", label: "식탁", answer: "set", image: PREP_BASE + "dining-table.webp", alt: "식탁" },
-                { id: "gift", label: "선물", answer: "prepare", image: PREP_BASE + "gift.webp", alt: "선물" },
-                { id: "souvenir", label: "기념품", answer: "prepare", image: PREP_BASE + "souvenir.webp", alt: "기념품" },
-                { id: "venue", label: "장소", answer: "prepare", image: PREP_BASE + "venue.webp", alt: "장소" },
-                { id: "refreshments", label: "다과", answer: "prepare", image: PREP_BASE + "refreshments.webp", alt: "다과" },
-                { id: "guest", label: "손님", answer: "treat", image: PREP_BASE + "guest.webp", alt: "손님" },
-                { id: "older-adult", label: "어른", answer: "treat", image: PREP_BASE + "older-adult.webp", alt: "어른" },
-                { id: "friend", label: "친구", answer: "treat", image: PREP_BASE + "friend.webp", alt: "친구" },
-                { id: "visitor", label: "방문객", answer: "treat", image: PREP_BASE + "visitor.webp", alt: "방문객" }
+        transform: {
+            id: "prep-actions-transform",
+            verbTitle: "넣을 동사",
+            verbNote: "동사를 누른 뒤 목적어 이미지를 누르거나, 동사를 이미지 위로 끌어 놓으세요.",
+            hint: "동사를 고른 뒤 목적어 이미지에 넣어 보세요.",
+            verbs: PREP_VERBS,
+            items: PREP_TRANSFORM_ITEMS
+        },
+        contrast: {
+            summary: "차리다는 상 위에 보기 좋게 놓는 장면, 마련하다는 필요한 것을 미리 갖추는 장면, 대접하다는 사람에게 내며 맞이하는 장면에 초점이 있습니다.",
+            groups: [
+                {
+                    id: "food",
+                    label: "음식",
+                    note: "음식은 세 동사 모두와 어울리지만, 장면이 가리키는 행동의 중심이 달라집니다.",
+                    scenes: [
+                        {
+                            id: "food-set",
+                            phrase: "음식을 차리다",
+                            focus: "상 위에 배열",
+                            note: "먹을 수 있게 음식과 그릇을 놓는 장면입니다.",
+                            image: PREP_OVERLAP_BASE + "food-set.webp",
+                            alt: "음식을 차린 식탁"
+                        },
+                        {
+                            id: "food-prepare",
+                            phrase: "음식을 마련하다",
+                            focus: "미리 갖추기",
+                            note: "행사나 손님을 위해 음식을 준비해 둔 장면입니다.",
+                            image: PREP_OVERLAP_BASE + "food-prepare.webp",
+                            alt: "음식을 미리 마련한 준비대"
+                        },
+                        {
+                            id: "food-treat",
+                            phrase: "음식을 대접하다",
+                            focus: "사람에게 내기",
+                            note: "손님에게 음식을 내며 정성껏 맞이하는 장면입니다.",
+                            image: PREP_OVERLAP_BASE + "food-treat.webp",
+                            alt: "손님에게 음식을 대접하는 장면"
+                        }
+                    ]
+                },
+                {
+                    id: "meal",
+                    label: "식사",
+                    note: "식사는 한 끼를 차려 놓을 수도, 미리 준비할 수도, 누군가에게 대접할 수도 있습니다.",
+                    scenes: [
+                        {
+                            id: "meal-set",
+                            phrase: "식사를 차리다",
+                            focus: "한 끼를 차려 놓기",
+                            note: "식탁에 한 끼 음식과 식기를 놓아 둔 장면입니다.",
+                            image: PREP_OVERLAP_BASE + "meal-set.webp",
+                            alt: "식사를 차린 식탁"
+                        },
+                        {
+                            id: "meal-prepare",
+                            phrase: "식사를 마련하다",
+                            focus: "필요한 한 끼 준비",
+                            note: "여러 사람이 먹을 식사를 미리 준비해 둔 장면입니다.",
+                            image: PREP_OVERLAP_BASE + "meal-prepare.webp",
+                            alt: "식사를 미리 마련한 준비대"
+                        },
+                        {
+                            id: "meal-treat",
+                            phrase: "식사를 대접하다",
+                            focus: "초대해 먹게 하기",
+                            note: "손님에게 한 끼를 내며 환대하는 장면입니다.",
+                            image: PREP_OVERLAP_BASE + "meal-treat.webp",
+                            alt: "손님에게 식사를 대접하는 장면"
+                        }
+                    ]
+                },
+                {
+                    id: "refreshments",
+                    label: "다과",
+                    note: "다과는 차와 간식을 놓는지, 미리 갖추는지, 손님에게 내는지에 따라 동사가 달라집니다.",
+                    scenes: [
+                        {
+                            id: "refreshments-set",
+                            phrase: "다과를 차리다",
+                            focus: "상에 놓기",
+                            note: "차와 간식을 상 위에 보기 좋게 놓은 장면입니다.",
+                            image: PREP_OVERLAP_BASE + "refreshments-set.webp",
+                            alt: "다과를 차린 테이블"
+                        },
+                        {
+                            id: "refreshments-prepare",
+                            phrase: "다과를 마련하다",
+                            focus: "미리 준비",
+                            note: "손님이 오기 전에 다과를 준비해 둔 장면입니다.",
+                            image: PREP_OVERLAP_BASE + "refreshments-prepare.webp",
+                            alt: "다과를 미리 마련한 준비대"
+                        },
+                        {
+                            id: "refreshments-treat",
+                            phrase: "다과를 대접하다",
+                            focus: "손님에게 내기",
+                            note: "방문객에게 차와 간식을 내는 장면입니다.",
+                            image: PREP_OVERLAP_BASE + "refreshments-treat.webp",
+                            alt: "손님에게 다과를 대접하는 장면"
+                        }
+                    ]
+                }
             ]
         },
-        check: [
-            {
-                id: "check-set-table",
-                title: "상을 ___",
-                prompt: "음식과 그릇을 놓아 먹을 수 있게 준비합니다.",
-                answer: "차리다",
-                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
-                image: PREP_BASE + "low-table.webp",
-                alt: "음식이 놓인 상",
-                feedback: "정답: 상을 차리다. 먹을 수 있게 상을 준비합니다.",
-                wrongFeedback: "상이나 식탁에는 보통 차리다를 씁니다."
-            },
-            {
-                id: "check-birthday-table",
-                title: "생일상을 ___",
-                prompt: "생일 음식을 차려 놓는 상황입니다.",
-                answer: "차리다",
-                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
-                image: PREP_BASE + "birthday-table.webp",
-                alt: "생일상",
-                feedback: "정답: 생일상을 차리다."
-            },
-            {
-                id: "check-gift",
-                title: "선물을 ___",
-                prompt: "필요한 선물을 미리 준비합니다.",
-                answer: "마련하다",
-                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
-                image: PREP_BASE + "gift.webp",
-                alt: "선물",
-                feedback: "정답: 선물을 마련하다. 필요한 것을 미리 준비한다는 뜻입니다.",
-                wrongFeedback: "선물처럼 필요한 물건을 미리 준비할 때는 마련하다가 자연스럽습니다."
-            },
-            {
-                id: "check-venue",
-                title: "장소를 ___",
-                prompt: "모임에 필요한 장소를 미리 준비합니다.",
-                answer: "마련하다",
-                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
-                image: PREP_BASE + "venue.webp",
-                alt: "행사 장소",
-                feedback: "정답: 장소를 마련하다."
-            },
-            {
-                id: "check-guest",
-                title: "손님을 ___",
-                prompt: "손님에게 음식과 정성으로 잘 맞이합니다.",
-                answer: "대접하다",
-                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
-                image: PREP_BASE + "guest.webp",
-                alt: "손님을 맞이하는 장면",
-                feedback: "정답: 손님을 대접하다. 사람을 정성껏 맞이합니다.",
-                wrongFeedback: "손님이나 어른처럼 사람에게는 대접하다가 어울립니다."
-            },
-            {
-                id: "check-older-adult",
-                title: "어른을 ___",
-                prompt: "어른에게 음식을 내고 예의를 갖춰 맞이합니다.",
-                answer: "대접하다",
-                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
-                image: PREP_BASE + "older-adult.webp",
-                alt: "어른을 대접하는 장면",
-                feedback: "정답: 어른을 대접하다."
-            },
-            {
-                id: "check-room",
-                title: "방을 ___",
-                prompt: "공간을 보기 좋게 장식합니다.",
-                answer: "꾸미다",
-                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
-                image: PREP_BASE + "room.webp",
-                alt: "방",
-                feedback: "정답: 방을 꾸미다. 공간을 예쁘게 만듭니다."
-            },
-            {
-                id: "check-event-hall",
-                title: "행사장을 ___",
-                prompt: "모임 분위기에 맞게 공간을 장식합니다.",
-                answer: "꾸미다",
-                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
-                image: PREP_BASE + "event-hall.webp",
-                alt: "행사장",
-                feedback: "정답: 행사장을 꾸미다."
-            }
-        ]
+        check: PREP_CHECK
     };
     </script>
     <script src="vocab-support-activity.js"></script>
