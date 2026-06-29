@@ -36,8 +36,12 @@ const pages = [
   {
     path: '/c12/grammar4.html',
     title: '-아야/어야',
+    visual: true,
+    storyCount: 4,
     resources: [
-      { href: 'grammar4-form-typing.html', text: '활용형·문장 완성' }
+      { href: 'grammar4-support-activity1.html', text: '보조활동 1' },
+      { href: 'grammar4-form-typing.html', text: '활용형·문장 완성' },
+      { href: 'grammar4-classic.html', text: '기존 버전' }
     ]
   }
 ];
@@ -119,7 +123,7 @@ async function answerCurrentQuestionWrong(page) {
 
   const wrongChoice = await page.evaluate(() => {
     const prompt = document.getElementById('qText').textContent;
-    const config = window.C12_GRAMMAR_PAGE || window.C12_GRAMMAR1_VISUAL_PROTOTYPE || window.C12_GRAMMAR2_VISUAL_PAGE;
+    const config = window.C12_GRAMMAR_PAGE || window.C12_GRAMMAR1_VISUAL_PROTOTYPE || window.C12_GRAMMAR2_VISUAL_PAGE || window.C12_GRAMMAR4_VISUAL_PAGE;
     const item = config.quiz.find((q) => q.q === prompt);
     const choices = Array.from(document.querySelectorAll('#choices button')).map((button) => button.textContent);
     return choices.find((choice) => choice !== item.answer) || choices[0];
@@ -221,6 +225,39 @@ test('c12 grammar2 classic version remains available with the old structure', as
   await expect(page.locator('[data-multilang-btn="vi"]')).toBeVisible();
   await page.locator('[data-multilang-btn="vi"]').click();
   await expectOnlyScaffoldLanguageVisible(page, 'vi');
+});
+
+test('c12 grammar4 classic version remains available with the old structure', async ({ page }) => {
+  await blockExternalRequests(page);
+  await page.goto('/c12/grammar4-classic.html', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('h1')).toContainText('-아야/어야');
+  await expect(page.locator('.hero-panel')).toBeVisible();
+  await expect(page.locator('#learnPanel')).toBeVisible();
+  await expect(page.locator('#tabLearn')).toBeVisible();
+  await expect(page.locator('a[href="grammar4.html"]')).toContainText('새 버전');
+
+  await expect(page.locator('[data-multilang-btn="vi"]')).toBeVisible();
+  await page.locator('[data-multilang-btn="vi"]').click();
+  await expectOnlyScaffoldLanguageVisible(page, 'vi');
+});
+
+test('c12 grammar4 visual page integrates support images and fullscreen viewing', async ({ page }) => {
+  await blockExternalRequests(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/c12/grammar4.html', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('.story-card')).toHaveCount(4);
+  await expect(page.locator('.fullscreen-btn')).toHaveCount(4);
+  const firstImage = page.locator('.story-card').first().locator('.story-media img');
+  await expect(firstImage).toHaveAttribute('src', /grammar4-support-activity1\/01-core-meaning\.webp$/);
+  await expect.poll(async () => firstImage.evaluate((img) => img.complete && img.naturalWidth === 1448)).toBe(true);
+
+  await page.locator('.fullscreen-btn').first().click();
+  await expect(page.locator('#imageLightbox')).toBeVisible();
+  await expect(page.locator('#lightboxImage')).toHaveAttribute('src', /01-core-meaning\.webp$/);
+  await page.locator('#lightboxCloseBtn').click();
+  await expect(page.locator('#imageLightbox')).toBeHidden();
 });
 
 test('c12 grammar main pages support all scaffold languages', async ({ page }) => {

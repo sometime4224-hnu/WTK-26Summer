@@ -34,6 +34,15 @@
         return `${parts[parts.length - 2]}/${parts[parts.length - 1]}`;
     }
 
+    function getEntryForCurrentPage() {
+        const key = getPageKey();
+        if (DATA[key]) return DATA[key];
+
+        const classicKey = key.replace(/-classic\.html$/, ".html");
+        if (classicKey !== key && DATA[classicKey]) return DATA[classicKey];
+        return null;
+    }
+
     function escapeHtml(value) {
         return String(value == null ? "" : value)
             .replace(/&/g, "&amp;")
@@ -205,7 +214,7 @@
     }
 
     function init() {
-        const entry = DATA[getPageKey()];
+        const entry = getEntryForCurrentPage();
         if (!entry || document.querySelector("[data-multilang-scaffold='auto']")) return;
 
         const languages = getLanguages(entry);
