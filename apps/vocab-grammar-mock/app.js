@@ -1,9 +1,9 @@
 const ROUND_LINKS = [
-    { id: "1", href: "./round1.html", label: "1회차" },
-    { id: "2", href: "./round2.html", label: "2회차" },
-    { id: "3", href: "./round3.html", label: "3회차" },
-    { id: "4", href: "./round4.html", label: "4회차" },
-    { id: "marathon30", href: "./marathon30.html", label: "30문제 마라톤" }
+    { id: "1", href: "./round1.html", label: "1회차", enabled: true },
+    { id: "2", href: "./round2.html", label: "2회차", enabled: true },
+    { id: "3", href: "./round3.html", label: "3회차", enabled: false },
+    { id: "4", href: "./round4.html", label: "4회차", enabled: false },
+    { id: "marathon30", href: "./marathon30.html", label: "30문제 마라톤", enabled: false }
 ];
 
 const STORAGE_NAMESPACE = "vocab-grammar-mock";
@@ -1364,6 +1364,7 @@ function renderLandingIndex() {
     if (!container) return;
 
     container.innerHTML = ROUND_LINKS.map((round) => {
+        const isEnabled = round.enabled !== false;
         const totalQuestions = getRoundQuestionTotal(round.id);
         const savedSelections = readStoredSelections(getRoundStorageKey(round.id));
         const answeredCount = Object.keys(savedSelections).length;
@@ -1374,17 +1375,36 @@ function renderLandingIndex() {
         const progressText = answeredCount > 0
             ? `이어 풀기 ${answeredCount}/${totalQuestions}`
             : `진행 0/${totalQuestions}`;
-        const stateText = answeredCount > 0 ? "이어 풀기 가능" : summary.attempts > 0 ? "다시 풀기" : "새로 시작";
-        const cardClass = answeredCount > 0 ? " is-in-progress" : summary.attempts > 0 ? " is-attempted" : "";
+        const stateText = isEnabled
+            ? answeredCount > 0 ? "이어 풀기 가능" : summary.attempts > 0 ? "다시 풀기" : "새로 시작"
+            : "비활성화";
+        const cardClass = isEnabled
+            ? answeredCount > 0 ? " is-in-progress" : summary.attempts > 0 ? " is-attempted" : ""
+            : " is-disabled";
+        const cardBody = `
+                <span class="round-card__label">${round.label}</span>
+                <span class="round-card__badge">${stateText}</span>
+                ${isEnabled
+                    ? `
+                        <span class="round-card__status">${attemptText}</span>
+                        <span class="round-card__status">${bestText}</span>
+                        <span class="round-card__status">${averageText}</span>
+                        <span class="round-card__status">${progressText}</span>
+                    `
+                    : '<span class="round-card__status">현재 1~2회차만 열려 있습니다.</span>'}
+        `;
+
+        if (!isEnabled) {
+            return `
+                <article class="round-card${cardClass}" aria-disabled="true">
+                    ${cardBody}
+                </article>
+            `;
+        }
 
         return `
             <a class="round-card${cardClass}" href="${round.href}">
-                <span class="round-card__label">${round.label}</span>
-                <span class="round-card__badge">${stateText}</span>
-                <span class="round-card__status">${attemptText}</span>
-                <span class="round-card__status">${bestText}</span>
-                <span class="round-card__status">${averageText}</span>
-                <span class="round-card__status">${progressText}</span>
+                ${cardBody}
             </a>
         `;
     }).join("");
@@ -1397,6 +1417,13 @@ function renderRoundNav() {
     const currentRound = document.body.dataset.roundId;
     container.innerHTML = ROUND_LINKS.map((round) => {
         const activeClass = round.id === currentRound ? " is-active" : "";
+        if (round.enabled === false) {
+            return `
+                <span class="${`is-disabled${activeClass}`.trim()}" aria-disabled="true">
+                    <span>${round.label}</span>
+                </span>
+            `;
+        }
         return `
             <a href="${round.href}" class="${activeClass.trim()}">
                 <span>${round.label}</span>
