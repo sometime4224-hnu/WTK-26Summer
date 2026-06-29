@@ -154,13 +154,15 @@ test.describe("c13 vocabulary support activities", () => {
     await expect(giftImage).toHaveAttribute("src", /before\/gift\.webp$/);
 
     await page.locator('[data-transform-verb="set"]').click();
-    await expect(gift).toHaveClass(/is-ready-target/);
+    await expect(gift).not.toHaveClass(/is-ready-target/);
     await expect(page.locator('[data-transform-card="low-table"]')).toHaveClass(/is-ready-target/);
     await gift.click();
     await expect(page.locator(".transform-feedback")).toHaveClass(/is-wrong/);
     await expect(giftImage).toHaveAttribute("src", /before\/gift\.webp$/);
 
     await page.locator('[data-transform-verb="prepare"]').click();
+    await expect(gift).toHaveClass(/is-ready-target/);
+    await expect(page.locator('[data-transform-card="low-table"]')).not.toHaveClass(/is-ready-target/);
     await gift.click();
     await expect(page.locator(".transform-feedback")).toHaveClass(/is-correct/);
     await expect(giftImage).toHaveAttribute("src", /after\/gift\.webp$/);

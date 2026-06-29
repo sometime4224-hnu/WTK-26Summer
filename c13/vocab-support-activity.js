@@ -578,10 +578,10 @@
         });
     }
 
-    function updateTransformTargetHints(board, active) {
+    function updateTransformTargetHints(board, active, verbId = selectedTransformVerb) {
         if (!board) return;
         board.querySelectorAll("[data-transform-card]").forEach((card) => {
-            const ready = active && card.dataset.solved !== "true" && !card.disabled;
+            const ready = active && card.dataset.answer === verbId && card.dataset.solved !== "true" && !card.disabled;
             card.classList.toggle("is-ready-target", ready);
             if (!ready) card.classList.remove("is-drop-target");
         });
@@ -595,7 +595,7 @@
             candidate.setAttribute("aria-pressed", String(selected));
             candidate.classList.toggle("is-selected", selected);
         });
-        updateTransformTargetHints(board, true);
+        updateTransformTargetHints(board, true, selectedTransformVerb);
         const verb = transformVerbById(selectedTransformVerb);
         if (board && verb) setTransformFeedback(board, `${verb.label}: 넣을 목적어 이미지를 선택하세요.`, "");
     }
