@@ -143,6 +143,16 @@ a { color: inherit; }
     background: #fafbfc;
 }
 
+.homework-panel.is-name-missing {
+    border-color: #dc2626;
+    background: #fff7ed;
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12), 0 12px 28px rgba(127, 29, 29, 0.12);
+}
+
+.homework-panel.is-attention {
+    animation: homeworkAttention 0.8s ease 0s 2;
+}
+
 .homework-panel__text {
     min-width: 0;
 }
@@ -157,6 +167,11 @@ a { color: inherit; }
     color: var(--brand);
     font-size: 0.78rem;
     font-weight: 800;
+}
+
+.homework-panel.is-name-missing .homework-panel__badge {
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 .homework-panel h2 {
@@ -198,9 +213,24 @@ a { color: inherit; }
     border-color: var(--brand);
 }
 
+.homework-panel.is-name-missing .student-name-field span {
+    color: #b91c1c;
+}
+
+.homework-panel.is-name-missing .student-name-field input {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.14);
+}
+
+.homework-panel.is-name-missing .student-name-field input:focus {
+    outline: 4px solid rgba(220, 38, 38, 0.16);
+    border-color: #b91c1c;
+}
+
 .homework-status {
     grid-column: 1 / -1;
     min-height: 32px;
+    border: 1px solid transparent;
     padding: 8px 10px;
     border-radius: 10px;
     background: #fff;
@@ -210,16 +240,25 @@ a { color: inherit; }
 }
 
 .homework-status.is-pending {
+    border-color: #f59e0b;
     background: #fff8e5;
     color: #7a4d00;
 }
 
+.homework-status.is-ready {
+    border-color: #06b6d4;
+    background: #ecfeff;
+    color: #0e7490;
+}
+
 .homework-status.is-success {
+    border-color: #86efac;
     background: var(--good);
     color: #176332;
 }
 
 .homework-status.is-error {
+    border-color: #fca5a5;
     background: var(--bad);
     color: #9f1c1c;
 }
@@ -305,6 +344,14 @@ a { color: inherit; }
     border-color: var(--brand);
     background: var(--brand);
     color: #fff;
+}
+
+.action-button.is-ready-to-submit {
+    border-color: #0f766e;
+    background: #0f766e;
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.16), 0 12px 24px rgba(15, 118, 110, 0.2);
+    animation: submitPulse 1.05s ease-in-out infinite;
 }
 
 .section-stack {
@@ -640,6 +687,7 @@ a { color: inherit; }
         grid-template-columns: minmax(0, 1fr) 174px;
         gap: 14px;
         align-items: start;
+        grid-auto-flow: dense;
     }
 
     .quiz-panel > .toolbar,
@@ -876,5 +924,28 @@ body.has-summary-modal {
         margin: 12px -10px -10px;
         padding: 10px;
         border-top: 1px solid var(--line);
+    }
+}
+
+@keyframes homeworkAttention {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    35% {
+        transform: translateY(-2px);
+        box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.18), 0 16px 34px rgba(127, 29, 29, 0.16);
+    }
+}
+
+@keyframes submitPulse {
+    0%,
+    100% {
+        box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.16), 0 12px 24px rgba(15, 118, 110, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 0 7px rgba(15, 118, 110, 0.08), 0 16px 30px rgba(15, 118, 110, 0.24);
     }
 }

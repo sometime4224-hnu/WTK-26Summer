@@ -7,6 +7,13 @@
 
     if (!root) return;
 
+    const registry = normalizeRegistry(window.HOMEWORK_DASHBOARD_REGISTRY);
+    const requestedAssignmentId = new URLSearchParams(window.location.search).get("assignment") || "";
+    const selectedRegistryAssignment = requestedAssignmentId
+        ? findRegistryAssignment(requestedAssignmentId)
+        : null;
+    const unknownRegistryAssignment = Boolean(registry && requestedAssignmentId && !selectedRegistryAssignment);
+
     const state = {
         user: null,
         submissions: [],
@@ -52,7 +59,61 @@
         return "low";
     }
 
+    function normalizeRegistry(source) {
+        if (!source || !Array.isArray(source.groups)) return null;
+        const groups = source.groups
+            .map(function (group) {
+                const assignments = Array.isArray(group.assignments)
+                    ? group.assignments.map(function (assignment) {
+                        return normalizeRegistryAssignment(assignment, group);
+                    }).filter(Boolean)
+                    : [];
+                return Object.assign({}, group, { assignments });
+            })
+            .filter(function (group) {
+                return group.assignments.length > 0;
+            });
+
+        if (!groups.length) return null;
+        return Object.assign({
+            title: "제출 통계",
+            description: "수집된 제출 현황을 활동별로 확인합니다."
+        }, source, { groups });
+    }
+
+    function normalizeRegistryAssignment(assignment, group) {
+        if (!assignment || !assignment.assignmentId) return null;
+        const title = assignment.title || assignment.assignmentTitle || assignment.assignmentId;
+        return Object.assign({}, assignment, {
+            assignmentId: String(assignment.assignmentId),
+            assignmentTitle: title,
+            title,
+            chapter: String(assignment.chapter || ""),
+            totalQuestions: Number(assignment.totalQuestions) || 0,
+            roster: Array.isArray(assignment.roster) ? assignment.roster : [],
+            groupId: group.id || "",
+            groupTitle: group.title || ""
+        });
+    }
+
+    function findRegistryAssignment(assignmentId) {
+        if (!registry) return null;
+        const normalizedId = String(assignmentId || "");
+        for (const group of registry.groups) {
+            const match = group.assignments.find(function (assignment) {
+                return assignment.assignmentId === normalizedId;
+            });
+            if (match) return match;
+        }
+        return null;
+    }
+
+    function isRegistryMode() {
+        return Boolean(registry);
+    }
+
     function getAssignment() {
+        if (selectedRegistryAssignment) return selectedRegistryAssignment;
         return Object.assign({
             assignmentId: "c12-review-quiz-v1",
             assignmentTitle: "12과 어휘·문법 복습",
@@ -152,6 +213,109 @@
         return Array.from(seen.entries()).map(function ([name, submission]) {
             return Object.assign({ displayName: name }, submission);
         });
+    }
+
+    function resolveSiteHref(href) {
+        const value = String(href || "");
+        if (!value || /^(?:[a-z][a-z0-9+.-]*:|#|\/)/i.test(value)) return value;
+        const depth = Math.max(0, window.location.pathname.split("/").filter(Boolean).length - 1);
+        return `${"../".repeat(depth)}${value}`;
+    }
+
+    function renderRegistryBackLink() {
+        if (!isRegistryMode()) return "";
+        return `
+            <div class="dashboard-context">
+                <a href="./index.html">통계 목록</a>
+                <span>${escapeHtml(getAssignment().groupTitle || "활동")}</span>
+            </div>
+        `;
+    }
+
+    function renderRegistryGroups() {
+        if (!registry) return "";
+        return `
+            <section class="assignment-picker" aria-label="통계 활동 선택">
+                ${registry.groups.map(function (group) {
+                    const labelId = `assignmentGroup-${group.id || group.title}`;
+                    return `
+                        <section class="assignment-group" aria-labelledby="${escapeHtml(labelId)}">
+                            <div class="assignment-group__head">
+                                <h2 id="${escapeHtml(labelId)}">${escapeHtml(group.title || "활동")}</h2>
+                            </div>
+                            <div class="assignment-grid">
+                                ${group.assignments.map(function (assignment) {
+                                    return `
+                                        <article class="assignment-card" data-assignment-card="${escapeHtml(assignment.assignmentId)}">
+                                            <div class="assignment-card__meta">
+                                                <span>${escapeHtml(assignment.chapter || assignment.groupTitle || "통계")}</span>
+                                                <b>${assignment.totalQuestions ? `${assignment.totalQuestions}문항` : "문항 수 미정"}</b>
+                                            </div>
+                                            <h3>${escapeHtml(assignment.title)}</h3>
+                                            <p>${escapeHtml(assignment.assignmentId)}</p>
+                                            <div class="assignment-card__actions">
+                                                <a data-assignment-link="${escapeHtml(assignment.assignmentId)}" href="?assignment=${encodeURIComponent(assignment.assignmentId)}">제출 현황</a>
+                                                ${assignment.activityHref ? `<a href="${escapeHtml(resolveSiteHref(assignment.activityHref))}">활동 열기</a>` : ""}
+                                            </div>
+                                        </article>
+                                    `;
+                                }).join("")}
+                            </div>
+                        </section>
+                    `;
+                }).join("")}
+            </section>
+        `;
+    }
+
+    function wireAuthButtons() {
+        const signInButton = document.getElementById("signInButton");
+        if (signInButton) {
+            signInButton.addEventListener("click", async function () {
+                try {
+                    state.error = "";
+                    await client.signIn();
+                } catch (error) {
+                    state.error = error.message || "로그인에 실패했습니다.";
+                    if (isRegistryMode() && (!selectedRegistryAssignment || unknownRegistryAssignment)) {
+                        renderRegistryHub();
+                    } else {
+                        renderSignedOut();
+                    }
+                }
+            });
+        }
+
+        const signOutButton = document.getElementById("signOutButton");
+        if (signOutButton) {
+            signOutButton.addEventListener("click", async function () {
+                await client.signOut();
+            });
+        }
+    }
+
+    function renderRegistryHub(message) {
+        const alert = message || state.error;
+        const signedInText = state.user && state.user.email
+            ? `${state.user.email}으로 로그인했습니다.`
+            : "Google 계정으로 로그인한 뒤 활동별 제출 현황을 확인할 수 있습니다.";
+        root.innerHTML = `
+            <header class="dashboard-hero">
+                <p class="dashboard-eyebrow">Homework Dashboard</p>
+                <h1>${escapeHtml(registry.title)}</h1>
+                <p>${escapeHtml(registry.description)}</p>
+                <p>${escapeHtml(signedInText)}</p>
+                <div class="dashboard-actions">
+                    ${state.user
+                        ? '<button id="signOutButton" class="dashboard-button" type="button">로그아웃</button>'
+                        : '<button id="signInButton" class="dashboard-button primary" type="button">Google로 로그인</button>'}
+                </div>
+            </header>
+            ${unknownRegistryAssignment ? `<div class="dashboard-alert">등록되지 않은 통계 항목입니다: ${escapeHtml(requestedAssignmentId)}</div>` : ""}
+            ${alert && !unknownRegistryAssignment ? `<div class="dashboard-alert">${escapeHtml(alert)}</div>` : ""}
+            ${renderRegistryGroups()}
+        `;
+        wireAuthButtons();
     }
 
     function buildWeakQuestions(submissions) {
@@ -370,8 +534,14 @@
     }
 
     function renderSignedOut() {
+        if (isRegistryMode() && (!selectedRegistryAssignment || unknownRegistryAssignment)) {
+            renderRegistryHub();
+            return;
+        }
+
         const assignment = getAssignment();
         root.innerHTML = `
+            ${renderRegistryBackLink()}
             <header class="dashboard-hero">
                 <p class="dashboard-eyebrow">Homework Dashboard</p>
                 <h1>${escapeHtml(assignment.assignmentTitle)} 제출 현황</h1>
@@ -380,21 +550,19 @@
             </header>
             ${state.error ? `<div class="dashboard-alert">${escapeHtml(state.error)}</div>` : ""}
         `;
-        document.getElementById("signInButton").addEventListener("click", async function () {
-            try {
-                state.error = "";
-                await client.signIn();
-            } catch (error) {
-                state.error = error.message || "로그인에 실패했습니다.";
-                renderSignedOut();
-            }
-        });
+        wireAuthButtons();
     }
 
     function renderDashboard() {
+        if (isRegistryMode() && (!selectedRegistryAssignment || unknownRegistryAssignment)) {
+            renderRegistryHub();
+            return;
+        }
+
         const assignment = getAssignment();
         const rows = getFilteredRows();
         root.innerHTML = `
+            ${renderRegistryBackLink()}
             <header class="dashboard-hero">
                 <p class="dashboard-eyebrow">Homework Dashboard</p>
                 <h1>${escapeHtml(assignment.assignmentTitle)} 제출 현황</h1>
@@ -413,9 +581,7 @@
         `;
 
         document.getElementById("refreshButton").addEventListener("click", loadAndRender);
-        document.getElementById("signOutButton").addEventListener("click", async function () {
-            await client.signOut();
-        });
+        wireAuthButtons();
         const search = document.getElementById("studentSearch");
         if (search) {
             search.addEventListener("input", function () {
@@ -431,6 +597,11 @@
     }
 
     async function loadAndRender() {
+        if (isRegistryMode() && (!selectedRegistryAssignment || unknownRegistryAssignment)) {
+            renderRegistryHub();
+            return;
+        }
+
         if (!state.user) {
             renderSignedOut();
             return;

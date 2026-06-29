@@ -71,7 +71,27 @@ async function answerAllCorrect(page) {
   }));
 
   for (const answer of answers) {
-    await page.locator(`#q${answer.number}-${answer.original}`).check({ force: true });
+    await page.locator(`#q${answer.number}-${answer.original}`).evaluate((input) => {
+      input.checked = true;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  }
+}
+
+async function answerFirstCorrect(page, count) {
+  const answers = await page.evaluate((limit) => Array.from(document.querySelectorAll('.question-card')).slice(0, limit).map((card) => {
+    const correct = card.querySelector('.option[data-correct="true"]');
+    return {
+      number: card.dataset.question,
+      original: correct.dataset.choice
+    };
+  }), count);
+
+  for (const answer of answers) {
+    await page.locator(`#q${answer.number}-${answer.original}`).evaluate((input) => {
+      input.checked = true;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
   }
 }
 
@@ -183,7 +203,8 @@ test.beforeEach(async ({ page }) => {
 test('vocab grammar mock landing exposes only the visible rounds', async ({ page }) => {
   await page.goto('/apps/vocab-grammar-mock/index.html', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.locator('.round-card')).toHaveCount(4);
+  await expect(page.locator('.round-card')).toHaveCount(5);
+  await expect(page.locator('.round-card[href="./marathon30.html"]')).toContainText('30문제 마라톤');
   await expect(page.locator('body')).not.toContainText('5회차');
 });
 
@@ -212,6 +233,21 @@ test('vocab grammar mock pages render balanced shuffled choices responsively', a
       expect(audit.maxRun).toBeLessThanOrEqual(2);
     }
   }
+});
+
+test('vocab grammar mock desktop layout keeps the first section close to progress controls', async ({ page }) => {
+  await page.setViewportSize({ width: 1310, height: 900 });
+  await page.goto('/apps/vocab-grammar-mock/round4.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.question-card')).toHaveCount(25);
+  await enterStudentName(page, '공백 확인');
+
+  const gap = await page.evaluate(() => {
+    const progress = document.querySelector('.progress-track').getBoundingClientRect();
+    const section = document.querySelector('.section-card').getBoundingClientRect();
+    return Math.round(section.top - progress.bottom);
+  });
+
+  expect(gap).toBeLessThan(90);
 });
 
 test('vocab grammar mock keeps a shuffled attempt stable across reload and creates a new one on reset', async ({ page }) => {
@@ -269,15 +305,47 @@ test('vocab grammar mock locks the quiz until a student name is entered and keep
   await expect(page.locator('.question-card')).toHaveCount(26);
 
   await expect(page.locator('body')).toHaveClass(/homework-locked/);
+  await expect(page.locator('#homeworkPanel')).toHaveClass(/is-name-missing/);
+  await expect(page.locator('#studentNameInput')).toHaveAttribute('aria-invalid', 'true');
   await expect(page.locator('#homeworkStatus')).toContainText('이름을 입력하면');
   await expect(page.locator('.question-card[data-question="1"] .option-input').first()).toBeDisabled();
 
+  await page.locator('.question-card[data-question="1"]').click();
+  await expect(page.locator('#homeworkStatus')).toContainText('이름을 먼저 입력');
+
   await enterStudentName(page, '저장 학생');
+  await expect(page.locator('#homeworkPanel')).not.toHaveClass(/is-name-missing/);
+  await expect(page.locator('#studentNameInput')).toHaveAttribute('aria-invalid', 'false');
   await expect(page.locator('.question-card[data-question="1"] .option-input').first()).toBeEnabled();
 
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.locator('#studentNameInput')).toHaveValue('저장 학생');
   await expect(page.locator('body')).not.toHaveClass(/homework-locked/);
+});
+
+test('vocab grammar mock autosaves progress and guides completed students to grading', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/apps/vocab-grammar-mock/round2.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.question-card')).toHaveCount(25);
+  await enterStudentName(page, '자동저장 학생');
+  await answerFirstCorrect(page, 3);
+
+  const savedCount = await page.evaluate(() => {
+    const saved = JSON.parse(localStorage.getItem('vocab-grammar-mock-round-2') || '{}');
+    return Object.keys(saved).length;
+  });
+  expect(savedCount).toBe(3);
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.option-input:checked')).toHaveCount(3);
+
+  await answerAllCorrect(page);
+  await expect(page.locator('#homeworkStatus')).toContainText('채점 버튼');
+  await expect(page.locator('[data-action="grade"]').first()).toHaveClass(/is-ready-to-submit/);
+  await expect.poll(async () => page.locator('.toolbar--bottom [data-action="grade"]').evaluate((button) => {
+    const rect = button.getBoundingClientRect();
+    return rect.top >= 0 && rect.bottom <= window.innerHeight;
+  })).toBe(true);
 });
 
 test('vocab grammar mock submits round payload with answer details', async ({ page }) => {

@@ -2,7 +2,8 @@ const ROUND_LINKS = [
     { id: "1", href: "./round1.html", label: "1회차" },
     { id: "2", href: "./round2.html", label: "2회차" },
     { id: "3", href: "./round3.html", label: "3회차" },
-    { id: "4", href: "./round4.html", label: "4회차" }
+    { id: "4", href: "./round4.html", label: "4회차" },
+    { id: "marathon30", href: "./marathon30.html", label: "30문제 마라톤" }
 ];
 
 const STORAGE_NAMESPACE = "vocab-grammar-mock";
@@ -343,6 +344,7 @@ function bindHomeworkPanel(quiz) {
         setHomeworkStudentName(value);
         applyHomeworkLockState(quiz);
         if (value) {
+            clearHomeworkNameAttention();
             setHomeworkStatus(quiz, "idle", "이름이 저장되었습니다. 모든 문항을 푼 뒤 제출하세요.");
         }
         updateProgress(getQuestionNumbers(quiz.sections).length);
@@ -359,7 +361,13 @@ function isHomeworkLocked(quiz) {
 
 function applyHomeworkLockState(quiz) {
     const locked = isHomeworkLocked(quiz);
+    const panel = document.getElementById("homeworkPanel");
+    const input = document.getElementById("studentNameInput");
+
     document.body.classList.toggle("homework-locked", locked);
+    document.body.classList.toggle("homework-name-missing", locked);
+    if (panel) panel.classList.toggle("is-name-missing", locked);
+    if (input) input.setAttribute("aria-invalid", String(locked));
 
     document.querySelectorAll(".option-input").forEach((input) => {
         input.disabled = locked;
@@ -371,12 +379,24 @@ function applyHomeworkLockState(quiz) {
 }
 
 function showMissingHomeworkName(quiz) {
+    const panel = document.getElementById("homeworkPanel");
     setHomeworkStatus(quiz, "error", "이름을 먼저 입력해야 제출할 수 있습니다.");
+    if (panel) {
+        panel.classList.remove("is-attention");
+        void panel.offsetWidth;
+        panel.classList.add("is-attention");
+    }
     const input = document.getElementById("studentNameInput");
     if (input) {
         input.focus();
         input.scrollIntoView({ behavior: "smooth", block: "center" });
     }
+}
+
+function clearHomeworkNameAttention() {
+    const panel = document.getElementById("homeworkPanel");
+    if (!panel) return;
+    panel.classList.remove("is-attention");
 }
 
 function setHomeworkStatus(quiz, kind, message) {
@@ -466,24 +486,40 @@ function wireQuizInteractions(quiz) {
     const gradeButtons = [...document.querySelectorAll('[data-action="grade"]')];
     const resetButtons = [...document.querySelectorAll('[data-action="reset"]')];
     const totalQuestions = getQuestionNumbers(quiz.sections).length;
+    let wasReadyToGrade = false;
 
     ensureGradeSummaryModal();
     bindHomeworkPanel(quiz);
     restoreAnswers(storageKey);
-    updateProgress(totalQuestions);
+    wasReadyToGrade = updateProgress(totalQuestions);
     applyHomeworkLockState(quiz);
+    window.addEventListener("pagehide", () => saveAnswers(storageKey));
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") saveAnswers(storageKey);
+    });
 
     if (root) {
         root.addEventListener("change", (event) => {
             if (!event.target.classList.contains("option-input")) return;
             saveAnswers(storageKey);
-        clearFeedback();
-        setHomeworkStatus(quiz, "idle", "답안이 저장되었습니다. 모든 문항을 푼 뒤 제출하세요.");
-        closeGradeSummaryModal({ scrollTop: false });
-        updateProgress(totalQuestions);
+            clearFeedback();
+            closeGradeSummaryModal({ scrollTop: false });
+            const readyToGrade = updateProgress(totalQuestions);
+            if (readyToGrade && !wasReadyToGrade) {
+                promptReadyToSubmit(quiz);
+            } else if (!readyToGrade) {
+                clearReadyToSubmitHighlight();
+                setHomeworkStatus(quiz, "idle", "답안이 자동 저장되었습니다. 모든 문항을 푼 뒤 제출하세요.");
+            }
+            wasReadyToGrade = readyToGrade;
         });
 
         root.addEventListener("click", (event) => {
+            if (isHomeworkLocked(quiz) && event.target.closest(".question-card, .option")) {
+                showMissingHomeworkName(quiz);
+                return;
+            }
+
             const toggleButton = event.target.closest(".feedback-translate-toggle");
             if (!toggleButton) return;
 
@@ -520,6 +556,7 @@ function wireQuizInteractions(quiz) {
         }
 
         saveAnswers(storageKey);
+        clearReadyToSubmitHighlight();
         const result = window.gradeQuiz(quiz.answers);
         const signature = getAnswerSignature(roundId);
         saveRoundSummary(roundId, result, totalQuestions, signature);
@@ -532,6 +569,7 @@ function wireQuizInteractions(quiz) {
         if (!window.confirm("선택한 답을 모두 지우고 처음부터 다시 풀까요?")) return;
         localStorage.removeItem(storageKey);
         localStorage.removeItem(attemptKey);
+        clearReadyToSubmitHighlight();
         closeGradeSummaryModal({ scrollTop: false });
         window.location.reload();
     }));
@@ -772,7 +810,11 @@ function rewriteExplanationForFeedback(explanation) {
 
 function saveAnswers(storageKey) {
     const selections = collectSelections();
-    localStorage.setItem(storageKey, JSON.stringify(selections));
+    try {
+        localStorage.setItem(storageKey, JSON.stringify(selections));
+    } catch {
+        // Keep the in-memory selections available even when local storage is blocked.
+    }
     return selections;
 }
 
@@ -823,6 +865,7 @@ function updateProgress(totalCount) {
     }
     if (progressFill) progressFill.style.width = `${percent}%`;
     updateQuestionPalette();
+    return readyToGrade;
 }
 
 function collectSelections() {
@@ -858,6 +901,34 @@ function setGradeButtonsState(answeredCount, totalCount) {
         button.setAttribute("aria-disabled", String(locked || !readyToGrade));
     });
     return readyToGrade;
+}
+
+function promptReadyToSubmit(quiz) {
+    if (isHomeworkLocked(quiz)) return;
+    const gradeButton = getPreferredGradeButton();
+    document.body.classList.add("ready-to-submit");
+    document.querySelectorAll('[data-action="grade"]').forEach((button) => {
+        button.classList.add("is-ready-to-submit");
+    });
+    setHomeworkStatus(quiz, "ready", "모든 문항이 자동 저장되었습니다. 채점 버튼을 눌러 제출을 완료하세요.");
+    if (!gradeButton) return;
+    window.setTimeout(() => {
+        gradeButton.scrollIntoView({ behavior: "smooth", block: "center" });
+        window.setTimeout(() => gradeButton.focus({ preventScroll: true }), 320);
+    }, 120);
+}
+
+function getPreferredGradeButton() {
+    const buttons = [...document.querySelectorAll('[data-action="grade"]')]
+        .filter((button) => !button.disabled);
+    return buttons.find((button) => button.closest(".toolbar--bottom")) || buttons[0] || null;
+}
+
+function clearReadyToSubmitHighlight() {
+    document.body.classList.remove("ready-to-submit");
+    document.querySelectorAll('[data-action="grade"]').forEach((button) => {
+        button.classList.remove("is-ready-to-submit");
+    });
 }
 
 function isReadyToGrade(totalCount) {
