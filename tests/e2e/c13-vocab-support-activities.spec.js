@@ -117,13 +117,33 @@ test.describe("c13 vocabulary support activities", () => {
     await page.goto("/c13/vocab-support-prep-actions.html", { waitUntil: "domcontentloaded" });
     await expect(page.locator("#contrast-section")).toBeVisible();
     await expect(page.locator(".flow-nav")).toContainText("비교");
-    await expect(page.locator("[data-contrast-card]")).toHaveCount(9);
-    await expect(page.locator('[data-contrast-object="food"]')).toContainText("음식을 차리다");
-    await expect(page.locator('[data-contrast-object="food"]')).toContainText("음식을 마련하다");
-    await expect(page.locator('[data-contrast-object="food"]')).toContainText("음식을 대접하다");
-    await expect(page.locator('[data-contrast-object="meal"]')).toContainText("식사를 대접하다");
-    await expect(page.locator('[data-contrast-object="refreshments"]')).toContainText("다과를 마련하다");
-    await expect(page.locator('[data-contrast-card="food-set"] img')).toHaveAttribute("src", /prep-actions-overlap\/food-set\.webp$/);
+    await expect(page.locator("[data-contrast-board]")).toHaveCount(3);
+    await expect(page.locator("[data-contrast-scene]")).toHaveCount(9);
+
+    const failures = await page.evaluate(async () => {
+      const urls = [...new Set([...document.querySelectorAll("[data-contrast-scene]")].map((button) => new URL(button.dataset.contrastImageSrc, window.location.href).href))];
+      const results = await Promise.all(urls.map((url) => new Promise((resolve) => {
+        const probe = new Image();
+        probe.onload = () => resolve({ url, ok: probe.naturalWidth > 0 && probe.naturalHeight > 0 });
+        probe.onerror = () => resolve({ url, ok: false });
+        probe.src = url;
+      })));
+      return results.filter((result) => !result.ok);
+    });
+    expect(failures).toEqual([]);
+
+    const foodBoard = page.locator('[data-contrast-board="food"]');
+    await expect(foodBoard.locator("[data-contrast-image]")).toHaveAttribute("src", /prep-actions-transform\/before\/low-table\.webp$/);
+    await expect(foodBoard.locator("[data-contrast-phrase]")).toContainText("음식을 ___");
+    await foodBoard.locator('[data-contrast-scene="food-treat"]').click();
+    await expect(foodBoard.locator("[data-contrast-image]")).toHaveAttribute("src", /prep-actions-overlap\/food-treat\.webp$/);
+    await expect(foodBoard.locator("[data-contrast-phrase]")).toContainText("음식을 대접하다");
+    await expect(foodBoard.locator("[data-contrast-focus]")).toContainText("사람에게 내기");
+
+    const mealBoard = page.locator('[data-contrast-board="meal"]');
+    await mealBoard.locator('[data-contrast-scene="meal-set"]').click();
+    await expect(mealBoard.locator("[data-contrast-image]")).toHaveAttribute("src", /prep-actions-overlap\/meal-set\.webp$/);
+    await expect(mealBoard.locator("[data-contrast-phrase]")).toContainText("식사를 차리다");
   });
 
   test("prep activity transforms object images by applying verbs", async ({ page }) => {
@@ -134,6 +154,8 @@ test.describe("c13 vocabulary support activities", () => {
     await expect(giftImage).toHaveAttribute("src", /before\/gift\.webp$/);
 
     await page.locator('[data-transform-verb="set"]').click();
+    await expect(gift).toHaveClass(/is-ready-target/);
+    await expect(page.locator('[data-transform-card="low-table"]')).toHaveClass(/is-ready-target/);
     await gift.click();
     await expect(page.locator(".transform-feedback")).toHaveClass(/is-wrong/);
     await expect(giftImage).toHaveAttribute("src", /before\/gift\.webp$/);
@@ -155,6 +177,14 @@ test.describe("c13 vocabulary support activities", () => {
     await page.locator('[data-transform-verb="treat"]').click();
     await page.locator('[data-transform-card="guest"]').click();
     await expect(page.locator('[data-transform-card="guest"] [data-transform-phrase]')).toContainText("손님을 대접하다");
+  });
+
+  test("prep verb tray stays reachable while scrolling object cards", async ({ page }) => {
+    await page.goto("/c13/vocab-support-prep-actions.html", { waitUntil: "domcontentloaded" });
+    await page.locator('[data-transform-card="visitor"]').scrollIntoViewIfNeeded();
+    const trayTop = await page.locator(".verb-tray").evaluate((tray) => tray.getBoundingClientRect().top);
+    expect(trayTop).toBeGreaterThanOrEqual(48);
+    expect(trayTop).toBeLessThanOrEqual(70);
   });
 
   test("prep check transforms an image and updates score", async ({ page }) => {

@@ -7,6 +7,7 @@
 
     const selectedByBoard = new Map();
     let selectedTransformVerb = null;
+    let draggedContrastSceneId = null;
 
     function escapeHtml(value) {
         return String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -302,7 +303,7 @@
             ${contrast.summary ? `<p class="contrast-summary">${escapeHtml(contrast.summary)}</p>` : ""}
             <div class="contrast-group-list">
                 ${(contrast.groups || []).map((group) => `
-                    <section class="contrast-group" data-contrast-object="${escapeHtml(group.id || group.label)}">
+                    <section class="contrast-group" data-contrast-object="${escapeHtml(group.id || group.label)}" data-contrast-board="${escapeHtml(group.id || group.label)}">
                         <div class="contrast-group-head">
                             <div>
                                 <p class="eyebrow">${escapeHtml(group.eyebrow || "같은 명사")}</p>
@@ -310,19 +311,44 @@
                             </div>
                             ${group.note ? `<p>${escapeHtml(group.note)}</p>` : ""}
                         </div>
-                        <div class="contrast-panel-grid">
-                            ${(group.scenes || []).map((scene) => `
-                                <article class="contrast-card" data-contrast-card="${escapeHtml(scene.id)}">
-                                    <div class="contrast-image">
-                                        <img src="${escapeHtml(scene.image)}" alt="${escapeHtml(scene.alt || scene.phrase)}" loading="lazy" decoding="async" />
-                                    </div>
-                                    <div class="contrast-card-copy">
-                                        <h4>${escapeHtml(scene.phrase)}</h4>
-                                        <span class="contrast-focus">${escapeHtml(scene.focus)}</span>
-                                        <p>${escapeHtml(scene.note || "")}</p>
-                                    </div>
-                                </article>
-                            `).join("")}
+                        <div class="contrast-playground">
+                            <div class="contrast-stage" data-contrast-stage tabindex="0">
+                                <div class="contrast-image">
+                                    <img
+                                        src="${escapeHtml(group.baseImage || group.scenes?.[0]?.image || "")}"
+                                        alt="${escapeHtml(group.baseAlt || `${group.label} 기본 장면`)}"
+                                        data-contrast-image
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </div>
+                                <div class="contrast-card-copy">
+                                    <h4 data-contrast-phrase>${escapeHtml(group.placeholderPhrase || `${group.label} ___`)}</h4>
+                                    <span class="contrast-focus" data-contrast-focus>${escapeHtml(group.placeholderFocus || "동사를 넣어 보세요")}</span>
+                                    <p data-contrast-note>${escapeHtml(group.placeholderNote || "아래 동사를 넣으면 같은 명사의 초점이 어떻게 달라지는지 확인할 수 있습니다.")}</p>
+                                </div>
+                            </div>
+                            <div class="contrast-verb-row" role="group" aria-label="${escapeHtml(group.label)}에 넣을 동사">
+                                ${(group.scenes || []).map((scene) => `
+                                    <button
+                                        class="contrast-verb-chip"
+                                        type="button"
+                                        draggable="true"
+                                        data-contrast-scene="${escapeHtml(scene.id)}"
+                                        data-contrast-image-src="${escapeHtml(scene.image)}"
+                                        data-contrast-alt="${escapeHtml(scene.alt || scene.phrase)}"
+                                        data-contrast-result-phrase="${escapeHtml(scene.phrase)}"
+                                        data-contrast-result-focus="${escapeHtml(scene.focus)}"
+                                        data-contrast-result-note="${escapeHtml(scene.note || "")}"
+                                    >
+                                        <span>${escapeHtml(scene.verb || scene.phrase.split(" ").pop())}</span>
+                                        <small>${escapeHtml(scene.focus)}</small>
+                                    </button>
+                                `).join("")}
+                            </div>
+                            <div class="feedback contrast-feedback" role="status" aria-live="polite">
+                                ${escapeHtml(group.hint || "동사를 선택하거나 빈 그림 위로 끌어 놓으세요.")}
+                            </div>
                         </div>
                     </section>
                 `).join("")}
@@ -547,6 +573,18 @@
             button.setAttribute("aria-pressed", "false");
             button.classList.remove("is-selected", "is-dragging");
         });
+        document.querySelectorAll("[data-transform-card]").forEach((card) => {
+            card.classList.remove("is-ready-target", "is-drop-target");
+        });
+    }
+
+    function updateTransformTargetHints(board, active) {
+        if (!board) return;
+        board.querySelectorAll("[data-transform-card]").forEach((card) => {
+            const ready = active && card.dataset.solved !== "true" && !card.disabled;
+            card.classList.toggle("is-ready-target", ready);
+            if (!ready) card.classList.remove("is-drop-target");
+        });
     }
 
     function handleTransformVerb(button) {
@@ -557,6 +595,7 @@
             candidate.setAttribute("aria-pressed", String(selected));
             candidate.classList.toggle("is-selected", selected);
         });
+        updateTransformTargetHints(board, true);
         const verb = transformVerbById(selectedTransformVerb);
         if (board && verb) setTransformFeedback(board, `${verb.label}: 넣을 목적어 이미지를 선택하세요.`, "");
     }
@@ -614,14 +653,49 @@
             const phrase = card.querySelector("[data-transform-phrase]");
             if (item && phrase) phrase.textContent = `${item.objectPhrase || item.label} ___`;
             card.dataset.solved = "false";
-            card.classList.remove("is-correct", "is-wrong", "is-drop-target");
+            card.classList.remove("is-correct", "is-wrong", "is-ready-target", "is-drop-target");
             card.disabled = false;
         });
         clearTransformSelection();
         setTransformFeedback(board, cfg.transform?.hint || "동사를 고른 뒤 목적어 이미지에 넣어 보세요.", "");
     }
 
+    function applyContrastScene(button) {
+        const board = button.closest("[data-contrast-board]");
+        if (!board) return;
+        const stage = board.querySelector("[data-contrast-stage]");
+        const image = board.querySelector("[data-contrast-image]");
+        const phrase = board.querySelector("[data-contrast-phrase]");
+        const focus = board.querySelector("[data-contrast-focus]");
+        const note = board.querySelector("[data-contrast-note]");
+        const feedback = board.querySelector(".contrast-feedback");
+        if (!image || !phrase || !focus || !note) return;
+
+        image.classList.add("is-switching");
+        image.src = button.dataset.contrastImageSrc;
+        image.alt = button.dataset.contrastAlt || button.dataset.contrastResultPhrase || image.alt;
+        image.addEventListener("load", () => image.classList.remove("is-switching"), { once: true });
+        phrase.textContent = button.dataset.contrastResultPhrase || "";
+        focus.textContent = button.dataset.contrastResultFocus || "";
+        note.textContent = button.dataset.contrastResultNote || "";
+        board.querySelectorAll("[data-contrast-scene]").forEach((candidate) => {
+            candidate.classList.toggle("is-selected", candidate === button);
+        });
+        stage?.classList.add("is-filled");
+        stage?.classList.remove("is-drop-target");
+        if (feedback) {
+            feedback.textContent = `${button.dataset.contrastResultPhrase}: ${button.dataset.contrastResultFocus}`;
+            feedback.className = "feedback contrast-feedback is-correct";
+        }
+    }
+
     document.addEventListener("click", (event) => {
+        const contrastScene = event.target.closest("[data-contrast-scene]");
+        if (contrastScene) {
+            applyContrastScene(contrastScene);
+            return;
+        }
+
         const verb = event.target.closest("[data-transform-verb]");
         if (verb) {
             handleTransformVerb(verb);
@@ -666,9 +740,21 @@
     });
 
     document.addEventListener("dragstart", (event) => {
+        const contrastScene = event.target.closest("[data-contrast-scene]");
+        if (contrastScene && event.dataTransfer) {
+            const board = contrastScene.closest("[data-contrast-board]");
+            draggedContrastSceneId = contrastScene.dataset.contrastScene;
+            event.dataTransfer.setData("text/x-c13-contrast-scene", contrastScene.dataset.contrastScene);
+            event.dataTransfer.setData("text/plain", contrastScene.dataset.contrastScene);
+            event.dataTransfer.effectAllowed = "copy";
+            contrastScene.classList.add("is-dragging");
+            board?.querySelector("[data-contrast-stage]")?.classList.add("is-ready-target");
+            return;
+        }
+
         const verb = event.target.closest("[data-transform-verb]");
         if (!verb || !event.dataTransfer) return;
-        selectedTransformVerb = verb.dataset.transformVerb;
+        handleTransformVerb(verb);
         event.dataTransfer.setData("text/plain", selectedTransformVerb);
         event.dataTransfer.effectAllowed = "copy";
         verb.classList.add("is-dragging");
@@ -677,9 +763,21 @@
     document.addEventListener("dragend", () => {
         document.querySelectorAll("[data-transform-verb]").forEach((verb) => verb.classList.remove("is-dragging"));
         document.querySelectorAll("[data-transform-card]").forEach((card) => card.classList.remove("is-drop-target"));
+        document.querySelectorAll("[data-contrast-scene]").forEach((scene) => scene.classList.remove("is-dragging"));
+        document.querySelectorAll("[data-contrast-stage]").forEach((stage) => stage.classList.remove("is-ready-target", "is-drop-target"));
+        draggedContrastSceneId = null;
     });
 
     document.addEventListener("dragover", (event) => {
+        const contrastStage = event.target.closest("[data-contrast-stage]");
+        const dragTypes = Array.from(event.dataTransfer?.types || []);
+        if (contrastStage && (dragTypes.includes("text/x-c13-contrast-scene") || dragTypes.includes("text/plain") || draggedContrastSceneId)) {
+            event.preventDefault();
+            contrastStage.classList.add("is-drop-target");
+            if (event.dataTransfer) event.dataTransfer.dropEffect = "copy";
+            return;
+        }
+
         const card = event.target.closest("[data-transform-card]");
         if (!card || card.disabled) return;
         event.preventDefault();
@@ -688,11 +786,31 @@
     });
 
     document.addEventListener("dragleave", (event) => {
+        const contrastStage = event.target.closest("[data-contrast-stage]");
+        if (contrastStage && !contrastStage.contains(event.relatedTarget)) {
+            contrastStage.classList.remove("is-drop-target");
+            return;
+        }
+
         const card = event.target.closest("[data-transform-card]");
         if (card && !card.contains(event.relatedTarget)) card.classList.remove("is-drop-target");
     });
 
     document.addEventListener("drop", (event) => {
+        const contrastStage = event.target.closest("[data-contrast-stage]");
+        if (contrastStage) {
+            const sceneId = event.dataTransfer?.getData("text/x-c13-contrast-scene") || draggedContrastSceneId || event.dataTransfer?.getData("text/plain");
+            if (sceneId) {
+                event.preventDefault();
+                const board = contrastStage.closest("[data-contrast-board]");
+                const button = board?.querySelector(`[data-contrast-scene="${CSS.escape(sceneId)}"]`);
+                contrastStage.classList.remove("is-ready-target", "is-drop-target");
+                draggedContrastSceneId = null;
+                if (button) applyContrastScene(button);
+                return;
+            }
+        }
+
         const card = event.target.closest("[data-transform-card]");
         if (!card) return;
         event.preventDefault();
