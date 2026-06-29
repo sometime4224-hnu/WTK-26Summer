@@ -325,12 +325,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung khi lo rang mot viec co the xay ra hoac co the dung.",
+                "title": "Hỗ trợ Tiếng Việt",
+                "summary": "Dùng khi lo rằng một việc có thể xảy ra hoặc có thể đúng.",
                 "points": [
-                    "Gan mau nay vao than tinh tu hoac dong tu.",
-                    "Thuong giai thich ly do chuan bi, tranh ne hoac lo lang.",
-                    "Ve sau co the noi nguoi noi lam gi vi noi lo do."
+                    "Gắn mẫu này vào thân tính từ hoặc động từ.",
+                    "Thường giải thích lý do chuẩn bị, tránh né hoặc lo lắng.",
+                    "Vế sau có thể nói người nói đã làm gì vì nỗi lo đó."
                 ]
             }
         }
@@ -349,12 +349,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung de noi hanh dong dang dien ra hoac trang thai sau hanh dong dang tiep tuc.",
+                "title": "Hỗ trợ Tiếng Việt",
+                "summary": "Dùng để nói hành động đang diễn ra hoặc trạng thái sau hành động vẫn đang tiếp tục.",
                 "points": [
-                    "Voi dong tu hanh dong, thuong nghia la dang lam.",
-                    "Voi dong tu mac hoac deo, thuong la trang thai dang mang tren nguoi.",
-                    "Can xem loai dong tu de biet la tien trinh hay trang thai."
+                    "Với động từ hành động, thường nghĩa là đang làm.",
+                    "Với động từ mặc hoặc đeo, thường là trạng thái đang mang trên người.",
+                    "Cần xem loại động từ để biết là tiến trình hay trạng thái."
                 ]
             }
         }
@@ -373,12 +373,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung de dien ta su tiec nuoi ve viec le ra nen lam nhung da khong lam.",
+                "title": "Hỗ trợ Tiếng Việt",
+                "summary": "Dùng để diễn tả sự tiếc nuối về việc lẽ ra nên làm nhưng đã không làm.",
                 "points": [
-                    "Nghia gan voi: le ra toi nen lam, nhung....",
-                    "Duoi cau de lai cam giac tiec, giai thich hoac chua noi het.",
-                    "Dung khi nhin lai loi hoac co hoi da bo lo."
+                    "Nghĩa gần với: lẽ ra tôi nên làm, nhưng...",
+                    "Đuôi câu để lại cảm giác tiếc nuối, giải thích hoặc chưa nói hết.",
+                    "Dùng khi nhìn lại lỗi hoặc cơ hội đã bỏ lỡ."
                 ]
             }
         }
@@ -393,16 +393,16 @@ window.MULTILANG_PAGE_DATA = {
                 "points": [
                     "It can mean so that or in order to.",
                     "It can also mean until something reaches that state.",
-                    "Look at the verb after -도록 to decide whether the sentence is giving instruction, purpose, or degree."
+                    "Look at the following clause to decide whether the sentence is giving instruction, purpose, or degree."
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung de chi muc dich, huong hanh dong, hoac ket qua dat den mot muc nao do.",
+                "title": "Hỗ trợ Tiếng Việt",
+                "summary": "Dùng để chỉ mục đích, hướng hành động hoặc kết quả đạt đến một mức nào đó.",
                 "points": [
-                    "Co the hieu la de hoac de cho.",
-                    "Cung co the noi den muc do dat toi trang thai do.",
-                    "Nhin dong tu phia sau de biet la chi dan, muc dich hay muc do."
+                    "Có thể hiểu là để hoặc để cho.",
+                    "Cũng có thể nói đến mức độ đạt tới trạng thái đó.",
+                    "Nhìn vế sau để biết là chỉ dẫn, mục đích hay mức độ."
                 ]
             }
         }

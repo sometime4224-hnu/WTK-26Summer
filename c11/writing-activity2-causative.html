@@ -653,6 +653,10 @@
             box-shadow: 0 6px 14px rgba(15, 118, 110, 0.3);
         }
 
+        .action-btn.success.is-available:not(:disabled) {
+            animation: nextReadyPulse 1.35s ease-in-out infinite;
+        }
+
         .action-btn:active:not(:disabled) {
             transform: scale(0.96);
         }
@@ -746,6 +750,15 @@
             0%, 100% { transform: translateX(0); }
             20%, 60% { transform: translateX(-4px); }
             40%, 80% { transform: translateX(4px); }
+        }
+
+        @keyframes nextReadyPulse {
+            0%, 100% {
+                box-shadow: 0 4px 10px rgba(15, 118, 110, 0.2), 0 0 0 0 rgba(16, 185, 129, 0.24);
+            }
+            50% {
+                box-shadow: 0 6px 14px rgba(15, 118, 110, 0.3), 0 0 0 7px rgba(16, 185, 129, 0);
+            }
         }
 
         @keyframes slotBreath {
@@ -889,6 +902,37 @@
             }))
         }));
 
+        const VERB_VARIANTS = {
+            "숨긴다": ["숨겨요", "숨기어요", "숨깁니다"],
+            "씻긴다": ["씻겨요", "씻기어요", "씻깁니다"],
+            "태운다": ["태워요", "태웁니다"],
+            "달군다": ["달궈요", "달구어요", "달굽니다"],
+            "늦춘다": ["늦춰요", "늦추어요", "늦춥니다"],
+            "낮춘다": ["낮춰요", "낮추어요", "낮춥니다"],
+            "세운다": ["세워요", "세웁니다"],
+            "씌운다": ["씌워요", "씌웁니다"],
+            "재운다": ["재워요", "재웁니다"],
+            "깨운다": ["깨워요", "깨웁니다"],
+            "눕힌다": ["눕혀요", "눕히어요", "눕힙니다"],
+            "익힌다": ["익혀요", "익히어요", "익힙니다"],
+            "울린다": ["울려요", "울리어요", "울립니다"],
+            "알린다": ["알려요", "알리어요", "알립니다"],
+            "살린다": ["살려요", "살리어요", "살립니다"],
+            "날린다": ["날려요", "날리어요", "날립니다"],
+            "돌린다": ["돌려요", "돌리어요", "돌립니다"],
+            "웃긴다": ["웃겨요", "웃기어요", "웃깁니다"],
+            "벗긴다": ["벗겨요", "벗기어요", "벗깁니다"],
+            "신긴다": ["신겨요", "신기어요", "신깁니다"],
+            "먹인다": ["먹여요", "먹이어요", "먹입니다"],
+            "끓인다": ["끓여요", "끓이어요", "끓입니다"],
+            "줄인다": ["줄여요", "줄이어요", "줄입니다"],
+            "붙인다": ["붙여요", "붙이어요", "붙입니다"],
+            "높인다": ["높여요", "높이어요", "높입니다"],
+            "앉힌다": ["앉혀요", "앉히어요", "앉힙니다"],
+            "입힌다": ["입혀요", "입히어요", "입힙니다"],
+            "읽힌다": ["읽혀요", "읽히어요", "읽힙니다"]
+        };
+
         const refs = {
             suffixStrip: document.getElementById("suffixStrip"),
             counter: document.getElementById("counter"),
@@ -927,6 +971,7 @@
                 currentId: DRILLS[0].id,
                 filter: "전체",
                 done: [],
+                attempted: [],
                 answers: {},
                 slots: {}
             };
@@ -937,6 +982,7 @@
                     currentId: saved.currentId,
                     filter: FILTERS.includes(saved.filter) ? saved.filter : "전체",
                     done: Array.isArray(saved.done) ? saved.done.filter((id) => DRILLS.some((drill) => drill.id === id)) : [],
+                    attempted: Array.isArray(saved.attempted) ? saved.attempted.filter((id) => DRILLS.some((drill) => drill.id === id)) : [],
                     answers: saved.answers && typeof saved.answers === "object" ? saved.answers : {},
                     slots: saved.slots && typeof saved.slots === "object" ? saved.slots : {}
                 };
@@ -980,11 +1026,26 @@
             return drill.slots.map((slot) => slot.text + slot.particle).join(" ") + " " + drill.verb;
         }
 
+        function targetSentences(drill) {
+            const subjectPart = drill.slots.map((slot) => slot.text + slot.particle).join(" ");
+            const verbs = [drill.verb].concat(VERB_VARIANTS[drill.verb] || []);
+            return verbs.map((verb) => subjectPart + " " + verb);
+        }
+
         function normalizeSentence(value) {
             return String(value || "")
                 .replace(/[.。]/g, "")
                 .replace(/\s+/g, " ")
                 .trim();
+        }
+
+        function sentenceKey(value) {
+            return normalizeSentence(value).replace(/\s+/g, "");
+        }
+
+        function sentenceMatches(drill, value) {
+            const candidate = sentenceKey(value);
+            return Boolean(candidate) && targetSentences(drill).some((sentence) => sentenceKey(sentence) === candidate);
         }
 
         function slotsComplete(drill) {
@@ -999,6 +1060,23 @@
 
         function isDone(drill) {
             return state.done.includes(drill.id);
+        }
+
+        function isAttempted(drill) {
+            return state.attempted.includes(drill.id);
+        }
+
+        function canAdvance(drill) {
+            return isDone(drill) || isAttempted(drill);
+        }
+
+        function addUnique(list, id) {
+            if (!list.includes(id)) list.push(id);
+        }
+
+        function clearAttempt(drill) {
+            state.done = state.done.filter((id) => id !== drill.id);
+            state.attempted = state.attempted.filter((id) => id !== drill.id);
         }
 
         function setResult(result) {
@@ -1103,6 +1181,7 @@
             const index = currentIndex();
             const inputReady = slotsComplete(drill);
             const done = isDone(drill);
+            const advanceReady = canAdvance(drill);
             const visualResult = done ? "good" : lastResult === "bad" ? "bad" : inputReady ? "ready" : "idle";
             lastResult = visualResult;
 
@@ -1117,7 +1196,8 @@
             refs.sentenceInput.value = state.answers[drill.id] || "";
             refs.checkButton.disabled = !inputReady;
             refs.inputRow.classList.toggle("is-active", inputReady);
-            refs.nextButton.disabled = !done;
+            refs.nextButton.disabled = !advanceReady;
+            refs.nextButton.classList.toggle("is-available", advanceReady);
 
             renderSlots(drill);
             renderTokens(drill);
@@ -1132,6 +1212,7 @@
             if (!tokenById(drill, tokenId)) return;
             slotState(drill)[slotId] = tokenId;
             selectedTokenId = null;
+            clearAttempt(drill);
             lastResult = "idle";
             saveState();
             render();
@@ -1198,10 +1279,11 @@
         function checkCurrent() {
             const drill = currentDrill();
             state.answers[drill.id] = refs.sentenceInput.value;
-            const correct = slotsCorrect(drill) && normalizeSentence(refs.sentenceInput.value) === normalizeSentence(targetSentence(drill));
+            const correct = slotsCorrect(drill) && sentenceMatches(drill, refs.sentenceInput.value);
+            addUnique(state.attempted, drill.id);
 
             if (correct) {
-                if (!state.done.includes(drill.id)) state.done.push(drill.id);
+                addUnique(state.done, drill.id);
                 lastResult = "good";
                 try {
                     triggerConfetti();
@@ -1229,7 +1311,7 @@
             const drill = currentDrill();
             delete state.answers[drill.id];
             delete state.slots[drill.id];
-            state.done = state.done.filter((id) => id !== drill.id);
+            clearAttempt(drill);
             selectedTokenId = null;
             lastResult = "idle";
             saveState();
@@ -1239,10 +1321,11 @@
         refs.sentenceInput.addEventListener("input", () => {
             const drill = currentDrill();
             state.answers[drill.id] = refs.sentenceInput.value;
-            if (isDone(drill)) state.done = state.done.filter((id) => id !== drill.id);
+            clearAttempt(drill);
             lastResult = slotsComplete(drill) ? "ready" : "idle";
             saveState();
             setResult(lastResult);
+            refs.nextButton.classList.remove("is-available");
             refs.nextButton.disabled = true;
         });
         refs.sentenceInput.addEventListener("keydown", (event) => {

@@ -23,27 +23,196 @@
         "배낭을메다": `${imageBase}/s05_br_n20.webp`
     };
 
+    const clueLangs = [
+        { code: "en", label: "English" },
+        { code: "vi", label: "Tiếng Việt" },
+        { code: "mn", label: "Монгол" },
+        { code: "ar", label: "العربية" },
+        { code: "kk", label: "Қазақша" },
+        { code: "th", label: "ไทย" }
+    ];
+
     const hintCopyMap = {
-        "집들이": { ko: "새 집에 사람들을 초대하는 모임", vi: "tiệc tân gia" },
-        "돌잔치": { ko: "아이가 한 살 된 것을 기념하는 잔치", vi: "tiệc thôi nôi" },
-        "송년회": { ko: "한 해를 마무리하며 함께 모이는 자리", vi: "tiệc cuối năm" },
-        "송별회": { ko: "떠나는 사람과 작별 인사를 나누는 모임", vi: "tiệc chia tay" },
-        "동창회": { ko: "같은 학교를 나온 사람들이 다시 만나는 모임", vi: "họp lớp" },
-        "방을꾸미다": { ko: "방을 예쁘게 장식하다", vi: "trang trí phòng" },
-        "상을차리다": { ko: "음식을 먹을 수 있게 상을 준비하다", vi: "dọn bàn ăn" },
-        "선물을마련하다": { ko: "필요한 선물을 미리 준비하다", vi: "chuẩn bị quà" },
-        "손님을대접하다": { ko: "손님에게 정성껏 음식을 내고 챙기다", vi: "tiếp đãi khách" },
-        "충분하다": { ko: "필요한 만큼 넉넉하다", vi: "đủ" },
-        "모자라다": { ko: "필요한 양보다 적다", vi: "thiếu" },
-        "남다": { ko: "쓰고도 아직 남아 있다", vi: "còn lại, thừa" },
-        "부족하다": { ko: "필요한 만큼 되지 않다", vi: "thiếu, không đủ" },
-        "옷을차려입다": { ko: "옷을 단정하고 예쁘게 입다", vi: "ăn mặc đẹp, diện" },
-        "넥타이를매다": { ko: "목에 넥타이를 묶다", vi: "thắt cà vạt" },
-        "반지를끼다": { ko: "손가락에 반지를 끼다", vi: "đeo nhẫn" },
-        "귀고리를하다": { ko: "귀에 귀고리를 하다", vi: "đeo bông tai" },
-        "시계를차다": { ko: "손목에 시계를 차다", vi: "đeo đồng hồ" },
-        "가방을들다": { ko: "손으로 가방을 들다", vi: "cầm túi xách" },
-        "배낭을메다": { ko: "어깨에 배낭을 메다", vi: "đeo ba lô" }
+        "집들이": {
+            ko: "새 집에 사람들을 초대하는 모임",
+            en: "A gathering where people are invited to a new home.",
+            vi: "Buổi gặp mặt khi mời mọi người đến nhà mới.",
+            mn: "Шинэ гэртээ хүмүүсийг урьж хийдэг уулзалт.",
+            ar: "اجتماع يدعى فيه الناس إلى منزل جديد.",
+            kk: "Жаңа үйге адамдарды шақырып өткізетін жиын.",
+            th: "งานที่เชิญคนมาที่บ้านใหม่."
+        },
+        "돌잔치": {
+            ko: "아이가 한 살 된 것을 기념하는 잔치",
+            en: "A celebration for a child's first birthday.",
+            vi: "Bữa tiệc kỷ niệm em bé tròn một tuổi.",
+            mn: "Хүүхэд нэг нас хүрснийг тэмдэглэдэг баяр.",
+            ar: "احتفال ببلوغ الطفل عاما واحدا.",
+            kk: "Баланың бір жасқа толуын атап өтетін той.",
+            th: "งานฉลองที่เด็กอายุครบหนึ่งขวบ."
+        },
+        "송년회": {
+            ko: "한 해를 마무리하며 함께 모이는 자리",
+            en: "A gathering to wrap up the year together.",
+            vi: "Buổi gặp mặt để cùng kết thúc một năm.",
+            mn: "Жилийг хамтдаа дүгнэж дуусгах уулзалт.",
+            ar: "اجتماع يختتم فيه الناس السنة معا.",
+            kk: "Жылды бірге қорытындылайтын кездесу.",
+            th: "งานพบปะเพื่อปิดท้ายปีด้วยกัน."
+        },
+        "송별회": {
+            ko: "떠나는 사람과 작별 인사를 나누는 모임",
+            en: "A gathering to say goodbye to someone who is leaving.",
+            vi: "Buổi gặp mặt để chào tạm biệt người sắp rời đi.",
+            mn: "Явах гэж буй хүнтэй салах ёс хийх уулзалт.",
+            ar: "اجتماع لتوديع شخص سيغادر.",
+            kk: "Кететін адаммен қоштасу үшін жиналу.",
+            th: "งานพบปะเพื่อบอกลาคนที่จะจากไป."
+        },
+        "동창회": {
+            ko: "같은 학교를 나온 사람들이 다시 만나는 모임",
+            en: "A gathering where graduates of the same school meet again.",
+            vi: "Buổi gặp lại của những người từng học cùng trường.",
+            mn: "Нэг сургуулийг төгссөн хүмүүс дахин уулзах уулзалт.",
+            ar: "اجتماع يلتقي فيه خريجو المدرسة نفسها مرة أخرى.",
+            kk: "Бір мектепті бітірген адамдар қайта кездесетін жиын.",
+            th: "งานที่คนจบจากโรงเรียนเดียวกันกลับมาพบกัน."
+        },
+        "방을꾸미다": {
+            ko: "방을 예쁘게 장식하다",
+            en: "To decorate a room so it looks nice.",
+            vi: "Trang trí căn phòng cho đẹp.",
+            mn: "Өрөөг гоё харагдахаар чимэглэх.",
+            ar: "يزين الغرفة لتبدو جميلة.",
+            kk: "Бөлмені әдемі етіп безендіру.",
+            th: "ตกแต่งห้องให้สวยงาม."
+        },
+        "상을차리다": {
+            ko: "음식을 먹을 수 있게 상을 준비하다",
+            en: "To prepare the table so people can eat.",
+            vi: "Chuẩn bị bàn ăn để mọi người có thể ăn.",
+            mn: "Хүмүүс хооллож болохоор ширээ бэлтгэх.",
+            ar: "يجهز المائدة حتى يستطيع الناس الأكل.",
+            kk: "Адамдар тамақтана алуы үшін дастарқан дайындау.",
+            th: "เตรียมโต๊ะให้พร้อมสำหรับกินอาหาร."
+        },
+        "선물을마련하다": {
+            ko: "필요한 선물을 미리 준비하다",
+            en: "To prepare the needed present in advance.",
+            vi: "Chuẩn bị trước món quà cần thiết.",
+            mn: "Хэрэгтэй бэлгийг урьдчилан бэлтгэх.",
+            ar: "يحضر الهدية المطلوبة مسبقا.",
+            kk: "Қажет сыйлықты алдын ала дайындау.",
+            th: "เตรียมของขวัญที่จำเป็นไว้ล่วงหน้า."
+        },
+        "손님을대접하다": {
+            ko: "손님에게 정성껏 음식을 내고 챙기다",
+            en: "To serve guests carefully with food and attention.",
+            vi: "Tiếp đãi khách chu đáo bằng đồ ăn và sự quan tâm.",
+            mn: "Зочдод хоол өгч, сэтгэлээсээ дайлах.",
+            ar: "يقدم الطعام للضيوف ويعتني بهم باهتمام.",
+            kk: "Қонақтарға ас ұсынып, ықыласпен күту.",
+            th: "ดูแลแขกอย่างตั้งใจและเสิร์ฟอาหารให้."
+        },
+        "충분하다": {
+            ko: "필요한 만큼 넉넉하다",
+            en: "To be enough for what is needed.",
+            vi: "Có đủ so với mức cần thiết.",
+            mn: "Хэрэгтэй хэмжээнд хангалттай байх.",
+            ar: "يكون كافيا لما هو مطلوب.",
+            kk: "Қажет мөлшерге жеткілікті болу.",
+            th: "มีพอสำหรับสิ่งที่ต้องการ."
+        },
+        "모자라다": {
+            ko: "필요한 양보다 적다",
+            en: "To be less than the amount needed.",
+            vi: "Ít hơn số lượng cần thiết.",
+            mn: "Хэрэгтэй хэмжээнээс бага байх.",
+            ar: "يكون أقل من الكمية المطلوبة.",
+            kk: "Қажет мөлшерден аз болу.",
+            th: "มีน้อยกว่าปริมาณที่ต้องการ."
+        },
+        "남다": {
+            ko: "쓰고도 아직 남아 있다",
+            en: "To still be left after being used.",
+            vi: "Sau khi dùng vẫn còn lại.",
+            mn: "Хэрэглэсний дараа ч үлдэх.",
+            ar: "يبقى شيء بعد استخدامه.",
+            kk: "Пайдаланғаннан кейін де артық қалу.",
+            th: "ใช้แล้วก็ยังเหลืออยู่."
+        },
+        "부족하다": {
+            ko: "필요한 만큼 되지 않다",
+            en: "To not reach the amount or level needed.",
+            vi: "Không đạt đến mức hoặc lượng cần thiết.",
+            mn: "Хэрэгтэй хэмжээ эсвэл түвшинд хүрэхгүй байх.",
+            ar: "لا يصل إلى القدر أو المستوى المطلوب.",
+            kk: "Қажет мөлшерге немесе деңгейге жетпеу.",
+            th: "ไม่ถึงปริมาณหรือระดับที่จำเป็น."
+        },
+        "옷을차려입다": {
+            ko: "옷을 단정하고 예쁘게 입다",
+            en: "To dress neatly and nicely.",
+            vi: "Ăn mặc gọn gàng và đẹp.",
+            mn: "Цэвэрхэн, гоё хувцаслах.",
+            ar: "يرتدي ملابس مرتبة وجميلة.",
+            kk: "Киімді жинақы әрі әдемі кию.",
+            th: "แต่งตัวเรียบร้อยและดูดี."
+        },
+        "넥타이를매다": {
+            ko: "목에 넥타이를 묶다",
+            en: "To tie a necktie around the neck.",
+            vi: "Thắt cà vạt quanh cổ.",
+            mn: "Хүзүүндээ зангиа зангидах.",
+            ar: "يربط ربطة العنق حول الرقبة.",
+            kk: "Мойынға галстук байлау.",
+            th: "ผูกเน็กไทรอบคอ."
+        },
+        "반지를끼다": {
+            ko: "손가락에 반지를 끼다",
+            en: "To put a ring on a finger.",
+            vi: "Đeo nhẫn vào ngón tay.",
+            mn: "Хуруундаа бөгж зүүх.",
+            ar: "يضع خاتما في الإصبع.",
+            kk: "Саусаққа сақина тағу.",
+            th: "สวมแหวนที่นิ้ว."
+        },
+        "귀고리를하다": {
+            ko: "귀에 귀고리를 하다",
+            en: "To wear earrings on the ears.",
+            vi: "Đeo bông tai ở tai.",
+            mn: "Чихэндээ ээмэг зүүх.",
+            ar: "يرتدي أقراطا في الأذنين.",
+            kk: "Құлаққа сырға тағу.",
+            th: "ใส่ต่างหูที่หู."
+        },
+        "시계를차다": {
+            ko: "손목에 시계를 차다",
+            en: "To wear a watch on the wrist.",
+            vi: "Đeo đồng hồ trên cổ tay.",
+            mn: "Бугуйндаа цаг зүүх.",
+            ar: "يرتدي ساعة على المعصم.",
+            kk: "Білекке сағат тағу.",
+            th: "ใส่นาฬิกาที่ข้อมือ."
+        },
+        "가방을들다": {
+            ko: "손으로 가방을 들다",
+            en: "To carry a bag by hand.",
+            vi: "Cầm túi bằng tay.",
+            mn: "Цүнхийг гараараа барих.",
+            ar: "يحمل حقيبة باليد.",
+            kk: "Сөмкені қолмен ұстау.",
+            th: "ถือกระเป๋าด้วยมือ."
+        },
+        "배낭을메다": {
+            ko: "어깨에 배낭을 메다",
+            en: "To carry a backpack on the shoulders.",
+            vi: "Đeo ba lô trên vai.",
+            mn: "Үүргэвчийг мөрөндөө үүрэх.",
+            ar: "يحمل حقيبة ظهر على الكتفين.",
+            kk: "Рюкзакты иыққа асып жүру.",
+            th: "สะพายเป้ไว้บนไหล่."
+        }
     };
 
     const sets = [
@@ -116,7 +285,9 @@
         grid: document.getElementById("crossword-grid"),
         activeMeta: document.getElementById("active-clue-meta"),
         activeText: document.getElementById("active-clue-text"),
-        activeClueVi: document.getElementById("active-clue-vi"),
+        clueTranslations: Object.fromEntries(
+            clueLangs.map(({ code }) => [code, document.getElementById(`active-clue-${code}`)])
+        ),
         activeImage: document.getElementById("active-clue-image"),
         bankSelection: document.getElementById("bank-selection"),
         wordTrack: document.getElementById("word-track"),
@@ -142,7 +313,8 @@
         openSheet: "",
         touchDrag: null,
         ignoreNextTileClick: false,
-        feedbackOverride: ""
+        feedbackOverride: "",
+        feedbackTone: ""
     };
 
     function currentSet() {
@@ -187,16 +359,19 @@
 
     function clearFeedbackOverride() {
         state.feedbackOverride = "";
+        state.feedbackTone = "";
     }
 
     function showPlacementError(row, col, tileId, wordIndex = -1) {
-        state.feedbackOverride = "맞는 칸에 놓아 보세요.";
+        state.feedbackOverride = "아니에요. 맞는 글자를 넣어 보세요.";
+        state.feedbackTone = "error";
         flashTile(tileId, "is-wrong-flash");
-        flashCell(row, col, "is-cleared-flash");
+        flashCell(row, col, "is-wrong-flash", 620);
         if (wordIndex >= 0) {
-            flashWordSlot(wordIndex, "is-wrong-flash");
+            flashWordSlot(wordIndex, "is-wrong-flash", 620);
         }
         updateBankSelection();
+        flashElement(dom.bankSelection, "is-error-flash", 700);
     }
 
     function tryPlaceTileAt(row, col, tileId, options = {}) {
@@ -207,13 +382,35 @@
             return false;
         }
 
-        const activeEntry = cell.entries.find((entry) => entry.wordId === set.activeWordId) || cell.entries[0];
+        const activeEntry = cell.entries.find((entry) => entry.wordId === set.activeWordId) || null;
         if (tile.letter !== cell.solution) {
             showPlacementError(row, col, tile.id, activeEntry?.index ?? -1);
             return false;
         }
 
         return placeTileAt(row, col, tile.id, options);
+    }
+
+    function tryPlaceTileInWordSlot(index, tileId, options = {}) {
+        const set = currentSet();
+        const word = activeWord();
+        const tile = getTileById(set, tileId);
+        if (!word || !tile || tile.used || index < 0 || index >= word.cells.length) {
+            return false;
+        }
+
+        const target = wordCellState(set, word, index);
+        state.wordCursorIndex = index;
+
+        if (tile.letter !== target.solution) {
+            showPlacementError(target.row, target.col, tile.id, target.index);
+            return false;
+        }
+
+        return placeTileAt(target.row, target.col, tile.id, {
+            ...options,
+            source: options.source || "word-track-drag"
+        });
     }
 
     function setWordValue(set, word) {
@@ -411,9 +608,9 @@
         flashElement(tile, className);
     }
 
-    function flashCell(row, col, className) {
+    function flashCell(row, col, className, duration) {
         const cell = dom.grid.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-        flashElement(cell, className);
+        flashElement(cell, className, duration);
     }
 
     function flashWordSlot(index, className, duration = 360) {
@@ -550,7 +747,12 @@
         const hint = hintCopyMap[word.answer];
         dom.activeMeta.textContent = `${wordLabel(word)} · ${word.answer.length}칸 · ${state.imageMode === "easy" ? "초성" : "마스킹"}`;
         dom.activeText.textContent = `한글: ${hint.ko}`;
-        dom.activeClueVi.textContent = `Tiếng Việt: ${hint.vi}`;
+        clueLangs.forEach(({ code, label }) => {
+            const element = dom.clueTranslations[code];
+            if (element) {
+                element.textContent = `${label}: ${hint[code] || hint.ko}`;
+            }
+        });
         dom.activeImage.src = clueImageFor(word);
         dom.activeImage.alt = `${displayAnswer(word)} 단서 그림`;
         updateMobileDock();
@@ -566,12 +768,12 @@
         tile.cellKey = "";
     }
 
-    function findGridCellAt(x, y) {
+    function findDropTargetAt(x, y) {
         const element = document.elementFromPoint(x, y);
         if (!element) {
             return null;
         }
-        return element.closest(".grid-cell:not(.is-block)");
+        return element.closest(".grid-cell:not(.is-block), .word-track__slot");
     }
 
     function clearTouchDropTarget() {
@@ -615,7 +817,7 @@
         state.touchDrag.ghost.style.left = `${x}px`;
         state.touchDrag.ghost.style.top = `${y}px`;
 
-        const target = findGridCellAt(x, y);
+        const target = findDropTargetAt(x, y);
         if (target === state.touchDrag.dropTarget) {
             return;
         }
@@ -642,9 +844,17 @@
             return false;
         }
 
+        if (target.matches(".word-track__slot")) {
+            tryPlaceTileInWordSlot(Number(target.dataset.wordIndex), tileId, {
+                keepSheetOpen: isMobileLayout() && state.openSheet === "bank",
+                source: "touch-word-track"
+            });
+            return true;
+        }
+
         const row = Number(target.dataset.row);
         const col = Number(target.dataset.col);
-        tryPlaceTileAt(row, col, tileId, { source: "touch" });
+        tryPlaceTileAt(row, col, tileId, { source: "touch-board" });
         return true;
     }
 
@@ -720,6 +930,7 @@
             dom.wordTrackHint.textContent = "글자를 이어서 눌러 채워 보세요.";
         }
 
+        dom.bankSelection.classList.toggle("is-error", state.feedbackTone === "error");
         updateMobileDock();
     }
 
@@ -830,6 +1041,12 @@
 
         const candidate = cell.entries.find((entry) => entry.wordId === set.activeWordId) || cell.entries[0];
         event.preventDefault();
+
+        if (state.selectedTileId) {
+            tryPlaceTileAt(row, col, state.selectedTileId, { source: "click-board" });
+            return;
+        }
+
         selectWord(candidate.wordId, candidate.index);
 
         if (isMobileLayout()) {
@@ -1002,11 +1219,51 @@
         }
 
         state.wordCursorIndex = Number(slot.dataset.wordIndex);
+
+        if (state.selectedTileId) {
+            tryPlaceTileInWordSlot(state.wordCursorIndex, state.selectedTileId, { source: "click-word-track" });
+            return;
+        }
+
         syncWordTrackUI();
 
         if (isMobileLayout()) {
             openMobileSheet("bank");
         }
+    });
+
+    dom.wordTrack.addEventListener("dragover", (event) => {
+        const slot = event.target.closest("[data-word-index]");
+        if (!slot) {
+            return;
+        }
+        event.preventDefault();
+        slot.classList.add("is-drop");
+    });
+
+    dom.wordTrack.addEventListener("dragleave", (event) => {
+        const slot = event.target.closest("[data-word-index]");
+        if (slot) {
+            slot.classList.remove("is-drop");
+        }
+    });
+
+    dom.wordTrack.addEventListener("drop", (event) => {
+        const slot = event.target.closest("[data-word-index]");
+        if (!slot) {
+            return;
+        }
+
+        event.preventDefault();
+        slot.classList.remove("is-drop");
+        const tileId =
+            event.dataTransfer?.getData("application/x-crossword-tile") ||
+            event.dataTransfer?.getData("text/plain") ||
+            "";
+        if (!tileId) {
+            return;
+        }
+        tryPlaceTileInWordSlot(Number(slot.dataset.wordIndex), tileId, { source: "word-track-drag" });
     });
 
     dom.letterBank.addEventListener("click", (event) => {
@@ -1046,6 +1303,8 @@
     }, { capture: true, passive: false });
 
     dom.letterBank.addEventListener("dragend", () => {
+        dom.grid.querySelectorAll(".is-drop").forEach((element) => element.classList.remove("is-drop"));
+        dom.wordTrack.querySelectorAll(".is-drop").forEach((element) => element.classList.remove("is-drop"));
         setSelectedTile("");
     });
 

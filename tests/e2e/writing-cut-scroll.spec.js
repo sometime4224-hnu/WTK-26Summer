@@ -1,11 +1,12 @@
 const { test, expect } = require('@playwright/test');
 
-const writingCutPages = [
-  '/c11/writing-cut.html',
+const legacyWritingCutPages = [
   '/c12/writing-cut.html',
   '/c14/writing-cut.html',
   '/c15/writing-cut.html'
 ];
+
+const c11WritingCutPage = '/c11/writing-cut.html';
 
 async function blockExternalRequests(page) {
   await page.route('https://www.googletagmanager.com/**', (route) => route.abort());
@@ -133,7 +134,24 @@ async function fillStepTwo(page) {
   }
 }
 
-for (const pagePath of writingCutPages) {
+async function solveCurrentC11Cut(page) {
+  const sentence = await page.evaluate(() => window.__C11_WRITING_CUT.getCurrentSentence());
+  await page.locator('[data-action="draft-text"]').fill(sentence);
+  await page.locator('[data-action="check-draft"]').click();
+  await expect(page.locator('[data-action="next"]')).toBeEnabled();
+}
+
+test(`auto-scrolls back to the image panel after moving to the next cut on ${c11WritingCutPage}`, async ({ page }) => {
+  await openWritingCutPage(page, c11WritingCutPage);
+
+  await solveCurrentC11Cut(page);
+  await scrollNextButtonAndConfirmImagePanelMovedOffscreen(page);
+
+  await page.locator('[data-action="next"]').click();
+  await expectImagePanelNearTop(page);
+});
+
+for (const pagePath of legacyWritingCutPages) {
   test(`auto-scrolls back to the image panel after moving to the next cut on ${pagePath}`, async ({ page }) => {
     await openWritingCutPage(page, pagePath);
 
@@ -170,7 +188,38 @@ test.describe('mobile viewport', () => {
     viewport: { width: 390, height: 844 }
   });
 
-  for (const pagePath of writingCutPages) {
+  test(`opens and closes the full passage view without breaking focus flow on mobile for ${c11WritingCutPage}`, async ({ page }) => {
+    await openWritingCutPage(page, c11WritingCutPage);
+
+    const openButton = page.locator('[data-nav-open-passage]');
+    await expect(openButton).toBeVisible();
+    await expect(openButton).toHaveAttribute('aria-haspopup', 'dialog');
+    await expect(openButton).toHaveAttribute('aria-controls', 'passage-dialog');
+
+    await openButton.click();
+    await expectBodyPassageState(page, true);
+    await expect(page.locator('#passage-dialog')).toBeVisible();
+    await expect(page.locator('[data-passage-close-button]')).toBeFocused();
+
+    await page.locator('[data-passage-close-button]').click();
+    await expectBodyPassageState(page, false);
+    await expect(page.locator('#passage-dialog')).toHaveCount(0);
+    await expect(openButton).toBeFocused();
+
+    await solveCurrentC11Cut(page);
+  });
+
+  test(`auto-scrolls back to the image panel after moving to the next cut on mobile for ${c11WritingCutPage}`, async ({ page }) => {
+    await openWritingCutPage(page, c11WritingCutPage);
+
+    await solveCurrentC11Cut(page);
+    await scrollNextButtonAndConfirmImagePanelMovedOffscreen(page);
+
+    await page.locator('[data-action="next"]').click();
+    await expectImagePanelNearTop(page);
+  });
+
+  for (const pagePath of legacyWritingCutPages) {
     test(`opens and closes the full passage view without breaking focus flow on mobile for ${pagePath}`, async ({ page }) => {
       await openWritingCutPage(page, pagePath);
 

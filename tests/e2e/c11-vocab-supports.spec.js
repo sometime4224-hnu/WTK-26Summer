@@ -55,7 +55,8 @@ const supportPages = [
   { path: '/c11/vocab-support-job-posting.html', visual: '.job-company-img' },
   { path: '/c11/vocab-support-org-chart.html', visual: '.chip-img' },
   { path: '/c11/vocab-support-welfare-balance.html', visual: '.balancer-icon' },
-  { path: '/c11/vocab-support-work-scenario.html', visual: '.char-avatar img' }
+  { path: '/c11/vocab-support-work-scenario.html', visual: '.char-avatar img' },
+  { path: '/c11/vocab-support-quiz.html', visual: '.support-visual-img' }
 ];
 
 const layoutViewports = [
@@ -76,7 +77,7 @@ test.describe('Chapter 11 Vocabulary Support Activities', () => {
     // Open drawer
     await drawer.locator('summary.support-drawer__summary').click();
     await expect(drawer).toHaveAttribute('open', '');
-    await expect(drawer.locator('.support-drawer__links .lesson-link')).toHaveCount(7);
+    await expect(drawer.locator('.support-drawer__links .lesson-link')).toHaveCount(8);
   });
 
   test('job-posting page matches candidate to job via click-to-select', async ({ page }) => {
@@ -218,5 +219,32 @@ test.describe('Chapter 11 Vocabulary Support Activities', () => {
         await expectNoHorizontalOverflow(page);
       }
     }
+  });
+
+  test('vocab-support-quiz page steps through 12 questions and displays correct results', async ({ page }) => {
+    await blockExternalRequests(page);
+    await page.goto('/c11/vocab-support-quiz.html', { waitUntil: 'domcontentloaded' });
+
+    // Iterate through all 12 questions
+    for (let i = 1; i <= 12; i++) {
+      await expect(page.locator('#quiz-progress-text')).toHaveText(`문제 ${i} / 12`);
+
+      // Wait for choices to load
+      const firstChoice = page.locator('.choice-btn').first();
+      await expect(firstChoice).toBeVisible();
+
+      // Click the first choice
+      await firstChoice.click();
+
+      // Verify next button becomes enabled and click it
+      const nextBtn = page.locator('#btn-next');
+      await expect(nextBtn).toBeEnabled();
+      await nextBtn.click();
+    }
+
+    // After 12 questions, the result panel should be visible
+    await expect(page.locator('#result-panel')).toBeVisible();
+    await expect(page.locator('#result-score-val')).toContainText('/ 12');
+    await expect(page.locator('#result-char-title')).not.toBeEmpty();
   });
 });

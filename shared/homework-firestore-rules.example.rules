@@ -27,22 +27,60 @@ service cloud.firestore {
         && request.resource.data.studentName is string
         && request.resource.data.studentName.size() >= 1
         && request.resource.data.studentName.size() <= 40
-        && request.resource.data.chapter == "12"
-        && request.resource.data.total == 24
-        && request.resource.data.answered == 24
         && request.resource.data.completed == true
         && request.resource.data.score is int
-        && request.resource.data.score >= 0
-        && request.resource.data.score <= 24
         && request.resource.data.percent is int
         && request.resource.data.percent >= 0
         && request.resource.data.percent <= 100
         && request.resource.data.correctQuestions is list
         && request.resource.data.wrongQuestions is list
         && request.resource.data.questionResults is list
-        && request.resource.data.questionResults.size() == 24
         && request.resource.data.clientSubmittedAt is string
-        && request.resource.data.submittedAt is timestamp;
+        && request.resource.data.submittedAt is timestamp
+        && (
+          isC12ReviewSubmission(assignmentId)
+          || isVocabGrammarMockSubmission(assignmentId)
+        );
+    }
+
+    function isC12ReviewSubmission(assignmentId) {
+      return assignmentId == "c12-review-quiz-v1"
+        && request.resource.data.chapter == "12"
+        && request.resource.data.total == 24
+        && request.resource.data.answered == 24
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= 24
+        && request.resource.data.questionResults.size() == 24;
+    }
+
+    function isVocabGrammarMockAssignment(assignmentId) {
+      return assignmentId in [
+        "vocab-grammar-mock-round1-v1",
+        "vocab-grammar-mock-round2-v1",
+        "vocab-grammar-mock-round3-v1",
+        "vocab-grammar-mock-round4-v1",
+        "vocab-grammar-mock-marathon30-v1"
+      ];
+    }
+
+    function vocabGrammarMockTotal(assignmentId) {
+      return assignmentId == "vocab-grammar-mock-round1-v1"
+        ? 26
+        : assignmentId == "vocab-grammar-mock-marathon30-v1"
+          ? 30
+          : 25;
+    }
+
+    function isVocabGrammarMockSubmission(assignmentId) {
+      return isVocabGrammarMockAssignment(assignmentId)
+        && request.resource.data.chapter == "midterm-3b"
+        && request.resource.data.roundId is string
+        && request.resource.data.roundLabel is string
+        && request.resource.data.total == vocabGrammarMockTotal(assignmentId)
+        && request.resource.data.answered == vocabGrammarMockTotal(assignmentId)
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= vocabGrammarMockTotal(assignmentId)
+        && request.resource.data.questionResults.size() == vocabGrammarMockTotal(assignmentId);
     }
   }
 }

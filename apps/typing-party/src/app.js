@@ -1836,15 +1836,31 @@ async function setStage(nextStage) {
 
 async function nextLobby() {
   if (state.role !== "host") return;
-  await state.client.updateRoom(state.roomCode, {
-    "meta/status": "lobby",
-    "meta/currentRoundId": "",
-    "meta/currentActivityId": "",
-    "meta/currentActivityRunId": "",
-    "meta/currentGroupSessionId": "",
-    "meta/groupGameType": "",
-    "meta/phaseStartedAt": now()
-  });
+  const nextMeta = {
+    ...(state.room?.meta || {}),
+    status: "lobby",
+    currentRoundId: "",
+    currentActivityId: "",
+    currentActivityRunId: "",
+    currentGroupSessionId: "",
+    groupGameType: "",
+    phaseStartedAt: now()
+  };
+
+  setStartStatus("대기실로 돌아가는 중입니다.");
+  try {
+    await state.client.updateRoom(state.roomCode, { meta: nextMeta });
+    if (state.room?.meta) {
+      state.room = {
+        ...state.room,
+        meta: nextMeta
+      };
+      renderRoom();
+    }
+    setStartStatus("대기실로 돌아왔습니다.");
+  } catch (error) {
+    setStartStatus(`대기실 전환 실패: ${error.message}`);
+  }
 }
 
 function validateAnswer(text, round) {

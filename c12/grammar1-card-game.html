@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-        <!-- Google Tag Manager -->
+    <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -12,174 +12,1210 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>12과 문법 카드 게임 | -았/었더니</title>
     <script src="https://cdn.tailwindcss.com" defer></script>
-<style>
-        body { margin:0; font-family:'Noto Sans KR',sans-serif; background:linear-gradient(180deg,#fff7ed 0%,#fffbf5 100%); color:#1f2937; }
-        .screen { display:none; }
-        .screen.active { display:block; }
-        .slot { border:2px dashed #fdba74; border-radius:22px; background:#fff; min-height:126px; padding:10px; transition:all .15s ease; }
-        .slot.hover { border-color:#f97316; box-shadow:0 0 0 3px rgba(249,115,22,.12); }
-        .slot.filled { border-style:solid; }
-        .slot.next { border-color:#f97316; background:#fff7ed; box-shadow:0 0 0 3px rgba(249,115,22,.1); }
-        .slot.correct { border-color:#16a34a; box-shadow:0 0 0 3px rgba(22,163,74,.12); }
-        .slot.wrong { border-color:#ef4444; box-shadow:0 0 0 3px rgba(239,68,68,.12); }
-        .choice-card { border:3px solid transparent; border-radius:24px; overflow:hidden; background:#fff; box-shadow:0 10px 24px rgba(15,23,42,.08); cursor:pointer; transition:all .15s ease; position:relative; }
-        .choice-card:active { transform:scale(.98); }
-        .choice-card.used { opacity:.42; cursor:default; }
-        .choice-card.answer { border-color:#16a34a; }
-        .card-media { aspect-ratio:1/1; background:#fff7ed; display:flex; align-items:center; justify-content:center; }
-        .card-media img { width:100%; height:100%; object-fit:contain; display:block; }
-        .card-label { padding:8px 8px 10px; text-align:center; font-size:13px; font-weight:800; line-height:1.35; word-break:keep-all; }
-        .tag-used { position:absolute; top:10px; right:10px; font-size:11px; font-weight:900; color:#fff; background:rgba(15,23,42,.78); border-radius:999px; padding:4px 8px; }
-        .pill { display:inline-flex; align-items:center; justify-content:center; border-radius:999px; font-weight:900; color:#fff; min-height:48px; padding:0 16px; }
-        .pill.reason { background:linear-gradient(135deg,#60a5fa,#2563eb); }
-        .pill.discovery { background:linear-gradient(135deg,#fb923c,#ea580c); }
-        .safe { word-break:keep-all; overflow-wrap:break-word; }
-        .game-sheet {
-            position:fixed;
-            left:50%;
-            bottom:max(10px, env(safe-area-inset-bottom));
-            transform:translateX(-50%);
-            width:min(1080px, calc(100vw - 16px));
-            z-index:45;
+    <style>
+        :root {
+            --nav-h: 56px;
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #fed7aa;
+            --orange: #f97316;
+            --orange-dark: #c2410c;
+            --sky: #2563eb;
+            --panel: #fff;
+            --bg: #fff7ed;
         }
-        .slot-grid-basic, .slot-grid-compare { display:grid; gap:10px; grid-template-columns:repeat(2,minmax(0,1fr)); }
-        .slot-grid-compare .slot-shared { grid-column:1 / -1; }
-        .slot-tip {
-            margin-top:8px;
-            font-size:11px;
-            font-weight:800;
-            line-height:1.45;
-            color:#94a3b8;
-            text-align:center;
+
+        * { box-sizing: border-box; }
+        html { min-height: 100%; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--ink);
+            background: linear-gradient(180deg, #fff7ed 0%, #fffbf5 100%);
         }
-        @media (min-width: 768px) {
-            .slot { min-height:140px; padding:12px; }
-            .game-sheet { width:min(960px, calc(100vw - 40px)); }
+        button { font: inherit; }
+        .safe { word-break: keep-all; overflow-wrap: break-word; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        .hidden { display: none !important; }
+
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            min-height: var(--nav-h);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+        }
+        .top-nav a,
+        .top-nav span {
+            font-size: 14px;
+            font-weight: 800;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .top-nav a { color: #ea580c; }
+.top-nav__current { color: #64748b; }
+
+        .game-main {
+            width: min(1080px, calc(100% - 24px));
+            margin: 0 auto;
+            padding: 18px 0 36px;
+        }
+
+        .intro-card,
+        .break-card,
+        .result-card {
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            background: var(--panel);
+            box-shadow: 0 18px 44px rgba(194, 65, 12, 0.08);
+        }
+        .intro-card__hero {
+            padding: 28px;
+            background: linear-gradient(135deg, #fff7ed 0%, #fffbeb 48%, #eff6ff 100%);
+        }
+        .eyebrow,
+        .panel-label {
+            margin: 0;
+            color: var(--orange-dark);
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 8px 14px;
+            color: #9a3412;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .intro-title,
+        .break-title,
+        .result-title {
+            margin: 14px 0 0;
+            font-size: clamp(1.75rem, 4vw, 2.35rem);
+            line-height: 1.22;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
+        .intro-copy,
+        .break-copy {
+            max-width: 760px;
+            margin: 14px 0 0;
+            color: #475569;
+            font-size: 15px;
+            line-height: 1.75;
+        }
+        .intro-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            padding: 22px;
+        }
+        .intro-panel {
+            border: 1px solid rgba(253, 186, 116, 0.72);
+            border-radius: 22px;
+            padding: 18px;
+            background: #fff7ed;
+        }
+        .intro-panel:nth-child(2) { background: #fff; border-color: #e2e8f0; }
+        .intro-panel p:not(.panel-label) {
+            margin: 10px 0 0;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .start-area {
+            padding: 0 22px 22px;
+        }
+        .primary-btn,
+        .secondary-btn,
+        .ghost-btn {
+            min-height: 46px;
+            border: 0;
+            border-radius: 16px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .primary-btn {
+            width: 100%;
+            color: #fff;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            box-shadow: 0 10px 22px rgba(249, 115, 22, 0.22);
+        }
+        .secondary-btn {
+            color: #9a3412;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+        }
+        .ghost-btn {
+            color: #475569;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+        .primary-btn:disabled,
+        .secondary-btn:disabled,
+        .ghost-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+            box-shadow: none;
+        }
+
+        .game-shell {
+            display: grid;
+            gap: 12px;
+        }
+        .game-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .game-stage {
+            min-width: 0;
+            display: grid;
+            gap: 8px;
+        }
+        .stage-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+        .stage-chip,
+        .score-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 30px;
+            border-radius: 999px;
+            padding: 6px 12px;
+            background: #fff;
+            color: var(--orange-dark);
+            font-size: 13px;
+            font-weight: 900;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+        }
+        .stage-chip.stage-two {
+            color: #1d4ed8;
+            background: #eff6ff;
+        }
+        .meta-text,
+        .stage-text {
+            color: #475569;
+            font-size: 14px;
+            font-weight: 900;
+        }
+        .stage-text { color: #64748b; }
+        .progress-track {
+            width: min(260px, 58vw);
+            height: 8px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #ffedd5;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #fb923c, #f59e0b);
+            transition: width 0.25s ease;
+        }
+
+        .game-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+            gap: 12px;
+            align-items: start;
+        }
+        .prompt-panel,
+        .play-panel,
+        .choices-panel {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        }
+        .prompt-panel { padding: 20px; }
+        .play-panel,
+        .choices-panel { padding: 14px; }
+        .right-stack {
+            display: grid;
+            gap: 12px;
+            min-width: 0;
+        }
+        .prompt-title {
+            margin: 10px 0 0;
+            font-size: clamp(1.45rem, 3vw, 2rem);
+            line-height: 1.45;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
+        .prompt-hint {
+            margin: 12px 0 0;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .compare-lines {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .compare-line {
+            border: 1px solid #bfdbfe;
+            border-radius: 18px;
+            padding: 12px;
+            background: #eff6ff;
+        }
+        .compare-line.discovery {
+            border-color: #fed7aa;
+            background: #fff7ed;
+        }
+        .compare-line span {
+            display: inline-flex;
+            border-radius: 999px;
+            background: #fff;
+            padding: 5px 10px;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .compare-line.discovery span { color: #c2410c; }
+        .compare-line p {
+            margin: 8px 0 0;
+            font-size: 14px;
+            line-height: 1.55;
+            font-weight: 900;
+        }
+
+        .action-hint {
+            margin: 0 0 10px;
+            border-radius: 14px;
+            padding: 10px 12px;
+            background: #fff7ed;
+            color: #9a3412;
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+        .slot-grid-basic {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: stretch;
+            gap: 8px;
+        }
+        .slot-grid-compare {
+            display: grid;
+            gap: 8px;
+        }
+        .compare-slot-row {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            align-items: stretch;
+            gap: 8px;
+        }
+        .grammar-pill {
+            align-self: center;
+            justify-self: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            border-radius: 999px;
+            padding: 0 12px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .grammar-pill.reason { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+        .grammar-pill.discovery { background: linear-gradient(135deg, #fb923c, #ea580c); }
+        .slot {
+            width: 100%;
+            min-width: 0;
+            min-height: 116px;
+            border: 2px dashed #fdba74;
+            border-radius: 18px;
+            padding: 9px;
+            background: #fffaf5;
+            color: inherit;
+            text-align: left;
+            cursor: pointer;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+        }
+        .slot:hover,
+        .slot.hover,
+        .slot.next {
+            border-color: var(--orange);
+            background: #fff7ed;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+        }
+        .slot.filled {
+            border-style: solid;
+            background: #fff;
+        }
+        .slot.correct {
+            border-color: #16a34a;
+            background: #f0fdf4;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+        }
+        .slot.wrong {
+            border-color: #ef4444;
+            background: #fff1f2;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+        }
+        .slot-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            color: var(--orange-dark);
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .slot-next-badge {
+            border-radius: 999px;
+            padding: 3px 7px;
+            background: #ffedd5;
+            color: #c2410c;
+            font-size: 10px;
+            font-weight: 900;
+        }
+        .slot-body {
+            min-height: 78px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 7px;
+        }
+        .slot-placeholder {
+            display: grid;
+            justify-items: center;
+            gap: 5px;
+            text-align: center;
+        }
+        .slot-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: #ffedd5;
+            font-size: 22px;
+        }
+        .slot-placeholder strong {
+            color: #7c2d12;
+            font-size: 12px;
+            line-height: 1.25;
+        }
+        .slot-placeholder span {
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .choices-panel {
+            display: grid;
+            gap: 10px;
+        }
+        .choices-copy {
+            margin: 0;
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+        .choices-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .choice-card {
+            position: relative;
+            min-width: 0;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #fff;
+            color: inherit;
+            box-shadow: 0 6px 15px rgba(15, 23, 42, 0.08);
+            cursor: grab;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+        }
+        .choice-card:focus-visible,
+        .slot:focus-visible,
+        .primary-btn:focus-visible,
+        .secondary-btn:focus-visible,
+        .ghost-btn:focus-visible {
+            outline: 3px solid rgba(37, 99, 235, 0.35);
+            outline-offset: 2px;
+        }
+        .choice-card:active { transform: scale(0.98); }
+        .choice-card.selected {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.14), 0 8px 18px rgba(15, 23, 42, 0.1);
+        }
+        .choice-card.used {
+            opacity: 0.48;
+            cursor: default;
+        }
+        .choice-card.answer { border-color: #16a34a; }
+        .choice-card:disabled { pointer-events: none; }
+        .mini-card {
+            width: 100%;
+            overflow: hidden;
+            border-radius: 13px;
+            background: #fff;
+        }
+        .slot .mini-card {
+            max-width: 92px;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+        }
+        .choice-card .mini-card {
+            border-radius: 14px;
+        }
+        .card-media {
+            aspect-ratio: 4 / 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff7ed;
+        }
+        .card-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .card-label {
+            min-height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 6px 7px;
+            color: #1f2937;
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1.25;
+            text-align: center;
+            word-break: keep-all;
+            background: #fff;
+        }
+        .tag-used,
+        .tag-selected {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            border-radius: 999px;
+            padding: 3px 7px;
+            color: #fff;
+            background: rgba(15, 23, 42, 0.78);
+            font-size: 10px;
+            font-weight: 900;
+        }
+        .tag-selected { background: rgba(234, 88, 12, 0.9); }
+
+        .feedback-box {
+            margin-top: 10px;
+            border: 1px solid;
+            border-radius: 18px;
+            padding: 12px;
+        }
+        .feedback-box.correct { border-color: #bbf7d0; background: #f0fdf4; }
+        .feedback-box.wrong { border-color: #fecdd3; background: #fff1f2; }
+        .feedback-title {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 900;
+        }
+        .feedback-title.correct { color: #15803d; }
+        .feedback-title.wrong { color: #be123c; }
+        .feedback-explain {
+            margin: 7px 0 0;
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+        .answer-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 9px;
+        }
+        .answer-chip {
+            border-radius: 999px;
+            padding: 6px 9px;
+            background: #fff;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 900;
+            box-shadow: inset 0 0 0 1px #e2e8f0;
+        }
+        .change-stage {
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+            border: 1px solid #fed7aa;
+            border-radius: 20px;
+            padding: 12px;
+            background:
+                radial-gradient(circle at 18% 28%, rgba(251, 146, 60, 0.12), transparent 32%),
+                radial-gradient(circle at 84% 26%, rgba(37, 99, 235, 0.1), transparent 30%),
+                #fffaf5;
+        }
+        .change-stage::before {
+            content: "";
+            position: absolute;
+            inset: 10px 16px auto;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.48), transparent);
+            opacity: 0;
+            transform: translateX(-34%);
+        }
+        .change-stage.is-playing::before {
+            animation: changeBeam 1.45s ease-out both;
+        }
+        .change-stage__caption {
+            position: relative;
+            z-index: 1;
+            margin: 0 0 10px;
+            color: #9a3412;
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1.45;
+        }
+        .change-stage__row {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: center;
+            gap: 9px;
+        }
+        .change-stage__row.compare {
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.35fr);
+        }
+        .change-card {
+            min-width: 0;
+            border: 2px solid #fed7aa;
+            border-radius: 16px;
+            padding: 7px;
+            background: #fff;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        }
+        .change-card .mini-card {
+            max-width: 112px;
+            margin: 0 auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+        }
+        .change-card__label {
+            display: block;
+            margin-bottom: 5px;
+            color: #c2410c;
+            font-size: 11px;
+            font-weight: 900;
+            text-align: center;
+        }
+        .change-bridge {
+            position: relative;
+            min-width: 62px;
+            display: grid;
+            justify-items: center;
+            gap: 5px;
+            color: #ea580c;
+            font-size: 12px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .change-arrow {
+            width: 58px;
+            height: 18px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #fed7aa, #f97316);
+            clip-path: polygon(0 36%, 68% 36%, 68% 0, 100% 50%, 68% 100%, 68% 64%, 0 64%);
+        }
+        .change-wave {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: rgba(249, 115, 22, 0.32);
+            opacity: 0;
+        }
+        .change-stage.is-playing .change-wave {
+            animation: flowWave 1.35s ease-out both;
+        }
+        .change-stage.is-playing .change-card--from {
+            animation: actionNudge 1.2s ease-out both;
+        }
+        .change-stage.is-playing .change-card--to {
+            animation: resultReveal 1.35s ease-out both;
+        }
+        .change-stage.effect-glow-rise .change-card--to {
+            border-color: #fde68a;
+        }
+        .change-stage.effect-glow-rise.is-playing .change-card--from {
+            animation-name: glowLift;
+        }
+        .change-stage.effect-glow-rise.is-playing .change-card--to {
+            animation-name: glowResult;
+        }
+        .change-stage.effect-heal-pulse .change-bridge::before,
+        .change-stage.effect-heal-pulse .change-bridge::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 26px;
+            height: 26px;
+            border: 2px solid rgba(34, 197, 94, 0.38);
+            border-radius: 999px;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.35);
+        }
+        .change-stage.effect-heal-pulse.is-playing .change-bridge::before {
+            animation: healPulse 1.25s ease-out both;
+        }
+        .change-stage.effect-heal-pulse.is-playing .change-bridge::after {
+            animation: healPulse 1.25s 0.22s ease-out both;
+        }
+        .change-stage.effect-gauge-shift .change-gauge {
+            width: 68px;
+            height: 9px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+        .change-stage.effect-gauge-shift .change-gauge span {
+            display: block;
+            width: 34%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #fb923c, #22c55e);
+        }
+        .change-stage.effect-gauge-shift.is-playing .change-gauge span {
+            animation: gaugeShift 1.35s ease-out both;
+        }
+        .compare-flows {
+            display: grid;
+            gap: 8px;
+        }
+        .compare-flow {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #bfdbfe;
+            border-radius: 14px;
+            padding: 8px;
+            background: #eff6ff;
+        }
+        .compare-flow.discovery {
+            border-color: #fed7aa;
+            background: #fff7ed;
+        }
+        .compare-flow__pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 30px;
+            border-radius: 999px;
+            padding: 0 10px;
+            color: #fff;
+            background: #2563eb;
+            font-size: 12px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .compare-flow.discovery .compare-flow__pill {
+            background: #ea580c;
+        }
+        .compare-flow__text {
+            color: #334155;
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+        .change-stage.effect-split-compare.is-playing .compare-flow.discovery {
+            animation: resultReveal 1.35s ease-out both;
+        }
+        .feedback-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .effect-btn {
+            min-height: 38px;
+            border: 1px solid #fed7aa;
+            border-radius: 999px;
+            padding: 8px 12px;
+            color: #9a3412;
+            background: #fff;
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .effect-btn:focus-visible {
+            outline: 3px solid rgba(37, 99, 235, 0.35);
+            outline-offset: 2px;
+        }
+        .controls-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .controls-row .primary-btn,
+        .controls-row .secondary-btn {
+            flex: 1;
+        }
+
+        .break-card,
+        .result-card {
+            padding: 24px;
+        }
+        .comparison-demo {
+            display: grid;
+            gap: 10px;
+            margin-top: 18px;
+            border: 1px solid #bfdbfe;
+            border-radius: 20px;
+            padding: 14px;
+            background: #eff6ff;
+        }
+        .comparison-demo__line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 900;
+        }
+        .demo-slot {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 8px 10px;
+            background: #fff;
+            color: #64748b;
+        }
+        .result-score {
+            margin-top: 22px;
+            text-align: center;
+        }
+        .result-score strong {
+            display: block;
+            color: #ea580c;
+            font-size: clamp(2.4rem, 7vw, 3.6rem);
+            font-weight: 900;
+        }
+        .result-score span {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 800;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .result-stat,
+.result-stat p {
+            margin: 0;
+            color: #c2410c;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .result-stat strong {
+            display: block;
+            margin-top: 5px;
+            font-size: 18px;
+            line-height: 1.35;
+        }
+
+
+.result-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        @keyframes changeBeam {
+            0% { opacity: 0; transform: translateX(-34%); }
+            26% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(34%); }
+        }
+        @keyframes flowWave {
+            0% { opacity: 0; transform: translate(-36px, -50%) scale(0.45); }
+            24% { opacity: 1; }
+            100% { opacity: 0; transform: translate(52px, -50%) scale(1.9); }
+        }
+        @keyframes actionNudge {
+            0%, 100% { transform: translateY(0) scale(1); }
+            35% { transform: translateY(-6px) scale(1.02); }
+        }
+        @keyframes resultReveal {
+            0% { transform: scale(0.96); box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08); }
+            55% { transform: scale(1.04); box-shadow: 0 0 0 5px rgba(249, 115, 22, 0.16), 0 12px 24px rgba(15, 23, 42, 0.12); }
+            100% { transform: scale(1); box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08); }
+        }
+        @keyframes glowLift {
+            0%, 100% { transform: translateY(0); }
+            48% { transform: translateY(-9px); }
+        }
+        @keyframes glowResult {
+            0% { box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08); }
+            55% { box-shadow: 0 0 0 6px rgba(250, 204, 21, 0.24), 0 0 28px rgba(250, 204, 21, 0.32); }
+            100% { box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08); }
+        }
+        @keyframes healPulse {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.35); }
+            25% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(2.3); }
+        }
+        @keyframes gaugeShift {
+            0% { width: 18%; }
+            55% { width: 92%; }
+            100% { width: 72%; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .change-stage,
+            .change-stage *,
+            .change-stage::before {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+            }
+            .change-stage::before,
+            .change-wave {
+                display: none;
+            }
+            .change-stage {
+                background: #fff7ed;
+            }
+            .change-card--to {
+                border-color: #f97316;
+                box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+            }
+        }
+
+        @media (max-width: 1023px) {
+            .game-main {
+                width: min(100% - 20px, 760px);
+                padding: 12px 0 28px;
+            }
+            .game-layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .prompt-panel {
+                padding: 16px;
+            }
+            .prompt-title {
+                font-size: 1.35rem;
+                line-height: 1.45;
+            }
+            .compare-lines {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .top-nav {
+                gap: 8px;
+                overflow-x: auto;
+                padding: 0 12px;
+            }
+            .game-main {
+                width: calc(100% - 16px);
+                padding-top: 10px;
+            }
+            .intro-card__hero,
+            .break-card,
+            .result-card {
+                padding: 18px;
+                border-radius: 22px;
+            }
+            .intro-grid,
+            .result-grid {
+                grid-template-columns: minmax(0, 1fr);
+                padding: 16px;
+            }
+            .start-area {
+                padding: 0 16px 16px;
+            }
+            .game-top {
+                align-items: flex-start;
+            }
+            .score-chip {
+                min-height: 28px;
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            .meta-text,
+            .stage-text {
+                font-size: 13px;
+            }
+            .progress-track {
+                width: min(180px, 52vw);
+            }
+            .prompt-panel,
+            .play-panel,
+            .choices-panel {
+                border-radius: 20px;
+            }
+            .prompt-panel {
+                padding: 14px;
+            }
+            .prompt-title {
+                margin-top: 8px;
+                font-size: 1.22rem;
+                line-height: 1.42;
+            }
+            .prompt-hint {
+                margin-top: 8px;
+                font-size: 13px;
+                line-height: 1.55;
+            }
+            .compare-lines {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .slot-grid-basic {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            }
+            .slot-grid-basic .grammar-pill {
+                grid-column: 1 / -1;
+                grid-row: 2;
+                min-height: 36px;
+                width: max-content;
+                margin: -2px auto;
+            }
+            .slot-grid-basic .slot:nth-child(3) {
+                grid-column: 2;
+                grid-row: 1;
+            }
+            .compare-slot-row {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .change-stage__row.compare {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .change-bridge {
+                min-width: 0;
+            }
+            .compare-flow {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .compare-slot-row .grammar-pill {
+                justify-self: start;
+                min-height: 34px;
+            }
+            .slot {
+                min-height: 108px;
+                padding: 8px;
+            }
+            .slot-body {
+                min-height: 70px;
+            }
+            .slot .mini-card {
+                max-width: 82px;
+            }
+            .choices-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 7px;
+            }
+            .card-label {
+                min-height: 32px;
+                padding: 4px 4px 6px;
+                font-size: 11px;
+            }
+            .controls-row,
+            .result-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .game-main {
+                width: calc(100% - 14px);
+            }
+            .play-panel,
+            .choices-panel {
+                padding: 12px;
+            }
+            .slot {
+                min-height: 102px;
+            }
+            .slot-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 19px;
+            }
+            .slot-placeholder strong {
+                font-size: 11px;
+            }
+            .slot-placeholder span {
+                font-size: 10px;
+            }
+            .grammar-pill {
+                min-height: 32px;
+                font-size: 12px;
+            }
+            .choices-grid {
+                gap: 6px;
+            }
+            .card-media {
+                aspect-ratio: 1.08 / 1;
+            }
+            .card-label {
+                min-height: 31px;
+                font-size: 10.5px;
+            }
         }
     </style>
 </head>
 <body>
-        <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <nav class="sticky top-0 z-50 flex h-14 items-center gap-3 border-b border-orange-200 bg-white/90 px-4 backdrop-blur">
-        <a href="../index.html" class="text-sm font-bold text-orange-700">메인</a>
-        <span class="text-orange-300">|</span>
-        <a href="index.html" class="text-sm font-bold text-orange-700">12과</a>
-        <span class="text-orange-300">|</span>
-        <a href="grammar1.html" class="text-sm font-bold text-orange-700">문법 1</a>
-        <span class="text-orange-300">|</span>
-        <span class="text-sm font-bold text-slate-500">문법 카드 게임</span>
+
+    <nav class="top-nav" aria-label="상단 이동">
+        <a href="../index.html">메인</a>
+        <span class="top-nav__divider">|</span>
+        <a href="index.html">12과</a>
+        <span class="top-nav__divider">|</span>
+        <a href="grammar1.html">문법 1</a>
+        <span class="top-nav__divider">|</span>
+        <span class="top-nav__current">문법 카드 게임</span>
     </nav>
 
-    <main class="mx-auto w-[min(1080px,calc(100%-24px))] py-5 pb-10">
+    <main class="game-main">
         <section id="screen-start" class="screen active">
-            <div class="overflow-hidden rounded-[32px] border border-orange-200 bg-white shadow-[0_20px_50px_rgba(194,65,12,0.08)]">
-                <div class="bg-gradient-to-br from-orange-50 via-amber-50 to-sky-50 px-6 py-7">
-                    <span class="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-black text-orange-800">문법 카드 게임</span>
-                    <h1 class="mt-4 text-3xl font-black leading-tight text-slate-900 safe">상단 문장을 보고, 아래 그림 카드를 순서대로 터치해<br>`-았/었더니` 구조를 완성해 보세요.</h1>
-                    <p class="mt-4 max-w-3xl text-sm leading-7 text-slate-600 safe">1단계는 `카드 -았/었더니 카드` 완성, 2단계는 같은 행동을 기준으로 `-아/어서`와 `-았/었더니`의 차이를 비교하는 활동입니다.</p>
+            <div class="intro-card">
+                <div class="intro-card__hero">
+                    <span class="badge">문법 카드 게임</span>
+                    <h1 class="intro-title safe">문장을 보고 그림 카드를 슬롯에 배치해<br>-았/었더니 구조를 완성해 보세요.</h1>
+                    <p class="intro-copy safe">1단계는 앞 행동과 뒤 결과를 연결하고, 2단계는 같은 행동을 기준으로 -아/어서와 -았/었더니의 차이를 비교합니다.</p>
                 </div>
-                <div class="grid gap-4 p-6 md:grid-cols-2">
-                    <section class="rounded-[28px] border border-orange-200 bg-orange-50 p-5">
-                        <p class="text-xs font-black uppercase tracking-[0.14em] text-orange-700">Stages</p>
-                        <div class="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                            <p><b>1단계</b> 상단 문장을 보고 앞 행동 카드와 뒤 결과 카드를 채웁니다.</p>
-                            <p><b>2단계</b> 공통 행동 카드를 중심으로 `-아/어서 뒤 행동`과 `-았/었더니 뒤 결과`를 비교합니다.</p>
-                        </div>
+                <div class="intro-grid">
+                    <section class="intro-panel">
+                        <p class="panel-label">Stages</p>
+                        <p><b>1단계</b> 앞 행동 카드와 뒤 결과 카드를 골라 -았/었더니 문장을 완성합니다.</p>
+                        <p><b>2단계</b> 공통 행동, 이어서 한 행동, 해 보니 생긴 결과를 나누어 봅니다.</p>
                     </section>
-                    <section class="rounded-[28px] border border-slate-200 bg-white p-5">
-                        <p class="text-xs font-black uppercase tracking-[0.14em] text-orange-700">How To Play</p>
-                        <div class="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                            <p>1. 문장을 읽고 들어갈 그림 카드를 떠올립니다.</p>
-                            <p>2. 카드를 순서대로 터치하면 하단 슬롯이 왼쪽부터 자동으로 채워집니다.</p>
-                            <p>3. 실수했으면 슬롯을 눌러 그 칸부터 다시 고르고, 모두 채우면 정답을 확인합니다.</p>
-                        </div>
+                    <section class="intro-panel">
+                        <p class="panel-label">How To Play</p>
+                        <p>1. 문장을 읽고 알맞은 그림 카드를 찾습니다.</p>
+                        <p>2. 카드를 드래그하거나 탭한 뒤 슬롯을 눌러 배치합니다.</p>
+                        <p>3. 놓인 슬롯을 다시 누르면 카드가 빠집니다.</p>
                     </section>
                 </div>
-                <div class="px-6 pb-6">
-                    <button id="startBtn" class="w-full rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-5 py-4 text-base font-black text-white shadow-lg shadow-orange-200">게임 시작하기</button>
+                <div class="start-area">
+                    <button id="startBtn" class="primary-btn" type="button">게임 시작하기</button>
                 </div>
             </div>
         </section>
 
         <section id="screen-break" class="screen">
-            <div class="rounded-[32px] border border-orange-200 bg-white p-7 shadow-[0_20px_50px_rgba(194,65,12,0.08)]">
-                <span class="inline-flex items-center gap-2 rounded-full bg-sky-50 px-4 py-2 text-xs font-black text-sky-700">2단계 시작</span>
-                <h2 class="mt-4 text-3xl font-black text-slate-900 safe">이제 `-아/어서`와 `-았/었더니`를 같이 비교합니다.</h2>
-                <p class="mt-3 text-sm leading-7 text-slate-600 safe">같은 행동이더라도 `-아/어서` 뒤에는 다음 행동이나 이유 연결이, `-았/었더니` 뒤에는 직접 해 본 뒤 알게 된 결과가 온다는 점을 보면서 채워 보세요.</p>
-                <div class="mt-5 space-y-3 rounded-[24px] border border-sky-200 bg-sky-50 p-4 text-sm font-black text-slate-700">
-                    <div class="flex flex-wrap items-center gap-2"><span class="rounded-xl border-2 border-dashed border-slate-300 bg-white px-3 py-2 text-slate-400">공통 행동</span><span class="pill reason">-아/어서</span><span class="rounded-xl border-2 border-dashed border-slate-300 bg-white px-3 py-2 text-slate-400">다음 행동</span></div>
-                    <div class="flex flex-wrap items-center gap-2"><span class="rounded-xl border-2 border-dashed border-slate-300 bg-white px-3 py-2 text-slate-400">공통 행동</span><span class="pill discovery">-았/었더니</span><span class="rounded-xl border-2 border-dashed border-slate-300 bg-white px-3 py-2 text-slate-400">결과</span></div>
+            <div class="break-card">
+                <span class="badge">2단계 시작</span>
+                <h2 class="break-title safe">이제 -아/어서와 -았/었더니를 같이 비교합니다.</h2>
+                <p class="break-copy safe">같은 행동이라도 -아/어서 뒤에는 다음 행동이나 이유 연결이, -았/었더니 뒤에는 직접 해 본 뒤 알게 된 결과가 옵니다.</p>
+                <div class="comparison-demo" aria-hidden="true">
+                    <div class="comparison-demo__line">
+                        <span class="demo-slot">공통 행동</span>
+                        <span class="grammar-pill reason">-아/어서</span>
+                        <span class="demo-slot">이어서 한 행동</span>
+                    </div>
+                    <div class="comparison-demo__line">
+                        <span class="demo-slot">공통 행동</span>
+                        <span class="grammar-pill discovery">-았/었더니</span>
+                        <span class="demo-slot">해 보니 생긴 결과</span>
+                    </div>
                 </div>
-                <button id="continueBtn" class="mt-6 w-full rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-5 py-4 text-base font-black text-white shadow-lg shadow-orange-200">2단계 시작</button>
+                <button id="continueBtn" class="primary-btn" type="button" style="margin-top:18px;">2단계 시작</button>
             </div>
         </section>
 
-        <section id="screen-game" class="screen pb-[430px] md:pb-[360px]">
-            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <span id="stageChip" class="inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs font-black text-orange-700">1단계</span>
-                        <span id="metaText" class="text-sm font-black text-slate-700">전체 1 / 10</span>
-                        <span id="stageText" class="text-sm font-bold text-slate-500">1단계 1 / 5</span>
-                    </div>
-                    <div class="mt-2 h-2 w-64 overflow-hidden rounded-full bg-orange-100"><div id="progressFill" class="h-full w-0 rounded-full bg-gradient-to-r from-orange-400 to-amber-500"></div></div>
-                </div>
-                <div class="rounded-full bg-white px-4 py-2 text-sm font-black text-orange-700 shadow">정답 <span id="scoreText">0</span> / <span id="totalText">10</span></div>
-            </div>
-
-            <div class="grid gap-4 lg:grid-cols-[1.02fr_0.98fr]">
-                <section id="promptBox" class="rounded-[28px] border border-orange-200 bg-white p-6 shadow-sm"></section>
-                <section class="rounded-[28px] border border-orange-200 bg-white p-5 shadow-sm">
-                    <p class="text-xs font-black uppercase tracking-[0.14em] text-orange-700">Choice Cards</p>
-                    <p class="mt-2 text-sm leading-6 text-slate-600 safe">카드를 터치하면 하단 슬롯이 순서대로 채워집니다. 다시 고르고 싶으면 슬롯을 눌러 주세요.</p>
-                    <div id="tapGuideText" class="mt-3 inline-flex self-start rounded-full bg-orange-50 px-3 py-2 text-xs font-black text-orange-700">첫 칸부터 순서대로 선택하세요.</div>
-                    <div id="choicesGrid" class="mt-4 grid grid-cols-2 gap-3"></div>
-                </section>
-            </div>
-
-            <section class="game-sheet">
-                <div class="rounded-[28px] border border-orange-200 bg-white/95 p-4 shadow-[0_18px_50px_rgba(194,65,12,0.16)] backdrop-blur">
-                    <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                        <div>
-                            <p class="text-xs font-black uppercase tracking-[0.14em] text-orange-700">Touch Builder</p>
-                            <p class="mt-1 text-sm leading-6 text-slate-600 safe">카드를 터치하면 슬롯이 순서대로 채워집니다. 채운 슬롯을 누르면 그 칸부터 다시 고를 수 있습니다.</p>
+        <section id="screen-game" class="screen">
+            <div class="game-shell">
+                <header class="game-top">
+                    <div class="game-stage">
+                        <div class="stage-line">
+                            <span id="stageChip" class="stage-chip">1단계</span>
+                            <span id="metaText" class="meta-text">전체 1 / 10</span>
+                            <span id="stageText" class="stage-text">1단계 1 / 5</span>
                         </div>
-                        <div class="flex gap-2">
-                            <button id="undoBtn" class="rounded-2xl bg-slate-100 px-4 py-3 text-sm font-black text-slate-700 ring-1 ring-slate-200 disabled:cursor-not-allowed disabled:opacity-40">한 칸 지우기</button>
-                            <button id="resetBtn" class="rounded-2xl bg-orange-50 px-4 py-3 text-sm font-black text-orange-800 ring-1 ring-orange-200 disabled:cursor-not-allowed disabled:opacity-40">처음부터</button>
+                        <div class="progress-track" aria-hidden="true">
+                            <div id="progressFill" class="progress-fill"></div>
                         </div>
                     </div>
-                <p class="mb-3 text-sm leading-6 text-slate-600 safe">하단 슬롯은 항상 보입니다. 왼쪽부터 차례대로 채운 뒤 정답을 확인하세요.</p>
-                <div id="board"></div>
-                <div id="feedbackBox" class="mt-4 hidden rounded-[22px] border p-4"></div>
-                <div class="mt-4 flex gap-3">
-                    <button id="checkBtn" class="flex-1 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-5 py-3 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-40">정답 확인</button>
-                    <button id="nextBtn" class="hidden flex-1 rounded-2xl bg-orange-50 px-5 py-3 text-sm font-black text-orange-800 ring-1 ring-orange-200">다음 문제</button>
+                    <div class="score-chip">정답 <span id="scoreText">0</span> / <span id="totalText">10</span></div>
+                </header>
+
+                <div class="game-layout">
+                    <section id="promptPanel" class="prompt-panel">
+                        <div id="promptBox"></div>
+                    </section>
+
+                    <div class="right-stack">
+                        <section class="play-panel" aria-label="문장 슬롯">
+                            <p id="actionHint" class="action-hint" aria-live="polite">앞 행동 카드를 선택하세요.</p>
+                            <div id="board"></div>
+                            <div id="changeStage" class="change-stage hidden" aria-live="polite"></div>
+                            <div id="feedbackBox" class="feedback-box hidden"></div>
+                            <div class="controls-row">
+                                <button id="checkBtn" class="primary-btn" type="button" disabled>정답 확인</button>
+                                <button id="nextBtn" class="secondary-btn hidden" type="button">다음 문제</button>
+                            </div>
+                        </section>
+
+                        <section class="choices-panel" aria-label="선택 카드">
+                            <p class="panel-label">Choice Cards</p>
+                            <p class="choices-copy safe">카드를 드래그하거나 탭한 뒤 슬롯을 눌러 배치하세요.</p>
+                            <div id="choicesGrid" class="choices-grid"></div>
+                        </section>
+                    </div>
                 </div>
-                </div>
-            </section>
+            </div>
         </section>
 
         <section id="screen-result" class="screen">
-            <div class="rounded-[32px] border border-orange-200 bg-white p-7 shadow-[0_20px_50px_rgba(194,65,12,0.08)]">
-                <p class="text-xs font-black uppercase tracking-[0.14em] text-orange-700">Result</p>
-                <h2 class="mt-3 text-3xl font-black text-slate-900">문법 카드 게임 완료</h2>
-                <div class="mt-6 text-center">
-                    <div id="resultScore" class="text-5xl font-black text-orange-600">0 / 10</div>
-                    <p id="resultRate" class="mt-2 text-sm font-bold text-slate-500">정답률 0%</p>
+            <div class="result-card">
+                <p class="panel-label">Result</p>
+                <h2 class="result-title">문법 카드 게임 완료</h2>
+                <div class="result-score">
+                    <strong id="resultScore">0 / 10</strong>
+                    <span id="resultRate">정답률 0%</span>
                 </div>
-                <div class="mt-6 grid gap-3 md:grid-cols-3">
-                    <div class="rounded-[22px] border border-orange-100 bg-orange-50 p-4"><p class="text-xs font-black text-orange-700">1단계</p><p id="stage1Result" class="mt-1 text-xl font-black text-slate-900">0 / 5</p></div>
-                    <div class="rounded-[22px] border border-orange-100 bg-orange-50 p-4"><p class="text-xs font-black text-orange-700">2단계</p><p id="stage2Result" class="mt-1 text-xl font-black text-slate-900">0 / 5</p></div>
-                    <div class="rounded-[22px] border border-orange-100 bg-orange-50 p-4"><p class="text-xs font-black text-orange-700">복습 포인트</p><p id="summaryNote" class="mt-1 text-base font-black text-slate-900 safe">기본형 먼저 복습</p></div>
+                <div class="result-grid">
+                    <div class="result-stat"><p>1단계</p><strong id="stage1Result">0 / 5</strong></div>
+                    <div class="result-stat"><p>2단계</p><strong id="stage2Result">0 / 5</strong></div>
+                    <div class="result-stat"><p>복습 포인트</p><strong id="summaryNote" class="safe">기본형 먼저 복습</strong></div>
                 </div>
-                <div id="reviewList" class="mt-6 space-y-3"></div>
-                <div class="mt-6 flex gap-3">
-                    <button id="restartBtn" class="flex-1 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-5 py-4 text-sm font-black text-white">다시 하기</button>
-                    <button id="homeBtn" class="flex-1 rounded-2xl bg-orange-50 px-5 py-4 text-sm font-black text-orange-800 ring-1 ring-orange-200">처음 화면</button>
+                <div id="reviewList" class="review-list"></div>
+                <div class="result-actions">
+                    <button id="restartBtn" class="primary-btn" type="button">다시 하기</button>
+                    <button id="homeBtn" class="secondary-btn" type="button">처음 화면</button>
                 </div>
             </div>
         </section>
@@ -196,48 +1232,599 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             n09:{label:'기분이 상쾌하다',img:'n09.webp'}, n10:{label:'기운이 나다',img:'n10.webp'}, n11:{label:'몸이 좋아지다',img:'n11.webp'}
         };
         const STAGE1 = [
-            {stage:1,type:'basic',sentence:'매일 스트레칭을 했더니 기분이 상쾌해졌어요.',hint:'직접 해 본 행동 뒤에 달라진 몸 상태를 찾는 문제예요.',explain:'`-았/었더니`는 내가 실제로 해 본 뒤에 생긴 결과를 말할 때 자연스럽습니다.',slots:[{key:'before',label:'앞 행동',placeholder:'무슨 행동을 했을까요?',icon:'🏃',answer:'v03'},{key:'after',label:'뒤 결과',placeholder:'어떤 결과가 생겼을까요?',icon:'✨',answer:'n09'}],choices:['v03','n09','v05','n11','v08']},
-            {stage:1,type:'basic',sentence:'일찍 잤더니 다음 날 기운이 났어요.',hint:'앞에는 내가 한 행동, 뒤에는 그 뒤에 느낀 변화가 옵니다.',explain:'잠을 자 본 뒤에 새롭게 드러난 결과를 말하고 있으므로 `-았/었더니`가 잘 맞습니다.',slots:[{key:'before',label:'앞 행동',placeholder:'무슨 행동을 했을까요?',icon:'🌙',answer:'v08'},{key:'after',label:'뒤 결과',placeholder:'어떤 결과가 생겼을까요?',icon:'⚡',answer:'n10'}],choices:['v08','n10','v04','n09','v06']},
-            {stage:1,type:'basic',sentence:'푹 쉬었더니 몸이 좋아졌어요.',hint:'행동 뒤에 건강 상태가 더 좋아진 문장입니다.',explain:'직접 쉬어 본 뒤에 나타난 몸 상태의 변화이므로 결과 발견 표현으로 보는 것이 자연스럽습니다.',slots:[{key:'before',label:'앞 행동',placeholder:'무슨 행동을 했을까요?',icon:'🛌',answer:'v04'},{key:'after',label:'뒤 결과',placeholder:'어떤 결과가 생겼을까요?',icon:'💚',answer:'n11'}],choices:['v04','n11','v03','n04b','v05']},
-            {stage:1,type:'basic',sentence:'계단을 이용했더니 살이 조금 빠졌어요.',hint:'앞 행동은 습관이나 실천, 뒤는 몸의 변화입니다.',explain:'직접 실천해 본 뒤 몸에 어떤 변화가 생겼는지를 말하는 전형적인 `-았/었더니` 문장입니다.',slots:[{key:'before',label:'앞 행동',placeholder:'무슨 행동을 했을까요?',icon:'🪜',answer:'v09'},{key:'after',label:'뒤 결과',placeholder:'어떤 결과가 생겼을까요?',icon:'📉',answer:'n01b'}],choices:['v09','n01b','v11','n11','v05']},
-            {stage:1,type:'basic',sentence:'운동을 했더니 힘이 더 세졌어요.',hint:'운동을 한 뒤의 신체 변화에 주목해 보세요.',explain:'실제로 해 본 행동 뒤 결과를 말할 때 `-았/었더니`가 잘 어울립니다.',slots:[{key:'before',label:'앞 행동',placeholder:'무슨 행동을 했을까요?',icon:'💪',answer:'v05'},{key:'after',label:'뒤 결과',placeholder:'어떤 결과가 생겼을까요?',icon:'🔥',answer:'n02a'}],choices:['v05','n02a','v03','n09','v06']}
+            {stage:1,type:'basic',effect:'flow-wave',sentence:'매일 스트레칭을 했더니 기분이 상쾌해졌어요.',hint:'직접 해 본 행동 뒤에 달라진 몸 상태를 찾는 문제예요.',explain:'`-았/었더니`는 내가 실제로 해 본 뒤에 생긴 결과를 말할 때 자연스럽습니다.',slots:[{key:'before',label:'앞 행동',placeholder:'무슨 행동을 했을까요?',icon:'🏃',answer:'v03'},{key:'after',label:'뒤 결과',placeholder:'어떤 결과가 생겼을까요?',icon:'✨',answer:'n09'}],choices:['v03','n09','v05','n11','v08']},
+            {stage:1,type:'basic',effect:'glow-rise',sentence:'일찍 잤더니 다음 날 기운이 났어요.',hint:'앞에는 내가 한 행동, 뒤에는 그 뒤에 느낀 변화가 옵니다.',explain:'잠을 자 본 뒤에 새롭게 드러난 결과를 말하고 있으므로 `-았/었더니`가 잘 맞습니다.',slots:[{key:'before',label:'앞 행동',placeholder:'무슨 행동을 했을까요?',icon:'🌙',answer:'v08'},{key:'after',label:'뒤 결과',placeholder:'어떤 결과가 생겼을까요?',icon:'⚡',answer:'n10'}],choices:['v08','n10','v04','n09','v06']},
+            {stage:1,type:'basic',effect:'heal-pulse',sentence:'푹 쉬었더니 몸이 좋아졌어요.',hint:'행동 뒤에 건강 상태가 더 좋아진 문장입니다.',explain:'직접 쉬어 본 뒤에 나타난 몸 상태의 변화이므로 결과 발견 표현으로 보는 것이 자연스럽습니다.',slots:[{key:'before',label:'앞 행동',placeholder:'무슨 행동을 했을까요?',icon:'🛌',answer:'v04'},{key:'after',label:'뒤 결과',placeholder:'어떤 결과가 생겼을까요?',icon:'💚',answer:'n11'}],choices:['v04','n11','v03','n04b','v05']},
+            {stage:1,type:'basic',effect:'gauge-shift',sentence:'계단을 이용했더니 살이 조금 빠졌어요.',hint:'앞 행동은 습관이나 실천, 뒤는 몸의 변화입니다.',explain:'직접 실천해 본 뒤 몸에 어떤 변화가 생겼는지를 말하는 전형적인 `-았/었더니` 문장입니다.',slots:[{key:'before',label:'앞 행동',placeholder:'무슨 행동을 했을까요?',icon:'🪜',answer:'v09'},{key:'after',label:'뒤 결과',placeholder:'어떤 결과가 생겼을까요?',icon:'📉',answer:'n01b'}],choices:['v09','n01b','v11','n11','v05']},
+            {stage:1,type:'basic',effect:'gauge-shift',sentence:'운동을 했더니 힘이 더 세졌어요.',hint:'운동을 한 뒤의 신체 변화에 주목해 보세요.',explain:'실제로 해 본 행동 뒤 결과를 말할 때 `-았/었더니`가 잘 어울립니다.',slots:[{key:'before',label:'앞 행동',placeholder:'무슨 행동을 했을까요?',icon:'💪',answer:'v05'},{key:'after',label:'뒤 결과',placeholder:'어떤 결과가 생겼을까요?',icon:'🔥',answer:'n02a'}],choices:['v05','n02a','v03','n09','v06']}
         ];
         const STAGE2 = [
-            {stage:2,type:'compare',headline:'같은 행동이라도 뒤 문장이 달라져요.',reasonSentence:'스트레칭을 해서 운동을 했어요.',discoverySentence:'스트레칭을 했더니 기분이 상쾌해졌어요.',hint:'`-아/어서`는 뒤에 이어지는 행동, `-았/었더니`는 뒤에 나온 결과를 연결합니다.',explain:'`-아/어서`는 순서나 이유로 다음 행동을 이어 주고, `-았/었더니`는 직접 해 본 뒤 알게 된 결과를 보여 줍니다.',slots:[{key:'shared',label:'공통 행동',placeholder:'두 문장에 공통으로 들어갈 행동',icon:'🧩',answer:'v03'},{key:'reason',label:'이어서 한 행동',placeholder:'-아/어서 뒤 행동',icon:'➡️',answer:'v05'},{key:'discovery',label:'발견한 결과',placeholder:'-았/었더니 뒤 결과',icon:'💡',answer:'n09'}],choices:['v03','v05','n09','v04','n11','n18']},
-            {stage:2,type:'compare',headline:'왼쪽은 이어지는 행동, 오른쪽은 직접 경험 뒤 결과예요.',reasonSentence:'푹 쉬어서 스트레칭을 했어요.',discoverySentence:'푹 쉬었더니 몸이 좋아졌어요.',hint:'같은 앞행동이지만, 한쪽은 다음 행동이고 다른 한쪽은 건강 변화입니다.',explain:'`-아/어서`는 뒤에 또 다른 행동이 따라오고, `-았/었더니`는 몸 상태 변화처럼 결과가 이어집니다.',slots:[{key:'shared',label:'공통 행동',placeholder:'두 문장에 공통으로 들어갈 행동',icon:'🧩',answer:'v04'},{key:'reason',label:'이어서 한 행동',placeholder:'-아/어서 뒤 행동',icon:'➡️',answer:'v03'},{key:'discovery',label:'발견한 결과',placeholder:'-았/었더니 뒤 결과',icon:'💡',answer:'n11'}],choices:['v04','v03','n11','v08','n10','n19']},
-            {stage:2,type:'compare',headline:'이유 연결과 결과 발견의 차이를 함께 보세요.',reasonSentence:'운동을 해서 물을 많이 마셨어요.',discoverySentence:'운동을 했더니 힘이 세졌어요.',hint:'왼쪽은 다음 행동, 오른쪽은 몸의 변화입니다.',explain:'`-아/어서`는 "그래서 다음에 무엇을 했는가", `-았/었더니`는 "해 보니 어떻게 달라졌는가"에 더 알맞습니다.',slots:[{key:'shared',label:'공통 행동',placeholder:'두 문장에 공통으로 들어갈 행동',icon:'🧩',answer:'v05'},{key:'reason',label:'이어서 한 행동',placeholder:'-아/어서 뒤 행동',icon:'➡️',answer:'v06'},{key:'discovery',label:'발견한 결과',placeholder:'-았/었더니 뒤 결과',icon:'💡',answer:'n02a'}],choices:['v05','v06','n02a','v09','n01b','v04']},
-            {stage:2,type:'compare',headline:'같은 실천이 두 문장에서 다른 역할을 해요.',reasonSentence:'계단을 이용해서 매일 걸었어요.',discoverySentence:'계단을 이용했더니 살이 조금 빠졌어요.',hint:'`-아/어서`는 습관이 이어지고, `-았/었더니`는 몸의 변화를 보여 줍니다.',explain:'뒤에 또 다른 행동이 이어지면 `-아/어서`, 직접 해 보고 난 뒤 변화가 오면 `-았/었더니`가 더 자연스럽습니다.',slots:[{key:'shared',label:'공통 행동',placeholder:'두 문장에 공통으로 들어갈 행동',icon:'🧩',answer:'v09'},{key:'reason',label:'이어서 한 행동',placeholder:'-아/어서 뒤 행동',icon:'➡️',answer:'v11'},{key:'discovery',label:'발견한 결과',placeholder:'-았/었더니 뒤 결과',icon:'💡',answer:'n01b'}],choices:['v09','v11','n01b','v03','n11','n20']},
-            {stage:2,type:'compare',headline:'운동 동작도 두 표현으로 다르게 이어질 수 있어요.',reasonSentence:'목을 돌려서 팔을 뻗었어요.',discoverySentence:'목을 돌렸더니 몸이 가벼워졌어요.',hint:'왼쪽은 연속 동작, 오른쪽은 동작 후 느낀 결과입니다.',explain:'연속 동작은 `-아/어서`, 직접 해 본 뒤 몸 상태의 변화는 `-았/었더니`가 더 적절합니다.',slots:[{key:'shared',label:'공통 행동',placeholder:'두 문장에 공통으로 들어갈 행동',icon:'🧩',answer:'n13'},{key:'reason',label:'이어서 한 행동',placeholder:'-아/어서 뒤 행동',icon:'➡️',answer:'n18'},{key:'discovery',label:'발견한 결과',placeholder:'-았/었더니 뒤 결과',icon:'💡',answer:'n04b'}],choices:['n13','n18','n04b','n19','n03a','v05']}
+            {stage:2,type:'compare',effect:'split-compare',headline:'같은 행동이라도 뒤 문장이 달라져요.',reasonSentence:'스트레칭을 해서 운동을 했어요.',discoverySentence:'스트레칭을 했더니 기분이 상쾌해졌어요.',hint:'`-아/어서`는 뒤에 이어지는 행동, `-았/었더니`는 뒤에 나온 결과를 연결합니다.',explain:'`-아/어서`는 순서나 이유로 다음 행동을 이어 주고, `-았/었더니`는 직접 해 본 뒤 알게 된 결과를 보여 줍니다.',slots:[{key:'shared',label:'공통 행동',placeholder:'두 문장에 공통 행동',icon:'🧩',answer:'v03'},{key:'reason',label:'이어서 한 행동',placeholder:'-아/어서 뒤 행동',icon:'➡️',answer:'v05'},{key:'discovery',label:'해 보니 생긴 결과',placeholder:'-았/었더니 뒤 결과',icon:'💡',answer:'n09'}],choices:['v03','v05','n09','v04','n11','n18']},
+            {stage:2,type:'compare',effect:'split-compare',headline:'왼쪽은 이어지는 행동, 오른쪽은 직접 경험 뒤 결과예요.',reasonSentence:'푹 쉬어서 스트레칭을 했어요.',discoverySentence:'푹 쉬었더니 몸이 좋아졌어요.',hint:'같은 앞행동이지만, 한쪽은 다음 행동이고 다른 한쪽은 건강 변화입니다.',explain:'`-아/어서`는 뒤에 또 다른 행동이 따라오고, `-았/었더니`는 몸 상태 변화처럼 결과가 이어집니다.',slots:[{key:'shared',label:'공통 행동',placeholder:'두 문장에 공통 행동',icon:'🧩',answer:'v04'},{key:'reason',label:'이어서 한 행동',placeholder:'-아/어서 뒤 행동',icon:'➡️',answer:'v03'},{key:'discovery',label:'해 보니 생긴 결과',placeholder:'-았/었더니 뒤 결과',icon:'💡',answer:'n11'}],choices:['v04','v03','n11','v08','n10','n19']},
+            {stage:2,type:'compare',effect:'split-compare',headline:'이유 연결과 결과 발견의 차이를 함께 보세요.',reasonSentence:'운동을 해서 물을 많이 마셨어요.',discoverySentence:'운동을 했더니 힘이 세졌어요.',hint:'왼쪽은 다음 행동, 오른쪽은 몸의 변화입니다.',explain:'`-아/어서`는 "그래서 다음에 무엇을 했는가", `-았/었더니`는 "해 보니 어떻게 달라졌는가"에 더 알맞습니다.',slots:[{key:'shared',label:'공통 행동',placeholder:'두 문장에 공통 행동',icon:'🧩',answer:'v05'},{key:'reason',label:'이어서 한 행동',placeholder:'-아/어서 뒤 행동',icon:'➡️',answer:'v06'},{key:'discovery',label:'해 보니 생긴 결과',placeholder:'-았/었더니 뒤 결과',icon:'💡',answer:'n02a'}],choices:['v05','v06','n02a','v09','n01b','v04']},
+            {stage:2,type:'compare',effect:'split-compare',headline:'같은 실천이 두 문장에서 다른 역할을 해요.',reasonSentence:'계단을 이용해서 매일 걸었어요.',discoverySentence:'계단을 이용했더니 살이 조금 빠졌어요.',hint:'`-아/어서`는 습관이 이어지고, `-았/었더니`는 몸의 변화를 보여 줍니다.',explain:'뒤에 또 다른 행동이 이어지면 `-아/어서`, 직접 해 보고 난 뒤 변화가 오면 `-았/었더니`가 더 자연스럽습니다.',slots:[{key:'shared',label:'공통 행동',placeholder:'두 문장에 공통 행동',icon:'🧩',answer:'v09'},{key:'reason',label:'이어서 한 행동',placeholder:'-아/어서 뒤 행동',icon:'➡️',answer:'v11'},{key:'discovery',label:'해 보니 생긴 결과',placeholder:'-았/었더니 뒤 결과',icon:'💡',answer:'n01b'}],choices:['v09','v11','n01b','v03','n11','n20']},
+            {stage:2,type:'compare',effect:'split-compare',headline:'운동 동작도 두 표현으로 다르게 이어질 수 있어요.',reasonSentence:'목을 돌려서 팔을 뻗었어요.',discoverySentence:'목을 돌렸더니 몸이 가벼워졌어요.',hint:'왼쪽은 연속 동작, 오른쪽은 동작 후 느낀 결과입니다.',explain:'연속 동작은 `-아/어서`, 직접 해 본 뒤 몸 상태의 변화는 `-았/었더니`가 더 적절합니다.',slots:[{key:'shared',label:'공통 행동',placeholder:'두 문장에 공통 행동',icon:'🧩',answer:'n13'},{key:'reason',label:'이어서 한 행동',placeholder:'-아/어서 뒤 행동',icon:'➡️',answer:'n18'},{key:'discovery',label:'해 보니 생긴 결과',placeholder:'-았/었더니 뒤 결과',icon:'💡',answer:'n04b'}],choices:['n13','n18','n04b','n19','n03a','v05']}
         ];
-        const state = { questions:[], current:0, score:0, logs:[], placements:{}, checked:false };
+
+        const state = {
+            questions: [],
+            current: 0,
+            score: 0,
+            logs: [],
+            placements: {},
+            selected: null,
+            checked: false,
+            dragId: null,
+            lastEffect: null,
+            effectPlaying: false,
+            effectTimer: null
+        };
+
         const $ = (id) => document.getElementById(id);
-        const shuffle = (arr) => { const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
-        const show = (name) => ['start','break','game','result'].forEach((s) => $('screen-'+s).classList.toggle('active', s===name));
+        const clone = (value) => JSON.parse(JSON.stringify(value));
         const q = () => state.questions[state.current];
-        const card = (id) => `<div class="mx-auto w-full max-w-[180px] overflow-hidden rounded-[18px] bg-white shadow-md"><div class="card-media"><img src="${IMG}${CARDS[id].img}" alt="${CARDS[id].label}" loading="lazy" decoding="async"></div><div class="card-label">${CARDS[id].label}</div></div>`;
-        const summaryNote = (score,total) => score===total ? '표현 차이를 정확히 구별했어요' : score>=8 ? '비교 단계까지 잘 연결했어요' : score>=6 ? '2단계 연결을 조금 더 연습해 보세요' : '기본형과 비교형을 다시 묶어 보세요';
-        function buildQuestions(){ return shuffle(STAGE1).map((x)=>({...x,choices:shuffle(x.choices)})).concat(shuffle(STAGE2).map((x)=>({...x,choices:shuffle(x.choices)}))); }
-        function prepare(){ const placements={}; q().slots.forEach((slot)=> placements[slot.key]=null); state.placements=placements; state.checked=false; }
-        function stageProgress(stage){ return { total: state.questions.filter((x)=>x.stage===stage).length, current: state.questions.slice(0,state.current).filter((x)=>x.stage===stage).length + 1 }; }
-        function slotKeys(){ return q().slots.map((slot)=>slot.key); }
-        function nextEmptySlotKey(){ const next=q().slots.find((slot)=>!state.placements[slot.key]); return next ? next.key : null; }
-        function lastFilledSlotKey(){ const keys=slotKeys(); for(let i=keys.length-1;i>=0;i-=1){ if(state.placements[keys[i]]) return keys[i]; } return null; }
-        function clearFromSlot(key){ if(state.checked) return; const keys=slotKeys(); const index=keys.indexOf(key); if(index===-1) return; let changed=false; for(let i=index;i<keys.length;i+=1){ if(state.placements[keys[i]]){ state.placements[keys[i]]=null; changed=true; } } if(changed) render(); }
-        function undoPlacement(){ if(state.checked) return; const key=lastFilledSlotKey(); if(!key) return; state.placements[key]=null; render(); }
-        function resetPlacements(){ if(state.checked) return; Object.keys(state.placements).forEach((key)=>{ state.placements[key]=null; }); render(); }
-        function placeNext(id){ if(state.checked) return; if(Object.values(state.placements).includes(id)) return; const key=nextEmptySlotKey(); if(!key) return; state.placements[key]=id; render(); }
-        function slotMarkup(slot,index){ const val=state.placements[slot.key]; const nextKey=nextEmptySlotKey(); const isNext=!state.checked && !val && nextKey===slot.key; const classes=['slot']; if(val) classes.push('filled'); if(isNext) classes.push('next'); if(state.checked && val===slot.answer) classes.push('correct'); if(state.checked && val!==slot.answer) classes.push('wrong'); const tip = val ? '이 칸을 누르면 여기부터 다시 고를 수 있어요.' : isNext ? '지금 이 칸에 들어갈 카드를 아래에서 고르세요.' : '앞쪽 칸을 먼저 채우면 이 칸이 열립니다.'; return `<div class="${classes.join(' ')}" data-slot="${slot.key}"><div class="flex items-center justify-between gap-2"><p class="text-xs font-black text-orange-700">${index+1}. ${slot.label}</p>${isNext ? '<span class="rounded-full bg-orange-100 px-2 py-1 text-[10px] font-black text-orange-700">다음</span>' : ''}</div><div class="mt-2 min-h-[118px] flex items-center justify-center">${val ? card(val) : `<div class="grid justify-items-center gap-2 text-center"><div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-2xl">${slot.icon}</div><strong class="text-sm text-orange-900">${slot.placeholder}</strong><span class="text-xs text-slate-400">아래 카드에서 순서대로 골라 주세요.</span></div>`}</div><p class="slot-tip">${tip}</p></div>`; }
-        function renderPrompt(){ const item=q(); if(item.type==='basic'){ $('promptBox').innerHTML = `<p class="text-xs font-black uppercase tracking-[0.14em] text-orange-700">-았/었더니 카드 채우기</p><h2 class="mt-3 text-2xl font-black leading-10 text-slate-900 safe">${item.sentence}</h2><p class="mt-3 text-sm leading-7 text-slate-600 safe">${item.hint}</p>`; return; } $('promptBox').innerHTML = `<p class="text-xs font-black uppercase tracking-[0.14em] text-orange-700">-아/어서 vs -았/었더니</p><h2 class="mt-3 text-2xl font-black leading-10 text-slate-900 safe">${item.headline}</h2><p class="mt-3 text-sm leading-7 text-slate-600 safe">${item.hint}</p><div class="mt-4 space-y-3"><article class="rounded-[22px] border border-sky-200 bg-sky-50 p-4"><span class="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-sky-700">-아/어서</span><p class="mt-2 text-sm font-black leading-7 text-slate-900 safe">${item.reasonSentence}</p></article><article class="rounded-[22px] border border-orange-200 bg-orange-50 p-4"><span class="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-orange-700">-았/었더니</span><p class="mt-2 text-sm font-black leading-7 text-slate-900 safe">${item.discoverySentence}</p></article></div>`; }
-        function renderBoard(){ const item=q(); $('board').innerHTML = item.type==='basic' ? `<div class="slot-grid-basic"><div>${slotMarkup(item.slots[0],0)}</div><div><div class="mb-2 flex justify-center"><div class="pill discovery">-았/었더니</div></div>${slotMarkup(item.slots[1],1)}</div></div>` : `<div class="slot-grid-compare"><div class="slot-shared">${slotMarkup(item.slots[0],0)}</div><div><div class="mb-2 flex justify-center"><div class="pill reason">-아/어서</div></div>${slotMarkup(item.slots[1],1)}</div><div><div class="mb-2 flex justify-center"><div class="pill discovery">-았/었더니</div></div>${slotMarkup(item.slots[2],2)}</div></div>`; Array.from(document.querySelectorAll('[data-slot]')).forEach((el)=>{ const key=el.dataset.slot; el.addEventListener('click',()=>{ if(!state.placements[key] || state.checked) return; clearFromSlot(key); }); }); }
-        function renderChoices(){ const used=new Set(Object.values(state.placements).filter(Boolean)); const locked=!nextEmptySlotKey(); $('choicesGrid').innerHTML = q().choices.map((id)=>{ const classes=['choice-card']; if(used.has(id)) classes.push('used'); if(state.checked && q().slots.some((slot)=>slot.answer===id)) classes.push('answer'); return `<div class="${classes.join(' ')}" data-card="${id}">${card(id)}${used.has(id)?'<span class="tag-used">사용 중</span>':''}</div>`; }).join(''); Array.from(document.querySelectorAll('[data-card]')).forEach((el)=>{ const id=el.dataset.card; const disabled=used.has(id)||state.checked||locked; el.addEventListener('click',()=>{ if(disabled) return; placeNext(id); }); }); }
-        function renderFeedback(){ if(!state.checked){ $('feedbackBox').className='mt-4 hidden rounded-[22px] border p-4'; $('feedbackBox').innerHTML=''; return; } const ok=q().slots.every((slot)=>state.placements[slot.key]===slot.answer); $('feedbackBox').className='mt-4 rounded-[22px] border p-4 ' + (ok ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'); $('feedbackBox').innerHTML = `<p class="text-sm font-black ${ok ? 'text-emerald-700' : 'text-rose-700'}">${ok ? '정답이에요.' : '구조를 다시 확인해 보세요.'}</p><p class="mt-2 text-sm leading-7 text-slate-700 safe">${q().explain}</p><div class="mt-3 flex flex-wrap gap-2">${q().slots.map((slot)=>`<span class="rounded-full bg-white px-3 py-2 text-xs font-black text-slate-700 ring-1 ring-slate-200">${slot.label}: ${CARDS[slot.answer].label}</span>`).join('')}</div>`; }
-        function renderHeader(){ const p=stageProgress(q().stage); $('stageChip').textContent = q().stage===1 ? '1단계' : '2단계'; $('stageChip').className = q().stage===1 ? 'inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs font-black text-orange-700' : 'inline-flex rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-700'; $('metaText').textContent = `전체 ${state.current+1} / ${state.questions.length}`; $('stageText').textContent = `${q().stage}단계 ${p.current} / ${p.total}`; $('scoreText').textContent = state.score; $('totalText').textContent = state.questions.length; $('progressFill').style.width = `${(state.current / state.questions.length) * 100}%`; }
-        function render(){ renderHeader(); renderPrompt(); renderBoard(); renderChoices(); renderFeedback(); const filled=q().slots.every((slot)=>!!state.placements[slot.key]); const hasAny=Object.values(state.placements).some(Boolean); const nextKey=nextEmptySlotKey(); $('checkBtn').disabled = !filled || state.checked; $('nextBtn').classList.toggle('hidden', !state.checked); $('undoBtn').disabled = !hasAny || state.checked; $('resetBtn').disabled = !hasAny || state.checked; $('tapGuideText').textContent = state.checked ? '설명을 보고 다음 문제로 넘어가세요.' : nextKey ? `${q().slots.find((slot)=>slot.key===nextKey).label} 카드를 골라 주세요.` : '모든 칸을 채웠어요. 정답 확인을 눌러 보세요.'; }
-        function check(){ const ok=q().slots.every((slot)=>state.placements[slot.key]===slot.answer); state.checked=true; if(ok) state.score += 1; state.logs.push({stage:q().stage,ok,lines:q().type==='basic'?[q().sentence]:[q().reasonSentence,q().discoverySentence],answers:q().slots.map((slot)=>({label:slot.label,correct:CARDS[slot.answer].label,selected:state.placements[slot.key]?CARDS[state.placements[slot.key]].label:'(없음)'}))}); render(); }
-        function next(){ const prev=q().stage; state.current += 1; if(state.current >= state.questions.length){ showResult(); return; } prepare(); if(q().stage !== prev){ show('break'); return; } render(); }
-        function showResult(){ show('result'); const total=state.questions.length, rate=Math.round((state.score/total)*100), s1=state.logs.filter((x)=>x.stage===1&&x.ok).length, s2=state.logs.filter((x)=>x.stage===2&&x.ok).length, wrong=state.logs.filter((x)=>!x.ok); $('resultScore').textContent=`${state.score} / ${total}`; $('resultRate').textContent=`정답률 ${rate}%`; $('stage1Result').textContent=`${s1} / ${STAGE1.length}`; $('stage2Result').textContent=`${s2} / ${STAGE2.length}`; $('summaryNote').textContent=summaryNote(state.score,total); $('reviewList').innerHTML = wrong.length ? wrong.map((log)=>`<article class="rounded-[22px] border border-rose-200 bg-rose-50 p-4"><span class="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-rose-700">${log.stage}단계 다시 보기</span>${log.lines.map((line)=>`<p class="mt-2 text-sm font-black leading-7 text-slate-900 safe">${line}</p>`).join('')}${log.answers.map((a)=>`<p class="mt-2 text-sm text-slate-700"><b>${a.label}</b> 내 답: ${a.selected} / 정답: ${a.correct}</p>`).join('')}</article>`).join('') : `<article class="rounded-[22px] border border-emerald-200 bg-emerald-50 p-4"><p class="text-sm font-black text-emerald-700 safe">모든 문제를 정확하게 완성했어요. 이제 직접 문장을 만들어 보며 두 표현을 더 자연스럽게 구분해 보세요.</p></article>`; }
-        function start(){ state.questions=buildQuestions(); state.current=0; state.score=0; state.logs=[]; prepare(); show('game'); render(); }
-        $('startBtn').addEventListener('click', start); $('continueBtn').addEventListener('click',()=>{ show('game'); render(); }); $('checkBtn').addEventListener('click', check); $('nextBtn').addEventListener('click', next); $('undoBtn').addEventListener('click', undoPlacement); $('resetBtn').addEventListener('click', resetPlacements); $('restartBtn').addEventListener('click', start); $('homeBtn').addEventListener('click',()=>show('start'));
+        const shuffle = (arr) => {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        };
+        const summaryNote = (score, total) => {
+            if (score === total) return '표현 차이를 정확히 구별했어요';
+            if (score >= 8) return '비교 단계까지 잘 연결했어요';
+            if (score >= 6) return '2단계 연결을 조금 더 연습해 보세요';
+            return '기본형과 비교형을 다시 묶어 보세요';
+        };
+
+        function show(name) {
+            ['start', 'break', 'game', 'result'].forEach((screen) => {
+                $('screen-' + screen).classList.toggle('active', screen === name);
+            });
+            if (name !== 'game') window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+
+        function buildQuestions() {
+            return shuffle(STAGE1).map((item) => ({ ...clone(item), choices: shuffle(item.choices) }))
+                .concat(shuffle(STAGE2).map((item) => ({ ...clone(item), choices: shuffle(item.choices) })));
+        }
+
+        function prepare() {
+            const placements = {};
+            q().slots.forEach((slot) => { placements[slot.key] = null; });
+            state.placements = placements;
+            state.selected = null;
+            state.checked = false;
+            state.dragId = null;
+            state.lastEffect = null;
+            state.effectPlaying = false;
+            if (state.effectTimer) {
+                clearTimeout(state.effectTimer);
+                state.effectTimer = null;
+            }
+            clearChangeStage();
+        }
+
+        function stageProgress(stage) {
+            return {
+                total: state.questions.filter((item) => item.stage === stage).length,
+                current: state.questions.slice(0, state.current).filter((item) => item.stage === stage).length + 1
+            };
+        }
+
+        function nextEmptySlot() {
+            return q().slots.find((slot) => !state.placements[slot.key]) || null;
+        }
+
+        function cardMarkup(id) {
+            const item = CARDS[id];
+            return `
+                <div class="mini-card">
+                    <div class="card-media">
+                        <img src="${IMG}${item.img}" alt="${item.label}" loading="eager" decoding="async">
+                    </div>
+                    <div class="card-label">${item.label}</div>
+                </div>
+            `;
+        }
+
+        function clearChangeStage() {
+            const stage = $('changeStage');
+            if (!stage) return;
+            stage.className = 'change-stage hidden';
+            stage.innerHTML = '';
+            delete stage.dataset.effect;
+        }
+
+        function getEffectType(item = q()) {
+            if (!item) return 'flow-wave';
+            return item.effect || (item.stage === 2 ? 'split-compare' : 'flow-wave');
+        }
+
+        function getCardLabel(id) {
+            return CARDS[id] ? CARDS[id].label : '';
+        }
+
+        function changeCardMarkup(id, label, modifier) {
+            return `
+                <article class="change-card ${modifier}">
+                    <span class="change-card__label">${label}</span>
+                    ${cardMarkup(id)}
+                </article>
+            `;
+        }
+
+        function buildChangeEffectModel() {
+            const item = q();
+            const effect = getEffectType(item);
+            if (item.type === 'compare') {
+                const shared = item.slots[0];
+                const reason = item.slots[1];
+                const discovery = item.slots[2];
+                return {
+                    effect,
+                    stage: item.stage,
+                    type: item.type,
+                    from: getCardLabel(shared.answer),
+                    reason: getCardLabel(reason.answer),
+                    to: getCardLabel(discovery.answer),
+                    caption: `${getCardLabel(shared.answer)} 행동에서 두 흐름이 갈라지고, -았/었더니는 ${getCardLabel(discovery.answer)} 결과를 보여 줘요.`,
+                    html: `
+                        <p class="change-stage__caption safe">${getCardLabel(shared.answer)} 행동에서 두 흐름이 갈라지고, -았/었더니는 ${getCardLabel(discovery.answer)} 결과를 보여 줘요.</p>
+                        <div class="change-stage__row compare">
+                            ${changeCardMarkup(shared.answer, '공통 행동', 'change-card--from')}
+                            <div class="compare-flows">
+                                <div class="compare-flow">
+                                    <span class="compare-flow__pill">-아/어서</span>
+                                    <span class="compare-flow__text">이어서 한 행동: ${getCardLabel(reason.answer)}</span>
+                                </div>
+                                <div class="compare-flow discovery">
+                                    <span class="compare-flow__pill">-았/었더니</span>
+                                    <span class="compare-flow__text">해 보니 생긴 결과: ${getCardLabel(discovery.answer)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                };
+            }
+
+            const before = item.slots[0];
+            const after = item.slots[1];
+            const caption = `${getCardLabel(before.answer)} 행동을 해 봤더니 ${getCardLabel(after.answer)} 변화가 나타났어요.`;
+            const gauge = effect === 'gauge-shift' ? '<span class="change-gauge" aria-hidden="true"><span></span></span>' : '';
+            return {
+                effect,
+                stage: item.stage,
+                type: item.type,
+                from: getCardLabel(before.answer),
+                to: getCardLabel(after.answer),
+                caption,
+                html: `
+                    <p class="change-stage__caption safe">${caption}</p>
+                    <div class="change-stage__row">
+                        ${changeCardMarkup(before.answer, '앞 행동', 'change-card--from')}
+                        <div class="change-bridge" aria-hidden="true">
+                            <span class="change-wave"></span>
+                            <span class="change-arrow"></span>
+                            <span>-았/었더니</span>
+                            ${gauge}
+                        </div>
+                        ${changeCardMarkup(after.answer, '뒤 결과 변화', 'change-card--to')}
+                    </div>
+                `
+            };
+        }
+
+        function playChangeEffect(options = {}) {
+            if (!q()) return false;
+            const stage = $('changeStage');
+            if (!stage) return false;
+            if (state.effectTimer) {
+                clearTimeout(state.effectTimer);
+                state.effectTimer = null;
+            }
+
+            const model = buildChangeEffectModel();
+            state.lastEffect = {
+                effect: model.effect,
+                stage: model.stage,
+                type: model.type,
+                from: model.from,
+                reason: model.reason || null,
+                to: model.to,
+                caption: model.caption,
+                auto: Boolean(options.auto)
+            };
+            state.effectPlaying = true;
+
+            stage.className = `change-stage effect-${model.effect}`;
+            stage.dataset.effect = model.effect;
+            stage.innerHTML = model.html;
+            stage.classList.remove('hidden', 'is-playing');
+            void stage.offsetWidth;
+            stage.classList.add('is-playing');
+
+            state.effectTimer = setTimeout(() => {
+                state.effectPlaying = false;
+                stage.classList.remove('is-playing');
+                state.effectTimer = null;
+            }, 1550);
+            return true;
+        }
+
+        function slotMarkup(slot) {
+            const val = state.placements[slot.key];
+            const next = nextEmptySlot();
+            const isNext = !state.checked && !val && next && next.key === slot.key;
+            const classes = ['slot'];
+            if (val) classes.push('filled');
+            if (isNext) classes.push('next');
+            if (state.checked && val === slot.answer) classes.push('correct');
+            if (state.checked && val !== slot.answer) classes.push('wrong');
+
+            const label = val
+                ? `${slot.label}: ${CARDS[val].label}. 다시 누르면 카드가 빠집니다.`
+                : `${slot.label}: ${slot.placeholder}`;
+
+            return `
+                <button class="${classes.join(' ')}" type="button" data-slot="${slot.key}" aria-label="${label}">
+                    <span class="slot-label">
+                        <span>${slot.label}</span>
+                        ${isNext ? '<span class="slot-next-badge">다음</span>' : ''}
+                    </span>
+                    <span class="slot-body">
+                        ${
+                            val ? cardMarkup(val) : `
+                            <span class="slot-placeholder">
+                                <span class="slot-icon" aria-hidden="true">${slot.icon}</span>
+                                <strong>${slot.placeholder}</strong>
+                                <span>알맞은 그림 카드를 놓아 주세요.</span>
+                            </span>
+                            `
+                        }
+                    </span>
+                </button>
+            `;
+        }
+
+        function renderPrompt() {
+            const item = q();
+            if (item.type === 'basic') {
+                $('promptBox').innerHTML = `
+                    <p class="panel-label">-았/었더니 카드 채우기</p>
+                    <h2 class="prompt-title safe">${item.sentence}</h2>
+                    <p class="prompt-hint safe">${item.hint}</p>
+                `;
+                return;
+            }
+
+            $('promptBox').innerHTML = `
+                <p class="panel-label">-아/어서 vs -았/었더니</p>
+                <h2 class="prompt-title safe">${item.headline}</h2>
+                <p class="prompt-hint safe">${item.hint}</p>
+                <div class="compare-lines">
+                    <article class="compare-line">
+                        <span>-아/어서</span>
+                        <p class="safe">${item.reasonSentence}</p>
+                    </article>
+                    <article class="compare-line discovery">
+                        <span>-았/었더니</span>
+                        <p class="safe">${item.discoverySentence}</p>
+                    </article>
+                </div>
+            `;
+        }
+
+        function renderBoard() {
+            const item = q();
+            $('board').innerHTML = item.type === 'basic'
+                ? `
+                    <div class="slot-grid-basic">
+                        ${slotMarkup(item.slots[0])}
+                        <div class="grammar-pill discovery">-았/었더니</div>
+                        ${slotMarkup(item.slots[1])}
+                    </div>
+                `
+                : `
+                    <div class="slot-grid-compare">
+                        ${slotMarkup(item.slots[0])}
+                        <div class="compare-slot-row">
+                            <div class="grammar-pill reason">-아/어서</div>
+                            ${slotMarkup(item.slots[1])}
+                        </div>
+                        <div class="compare-slot-row">
+                            <div class="grammar-pill discovery">-았/었더니</div>
+                            ${slotMarkup(item.slots[2])}
+                        </div>
+                    </div>
+                `;
+
+            Array.from(document.querySelectorAll('[data-slot]')).forEach((el) => {
+                const key = el.dataset.slot;
+
+                el.addEventListener('dragover', (event) => {
+                    if (state.checked) return;
+                    event.preventDefault();
+                    el.classList.add('hover');
+                });
+
+                el.addEventListener('dragleave', () => {
+                    el.classList.remove('hover');
+                });
+
+                el.addEventListener('drop', (event) => {
+                    if (state.checked) return;
+                    event.preventDefault();
+                    el.classList.remove('hover');
+                    const id = event.dataTransfer.getData('text/plain') || state.dragId;
+                    if (id) place(id, key);
+                });
+
+                el.addEventListener('click', () => {
+                    if (state.checked) return;
+                    if (state.selected) {
+                        place(state.selected, key);
+                        return;
+                    }
+                    if (state.placements[key]) {
+                        state.placements[key] = null;
+                        render();
+                    }
+                });
+            });
+        }
+
+        function renderChoices() {
+            const used = new Set(Object.values(state.placements).filter(Boolean));
+            $('choicesGrid').innerHTML = q().choices.map((id) => {
+                const classes = ['choice-card'];
+                if (state.selected === id) classes.push('selected');
+                if (used.has(id)) classes.push('used');
+                if (state.checked && q().slots.some((slot) => slot.answer === id)) classes.push('answer');
+                const disabled = used.has(id) || state.checked;
+                return `
+                    <button
+                        id="choice-${id}"
+                        class="${classes.join(' ')}"
+                        type="button"
+                        data-card="${id}"
+                        draggable="${disabled ? 'false' : 'true'}"
+                        aria-pressed="${state.selected === id}"
+                        aria-label="${CARDS[id].label} 카드 선택"
+                        ${disabled ? 'disabled' : ''}
+                    >
+                        ${cardMarkup(id)}
+                        ${state.selected === id ? '<span class="tag-selected">선택됨</span>' : ''}
+                        ${used.has(id) ? '<span class="tag-used">사용 중</span>' : ''}
+                    </button>
+                `;
+            }).join('');
+
+            Array.from(document.querySelectorAll('[data-card]')).forEach((el) => {
+                const id = el.dataset.card;
+                const disabled = el.disabled;
+
+                el.addEventListener('click', () => {
+                    if (disabled) return;
+                    state.selected = state.selected === id ? null : id;
+                    render();
+                });
+
+                el.addEventListener('dragstart', (event) => {
+                    if (disabled) {
+                        event.preventDefault();
+                        return;
+                    }
+                    state.dragId = id;
+                    event.dataTransfer.setData('text/plain', id);
+                });
+
+                el.addEventListener('dragend', () => {
+                    state.dragId = null;
+                });
+            });
+        }
+
+        function renderFeedback() {
+            if (!state.checked) {
+                $('feedbackBox').className = 'feedback-box hidden';
+                $('feedbackBox').innerHTML = '';
+                return;
+            }
+
+            const ok = q().slots.every((slot) => state.placements[slot.key] === slot.answer);
+            $('feedbackBox').className = 'feedback-box ' + (ok ? 'correct' : 'wrong');
+            $('feedbackBox').innerHTML = `
+                <p class="feedback-title ${ok ? 'correct' : 'wrong'}">${ok ? '정답이에요.' : '구조를 다시 확인해 보세요.'}</p>
+                <p class="feedback-explain safe">${q().explain}</p>
+                <div class="answer-chips">
+                    ${q().slots.map((slot) => `
+                        <span class="answer-chip">${slot.label}: ${CARDS[slot.answer].label}</span>
+                    `).join('')}
+                </div>
+                <div class="feedback-actions">
+                    <button id="${ok ? 'replayEffectBtn' : 'revealEffectBtn'}" class="effect-btn" type="button">
+                        ${ok ? '변화 다시 보기' : '정답 흐름 보기'}
+                    </button>
+                </div>
+            `;
+            const effectButton = document.getElementById(ok ? 'replayEffectBtn' : 'revealEffectBtn');
+            if (effectButton) {
+                effectButton.addEventListener('click', () => {
+                    playChangeEffect({ auto: false });
+                });
+            }
+        }
+
+        function renderHeader() {
+            const item = q();
+            const progress = stageProgress(item.stage);
+            $('stageChip').textContent = item.stage === 1 ? '1단계' : '2단계';
+            $('stageChip').className = item.stage === 1 ? 'stage-chip' : 'stage-chip stage-two';
+            $('metaText').textContent = `전체 ${state.current + 1} / ${state.questions.length}`;
+            $('stageText').textContent = `${item.stage}단계 ${progress.current} / ${progress.total}`;
+            $('scoreText').textContent = state.score;
+            $('totalText').textContent = state.questions.length;
+            $('progressFill').style.width = `${(state.current / state.questions.length) * 100}%`;
+        }
+
+        function renderActionHint() {
+            if (state.checked) {
+                $('actionHint').textContent = '피드백을 확인하고 다음 문제로 넘어가세요.';
+                return;
+            }
+            const next = nextEmptySlot();
+            if (!next) {
+                $('actionHint').textContent = '모든 칸을 채웠어요. 정답 확인을 눌러 보세요.';
+                return;
+            }
+            if (state.selected) {
+                $('actionHint').textContent = `${CARDS[state.selected].label} 카드를 ${next.label} 슬롯에 놓아 보세요.`;
+                return;
+            }
+            $('actionHint').textContent = `${next.label} 카드를 선택하세요.`;
+        }
+
+        function render() {
+            renderHeader();
+            renderPrompt();
+            renderBoard();
+            renderChoices();
+            renderFeedback();
+            renderActionHint();
+
+            const filled = q().slots.every((slot) => Boolean(state.placements[slot.key]));
+            $('checkBtn').disabled = !filled || state.checked;
+            $('nextBtn').classList.toggle('hidden', !state.checked);
+        }
+
+        function place(id, key) {
+            if (!q() || state.checked || !CARDS[id] || !(key in state.placements)) return false;
+            Object.keys(state.placements).forEach((slotKey) => {
+                if (state.placements[slotKey] === id) state.placements[slotKey] = null;
+            });
+            state.placements[key] = id;
+            state.selected = null;
+            render();
+            return true;
+        }
+
+        function check() {
+            if (!q() || state.checked) return false;
+            const filled = q().slots.every((slot) => Boolean(state.placements[slot.key]));
+            if (!filled) return false;
+            const ok = q().slots.every((slot) => state.placements[slot.key] === slot.answer);
+            state.checked = true;
+            if (ok) state.score += 1;
+            state.logs.push({
+                stage: q().stage,
+                ok,
+                lines: q().type === 'basic' ? [q().sentence] : [q().reasonSentence, q().discoverySentence],
+                answers: q().slots.map((slot) => ({
+                    label: slot.label,
+                    correct: CARDS[slot.answer].label,
+                    selected: state.placements[slot.key] ? CARDS[state.placements[slot.key]].label : '(없음)'
+                }))
+            });
+            render();
+            if (ok) playChangeEffect({ auto: true });
+            return ok;
+        }
+
+        function next() {
+            const previousStage = q().stage;
+            state.current += 1;
+
+            if (state.current >= state.questions.length) {
+                showResult();
+                return true;
+            }
+
+            prepare();
+
+            if (q().stage !== previousStage) {
+                show('break');
+                return true;
+            }
+
+            show('game');
+            render();
+            return true;
+        }
+
+        function showResult() {
+            show('result');
+            const total = state.questions.length;
+            const rate = Math.round((state.score / total) * 100);
+            const stage1Correct = state.logs.filter((log) => log.stage === 1 && log.ok).length;
+            const stage2Correct = state.logs.filter((log) => log.stage === 2 && log.ok).length;
+            const wrong = state.logs.filter((log) => !log.ok);
+
+            $('resultScore').textContent = `${state.score} / ${total}`;
+            $('resultRate').textContent = `정답률 ${rate}%`;
+            $('stage1Result').textContent = `${stage1Correct} / ${STAGE1.length}`;
+            $('stage2Result').textContent = `${stage2Correct} / ${STAGE2.length}`;
+            $('summaryNote').textContent = summaryNote(state.score, total);
+            $('reviewList').innerHTML = wrong.length
+                ? wrong.map((log) => `
+                    <article class="review-item">
+                        <p><b>${log.stage}단계 다시 보기</b></p>
+                        ${log.lines.map((line) => `<p class="safe">${line}</p>`).join('')}
+                        ${log.answers.map((answer) => `<p><b>${answer.label}</b> 내 답: ${answer.selected} / 정답: ${answer.correct}</p>`).join('')}
+                    </article>
+                `).join('')
+                : `
+                    <article class="review-item success">
+                        <p class="safe"><b>모든 문제를 정확하게 완성했어요.</b> 이제 직접 문장을 만들어 보며 두 표현을 더 자연스럽게 구분해 보세요.</p>
+                    </article>
+                `;
+        }
+
+        function startWithQuestions(questions) {
+            state.questions = questions.map((item) => clone(item));
+            state.current = 0;
+            state.score = 0;
+            state.logs = [];
+            prepare();
+            show('game');
+            render();
+        }
+
+        function start() {
+            startWithQuestions(buildQuestions());
+        }
+
+        function reset() {
+            if (!q()) return false;
+            prepare();
+            render();
+            return true;
+        }
+
+        $('startBtn').addEventListener('click', start);
+        $('continueBtn').addEventListener('click', () => {
+            show('game');
+            render();
+        });
+        $('checkBtn').addEventListener('click', check);
+        $('nextBtn').addEventListener('click', next);
+        $('restartBtn').addEventListener('click', start);
+        $('homeBtn').addEventListener('click', () => show('start'));
+
+        window.__C12_GRAMMAR_CARD_GAME__ = {
+            startWithQuestions,
+            getState: () => clone(state),
+            place,
+            check,
+            next,
+            reset,
+            playEffect: () => playChangeEffect({ auto: false }),
+            getLastEffect: () => clone(state.lastEffect),
+            buildQuestions,
+            getCards: () => clone(CARDS),
+            getStages: () => ({ stage1: clone(STAGE1), stage2: clone(STAGE2) })
+        };
     </script>
     <script src="../shared/pc-mode.js"></script>
     <script src="../shared/site-copyright.js"></script>

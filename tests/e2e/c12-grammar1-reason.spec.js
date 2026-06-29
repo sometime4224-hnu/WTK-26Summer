@@ -139,7 +139,29 @@ test('c12 grammar1 reason page supports Arabic RTL in cards, modal, and comparis
   await selectLanguage(page, LANGUAGES.find((lang) => lang.code === 'ar'));
 
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.locator('body')).toHaveAttribute('data-text-dir', 'rtl');
+  await expect(page.locator('body')).toHaveCSS('direction', 'ltr');
+  await expect(page.locator('.reason-header .flex').first()).toHaveCSS('direction', 'ltr');
+  await expect(page.locator('.grammar-card[data-grammar="-아/어서"] .flex').first()).toHaveCSS('direction', 'ltr');
   await expect(page.locator('.grammar-card[data-grammar="-아/어서"] .grammar-token')).toHaveCSS('direction', 'ltr');
+  await expect(page.locator('.grammar-card[data-grammar="-아/어서"] .reason-copy-text')).toHaveCSS('direction', 'rtl');
+
+  const arabicCardLayout = await page
+    .locator('.grammar-card[data-grammar="-아/어서"]')
+    .evaluate((card) => {
+      const desc = card.querySelector('.reason-copy-text');
+      const cardRect = card.getBoundingClientRect();
+      const descRect = desc.getBoundingClientRect();
+      return {
+        cardWidth: cardRect.width,
+        descWidth: descRect.width,
+        leftGap: descRect.left - cardRect.left,
+        rightGap: cardRect.right - descRect.right
+      };
+    });
+  expect(arabicCardLayout.descWidth).toBeGreaterThan(arabicCardLayout.cardWidth * 0.7);
+  expect(arabicCardLayout.leftGap).toBeLessThan(48);
+  expect(arabicCardLayout.rightGap).toBeLessThan(48);
 
   await page.locator('.grammar-card[data-grammar="-아/어서"]').click();
   await expect(page.locator('#grammarModal')).toBeVisible();

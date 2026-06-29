@@ -121,36 +121,82 @@
         }
 
         html[dir="rtl"] body {
-            text-align: right;
+            direction: ltr;
+            text-align: left;
         }
 
-        html[dir="rtl"] .reason-return-nav,
-        html[dir="rtl"] .reason-header .flex,
-        html[dir="rtl"] .grammar-card .flex,
-        html[dir="rtl"] #compare-fab-container,
-        html[dir="rtl"] .modal-inner .flex {
+        .reason-copy-text {
+            width: 100%;
+            min-width: 0;
+        }
+
+        body[data-text-dir="rtl"] #app-title,
+        body[data-text-dir="rtl"] #app-subtitle,
+        body[data-text-dir="rtl"] #group1-title,
+        body[data-text-dir="rtl"] #group1-subtitle,
+        body[data-text-dir="rtl"] #group2-title,
+        body[data-text-dir="rtl"] #group2-subtitle,
+        body[data-text-dir="rtl"] #compareTitle,
+        body[data-text-dir="rtl"] #btn-compare-text,
+        body[data-text-dir="rtl"] #cancel-compare-btn,
+        body[data-text-dir="rtl"] .tab-btn,
+        body[data-text-dir="rtl"] .lang-btn,
+        body[data-text-dir="rtl"] .reason-copy-text,
+        body[data-text-dir="rtl"] .reason-table-label,
+        body[data-text-dir="rtl"] .reason-guide__title,
+        body[data-text-dir="rtl"] .reason-guide__desc,
+        body[data-text-dir="rtl"] .reason-guide__panel h3,
+        body[data-text-dir="rtl"] .reason-guide__step > div,
+        body[data-text-dir="rtl"] .reason-guide__bucket-title,
+        body[data-text-dir="rtl"] .reason-guide__bucket p,
+        body[data-text-dir="rtl"] .reason-card-hint,
+        body[data-text-dir="rtl"] .reason-modal-quick h3,
+        body[data-text-dir="rtl"] .reason-modal-quick p,
+        body[data-text-dir="rtl"] .reason-compare-note h3,
+        body[data-text-dir="rtl"] .reason-compare-note__item strong,
+        body[data-text-dir="rtl"] .reason-compare-note__item p,
+        body[data-text-dir="rtl"] .reason-compare-help,
+        body[data-text-dir="rtl"] .reason-compare-tab,
+        body[data-text-dir="rtl"] .reason-decision-card__section strong,
+        body[data-text-dir="rtl"] .reason-decision-card__section p,
+        body[data-text-dir="rtl"] .reason-chip {
             direction: rtl;
+            unicode-bidi: plaintext;
+            text-align: start;
         }
 
         .ko-term,
         .grammar-token,
         .formula-token,
-        html[dir="rtl"] .font-mono,
-        html[dir="rtl"] #modalTitle,
-        html[dir="rtl"] .grammar-card h3 {
+        .font-mono,
+        #modalTitle,
+        .grammar-card h3,
+        .reason-decision-card__title,
+        .reason-decision-card__formula {
             direction: ltr;
             unicode-bidi: isolate;
-        }
-
-        html[dir="rtl"] .formula-token,
-        html[dir="rtl"] .font-mono {
             text-align: left;
         }
 
-        html[dir="rtl"] input,
-        html[dir="rtl"] textarea {
+        .formula-token,
+        .font-mono {
+            text-align: left;
+        }
+
+        body[data-text-dir="rtl"] input,
+        body[data-text-dir="rtl"] textarea {
             direction: rtl;
-            text-align: right;
+            text-align: start;
+        }
+
+        body[data-text-dir="rtl"] #search-input {
+            padding-left: 1rem;
+            padding-right: 2.5rem;
+        }
+
+        body[data-text-dir="rtl"] #search-container .fa-search {
+            left: auto;
+            right: 0.75rem;
         }
 
         #toggle-compare-mode {
@@ -702,6 +748,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             document.documentElement.lang = currentLang;
             document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
             document.body.dataset.activeLang = currentLang;
+            document.body.dataset.textDir = isRtl ? 'rtl' : 'ltr';
             searchInput.dir = isRtl ? 'rtl' : 'ltr';
         }
 
@@ -734,7 +781,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <div class="text-lg">${iconHTML}</div>
                     </div>
                     ${formulaBadge}
-                    <p class="text-sm text-slate-600 line-clamp-2">${escapeHTML(data.desc)}</p>
+                    <p class="reason-copy-text text-sm text-slate-600 line-clamp-2">${escapeHTML(data.desc)}</p>
                     
                     <!-- Checkmark for compare mode -->
                     <div class="absolute top-4 right-4 text-blue-500 opacity-0 check-icon transition-opacity">
@@ -827,7 +874,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 
                 <div class="mb-4">
                     <span class="text-xs font-bold text-slate-500 uppercase tracking-wide block mb-1">${escapeHTML(labels.labelDesc)}</span>
-                    <p class="text-slate-700 leading-relaxed">${escapeHTML(data.desc)}</p>
+                    <p class="reason-copy-text text-slate-700 leading-relaxed">${escapeHTML(data.desc)}</p>
                 </div>
                 
                 <div class="bg-red-50 rounded-lg p-4 border border-red-100">
@@ -835,7 +882,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <i class="fas fa-exclamation-triangle mr-2 text-sm"></i>
                         <span class="text-xs font-bold uppercase tracking-wide">${escapeHTML(labels.labelConstraints)}</span>
                     </div>
-                    <p class="text-sm text-red-800 leading-relaxed">${escapeHTML(data.constraints)}</p>
+                    <p class="reason-copy-text text-sm text-red-800 leading-relaxed">${escapeHTML(data.constraints)}</p>
                 </div>
             `;
 
@@ -844,7 +891,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             examplesTab.innerHTML = data.examples.map(ex => `
                 <div class="p-4 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-blue-300 transition-colors">
                     <div class="flex justify-between items-start mb-2">
-                        <p class="text-lg font-medium text-slate-800 break-keep pr-2">${escapeHTML(ex)}</p>
+                        <p class="reason-copy-text flex-1 text-lg font-medium text-slate-800 break-keep pr-2">${escapeHTML(ex)}</p>
                         <button class="speak-btn text-slate-400 hover:text-blue-500 transition-colors p-1" type="button" data-speak-text="${escapeHTML(ex)}" aria-label="예문 듣기">
                             <i class="fas fa-volume-high"></i>
                         </button>
@@ -915,35 +962,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             let html = `<div class="grid gap-0 text-sm border-t border-l border-slate-200" style="${gridCols}">`;
             
             // Row: Title (Sticky Header)
-            html += `<div class="p-3 bg-slate-50 font-bold border-r border-b border-slate-200 sticky top-0 left-0 z-20">${escapeHTML(getGrammarHeaderLabel())}</div>`;
+            html += `<div class="reason-table-label p-3 bg-slate-50 font-bold border-r border-b border-slate-200 sticky top-0 left-0 z-20">${escapeHTML(getGrammarHeaderLabel())}</div>`;
             selectedGrammars.forEach(g => {
                 html += `<div class="grammar-token p-3 bg-blue-50 font-bold text-blue-700 text-center border-r border-b border-slate-200 sticky top-0 z-10">${escapeHTML(g)}</div>`;
             });
 
             // Row: Formula
-            html += `<div class="p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${escapeHTML(labels.labelFormula)}</div>`;
+            html += `<div class="reason-table-label p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${escapeHTML(labels.labelFormula)}</div>`;
             selectedGrammars.forEach(g => {
                 html += `<div class="formula-token p-3 bg-white font-mono text-center border-r border-b border-slate-200">${escapeHTML(grammarData[g].formula)}</div>`;
             });
 
             // Row: Description
-            html += `<div class="p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${escapeHTML(labels.labelDesc)}</div>`;
+            html += `<div class="reason-table-label p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${escapeHTML(labels.labelDesc)}</div>`;
             selectedGrammars.forEach(g => {
-                html += `<div class="p-3 bg-white border-r border-b border-slate-200">${escapeHTML(grammarData[g].desc)}</div>`;
+                html += `<div class="reason-copy-text p-3 bg-white border-r border-b border-slate-200">${escapeHTML(grammarData[g].desc)}</div>`;
             });
 
             // Row: Constraints
-            html += `<div class="p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${escapeHTML(labels.labelConstraints)}</div>`;
+            html += `<div class="reason-table-label p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${escapeHTML(labels.labelConstraints)}</div>`;
             selectedGrammars.forEach(g => {
-                html += `<div class="p-3 bg-red-50 text-red-700 border-r border-b border-slate-200">${escapeHTML(grammarData[g].constraints)}</div>`;
+                html += `<div class="reason-copy-text p-3 bg-red-50 text-red-700 border-r border-b border-slate-200">${escapeHTML(grammarData[g].constraints)}</div>`;
             });
             
             // Row: Examples
-            html += `<div class="p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${escapeHTML(labels.modalTabExamples)}</div>`;
+            html += `<div class="reason-table-label p-3 bg-slate-50 font-semibold border-r border-b border-slate-200 sticky left-0 z-10">${escapeHTML(labels.modalTabExamples)}</div>`;
              selectedGrammars.forEach(g => {
                 html += `<div class="p-3 bg-white border-r border-b border-slate-200 space-y-2">`;
                 grammarData[g].examples.forEach(ex => {
-                    html += `<p class="text-xs bg-slate-100 p-2 rounded">${escapeHTML(ex)}</p>`;
+                    html += `<p class="reason-copy-text text-xs bg-slate-100 p-2 rounded">${escapeHTML(ex)}</p>`;
                 });
                 html += `</div>`;
             });

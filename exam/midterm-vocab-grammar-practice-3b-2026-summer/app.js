@@ -1,10 +1,6 @@
 const ROUND_LINKS = [];
 
-const REVIEW_LINKS = [
-    { id: "c10-vocab-apply", href: "./c10-vocab-apply.html", label: "1번 연습 시험" },
-    { id: "c10-grammar-c12", href: "./c10-grammar-c12.html", label: "2번 연습 시험" },
-    { id: "c11-target", href: "./c11-target.html", label: "3번 연습 시험" }
-];
+const REVIEW_LINKS = [];
 
 const STORAGE_NAMESPACE = "vocab-grammar-mock";
 const LEGACY_STORAGE_NAMESPACE = "private-listening-review";

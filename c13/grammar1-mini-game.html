@@ -32,8 +32,9 @@
         }
     </style>
         <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+        <link rel="stylesheet" href="grammar-support-responsive.css" />
 </head>
-<body>
+<body class="c13-support-page c13-mini-game-page">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
@@ -45,8 +46,8 @@
         <span class="text-sm font-extrabold text-slate-600">문법 1 미니 게임</span>
     </nav>
 
-    <main class="mx-auto w-[min(760px,calc(100%-20px))] py-4 pb-12">
-        <section class="panel rounded-[28px] p-5 sm:p-6">
+    <main class="c13-support-main c13-mini-main mx-auto w-[min(760px,calc(100%-20px))] py-4 pb-12">
+        <section class="c13-support-hero c13-mini-hero panel rounded-[28px] p-5 sm:p-6">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <p class="text-[11px] font-black uppercase tracking-[0.18em] text-orange-700">Mini Game</p>
@@ -61,15 +62,15 @@
             </div>
         </section>
 
-        <section id="gameCard" class="panel mt-3 rounded-[28px] p-5 sm:p-6"></section>
+        <section id="gameCard" class="c13-mini-card panel mt-3 rounded-[28px] p-5 sm:p-6"></section>
     </main>
 
     <script>
         const IMAGE_BASE = '../assets/c13/grammar/images/grammar1-mini';
         const QUESTIONS = [
             {
-                image: `${IMAGE_BASE}/g1_q01.webp`,
-                title: '우산을 챙기는 장면',
+                image: `${IMAGE_BASE}/g1_q01_cloudy_prepare.webp`,
+                title: '흐린 하늘을 보고 우산을 챙기는 장면',
                 situation: '아직 비는 안 오지만 하늘이 흐려요.',
                 choices: [
                     '비가 올까 봐 우산을 챙겼어요.',
@@ -80,28 +81,52 @@
                 explain: '아직 일어나지 않은 일을 걱정하면서 미리 준비한 행동이므로 `올까 봐`가 가장 자연스러워요.'
             },
             {
+                image: `${IMAGE_BASE}/g1_q01.webp`,
+                title: '비가 와서 우산을 챙기는 장면',
+                situation: '지금 밖에 비가 오고 있어요.',
+                choices: [
+                    '비가 올까 봐 우산을 챙겼어요.',
+                    '비가 그쳐서 우산을 챙겼어요.',
+                    '비가 오고 있어서 우산을 챙겼어요.'
+                ],
+                answer: '비가 오고 있어서 우산을 챙겼어요.',
+                explain: '그림에서는 이미 비가 오고 있으므로 현재 상황을 나타내는 `비가 오고 있어서`가 자연스러워요.'
+            },
+            {
                 image: `${IMAGE_BASE}/g1_q02.webp`,
                 title: '서둘러 출발하는 장면',
                 situation: '지하철이 늦을 수도 있어서 약속 시간이 걱정돼요.',
                 choices: [
-                    '지하철이 늦을까 봐 일찍 출발했어요.',
+                    '약속 시간에 늦을까 봐 일찍 출발했어요.',
                     '지하철이 늦어서 일찍 출발했어요.',
-                    '지하철이 늦고 있어서 일찍 출발했어요.'
+                    '약속 시간에 늦고 있어서 일찍 출발했어요.'
                 ],
-                answer: '지하철이 늦을까 봐 일찍 출발했어요.',
-                explain: '미리 걱정해서 먼저 행동한 경우이므로 `늦을까 봐`를 써야 해요.'
+                answer: '약속 시간에 늦을까 봐 일찍 출발했어요.',
+                explain: '걱정되는 것은 지하철 자체보다 약속 시간에 늦는 일이므로 `약속 시간에 늦을까 봐`가 가장 자연스러워요.'
             },
             {
                 image: `${IMAGE_BASE}/g1_q03.webp`,
-                title: '골목길로 가는 장면',
-                situation: '퇴근 시간이라 큰길이 많이 막힐 것 같아요.',
+                title: '길이 막히고 있는 장면',
+                situation: '지금 도로에 차가 많아서 천천히 움직여요.',
                 choices: [
-                    '길이 막힐까 봐 골목길로 갔어요.',
-                    '길이 막혀서 골목길로 갔어요.',
-                    '길이 막히고 있어서 골목길로 갔어요.'
+                    '차가 많이 막힐까 봐요.',
+                    '차가 많이 막힐 것 같아요.',
+                    '차가 많이 막히고 있어요.'
                 ],
-                answer: '길이 막힐까 봐 골목길로 갔어요.',
-                explain: '실제로 막히기 전에 걱정하고 다른 길을 선택했기 때문에 `막힐까 봐`가 맞아요.'
+                answer: '차가 많이 막히고 있어요.',
+                explain: '그림에서는 차가 이미 많이 막히는 중이므로 현재 상황을 나타내는 `막히고 있어요`가 맞아요.'
+            },
+            {
+                image: `${IMAGE_BASE}/g1_q03_traffic_worry.webp`,
+                title: '길이 막힐까 봐 일찍 나가는 장면',
+                situation: '도로가 막힐 것 같아서 약속 시간이 걱정돼요.',
+                choices: [
+                    '길이 막힐까 봐 일찍 출발했어요.',
+                    '길이 막혀서 일찍 출발했어요.',
+                    '길이 막히고 있어서 일찍 출발했어요.'
+                ],
+                answer: '길이 막힐까 봐 일찍 출발했어요.',
+                explain: '아직 길이 막히기 전에 걱정하고 미리 출발했으므로 `막힐까 봐`가 자연스러워요.'
             },
             {
                 image: `${IMAGE_BASE}/g1_q04.webp`,
@@ -110,7 +135,7 @@
                 choices: [
                     '추울까 봐 코트를 입고 나왔어요.',
                     '추워서 코트를 입고 나왔어요.',
-                    '추우면 코트를 입고 나왔어요.'
+                    '추울 때 코트를 입고 나왔어요.'
                 ],
                 answer: '추울까 봐 코트를 입고 나왔어요.',
                 explain: '앞으로 추워질 가능성을 걱정하며 준비한 행동이라 `추울까 봐`가 자연스러워요.'
@@ -132,11 +157,11 @@
                 title: '손님맞이 음식을 준비하는 장면',
                 situation: '주말 행사에 손님이 많이 올 것 같아요.',
                 choices: [
-                    '손님이 많을까 봐 음식을 넉넉하게 준비했어요.',
-                    '손님이 많아서 음식을 넉넉하게 준비했어요.',
-                    '손님이 많고 있어서 음식을 넉넉하게 준비했어요.'
+                    '손님이 많을까 봐 음식을 많이 준비했어요.',
+                    '손님이 많아서 음식을 많이 준비했어요.',
+                    '손님이 많고 있어서 음식을 많이 준비했어요.'
                 ],
-                answer: '손님이 많을까 봐 음식을 넉넉하게 준비했어요.',
+                answer: '손님이 많을까 봐 음식을 많이 준비했어요.',
                 explain: '아직 오지 않은 손님 수를 예상하고 미리 준비한 것이므로 `많을까 봐`가 가장 자연스러워요.'
             },
             {
@@ -154,11 +179,11 @@
             {
                 image: `${IMAGE_BASE}/g1_q08.webp`,
                 title: '보조 배터리를 챙기는 장면',
-                situation: '휴대전화 배터리가 빨리 닳는 편이에요.',
+                situation: '휴대전화 배터리가 빨리 닳을 것 같아요.',
                 choices: [
                     '배터리가 없을까 봐 보조 배터리를 가져왔어요.',
                     '배터리가 없어서 보조 배터리를 가져왔어요.',
-                    '배터리가 없고 있어서 보조 배터리를 가져왔어요.'
+                    '배터리가 없을 때 보조 배터리를 가져왔어요.'
                 ],
                 answer: '배터리가 없을까 봐 보조 배터리를 가져왔어요.',
                 explain: '나중에 배터리가 없을 가능성을 걱정하고 미리 준비한 경우라 `없을까 봐`가 맞아요.'
@@ -202,7 +227,7 @@
             const progress = `${state.index + 1} / ${state.questions.length}`;
 
             gameCard.innerHTML = `
-                <div class="flex items-center justify-between gap-3">
+                <div class="c13-mini-status flex items-center justify-between gap-3">
                     <div>
                         <p class="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Question</p>
                         <p class="mt-1 text-lg font-black text-slate-900">${progress}</p>
@@ -213,36 +238,42 @@
                     </div>
                 </div>
 
-                <div class="mt-4 overflow-hidden rounded-[24px] border border-slate-200 bg-slate-50">
-                    <div class="aspect-[11/12] bg-white">
-                        <img src="${escapeHtml(question.image)}" alt="${escapeHtml(question.title)}" class="block h-full w-full object-contain" loading="lazy" decoding="async" />
+                <div class="c13-mini-question-grid">
+                    <div class="c13-mini-visual">
+                        <div class="c13-mini-image-frame mt-4 overflow-hidden rounded-[24px] border border-slate-200 bg-slate-50">
+                            <div class="c13-mini-image-box aspect-[11/12] bg-white">
+                                <img src="${escapeHtml(question.image)}" alt="${escapeHtml(question.title)}" class="block h-full w-full object-contain" loading="lazy" decoding="async" />
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="mt-4 rounded-[24px] border border-orange-200 bg-orange-50 px-4 py-4">
-                    <p class="text-xs font-black uppercase tracking-[0.16em] text-orange-700">Situation</p>
-                    <p class="mt-2 text-lg font-black leading-9 text-slate-900">${escapeHtml(question.situation)}</p>
-                </div>
+                    <div class="c13-mini-work">
+                        <div class="c13-mini-context mt-4 rounded-[24px] border border-orange-200 bg-orange-50 px-4 py-4">
+                            <p class="text-xs font-black uppercase tracking-[0.16em] text-orange-700">Situation</p>
+                            <p class="mt-2 text-lg font-black leading-9 text-slate-900">${escapeHtml(question.situation)}</p>
+                        </div>
 
-                <div class="mt-4 grid gap-2">
-                    ${question.shuffledChoices.map((choice, index) => {
-                        const selected = state.selected === index;
-                        const baseClass = selected
-                            ? 'border-orange-500 bg-orange-50 text-orange-700'
-                            : 'border-slate-200 bg-white text-slate-700';
-                        return `
-                            <button type="button" class="option-btn rounded-2xl border px-4 py-4 text-left text-base font-black leading-7 ${baseClass}" data-choice="${index}">
-                                ${escapeHtml(choice)}
-                            </button>
-                        `;
-                    }).join('')}
-                </div>
+                        <div class="c13-mini-options mt-4 grid gap-2">
+                            ${question.shuffledChoices.map((choice, index) => {
+                                const selected = state.selected === index;
+                                const baseClass = selected
+                                    ? 'border-orange-500 bg-orange-50 text-orange-700'
+                                    : 'border-slate-200 bg-white text-slate-700';
+                                return `
+                                    <button type="button" class="option-btn rounded-2xl border px-4 py-4 text-left text-base font-black leading-7 ${baseClass}" data-choice="${index}">
+                                        ${escapeHtml(choice)}
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
 
-                <div id="feedbackBox" class="mt-4 ${state.answered ? '' : 'hidden'}"></div>
+                        <div id="feedbackBox" class="mt-4 ${state.answered ? '' : 'hidden'}"></div>
 
-                <div class="mt-4 grid gap-2 sm:grid-cols-2">
-                    <button type="button" id="confirmBtn" class="ui-btn rounded-2xl border border-orange-600 bg-orange-600 px-4 py-3 text-sm font-black text-white ${state.answered ? 'opacity-40' : ''}" ${state.answered ? 'disabled' : ''}>확인</button>
-                    <button type="button" id="nextBtn" class="ui-btn rounded-2xl border border-slate-900 bg-slate-900 px-4 py-3 text-sm font-black text-white ${state.answered ? '' : 'opacity-40'}" ${state.answered ? '' : 'disabled'}>${state.index === state.questions.length - 1 ? '결과 보기' : '다음'}</button>
+                        <div class="c13-mini-actions mt-4 grid gap-2 sm:grid-cols-2">
+                            <button type="button" id="confirmBtn" class="ui-btn rounded-2xl border border-orange-600 bg-orange-600 px-4 py-3 text-sm font-black text-white ${state.answered ? 'opacity-40' : ''}" ${state.answered ? 'disabled' : ''}>확인</button>
+                            <button type="button" id="nextBtn" class="ui-btn rounded-2xl border border-slate-900 bg-slate-900 px-4 py-3 text-sm font-black text-white ${state.answered ? '' : 'opacity-40'}" ${state.answered ? '' : 'disabled'}>${state.index === state.questions.length - 1 ? '결과 보기' : '다음'}</button>
+                        </div>
+                    </div>
                 </div>
             `;
 

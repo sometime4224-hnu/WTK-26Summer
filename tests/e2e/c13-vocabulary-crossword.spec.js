@@ -33,6 +33,14 @@ async function dragLetterToCell(page, letter, row, col) {
     .dragTo(page.locator(`.grid-cell[data-row="${row}"][data-col="${col}"]`));
 }
 
+async function dragLetterToSlot(page, letter, index) {
+  await page
+    .locator(".letter-tile:not(.is-used)")
+    .filter({ hasText: new RegExp(`^${letter}$`) })
+    .first()
+    .dragTo(page.locator(`[data-word-index="${index}"]`));
+}
+
 async function touchDragLetterToCell(page, letter, row, col) {
   const tile = page
     .locator(".letter-tile:not(.is-used)")
@@ -75,22 +83,91 @@ async function touchDragLetterToCell(page, letter, row, col) {
   });
 }
 
+const CLUE_LANGUAGES = [
+  { code: "en", text: "English: A gathering where graduates of the same school meet again." },
+  { code: "vi", text: "Tiếng Việt: Buổi gặp lại của những người từng học cùng trường." },
+  { code: "mn", text: "Монгол: Нэг сургуулийг төгссөн хүмүүс дахин уулзах уулзалт." },
+  { code: "ar", text: "العربية: اجتماع يلتقي فيه خريجو المدرسة نفسها مرة أخرى." },
+  { code: "kk", text: "Қазақша: Бір мектепті бітірген адамдар қайта кездесетін жиын." },
+  { code: "th", text: "ไทย: งานที่คนจบจากโรงเรียนเดียวกันกลับมาพบกัน." }
+];
+
 test.describe("c13 vocabulary crossword", () => {
   test.beforeEach(async ({ page }) => {
     await blockExternalRequests(page);
   });
 
-  test("rejects wrong drag drops and keeps click entry working", async ({ page }) => {
+  test("shows multilingual clue support only for the selected language", async ({ page }) => {
+    await page.goto("/c13/vocabulary-crossword.html", { waitUntil: "domcontentloaded" });
+
+    await expect(page.locator("[data-multilang-btn]")).toHaveCount(7);
+    await expect(page.locator(".mobile-dock__label")).toHaveText(["단서", "글자"]);
+    await expect(page.locator("#active-clue-text")).toHaveText("한글: 같은 학교를 나온 사람들이 다시 만나는 모임");
+
+    for (const { code } of CLUE_LANGUAGES) {
+      await expect(page.locator(`#active-clue-${code}`)).toBeHidden();
+    }
+
+    for (const { code, text } of CLUE_LANGUAGES) {
+      await page.locator(`[data-multilang-btn="${code}"]`).click();
+      await expect(page.locator(`#active-clue-${code}`)).toBeVisible();
+      await expect(page.locator(`#active-clue-${code}`)).toHaveText(text);
+
+      for (const other of CLUE_LANGUAGES.filter((lang) => lang.code !== code)) {
+        await expect(page.locator(`#active-clue-${other.code}`)).toBeHidden();
+      }
+    }
+
+    await page.locator(`[data-multilang-btn="ar"]`).click();
+    const arabicDirection = await page.locator("#active-clue-ar").evaluate((el) => getComputedStyle(el).direction);
+    expect(arabicDirection).toBe("rtl");
+
+    await page.locator(`[data-multilang-btn="en"]`).click();
+    await page.locator(".set-tab", { hasText: "차림" }).click();
+    await page.locator('.grid-cell[data-row="0"][data-col="5"]').click();
+    await expect(page.locator("#active-clue-text")).toHaveText("한글: 어깨에 배낭을 메다");
+    await expect(page.locator("#active-clue-en")).toBeVisible();
+    await expect(page.locator("#active-clue-en")).toHaveText("English: To carry a backpack on the shoulders.");
+  });
+
+  test("supports slot and board drag drops while keeping click entry working", async ({ page }) => {
+    await page.goto("/c13/vocabulary-crossword.html", { waitUntil: "domcontentloaded" });
+
+    await dragLetterToSlot(page, "가", 0);
+    await expectCellText(page, 0, 2, "");
+    await expect(page.locator(".letter-tile.is-used").filter({ hasText: /^가$/ })).toHaveCount(0);
+    await expect(page.locator("#bank-selection")).toHaveClass(/is-error/);
+    await expect(page.locator("#word-track-hint")).toHaveText("아니에요. 맞는 글자를 넣어 보세요.");
+
+    await dragLetterToSlot(page, "동", 0);
+    await expectCellText(page, 0, 2, "동");
+    await expectTrackText(page, "동");
+    await expect(page.locator(".letter-tile.is-used").filter({ hasText: /^동$/ })).toHaveCount(1);
+    await expect(page.locator("#bank-selection")).not.toHaveClass(/is-error/);
+
+    await dragLetterToSlot(page, "창", 1);
+    await expectCellText(page, 1, 2, "창");
+    await expectTrackText(page, "동창");
+
+    await dragLetterToCell(page, "회", 2, 2);
+    await expectCellText(page, 2, 2, "회");
+    await expectTrackText(page, "동창회");
+    await expect(page.locator("#word-track-hint")).toContainText("동창회 완성");
+  });
+
+  test("rejects wrong board drops and keeps click entry working", async ({ page }) => {
     await page.goto("/c13/vocabulary-crossword.html", { waitUntil: "domcontentloaded" });
 
     await dragLetterToCell(page, "가", 0, 2);
     await expectCellText(page, 0, 2, "");
     await expect(page.locator(".letter-tile.is-used").filter({ hasText: /^가$/ })).toHaveCount(0);
-    await expect(page.locator("#word-track-hint")).toHaveText("맞는 칸에 놓아 보세요.");
+    await expect(page.locator("#bank-selection")).toHaveClass(/is-error/);
+    await expect(page.locator("#word-track-hint")).toHaveText("아니에요. 맞는 글자를 넣어 보세요.");
 
     await dragLetterToCell(page, "동", 0, 2);
     await expectCellText(page, 0, 2, "동");
     await expect(page.locator(".letter-tile.is-used").filter({ hasText: /^동$/ })).toHaveCount(1);
+    await expect(page.locator("#bank-selection")).not.toHaveClass(/is-error/);
 
     await clickLetters(page, "창회");
     await expectTrackText(page, "동창회");
@@ -153,6 +230,7 @@ test.describe("c13 vocabulary crossword mobile touch", () => {
     await touchDragLetterToCell(page, "가", 0, 2);
     await expectCellText(page, 0, 2, "");
     await expect(page.locator(".letter-tile.is-used").filter({ hasText: /^가$/ })).toHaveCount(0);
-    await expect(page.locator("#word-track-hint")).toHaveText("맞는 칸에 놓아 보세요.");
+    await expect(page.locator("#bank-selection")).toHaveClass(/is-error/);
+    await expect(page.locator("#word-track-hint")).toHaveText("아니에요. 맞는 글자를 넣어 보세요.");
   });
 });

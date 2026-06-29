@@ -51,16 +51,34 @@ test('c11 writing activity2 unlocks input after slots and checks the sentence', 
   await expect(page.getByTestId('sentence-input')).toBeEnabled();
   await expect(page.getByTestId('input-row')).toHaveClass(/is-active/);
 
-  await page.getByTestId('sentence-input').fill('아이가 곰 인형을 숨깁니다');
-  await page.getByTestId('check-button').click();
-  await expect(page.getByTestId('status-light')).toHaveClass(/is-bad/);
-  await expect(page.getByTestId('next-button')).toBeDisabled();
-
-  await page.getByTestId('sentence-input').fill('아이가 곰 인형을 숨긴다.');
+  await page.getByTestId('sentence-input').fill('아이 가 곰인형 을 숨겨요.');
   await page.getByTestId('check-button').click();
   await expect(page.getByTestId('status-light')).toHaveClass(/is-good/);
   await expect(page.getByTestId('next-button')).toBeEnabled();
+  await expect(page.getByTestId('next-button')).toHaveClass(/is-available/);
   await expect(page.getByTestId('flow-stage')).toHaveClass(/is-success/);
+
+  await page.getByTestId('next-button').click();
+  await expect(page.getByTestId('counter')).toHaveText('2 / 28');
+  await expect(page.getByTestId('causative-verb')).toHaveText('씻기다');
+});
+
+test('c11 writing activity2 allows the next card after an incorrect checked answer', async ({ page }) => {
+  await openFresh(page);
+
+  await fillSlot(page, 'causer', 'causer');
+  await fillSlot(page, 'target', 'target');
+  await page.getByTestId('sentence-input').fill('아이가 곰 인형을 먹어요');
+  await page.getByTestId('check-button').click();
+
+  await expect(page.getByTestId('status-light')).toHaveClass(/is-bad/);
+  await expect(page.getByTestId('next-button')).toBeEnabled();
+  await expect(page.getByTestId('next-button')).toHaveClass(/is-available/);
+  await expect(page.getByTestId('flow-stage')).not.toHaveClass(/is-success/);
+
+  const snapshot = await page.evaluate(() => window.__C11_CAUSATIVE_WRITING.getState());
+  expect(snapshot.done).not.toContain('hide');
+  expect(snapshot.attempted).toContain('hide');
 
   await page.getByTestId('next-button').click();
   await expect(page.getByTestId('counter')).toHaveText('2 / 28');
@@ -112,6 +130,7 @@ test('c11 writing activity2 persists current drill progress and exposes its API'
   }));
   expect(snapshot.state.currentId).toBe('eat');
   expect(snapshot.state.done).toContain('eat');
+  expect(snapshot.state.attempted).toContain('eat');
   expect(snapshot.normalized).toBe('엄마가 아이에게 밥을 먹인다');
 
   await page.reload({ waitUntil: 'domcontentloaded' });
