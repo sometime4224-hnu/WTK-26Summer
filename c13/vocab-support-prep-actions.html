@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>13과 어휘 보조 | 준비·대접 동작</title>
+    <link rel="stylesheet" href="vocab-support-activity.css" />
+</head>
+<body>
+    <nav class="support-topbar" aria-label="상단 이동">
+        <a href="../index.html">메인</a>
+        <span>|</span>
+        <a href="index.html">13과</a>
+        <span>|</span>
+        <a href="vocabulary.html">어휘</a>
+        <span>|</span>
+        <span>준비·대접 동작</span>
+    </nav>
+
+    <main id="support-app"></main>
+
+    <script>
+    const PREP_BASE = "../assets/c13/vocabulary/images/support/prep-actions/";
+    window.C13_SUPPORT_ACTIVITY = {
+        type: "verb-object-sort",
+        title: "준비·대접 동작",
+        subtitle: "목적어와 동사를 함께 보며 꾸미다, 차리다, 마련하다, 대접하다의 차이를 익힙니다.",
+        learnTitle: "동사의 중심 의미",
+        learnNote: "네 동사는 모두 준비와 관련이 있지만, 목적어가 달라지면 쓰임이 분명해집니다.",
+        practiceTitle: "목적어를 동사 칸에 배치하기",
+        practiceNote: "카드를 하나 고른 뒤 어울리는 동사 칸을 누르세요.",
+        checkTitle: "문장 완성 점검",
+        checkNote: "문장의 목적어와 의미를 보고 가장 자연스러운 동사를 고릅니다.",
+        options: ["꾸미다", "차리다", "마련하다", "대접하다"],
+        learnCards: [
+            {
+                label: "꾸미다",
+                cues: ["공간", "보기 좋게 만들다"],
+                result: "꾸미다",
+                image: PREP_BASE + "room.webp",
+                alt: "꾸미기 전의 방",
+                note: "방, 거실, 행사장처럼 공간을 보기 좋게 만들 때 씁니다."
+            },
+            {
+                label: "차리다",
+                cues: ["상", "음식과 그릇을 놓다"],
+                result: "차리다",
+                image: PREP_BASE + "low-table.webp",
+                alt: "음식이 놓인 상",
+                note: "먹을 수 있도록 상이나 식탁을 준비할 때 씁니다."
+            },
+            {
+                label: "마련하다",
+                cues: ["필요한 것", "미리 준비하다"],
+                result: "마련하다",
+                image: PREP_BASE + "gift.webp",
+                alt: "준비한 선물",
+                note: "선물, 장소, 기념품처럼 필요한 것을 미리 준비할 때 씁니다."
+            },
+            {
+                label: "대접하다",
+                cues: ["사람", "음식과 정성으로 맞이하다"],
+                result: "대접하다",
+                image: PREP_BASE + "guest.webp",
+                alt: "손님을 맞이하는 장면",
+                note: "손님이나 어른에게 음식을 내고 정성껏 맞이할 때 씁니다."
+            }
+        ],
+        match: {
+            id: "prep-actions",
+            bankTitle: "목적어 카드",
+            bankNote: "목적어를 고른 뒤 알맞은 동사 칸에 넣으세요.",
+            targetTitle: "동사 칸",
+            targetNote: "동사의 의미와 잘 어울리는 목적어를 모아 보세요.",
+            hint: "카드를 먼저 고른 다음 어울리는 동사 칸을 누르세요.",
+            targets: [
+                { id: "decorate", label: "꾸미다", summary: "공간을 보기 좋게 만들다" },
+                { id: "set", label: "차리다", summary: "먹을 수 있도록 상을 준비하다" },
+                { id: "prepare", label: "마련하다", summary: "필요한 것을 미리 준비하다" },
+                { id: "treat", label: "대접하다", summary: "사람을 정성껏 맞이하다" }
+            ],
+            items: [
+                { id: "room", label: "방", answer: "decorate", image: PREP_BASE + "room.webp", alt: "방" },
+                { id: "living-room", label: "거실", answer: "decorate", image: PREP_BASE + "living-room.webp", alt: "거실" },
+                { id: "classroom-wall", label: "교실 벽", answer: "decorate", image: PREP_BASE + "classroom-wall.webp", alt: "교실 벽" },
+                { id: "event-hall", label: "행사장", answer: "decorate", image: PREP_BASE + "event-hall.webp", alt: "행사장" },
+                { id: "low-table", label: "상", answer: "set", image: PREP_BASE + "low-table.webp", alt: "상" },
+                { id: "meal-table", label: "밥상", answer: "set", image: PREP_BASE + "meal-table.webp", alt: "밥상" },
+                { id: "birthday-table", label: "생일상", answer: "set", image: PREP_BASE + "birthday-table.webp", alt: "생일상" },
+                { id: "dining-table", label: "식탁", answer: "set", image: PREP_BASE + "dining-table.webp", alt: "식탁" },
+                { id: "gift", label: "선물", answer: "prepare", image: PREP_BASE + "gift.webp", alt: "선물" },
+                { id: "souvenir", label: "기념품", answer: "prepare", image: PREP_BASE + "souvenir.webp", alt: "기념품" },
+                { id: "venue", label: "장소", answer: "prepare", image: PREP_BASE + "venue.webp", alt: "장소" },
+                { id: "refreshments", label: "다과", answer: "prepare", image: PREP_BASE + "refreshments.webp", alt: "다과" },
+                { id: "guest", label: "손님", answer: "treat", image: PREP_BASE + "guest.webp", alt: "손님" },
+                { id: "older-adult", label: "어른", answer: "treat", image: PREP_BASE + "older-adult.webp", alt: "어른" },
+                { id: "friend", label: "친구", answer: "treat", image: PREP_BASE + "friend.webp", alt: "친구" },
+                { id: "visitor", label: "방문객", answer: "treat", image: PREP_BASE + "visitor.webp", alt: "방문객" }
+            ]
+        },
+        check: [
+            {
+                id: "check-set-table",
+                title: "상을 ___",
+                prompt: "음식과 그릇을 놓아 먹을 수 있게 준비합니다.",
+                answer: "차리다",
+                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
+                image: PREP_BASE + "low-table.webp",
+                alt: "음식이 놓인 상",
+                feedback: "정답: 상을 차리다. 먹을 수 있게 상을 준비합니다.",
+                wrongFeedback: "상이나 식탁에는 보통 차리다를 씁니다."
+            },
+            {
+                id: "check-birthday-table",
+                title: "생일상을 ___",
+                prompt: "생일 음식을 차려 놓는 상황입니다.",
+                answer: "차리다",
+                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
+                image: PREP_BASE + "birthday-table.webp",
+                alt: "생일상",
+                feedback: "정답: 생일상을 차리다."
+            },
+            {
+                id: "check-gift",
+                title: "선물을 ___",
+                prompt: "필요한 선물을 미리 준비합니다.",
+                answer: "마련하다",
+                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
+                image: PREP_BASE + "gift.webp",
+                alt: "선물",
+                feedback: "정답: 선물을 마련하다. 필요한 것을 미리 준비한다는 뜻입니다.",
+                wrongFeedback: "선물처럼 필요한 물건을 미리 준비할 때는 마련하다가 자연스럽습니다."
+            },
+            {
+                id: "check-venue",
+                title: "장소를 ___",
+                prompt: "모임에 필요한 장소를 미리 준비합니다.",
+                answer: "마련하다",
+                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
+                image: PREP_BASE + "venue.webp",
+                alt: "행사 장소",
+                feedback: "정답: 장소를 마련하다."
+            },
+            {
+                id: "check-guest",
+                title: "손님을 ___",
+                prompt: "손님에게 음식과 정성으로 잘 맞이합니다.",
+                answer: "대접하다",
+                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
+                image: PREP_BASE + "guest.webp",
+                alt: "손님을 맞이하는 장면",
+                feedback: "정답: 손님을 대접하다. 사람을 정성껏 맞이합니다.",
+                wrongFeedback: "손님이나 어른처럼 사람에게는 대접하다가 어울립니다."
+            },
+            {
+                id: "check-older-adult",
+                title: "어른을 ___",
+                prompt: "어른에게 음식을 내고 예의를 갖춰 맞이합니다.",
+                answer: "대접하다",
+                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
+                image: PREP_BASE + "older-adult.webp",
+                alt: "어른을 대접하는 장면",
+                feedback: "정답: 어른을 대접하다."
+            },
+            {
+                id: "check-room",
+                title: "방을 ___",
+                prompt: "공간을 보기 좋게 장식합니다.",
+                answer: "꾸미다",
+                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
+                image: PREP_BASE + "room.webp",
+                alt: "방",
+                feedback: "정답: 방을 꾸미다. 공간을 예쁘게 만듭니다."
+            },
+            {
+                id: "check-event-hall",
+                title: "행사장을 ___",
+                prompt: "모임 분위기에 맞게 공간을 장식합니다.",
+                answer: "꾸미다",
+                options: ["꾸미다", "차리다", "마련하다", "대접하다"],
+                image: PREP_BASE + "event-hall.webp",
+                alt: "행사장",
+                feedback: "정답: 행사장을 꾸미다."
+            }
+        ]
+    };
+    </script>
+    <script src="vocab-support-activity.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>

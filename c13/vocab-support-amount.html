@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>13과 어휘 보조 | 양·충분함</title>
+    <link rel="stylesheet" href="vocab-support-activity.css" />
+</head>
+<body>
+    <nav class="support-topbar" aria-label="상단 이동">
+        <a href="../index.html">메인</a>
+        <span>|</span>
+        <a href="index.html">13과</a>
+        <span>|</span>
+        <a href="vocabulary.html">어휘</a>
+        <span>|</span>
+        <span>양·충분함</span>
+    </nav>
+
+    <main id="support-app"></main>
+
+    <script>
+    const AMOUNT_BASE = "../assets/c13/vocabulary/images/support/amount/";
+    window.C13_SUPPORT_ACTIVITY = {
+        type: "amount-choice",
+        title: "양·충분함",
+        subtitle: "많고 적음만 보지 않고, 필요한 기준과 비교해 표현을 고릅니다.",
+        learnTitle: "요구치와 비교하기",
+        learnNote: "기준보다 적은지, 충분한지, 쓰고도 남았는지, 넓은 의미로 부족한지를 구분합니다.",
+        practiceTitle: "요구치 보고 고르기",
+        practiceNote: "이미지와 HTML 요구치 칩을 함께 보고 알맞은 표현을 선택하세요.",
+        checkTitle: "10문항 점검",
+        checkNote: "구체적 수량, 사용 후 남음, 추상적 기준 부족을 나누어 봅니다.",
+        options: ["충분하다", "모자라다", "남다", "부족하다"],
+        learnCards: [
+            {
+                label: "충분하다",
+                cues: ["필요한 만큼 있음", "넉넉함"],
+                result: "충분하다",
+                image: AMOUNT_BASE + "plates-enough.webp",
+                alt: "필요한 만큼 접시가 준비된 식탁",
+                note: "요구치에 맞거나 그보다 넉넉하면 충분하다고 말합니다."
+            },
+            {
+                label: "모자라다",
+                cues: ["필요한 수량", "현재 수량이 적음"],
+                result: "모자라다",
+                image: AMOUNT_BASE + "cups-short.webp",
+                alt: "필요한 컵보다 적은 컵",
+                note: "구체적인 양이나 개수가 필요한 만큼 되지 않을 때 씁니다."
+            },
+            {
+                label: "남다",
+                cues: ["쓰고 나서", "아직 있음"],
+                result: "남다",
+                image: AMOUNT_BASE + "party-leftovers.webp",
+                alt: "파티 후 남은 음식",
+                note: "사용하거나 나누어 준 뒤에도 아직 있을 때 씁니다."
+            },
+            {
+                label: "부족하다",
+                cues: ["기준에 못 미침", "시간·돈·준비"],
+                result: "부족하다",
+                image: AMOUNT_BASE + "time-lacking.webp",
+                alt: "시간이 부족한 학생",
+                note: "돈, 시간, 준비처럼 넓은 기준에 충분히 미치지 못할 때 씁니다."
+            }
+        ],
+        practice: [
+            {
+                id: "practice-cups-short",
+                title: "컵이 몇 개 필요할까요?",
+                prompt: "필요한 컵 수보다 현재 컵이 적습니다.",
+                metrics: ["필요 6개", "있음 4개"],
+                answer: "모자라다",
+                image: AMOUNT_BASE + "cups-short.webp",
+                alt: "컵이 부족한 장면",
+                feedback: "정답: 모자라다. 필요한 개수보다 적습니다.",
+                wrongFeedback: "필요 6개인데 있음 4개입니다. 구체적인 수량이 부족하면 모자라다를 씁니다."
+            },
+            {
+                id: "practice-plates-enough",
+                title: "접시가 딱 맞게 있어요",
+                prompt: "필요한 만큼 접시가 준비되었습니다.",
+                metrics: ["필요 4개", "있음 4개"],
+                answer: "충분하다",
+                image: AMOUNT_BASE + "plates-enough.webp",
+                alt: "접시가 충분한 식탁",
+                feedback: "정답: 충분하다. 필요한 만큼 있습니다."
+            },
+            {
+                id: "practice-party-leftovers",
+                title: "파티 후 음식이 있어요",
+                prompt: "사람들이 먹고 난 뒤에도 음식이 남아 있습니다.",
+                metrics: ["행사 후", "아직 있음"],
+                answer: "남다",
+                image: AMOUNT_BASE + "party-leftovers.webp",
+                alt: "파티 후 남은 음식",
+                feedback: "정답: 남다. 쓰고 난 뒤에도 아직 있습니다.",
+                wrongFeedback: "사용 후에도 남아 있는 상태이므로 남다를 씁니다."
+            },
+            {
+                id: "practice-money-lacking",
+                title: "돈이 기준에 못 미쳐요",
+                prompt: "결제해야 하는 금액에 돈이 미치지 못합니다.",
+                metrics: ["결제 기준", "돈이 적음"],
+                answer: "부족하다",
+                image: AMOUNT_BASE + "money-lacking.webp",
+                alt: "돈이 부족한 장면",
+                feedback: "정답: 부족하다. 필요한 기준에 미치지 못합니다."
+            }
+        ],
+        check: [
+            {
+                id: "check-cups-short",
+                title: "필요 6개 / 있음 4개",
+                prompt: "컵이 필요한 수보다 적습니다.",
+                metrics: ["필요 6개", "있음 4개"],
+                answer: "모자라다",
+                image: AMOUNT_BASE + "cups-short.webp",
+                alt: "컵이 모자란 장면",
+                feedback: "맞아요. 구체적인 수량이 적으므로 모자라다입니다."
+            },
+            {
+                id: "check-lunchboxes-short",
+                title: "필요 5개 / 있음 3개",
+                prompt: "도시락 수가 필요한 수보다 적습니다.",
+                metrics: ["필요 5개", "있음 3개"],
+                answer: "모자라다",
+                image: AMOUNT_BASE + "lunchboxes-short.webp",
+                alt: "도시락이 모자란 장면",
+                feedback: "맞아요. 도시락이 모자랍니다."
+            },
+            {
+                id: "check-plates-enough",
+                title: "필요 4개 / 있음 4개",
+                prompt: "필요한 접시 수와 준비된 접시 수가 같습니다.",
+                metrics: ["필요 4개", "있음 4개"],
+                answer: "충분하다",
+                image: AMOUNT_BASE + "plates-enough.webp",
+                alt: "접시가 충분한 장면",
+                feedback: "맞아요. 필요한 만큼 있어서 충분합니다."
+            },
+            {
+                id: "check-snacks-extra",
+                title: "필요 5개 / 있음 8개",
+                prompt: "간식이 필요한 수보다 넉넉합니다.",
+                metrics: ["필요 5개", "있음 8개"],
+                answer: "충분하다",
+                image: AMOUNT_BASE + "snacks-extra.webp",
+                alt: "간식이 넉넉한 장면",
+                feedback: "맞아요. 필요보다 넉넉하므로 충분합니다."
+            },
+            {
+                id: "check-party-leftovers",
+                title: "행사 후 음식",
+                prompt: "사람들이 먹고 난 뒤에도 음식이 있습니다.",
+                metrics: ["사용 후", "아직 있음"],
+                answer: "남다",
+                image: AMOUNT_BASE + "party-leftovers.webp",
+                alt: "행사 후 남은 음식",
+                feedback: "맞아요. 사용 후에도 있으니 남다입니다."
+            },
+            {
+                id: "check-gift-leftovers",
+                title: "포장 후 재료",
+                prompt: "선물 포장을 끝냈는데 재료가 더 있습니다.",
+                metrics: ["포장 후", "재료가 있음"],
+                answer: "남다",
+                image: AMOUNT_BASE + "gift-bag-leftovers.webp",
+                alt: "포장 후 남은 재료",
+                feedback: "맞아요. 쓰고 난 뒤에도 남았습니다."
+            },
+            {
+                id: "check-money-lacking",
+                title: "결제할 돈",
+                prompt: "결제해야 하는 기준에 돈이 미치지 못합니다.",
+                metrics: ["결제 기준", "돈이 적음"],
+                answer: "부족하다",
+                image: AMOUNT_BASE + "money-lacking.webp",
+                alt: "돈이 부족한 장면",
+                feedback: "맞아요. 돈이 기준에 못 미치므로 부족하다가 자연스럽습니다."
+            },
+            {
+                id: "check-time-lacking",
+                title: "제출까지 남은 시간",
+                prompt: "해야 할 일에 비해 시간이 충분하지 않습니다.",
+                metrics: ["마감 기준", "시간이 적음"],
+                answer: "부족하다",
+                image: AMOUNT_BASE + "time-lacking.webp",
+                alt: "시간이 부족한 장면",
+                feedback: "맞아요. 시간이 부족합니다."
+            },
+            {
+                id: "check-refreshments-enough",
+                title: "필요 10개 / 있음 10개",
+                prompt: "준비한 다과가 필요한 양과 같습니다.",
+                metrics: ["필요 10개", "있음 10개"],
+                answer: "충분하다",
+                image: AMOUNT_BASE + "snacks-extra.webp",
+                alt: "다과가 충분한 장면",
+                feedback: "맞아요. 필요한 만큼 있어서 충분합니다."
+            },
+            {
+                id: "check-supplies-short",
+                title: "필요 8개 / 있음 6개",
+                prompt: "선물 포장 재료가 필요한 수보다 적습니다.",
+                metrics: ["필요 8개", "있음 6개"],
+                answer: "모자라다",
+                image: AMOUNT_BASE + "gift-bag-leftovers.webp",
+                alt: "포장 재료 장면",
+                feedback: "맞아요. 구체적인 개수가 필요한 수보다 적어서 모자랍니다."
+            }
+        ]
+    };
+    </script>
+    <script src="vocab-support-activity.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>

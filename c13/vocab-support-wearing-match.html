@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>13과 어휘 보조 | 옷차림·착용 매칭</title>
+    <link rel="stylesheet" href="vocab-support-activity.css" />
+</head>
+<body>
+    <nav class="support-topbar" aria-label="상단 이동">
+        <a href="../index.html">메인</a>
+        <span>|</span>
+        <a href="index.html">13과</a>
+        <span>|</span>
+        <a href="vocabulary.html">어휘</a>
+        <span>|</span>
+        <span>옷차림·착용 매칭</span>
+    </nav>
+
+    <main id="support-app"></main>
+
+    <script>
+    const WEAR_BASE = "../assets/c13/vocabulary/images/split-variants/full/";
+    const OBJECT_OPTIONS = ["옷", "넥타이", "반지", "귀고리", "시계", "가방", "배낭"];
+    const VERB_OPTIONS = ["차려입다", "매다", "끼다", "하다", "차다", "들다", "메다"];
+    window.C13_SUPPORT_ACTIVITY = {
+        type: "pair-match",
+        title: "옷차림·착용 매칭",
+        subtitle: "착용 대상에 따라 달라지는 동사를 그림과 함께 연습합니다.",
+        learnTitle: "대상과 동사를 한 쌍으로 보기",
+        learnNote: "착용 표현은 목적어와 동사를 함께 기억하면 헷갈림이 줄어듭니다.",
+        practiceTitle: "대상 카드를 동사에 연결하기",
+        practiceNote: "대상 카드를 누른 뒤 어울리는 동사 칸을 선택하세요.",
+        checkTitle: "대상→동사 / 동사→대상 점검",
+        checkNote: "앞 7문항은 대상에 맞는 동사를, 뒤 7문항은 동사에 맞는 대상을 고릅니다.",
+        learnCards: [
+            {
+                result: "차려입다",
+                cues: ["옷", "특별한 날에 갖추어 입다"],
+                image: WEAR_BASE + "s01_tr_n14.webp",
+                alt: "옷을 차려입은 사람",
+                note: "옷을 잘 갖추어 입을 때: 옷을 차려입다"
+            },
+            {
+                result: "매다",
+                cues: ["넥타이", "목에 묶다"],
+                image: WEAR_BASE + "s01_bl_n15.webp",
+                alt: "넥타이를 맨 사람",
+                note: "목에 둘러 묶으면: 넥타이를 매다"
+            },
+            {
+                result: "끼다",
+                cues: ["반지", "손가락에 넣다"],
+                image: WEAR_BASE + "s01_br_n16.webp",
+                alt: "반지를 낀 손",
+                note: "손가락에 넣으면: 반지를 끼다"
+            },
+            {
+                result: "하다",
+                cues: ["귀고리", "귀에 장신구"],
+                image: WEAR_BASE + "s05_tl_n17.webp",
+                alt: "귀고리를 한 사람",
+                note: "귀 장신구에는: 귀고리를 하다"
+            },
+            {
+                result: "차다",
+                cues: ["시계", "손목에 걸다"],
+                image: WEAR_BASE + "s05_tr_n18.webp",
+                alt: "시계를 찬 손목",
+                note: "손목에는: 시계를 차다"
+            },
+            {
+                result: "들다",
+                cues: ["가방", "손으로 잡다"],
+                image: WEAR_BASE + "s05_bl_n19.webp",
+                alt: "가방을 든 사람",
+                note: "손으로 잡으면: 가방을 들다"
+            },
+            {
+                result: "메다",
+                cues: ["배낭", "어깨에 걸치다"],
+                image: WEAR_BASE + "s05_br_n20.webp",
+                alt: "배낭을 멘 사람",
+                note: "어깨에 걸치면: 배낭을 메다"
+            }
+        ],
+        match: {
+            id: "wearing-match",
+            bankTitle: "대상 카드",
+            bankNote: "대상 카드를 고른 뒤 어울리는 동사 칸을 누르세요.",
+            targetTitle: "착용 동사",
+            targetNote: "목적어와 자연스럽게 어울리는 동사를 찾습니다.",
+            hint: "대상 카드를 먼저 고르고 알맞은 동사 칸을 선택하세요.",
+            targets: [
+                { id: "dress-up", label: "차려입다", summary: "옷을 갖추어 입다" },
+                { id: "tie", label: "매다", summary: "목에 묶다" },
+                { id: "put-on", label: "끼다", summary: "손가락에 넣다" },
+                { id: "wear-ear", label: "하다", summary: "귀 장신구를 착용하다" },
+                { id: "wear-wrist", label: "차다", summary: "손목에 걸다" },
+                { id: "hold", label: "들다", summary: "손으로 잡다" },
+                { id: "shoulder", label: "메다", summary: "어깨에 걸치다" }
+            ],
+            items: [
+                { id: "clothes", label: "옷", answer: "dress-up", image: WEAR_BASE + "s01_tr_n14.webp", alt: "옷" },
+                { id: "necktie", label: "넥타이", answer: "tie", image: WEAR_BASE + "s01_bl_n15.webp", alt: "넥타이" },
+                { id: "ring", label: "반지", answer: "put-on", image: WEAR_BASE + "s01_br_n16.webp", alt: "반지" },
+                { id: "earrings", label: "귀고리", answer: "wear-ear", image: WEAR_BASE + "s05_tl_n17.webp", alt: "귀고리" },
+                { id: "watch", label: "시계", answer: "wear-wrist", image: WEAR_BASE + "s05_tr_n18.webp", alt: "시계" },
+                { id: "bag", label: "가방", answer: "hold", image: WEAR_BASE + "s05_bl_n19.webp", alt: "가방" },
+                { id: "backpack", label: "배낭", answer: "shoulder", image: WEAR_BASE + "s05_br_n20.webp", alt: "배낭" }
+            ]
+        },
+        check: [
+            {
+                id: "check-clothes-to-verb",
+                title: "옷 + ?",
+                prompt: "특별한 날에 옷을 잘 갖추어 입습니다.",
+                answer: "차려입다",
+                options: VERB_OPTIONS,
+                image: WEAR_BASE + "s01_tr_n14.webp",
+                alt: "옷을 차려입은 사람",
+                feedback: "정답: 옷을 차려입다."
+            },
+            {
+                id: "check-tie-to-verb",
+                title: "넥타이 + ?",
+                prompt: "목에 둘러 묶는 동사입니다.",
+                answer: "매다",
+                options: VERB_OPTIONS,
+                image: WEAR_BASE + "s01_bl_n15.webp",
+                alt: "넥타이",
+                feedback: "정답: 넥타이를 매다. 묶으면 매다입니다.",
+                wrongFeedback: "넥타이는 목에 묶으므로 매다를 씁니다."
+            },
+            {
+                id: "check-ring-to-verb",
+                title: "반지 + ?",
+                prompt: "손가락에 넣는 동사입니다.",
+                answer: "끼다",
+                options: VERB_OPTIONS,
+                image: WEAR_BASE + "s01_br_n16.webp",
+                alt: "반지",
+                feedback: "정답: 반지를 끼다."
+            },
+            {
+                id: "check-earrings-to-verb",
+                title: "귀고리 + ?",
+                prompt: "귀 장신구를 착용할 때 씁니다.",
+                answer: "하다",
+                options: VERB_OPTIONS,
+                image: WEAR_BASE + "s05_tl_n17.webp",
+                alt: "귀고리",
+                feedback: "정답: 귀고리를 하다."
+            },
+            {
+                id: "check-watch-to-verb",
+                title: "시계 + ?",
+                prompt: "손목에 걸 때 쓰는 동사입니다.",
+                answer: "차다",
+                options: VERB_OPTIONS,
+                image: WEAR_BASE + "s05_tr_n18.webp",
+                alt: "시계",
+                feedback: "정답: 시계를 차다.",
+                wrongFeedback: "손목에 거는 시계는 차다를 씁니다."
+            },
+            {
+                id: "check-bag-to-verb",
+                title: "가방 + ?",
+                prompt: "손으로 잡고 옮깁니다.",
+                answer: "들다",
+                options: VERB_OPTIONS,
+                image: WEAR_BASE + "s05_bl_n19.webp",
+                alt: "가방",
+                feedback: "정답: 가방을 들다. 손으로 잡으면 들다입니다.",
+                wrongFeedback: "손으로 잡는 가방은 들다, 어깨에 걸치는 배낭은 메다입니다."
+            },
+            {
+                id: "check-backpack-to-verb",
+                title: "배낭 + ?",
+                prompt: "어깨에 걸쳐 착용합니다.",
+                answer: "메다",
+                options: VERB_OPTIONS,
+                image: WEAR_BASE + "s05_br_n20.webp",
+                alt: "배낭",
+                feedback: "정답: 배낭을 메다. 어깨에 걸치면 메다입니다.",
+                wrongFeedback: "배낭은 어깨에 걸치므로 메다를 씁니다."
+            },
+            {
+                id: "check-verb-dress-up-to-object",
+                title: "차려입다 + ?",
+                prompt: "특별한 날에 잘 갖추어 입는 대상은 무엇일까요?",
+                answer: "옷",
+                options: OBJECT_OPTIONS,
+                feedback: "정답: 옷을 차려입다."
+            },
+            {
+                id: "check-verb-tie-to-object",
+                title: "매다 + ?",
+                prompt: "목에 둘러 묶는 대상입니다.",
+                answer: "넥타이",
+                options: OBJECT_OPTIONS,
+                feedback: "정답: 넥타이를 매다."
+            },
+            {
+                id: "check-verb-put-on-to-object",
+                title: "끼다 + ?",
+                prompt: "손가락에 넣는 대상입니다.",
+                answer: "반지",
+                options: OBJECT_OPTIONS,
+                feedback: "정답: 반지를 끼다."
+            },
+            {
+                id: "check-verb-wear-ear-to-object",
+                title: "하다 + ?",
+                prompt: "귀 장신구와 자연스럽게 어울립니다.",
+                answer: "귀고리",
+                options: OBJECT_OPTIONS,
+                feedback: "정답: 귀고리를 하다."
+            },
+            {
+                id: "check-verb-wear-wrist-to-object",
+                title: "차다 + ?",
+                prompt: "손목에 걸치는 대상입니다.",
+                answer: "시계",
+                options: OBJECT_OPTIONS,
+                feedback: "정답: 시계를 차다."
+            },
+            {
+                id: "check-verb-hold-to-object",
+                title: "들다 + ?",
+                prompt: "손으로 잡고 옮기는 대상입니다.",
+                answer: "가방",
+                options: OBJECT_OPTIONS,
+                feedback: "정답: 가방을 들다."
+            },
+            {
+                id: "check-verb-shoulder-to-object",
+                title: "메다 + ?",
+                prompt: "어깨에 걸쳐 착용하는 대상입니다.",
+                answer: "배낭",
+                options: OBJECT_OPTIONS,
+                feedback: "정답: 배낭을 메다."
+            }
+        ]
+    };
+    </script>
+    <script src="vocab-support-activity.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>
