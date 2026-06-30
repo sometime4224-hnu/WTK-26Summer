@@ -316,6 +316,46 @@
             line-height: 1.55;
         }
 
+        .flow-control {
+            display: grid;
+            gap: 7px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 11px;
+            background: var(--blue-soft);
+        }
+
+        .flow-toggle {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 5px;
+        }
+
+        .flow-toggle button {
+            min-height: 34px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            background: #fff;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .flow-toggle button[aria-pressed="true"] {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .flow-hint {
+            margin: 0;
+            color: #1e3a8a;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
         .stage-head {
             display: flex;
             align-items: start;
@@ -579,6 +619,72 @@
             border-color: #bfdbfe;
             background: var(--blue-soft);
             color: #1e3a8a;
+        }
+
+        .advance-panel {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+            border: 1px solid #99f6e4;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f0fdfa;
+        }
+
+        .advance-copy {
+            display: grid;
+            gap: 5px;
+            min-width: 0;
+        }
+
+        .advance-copy strong {
+            color: #0f766e;
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1.3;
+        }
+
+        .advance-copy span {
+            color: #115e59;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .advance-track {
+            height: 7px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(15, 118, 110, 0.14);
+        }
+
+        .advance-track span {
+            display: block;
+            width: 0%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--teal), var(--blue));
+            transition: width 0.12s linear;
+        }
+
+        .advance-panel.is-paused {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .advance-panel.is-paused .advance-copy strong,
+        .advance-panel.is-paused .advance-copy span {
+            color: #475569;
+        }
+
+        .advance-panel.is-paused .advance-track span {
+            background: #94a3b8;
+        }
+
+        .advance-panel.is-manual [data-advance-pause] {
+            display: none;
         }
 
         .person-roster {
@@ -913,6 +1019,14 @@
                 font-size: 15px;
             }
 
+            .advance-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .advance-panel .ghost-button {
+                justify-self: start;
+            }
+
             .person-roster {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
@@ -1009,6 +1123,15 @@
                             <div class="meter__track"><div id="dialogueMeterBar" class="meter__bar"></div></div>
                         </div>
                     </div>
+                </div>
+                <div class="flow-control" aria-label="정답 후 진행 방식">
+                    <p class="progress-title">진행 방식</p>
+                    <div class="flow-toggle" role="group" aria-label="정답 후 진행 방식 선택">
+                        <button type="button" data-flow-mode="auto" aria-pressed="false">자동</button>
+                        <button type="button" data-flow-mode="slow" aria-pressed="true">천천히</button>
+                        <button type="button" data-flow-mode="manual" aria-pressed="false">수동</button>
+                    </div>
+                    <p id="flowModeHint" class="flow-hint">정답 피드백을 잠깐 보고 다음으로 이동합니다.</p>
                 </div>
                 <div class="mini-rule">
                     <strong>핵심 형태</strong>
@@ -1189,6 +1312,25 @@
             ]
         };
 
+        const FLOW_STORAGE_KEY = "c13-g2-wb-flow-mode";
+        const FLOW_MODES = {
+            auto: {
+                label: "자동",
+                delay: 1200,
+                hint: "정답이면 빠르게 다음 문제로 넘어갑니다."
+            },
+            slow: {
+                label: "천천히",
+                delay: 2400,
+                hint: "정답 피드백을 잠깐 보고 다음으로 이동합니다."
+            },
+            manual: {
+                label: "수동",
+                delay: 0,
+                hint: "자동 이동 없이 직접 다음 버튼으로 진행합니다."
+            }
+        };
+
         const state = {
             stage: "match",
             matchIndex: 0,
@@ -1200,22 +1342,26 @@
             dialogueIndex: 0,
             dialogueSelected: null,
             dialogueAnswered: false,
-            dialogueCorrect: 0
+            dialogueCorrect: 0,
+            flowMode: getSavedFlowMode()
         };
 
-        window.C13_G2_WB = { DATA, state };
+        window.C13_G2_WB = { DATA, state, FLOW_MODES };
 
         const app = document.getElementById("workbookApp");
         const stageButtons = [...document.querySelectorAll("[data-stage]")];
         const guideTimers = [];
+        let activeAdvance = null;
 
         stageButtons.forEach((button) => {
             button.addEventListener("click", () => {
+                clearAutoAdvance();
                 state.stage = button.dataset.stage;
                 render();
             });
         });
 
+        bindFlowControls();
         render();
 
         function render() {
@@ -1231,6 +1377,9 @@
         function renderMatch() {
             const task = DATA.match[state.matchIndex];
             const progress = `${state.matchIndex + 1} / ${DATA.match.length}`;
+            const isCorrect = state.matchAnswered && selectedMatchText() === task.answer;
+            const nextLabel = state.matchIndex === DATA.match.length - 1 ? "묘사 단계로" : "다음";
+            const nextDestination = state.matchIndex === DATA.match.length - 1 ? "묘사 단계" : "다음 문제";
             app.innerHTML = `
                 <div class="stage-head">
                     <div>
@@ -1262,9 +1411,10 @@
                         </div>
                         <div class="action-row">
                             <button type="button" id="checkMatchBtn" class="primary-button" data-guide-target="match-check" ${state.matchAnswered || state.matchSelected === null ? "disabled" : ""}>확인</button>
-                            <button type="button" id="nextMatchBtn" class="ghost-button" data-guide-target="match-next" ${state.matchAnswered ? "" : "disabled"}>${state.matchIndex === DATA.match.length - 1 ? "묘사 단계로" : "다음"}</button>
+                            <button type="button" id="nextMatchBtn" class="${isCorrect ? "primary-button" : "ghost-button"}" data-guide-target="match-next" ${state.matchAnswered ? "" : "disabled"}>${isCorrect ? `지금 ${nextLabel}` : nextLabel}</button>
                         </div>
                         <div id="matchFeedback" class="feedback ${state.matchAnswered ? feedbackClass(selectedMatchText() === task.answer) : ""}" data-guide-target="match-feedback">${state.matchAnswered ? matchFeedback(task) : ""}</div>
+                        <div id="matchAdvance" class="advance-panel hidden" aria-live="polite"></div>
                     </div>
                 </div>
             `;
@@ -1278,6 +1428,18 @@
             });
             document.getElementById("checkMatchBtn").addEventListener("click", checkMatch);
             document.getElementById("nextMatchBtn").addEventListener("click", nextMatch);
+            if (isCorrect) {
+                startAutoAdvance({
+                    key: `match-${state.matchIndex}`,
+                    panelId: "matchAdvance",
+                    nextButtonId: "nextMatchBtn",
+                    destination: nextDestination,
+                    nowText: `지금 ${nextLabel}`,
+                    onNext: nextMatch
+                });
+            } else {
+                clearAutoAdvance();
+            }
             scheduleMatchGuide();
         }
 
@@ -1303,6 +1465,7 @@
 
         function nextMatch() {
             if (!state.matchAnswered) return;
+            clearAutoAdvance();
             if (state.matchIndex === DATA.match.length - 1) {
                 state.stage = "describe";
             } else {
@@ -1316,6 +1479,7 @@
         function renderDescribe() {
             const task = DATA.describe[state.describeIndex];
             const completed = state.describeDone.filter(Boolean).length;
+            const nextLabel = describeNextLabel();
             app.innerHTML = `
                 <div class="stage-head">
                     <div>
@@ -1354,15 +1518,17 @@
                             <button type="button" id="checkDescribeBtn" class="primary-button" data-guide-target="describe-check">문장 확인</button>
                             <button type="button" id="modelDescribeBtn" class="ghost-button">모범 문장</button>
                             <button type="button" id="clearDescribeBtn" class="ghost-button">지우기</button>
-                            <button type="button" id="nextDescribeBtn" class="ghost-button" data-guide-target="describe-next">${state.describeIndex === DATA.describe.length - 1 ? "대화 단계로" : "다음 사람"}</button>
+                            <button type="button" id="nextDescribeBtn" class="ghost-button" data-guide-target="describe-next">${nextLabel}</button>
                         </div>
                         <div id="describeFeedback" class="feedback is-hint" data-guide-target="describe-feedback">단서 두 개와 사람 이름이 모두 들어가면 정답으로 인정됩니다.</div>
+                        <div id="describeAdvance" class="advance-panel hidden" aria-live="polite"></div>
                     </div>
                 </div>
             `;
 
             document.querySelectorAll("[data-person]").forEach((button) => {
                 button.addEventListener("click", () => {
+                    clearAutoAdvance();
                     state.describeIndex = Number(button.dataset.person);
                     renderDescribe();
                 });
@@ -1373,12 +1539,16 @@
             document.getElementById("checkDescribeBtn").addEventListener("click", checkDescribe);
             document.getElementById("modelDescribeBtn").addEventListener("click", showDescribeModel);
             document.getElementById("clearDescribeBtn").addEventListener("click", () => {
+                clearAutoAdvance();
                 document.getElementById("describeInput").value = "";
                 setFeedback("describeFeedback", "is-hint", "단서 두 개와 사람 이름이 모두 들어가면 정답으로 인정됩니다.");
                 scheduleDescribeGuide();
             });
             document.getElementById("nextDescribeBtn").addEventListener("click", nextDescribe);
-            document.getElementById("describeInput").addEventListener("input", syncDescribeGuide);
+            document.getElementById("describeInput").addEventListener("input", () => {
+                clearAutoAdvance();
+                syncDescribeGuide();
+            });
             scheduleDescribeGuide();
         }
 
@@ -1396,25 +1566,39 @@
             const value = normalize(input.value);
             const missing = task.required.filter((piece) => !value.includes(normalize(piece)));
             if (!input.value.trim()) {
+                clearAutoAdvance();
                 setFeedback("describeFeedback", "is-wrong", "먼저 문장을 한 번 만들어 보세요.");
                 focusGuide('[data-guide-target="describe-input"]', "3 입력", 2);
                 return;
             }
             if (missing.length === 0) {
                 state.describeDone[state.describeIndex] = true;
+                const nextLabel = describeNextLabel();
+                const nextDestination = describeNextDestination();
                 setFeedback("describeFeedback", "is-correct", `<b>좋아요.</b> 착용 단서와 사람 이름이 모두 들어갔어요.`);
+                prepareNowButton("nextDescribeBtn", `지금 ${nextLabel}`);
                 updateMeters();
+                startAutoAdvance({
+                    key: `describe-${state.describeIndex}`,
+                    panelId: "describeAdvance",
+                    nextButtonId: "nextDescribeBtn",
+                    destination: nextDestination,
+                    nowText: `지금 ${nextLabel}`,
+                    onNext: nextDescribe
+                });
                 runGuideSequence([
                     { selector: '[data-guide-target="describe-feedback"]', label: "피드백", index: 3, delay: 40 },
                     { selector: '[data-guide-target="describe-next"]', label: "5 다음", index: 4, delay: 850 }
                 ]);
                 return;
             }
+            clearAutoAdvance();
             setFeedback("describeFeedback", "is-wrong", `아직 단서가 부족해요. <b>${esc(task.cue)}</b>와 <b>${esc(task.person)}</b>를 모두 넣어 보세요.`);
             focusGuide('[data-guide-target="describe-feedback"]', "다시 확인", 3);
         }
 
         function showDescribeModel() {
+            clearAutoAdvance();
             const task = DATA.describe[state.describeIndex];
             document.getElementById("describeInput").value = task.model;
             setFeedback("describeFeedback", "is-hint", `<b>모범 문장:</b> ${esc(task.model)}`);
@@ -1422,6 +1606,7 @@
         }
 
         function nextDescribe() {
+            clearAutoAdvance();
             if (state.describeIndex === DATA.describe.length - 1) {
                 state.stage = "dialogue";
             } else {
@@ -1430,9 +1615,20 @@
             render();
         }
 
+        function describeNextLabel() {
+            return state.describeIndex === DATA.describe.length - 1 ? "대화 단계로" : "다음 사람";
+        }
+
+        function describeNextDestination() {
+            return state.describeIndex === DATA.describe.length - 1 ? "대화 단계" : "다음 사람";
+        }
+
         function renderDialogue() {
             const task = DATA.dialogue[state.dialogueIndex];
             const progress = `${state.dialogueIndex + 1} / ${DATA.dialogue.length}`;
+            const isCorrect = state.dialogueAnswered && selectedDialogueText() === task.answer;
+            const nextLabel = state.dialogueIndex === DATA.dialogue.length - 1 ? "결과 보기" : "다음";
+            const nextDestination = state.dialogueIndex === DATA.dialogue.length - 1 ? "결과 화면" : "다음 대화";
             app.innerHTML = `
                 <div class="stage-head">
                     <div>
@@ -1457,9 +1653,10 @@
                 </div>
                 <div class="action-row">
                     <button type="button" id="checkDialogueBtn" class="primary-button" data-guide-target="dialogue-check" ${state.dialogueAnswered || state.dialogueSelected === null ? "disabled" : ""}>확인</button>
-                    <button type="button" id="nextDialogueBtn" class="ghost-button" data-guide-target="dialogue-next" ${state.dialogueAnswered ? "" : "disabled"}>${state.dialogueIndex === DATA.dialogue.length - 1 ? "결과 보기" : "다음"}</button>
+                    <button type="button" id="nextDialogueBtn" class="${isCorrect ? "primary-button" : "ghost-button"}" data-guide-target="dialogue-next" ${state.dialogueAnswered ? "" : "disabled"}>${isCorrect ? `지금 ${nextLabel}` : nextLabel}</button>
                 </div>
                 <div id="dialogueFeedback" class="feedback ${state.dialogueAnswered ? feedbackClass(selectedDialogueText() === task.answer) : ""}" data-guide-target="dialogue-feedback">${state.dialogueAnswered ? dialogueFeedback(task) : ""}</div>
+                <div id="dialogueAdvance" class="advance-panel hidden" aria-live="polite"></div>
             `;
 
             document.querySelectorAll("[data-dialogue-option]").forEach((button) => {
@@ -1471,6 +1668,18 @@
             });
             document.getElementById("checkDialogueBtn").addEventListener("click", checkDialogue);
             document.getElementById("nextDialogueBtn").addEventListener("click", nextDialogue);
+            if (isCorrect) {
+                startAutoAdvance({
+                    key: `dialogue-${state.dialogueIndex}`,
+                    panelId: "dialogueAdvance",
+                    nextButtonId: "nextDialogueBtn",
+                    destination: nextDestination,
+                    nowText: `지금 ${nextLabel}`,
+                    onNext: nextDialogue
+                });
+            } else {
+                clearAutoAdvance();
+            }
             scheduleDialogueGuide();
         }
 
@@ -1500,6 +1709,7 @@
 
         function nextDialogue() {
             if (!state.dialogueAnswered) return;
+            clearAutoAdvance();
             if (state.dialogueIndex === DATA.dialogue.length - 1) {
                 renderSummary();
                 return;
@@ -1511,6 +1721,7 @@
         }
 
         function renderSummary() {
+            clearAutoAdvance();
             state.stage = "dialogue";
             const describeCount = state.describeDone.filter(Boolean).length;
             const total = DATA.match.length + DATA.describe.length + DATA.dialogue.length;
@@ -1532,6 +1743,7 @@
         }
 
         function restartAll() {
+            clearAutoAdvance();
             state.stage = "match";
             state.matchIndex = 0;
             state.matchSelected = null;
@@ -1559,6 +1771,173 @@
             if (!text || !bar) return;
             text.textContent = `${value} / ${total}`;
             bar.style.width = `${Math.round((value / total) * 100)}%`;
+        }
+
+        function bindFlowControls() {
+            document.querySelectorAll("[data-flow-mode]").forEach((button) => {
+                button.addEventListener("click", () => setFlowMode(button.dataset.flowMode));
+            });
+            refreshFlowControls();
+        }
+
+        function setFlowMode(mode) {
+            if (!FLOW_MODES[mode]) return;
+            const context = activeAdvance && !activeAdvance.paused
+                ? {
+                    key: activeAdvance.key,
+                    panelId: activeAdvance.panelId,
+                    nextButtonId: activeAdvance.nextButtonId,
+                    destination: activeAdvance.destination,
+                    nowText: activeAdvance.nowText,
+                    onNext: activeAdvance.onNext
+                }
+                : null;
+            state.flowMode = mode;
+            saveFlowMode(mode);
+            refreshFlowControls();
+            if (context) startAutoAdvance(context);
+        }
+
+        function refreshFlowControls() {
+            document.querySelectorAll("[data-flow-mode]").forEach((button) => {
+                button.setAttribute("aria-pressed", String(button.dataset.flowMode === state.flowMode));
+            });
+            const hint = document.getElementById("flowModeHint");
+            if (hint) hint.textContent = FLOW_MODES[state.flowMode].hint;
+        }
+
+        function getSavedFlowMode() {
+            try {
+                const saved = window.localStorage.getItem(FLOW_STORAGE_KEY);
+                return FLOW_MODES[saved] ? saved : "slow";
+            } catch (error) {
+                return "slow";
+            }
+        }
+
+        function saveFlowMode(mode) {
+            try {
+                window.localStorage.setItem(FLOW_STORAGE_KEY, mode);
+            } catch (error) {
+                return;
+            }
+        }
+
+        function prepareNowButton(buttonId, text) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+            button.classList.remove("ghost-button");
+            button.classList.add("primary-button");
+            button.textContent = text;
+        }
+
+        function startAutoAdvance(context) {
+            clearAutoAdvance();
+            const panel = document.getElementById(context.panelId);
+            if (!panel) return;
+            prepareNowButton(context.nextButtonId, context.nowText);
+            panel.className = "advance-panel";
+            panel.innerHTML = `
+                <div class="advance-copy">
+                    <strong data-advance-status></strong>
+                    <span data-advance-detail></span>
+                    <div class="advance-track" aria-hidden="true"><span data-advance-bar></span></div>
+                </div>
+                <button type="button" class="ghost-button" data-advance-pause>멈춤</button>
+            `;
+            activeAdvance = {
+                ...context,
+                panelId: context.panelId,
+                interval: null,
+                timeout: null,
+                paused: false,
+                lastSecond: null
+            };
+
+            const pauseButton = panel.querySelector("[data-advance-pause]");
+            pauseButton.addEventListener("click", pauseAutoAdvance);
+
+            if (state.flowMode === "manual") {
+                panel.classList.add("is-manual");
+                setAdvanceStatus("수동 진행", `준비되면 ${context.nowText}을 누르세요.`, 0);
+                return;
+            }
+
+            const delay = FLOW_MODES[state.flowMode].delay;
+            activeAdvance.startedAt = Date.now();
+            activeAdvance.dueAt = activeAdvance.startedAt + delay;
+            updateAdvanceCountdown();
+            activeAdvance.interval = setInterval(updateAdvanceCountdown, 100);
+            activeAdvance.timeout = setTimeout(() => {
+                const stillActive = activeAdvance && activeAdvance.key === context.key && !activeAdvance.paused;
+                if (stillActive) context.onNext();
+            }, delay);
+        }
+
+        function pauseAutoAdvance() {
+            if (!activeAdvance) return;
+            clearTimeout(activeAdvance.timeout);
+            clearInterval(activeAdvance.interval);
+            activeAdvance.paused = true;
+            const panel = document.getElementById(activeAdvance.panelId);
+            if (panel) panel.classList.add("is-paused");
+            const pauseButton = panel ? panel.querySelector("[data-advance-pause]") : null;
+            if (pauseButton) {
+                pauseButton.textContent = "멈춤 완료";
+                pauseButton.disabled = true;
+            }
+            setAdvanceStatus("잠시 멈췄어요", `준비되면 ${activeAdvance.nowText}을 누르세요.`, currentAdvancePercent());
+        }
+
+        function clearAutoAdvance() {
+            if (!activeAdvance) return;
+            clearTimeout(activeAdvance.timeout);
+            clearInterval(activeAdvance.interval);
+            const panel = document.getElementById(activeAdvance.panelId);
+            if (panel) {
+                panel.className = "advance-panel hidden";
+                panel.innerHTML = "";
+            }
+            activeAdvance = null;
+        }
+
+        function updateAdvanceCountdown() {
+            if (!activeAdvance) return;
+            const remaining = Math.max(0, activeAdvance.dueAt - Date.now());
+            const percent = currentAdvancePercent();
+            const second = Math.ceil(remaining / 1000);
+            const status = `${activeAdvance.destination}로 이동 준비`;
+            if (activeAdvance.lastSecond !== second) {
+                activeAdvance.lastSecond = second;
+                setAdvanceStatus(status, `${second}초 후 자동으로 이동합니다.`, percent);
+                return;
+            }
+            setAdvanceBar(percent);
+        }
+
+        function currentAdvancePercent() {
+            if (!activeAdvance || !activeAdvance.startedAt || !activeAdvance.dueAt) return 0;
+            const elapsed = Date.now() - activeAdvance.startedAt;
+            const total = Math.max(1, activeAdvance.dueAt - activeAdvance.startedAt);
+            return Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
+        }
+
+        function setAdvanceStatus(status, detail, percent) {
+            if (!activeAdvance) return;
+            const panel = document.getElementById(activeAdvance.panelId);
+            if (!panel) return;
+            const statusNode = panel.querySelector("[data-advance-status]");
+            const detailNode = panel.querySelector("[data-advance-detail]");
+            if (statusNode) statusNode.textContent = status;
+            if (detailNode) detailNode.textContent = detail;
+            setAdvanceBar(percent);
+        }
+
+        function setAdvanceBar(percent) {
+            if (!activeAdvance) return;
+            const panel = document.getElementById(activeAdvance.panelId);
+            const bar = panel ? panel.querySelector("[data-advance-bar]") : null;
+            if (bar) bar.style.width = `${percent}%`;
         }
 
         function guideStrip(labels) {

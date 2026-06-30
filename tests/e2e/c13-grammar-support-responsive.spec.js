@@ -169,6 +169,8 @@ test.describe("c13 grammar support smoke interactions", () => {
     await openSupportPage(page, "grammar2-workbook-practice.html");
 
     await expect(page.locator("h1")).toContainText("V-고 있다");
+    await page.locator('[data-flow-mode="manual"]').click();
+    await expect(page.locator('[data-flow-mode="manual"]')).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator(".guide-strip")).toContainText("대상");
     await expect(page.locator('[data-guide-target="match-object"]')).toHaveClass(/guide-focus/);
     await expect(page.locator('[data-guide-target="match-options"]')).toHaveClass(/guide-focus/, { timeout: 2500 });
@@ -194,5 +196,37 @@ test.describe("c13 grammar support smoke interactions", () => {
     await page.locator("#checkDialogueBtn").click();
     await expect(page.locator("#dialogueFeedback")).toContainText("맞아요");
     await expect(page.locator("#nextDialogueBtn")).toHaveClass(/guide-focus/, { timeout: 2500 });
+  });
+
+  test("grammar2 workbook practice can auto-advance after a correct answer", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openSupportPage(page, "grammar2-workbook-practice.html");
+
+    await page.locator('[data-flow-mode="auto"]').click();
+    await expect(page.locator('[data-flow-mode="auto"]')).toHaveAttribute("aria-pressed", "true");
+    await page.locator("[data-match-option]").filter({ hasText: "차려입고 있는" }).click();
+    await page.locator("#checkMatchBtn").click();
+
+    await expect(page.locator("#matchAdvance")).toContainText("자동으로 이동");
+    await expect(page.locator("#nextMatchBtn")).toContainText("지금 다음");
+    await expect(page.locator(".status-pill")).toContainText("2 / 7", { timeout: 3000 });
+  });
+
+  test("grammar2 workbook practice lets students pause the countdown", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openSupportPage(page, "grammar2-workbook-practice.html");
+
+    await expect(page.locator('[data-flow-mode="slow"]')).toHaveAttribute("aria-pressed", "true");
+    await page.locator("[data-match-option]").filter({ hasText: "차려입고 있는" }).click();
+    await page.locator("#checkMatchBtn").click();
+    await expect(page.locator("#matchAdvance")).toContainText("다음 문제로 이동 준비");
+
+    await page.locator("#matchAdvance [data-advance-pause]").click();
+    await expect(page.locator("#matchAdvance")).toContainText("잠시 멈췄어요");
+    await page.waitForTimeout(2600);
+    await expect(page.locator(".status-pill")).toContainText("1 / 7");
+
+    await page.locator("#nextMatchBtn").click();
+    await expect(page.locator(".status-pill")).toContainText("2 / 7");
   });
 });
