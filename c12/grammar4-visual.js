@@ -132,10 +132,11 @@
             <section class="support-panel" aria-label="문법 4 연결 활동">
                 <div>
                     <p class="support-panel__title">연결 활동</p>
-                    <p class="support-panel__desc">이미지로 필수 조건의 구조를 잡은 뒤, 전체 이미지 보기와 문장 완성으로 바로 이어 갈 수 있습니다.</p>
+                    <p class="support-panel__desc">이미지로 필수 조건의 구조를 잡은 뒤, 상황별 조건 고르기와 문장 완성으로 바로 이어 갈 수 있습니다.</p>
                 </div>
                 <div class="support-links">
                     <a class="resource-link" href="grammar4-support-activity1.html">보조활동 1 · 설명 이미지</a>
+                    <a class="resource-link" href="grammar4-support-activity2.html">보조활동 2 · 필수 조건 고르기</a>
                     <a class="resource-link" href="grammar4-form-typing.html">활용형·문장 완성</a>
                     <a class="resource-link" href="grammar4-classic.html">기존 버전</a>
                 </div>
