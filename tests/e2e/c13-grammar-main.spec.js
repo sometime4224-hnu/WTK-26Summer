@@ -6,6 +6,7 @@ const pages = [
     title: 'A/V-(으)ㄹ까 봐',
     quizTotal: 10,
     resources: [
+      { href: 'grammar1-wb-practice.html', text: '문법 1 WB 연습' },
       { href: 'grammar1-mini-game.html', text: '문법 1 미니 게임' }
     ],
     illustration: true,
@@ -19,6 +20,7 @@ const pages = [
     quizTotal: 10,
     resources: [
       { href: 'grammar2-mini-game.html', text: '문법 2 미니 게임' },
+      { href: 'grammar2-workbook-practice.html', text: '문법 2 WB 연습' },
       { href: 'grammar1-2-mini-game.html', text: '문법1·2 융합 미니 게임' },
       { href: 'grammar1-2-speaking.html', text: '문법1·2 융합 말하기' }
     ],

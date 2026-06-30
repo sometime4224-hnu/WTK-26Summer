@@ -8,6 +8,7 @@ const miniGamePages = [
 
 const supportPages = [
   ...miniGamePages,
+  "grammar2-workbook-practice.html",
   "grammar1-2-speaking.html",
   "grammar1-3-quiz.html"
 ];
@@ -161,5 +162,37 @@ test.describe("c13 grammar support smoke interactions", () => {
     }
 
     await expect(page.locator("#workspace")).toContainText("이 브라우저에서는 음성 인식을 사용할 수 없습니다.");
+  });
+
+  test("grammar2 workbook practice handles match, writing, and dialogue stages", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openSupportPage(page, "grammar2-workbook-practice.html");
+
+    await expect(page.locator("h1")).toContainText("V-고 있다");
+    await expect(page.locator(".guide-strip")).toContainText("대상");
+    await expect(page.locator('[data-guide-target="match-object"]')).toHaveClass(/guide-focus/);
+    await expect(page.locator('[data-guide-target="match-options"]')).toHaveClass(/guide-focus/, { timeout: 2500 });
+    await page.locator("[data-match-option]").filter({ hasText: "차려입고 있는" }).click();
+    await expect(page.locator("#checkMatchBtn")).toHaveClass(/guide-focus/);
+    await page.locator("#checkMatchBtn").click();
+    await expect(page.locator("#matchFeedback")).toContainText("맞아요");
+    await expect(page.locator("#nextMatchBtn")).toHaveClass(/guide-focus/, { timeout: 2500 });
+
+    await page.locator('[data-stage="describe"]').click();
+    await expect(page.locator('[data-guide-target="describe-cue"]')).toHaveClass(/guide-focus/);
+    await page.locator("#describeInput").fill("감색 양복을 입고 은색 넥타이를 매고 있는 사람이 신랑이에요.");
+    await expect(page.locator("#checkDescribeBtn")).toHaveClass(/guide-focus/);
+    await page.locator("#checkDescribeBtn").click();
+    await expect(page.locator("#describeFeedback")).toContainText("좋아요");
+    await expect(page.locator("#nextDescribeBtn")).toHaveClass(/guide-focus/, { timeout: 2500 });
+
+    await page.locator('[data-stage="dialogue"]').click();
+    await expect(page.locator('[data-guide-target="dialogue-blank"]')).toHaveClass(/guide-focus/);
+    await expect(page.locator('[data-guide-target="dialogue-options"]')).toHaveClass(/guide-focus/, { timeout: 2500 });
+    await page.locator("[data-dialogue-option]").filter({ hasText: "들고 있는" }).click();
+    await expect(page.locator("#checkDialogueBtn")).toHaveClass(/guide-focus/);
+    await page.locator("#checkDialogueBtn").click();
+    await expect(page.locator("#dialogueFeedback")).toContainText("맞아요");
+    await expect(page.locator("#nextDialogueBtn")).toHaveClass(/guide-focus/, { timeout: 2500 });
   });
 });

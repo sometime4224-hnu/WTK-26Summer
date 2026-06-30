@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>13과 문법 2 WB 연습 | V-고 있다</title>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --page-bg: #f6f8fb;
+            --panel: #ffffff;
+            --ink: #172033;
+            --muted: #5d6b82;
+            --line: #d7e0ea;
+            --teal: #0f766e;
+            --teal-soft: #e8fbf7;
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+            --orange: #ea580c;
+            --orange-soft: #fff4e8;
+            --rose: #dc2626;
+            --rose-soft: #fff1f2;
+            --green: #15803d;
+            --green-soft: #ecfdf3;
+            --shadow: 0 14px 28px rgba(15, 23, 42, 0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-padding-top: 58px;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+            color: var(--ink);
+            background: linear-gradient(180deg, #f8fafc 0%, var(--page-bg) 46%, #f1f5f9 100%);
+            font-family: "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+        }
+
+        button,
+        textarea {
+            font: inherit;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 46px;
+            border-bottom: 1px solid rgba(215, 224, 234, 0.92);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar a,
+        .topbar span {
+            color: var(--teal);
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1.1;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar span {
+            color: var(--muted);
+        }
+
+        .shell {
+            width: min(1120px, calc(100% - 28px));
+            margin: 14px auto 38px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .intro {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: end;
+            gap: 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 14px 16px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .eyebrow {
+            margin: 0 0 5px;
+            color: var(--orange);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.55rem, 3vw, 2.35rem);
+            line-height: 1.15;
+            letter-spacing: 0;
+        }
+
+        .intro__actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .link-button,
+        .ghost-button,
+        .primary-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            border-radius: 8px;
+            padding: 0 13px;
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .link-button {
+            border: 1px solid #bfdbfe;
+            background: var(--blue-soft);
+            color: #1d4ed8;
+        }
+
+        .ghost-button {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: #344256;
+        }
+
+        .primary-button {
+            border: 1px solid var(--teal);
+            background: var(--teal);
+            color: #fff;
+        }
+
+        .primary-button:disabled,
+        .ghost-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        .stage-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .stage-tab {
+            display: grid;
+            grid-template-columns: 30px minmax(0, 1fr);
+            gap: 9px;
+            align-items: center;
+            min-height: 54px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: #fff;
+            color: #334155;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .stage-tab[aria-selected="true"] {
+            border-color: rgba(15, 118, 110, 0.46);
+            background: var(--teal-soft);
+            color: #0f766e;
+            box-shadow: 0 10px 20px rgba(15, 118, 110, 0.08);
+        }
+
+        .stage-tab__number {
+            display: grid;
+            place-items: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #334155;
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stage-tab[aria-selected="true"] .stage-tab__number {
+            background: var(--teal);
+            color: #fff;
+        }
+
+        .stage-tab__title {
+            display: block;
+            min-width: 0;
+            font-size: 14px;
+            font-weight: 900;
+            line-height: 1.25;
+        }
+
+        .stage-tab__sub {
+            display: block;
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .workbook-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 260px;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .work-panel,
+        .progress-panel {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .work-panel {
+            min-width: 0;
+            padding: 16px;
+        }
+
+        .progress-panel {
+            position: sticky;
+            top: 58px;
+            display: grid;
+            gap: 10px;
+            padding: 14px;
+        }
+
+        .progress-title {
+            margin: 0;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .progress-meters {
+            display: grid;
+            gap: 8px;
+        }
+
+        .meter {
+            display: grid;
+            gap: 5px;
+        }
+
+        .meter__row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .meter__track {
+            height: 8px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        .meter__bar {
+            width: 0%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--teal), var(--blue));
+            transition: width 0.2s ease;
+        }
+
+        .mini-rule {
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 12px;
+            background: var(--orange-soft);
+        }
+
+        .mini-rule strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #9a3412;
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .mini-rule p {
+            margin: 0;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.55;
+        }
+
+        .stage-head {
+            display: flex;
+            align-items: start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .stage-title {
+            margin: 0;
+            font-size: clamp(1.28rem, 2.4vw, 1.85rem);
+            line-height: 1.22;
+        }
+
+        .stage-note {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.55;
+        }
+
+        .guide-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin: 0 0 12px;
+        }
+
+        .guide-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 30px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 0 9px;
+            background: #fff;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 900;
+            transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+        }
+
+        .guide-chip b {
+            display: inline-grid;
+            place-items: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 11px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .guide-chip.is-active {
+            border-color: rgba(15, 118, 110, 0.46);
+            background: var(--teal-soft);
+            color: #0f766e;
+            transform: translateY(-1px);
+        }
+
+        .guide-chip.is-active b {
+            background: var(--teal);
+            color: #fff;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 32px;
+            border: 1px solid #c7d2fe;
+            border-radius: 999px;
+            padding: 0 10px;
+            background: #eef2ff;
+            color: #3730a3;
+            font-size: 12px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .match-grid {
+            display: grid;
+            grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .focus-object {
+            display: grid;
+            gap: 10px;
+        }
+
+        .guide-focus {
+            position: relative;
+            z-index: 2;
+            outline: 3px solid rgba(245, 158, 11, 0.75);
+            outline-offset: 4px;
+            box-shadow: 0 0 0 7px rgba(245, 158, 11, 0.13), 0 16px 28px rgba(15, 23, 42, 0.12);
+            animation: guidePulse 1.05s ease-in-out 2;
+            scroll-margin-top: 70px;
+        }
+
+        .guide-focus[data-guide-label]::after {
+            content: attr(data-guide-label);
+            position: absolute;
+            top: -16px;
+            right: 10px;
+            z-index: 3;
+            border-radius: 999px;
+            padding: 4px 8px;
+            background: #0f766e;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 900;
+            line-height: 1;
+            white-space: nowrap;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+        }
+
+        @keyframes guidePulse {
+            0%, 100% {
+                outline-color: rgba(245, 158, 11, 0.62);
+                box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.1), 0 12px 22px rgba(15, 23, 42, 0.08);
+            }
+            50% {
+                outline-color: rgba(15, 118, 110, 0.84);
+                box-shadow: 0 0 0 9px rgba(15, 118, 110, 0.12), 0 16px 28px rgba(15, 23, 42, 0.13);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .guide-focus {
+                animation: none;
+            }
+        }
+
+        .image-frame {
+            display: grid;
+            place-items: center;
+            min-height: 250px;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .image-frame img {
+            display: block;
+            width: min(100%, 310px);
+            height: auto;
+        }
+
+        .object-name {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+        }
+
+        .object-name strong {
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .object-name span {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .option-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .option-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 52px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px 14px;
+            background: #fff;
+            color: #172033;
+            font-size: 16px;
+            font-weight: 900;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .option-button:hover:not(:disabled),
+        .person-button:hover,
+        .token-button:hover {
+            border-color: rgba(15, 118, 110, 0.46);
+            background: #f8fffd;
+        }
+
+        .option-button.is-selected {
+            border-color: var(--teal);
+            background: var(--teal-soft);
+            color: #0f766e;
+        }
+
+        .option-button.is-correct {
+            border-color: #86efac;
+            background: var(--green-soft);
+            color: var(--green);
+        }
+
+        .option-button.is-wrong {
+            border-color: #fecdd3;
+            background: var(--rose-soft);
+            color: var(--rose);
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .feedback {
+            min-height: 0;
+            margin-top: 12px;
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid transparent;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.6;
+        }
+
+        .feedback:empty {
+            display: none;
+        }
+
+        .feedback.is-correct {
+            border-color: #86efac;
+            background: var(--green-soft);
+            color: #166534;
+        }
+
+        .feedback.is-wrong {
+            border-color: #fecdd3;
+            background: var(--rose-soft);
+            color: #9f1239;
+        }
+
+        .feedback.is-hint {
+            border-color: #bfdbfe;
+            background: var(--blue-soft);
+            color: #1e3a8a;
+        }
+
+        .person-roster {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .person-button {
+            display: grid;
+            grid-template-columns: 50px minmax(0, 1fr);
+            gap: 9px;
+            align-items: center;
+            min-height: 72px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px;
+            background: #fff;
+            color: #172033;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .person-button[aria-pressed="true"] {
+            border-color: var(--blue);
+            background: var(--blue-soft);
+        }
+
+        .person-button img {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #fff;
+        }
+
+        .person-button strong,
+        .person-button span {
+            display: block;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .person-button strong {
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .person-button span {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .compose-area {
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .cue-panel {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            background: #f8fafc;
+        }
+
+        .cue-panel img {
+            display: block;
+            width: min(180px, 100%);
+            margin-inline: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .cue-panel h3 {
+            margin: 10px 0 6px;
+            font-size: 19px;
+            line-height: 1.25;
+        }
+
+        .cue-list {
+            display: grid;
+            gap: 6px;
+            margin: 10px 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .cue-list li {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: #fff;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .token-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-bottom: 10px;
+        }
+
+        .token-button {
+            min-height: 34px;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            padding: 0 10px;
+            background: var(--blue-soft);
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .sentence-input {
+            width: 100%;
+            min-height: 124px;
+            resize: vertical;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--ink);
+            background: #fff;
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.7;
+            outline: none;
+        }
+
+        .sentence-input:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+        }
+
+        .dialogue-box {
+            display: grid;
+            gap: 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 14px;
+            background: #f8fafc;
+        }
+
+        .dialogue-line {
+            margin: 0;
+            color: #334155;
+            font-size: 17px;
+            font-weight: 900;
+            line-height: 1.72;
+        }
+
+        .blank {
+            display: inline-grid;
+            place-items: center;
+            min-width: min(210px, 50vw);
+            min-height: 32px;
+            border-radius: 999px;
+            background: #fff;
+            color: var(--teal);
+            box-shadow: inset 0 -2px 0 #99f6e4;
+        }
+
+        .dialogue-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .summary-panel {
+            display: grid;
+            gap: 12px;
+            text-align: center;
+        }
+
+        .summary-score {
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 18px;
+            background: var(--green-soft);
+        }
+
+        .summary-score strong {
+            display: block;
+            color: var(--green);
+            font-size: clamp(2rem, 6vw, 3.6rem);
+            line-height: 1;
+        }
+
+        .summary-score span {
+            display: block;
+            margin-top: 7px;
+            color: #166534;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 920px) {
+            .workbook-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-panel {
+                position: static;
+                order: -1;
+                grid-template-columns: minmax(0, 1fr) minmax(220px, 0.8fr);
+            }
+
+            .match-grid,
+            .compose-area {
+                grid-template-columns: 1fr;
+            }
+
+            .focus-object {
+                order: 2;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .shell {
+                width: min(100% - 18px, 1120px);
+                margin-top: 8px;
+                gap: 9px;
+            }
+
+            .intro {
+                grid-template-columns: 1fr;
+                align-items: start;
+                padding: 11px 12px;
+            }
+
+            .intro__actions {
+                justify-content: start;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .stage-tabs {
+                display: flex;
+                overflow-x: auto;
+                gap: 7px;
+                padding: 7px;
+                scrollbar-width: none;
+            }
+
+            .stage-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .stage-tab {
+                flex: 0 0 184px;
+                min-height: 50px;
+                padding: 7px 8px;
+            }
+
+            .stage-tab__title {
+                font-size: 13px;
+            }
+
+            .work-panel {
+                padding: 12px;
+            }
+
+            .progress-panel {
+                grid-template-columns: 1fr;
+                padding: 11px;
+            }
+
+            .stage-head {
+                display: grid;
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .stage-note {
+                font-size: 13px;
+            }
+
+            .guide-strip {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                margin-bottom: 10px;
+                padding: 2px 1px 4px;
+                scrollbar-width: none;
+            }
+
+            .guide-strip::-webkit-scrollbar {
+                display: none;
+            }
+
+            .guide-chip {
+                flex: 0 0 auto;
+                min-height: 28px;
+                padding: 0 8px;
+                font-size: 11px;
+            }
+
+            .guide-focus[data-guide-label]::after {
+                top: -13px;
+                right: 8px;
+                font-size: 10px;
+            }
+
+            .image-frame {
+                min-height: 168px;
+            }
+
+            .image-frame img {
+                width: min(100%, 210px);
+            }
+
+            .option-button {
+                min-height: 48px;
+                padding: 10px 12px;
+                font-size: 15px;
+            }
+
+            .person-roster {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .dialogue-options {
+                grid-template-columns: 1fr;
+            }
+
+            .blank {
+                min-width: min(180px, 64vw);
+            }
+        }
+
+        @media (max-width: 390px) {
+            .person-roster {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="c13-support-page c13-grammar2-wb-page">
+    <nav class="topbar" aria-label="상단 이동">
+        <a href="../index.html">메인</a>
+        <span>|</span>
+        <a href="index.html">13과</a>
+        <span>|</span>
+        <a href="grammar2.html">문법 2</a>
+        <span>|</span>
+        <span>WB 연습</span>
+    </nav>
+
+    <main class="shell">
+        <section class="intro">
+            <div>
+                <p class="eyebrow">Workbook Practice</p>
+                <h1>V-고 있다로 옷차림 묘사하기</h1>
+            </div>
+            <div class="intro__actions" aria-label="관련 이동">
+                <a class="link-button" href="vocab-support-wearing-match.html">착용 동사 복습</a>
+                <a class="link-button" href="grammar2-mini-game.html">미니 게임</a>
+            </div>
+        </section>
+
+        <nav class="stage-tabs" aria-label="연습 단계">
+            <button class="stage-tab" type="button" aria-selected="true" data-stage="match">
+                <span class="stage-tab__number">1</span>
+                <span>
+                    <span class="stage-tab__title">표현 고르기</span>
+                    <span class="stage-tab__sub">대상 → -고 있는</span>
+                </span>
+            </button>
+            <button class="stage-tab" type="button" aria-selected="false" data-stage="describe">
+                <span class="stage-tab__number">2</span>
+                <span>
+                    <span class="stage-tab__title">사람 묘사</span>
+                    <span class="stage-tab__sub">사진 단서로 문장</span>
+                </span>
+            </button>
+            <button class="stage-tab" type="button" aria-selected="false" data-stage="dialogue">
+                <span class="stage-tab__number">3</span>
+                <span>
+                    <span class="stage-tab__title">대화 완성</span>
+                    <span class="stage-tab__sub">빈칸에 넣기</span>
+                </span>
+            </button>
+        </nav>
+
+        <section class="workbook-layout">
+            <section id="workbookApp" class="work-panel" aria-live="polite"></section>
+
+            <aside class="progress-panel" aria-label="연습 현황">
+                <div>
+                    <p class="progress-title">Progress</p>
+                    <div class="progress-meters">
+                        <div class="meter">
+                            <div class="meter__row">
+                                <span>표현</span>
+                                <span id="matchMeterText">0 / 7</span>
+                            </div>
+                            <div class="meter__track"><div id="matchMeterBar" class="meter__bar"></div></div>
+                        </div>
+                        <div class="meter">
+                            <div class="meter__row">
+                                <span>묘사</span>
+                                <span id="describeMeterText">0 / 6</span>
+                            </div>
+                            <div class="meter__track"><div id="describeMeterBar" class="meter__bar"></div></div>
+                        </div>
+                        <div class="meter">
+                            <div class="meter__row">
+                                <span>대화</span>
+                                <span id="dialogueMeterText">0 / 6</span>
+                            </div>
+                            <div class="meter__track"><div id="dialogueMeterBar" class="meter__bar"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mini-rule">
+                    <strong>핵심 형태</strong>
+                    <p>동작이나 착용 상태로 사람을 설명할 때는 <b>V-고 있는 + 사람</b>을 먼저 만드세요.</p>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <script>
+    (() => {
+        const IMAGE_BASE = "../assets/c13/vocabulary/images/split-variants/full/";
+        const DATA = {
+            match: [
+                {
+                    object: "옷",
+                    cue: "특별한 날에 갖추어 입은 옷",
+                    image: `${IMAGE_BASE}s01_tr_n14.webp`,
+                    alt: "격식을 갖춘 옷차림",
+                    answer: "차려입고 있는",
+                    options: ["차려입고 있는", "메고 있는", "끼고 있는", "차고 있는"],
+                    feedback: "옷을 특별하게 갖추어 입은 상태는 `차려입고 있는`으로 말할 수 있어요."
+                },
+                {
+                    object: "넥타이",
+                    cue: "목에 둘러 묶은 물건",
+                    image: `${IMAGE_BASE}s01_bl_n15.webp`,
+                    alt: "넥타이",
+                    answer: "매고 있는",
+                    options: ["메고 있는", "매고 있는", "차고 있는", "들고 있는"],
+                    feedback: "넥타이는 목에 묶으니까 `매고 있는`이 자연스러워요."
+                },
+                {
+                    object: "반지",
+                    cue: "손가락에 넣은 장신구",
+                    image: `${IMAGE_BASE}s01_br_n16.webp`,
+                    alt: "반지",
+                    answer: "끼고 있는",
+                    options: ["하고 있는", "신고 있는", "끼고 있는", "쓰고 있는"],
+                    feedback: "반지는 손가락에 넣으므로 `끼고 있는`을 씁니다."
+                },
+                {
+                    object: "귀고리",
+                    cue: "귀에 착용한 장신구",
+                    image: `${IMAGE_BASE}s05_tl_n17.webp`,
+                    alt: "귀고리",
+                    answer: "하고 있는",
+                    options: ["하고 있는", "차고 있는", "입고 있는", "매고 있는"],
+                    feedback: "귀고리는 `귀고리를 하고 있는 사람`처럼 많이 말해요."
+                },
+                {
+                    object: "시계",
+                    cue: "손목에 착용한 물건",
+                    image: `${IMAGE_BASE}s05_tr_n18.webp`,
+                    alt: "손목시계",
+                    answer: "차고 있는",
+                    options: ["들고 있는", "차고 있는", "끼고 있는", "신고 있는"],
+                    feedback: "손목시계는 손목에 `차고 있는` 물건입니다."
+                },
+                {
+                    object: "가방",
+                    cue: "손으로 잡고 있는 물건",
+                    image: `${IMAGE_BASE}s05_bl_n19.webp`,
+                    alt: "손가방",
+                    answer: "들고 있는",
+                    options: ["메고 있는", "매고 있는", "입고 있는", "들고 있는"],
+                    feedback: "손으로 잡고 있으면 `가방을 들고 있는`이라고 해요."
+                },
+                {
+                    object: "배낭",
+                    cue: "어깨에 걸쳐 멘 물건",
+                    image: `${IMAGE_BASE}s05_br_n20.webp`,
+                    alt: "배낭",
+                    answer: "메고 있는",
+                    options: ["매고 있는", "메고 있는", "하고 있는", "차려입고 있는"],
+                    feedback: "어깨에 걸치는 배낭은 `메고 있는`이 맞습니다."
+                }
+            ],
+            describe: [
+                {
+                    person: "신랑",
+                    cue: "감색 양복 + 은색 넥타이",
+                    image: `${IMAGE_BASE}s01_bl_n15.webp`,
+                    alt: "넥타이를 맨 사람",
+                    tokens: ["감색 양복을", "입고", "은색 넥타이를", "매고 있는", "사람이", "신랑이에요."],
+                    required: ["양복을입고", "넥타이를매고있는", "신랑"],
+                    model: "감색 양복을 입고 은색 넥타이를 매고 있는 사람이 신랑이에요."
+                },
+                {
+                    person: "어머니",
+                    cue: "분홍색 한복 + 진주 귀고리",
+                    image: `${IMAGE_BASE}s05_tl_n17.webp`,
+                    alt: "귀고리를 한 사람",
+                    tokens: ["분홍색 한복을", "입고", "진주 귀고리를", "하고 있는", "분이", "어머니예요."],
+                    required: ["한복을입고", "귀고리를하고있는", "어머니"],
+                    model: "분홍색 한복을 입고 진주 귀고리를 하고 있는 분이 어머니예요."
+                },
+                {
+                    person: "아버지",
+                    cue: "회색 재킷 + 손목시계",
+                    image: `${IMAGE_BASE}s05_tr_n18.webp`,
+                    alt: "시계를 찬 사람",
+                    tokens: ["회색 재킷을", "입고", "손목시계를", "차고 있는", "분이", "아버지예요."],
+                    required: ["재킷을입고", "시계를차고있는", "아버지"],
+                    model: "회색 재킷을 입고 손목시계를 차고 있는 분이 아버지예요."
+                },
+                {
+                    person: "누나",
+                    cue: "꽃무늬 원피스 + 작은 가방",
+                    image: `${IMAGE_BASE}s05_bl_n19.webp`,
+                    alt: "가방을 든 사람",
+                    tokens: ["꽃무늬 원피스를", "입고", "작은 가방을", "들고 있는", "사람이", "누나예요."],
+                    required: ["원피스를입고", "가방을들고있는", "누나"],
+                    model: "꽃무늬 원피스를 입고 작은 가방을 들고 있는 사람이 누나예요."
+                },
+                {
+                    person: "동생",
+                    cue: "파란 셔츠 + 배낭",
+                    image: `${IMAGE_BASE}s05_br_n20.webp`,
+                    alt: "배낭을 멘 사람",
+                    tokens: ["파란 셔츠를", "입고", "검은 배낭을", "메고 있는", "사람이", "동생이에요."],
+                    required: ["셔츠를입고", "배낭을메고있는", "동생"],
+                    model: "파란 셔츠를 입고 검은 배낭을 메고 있는 사람이 동생이에요."
+                },
+                {
+                    person: "조카",
+                    cue: "깔끔한 옷 + 반지",
+                    image: `${IMAGE_BASE}s01_br_n16.webp`,
+                    alt: "반지를 낀 사람",
+                    tokens: ["깔끔한 옷을", "차려입고", "작은 반지를", "끼고 있는", "아이가", "조카예요."],
+                    required: ["옷을차려입고", "반지를끼고있는", "조카"],
+                    model: "깔끔한 옷을 차려입고 작은 반지를 끼고 있는 아이가 조카예요."
+                }
+            ],
+            dialogue: [
+                {
+                    a: "사진에서 안내하는 학생이 누구예요?",
+                    prompt: "파란 가방을 ____ 학생이 안내할 거예요.",
+                    answer: "들고 있는",
+                    options: ["들고 있는", "메고 있는", "차고 있는", "하고 있는"],
+                    explain: "손으로 잡은 가방은 `들고 있는`이 자연스럽습니다."
+                },
+                {
+                    a: "저분이 오늘 사회자예요?",
+                    prompt: "네, 남색 양복을 ____ 사람이 사회자예요.",
+                    answer: "입고 있는",
+                    options: ["입고 있는", "신고 있는", "매고 있는", "끼고 있는"],
+                    explain: "양복은 옷이므로 `입고 있는`을 씁니다."
+                },
+                {
+                    a: "어느 분께 여쭤보면 돼요?",
+                    prompt: "빨간 배낭을 ____ 분께 물어보세요.",
+                    answer: "메고 있는",
+                    options: ["매고 있는", "메고 있는", "들고 있는", "차려입고 있는"],
+                    explain: "어깨에 걸치는 배낭은 `메고 있는`으로 말해요."
+                },
+                {
+                    a: "민지 씨가 누구인지 알아요?",
+                    prompt: "초록색 귀고리를 ____ 사람이 민지 씨예요.",
+                    answer: "하고 있는",
+                    options: ["하고 있는", "차고 있는", "입고 있는", "신고 있는"],
+                    explain: "귀고리는 `하고 있는`과 잘 어울립니다."
+                },
+                {
+                    a: "반 대표가 누구예요?",
+                    prompt: "손목시계를 ____ 사람이 반 대표예요.",
+                    answer: "차고 있는",
+                    options: ["차고 있는", "끼고 있는", "쓰고 있는", "입고 있는"],
+                    explain: "손목시계는 손목에 차는 물건입니다."
+                },
+                {
+                    a: "가족사진에서 조카는 어디 있어요?",
+                    prompt: "작은 반지를 ____ 아이가 조카예요.",
+                    answer: "끼고 있는",
+                    options: ["끼고 있는", "하고 있는", "메고 있는", "매고 있는"],
+                    explain: "반지는 손가락에 `끼고 있는` 장신구입니다."
+                }
+            ]
+        };
+
+        const state = {
+            stage: "match",
+            matchIndex: 0,
+            matchSelected: null,
+            matchAnswered: false,
+            matchCorrect: 0,
+            describeIndex: 0,
+            describeDone: Array(DATA.describe.length).fill(false),
+            dialogueIndex: 0,
+            dialogueSelected: null,
+            dialogueAnswered: false,
+            dialogueCorrect: 0
+        };
+
+        window.C13_G2_WB = { DATA, state };
+
+        const app = document.getElementById("workbookApp");
+        const stageButtons = [...document.querySelectorAll("[data-stage]")];
+        const guideTimers = [];
+
+        stageButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                state.stage = button.dataset.stage;
+                render();
+            });
+        });
+
+        render();
+
+        function render() {
+            stageButtons.forEach((button) => {
+                button.setAttribute("aria-selected", String(button.dataset.stage === state.stage));
+            });
+            if (state.stage === "match") renderMatch();
+            if (state.stage === "describe") renderDescribe();
+            if (state.stage === "dialogue") renderDialogue();
+            updateMeters();
+        }
+
+        function renderMatch() {
+            const task = DATA.match[state.matchIndex];
+            const progress = `${state.matchIndex + 1} / ${DATA.match.length}`;
+            app.innerHTML = `
+                <div class="stage-head">
+                    <div>
+                        <h2 class="stage-title">대상을 보고 표현을 고르세요.</h2>
+                        <p class="stage-note">착용 동사를 <b>-고 있는</b>으로 바꾸어 사람을 묘사하는 표현을 만듭니다.</p>
+                    </div>
+                    <span class="status-pill">${progress}</span>
+                </div>
+                ${guideStrip(["대상", "표현", "확인", "다음"])}
+                <div class="match-grid">
+                    <div class="focus-object" data-guide-target="match-object">
+                        <div class="image-frame">
+                            <img src="${esc(task.image)}" alt="${esc(task.alt)}" width="900" height="900" decoding="async" />
+                        </div>
+                        <div class="object-name">
+                            <strong>${esc(task.object)}</strong>
+                            <span>${esc(task.cue)}</span>
+                        </div>
+                    </div>
+                    <div data-guide-target="match-options">
+                        <div class="option-grid">
+                            ${task.options.map((option, index) => {
+                                const classes = ["option-button"];
+                                if (state.matchSelected === index) classes.push("is-selected");
+                                if (state.matchAnswered && option === task.answer) classes.push("is-correct");
+                                if (state.matchAnswered && state.matchSelected === index && option !== task.answer) classes.push("is-wrong");
+                                return `<button type="button" class="${classes.join(" ")}" data-match-option="${index}" ${state.matchAnswered ? "disabled" : ""}><span>${esc(option)}</span><span aria-hidden="true">›</span></button>`;
+                            }).join("")}
+                        </div>
+                        <div class="action-row">
+                            <button type="button" id="checkMatchBtn" class="primary-button" data-guide-target="match-check" ${state.matchAnswered || state.matchSelected === null ? "disabled" : ""}>확인</button>
+                            <button type="button" id="nextMatchBtn" class="ghost-button" data-guide-target="match-next" ${state.matchAnswered ? "" : "disabled"}>${state.matchIndex === DATA.match.length - 1 ? "묘사 단계로" : "다음"}</button>
+                        </div>
+                        <div id="matchFeedback" class="feedback ${state.matchAnswered ? feedbackClass(selectedMatchText() === task.answer) : ""}" data-guide-target="match-feedback">${state.matchAnswered ? matchFeedback(task) : ""}</div>
+                    </div>
+                </div>
+            `;
+
+            document.querySelectorAll("[data-match-option]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    if (state.matchAnswered) return;
+                    state.matchSelected = Number(button.dataset.matchOption);
+                    renderMatch();
+                });
+            });
+            document.getElementById("checkMatchBtn").addEventListener("click", checkMatch);
+            document.getElementById("nextMatchBtn").addEventListener("click", nextMatch);
+            scheduleMatchGuide();
+        }
+
+        function selectedMatchText() {
+            const task = DATA.match[state.matchIndex];
+            return task.options[state.matchSelected] || "";
+        }
+
+        function matchFeedback(task) {
+            const correct = selectedMatchText() === task.answer;
+            return correct
+                ? `<b>맞아요.</b> ${esc(task.feedback)}`
+                : `<b>다시 기억해요.</b> 정답은 <b>${esc(task.answer)}</b>입니다. ${esc(task.feedback)}`;
+        }
+
+        function checkMatch() {
+            if (state.matchSelected === null || state.matchAnswered) return;
+            const task = DATA.match[state.matchIndex];
+            state.matchAnswered = true;
+            if (selectedMatchText() === task.answer) state.matchCorrect += 1;
+            renderMatch();
+        }
+
+        function nextMatch() {
+            if (!state.matchAnswered) return;
+            if (state.matchIndex === DATA.match.length - 1) {
+                state.stage = "describe";
+            } else {
+                state.matchIndex += 1;
+            }
+            state.matchSelected = null;
+            state.matchAnswered = false;
+            render();
+        }
+
+        function renderDescribe() {
+            const task = DATA.describe[state.describeIndex];
+            const completed = state.describeDone.filter(Boolean).length;
+            app.innerHTML = `
+                <div class="stage-head">
+                    <div>
+                        <h2 class="stage-title">단서를 보고 사람을 설명하세요.</h2>
+                        <p class="stage-note">한 사람을 고른 뒤 <b>옷/소품 + V-고 있는 + 사람</b>으로 문장을 만듭니다.</p>
+                    </div>
+                    <span class="status-pill">${completed} / ${DATA.describe.length} 완료</span>
+                </div>
+                ${guideStrip(["단서", "조합", "입력", "확인", "다음"])}
+                <div class="person-roster" aria-label="묘사할 사람 선택">
+                    ${DATA.describe.map((item, index) => `
+                        <button type="button" class="person-button" data-person="${index}" aria-pressed="${index === state.describeIndex}">
+                            <img src="${esc(item.image)}" alt="${esc(item.alt)}" width="90" height="90" decoding="async" />
+                            <span>
+                                <strong>${esc(item.person)}</strong>
+                                <span>${esc(item.cue)}</span>
+                            </span>
+                        </button>
+                    `).join("")}
+                </div>
+                <div class="compose-area">
+                    <aside class="cue-panel" data-guide-target="describe-cue">
+                        <img src="${esc(task.image)}" alt="${esc(task.alt)}" width="900" height="900" decoding="async" />
+                        <h3>${esc(task.person)}</h3>
+                        <ul class="cue-list">
+                            <li>${esc(task.cue)}</li>
+                            <li>문장 끝: ${esc(task.person)}이에요 / 예요</li>
+                        </ul>
+                    </aside>
+                    <div>
+                        <div class="token-bank" aria-label="문장 조합 토큰" data-guide-target="describe-tokens">
+                            ${task.tokens.map((token) => `<button type="button" class="token-button" data-token="${esc(token)}">${esc(token)}</button>`).join("")}
+                        </div>
+                        <textarea id="describeInput" class="sentence-input" data-guide-target="describe-input" placeholder="예: 감색 양복을 입고 은색 넥타이를 매고 있는 사람이 신랑이에요." spellcheck="false"></textarea>
+                        <div class="action-row">
+                            <button type="button" id="checkDescribeBtn" class="primary-button" data-guide-target="describe-check">문장 확인</button>
+                            <button type="button" id="modelDescribeBtn" class="ghost-button">모범 문장</button>
+                            <button type="button" id="clearDescribeBtn" class="ghost-button">지우기</button>
+                            <button type="button" id="nextDescribeBtn" class="ghost-button" data-guide-target="describe-next">${state.describeIndex === DATA.describe.length - 1 ? "대화 단계로" : "다음 사람"}</button>
+                        </div>
+                        <div id="describeFeedback" class="feedback is-hint" data-guide-target="describe-feedback">단서 두 개와 사람 이름이 모두 들어가면 정답으로 인정됩니다.</div>
+                    </div>
+                </div>
+            `;
+
+            document.querySelectorAll("[data-person]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    state.describeIndex = Number(button.dataset.person);
+                    renderDescribe();
+                });
+            });
+            document.querySelectorAll("[data-token]").forEach((button) => {
+                button.addEventListener("click", () => appendToken(button.dataset.token));
+            });
+            document.getElementById("checkDescribeBtn").addEventListener("click", checkDescribe);
+            document.getElementById("modelDescribeBtn").addEventListener("click", showDescribeModel);
+            document.getElementById("clearDescribeBtn").addEventListener("click", () => {
+                document.getElementById("describeInput").value = "";
+                setFeedback("describeFeedback", "is-hint", "단서 두 개와 사람 이름이 모두 들어가면 정답으로 인정됩니다.");
+                scheduleDescribeGuide();
+            });
+            document.getElementById("nextDescribeBtn").addEventListener("click", nextDescribe);
+            document.getElementById("describeInput").addEventListener("input", syncDescribeGuide);
+            scheduleDescribeGuide();
+        }
+
+        function appendToken(token) {
+            const input = document.getElementById("describeInput");
+            const spacer = input.value.trim() ? " " : "";
+            input.value = `${input.value.trim()}${spacer}${token}`;
+            input.focus();
+            syncDescribeGuide();
+        }
+
+        function checkDescribe() {
+            const task = DATA.describe[state.describeIndex];
+            const input = document.getElementById("describeInput");
+            const value = normalize(input.value);
+            const missing = task.required.filter((piece) => !value.includes(normalize(piece)));
+            if (!input.value.trim()) {
+                setFeedback("describeFeedback", "is-wrong", "먼저 문장을 한 번 만들어 보세요.");
+                focusGuide('[data-guide-target="describe-input"]', "3 입력", 2);
+                return;
+            }
+            if (missing.length === 0) {
+                state.describeDone[state.describeIndex] = true;
+                setFeedback("describeFeedback", "is-correct", `<b>좋아요.</b> 착용 단서와 사람 이름이 모두 들어갔어요.`);
+                updateMeters();
+                runGuideSequence([
+                    { selector: '[data-guide-target="describe-feedback"]', label: "피드백", index: 3, delay: 40 },
+                    { selector: '[data-guide-target="describe-next"]', label: "5 다음", index: 4, delay: 850 }
+                ]);
+                return;
+            }
+            setFeedback("describeFeedback", "is-wrong", `아직 단서가 부족해요. <b>${esc(task.cue)}</b>와 <b>${esc(task.person)}</b>를 모두 넣어 보세요.`);
+            focusGuide('[data-guide-target="describe-feedback"]', "다시 확인", 3);
+        }
+
+        function showDescribeModel() {
+            const task = DATA.describe[state.describeIndex];
+            document.getElementById("describeInput").value = task.model;
+            setFeedback("describeFeedback", "is-hint", `<b>모범 문장:</b> ${esc(task.model)}`);
+            focusGuide('[data-guide-target="describe-check"]', "4 확인", 3);
+        }
+
+        function nextDescribe() {
+            if (state.describeIndex === DATA.describe.length - 1) {
+                state.stage = "dialogue";
+            } else {
+                state.describeIndex += 1;
+            }
+            render();
+        }
+
+        function renderDialogue() {
+            const task = DATA.dialogue[state.dialogueIndex];
+            const progress = `${state.dialogueIndex + 1} / ${DATA.dialogue.length}`;
+            app.innerHTML = `
+                <div class="stage-head">
+                    <div>
+                        <h2 class="stage-title">대화 빈칸을 완성하세요.</h2>
+                        <p class="stage-note">말하는 상황에 맞는 착용 표현을 골라 대화를 자연스럽게 만듭니다.</p>
+                    </div>
+                    <span class="status-pill">${progress}</span>
+                </div>
+                ${guideStrip(["빈칸", "표현", "확인", "다음"])}
+                <div class="dialogue-box" data-guide-target="dialogue-blank">
+                    <p class="dialogue-line"><b>A</b>: ${esc(task.a)}</p>
+                    <p class="dialogue-line"><b>B</b>: ${renderDialoguePrompt(task.prompt)}</p>
+                </div>
+                <div class="dialogue-options" data-guide-target="dialogue-options">
+                    ${task.options.map((option, index) => {
+                        const classes = ["option-button"];
+                        if (state.dialogueSelected === index) classes.push("is-selected");
+                        if (state.dialogueAnswered && option === task.answer) classes.push("is-correct");
+                        if (state.dialogueAnswered && state.dialogueSelected === index && option !== task.answer) classes.push("is-wrong");
+                        return `<button type="button" class="${classes.join(" ")}" data-dialogue-option="${index}" ${state.dialogueAnswered ? "disabled" : ""}><span>${esc(option)}</span><span aria-hidden="true">›</span></button>`;
+                    }).join("")}
+                </div>
+                <div class="action-row">
+                    <button type="button" id="checkDialogueBtn" class="primary-button" data-guide-target="dialogue-check" ${state.dialogueAnswered || state.dialogueSelected === null ? "disabled" : ""}>확인</button>
+                    <button type="button" id="nextDialogueBtn" class="ghost-button" data-guide-target="dialogue-next" ${state.dialogueAnswered ? "" : "disabled"}>${state.dialogueIndex === DATA.dialogue.length - 1 ? "결과 보기" : "다음"}</button>
+                </div>
+                <div id="dialogueFeedback" class="feedback ${state.dialogueAnswered ? feedbackClass(selectedDialogueText() === task.answer) : ""}" data-guide-target="dialogue-feedback">${state.dialogueAnswered ? dialogueFeedback(task) : ""}</div>
+            `;
+
+            document.querySelectorAll("[data-dialogue-option]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    if (state.dialogueAnswered) return;
+                    state.dialogueSelected = Number(button.dataset.dialogueOption);
+                    renderDialogue();
+                });
+            });
+            document.getElementById("checkDialogueBtn").addEventListener("click", checkDialogue);
+            document.getElementById("nextDialogueBtn").addEventListener("click", nextDialogue);
+            scheduleDialogueGuide();
+        }
+
+        function renderDialoguePrompt(prompt) {
+            return esc(prompt).replace("____", '<span class="blank">____</span>');
+        }
+
+        function selectedDialogueText() {
+            const task = DATA.dialogue[state.dialogueIndex];
+            return task.options[state.dialogueSelected] || "";
+        }
+
+        function dialogueFeedback(task) {
+            const correct = selectedDialogueText() === task.answer;
+            return correct
+                ? `<b>맞아요.</b> ${esc(task.explain)}`
+                : `<b>확인해요.</b> 정답은 <b>${esc(task.answer)}</b>입니다. ${esc(task.explain)}`;
+        }
+
+        function checkDialogue() {
+            if (state.dialogueSelected === null || state.dialogueAnswered) return;
+            const task = DATA.dialogue[state.dialogueIndex];
+            state.dialogueAnswered = true;
+            if (selectedDialogueText() === task.answer) state.dialogueCorrect += 1;
+            renderDialogue();
+        }
+
+        function nextDialogue() {
+            if (!state.dialogueAnswered) return;
+            if (state.dialogueIndex === DATA.dialogue.length - 1) {
+                renderSummary();
+                return;
+            }
+            state.dialogueIndex += 1;
+            state.dialogueSelected = null;
+            state.dialogueAnswered = false;
+            render();
+        }
+
+        function renderSummary() {
+            state.stage = "dialogue";
+            const describeCount = state.describeDone.filter(Boolean).length;
+            const total = DATA.match.length + DATA.describe.length + DATA.dialogue.length;
+            const score = state.matchCorrect + describeCount + state.dialogueCorrect;
+            app.innerHTML = `
+                <div class="summary-panel">
+                    <div class="summary-score">
+                        <strong>${score} / ${total}</strong>
+                        <span>표현 ${state.matchCorrect}/${DATA.match.length} · 묘사 ${describeCount}/${DATA.describe.length} · 대화 ${state.dialogueCorrect}/${DATA.dialogue.length}</span>
+                    </div>
+                    <div class="action-row" style="justify-content:center">
+                        <button type="button" id="restartWorkbookBtn" class="primary-button">처음부터 다시</button>
+                        <a class="link-button" href="grammar2.html">문법 2로 돌아가기</a>
+                    </div>
+                </div>
+            `;
+            document.getElementById("restartWorkbookBtn").addEventListener("click", restartAll);
+            updateMeters();
+        }
+
+        function restartAll() {
+            state.stage = "match";
+            state.matchIndex = 0;
+            state.matchSelected = null;
+            state.matchAnswered = false;
+            state.matchCorrect = 0;
+            state.describeIndex = 0;
+            state.describeDone = Array(DATA.describe.length).fill(false);
+            state.dialogueIndex = 0;
+            state.dialogueSelected = null;
+            state.dialogueAnswered = false;
+            state.dialogueCorrect = 0;
+            render();
+        }
+
+        function updateMeters() {
+            const describeCount = state.describeDone.filter(Boolean).length;
+            setMeter("match", state.matchCorrect, DATA.match.length);
+            setMeter("describe", describeCount, DATA.describe.length);
+            setMeter("dialogue", state.dialogueCorrect, DATA.dialogue.length);
+        }
+
+        function setMeter(kind, value, total) {
+            const text = document.getElementById(`${kind}MeterText`);
+            const bar = document.getElementById(`${kind}MeterBar`);
+            if (!text || !bar) return;
+            text.textContent = `${value} / ${total}`;
+            bar.style.width = `${Math.round((value / total) * 100)}%`;
+        }
+
+        function guideStrip(labels) {
+            return `
+                <div class="guide-strip" aria-label="순차 가이드">
+                    ${labels.map((label, index) => `
+                        <span class="guide-chip" data-guide-chip="${index}">
+                            <b>${index + 1}</b>${esc(label)}
+                        </span>
+                    `).join("")}
+                </div>
+            `;
+        }
+
+        function updateGuideStrip(index) {
+            document.querySelectorAll("[data-guide-chip]").forEach((chip) => {
+                chip.classList.toggle("is-active", Number(chip.dataset.guideChip) === index);
+            });
+        }
+
+        function clearGuideTimers() {
+            while (guideTimers.length) {
+                clearTimeout(guideTimers.pop());
+            }
+        }
+
+        function clearGuideFocus() {
+            document.querySelectorAll(".guide-focus").forEach((node) => {
+                node.classList.remove("guide-focus");
+                node.removeAttribute("data-guide-label");
+            });
+        }
+
+        function focusGuide(selector, label, index, scroll = true) {
+            clearGuideTimers();
+            activateGuide(selector, label, index, scroll);
+        }
+
+        function activateGuide(selector, label, index, scroll = true) {
+            clearGuideFocus();
+            updateGuideStrip(index);
+            const target = document.querySelector(selector);
+            if (!target) return;
+            target.classList.add("guide-focus");
+            target.setAttribute("data-guide-label", label);
+            if (scroll) {
+                requestAnimationFrame(() => {
+                    target.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+                });
+            }
+        }
+
+        function runGuideSequence(steps) {
+            clearGuideTimers();
+            clearGuideFocus();
+            steps.forEach((step) => {
+                const timer = setTimeout(() => {
+                    activateGuide(step.selector, step.label, step.index, step.scroll !== false);
+                }, step.delay || 0);
+                guideTimers.push(timer);
+            });
+        }
+
+        function scheduleMatchGuide() {
+            if (!state.matchAnswered && state.matchSelected === null) {
+                runGuideSequence([
+                    { selector: '[data-guide-target="match-object"]', label: "1 대상", index: 0, delay: 80 },
+                    { selector: '[data-guide-target="match-options"]', label: "2 표현", index: 1, delay: 900 }
+                ]);
+                return;
+            }
+            if (!state.matchAnswered) {
+                focusGuide('[data-guide-target="match-check"]', "3 확인", 2);
+                return;
+            }
+            runGuideSequence([
+                { selector: '[data-guide-target="match-feedback"]', label: "피드백", index: 2, delay: 40 },
+                { selector: '[data-guide-target="match-next"]', label: "4 다음", index: 3, delay: 850 }
+            ]);
+        }
+
+        function scheduleDescribeGuide() {
+            runGuideSequence([
+                { selector: '[data-guide-target="describe-cue"]', label: "1 단서", index: 0, delay: 80 },
+                { selector: '[data-guide-target="describe-tokens"]', label: "2 조합", index: 1, delay: 900 },
+                { selector: '[data-guide-target="describe-input"]', label: "3 입력", index: 2, delay: 1700 }
+            ]);
+        }
+
+        function syncDescribeGuide() {
+            const input = document.getElementById("describeInput");
+            if (input && input.value.trim()) {
+                focusGuide('[data-guide-target="describe-check"]', "4 확인", 3, false);
+            }
+        }
+
+        function scheduleDialogueGuide() {
+            if (!state.dialogueAnswered && state.dialogueSelected === null) {
+                runGuideSequence([
+                    { selector: '[data-guide-target="dialogue-blank"]', label: "1 빈칸", index: 0, delay: 80 },
+                    { selector: '[data-guide-target="dialogue-options"]', label: "2 표현", index: 1, delay: 900 }
+                ]);
+                return;
+            }
+            if (!state.dialogueAnswered) {
+                focusGuide('[data-guide-target="dialogue-check"]', "3 확인", 2);
+                return;
+            }
+            runGuideSequence([
+                { selector: '[data-guide-target="dialogue-feedback"]', label: "피드백", index: 2, delay: 40 },
+                { selector: '[data-guide-target="dialogue-next"]', label: "4 다음", index: 3, delay: 850 }
+            ]);
+        }
+
+        function setFeedback(id, className, html) {
+            const node = document.getElementById(id);
+            node.className = `feedback ${className}`;
+            node.innerHTML = html;
+        }
+
+        function feedbackClass(correct) {
+            return correct ? "is-correct" : "is-wrong";
+        }
+
+        function normalize(value) {
+            return String(value)
+                .replace(/\s+/g, "")
+                .replace(/[.?!。！？]/g, "")
+                .toLowerCase();
+        }
+
+        function esc(value) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+    })();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>

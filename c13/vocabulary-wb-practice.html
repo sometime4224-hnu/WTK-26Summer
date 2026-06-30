@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>13과 WB 어휘 연습 | 모임과 옷차림</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --wb-bg: #f6f8fb;
+            --wb-panel: #ffffff;
+            --wb-soft: #f8fafc;
+            --wb-ink: #172033;
+            --wb-muted: #64748b;
+            --wb-line: #d8e0ea;
+            --wb-accent: #0f766e;
+            --wb-accent-soft: #d9f3ef;
+            --wb-warm: #ea580c;
+            --wb-green: #15803d;
+            --wb-red: #be123c;
+            --wb-blue: #2563eb;
+            --wb-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            background: var(--wb-bg);
+            scroll-padding-top: 56px;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+            background: linear-gradient(180deg, #ffffff 0%, var(--wb-bg) 100%);
+            color: var(--wb-ink);
+            font-family: "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+            letter-spacing: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .wb-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 46px;
+            padding: 8px 12px;
+            overflow-x: auto;
+            border-bottom: 1px solid rgba(216, 224, 234, 0.92);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(14px);
+            scrollbar-width: none;
+        }
+
+        .wb-topbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .wb-topbar a,
+        .wb-topbar span {
+            flex: 0 0 auto;
+            color: var(--wb-accent);
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1.1;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .wb-topbar span {
+            color: var(--wb-muted);
+        }
+
+        .wb-shell {
+            width: min(1080px, calc(100vw - 24px));
+            margin: 12px auto 38px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .practice-head,
+        .practice-board,
+        .summary-panel {
+            border: 1px solid var(--wb-line);
+            border-radius: 8px;
+            background: var(--wb-panel);
+            box-shadow: var(--wb-shadow);
+        }
+
+        .practice-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: end;
+            padding: 13px 15px;
+        }
+
+        .eyebrow {
+            margin: 0 0 5px;
+            color: var(--wb-warm);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            word-break: keep-all;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(22px, 3.5vw, 31px);
+            line-height: 1.15;
+        }
+
+        .head-note {
+            margin: 6px 0 0;
+            color: var(--wb-muted);
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .score-box {
+            min-width: 132px;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            background: #f0fdf4;
+            padding: 10px 12px;
+            text-align: right;
+        }
+
+        .score-box span {
+            display: block;
+            color: #166534;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .score-box strong {
+            display: block;
+            margin-top: 2px;
+            color: var(--wb-green);
+            font-size: 25px;
+            font-weight: 950;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.05;
+        }
+
+        .stage-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .stage-tab {
+            display: grid;
+            gap: 4px;
+            min-height: 52px;
+            border: 1px solid var(--wb-line);
+            border-radius: 8px;
+            background: #fff;
+            padding: 8px 10px;
+            color: var(--wb-muted);
+            text-align: left;
+        }
+
+        .stage-tab span {
+            color: inherit;
+            font-size: 11px;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+
+        .stage-tab strong {
+            color: var(--wb-ink);
+            font-size: 14px;
+            font-weight: 950;
+            line-height: 1.2;
+        }
+
+        .stage-tab.is-active {
+            border-color: rgba(15, 118, 110, 0.46);
+            background: var(--wb-accent-soft);
+        }
+
+        .stage-tab.is-complete {
+            border-color: rgba(21, 128, 61, 0.34);
+            background: #f0fdf4;
+        }
+
+        .practice-board {
+            display: grid;
+            gap: 12px;
+            padding: 14px;
+        }
+
+        .visual-guide {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            background: #f8fbff;
+            padding: 10px;
+        }
+
+        .guide-steps {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .guide-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            border: 1px solid #d8e0ea;
+            border-radius: 999px;
+            background: #fff;
+            padding: 0 10px 0 7px;
+            color: var(--wb-muted);
+            font-size: 12px;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .guide-chip::before {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 950;
+            content: attr(data-step-number);
+        }
+
+        .guide-chip.is-active {
+            border-color: rgba(37, 99, 235, 0.38);
+            background: #eff6ff;
+            color: #1d4ed8;
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.1);
+        }
+
+        .guide-chip.is-active::before {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .guide-chip.is-done {
+            border-color: rgba(21, 128, 61, 0.3);
+            background: #f0fdf4;
+            color: #15803d;
+        }
+
+        .guide-chip.is-done::before {
+            background: #15803d;
+            color: #fff;
+        }
+
+        .guide-message {
+            margin: 6px 0 0;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 850;
+            line-height: 1.35;
+        }
+
+        .guide-next {
+            min-height: 42px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            background: #fff;
+            padding: 0 12px;
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 950;
+            cursor: pointer;
+        }
+
+        .guide-next:hover {
+            background: #eff6ff;
+        }
+
+        .board-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stage-title {
+            display: grid;
+            gap: 3px;
+        }
+
+        .stage-title h2 {
+            margin: 0;
+            font-size: clamp(20px, 3vw, 27px);
+            line-height: 1.2;
+        }
+
+        .stage-title p {
+            margin: 0;
+            color: var(--wb-muted);
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .progress-pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 34px;
+            border: 1px solid #fed7aa;
+            border-radius: 999px;
+            background: #fff7ed;
+            padding: 0 11px;
+            color: #9a3412;
+            font-size: 12px;
+            font-weight: 950;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .question-card {
+            display: grid;
+            grid-template-columns: minmax(180px, 0.42fr) minmax(0, 0.58fr);
+            gap: 13px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            padding: 12px;
+        }
+
+        .question-media {
+            overflow: hidden;
+            aspect-ratio: 1 / 1;
+            border: 1px solid #edf2f7;
+            border-radius: 8px;
+            background: #f8fafc;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+        }
+
+        .question-media img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .question-body {
+            display: grid;
+            align-content: start;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .question-kicker {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            min-height: 26px;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            background: #eff6ff;
+            padding: 0 9px;
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 950;
+        }
+
+        .question-body h3 {
+            margin: 0;
+            font-size: clamp(19px, 2.7vw, 25px);
+            line-height: 1.22;
+        }
+
+        .question-prompt,
+        .question-context {
+            margin: 0;
+            color: var(--wb-muted);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.55;
+        }
+
+        .question-context {
+            border-left: 4px solid var(--wb-accent);
+            border-radius: 8px;
+            background: #f8fafc;
+            padding: 9px 10px;
+            color: #334155;
+            transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .blank {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 74px;
+            border-bottom: 3px solid var(--wb-warm);
+            color: var(--wb-warm);
+            font-weight: 950;
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(122px, 1fr));
+            gap: 8px;
+            border-radius: 8px;
+            transition: box-shadow 0.15s ease, outline-color 0.15s ease;
+        }
+
+        .question-card[data-guide-step="0"] .question-media {
+            border-color: rgba(37, 99, 235, 0.55);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .question-card[data-guide-step="1"] .question-context {
+            border-left-color: #2563eb;
+            background: #eff6ff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+        }
+
+        .question-card[data-guide-step="2"] .option-grid {
+            outline: 3px solid rgba(37, 99, 235, 0.18);
+            outline-offset: 4px;
+        }
+
+        .answer-option,
+        .action-btn,
+        .summary-link {
+            min-height: 44px;
+            border: 1px solid var(--wb-line);
+            border-radius: 8px;
+            background: #fff;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 950;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .answer-option:hover,
+        .action-btn:hover,
+        .summary-link:hover {
+            border-color: rgba(15, 118, 110, 0.38);
+            background: #f8fffd;
+            transform: translateY(-1px);
+        }
+
+        .answer-option.is-correct {
+            border-color: rgba(21, 128, 61, 0.45);
+            background: #f0fdf4;
+            color: var(--wb-green);
+        }
+
+        .answer-option.is-wrong {
+            border-color: rgba(190, 18, 60, 0.34);
+            background: #fff1f2;
+            color: var(--wb-red);
+        }
+
+        .answer-option:disabled {
+            cursor: default;
+            transform: none;
+        }
+
+        .feedback {
+            min-height: 44px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+            padding: 9px 11px;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 850;
+            line-height: 1.45;
+        }
+
+        .feedback.is-correct {
+            border-color: rgba(21, 128, 61, 0.32);
+            background: #f0fdf4;
+            color: var(--wb-green);
+        }
+
+        .feedback.is-wrong {
+            border-color: rgba(190, 18, 60, 0.28);
+            background: #fff1f2;
+            color: var(--wb-red);
+        }
+
+        .board-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 14px;
+        }
+
+        .action-btn.primary {
+            border-color: var(--wb-accent);
+            background: var(--wb-accent);
+            color: #fff;
+        }
+
+        .action-btn[disabled] {
+            opacity: 0.42;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .summary-panel {
+            display: grid;
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .summary-panel h2 {
+            margin: 0;
+            font-size: clamp(22px, 3vw, 30px);
+        }
+
+        .summary-panel p {
+            margin: 0;
+            color: var(--wb-muted);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.6;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 8px;
+        }
+
+        .summary-stat {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            padding: 12px;
+        }
+
+        .summary-stat span {
+            display: block;
+            color: var(--wb-muted);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .summary-stat strong {
+            display: block;
+            margin-top: 5px;
+            color: var(--wb-accent);
+            font-size: 25px;
+            font-weight: 950;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .weak-list {
+            display: grid;
+            gap: 7px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .weak-list li {
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            background: #fff7ed;
+            padding: 9px 10px;
+            color: #9a3412;
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1.45;
+        }
+
+        .summary-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .summary-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 13px;
+            color: var(--wb-blue);
+            text-decoration: none;
+        }
+
+        @media (max-width: 760px) {
+            html {
+                scroll-padding-top: 50px;
+            }
+
+            .wb-topbar {
+                min-height: 44px;
+                padding: 7px 10px;
+            }
+
+            .wb-topbar a,
+            .wb-topbar span {
+                font-size: 11px;
+            }
+
+            .wb-shell {
+                width: min(100% - 14px, 1080px);
+                margin-top: 8px;
+                gap: 9px;
+            }
+
+            .practice-head {
+                grid-template-columns: 1fr;
+                align-items: start;
+                padding: 10px 11px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .head-note {
+                margin-top: 4px;
+                font-size: 12px;
+                line-height: 1.35;
+            }
+
+            .score-box {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                min-width: 0;
+                padding: 8px 10px;
+                text-align: left;
+            }
+
+            .score-box strong {
+                margin-top: 0;
+                font-size: 22px;
+            }
+
+            .stage-tabs {
+                grid-template-columns: repeat(4, minmax(86px, 1fr));
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+
+            .stage-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .stage-tab {
+                min-height: 48px;
+                padding: 7px 8px;
+            }
+
+            .stage-tab strong {
+                font-size: 13px;
+            }
+
+            .practice-board {
+                gap: 9px;
+                padding: 10px;
+            }
+
+            .visual-guide {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 9px;
+            }
+
+            .guide-steps {
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+
+            .guide-steps::-webkit-scrollbar {
+                display: none;
+            }
+
+            .guide-chip {
+                min-height: 32px;
+                padding-right: 9px;
+                font-size: 11px;
+            }
+
+            .guide-message {
+                margin-top: 5px;
+                font-size: 12px;
+            }
+
+            .guide-next {
+                width: 100%;
+                min-height: 44px;
+            }
+
+            .stage-title h2 {
+                font-size: 20px;
+            }
+
+            .stage-title p {
+                font-size: 12px;
+                line-height: 1.35;
+            }
+
+            .progress-pill {
+                min-height: 32px;
+                font-size: 11px;
+            }
+
+            .question-card {
+                grid-template-columns: minmax(92px, 34%) minmax(0, 1fr);
+                gap: 9px;
+                padding: 9px;
+            }
+
+            .question-body {
+                gap: 8px;
+            }
+
+            .question-kicker {
+                min-height: 24px;
+                font-size: 10px;
+            }
+
+            .question-body h3 {
+                font-size: 18px;
+                line-height: 1.18;
+            }
+
+            .question-prompt,
+            .question-context {
+                font-size: 12px;
+                line-height: 1.38;
+            }
+
+            .question-context {
+                padding: 7px 8px;
+            }
+
+            .option-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 6px;
+            }
+
+            .answer-option,
+            .action-btn,
+            .summary-link {
+                min-height: 44px;
+                padding-inline: 8px;
+                font-size: 13px;
+                line-height: 1.2;
+            }
+
+            .feedback {
+                min-height: 44px;
+                padding: 8px 9px;
+                font-size: 12px;
+                line-height: 1.35;
+            }
+
+            .board-actions {
+                justify-content: stretch;
+            }
+
+            .board-actions .action-btn {
+                flex: 1 1 140px;
+            }
+
+            .summary-panel {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .question-card {
+                grid-template-columns: 92px minmax(0, 1fr);
+            }
+
+            .option-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="wb-topbar" aria-label="상단 이동">
+        <a href="../index.html">메인</a>
+        <span>|</span>
+        <a href="index.html">13과</a>
+        <span>|</span>
+        <a href="vocabulary.html">어휘</a>
+        <span>|</span>
+        <a href="vocabulary-crossword.html">낱말퍼즐</a>
+        <span>|</span>
+        <span>WB 어휘 연습</span>
+    </nav>
+
+    <main class="wb-shell">
+        <header class="practice-head">
+            <div>
+                <p class="eyebrow">Workbook Vocabulary</p>
+                <h1>13과 WB 어휘 연습</h1>
+                <p class="head-note">장면을 보고 알맞은 표현을 고르세요.</p>
+            </div>
+            <div class="score-box" aria-label="현재 점수">
+                <span>맞힌 문항</span>
+                <strong id="scoreText">0 / 0</strong>
+            </div>
+        </header>
+
+        <nav id="stageTabs" class="stage-tabs" aria-label="연습 단계"></nav>
+
+        <section id="practiceBoard" class="practice-board" aria-live="polite"></section>
+
+        <section id="summaryPanel" class="summary-panel" hidden></section>
+    </main>
+
+    <script>
+    (function () {
+        "use strict";
+
+        const BASE = "../assets/c13/vocabulary/images";
+        const IMG = {
+            events: `${BASE}/support/events`,
+            prep: `${BASE}/support/prep-actions`,
+            amount: `${BASE}/support/amount`,
+            full: `${BASE}/split-variants/full`
+        };
+
+        const PRACTICE_STAGES = [
+            {
+                id: "events",
+                label: "모임",
+                title: "모임 이름 연결",
+                note: "상황 단서를 보고 모임 이름을 고릅니다.",
+                options: ["집들이", "돌잔치", "동창회", "송년회", "송별회"],
+                reviewHref: "vocab-support-events.html",
+                reviewLabel: "모임 이름 찾기",
+                questions: [
+                    {
+                        id: "event-housewarming",
+                        kicker: "새 집",
+                        title: "친구들을 새 집으로 초대해요.",
+                        prompt: "이사 후 주말에 음식을 준비하고 친구들을 부릅니다.",
+                        context: "새 집 + 초대 + 음식",
+                        answer: "집들이",
+                        image: `${IMG.events}/housewarming.webp`,
+                        imageAlt: "새 집에 친구들을 초대하는 장면",
+                        feedback: "맞아요. 새 집으로 초대하는 모임은 집들이입니다.",
+                        wrong: "새 집으로 이사한 뒤 초대하는 모임을 떠올려 보세요."
+                    },
+                    {
+                        id: "event-first-birthday",
+                        kicker: "한 살",
+                        title: "아이가 한 살이 되었어요.",
+                        prompt: "가족과 친구들이 모여 아이의 첫 생일을 축하합니다.",
+                        context: "아기 + 한 살 + 축하",
+                        answer: "돌잔치",
+                        image: `${IMG.events}/first-birthday.webp`,
+                        imageAlt: "아기의 첫 생일을 축하하는 장면",
+                        feedback: "맞아요. 아이의 첫 생일을 기념하는 모임은 돌잔치입니다.",
+                        wrong: "아기가 태어난 지 1년 된 것을 축하하는 잔치를 생각해 보세요."
+                    },
+                    {
+                        id: "event-alumni",
+                        kicker: "학교 친구",
+                        title: "졸업한 친구들을 다시 만나요.",
+                        prompt: "같은 학교를 나온 사람들이 오랜만에 모입니다.",
+                        context: "같은 학교 + 졸업 + 다시 만남",
+                        answer: "동창회",
+                        image: `${IMG.events}/alumni-reunion.webp`,
+                        imageAlt: "같은 학교를 나온 사람들이 다시 만나는 장면",
+                        feedback: "맞아요. 같은 학교를 나온 사람들이 만나는 모임은 동창회입니다.",
+                        wrong: "같은 학교를 나온 사람들을 동창이라고 합니다."
+                    },
+                    {
+                        id: "event-year-end",
+                        kicker: "연말",
+                        title: "한 해를 마무리해요.",
+                        prompt: "12월에 동호회 사람들이 모여 올해 이야기를 나눕니다.",
+                        context: "한 해 끝 + 마무리 모임",
+                        answer: "송년회",
+                        image: `${IMG.events}/year-end.webp`,
+                        imageAlt: "한 해를 마무리하는 모임 장면",
+                        feedback: "맞아요. 한 해를 보내며 모이는 자리는 송년회입니다.",
+                        wrong: "한 해를 보내는 연말 모임의 이름을 골라 보세요."
+                    },
+                    {
+                        id: "event-farewell",
+                        kicker: "작별",
+                        title: "떠나는 사람에게 인사해요.",
+                        prompt: "다른 지역으로 가는 친구를 위해 마지막으로 모입니다.",
+                        context: "떠남 + 작별 인사",
+                        answer: "송별회",
+                        image: `${IMG.events}/farewell.webp`,
+                        imageAlt: "떠나는 사람에게 인사하는 모임 장면",
+                        feedback: "맞아요. 떠나는 사람을 위해 작별 인사를 나누는 모임은 송별회입니다.",
+                        wrong: "떠나는 사람을 보내는 모임을 생각해 보세요."
+                    }
+                ]
+            },
+            {
+                id: "prep",
+                label: "준비",
+                title: "행사 준비 빈칸",
+                note: "목적어와 상황에 어울리는 동사를 고릅니다.",
+                options: ["꾸미다", "차리다", "차려입다", "대접하다", "마련하다"],
+                reviewHref: "vocab-support-prep-actions.html",
+                reviewLabel: "준비·대접 동작",
+                questions: [
+                    {
+                        id: "prep-room",
+                        kicker: "공간",
+                        title: "손님이 오기 전에 방을 ___어요.",
+                        prompt: "장식과 꽃을 놓아 방 분위기를 예쁘게 만들었습니다.",
+                        context: "공간을 보기 좋게 만들다",
+                        answer: "꾸미다",
+                        image: `${IMG.prep}/room.webp`,
+                        imageAlt: "꾸민 방 장면",
+                        feedback: "맞아요. 공간을 보기 좋게 만들 때는 꾸미다를 씁니다.",
+                        wrong: "방, 거실, 행사장처럼 공간이 바뀌는 행동입니다."
+                    },
+                    {
+                        id: "prep-table",
+                        kicker: "상",
+                        title: "아이 생일이라 생일상을 ___어요.",
+                        prompt: "음식과 그릇을 올려 모두가 먹을 수 있게 준비했습니다.",
+                        context: "음식과 그릇을 상 위에 놓다",
+                        answer: "차리다",
+                        image: `${IMG.prep}/birthday-table.webp`,
+                        imageAlt: "생일상을 차린 장면",
+                        feedback: "맞아요. 먹을 수 있게 상을 준비하면 상을 차리다입니다.",
+                        wrong: "상이나 식탁 위에 음식을 놓는 동사를 골라 보세요."
+                    },
+                    {
+                        id: "prep-dress",
+                        kicker: "차림",
+                        title: "중요한 모임이라 정장을 ___고 갔어요.",
+                        prompt: "평소보다 옷을 더 단정하고 격식 있게 입었습니다.",
+                        context: "옷을 잘 갖추어 입다",
+                        answer: "차려입다",
+                        image: `${IMG.full}/s01_tr_n14.webp`,
+                        imageAlt: "옷을 차려입은 사람",
+                        feedback: "맞아요. 옷을 잘 갖추어 입으면 차려입다를 씁니다.",
+                        wrong: "특별한 날에 옷을 갖추어 입는 표현입니다."
+                    },
+                    {
+                        id: "prep-guest",
+                        kicker: "사람",
+                        title: "방문한 손님을 따뜻하게 ___어요.",
+                        prompt: "차와 간식을 내고 편하게 쉬도록 챙겼습니다.",
+                        context: "사람에게 음식과 정성을 내다",
+                        answer: "대접하다",
+                        image: `${IMG.prep}/guest.webp`,
+                        imageAlt: "손님을 대접하는 장면",
+                        feedback: "맞아요. 손님을 정성껏 맞이하면 대접하다가 자연스럽습니다.",
+                        wrong: "손님, 어른, 방문객처럼 사람을 맞이하는 동사입니다."
+                    },
+                    {
+                        id: "prep-gift",
+                        kicker: "필요한 것",
+                        title: "참석자들에게 줄 선물을 미리 ___어요.",
+                        prompt: "모임 전에 필요한 물건을 준비해 두었습니다.",
+                        context: "필요한 것을 미리 준비하다",
+                        answer: "마련하다",
+                        image: `${IMG.prep}/gift.webp`,
+                        imageAlt: "준비한 선물 장면",
+                        feedback: "맞아요. 필요한 것을 미리 준비하면 마련하다를 씁니다.",
+                        wrong: "선물, 장소, 기념품처럼 필요한 것을 미리 준비하는 표현입니다."
+                    }
+                ]
+            },
+            {
+                id: "wear",
+                label: "착용",
+                title: "착용 동사 대화",
+                note: "대상에 따라 달라지는 착용 동사를 고릅니다.",
+                options: ["차려입다", "매다", "끼다", "하다", "차다", "들다", "메다"],
+                reviewHref: "vocab-support-wearing-match.html",
+                reviewLabel: "옷차림·착용 매칭",
+                questions: [
+                    {
+                        id: "wear-clothes",
+                        kicker: "옷",
+                        title: "면접이 있어서 양복을 ___고 왔어요.",
+                        prompt: "격식 있는 옷을 잘 갖추어 입었습니다.",
+                        context: "옷 + 갖추어 입다",
+                        answer: "차려입다",
+                        image: `${IMG.full}/s01_tr_n14.webp`,
+                        imageAlt: "양복을 차려입은 사람",
+                        feedback: "맞아요. 옷을 잘 갖추어 입으면 차려입다입니다.",
+                        wrong: "옷 전체를 격식 있게 입는 표현입니다."
+                    },
+                    {
+                        id: "wear-tie",
+                        kicker: "목",
+                        title: "셔츠에 넥타이를 ___면 더 단정해 보여요.",
+                        prompt: "목에 둘러 묶는 대상입니다.",
+                        context: "넥타이 + 목에 묶다",
+                        answer: "매다",
+                        image: `${IMG.full}/s01_bl_n15.webp`,
+                        imageAlt: "넥타이를 맨 사람",
+                        feedback: "맞아요. 넥타이는 매다를 씁니다.",
+                        wrong: "목에 둘러 묶는 것은 매다입니다."
+                    },
+                    {
+                        id: "wear-ring",
+                        kicker: "손가락",
+                        title: "기념일에 받은 반지를 손에 ___었어요.",
+                        prompt: "손가락에 넣는 장신구입니다.",
+                        context: "반지 + 손가락",
+                        answer: "끼다",
+                        image: `${IMG.full}/s01_br_n16.webp`,
+                        imageAlt: "반지를 낀 사람",
+                        feedback: "맞아요. 반지는 끼다를 씁니다.",
+                        wrong: "손가락에 넣는 동사를 골라 보세요."
+                    },
+                    {
+                        id: "wear-earrings",
+                        kicker: "귀",
+                        title: "오늘은 작은 귀고리를 ___고 왔어요.",
+                        prompt: "귀에 장신구를 착용합니다.",
+                        context: "귀고리 + 귀 장신구",
+                        answer: "하다",
+                        image: `${IMG.full}/s05_tl_n17.webp`,
+                        imageAlt: "귀고리를 한 사람",
+                        feedback: "맞아요. 귀고리는 하다와 자연스럽게 어울립니다.",
+                        wrong: "귀 장신구에는 귀고리를 하다를 씁니다."
+                    },
+                    {
+                        id: "wear-watch",
+                        kicker: "손목",
+                        title: "시간을 보려고 시계를 ___고 나왔어요.",
+                        prompt: "손목에 걸치는 대상입니다.",
+                        context: "시계 + 손목",
+                        answer: "차다",
+                        image: `${IMG.full}/s05_tr_n18.webp`,
+                        imageAlt: "시계를 찬 사람",
+                        feedback: "맞아요. 손목에 거는 시계는 차다를 씁니다.",
+                        wrong: "손목에 거는 대상에는 차다를 씁니다."
+                    },
+                    {
+                        id: "wear-bag",
+                        kicker: "손",
+                        title: "서류가 많아서 가방을 손에 ___고 갔어요.",
+                        prompt: "손으로 잡고 옮기는 대상입니다.",
+                        context: "가방 + 손으로 잡다",
+                        answer: "들다",
+                        image: `${IMG.full}/s05_bl_n19.webp`,
+                        imageAlt: "가방을 든 사람",
+                        feedback: "맞아요. 손으로 잡는 가방은 들다를 씁니다.",
+                        wrong: "손으로 잡으면 들다, 어깨에 걸치면 메다입니다."
+                    },
+                    {
+                        id: "wear-backpack",
+                        kicker: "어깨",
+                        title: "여행 갈 때 배낭을 어깨에 ___고 갔어요.",
+                        prompt: "어깨에 걸쳐 착용하는 대상입니다.",
+                        context: "배낭 + 어깨",
+                        answer: "메다",
+                        image: `${IMG.full}/s05_br_n20.webp`,
+                        imageAlt: "배낭을 멘 사람",
+                        feedback: "맞아요. 배낭은 어깨에 메다를 씁니다.",
+                        wrong: "배낭처럼 어깨에 걸치는 것은 메다입니다."
+                    }
+                ]
+            },
+            {
+                id: "amount",
+                label: "수량",
+                title: "수량 표현 점검",
+                note: "필요한 기준과 현재 상태를 비교해 고릅니다.",
+                options: ["충분하다", "모자라다", "남다", "부족하다"],
+                reviewHref: "vocab-support-amount.html",
+                reviewLabel: "양·충분함",
+                questions: [
+                    {
+                        id: "amount-cups",
+                        kicker: "필요 6 / 있음 4",
+                        title: "컵이 필요한 수보다 적어요.",
+                        prompt: "손님은 6명인데 컵은 4개뿐입니다.",
+                        context: "구체적인 개수가 필요한 만큼 되지 않음",
+                        answer: "모자라다",
+                        image: `${IMG.amount}/cups-short.webp`,
+                        imageAlt: "컵이 모자라는 장면",
+                        feedback: "맞아요. 구체적인 수량이 필요한 만큼 되지 않으면 모자라다를 씁니다.",
+                        wrong: "개수나 양이 딱 필요한 만큼 되지 않는 상황입니다."
+                    },
+                    {
+                        id: "amount-leftover",
+                        kicker: "사용 후",
+                        title: "파티가 끝났는데 음식이 아직 있어요.",
+                        prompt: "사람들이 먹고 난 뒤에도 음식이 더 있습니다.",
+                        context: "쓰고 난 뒤에도 아직 있음",
+                        answer: "남다",
+                        image: `${IMG.amount}/party-leftovers.webp`,
+                        imageAlt: "음식이 남은 장면",
+                        feedback: "맞아요. 사용 후에도 아직 있으면 남다입니다.",
+                        wrong: "먹거나 나누어 준 뒤에도 있는 상태를 떠올려 보세요."
+                    },
+                    {
+                        id: "amount-plates",
+                        kicker: "필요 4 / 있음 4",
+                        title: "접시가 필요한 만큼 준비됐어요.",
+                        prompt: "손님 수와 준비한 접시 수가 같습니다.",
+                        context: "필요한 만큼 있음",
+                        answer: "충분하다",
+                        image: `${IMG.amount}/plates-enough.webp`,
+                        imageAlt: "접시가 충분한 장면",
+                        feedback: "맞아요. 필요한 만큼 있으면 충분하다입니다.",
+                        wrong: "필요한 기준을 채웠는지 먼저 보세요."
+                    },
+                    {
+                        id: "amount-time",
+                        kicker: "시간",
+                        title: "제출까지 시간이 넉넉하지 않아요.",
+                        prompt: "해야 할 일에 비해 남은 시간이 너무 적습니다.",
+                        context: "기준이나 수준에 미치지 못함",
+                        answer: "부족하다",
+                        image: `${IMG.amount}/time-lacking.webp`,
+                        imageAlt: "시간이 부족한 장면",
+                        feedback: "맞아요. 시간, 돈, 준비처럼 넓은 기준에 못 미치면 부족하다를 씁니다.",
+                        wrong: "시간이나 돈처럼 기준에 못 미치는 상황입니다."
+                    },
+                    {
+                        id: "amount-snacks",
+                        kicker: "필요 5 / 있음 8",
+                        title: "간식이 필요보다 넉넉해요.",
+                        prompt: "5명에게 줄 간식을 8개 준비했습니다.",
+                        context: "필요한 양보다 넉넉함",
+                        answer: "충분하다",
+                        image: `${IMG.amount}/snacks-extra.webp`,
+                        imageAlt: "간식이 충분한 장면",
+                        feedback: "맞아요. 필요보다 넉넉하면 충분하다입니다.",
+                        wrong: "필요한 양보다 더 있는 상태입니다."
+                    }
+                ]
+            }
+        ];
+
+        const totalQuestions = PRACTICE_STAGES.reduce((sum, stage) => sum + stage.questions.length, 0);
+        const refs = {
+            scoreText: document.getElementById("scoreText"),
+            stageTabs: document.getElementById("stageTabs"),
+            board: document.getElementById("practiceBoard"),
+            summary: document.getElementById("summaryPanel")
+        };
+        const GUIDE_STEPS = [
+            { label: "장면", next: "단서 보기" },
+            { label: "단서", next: "선택 보기" },
+            { label: "선택", next: "" }
+        ];
+        const state = {
+            stageIndex: 0,
+            questionIndex: 0,
+            guideStep: 0,
+            solved: new Set(),
+            wrongCounts: Object.fromEntries(PRACTICE_STAGES.map((stage) => [stage.id, 0])),
+            selectedWrong: new Set()
+        };
+
+        function escapeHtml(value) {
+            return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[char]);
+        }
+
+        function currentStage() {
+            return PRACTICE_STAGES[state.stageIndex];
+        }
+
+        function currentQuestion() {
+            return currentStage().questions[state.questionIndex];
+        }
+
+        function solvedCount() {
+            return state.solved.size;
+        }
+
+        function stageSolvedCount(stage) {
+            return stage.questions.filter((question) => state.solved.has(question.id)).length;
+        }
+
+        function guideMessage(stage, question) {
+            if (state.guideStep === 0) {
+                return `장면: ${question.imageAlt}`;
+            }
+            if (state.guideStep === 1) {
+                return `단서: ${question.context}`;
+            }
+            return `선택: ${stage.label} 표현 중 가장 알맞은 답을 고르세요.`;
+        }
+
+        function guideChipClass(index) {
+            if (index < state.guideStep) return "guide-chip is-done";
+            if (index === state.guideStep) return "guide-chip is-active";
+            return "guide-chip";
+        }
+
+        function renderGuide(stage, question) {
+            return `
+                <div class="visual-guide" data-visual-guide>
+                    <div>
+                        <ol class="guide-steps" aria-label="시각 단서 순서">
+                            ${GUIDE_STEPS.map((step, index) => `
+                                <li class="${guideChipClass(index)}" data-guide-chip="${index}" data-step-number="${index + 1}" ${index === state.guideStep ? 'aria-current="step"' : ""}>${escapeHtml(step.label)}</li>
+                            `).join("")}
+                        </ol>
+                        <p class="guide-message" data-guide-message>${escapeHtml(guideMessage(stage, question))}</p>
+                    </div>
+                    <button class="guide-next" type="button" id="guideNextButton" ${state.guideStep >= GUIDE_STEPS.length - 1 ? "hidden" : ""}>${escapeHtml(GUIDE_STEPS[state.guideStep].next)}</button>
+                </div>
+            `;
+        }
+
+        function applyGuideStep() {
+            const stage = currentStage();
+            const question = currentQuestion();
+            const card = document.querySelector(".question-card");
+            const message = document.querySelector("[data-guide-message]");
+            const nextGuideButton = document.getElementById("guideNextButton");
+            if (card) {
+                card.dataset.guideStep = String(state.guideStep);
+            }
+            document.querySelectorAll("[data-guide-chip]").forEach((chip) => {
+                const index = Number(chip.dataset.guideChip);
+                chip.className = guideChipClass(index);
+                if (index === state.guideStep) {
+                    chip.setAttribute("aria-current", "step");
+                } else {
+                    chip.removeAttribute("aria-current");
+                }
+            });
+            if (message) {
+                message.textContent = guideMessage(stage, question);
+            }
+            if (nextGuideButton) {
+                nextGuideButton.hidden = state.guideStep >= GUIDE_STEPS.length - 1;
+                if (!nextGuideButton.hidden) {
+                    nextGuideButton.textContent = GUIDE_STEPS[state.guideStep].next;
+                }
+            }
+        }
+
+        function advanceGuideStep() {
+            if (state.guideStep < GUIDE_STEPS.length - 1) {
+                state.guideStep += 1;
+                applyGuideStep();
+            }
+        }
+
+        function updateScore() {
+            refs.scoreText.textContent = `${solvedCount()} / ${totalQuestions}`;
+        }
+
+        function renderTabs() {
+            refs.stageTabs.innerHTML = PRACTICE_STAGES.map((stage, index) => {
+                const complete = stageSolvedCount(stage) === stage.questions.length;
+                return `
+                    <button class="stage-tab ${index === state.stageIndex ? "is-active" : ""} ${complete ? "is-complete" : ""}" type="button" data-stage-index="${index}">
+                        <span>${index + 1}단계 · ${stageSolvedCount(stage)}/${stage.questions.length}</span>
+                        <strong>${escapeHtml(stage.label)}</strong>
+                    </button>
+                `;
+            }).join("");
+        }
+
+        function renderQuestion() {
+            const stage = currentStage();
+            const question = currentQuestion();
+            const isSolved = state.solved.has(question.id);
+            refs.summary.hidden = true;
+            refs.board.hidden = false;
+            refs.board.innerHTML = `
+                <div class="board-status">
+                    <div class="stage-title">
+                        <h2>${escapeHtml(stage.title)}</h2>
+                        <p>${escapeHtml(stage.note)}</p>
+                    </div>
+                    <span class="progress-pill">${state.questionIndex + 1} / ${stage.questions.length}</span>
+                </div>
+                ${renderGuide(stage, question)}
+                <article class="question-card" data-question-id="${escapeHtml(question.id)}" data-guide-step="${state.guideStep}">
+                    <div class="question-media">
+                        <img src="${escapeHtml(question.image)}" alt="${escapeHtml(question.imageAlt)}" loading="eager" decoding="async" />
+                    </div>
+                    <div class="question-body">
+                        <span class="question-kicker">${escapeHtml(question.kicker)}</span>
+                        <h3>${escapeHtml(question.title).replace("___", "<span class=\"blank\">?</span>")}</h3>
+                        <p class="question-prompt">${escapeHtml(question.prompt)}</p>
+                        <p class="question-context">${escapeHtml(question.context)}</p>
+                        <div class="option-grid" role="group" aria-label="답 선택">
+                            ${stage.options.map((option) => `
+                                <button class="answer-option ${isSolved && option === question.answer ? "is-correct" : ""}" type="button" data-answer-option="${escapeHtml(option)}" ${isSolved ? "disabled" : ""}>${escapeHtml(option)}</button>
+                            `).join("")}
+                        </div>
+                        <div class="feedback ${isSolved ? "is-correct" : ""}" role="status" aria-live="polite" data-feedback>
+                            ${isSolved ? escapeHtml(question.feedback) : "알맞은 표현을 고르세요."}
+                        </div>
+                    </div>
+                </article>
+                <div class="board-actions">
+                    <button class="action-btn" type="button" id="retryButton" ${isSolved ? "" : "hidden"}>다시 풀기</button>
+                    <button class="action-btn primary" type="button" id="nextButton" ${isSolved ? "" : "disabled"}>${nextLabel()}</button>
+                </div>
+            `;
+        }
+
+        function nextLabel() {
+            const stage = currentStage();
+            if (state.stageIndex === PRACTICE_STAGES.length - 1 && state.questionIndex === stage.questions.length - 1) {
+                return "결과 보기";
+            }
+            if (state.questionIndex === stage.questions.length - 1) {
+                return "다음 단계";
+            }
+            return "다음 문제";
+        }
+
+        function renderAll() {
+            updateScore();
+            renderTabs();
+            renderQuestion();
+        }
+
+        function handleAnswer(button) {
+            const question = currentQuestion();
+            const value = button.dataset.answerOption;
+            const card = button.closest(".question-card");
+            const feedback = card.querySelector("[data-feedback]");
+            const nextButton = document.getElementById("nextButton");
+            const isCorrect = value === question.answer;
+
+            if (!isCorrect) {
+                button.classList.add("is-wrong");
+                feedback.textContent = question.wrong;
+                feedback.className = "feedback is-wrong";
+                advanceGuideStep();
+                const wrongKey = `${question.id}:${value}`;
+                if (!state.selectedWrong.has(wrongKey)) {
+                    state.selectedWrong.add(wrongKey);
+                    state.wrongCounts[currentStage().id] += 1;
+                }
+                return;
+            }
+
+            state.solved.add(question.id);
+            state.guideStep = GUIDE_STEPS.length - 1;
+            card.querySelectorAll(".answer-option").forEach((option) => {
+                option.disabled = true;
+                option.classList.toggle("is-correct", option.dataset.answerOption === question.answer);
+                option.classList.remove("is-wrong");
+            });
+            feedback.textContent = question.feedback;
+            feedback.className = "feedback is-correct";
+            nextButton.disabled = false;
+            document.getElementById("retryButton").hidden = false;
+            applyGuideStep();
+            updateScore();
+            renderTabs();
+        }
+
+        function goNext() {
+            const stage = currentStage();
+            if (state.questionIndex < stage.questions.length - 1) {
+                state.questionIndex += 1;
+                state.guideStep = 0;
+                renderAll();
+                return;
+            }
+
+            if (state.stageIndex < PRACTICE_STAGES.length - 1) {
+                state.stageIndex += 1;
+                state.questionIndex = 0;
+                state.guideStep = 0;
+                renderAll();
+                return;
+            }
+
+            renderSummary();
+        }
+
+        function retryCurrent() {
+            const question = currentQuestion();
+            state.solved.delete(question.id);
+            state.guideStep = 0;
+            renderAll();
+        }
+
+        function switchStage(index) {
+            state.stageIndex = index;
+            state.questionIndex = 0;
+            state.guideStep = 0;
+            renderAll();
+        }
+
+        function renderSummary() {
+            refs.board.hidden = true;
+            refs.summary.hidden = false;
+            const weakStages = PRACTICE_STAGES
+                .filter((stage) => state.wrongCounts[stage.id] > 0)
+                .sort((a, b) => state.wrongCounts[b.id] - state.wrongCounts[a.id]);
+            const percent = totalQuestions ? Math.round((solvedCount() / totalQuestions) * 100) : 0;
+            refs.summary.innerHTML = `
+                <div>
+                    <p class="eyebrow">Final Check</p>
+                    <h2>어휘 연습 완료</h2>
+                    <p>${percent >= 90 ? "대부분의 어휘를 안정적으로 골랐어요." : "틀린 적이 있는 유형만 한 번 더 보면 더 단단해집니다."}</p>
+                </div>
+                <div class="summary-grid">
+                    <div class="summary-stat"><span>맞힌 문항</span><strong>${solvedCount()} / ${totalQuestions}</strong></div>
+                    <div class="summary-stat"><span>정확도</span><strong>${percent}%</strong></div>
+                    <div class="summary-stat"><span>재확인 유형</span><strong>${weakStages.length}</strong></div>
+                </div>
+                <ul class="weak-list" aria-label="다시 볼 어휘 유형">
+                    ${weakStages.length ? weakStages.map((stage) => `
+                        <li>${escapeHtml(stage.label)}: ${state.wrongCounts[stage.id]}번 다시 골랐어요. ${escapeHtml(stage.reviewLabel)}에서 한 번 더 확인하세요.</li>
+                    `).join("") : "<li>틀린 선택 없이 끝냈어요. 바로 낱말퍼즐로 넘어가도 좋습니다.</li>"}
+                </ul>
+                <div class="summary-links">
+                    ${PRACTICE_STAGES.map((stage) => `<a class="summary-link" href="${escapeHtml(stage.reviewHref)}">${escapeHtml(stage.reviewLabel)}</a>`).join("")}
+                    <a class="summary-link" href="vocabulary-crossword.html">낱말퍼즐</a>
+                    <button class="summary-link" type="button" id="restartButton">처음부터 다시</button>
+                </div>
+            `;
+        }
+
+        function reset() {
+            state.stageIndex = 0;
+            state.questionIndex = 0;
+            state.guideStep = 0;
+            state.solved.clear();
+            state.selectedWrong.clear();
+            state.wrongCounts = Object.fromEntries(PRACTICE_STAGES.map((stage) => [stage.id, 0]));
+            renderAll();
+        }
+
+        document.addEventListener("click", (event) => {
+            const option = event.target.closest("[data-answer-option]");
+            if (option) {
+                handleAnswer(option);
+                return;
+            }
+
+            const stageButton = event.target.closest("[data-stage-index]");
+            if (stageButton) {
+                switchStage(Number(stageButton.dataset.stageIndex));
+                return;
+            }
+
+            if (event.target.closest("#nextButton")) {
+                goNext();
+                return;
+            }
+
+            if (event.target.closest("#guideNextButton")) {
+                advanceGuideStep();
+                return;
+            }
+
+            if (event.target.closest("#retryButton")) {
+                retryCurrent();
+                return;
+            }
+
+            if (event.target.closest("#restartButton")) {
+                reset();
+            }
+        });
+
+        window.__c13WbVocabPractice = {
+            data: PRACTICE_STAGES,
+            getState() {
+                return {
+                    stageIndex: state.stageIndex,
+                    questionIndex: state.questionIndex,
+                    guideStep: state.guideStep,
+                    solved: [...state.solved],
+                    wrongCounts: { ...state.wrongCounts },
+                    totalQuestions
+                };
+            },
+            reset
+        };
+
+        renderAll();
+    })();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>
