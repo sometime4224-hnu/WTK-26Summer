@@ -17,12 +17,33 @@ async function expectImagesLoaded(page) {
   }
 }
 
+async function viewportOverflow(page) {
+  return page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+}
+
+async function elementTopRatio(page, selector) {
+  return page.locator(selector).first().evaluate((node) => {
+    const rect = node.getBoundingClientRect();
+    return rect.top / window.innerHeight;
+  });
+}
+
 const SUPPORT_PAGES = [
   { path: "/c13/vocab-support-events.html", title: "모임 이름 찾기" },
   { path: "/c13/vocab-support-prep-actions.html", title: "준비·대접 동작" },
   { path: "/c13/vocab-support-amount.html", title: "양·충분함" },
   { path: "/c13/vocab-support-wearing-match.html", title: "옷차림·착용 매칭" },
+  { path: "/c13/vocab-support-wearing-verbs.html", title: "의류·장신구 착용 동사" },
   { path: "/c13/vocab-support-learning.html", title: "유형별 어휘 배우기" }
+];
+
+const MOBILE_ACTION_TARGETS = [
+  { path: "/c13/vocab-support-events.html", title: "모임 이름 찾기", selector: ".answer-option", maxTopRatio: 0.7 },
+  { path: "/c13/vocab-support-prep-actions.html", title: "준비·대접 동작", selector: ".verb-chip", maxTopRatio: 0.6 },
+  { path: "/c13/vocab-support-amount.html", title: "양·충분함", selector: ".answer-option", maxTopRatio: 0.7 },
+  { path: "/c13/vocab-support-wearing-match.html", title: "옷차림·착용 매칭", selector: "[data-match-card]", maxTopRatio: 0.62 },
+  { path: "/c13/vocab-support-learning.html", title: "유형별 어휘 배우기", selector: ".concept-card", maxTopRatio: 0.55 },
+  { path: "/c13/vocab-support-wearing-verbs.html", title: "의류·장신구 착용 동사", selector: ".tab", maxTopRatio: 0.35 }
 ];
 
 const QUIZ_PAGES = [
@@ -51,7 +72,8 @@ test.describe("c13 vocabulary support activities", () => {
     await expect(page.locator('a[href="vocab-support-events.html"]')).toBeHidden();
     await page.locator(".support-activity-group summary").click();
     await expect(page.locator(".support-activity-group")).toHaveAttribute("open", "");
-    await expect(page.locator(".support-activity-list .lesson-link")).toHaveCount(5);
+    await expect(page.locator(".support-activity-list .lesson-link")).toHaveCount(6);
+    await expect(page.locator('a[href="vocab-support-wearing-verbs.html"]')).toContainText("의류·장신구 착용 동사");
     await expect(page.locator(".support-activity-list .lesson-link").last()).toContainText("유형별 어휘 배우기");
     await page.locator('a[href="vocab-support-events.html"]').click();
     await expect(page).toHaveURL(/\/c13\/vocab-support-events\.html$/);
@@ -241,8 +263,70 @@ test.describe("c13 vocabulary support activities mobile", () => {
   for (const supportPage of SUPPORT_PAGES) {
     test(`${supportPage.title} has no horizontal overflow on phone width`, async ({ page }) => {
       await page.goto(supportPage.path, { waitUntil: "domcontentloaded" });
-      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      const overflow = await viewportOverflow(page);
       expect(overflow).toBeLessThanOrEqual(2);
     });
   }
+});
+
+test.describe("c13 vocabulary support activities compact mobile", () => {
+  test.use({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
+
+  test.beforeEach(async ({ page }) => {
+    await blockExternalRequests(page);
+  });
+
+  for (const supportPage of MOBILE_ACTION_TARGETS) {
+    test(`${supportPage.title} exposes the first useful action early`, async ({ page }) => {
+      await page.goto(supportPage.path, { waitUntil: "domcontentloaded" });
+      expect(await viewportOverflow(page)).toBeLessThanOrEqual(2);
+      await expect(page.locator(supportPage.selector).first()).toBeVisible();
+      const ratio = await elementTopRatio(page, supportPage.selector);
+      expect(ratio).toBeLessThanOrEqual(supportPage.maxTopRatio);
+    });
+  }
+
+  test("mobile touch controls stay large enough to tap", async ({ page }) => {
+    for (const supportPage of SUPPORT_PAGES) {
+      await page.goto(supportPage.path, { waitUntil: "domcontentloaded" });
+      const shortControls = await page.evaluate(() => {
+        const selectors = [".answer-option", ".verb-chip", ".object-card", ".target-zone", ".tab"];
+        return selectors.flatMap((selector) => [...document.querySelectorAll(selector)].map((node, index) => {
+          const rect = node.getBoundingClientRect();
+          const visible = rect.width > 0 && rect.height > 0 && getComputedStyle(node).visibility !== "hidden";
+          return visible && rect.height < 44 ? `${selector}[${index}]:${Math.round(rect.height)}` : null;
+        }).filter(Boolean));
+      });
+      expect(shortControls, supportPage.path).toEqual([]);
+    }
+  });
+
+  test("prep mobile sticky verb tray does not cover scrolled object cards", async ({ page }) => {
+    await page.goto("/c13/vocab-support-prep-actions.html", { waitUntil: "domcontentloaded" });
+    await page.locator('[data-transform-card="visitor"]').scrollIntoViewIfNeeded();
+    const metrics = await page.evaluate(() => {
+      const tray = document.querySelector(".verb-tray").getBoundingClientRect();
+      const card = document.querySelector('[data-transform-card="visitor"]').getBoundingClientRect();
+      return {
+        trayTop: Math.round(tray.top),
+        trayBottom: Math.round(tray.bottom),
+        trayHeight: Math.round(tray.height),
+        cardTop: Math.round(card.top)
+      };
+    });
+    expect(metrics.trayTop).toBeGreaterThanOrEqual(40);
+    expect(metrics.trayHeight).toBeLessThanOrEqual(80);
+    expect(metrics.cardTop).toBeGreaterThanOrEqual(metrics.trayBottom - 1);
+  });
+
+  test("wearing match scrolls the active target into view after selecting a card", async ({ page }) => {
+    await page.goto("/c13/vocab-support-wearing-match.html", { waitUntil: "domcontentloaded" });
+    await page.locator('[data-match-card="backpack"]').click();
+    const target = page.locator('[data-match-target="shoulder"]');
+    await expect(target).toHaveClass(/is-active/);
+    await expect.poll(async () => target.evaluate((node) => {
+      const rect = node.getBoundingClientRect();
+      return rect.top >= 44 && rect.bottom <= window.innerHeight;
+    })).toBe(true);
+  });
 });

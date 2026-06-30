@@ -57,6 +57,7 @@ test.describe("c13 wearing verbs support page", () => {
 
   test("is linked from the chapter hub vocabulary area", async ({ page }) => {
     await page.goto("/c13/index.html", { waitUntil: "domcontentloaded" });
+    await page.locator(".support-activity-group summary").click();
 
     await expect(page.getByRole("link", { name: /의류·장신구 착용 동사/ })).toHaveAttribute(
       "href",
@@ -68,5 +69,30 @@ test.describe("c13 wearing verbs support page", () => {
       "href",
       "vocab-support-wearing-verbs.html"
     );
+  });
+});
+
+test.describe("c13 wearing verbs support page mobile", () => {
+  test.use({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
+
+  test.beforeEach(async ({ page }) => {
+    await blockExternalRequests(page);
+  });
+
+  test("keeps tabs and the active image reachable on phone portrait", async ({ page }) => {
+    await page.goto("/c13/vocab-support-wearing-verbs.html", { waitUntil: "domcontentloaded" });
+
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(2);
+
+    const firstTabTopRatio = await page.locator(".tab").first().evaluate((tab) => tab.getBoundingClientRect().top / window.innerHeight);
+    expect(firstTabTopRatio).toBeLessThanOrEqual(0.35);
+
+    const imageTopRatio = await page.locator(".image-wrap").evaluate((wrap) => wrap.getBoundingClientRect().top / window.innerHeight);
+    expect(imageTopRatio).toBeLessThanOrEqual(0.58);
+
+    await page.getByRole("tab", { name: /매다·메다·들다/ }).click();
+    await expect(page.locator("#viewer-image")).toHaveAttribute("src", /wearing-verbs-02\.webp$/);
+    await expect(page.locator("#viewer-image")).toBeVisible();
   });
 });

@@ -68,6 +68,17 @@
         return (values || []).map((value) => `<span class="${className}">${escapeHtml(value)}</span>`).join("");
     }
 
+    function isMobileLayout() {
+        return window.matchMedia?.("(max-width: 820px)").matches || false;
+    }
+
+    function revealMobileTarget(target, block = "center") {
+        if (!target || !isMobileLayout()) return;
+        window.requestAnimationFrame(() => {
+            target.scrollIntoView({ block, inline: "nearest", behavior: "auto" });
+        });
+    }
+
     function renderHero() {
         const flow = [
             cfg.showLearn === false ? null : ["learn-section", "학습"],
@@ -392,7 +403,7 @@
     function renderPage() {
         document.title = `${cfg.title} | 13과 어휘 보조`;
         root.innerHTML = `
-            <div class="support-shell">
+            <div class="support-shell" data-support-type="${escapeHtml(cfg.type || "support")}" data-support-has-learn="${escapeHtml(String(cfg.showLearn !== false))}">
                 ${renderHero()}
                 ${cfg.showLearn === false ? "" : renderSection("learn-section", cfg.learnTitle || "학습", cfg.learnNote || "", renderLearnCards(cfg.learnCards || []))}
                 ${cfg.showPractice === false ? "" : renderSection("practice-section", cfg.practiceTitle || "연습", cfg.practiceNote || "", renderPractice())}
@@ -514,6 +525,8 @@
         const feedback = board.querySelector(".match-feedback");
         feedback.textContent = `${card.querySelector(".object-label")?.textContent || "카드"}: 알맞은 칸을 선택하세요.`;
         feedback.className = "feedback match-feedback";
+        const activeTarget = board.querySelector(`[data-match-target="${CSS.escape(card.dataset.answer)}"]`);
+        revealMobileTarget(activeTarget);
     }
 
     function handleMatchTarget(target) {
@@ -598,6 +611,8 @@
         updateTransformTargetHints(board, true, selectedTransformVerb);
         const verb = transformVerbById(selectedTransformVerb);
         if (board && verb) setTransformFeedback(board, `${verb.label}: 넣을 목적어 이미지를 선택하세요.`, "");
+        const firstReadyTarget = board?.querySelector(".transform-card.is-ready-target");
+        revealMobileTarget(firstReadyTarget);
     }
 
     function applyTransformToCard(card, verbId) {
@@ -687,6 +702,7 @@
             feedback.textContent = `${button.dataset.contrastResultPhrase}: ${button.dataset.contrastResultFocus}`;
             feedback.className = "feedback contrast-feedback is-correct";
         }
+        revealMobileTarget(stage);
     }
 
     document.addEventListener("click", (event) => {

@@ -19,11 +19,13 @@
 
 html {
     background: var(--support-bg);
+    scroll-padding-top: 58px;
 }
 
 body {
     margin: 0;
     min-height: 100vh;
+    min-height: 100dvh;
     color: var(--support-ink);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, var(--support-bg) 100%);
@@ -114,7 +116,7 @@ button {
 }
 
 .support-hero h1 {
-    font-size: clamp(24px, 4vw, 38px);
+    font-size: 34px;
     line-height: 1.14;
 }
 
@@ -161,7 +163,7 @@ button {
 }
 
 .support-section h2 {
-    font-size: clamp(20px, 3vw, 28px);
+    font-size: 26px;
     line-height: 1.2;
 }
 
@@ -322,7 +324,7 @@ button {
 }
 
 .question-card h3 {
-    font-size: clamp(17px, 2.2vw, 22px);
+    font-size: 21px;
     line-height: 1.25;
 }
 
@@ -586,6 +588,7 @@ button {
     padding: 9px;
     color: #172033;
     text-align: left;
+    scroll-margin-top: 132px;
 }
 
 .transform-card:disabled {
@@ -725,7 +728,7 @@ button {
 }
 
 .contrast-group-head h3 {
-    font-size: clamp(19px, 2.5vw, 25px);
+    font-size: 24px;
     line-height: 1.2;
 }
 
@@ -920,33 +923,280 @@ button {
 }
 
 @media (max-width: 820px) {
+    html {
+        scroll-padding-top: 52px;
+    }
+
+    .support-topbar {
+        min-height: 44px;
+        padding: 7px 10px;
+    }
+
+    .support-topbar a,
+    .support-topbar span {
+        font-size: 11px;
+    }
+
     .support-shell {
         width: min(100% - 14px, 1180px);
-        margin-top: 10px;
+        margin-top: 8px;
+        gap: 10px;
     }
 
     .support-hero {
         grid-template-columns: 1fr;
         align-items: start;
-        padding: 14px;
+        gap: 9px;
+        padding: 10px 12px;
+    }
+
+    .support-hero h1 {
+        font-size: 24px;
+        line-height: 1.13;
+    }
+
+    .support-hero p {
+        margin-top: 4px;
+        font-size: 12px;
+        line-height: 1.35;
     }
 
     .flow-nav {
+        flex-wrap: nowrap;
         justify-content: flex-start;
+        gap: 6px;
+        max-width: 100%;
+        overflow-x: auto;
+        padding-bottom: 1px;
+        scrollbar-width: none;
     }
 
-    .question-card,
-    .match-layout {
+    .flow-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .flow-nav a {
+        flex: 0 0 auto;
+        min-height: 38px;
+        padding: 0 10px;
+        font-size: 11px;
+    }
+
+    .support-section {
+        padding: 11px;
+    }
+
+    .section-head {
+        margin-bottom: 9px;
+    }
+
+    .support-section h2 {
+        font-size: 21px;
+    }
+
+    .section-note {
+        margin-top: 4px;
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .learn-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .concept-card {
+        grid-template-columns: 76px minmax(0, 1fr);
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .concept-card .visual-frame {
+        grid-row: 1 / span 2;
+    }
+
+    .concept-card .question-prompt,
+    .concept-card .learn-resource-link {
+        grid-column: 2;
+    }
+
+    .concept-title {
+        gap: 5px;
+        font-size: 14px;
+        line-height: 1.22;
+    }
+
+    .visual-frame {
+        aspect-ratio: 1 / 1;
+    }
+
+    .question-card {
+        grid-template-columns: minmax(96px, 34%) minmax(0, 1fr);
+        gap: 8px;
+        padding: 9px;
+        align-items: start;
+    }
+
+    .question-card--text-only {
         grid-template-columns: 1fr;
     }
 
     .question-image {
         min-height: 0;
-        aspect-ratio: 16 / 10;
+        aspect-ratio: 1 / 1;
+    }
+
+    .question-body {
+        gap: 7px;
+    }
+
+    .question-card h3 {
+        font-size: 17px;
+        line-height: 1.18;
+    }
+
+    .question-prompt {
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .cue-row,
+    .metric-row,
+    .option-grid,
+    .target-grid,
+    .object-bank,
+    .placed-list {
+        gap: 6px;
+    }
+
+    .cue-chip,
+    .metric-chip,
+    .placed-chip,
+    .mini-chip {
+        min-height: 26px;
+        padding: 4px 8px;
+        font-size: 11px;
     }
 
     .option-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .answer-option,
+    .reset-btn,
+    .learn-resource-link {
+        min-height: 44px;
+        padding-inline: 8px;
+        font-size: 13px;
+        line-height: 1.2;
+    }
+
+    .feedback {
+        min-height: 36px;
+        padding: 7px 9px;
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .score-strip {
+        margin-bottom: 9px;
+        padding: 8px 10px;
+    }
+
+    .match-layout {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .object-bank,
+    .target-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .object-card {
+        padding: 7px;
+    }
+
+    .object-label {
+        min-height: 28px;
+        font-size: 12px;
+    }
+
+    .target-zone {
+        min-height: 104px;
+        padding: 9px;
+    }
+
+    .target-title {
+        font-size: 16px;
+    }
+
+    .target-summary {
+        font-size: 11px;
+        line-height: 1.3;
+    }
+
+    .transform-board,
+    .transform-grid {
+        gap: 9px;
+    }
+
+    .verb-tray {
+        top: 46px;
+        display: flex;
+        grid-template-columns: none;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 5px;
+        scrollbar-width: none;
+    }
+
+    .verb-tray::-webkit-scrollbar {
+        display: none;
+    }
+
+    .verb-chip {
+        flex: 0 0 136px;
+        min-height: 58px;
+        padding: 6px 7px;
+    }
+
+    .verb-chip span,
+    .contrast-verb-chip span {
+        font-size: 15px;
+    }
+
+    .verb-chip small,
+    .contrast-verb-chip small {
+        font-size: 11px;
+        line-height: 1.18;
+    }
+
+    .transform-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .transform-card {
+        gap: 7px;
+        padding: 7px;
+        scroll-margin-top: 126px;
+    }
+
+    .transform-title {
+        font-size: 14px;
+    }
+
+    .transform-phrase {
+        min-height: 30px;
+        padding: 4px 8px;
+        font-size: 12px;
+        border-radius: 8px;
+    }
+
+    .transform-note {
+        min-height: 0;
+        font-size: 11px;
+        line-height: 1.3;
     }
 
     .contrast-group-head {
@@ -963,13 +1213,27 @@ button {
     }
 
     .contrast-verb-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    .contrast-verb-chip {
+        min-height: 66px;
+        padding: 8px;
     }
 }
 
 @media (max-width: 430px) {
     .support-section {
-        padding: 10px;
+        padding: 9px;
+    }
+
+    .support-hero {
+        padding: 9px 10px;
+    }
+
+    .support-hero h1 {
+        font-size: 22px;
     }
 
     .learn-grid,
@@ -977,38 +1241,40 @@ button {
     .match-layout,
     .transform-board,
     .transform-grid {
-        gap: 9px;
+        gap: 8px;
     }
 
-    .option-grid,
-    .target-grid,
-    .object-bank,
-    .verb-tray,
-    .transform-grid {
+    .question-card {
+        grid-template-columns: 94px minmax(0, 1fr);
+    }
+
+    .question-card--text-only {
         grid-template-columns: 1fr;
     }
 
     .answer-option {
-        min-height: 38px;
+        min-height: 44px;
     }
 
     .verb-tray {
-        top: 50px;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 7px;
-        padding: 7px;
+        top: 44px;
     }
 
     .verb-chip {
-        min-height: 58px;
-        padding: 8px;
+        flex-basis: 128px;
+        min-height: 56px;
     }
 
-    .verb-chip span {
-        font-size: 15px;
+    .target-zone {
+        min-height: 96px;
     }
 
-    .verb-chip small {
-        font-size: 11px;
+    .support-footer {
+        justify-content: flex-start;
+    }
+
+    .support-footer a {
+        min-height: 44px;
+        font-size: 12px;
     }
 }
