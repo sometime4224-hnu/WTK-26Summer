@@ -131,7 +131,7 @@
             translations: {
                 en: {
                     title: "English reading scaffold",
-                    summary: "Read the health text by finding symptoms, causes, and recommended habits related to throat health.",
+                    summary: "Read the health text by finding symptoms, causes, and recommended habits related to neck health.",
                     points: [
                         "Mark health problem words before answering questions.",
                         "Connect each recommendation with the reason given in the text.",

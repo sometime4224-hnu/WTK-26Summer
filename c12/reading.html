@@ -36,9 +36,6 @@
         .vocab-card:hover {
             transform: translateY(-2px);
         }
-        .hidden-vietnamese {
-            display: none;
-        }
         .correct-answer {
             background-color: #dcfce7 !important;
             border-color: #22c55e !important;
@@ -63,6 +60,8 @@
             z-index: 999999;
             box-sizing: border-box;
             gap: 15px;
+            overflow-x: auto;
+            white-space: nowrap;
         }
         .injected-global-nav a {
             display: flex;
@@ -90,16 +89,20 @@
     <!-- End Google Tag Manager (noscript) -->
 
     <nav class="injected-global-nav">
-        <a href="../index.html"><i class="fa-solid fa-house"></i> 메인으로</a>
+        <a href="../index.html"><i class="fa-solid fa-house" aria-hidden="true"></i> 메인으로</a>
         <span class="divider">|</span>
-        <a href="index.html"><i class="fa-solid fa-folder-open"></i> 단원 홈</a>
+        <a href="index.html"><i class="fa-solid fa-folder-open" aria-hidden="true"></i> 12과 목록</a>
+        <span class="divider">|</span>
+        <a href="reading-quiz.html"><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 읽기 문제</a>
+        <span class="divider">|</span>
+        <a href="reading-cuttoon.html"><i class="fa-solid fa-images" aria-hidden="true"></i> 읽기 컷툰</a>
     </nav>
 
     <!-- Navigation -->
     <nav class="bg-orange-500 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <h1 class="text-lg md:text-xl font-bold"><i class="fas fa-book-open mr-2"></i>한국어 읽기 연습</h1>
-            <span class="text-sm bg-orange-400 px-3 py-1 rounded-full">중급 (Trung cấp)</span>
+            <span class="text-sm bg-orange-400 px-3 py-1 rounded-full">중급</span>
         </div>
     </nav>
 
@@ -113,8 +116,12 @@
 
         <!-- Main Text Section -->
         <section class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="bg-orange-50 px-6 py-4 border-b border-orange-100 flex justify-between items-center">
-                <h3 class="font-bold text-orange-800 text-lg"><i class="fas fa-align-left mr-2"></i>본문 읽기 (Đọc bài)</h3>
+            <div class="bg-orange-50 px-6 py-4 border-b border-orange-100 flex justify-between items-center gap-3 flex-wrap">
+                <h3 class="font-bold text-orange-800 text-lg"><i class="fas fa-align-left mr-2"></i>본문 읽기</h3>
+                <div class="flex gap-2 flex-wrap justify-end">
+                    <a href="reading-quiz.html" class="text-xs md:text-sm font-bold text-orange-700 bg-white px-3 py-1 rounded-full border border-orange-100 hover:bg-orange-50">문제 풀기</a>
+                    <a href="reading-cuttoon.html" class="text-xs md:text-sm font-bold text-orange-700 bg-white px-3 py-1 rounded-full border border-orange-100 hover:bg-orange-50">컷툰 탐색</a>
+                </div>
             </div>
             <div class="p-6 md:p-8 leading-relaxed text-lg text-gray-700 space-y-5">
                 <p>
@@ -143,10 +150,7 @@
         <!-- Vocabulary Section -->
         <section class="bg-white rounded-xl shadow-md p-6">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-gray-800 text-lg"><i class="fas fa-language mr-2 text-green-600"></i>주요 어휘 (Từ vựng)</h3>
-                <button onclick="toggleAllVietnamese()" class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold hover:bg-green-200 transition">
-                    <i class="fas fa-eye mr-1"></i> 베트남어 보기/숨기기
-                </button>
+                <h3 class="font-bold text-gray-800 text-lg"><i class="fas fa-language mr-2 text-green-600"></i>주요 어휘</h3>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="vocab-list"></div>
         </section>
@@ -156,29 +160,29 @@
 
             <!-- Multiple Choice -->
             <div class="bg-white rounded-xl shadow-md p-6">
-                <h3 class="font-bold text-gray-800 text-lg mb-4 border-b pb-2"><i class="fas fa-question-circle mr-2 text-blue-500"></i>내용 확인 (Kiểm tra nội dung)</h3>
+                <h3 class="font-bold text-gray-800 text-lg mb-4 border-b pb-2"><i class="fas fa-question-circle mr-2 text-blue-500"></i>내용 확인</h3>
 
                 <div class="space-y-6">
                     <!-- Q1 -->
-                    <div class="quiz-item">
+                    <div class="quiz-item" data-question="q1">
                         <p class="font-medium mb-3">1. 이 글의 주제로 가장 알맞은 것은 무엇입니까?</p>
                         <div class="space-y-2">
-                            <button class="w-full text-left p-3 rounded border hover:bg-gray-50 transition quiz-option" onclick="checkQuiz(this, false, 'q1')">① 거북목 증후군의 원인과 진단</button>
-                            <button class="w-full text-left p-3 rounded border hover:bg-gray-50 transition quiz-option" onclick="checkQuiz(this, true, 'q1')">② 목 건강을 지키는 스트레칭 방법</button>
-                            <button class="w-full text-left p-3 rounded border hover:bg-gray-50 transition quiz-option" onclick="checkQuiz(this, false, 'q1')">③ 걷기 운동과 다이어트의 관계</button>
+                            <button class="w-full text-left p-3 rounded border hover:bg-gray-50 transition quiz-option" data-choice="1" onclick="checkQuiz(this, false, 'q1')">① 거북목 증후군의 원인과 진단</button>
+                            <button class="w-full text-left p-3 rounded border hover:bg-gray-50 transition quiz-option" data-choice="2" onclick="checkQuiz(this, true, 'q1')">② 목 건강을 지키는 스트레칭 방법</button>
+                            <button class="w-full text-left p-3 rounded border hover:bg-gray-50 transition quiz-option" data-choice="3" onclick="checkQuiz(this, false, 'q1')">③ 걷기 운동과 다이어트의 관계</button>
                         </div>
-                        <p id="q1-feedback" class="mt-2 text-sm font-bold hidden"></p>
+                        <p id="q1-feedback" data-feedback class="mt-2 text-sm font-bold hidden"></p>
                     </div>
 
                     <!-- Q2 -->
-                    <div class="quiz-item">
+                    <div class="quiz-item" data-question="q2">
                         <p class="font-medium mb-3">2. 거북목 증후군에 걸리면 어떤 증상이 생깁니까?</p>
                         <div class="space-y-2">
-                            <button class="w-full text-left p-3 rounded border hover:bg-gray-50 transition quiz-option" onclick="checkQuiz(this, false, 'q2')">① 눈이 나빠지고 귀가 아프다</button>
-                            <button class="w-full text-left p-3 rounded border hover:bg-gray-50 transition quiz-option" onclick="checkQuiz(this, true, 'q2')">② 목과 어깨가 아프고 두통이 생긴다</button>
-                            <button class="w-full text-left p-3 rounded border hover:bg-gray-50 transition quiz-option" onclick="checkQuiz(this, false, 'q2')">③ 손발이 저리고 소화가 안 된다</button>
+                            <button class="w-full text-left p-3 rounded border hover:bg-gray-50 transition quiz-option" data-choice="1" onclick="checkQuiz(this, false, 'q2')">① 눈이 나빠지고 귀가 아프다</button>
+                            <button class="w-full text-left p-3 rounded border hover:bg-gray-50 transition quiz-option" data-choice="2" onclick="checkQuiz(this, true, 'q2')">② 목과 어깨가 아프고 두통이 생긴다</button>
+                            <button class="w-full text-left p-3 rounded border hover:bg-gray-50 transition quiz-option" data-choice="3" onclick="checkQuiz(this, false, 'q2')">③ 손발이 저리고 소화가 안 된다</button>
                         </div>
-                        <p id="q2-feedback" class="mt-2 text-sm font-bold hidden"></p>
+                        <p id="q2-feedback" data-feedback class="mt-2 text-sm font-bold hidden"></p>
                     </div>
                 </div>
             </div>
@@ -188,59 +192,59 @@
                 <h3 class="font-bold text-gray-800 text-lg mb-4 border-b pb-2"><i class="fas fa-check-circle mr-2 text-red-500"></i>O / X 퀴즈</h3>
 
                 <div class="space-y-4">
-                    <div class="bg-gray-50 p-4 rounded-lg">
+                    <div class="bg-gray-50 p-4 rounded-lg" data-question="ox1">
                         <p class="mb-3 text-sm">1. 거북목 증후군은 컴퓨터를 오래 볼 때 생길 수 있다.</p>
                         <div class="flex gap-2">
-                            <button onclick="checkOX(this, true, 'ox1')" class="flex-1 bg-white border border-gray-300 py-2 rounded font-bold hover:bg-blue-50 text-blue-600">O</button>
-                            <button onclick="checkOX(this, false, 'ox1')" class="flex-1 bg-white border border-gray-300 py-2 rounded font-bold hover:bg-red-50 text-red-600">X</button>
+                            <button data-choice="O" onclick="checkOX(this, true, 'ox1')" class="flex-1 bg-white border border-gray-300 py-2 rounded font-bold hover:bg-blue-50 text-blue-600">O</button>
+                            <button data-choice="X" onclick="checkOX(this, false, 'ox1')" class="flex-1 bg-white border border-gray-300 py-2 rounded font-bold hover:bg-red-50 text-red-600">X</button>
                         </div>
-                        <p id="ox1-feedback" class="mt-2 text-sm text-center hidden"></p>
+                        <p id="ox1-feedback" data-feedback class="mt-2 text-sm text-center hidden"></p>
                     </div>
 
-                    <div class="bg-gray-50 p-4 rounded-lg">
+                    <div class="bg-gray-50 p-4 rounded-lg" data-question="ox2">
                         <p class="mb-3 text-sm">2. 스트레칭을 하루에 30분 이상 해야만 효과가 있다.</p>
                         <div class="flex gap-2">
-                            <button onclick="checkOX(this, false, 'ox2')" class="flex-1 bg-white border border-gray-300 py-2 rounded font-bold hover:bg-blue-50 text-blue-600">O</button>
-                            <button onclick="checkOX(this, true, 'ox2')" class="flex-1 bg-white border border-gray-300 py-2 rounded font-bold hover:bg-red-50 text-red-600">X</button>
+                            <button data-choice="O" onclick="checkOX(this, false, 'ox2')" class="flex-1 bg-white border border-gray-300 py-2 rounded font-bold hover:bg-blue-50 text-blue-600">O</button>
+                            <button data-choice="X" onclick="checkOX(this, true, 'ox2')" class="flex-1 bg-white border border-gray-300 py-2 rounded font-bold hover:bg-red-50 text-red-600">X</button>
                         </div>
-                        <p id="ox2-feedback" class="mt-2 text-sm text-center hidden"></p>
+                        <p id="ox2-feedback" data-feedback class="mt-2 text-sm text-center hidden"></p>
                     </div>
 
-                    <div class="bg-gray-50 p-4 rounded-lg">
+                    <div class="bg-gray-50 p-4 rounded-lg" data-question="ox3">
                         <p class="mb-3 text-sm">3. 스트레칭의 마지막 단계는 고개를 천천히 돌리는 것이다.</p>
                         <div class="flex gap-2">
-                            <button onclick="checkOX(this, true, 'ox3')" class="flex-1 bg-white border border-gray-300 py-2 rounded font-bold hover:bg-blue-50 text-blue-600">O</button>
-                            <button onclick="checkOX(this, false, 'ox3')" class="flex-1 bg-white border border-gray-300 py-2 rounded font-bold hover:bg-red-50 text-red-600">X</button>
+                            <button data-choice="O" onclick="checkOX(this, true, 'ox3')" class="flex-1 bg-white border border-gray-300 py-2 rounded font-bold hover:bg-blue-50 text-blue-600">O</button>
+                            <button data-choice="X" onclick="checkOX(this, false, 'ox3')" class="flex-1 bg-white border border-gray-300 py-2 rounded font-bold hover:bg-red-50 text-red-600">X</button>
                         </div>
-                        <p id="ox3-feedback" class="mt-2 text-sm text-center hidden"></p>
+                        <p id="ox3-feedback" data-feedback class="mt-2 text-sm text-center hidden"></p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Fill in the Blank -->
-        <section class="bg-white rounded-xl shadow-md p-6">
-            <h3 class="font-bold text-gray-800 text-lg mb-4"><i class="fas fa-pen mr-2 text-purple-500"></i>빈칸 채우기 (Điền vào chỗ trống)</h3>
+        <section class="bg-white rounded-xl shadow-md p-6" data-question="blank">
+            <h3 class="font-bold text-gray-800 text-lg mb-4"><i class="fas fa-pen mr-2 text-purple-500"></i>빈칸 채우기</h3>
             <div class="bg-purple-50 p-6 rounded-lg leading-loose text-gray-700">
                 <p>
                     먼저 두 손을 (
                     <select class="border-b-2 border-purple-300 bg-transparent focus:outline-none p-1" id="blank1" onchange="checkBlank()">
-                        <option value="">선택하세요</option>
-                        <option value="wrong">어깨</option>
-                        <option value="correct">허리</option>
-                        <option value="wrong">머리</option>
+                        <option value="" data-choice="blank1-empty">선택하세요</option>
+                        <option value="wrong" data-choice="blank1-shoulder">어깨</option>
+                        <option value="correct" data-choice="blank1-waist">허리</option>
+                        <option value="wrong" data-choice="blank1-head">머리</option>
                     </select>
                     )에 대고 몸을 뒤로 젖힙니다.
                     그다음에 오른손을 왼쪽 (
                     <select class="border-b-2 border-purple-300 bg-transparent focus:outline-none p-1" id="blank2" onchange="checkBlank()">
-                        <option value="">선택하세요</option>
-                        <option value="wrong">눈</option>
-                        <option value="wrong">코</option>
-                        <option value="correct">귀</option>
+                        <option value="" data-choice="blank2-empty">선택하세요</option>
+                        <option value="wrong" data-choice="blank2-eye">눈</option>
+                        <option value="wrong" data-choice="blank2-nose">코</option>
+                        <option value="correct" data-choice="blank2-ear">귀</option>
                     </select>
                     )에 대고 눌러 줍니다.
                 </p>
-                <div id="blank-feedback" class="mt-4 text-center font-bold text-purple-700 h-6"></div>
+                <div id="blank-feedback" data-feedback class="mt-4 text-center font-bold text-purple-700 h-6"></div>
             </div>
         </section>
 
@@ -252,36 +256,29 @@
 
     <script>
         const vocabData = [
-            { ko: '거북목 증후군', vn: 'Hội chứng cổ rùa' },
-            { ko: '자세', vn: 'Tư thế' },
-            { ko: '목뼈', vn: 'Xương cổ' },
-            { ko: '피곤해지다', vn: 'Trở nên mệt mỏi' },
-            { ko: '어깨', vn: 'Vai' },
-            { ko: '교정하다', vn: 'Chỉnh, sửa (tư thế)' },
-            { ko: '스트레칭', vn: 'Khởi động / Giãn cơ' },
-            { ko: '허리', vn: 'Eo / Thắt lưng' },
-            { ko: '젖히다', vn: 'Ngửa (người) ra sau' },
-            { ko: '고개', vn: 'Đầu / Cổ' },
-            { ko: '두통', vn: 'Đau đầu' },
-            { ko: '반복하다', vn: 'Lặp lại' },
+            '거북목 증후군',
+            '자세',
+            '목뼈',
+            '피곤해지다',
+            '어깨',
+            '교정하다',
+            '스트레칭',
+            '허리',
+            '젖히다',
+            '고개',
+            '두통',
+            '반복하다',
         ];
 
         const vocabContainer = document.getElementById('vocab-list');
-        vocabData.forEach(item => {
+        vocabData.forEach(word => {
             const card = document.createElement('div');
             card.className = 'vocab-card bg-gray-50 border border-gray-200 p-3 rounded-lg flex flex-col justify-center items-center text-center';
             card.innerHTML = `
-                <span class="text-lg font-bold text-orange-600 mb-1">${item.ko}</span>
-                <span class="text-gray-500 text-sm vn-text hidden-vietnamese">${item.vn}</span>
+                <span class="text-lg font-bold text-orange-600 mb-1">${word}</span>
             `;
             vocabContainer.appendChild(card);
         });
-
-        function toggleAllVietnamese() {
-            document.querySelectorAll('.vn-text').forEach(el => {
-                el.classList.toggle('hidden-vietnamese');
-            });
-        }
 
         function showVocab(word) {
             const section = document.getElementById('vocab-list');
@@ -290,7 +287,6 @@
                 if (card.innerText.includes(word)) {
                     card.style.backgroundColor = '#fef08a';
                     setTimeout(() => card.style.backgroundColor = '#f9fafb', 1500);
-                    card.querySelector('.vn-text').classList.remove('hidden-vietnamese');
                 }
             });
         }
@@ -304,11 +300,11 @@
             feedback.classList.remove('hidden', 'text-green-600', 'text-red-600');
             if (isCorrect) {
                 btn.classList.add('correct-answer');
-                feedback.innerText = "정답입니다! (Đúng rồi!)";
+                feedback.innerText = "정답입니다!";
                 feedback.classList.add('text-green-600');
             } else {
                 btn.classList.add('wrong-answer');
-                feedback.innerText = "다시 시도해보세요. (Thử lại nhé.)";
+                feedback.innerText = "다시 시도해보세요.";
                 feedback.classList.add('text-red-600');
             }
         }
@@ -328,10 +324,10 @@
             const feedback = document.getElementById(`${qId}-feedback`);
             feedback.classList.remove('hidden');
             if (isCorrect) {
-                feedback.innerText = "정답! (Đúng)";
+                feedback.innerText = "정답!";
                 feedback.className = "mt-2 text-sm text-center font-bold text-green-600";
             } else {
-                feedback.innerText = "오답! (Sai)";
+                feedback.innerText = "오답!";
                 feedback.className = "mt-2 text-sm text-center font-bold text-red-600";
             }
         }
@@ -341,7 +337,7 @@
             const b2 = document.getElementById('blank2').value;
             const feedback = document.getElementById('blank-feedback');
             if (b1 === 'correct' && b2 === 'correct') {
-                feedback.innerText = "모두 맞았습니다! 참 잘했어요. (Xuất sắc!)";
+                feedback.innerText = "모두 맞았습니다! 참 잘했어요.";
                 feedback.className = "mt-4 text-center font-bold text-green-600 h-6";
             } else if (b1 === '' || b2 === '') {
                 feedback.innerText = "";
@@ -352,9 +348,6 @@
         }
     </script>
     <script src="../shared/learning-enhancements.js"></script>
-    <script src="../shared/multilang-reading-data.js"></script>
-    <script src="../shared/multilang-page-scaffold.js"></script>
-    <script src="../shared/multilang-toggle.js"></script>
     <script src="../shared/site-copyright.js"></script>
     <script src="../shared/page-qr.js"></script>
 </body>

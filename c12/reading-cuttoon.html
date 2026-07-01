@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12과 읽기 컷툰 탐색 | 여러분의 목 건강은 어떠십니까?</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <style>
+        :root {
+            --bg: #f4f6f8;
+            --paper: #ffffff;
+            --ink: #172033;
+            --muted: #667085;
+            --line: #dbe3ea;
+            --line-strong: #b8c7d4;
+            --orange: #ea580c;
+            --orange-dark: #c2410c;
+            --orange-soft: #ffedd5;
+            --teal: #0f766e;
+            --teal-soft: #ccfbf1;
+            --blue-soft: #e0f2fe;
+            --rose: #be123c;
+            --rose-soft: #ffe4e6;
+            --shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans KR", system-ui, sans-serif;
+            color: var(--ink);
+            background:
+                linear-gradient(135deg, rgba(234, 88, 12, 0.1), transparent 32%),
+                linear-gradient(315deg, rgba(15, 118, 110, 0.1), transparent 38%),
+                var(--bg);
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 50px;
+            padding: 8px 16px;
+            border-bottom: 1px solid rgba(219, 227, 234, 0.92);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar a,
+        .topbar strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--orange-dark);
+            font-size: 0.92rem;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar > span {
+            color: #cbd5e1;
+            font-weight: 900;
+        }
+
+        .topbar strong {
+            min-width: 0;
+            overflow: hidden;
+            color: #334155;
+            text-overflow: ellipsis;
+        }
+
+        .shell {
+            width: min(1440px, calc(100% - 28px));
+            margin: 14px auto 34px;
+        }
+
+        .page-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--orange-dark);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            word-break: keep-all;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.7rem, 3.1vw, 3rem);
+            line-height: 1.1;
+        }
+
+        .head-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 34px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 0 11px;
+            background: rgba(255, 255, 255, 0.94);
+            color: #475569;
+            font-size: 0.86rem;
+            font-weight: 900;
+        }
+
+        .reader-app {
+            display: grid;
+            grid-template-columns: minmax(340px, 470px) minmax(0, 1fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .tool-pane {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: var(--shadow);
+        }
+
+        .visual-pane {
+            position: sticky;
+            top: 64px;
+            padding: 12px;
+        }
+
+        .cut-toolbar {
+            display: grid;
+            grid-template-columns: 40px minmax(0, 1fr) 40px;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--orange-dark);
+            font-weight: 900;
+        }
+
+        .icon-btn:hover,
+        .icon-btn:focus-visible {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.14);
+            outline: none;
+        }
+
+        .cut-title {
+            min-width: 0;
+            text-align: center;
+        }
+
+        .cut-title strong {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 1.02rem;
+        }
+
+        .cut-title span {
+            display: block;
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+
+        .stage {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            background: #f8fafc;
+            aspect-ratio: 1 / 1;
+        }
+
+        .stage img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-placeholder {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 28px;
+            text-align: center;
+            background:
+                linear-gradient(135deg, rgba(234, 88, 12, 0.09), transparent 48%),
+                linear-gradient(315deg, rgba(15, 118, 110, 0.11), transparent 52%),
+                #f8fafc;
+        }
+
+        .placeholder-inner {
+            display: grid;
+            gap: 8px;
+            max-width: 310px;
+        }
+
+        .placeholder-label {
+            display: inline-flex;
+            justify-self: center;
+            align-items: center;
+            min-height: 34px;
+            border-radius: 999px;
+            padding: 0 12px;
+            background: var(--orange);
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 900;
+        }
+
+        .placeholder-inner strong {
+            font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+            line-height: 1.25;
+        }
+
+        .placeholder-inner p {
+            margin: 0;
+            color: #526071;
+            line-height: 1.55;
+            font-weight: 700;
+        }
+
+        .cut-note {
+            display: grid;
+            gap: 8px;
+            min-height: 116px;
+            margin-top: 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 11px;
+            background: #fbfdfd;
+        }
+
+        .cut-note h2 {
+            margin: 0;
+            font-size: 0.96rem;
+        }
+
+        .cut-note p {
+            margin: 0;
+            color: #475569;
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+
+        .target-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .target-chip {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            border: 1px solid rgba(234, 88, 12, 0.14);
+            border-radius: 999px;
+            padding: 0 9px;
+            background: var(--orange-soft);
+            color: #7c2d12;
+            font-size: 0.8rem;
+            font-weight: 900;
+        }
+
+        button.target-chip:hover,
+        button.target-chip:focus-visible,
+        button.target-chip.is-active {
+            border-color: var(--orange);
+            background: #fed7aa;
+            outline: none;
+        }
+
+        .thumb-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 7px;
+            min-width: 0;
+            width: 100%;
+            max-width: 100%;
+            margin-top: 10px;
+        }
+
+        .thumb {
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 0;
+            background: #fff;
+            aspect-ratio: 1 / 1;
+        }
+
+        .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumb-badge {
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 23px;
+            height: 23px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.94);
+            color: #111827;
+            font-size: 0.72rem;
+            font-weight: 900;
+        }
+
+        .thumb-placeholder {
+            display: grid;
+            place-items: center;
+            gap: 3px;
+            width: 100%;
+            height: 100%;
+            padding: 8px;
+            background: #fff7ed;
+            color: var(--orange-dark);
+            text-align: center;
+        }
+
+        .thumb-placeholder b {
+            display: inline-grid;
+            place-items: center;
+            width: 25px;
+            height: 25px;
+            border-radius: 999px;
+            background: var(--orange);
+            color: #fff;
+            font-size: 0.78rem;
+        }
+
+        .thumb-placeholder span {
+            color: #64748b;
+            font-size: 0.68rem;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+
+        .thumb:hover,
+        .thumb:focus-visible,
+        .thumb.is-active {
+            border-color: var(--orange);
+            outline: none;
+        }
+
+        .text-pane {
+            min-width: 0;
+            padding: 18px;
+        }
+
+        .text-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .text-head h2 {
+            margin: 0;
+            font-size: clamp(1.35rem, 2.3vw, 2.1rem);
+        }
+
+        .text-head p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .text-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .progress-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 38px;
+            border-radius: 999px;
+            padding: 0 12px;
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .meaning-lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            max-width: min(100%, 360px);
+            border: 1px solid rgba(234, 88, 12, 0.16);
+            border-radius: 999px;
+            padding: 4px;
+            background: #fff;
+            color: var(--orange-dark);
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+        }
+
+        .meaning-lang__icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 26px;
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            background: #fff7ed;
+            color: var(--orange-dark);
+            font-size: 0.8rem;
+        }
+
+        .meaning-lang__options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .meaning-lang__option {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 34px;
+            min-height: 26px;
+            border: 0;
+            border-radius: 999px;
+            padding: 0 7px;
+            background: transparent;
+            color: var(--ink);
+            font-size: 0.72rem;
+            font-weight: 950;
+            line-height: 1;
+            letter-spacing: 0;
+        }
+
+        .meaning-lang__option:hover,
+        .meaning-lang__option:focus-visible {
+            background: #f1f5f9;
+            outline: none;
+        }
+
+        .meaning-lang__option.is-active {
+            background: #fed7aa;
+            color: #7c2d12;
+        }
+
+        .vocab-panel {
+            display: grid;
+            gap: 8px;
+            margin: 4px 0 14px;
+            padding: 12px;
+            border: 1px solid rgba(15, 118, 110, 0.18);
+            border-radius: 8px;
+            background:
+                linear-gradient(135deg, rgba(240, 253, 250, 0.95), rgba(255, 247, 237, 0.9)),
+                #fff;
+        }
+
+        .vocab-panel__head {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .vocab-panel__tag {
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(15, 118, 110, 0.1);
+            color: var(--teal);
+            font-size: 0.76rem;
+            font-weight: 900;
+        }
+
+        .vocab-panel h3,
+        .vocab-panel p {
+            margin: 0;
+        }
+
+        .vocab-panel h3 {
+            color: #111827;
+            font-size: 1.1rem;
+        }
+
+        .vocab-panel__meaning {
+            color: var(--ink);
+            font-weight: 700;
+            line-height: 1.55;
+        }
+
+        .vocab-panel__meaning[dir="rtl"] {
+            direction: rtl;
+            unicode-bidi: isolate;
+            text-align: left;
+        }
+
+        .vocab-panel__example {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: baseline;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .vocab-panel__example strong {
+            color: #92400e;
+            font-size: 0.86rem;
+        }
+
+        .passage {
+            display: grid;
+            gap: 18px;
+            font-size: clamp(1rem, 1.45vw, 1.17rem);
+            line-height: 2.02;
+        }
+
+        .passage-block {
+            display: grid;
+            gap: 8px;
+        }
+
+        .passage-block h3 {
+            margin: 0;
+            color: var(--orange-dark);
+            font-size: 1.05rem;
+        }
+
+        .passage-block p {
+            margin: 0;
+        }
+
+        .sentence {
+            border-radius: 6px;
+            padding: 2px 3px;
+            transition: background 0.18s ease, box-shadow 0.18s ease;
+            cursor: pointer;
+        }
+
+        .sentence:hover,
+        .sentence:focus-visible {
+            background: rgba(234, 88, 12, 0.1);
+            outline: none;
+        }
+
+        .sentence.is-active {
+            background: rgba(190, 18, 60, 0.1);
+            box-shadow: 0 0 0 2px rgba(190, 18, 60, 0.16);
+        }
+
+        .sentence-index {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 25px;
+            height: 25px;
+            margin-right: 5px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.76rem;
+            font-weight: 900;
+            line-height: 1;
+            vertical-align: 2px;
+        }
+
+        .text-target {
+            border-radius: 5px;
+            padding: 1px 4px;
+            background: #ffedd5;
+            color: #111827;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+            box-shadow: inset 0 -1px 0 rgba(234, 88, 12, 0.3);
+            cursor: pointer;
+            font-weight: 800;
+            transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .text-target:hover,
+        .text-target:focus-visible {
+            background: #fed7aa;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.22);
+        }
+
+        .text-target.is-active,
+        .text-target.is-vocab-active {
+            background: #fed7aa;
+            color: #111827;
+            box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.28);
+        }
+
+        @media (max-width: 980px) {
+            .reader-app {
+                grid-template-columns: 1fr;
+            }
+
+            .visual-pane {
+                position: static;
+            }
+
+            .text-head {
+                grid-template-columns: 1fr;
+            }
+
+            .text-actions {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                width: min(100% - 18px, 1440px);
+                margin-top: 10px;
+            }
+
+            .page-head {
+                align-items: start;
+                flex-direction: column;
+            }
+
+            .head-meta {
+                justify-content: flex-start;
+            }
+
+            .visual-pane,
+            .text-pane {
+                padding: 10px;
+            }
+
+            .thumb-grid {
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+                gap: 5px;
+            }
+
+            .meaning-lang {
+                border-radius: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="페이지 이동">
+        <a href="../index.html"><i class="fa-solid fa-house" aria-hidden="true"></i> 메인으로</a>
+        <span>|</span>
+        <a href="index.html"><i class="fa-solid fa-folder-open" aria-hidden="true"></i> 12과 홈</a>
+        <span>|</span>
+        <strong><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> 읽기 컷툰 탐색</strong>
+    </nav>
+
+    <main class="shell">
+        <header class="page-head">
+            <div>
+                <p class="eyebrow">C12 Reading Cuttoon</p>
+                <h1>여러분의 목 건강은 어떠십니까?</h1>
+            </div>
+            <div class="head-meta" aria-label="학습 정보">
+                <span class="pill"><i class="fa-solid fa-images" aria-hidden="true"></i><span id="cut-count-label">18컷</span></span>
+                <span class="pill"><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span id="progress-label">1 / 18</span></span>
+            </div>
+        </header>
+
+        <section class="reader-app" aria-label="12과 읽기 컷툰 탐색 앱">
+            <aside class="tool-pane visual-pane" aria-label="컷 이미지 탐색">
+                <div class="cut-toolbar">
+                    <button class="icon-btn" type="button" id="prev-cut" aria-label="이전 컷">
+                        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+                    </button>
+                    <div class="cut-title">
+                        <strong id="cut-title">컷 제목</strong>
+                        <span id="cut-subtitle">1 / 18</span>
+                    </div>
+                    <button class="icon-btn" type="button" id="next-cut" aria-label="다음 컷">
+                        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <figure class="stage" aria-label="현재 컷 이미지">
+                    <img id="cut-image" alt="">
+                    <figcaption class="image-placeholder" id="stage-placeholder" data-stage-placeholder hidden></figcaption>
+                </figure>
+
+                <section class="cut-note" aria-label="현재 컷 설명">
+                    <h2 id="active-label">대표 문장</h2>
+                    <p id="active-note">컷 설명이 여기에 표시됩니다.</p>
+                    <div class="target-chips" id="target-chips" aria-label="현재 컷 핵심어"></div>
+                </section>
+
+                <div class="thumb-grid" id="thumb-grid" aria-label="컷 목록"></div>
+            </aside>
+
+            <article class="tool-pane text-pane" aria-label="읽기 지문">
+                <div class="text-head">
+                    <div>
+                        <p class="eyebrow">Passage</p>
+                        <h2 id="passage-title">여러분의 목 건강은 어떠십니까?</h2>
+                        <p>문장이나 핵심 단어를 누르면 그림 컷과 뜻 설명이 함께 바뀝니다.</p>
+                    </div>
+                    <div class="text-actions">
+                        <span class="progress-badge"><i class="fa-solid fa-check" aria-hidden="true"></i> 문장 18개</span>
+                        <div class="meaning-lang" aria-label="뜻 번역 언어 선택">
+                            <span class="meaning-lang__icon"><i class="fa-solid fa-language" aria-hidden="true"></i></span>
+                            <div class="meaning-lang__options" id="meaning-lang-options"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="vocab-panel" aria-label="핵심 단어 설명">
+                    <div class="vocab-panel__head">
+                        <span class="vocab-panel__tag">Vocabulary Focus</span>
+                        <h3 id="vocab-word">핵심 단어</h3>
+                    </div>
+                    <p class="vocab-panel__meaning" id="vocab-meaning">강조된 단어를 선택하면 쉬운 뜻이 여기에 표시됩니다.</p>
+                    <p class="vocab-panel__example"><strong>예문</strong><span id="vocab-example">문장 속 핵심 단어를 눌러 보세요.</span></p>
+                </section>
+
+                <div class="passage" id="passage" aria-label="지문 본문"></div>
+            </article>
+        </section>
+    </main>
+
+    <script src="./reading-cuttoon-data.js"></script>
+    <script>
+        (function () {
+            const data = window.C12_READING_CUTTOON_DATA;
+            if (!data) {
+                document.body.innerHTML = "<main class=\"shell\"><p>읽기 컷툰 데이터를 불러오지 못했습니다.</p></main>";
+                return;
+            }
+
+            const MEANING_LANGS = [
+                { code: "none", label: "한국어", short: "ko", lang: "ko", dir: "ltr" },
+                { code: "en", label: "English", short: "en", lang: "en", dir: "ltr" },
+                { code: "vi", label: "Tiếng Việt", short: "vi", lang: "vi", dir: "ltr" },
+                { code: "mn", label: "Монгол", short: "mn", lang: "mn", dir: "ltr" },
+                { code: "ar", label: "العربية", short: "ar", lang: "ar", dir: "rtl" },
+                { code: "kk", label: "Қазақша", short: "kk", lang: "kk", dir: "ltr" },
+                { code: "th", label: "ไทย", short: "th", lang: "th", dir: "ltr" },
+            ];
+            const STORAGE_KEY = "preferred-lang";
+            const LEGACY_STORAGE_KEY = "c12-reading-cuttoon-meaning-lang";
+
+            const cutTitle = document.getElementById("cut-title");
+            const cutSubtitle = document.getElementById("cut-subtitle");
+            const cutImage = document.getElementById("cut-image");
+            const stagePlaceholder = document.getElementById("stage-placeholder");
+            const activeLabel = document.getElementById("active-label");
+            const activeNote = document.getElementById("active-note");
+            const targetChips = document.getElementById("target-chips");
+            const thumbGrid = document.getElementById("thumb-grid");
+            const passage = document.getElementById("passage");
+            const vocabWord = document.getElementById("vocab-word");
+            const vocabMeaning = document.getElementById("vocab-meaning");
+            const vocabExample = document.getElementById("vocab-example");
+            const meaningLangOptions = document.getElementById("meaning-lang-options");
+            const progressLabel = document.getElementById("progress-label");
+            const cutCountLabel = document.getElementById("cut-count-label");
+
+            const cutMap = new Map(data.cuts.map((cut) => [cut.id, cut]));
+            const sentenceMap = new Map(data.sentences.map((sentence) => [sentence.id, sentence]));
+            const vocabNotes = data.vocabNotes || {};
+            const vocabFocusIds = new Set(data.vocabFocusIds || []);
+            const segmentMap = new Map();
+
+            data.sentences.forEach((sentence) => {
+                sentence.segments.forEach((segment) => {
+                    if (segment.id && !segmentMap.has(segment.id)) {
+                        segmentMap.set(segment.id, { sentence, segment });
+                    }
+                });
+            });
+
+            let activeCutId = data.cuts[0].id;
+            let activeSentenceId = data.cuts[0].sentenceIds[0];
+            let activeVocabId = null;
+            let activeMeaningLang = normalizeMeaningLang(getStoredMeaningLang());
+            let activeTargets = new Set([activeSentenceId]);
+
+            function escapeHtml(value) {
+                return String(value)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            function getStoredMeaningLang() {
+                try {
+                    return localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY) || "none";
+                } catch (error) {
+                    return "none";
+                }
+            }
+
+            function setStoredMeaningLang(lang) {
+                try {
+                    localStorage.setItem(STORAGE_KEY, lang);
+                } catch (error) {
+                    /* localStorage can be unavailable in some classroom browsers. */
+                }
+            }
+
+            function normalizeMeaningLang(lang) {
+                return MEANING_LANGS.some((item) => item.code === lang) ? lang : "none";
+            }
+
+            function getMeaningLangMeta(lang) {
+                return MEANING_LANGS.find((item) => item.code === normalizeMeaningLang(lang)) || MEANING_LANGS[0];
+            }
+
+            function translateMeaning(note) {
+                const lang = normalizeMeaningLang(activeMeaningLang);
+                if (lang === "none") {
+                    return note.meaning || "";
+                }
+                return (note.meaningTranslations && note.meaningTranslations[lang]) || note.meaning || "";
+            }
+
+            function renderLanguageButtons() {
+                const activeMeta = getMeaningLangMeta(activeMeaningLang);
+                meaningLangOptions.innerHTML = MEANING_LANGS.map((lang) => `
+                    <button
+                        class="meaning-lang__option${lang.code === activeMeta.code ? " is-active" : ""}"
+                        type="button"
+                        aria-pressed="${lang.code === activeMeta.code}"
+                        aria-label="${escapeHtml(lang.label)} 의미 번역"
+                        title="${escapeHtml(lang.label)}"
+                        data-meaning-lang-option="${escapeHtml(lang.code)}"
+                        dir="${escapeHtml(lang.dir)}"
+                    >
+                        ${escapeHtml(lang.short)}
+                    </button>
+                `).join("");
+            }
+
+            function setMeaningLang(lang) {
+                activeMeaningLang = normalizeMeaningLang(lang);
+                setStoredMeaningLang(activeMeaningLang);
+                renderLanguageButtons();
+                renderVocabPanel();
+            }
+
+            function flattenSentence(sentence) {
+                return sentence.segments.map((segment) => segment.text).join("");
+            }
+
+            function getCutIndex(cutId) {
+                return Math.max(0, data.cuts.findIndex((cut) => cut.id === cutId));
+            }
+
+            function getActiveCut() {
+                return cutMap.get(activeCutId) || data.cuts[0];
+            }
+
+            function isFocusVocabId(vocabId) {
+                return Boolean(vocabId && vocabNotes[vocabId] && vocabFocusIds.has(vocabId));
+            }
+
+            function getVocabIdsForSentence(sentence) {
+                if (!sentence) {
+                    return [];
+                }
+                return sentence.segments
+                    .filter((segment) => isFocusVocabId(segment.id))
+                    .map((segment) => segment.id);
+            }
+
+            function getVocabIdsForCut(cut) {
+                if (!cut) {
+                    return [];
+                }
+                return cut.sentenceIds.flatMap((sentenceId) => getVocabIdsForSentence(sentenceMap.get(sentenceId)));
+            }
+
+            function getFirstVocabIdForCut(cut) {
+                const fromSentence = getVocabIdsForSentence(sentenceMap.get(activeSentenceId));
+                if (cut.sentenceIds.includes(activeSentenceId) && fromSentence.length) {
+                    return fromSentence[0];
+                }
+                const vocabIds = getVocabIdsForCut(cut);
+                return vocabIds[0] || null;
+            }
+
+            function cutHasVocab(cut, vocabId) {
+                return Boolean(vocabId && getVocabIdsForCut(cut).includes(vocabId));
+            }
+
+            function ensureActiveVocabForCut(cut) {
+                if (!activeVocabId || !cutHasVocab(cut, activeVocabId)) {
+                    activeVocabId = getFirstVocabIdForCut(cut);
+                }
+            }
+
+            function renderVocabPanel() {
+                const note = activeVocabId ? vocabNotes[activeVocabId] : null;
+                if (!note) {
+                    vocabWord.textContent = "핵심 단어";
+                    vocabMeaning.textContent = "선택한 단어의 쉬운 뜻이 여기에 표시됩니다.";
+                    vocabMeaning.setAttribute("lang", "ko");
+                    vocabMeaning.setAttribute("dir", "ltr");
+                    vocabExample.textContent = "문장 속 핵심 단어를 선택해 보세요.";
+                    return;
+                }
+
+                const segment = segmentMap.get(activeVocabId);
+                const meaningMeta = getMeaningLangMeta(activeMeaningLang);
+                vocabWord.textContent = note.word || (segment ? segment.segment.text : "핵심 단어");
+                vocabMeaning.textContent = translateMeaning(note);
+                vocabMeaning.setAttribute("lang", meaningMeta.lang);
+                vocabMeaning.setAttribute("dir", meaningMeta.dir);
+                vocabExample.textContent = note.example || "";
+            }
+
+            function setActiveVocab(vocabId) {
+                if (!vocabNotes[vocabId]) {
+                    return false;
+                }
+                activeVocabId = vocabId;
+                renderVocabPanel();
+                applyHighlights();
+                return true;
+            }
+
+            function setPlaceholderContent(node, cut) {
+                node.innerHTML = `
+                    <div class="placeholder-inner">
+                        <span class="placeholder-label">컷 ${escapeHtml(cut.label)}</span>
+                        <strong>${escapeHtml(cut.title)}</strong>
+                        <p>${escapeHtml(cut.image)} 파일을 찾으면 이 자리에 바로 표시됩니다.</p>
+                    </div>
+                `;
+            }
+
+            function applyImageState(imageNode, placeholderNode, hasLoaded) {
+                imageNode.hidden = !hasLoaded;
+                placeholderNode.hidden = hasLoaded;
+            }
+
+            function renderMedia(cut) {
+                const src = data.assetBase + cut.image;
+                cutImage.onload = () => applyImageState(cutImage, stagePlaceholder, true);
+                cutImage.onerror = () => applyImageState(cutImage, stagePlaceholder, false);
+                cutImage.alt = `${cut.label}번 컷, ${cut.title}`;
+                setPlaceholderContent(stagePlaceholder, cut);
+                applyImageState(cutImage, stagePlaceholder, true);
+                if (cutImage.getAttribute("src") !== src) {
+                    cutImage.src = src;
+                } else if (cutImage.complete) {
+                    applyImageState(cutImage, stagePlaceholder, cutImage.naturalWidth > 0);
+                }
+            }
+
+            function bindThumbImageState(thumbButton) {
+                const imageNode = thumbButton.querySelector("[data-thumb-img]");
+                const placeholderNode = thumbButton.querySelector("[data-thumb-placeholder]");
+                if (!imageNode || !placeholderNode) {
+                    return;
+                }
+                const sync = (hasLoaded) => {
+                    imageNode.hidden = !hasLoaded;
+                    placeholderNode.hidden = hasLoaded;
+                    thumbButton.classList.toggle("has-image", hasLoaded);
+                };
+                imageNode.addEventListener("load", () => sync(true), { once: true });
+                imageNode.addEventListener("error", () => sync(false), { once: true });
+                if (imageNode.complete) {
+                    sync(imageNode.naturalWidth > 0);
+                }
+            }
+
+            function renderSentence(sentence, index) {
+                const segments = sentence.segments.map((segment) => {
+                    if (!segment.id) {
+                        return escapeHtml(segment.text);
+                    }
+                    if (!isFocusVocabId(segment.id)) {
+                        return `<span class="text-segment" data-target-id="${escapeHtml(segment.id)}">${escapeHtml(segment.text)}</span>`;
+                    }
+
+                    const vocab = vocabNotes[segment.id];
+                    const vocabAttributes = ` data-vocab-id="${escapeHtml(segment.id)}" tabindex="0" aria-label="${escapeHtml((vocab.word || segment.text) + " 뜻과 예문")}"`;
+                    return `<span class="text-target" data-target-id="${escapeHtml(segment.id)}"${vocabAttributes}>${escapeHtml(segment.text)}</span>`;
+                }).join("");
+                return `<span class="sentence" role="button" tabindex="0" data-sentence data-sentence-id="${escapeHtml(sentence.id)}" data-target-id="${escapeHtml(sentence.id)}"><span class="sentence-index">${index + 1}</span>${segments}</span>`;
+            }
+
+            function renderPassage() {
+                let sentenceIndex = 0;
+                passage.innerHTML = data.passageLayout.map((block) => {
+                    const body = block.sentenceIds.map((id) => {
+                        const sentence = sentenceMap.get(id);
+                        const html = sentence ? renderSentence(sentence, sentenceIndex) : "";
+                        sentenceIndex += 1;
+                        return html;
+                    }).join(" ");
+                    return `
+                        <section class="passage-block">
+                            <h3>${escapeHtml(block.title)}</h3>
+                            <p>${body}</p>
+                        </section>
+                    `;
+                }).join("");
+            }
+
+            function renderThumbs() {
+                thumbGrid.innerHTML = data.cuts.map((cut) => `
+                    <button class="thumb" type="button" data-thumb data-cut-id="${escapeHtml(cut.id)}" aria-label="${escapeHtml(cut.label)}번 컷 ${escapeHtml(cut.title)}">
+                        <img data-thumb-img src="${escapeHtml(data.assetBase + cut.image)}" alt="" loading="eager" decoding="async">
+                        <span class="thumb-badge">${escapeHtml(cut.label)}</span>
+                    </button>
+                `).join("");
+                thumbGrid.querySelectorAll("[data-thumb]").forEach(bindThumbImageState);
+            }
+
+            function sentenceHasActiveSegment(sentence) {
+                return sentence.segments.some((segment) => segment.id && activeTargets.has(segment.id));
+            }
+
+            function applyHighlights() {
+                document.querySelectorAll(".sentence").forEach((node) => {
+                    const sentenceId = node.dataset.sentenceId;
+                    const sentence = sentenceMap.get(sentenceId);
+                    node.classList.toggle("is-active", activeTargets.has(sentenceId) || (sentence && sentenceHasActiveSegment(sentence)));
+                });
+
+                document.querySelectorAll(".text-target, .text-segment").forEach((node) => {
+                    node.classList.toggle("is-active", activeTargets.has(node.dataset.targetId));
+                    node.classList.toggle("is-vocab-active", node.dataset.vocabId === activeVocabId);
+                });
+
+                document.querySelectorAll(".thumb").forEach((node) => {
+                    node.classList.toggle("is-active", node.dataset.cutId === activeCutId);
+                });
+
+                document.querySelectorAll("[data-chip-vocab-id]").forEach((node) => {
+                    node.classList.toggle("is-active", node.dataset.chipVocabId === activeVocabId);
+                });
+            }
+
+            function getTargetTexts(cut) {
+                if (Array.isArray(cut.keywords)) {
+                    return cut.keywords;
+                }
+                return cut.sentenceIds
+                    .map((sentenceId) => sentenceMap.get(sentenceId))
+                    .filter(Boolean)
+                    .map(flattenSentence);
+            }
+
+            function renderTargetChips(cut) {
+                const vocabIds = getVocabIdsForCut(cut);
+                const vocabButtons = vocabIds.map((vocabId) => {
+                    const note = vocabNotes[vocabId];
+                    return `<button class="target-chip" type="button" data-chip-vocab-id="${escapeHtml(vocabId)}">${escapeHtml(note.word)}</button>`;
+                });
+                const keywordSpans = getTargetTexts(cut)
+                    .filter((keyword) => !vocabIds.some((vocabId) => vocabNotes[vocabId].word === keyword))
+                    .slice(0, 3)
+                    .map((keyword) => `<span class="target-chip">${escapeHtml(keyword)}</span>`);
+                targetChips.innerHTML = [...vocabButtons, ...keywordSpans].join("");
+            }
+
+            function renderCurrentCut() {
+                const cut = getActiveCut();
+                const cutIndex = getCutIndex(cut.id);
+                const sentence = sentenceMap.get(activeSentenceId) || sentenceMap.get(cut.sentenceIds[0]);
+
+                cutTitle.textContent = cut.title;
+                cutSubtitle.textContent = `${cutIndex + 1} / ${data.cuts.length}`;
+                progressLabel.textContent = `${cutIndex + 1} / ${data.cuts.length}`;
+                cutCountLabel.textContent = `${data.cuts.length}컷`;
+
+                renderMedia(cut);
+                activeLabel.textContent = sentence ? `문장 ${cutIndex + 1}` : "대표 문장";
+                activeNote.textContent = cut.note || (sentence ? flattenSentence(sentence) : "");
+                ensureActiveVocabForCut(cut);
+                renderTargetChips(cut);
+                renderVocabPanel();
+            }
+
+            function scrollToSentence(sentenceId) {
+                const node = document.querySelector(`.sentence[data-sentence-id="${sentenceId}"]`);
+                if (node) {
+                    node.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+            }
+
+            function setActiveTargets(cut, sentenceId) {
+                activeTargets = new Set([sentenceId || cut.sentenceIds[0]]);
+            }
+
+            function selectCut(cutId, options = {}) {
+                const cut = cutMap.get(cutId);
+                if (!cut) {
+                    return;
+                }
+                activeCutId = cut.id;
+                activeSentenceId = cut.sentenceIds[0];
+                setActiveTargets(cut, activeSentenceId);
+                if (options.vocabId && vocabNotes[options.vocabId]) {
+                    activeVocabId = options.vocabId;
+                } else {
+                    activeVocabId = getFirstVocabIdForCut(cut);
+                }
+                renderCurrentCut();
+                applyHighlights();
+                if (options.scrollText) {
+                    scrollToSentence(activeSentenceId);
+                }
+            }
+
+            function selectSentence(sentenceId, options = {}) {
+                const cut = data.cuts.find((item) => item.sentenceIds.includes(sentenceId));
+                if (!cut) {
+                    return;
+                }
+                activeCutId = cut.id;
+                activeSentenceId = sentenceId;
+                setActiveTargets(cut, sentenceId);
+                if (options.vocabId && vocabNotes[options.vocabId]) {
+                    activeVocabId = options.vocabId;
+                    activeTargets.add(options.vocabId);
+                } else {
+                    activeVocabId = getVocabIdsForSentence(sentenceMap.get(sentenceId))[0] || getFirstVocabIdForCut(cut);
+                }
+                renderCurrentCut();
+                applyHighlights();
+            }
+
+            function moveCut(delta) {
+                const currentIndex = getCutIndex(activeCutId);
+                const nextIndex = (currentIndex + delta + data.cuts.length) % data.cuts.length;
+                selectCut(data.cuts[nextIndex].id, { scrollText: true });
+            }
+
+            renderLanguageButtons();
+            renderPassage();
+            renderThumbs();
+            selectCut(activeCutId);
+
+            document.getElementById("prev-cut").addEventListener("click", () => moveCut(-1));
+            document.getElementById("next-cut").addEventListener("click", () => moveCut(1));
+
+            meaningLangOptions.addEventListener("click", (event) => {
+                const langButton = event.target.closest("[data-meaning-lang-option]");
+                if (langButton) {
+                    setMeaningLang(langButton.dataset.meaningLangOption);
+                    langButton.focus({ preventScroll: true });
+                }
+            });
+
+            thumbGrid.addEventListener("click", (event) => {
+                const thumbButton = event.target.closest("[data-cut-id]");
+                if (thumbButton) {
+                    selectCut(thumbButton.dataset.cutId, { scrollText: true });
+                }
+            });
+
+            targetChips.addEventListener("click", (event) => {
+                const chipButton = event.target.closest("[data-chip-vocab-id]");
+                if (chipButton) {
+                    setActiveVocab(chipButton.dataset.chipVocabId);
+                    chipButton.focus({ preventScroll: true });
+                }
+            });
+
+            passage.addEventListener("click", (event) => {
+                const vocabNode = event.target.closest("[data-vocab-id]");
+                if (vocabNode) {
+                    const sentenceNode = vocabNode.closest("[data-sentence-id]");
+                    if (sentenceNode) {
+                        selectSentence(sentenceNode.dataset.sentenceId, { vocabId: vocabNode.dataset.vocabId });
+                    } else {
+                        setActiveVocab(vocabNode.dataset.vocabId);
+                    }
+                    return;
+                }
+
+                const sentenceNode = event.target.closest("[data-sentence-id]");
+                if (sentenceNode) {
+                    selectSentence(sentenceNode.dataset.sentenceId);
+                }
+            });
+
+            passage.addEventListener("keydown", (event) => {
+                if (event.key !== "Enter" && event.key !== " ") {
+                    return;
+                }
+                const vocabNode = event.target.closest("[data-vocab-id]");
+                if (vocabNode) {
+                    event.preventDefault();
+                    const sentenceNode = vocabNode.closest("[data-sentence-id]");
+                    if (sentenceNode) {
+                        selectSentence(sentenceNode.dataset.sentenceId, { vocabId: vocabNode.dataset.vocabId });
+                    } else {
+                        setActiveVocab(vocabNode.dataset.vocabId);
+                    }
+                    return;
+                }
+
+                const sentenceNode = event.target.closest("[data-sentence-id]");
+                if (sentenceNode) {
+                    event.preventDefault();
+                    selectSentence(sentenceNode.dataset.sentenceId);
+                }
+            });
+
+            document.addEventListener("keydown", (event) => {
+                const tagName = document.activeElement ? document.activeElement.tagName : "";
+                if (tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT") {
+                    return;
+                }
+                if (event.key === "ArrowLeft") {
+                    moveCut(-1);
+                }
+                if (event.key === "ArrowRight") {
+                    moveCut(1);
+                }
+            });
+        })();
+    </script>
+    <script src="../shared/page-qr.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>
