@@ -9,6 +9,8 @@ const miniGamePages = [
 const supportPages = [
   ...miniGamePages,
   "grammar2-workbook-practice.html",
+  "grammar3-wb-practice.html",
+  "grammar4-wb-practice.html",
   "grammar1-2-speaking.html",
   "grammar1-3-quiz.html"
 ];
@@ -182,10 +184,10 @@ test.describe("c13 grammar support smoke interactions", () => {
 
     await page.locator('[data-stage="describe"]').click();
     await expect(page.locator('[data-guide-target="describe-cue"]')).toHaveClass(/guide-focus/);
-    await page.locator("#describeInput").fill("감색 양복을 입고 은색 넥타이를 매고 있는 사람이 신랑이에요.");
+    await page.locator("#describeInput").fill("넥타이가 멋진 사람이 신랑인 것 같아요.");
     await expect(page.locator("#checkDescribeBtn")).toHaveClass(/guide-focus/);
     await page.locator("#checkDescribeBtn").click();
-    await expect(page.locator("#describeFeedback")).toContainText("좋아요");
+    await expect(page.locator("#describeFeedback")).toContainText("예시 답안");
     await expect(page.locator("#nextDescribeBtn")).toHaveClass(/guide-focus/, { timeout: 2500 });
 
     await page.locator('[data-stage="dialogue"]').click();

@@ -62,18 +62,19 @@ test.describe("c13 grammar1 WB practice", () => {
     await expect(page.locator("#dialogueGuideTitle")).toContainText("빈칸 입력");
     await expect(page.locator("#dialogueInput")).toHaveClass(/is-guide-target/);
     const dialogueAnswers = [
-      "모자랄까 봐서요",
-      "필요할까 봐서요",
-      "못 일어날까 봐서요",
-      "배탈이 날까 봐서요",
-      "실수할까 봐"
+      "나중에 돈 때문에 힘들까 봐서요",
+      "모르는 단어가 나올까 봐서요",
+      "회의에 늦을까 봐서요",
+      "몸이 안 좋아질까 봐서요",
+      "준비가 부족할까 봐"
     ];
 
     for (let index = 0; index < dialogueAnswers.length; index += 1) {
       await page.locator("#dialogueInput").fill(dialogueAnswers[index]);
       await expect(page.locator("#dialogueCheck")).toHaveClass(/is-guide-target/);
       await page.locator("#dialogueForm button").click();
-      await expect(page.locator("#dialogueFeedback")).toHaveClass(/ok/);
+      await expect(page.locator("#dialogueFeedback")).toContainText("예시 답안");
+      await expect(page.locator("#dialogueNext")).toBeEnabled();
       if (index < dialogueAnswers.length - 1) {
         await expect(page.locator("#dialogueNext")).toHaveClass(/is-guide-target/);
         await page.locator("#dialogueNext").click();

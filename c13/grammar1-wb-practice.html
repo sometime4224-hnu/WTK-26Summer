@@ -778,8 +778,8 @@
             <div class="stage-head">
                 <div>
                     <p class="eyebrow">Stage 2</p>
-                    <h2>대답을 `-(으)ㄹ까 봐서요`로 완성하세요</h2>
-                    <p>상대가 “왜요?”라고 묻는 상황에서 걱정되는 결과를 짧게 답합니다.</p>
+                    <h2>대답을 `-(으)ㄹ까 봐서요`로 만들어 보세요</h2>
+                    <p>상대가 “왜요?”라고 묻는 상황에서 가능한 걱정 표현을 쓰고 예시 답안과 비교합니다.</p>
                 </div>
                 <span id="dialogueStatus" class="status-pill">1 / 5</span>
             </div>
@@ -788,7 +788,7 @@
                 <span id="dialogueGuideStep" class="guide-step">1</span>
                 <div class="guide-copy">
                     <strong id="dialogueGuideTitle">빈칸 입력</strong>
-                    <span id="dialogueGuideText">걱정되는 결과를 `-(으)ㄹ까 봐서요`로 쓰세요.</span>
+                    <span id="dialogueGuideText">가능한 걱정 표현을 `-(으)ㄹ까 봐서요`로 쓰세요.</span>
                 </div>
                 <div class="guide-flow" aria-hidden="true">
                     <span class="guide-dot is-active" data-dialogue-guide-dot="1"></span>
@@ -805,9 +805,9 @@
                 <article class="type-card">
                     <form id="dialogueForm" class="answer-form">
                         <input id="dialogueInput" type="text" autocomplete="off" placeholder="예: 늦을까 봐서요" />
-                        <button id="dialogueCheck" class="btn primary" type="submit">확인</button>
+                        <button id="dialogueCheck" class="btn primary" type="submit">예시 보기</button>
                     </form>
-                    <div id="dialogueFeedback" class="feedback">빈칸에 알맞은 걱정 표현을 입력하세요.</div>
+                    <div id="dialogueFeedback" class="feedback">답을 쓴 뒤 예시 답안과 비교하세요.</div>
                     <div class="button-row">
                         <button id="dialogueNext" class="btn secondary" type="button" disabled>다음</button>
                     </div>
@@ -910,35 +910,30 @@
                 a: "왜 그렇게 돈을 아껴 써요?",
                 b: "돈을 아끼지 않으면 나중에 ________.",
                 answer: "모자랄까 봐서요",
-                accepted: ["모자랄까 봐서요", "돈이 모자랄까 봐서요", "모자랄까 봐요", "돈이 모자랄까 봐요"],
                 explain: "나중에 돈이 부족할 가능성을 걱정해서 아껴 쓰는 상황입니다."
             },
             {
                 a: "왜 항상 사전을 가지고 다녀요?",
                 b: "한국어 신문을 읽을 때 ________.",
                 answer: "필요할까 봐서요",
-                accepted: ["필요할까 봐서요", "사전이 필요할까 봐서요", "필요할까 봐요", "사전이 필요할까 봐요"],
                 explain: "신문을 읽다가 사전이 필요할 가능성을 미리 생각한 답입니다."
             },
             {
                 a: "왜 알람을 여러 개 맞춰요?",
                 b: "아침 회의가 있어서 ________.",
                 answer: "못 일어날까 봐서요",
-                accepted: ["못 일어날까 봐서요", "아침에 못 일어날까 봐서요", "못 일어날까 봐요", "아침에 못 일어날까 봐요"],
                 explain: "아침에 일어나지 못할 가능성이 걱정되는 상황입니다."
             },
             {
                 a: "아이스크림을 좋아하는데 왜 조금만 먹어요?",
                 b: "너무 많이 먹으면 ________.",
                 answer: "배탈이 날까 봐서요",
-                accepted: ["배탈이 날까 봐서요", "배탈 날까 봐서요", "배탈이 날까 봐요", "배탈 날까 봐요"],
                 explain: "먹은 뒤 몸에 문제가 생길까 걱정해서 양을 조절합니다."
             },
             {
                 a: "행사 준비는 잘돼 가요?",
                 b: "열심히 준비했지만 ________ 걱정이에요.",
                 answer: "실수할까 봐",
-                accepted: ["실수할까 봐", "실수할까봐"],
                 explain: "행사에서 실수할 가능성을 걱정하는 말입니다."
             }
         ];
@@ -1119,12 +1114,12 @@
             }
 
             if (refs.dialogueInput.value.trim()) {
-                setGuide("dialogue", 2, "정답 확인", "쓴 표현을 바로 확인하세요.");
+                setGuide("dialogue", 2, "예시 확인", "쓴 표현을 예시 답안과 비교하세요.");
                 setGuideTarget("#dialogueCheck");
                 return;
             }
 
-            setGuide("dialogue", 1, "빈칸 입력", "걱정되는 결과를 `-(으)ㄹ까 봐서요`로 쓰세요.");
+            setGuide("dialogue", 1, "빈칸 입력", "가능한 걱정 표현을 `-(으)ㄹ까 봐서요`로 쓰세요.");
             setGuideTarget("#dialogueInput");
         }
 
@@ -1256,7 +1251,7 @@
             refs.dialogueForm.querySelector("button").disabled = false;
             refs.dialogueNext.disabled = true;
             refs.dialogueFeedback.className = "feedback";
-            refs.dialogueFeedback.textContent = "빈칸에 알맞은 걱정 표현을 입력하세요.";
+            refs.dialogueFeedback.textContent = "답을 쓴 뒤 예시 답안과 비교하세요.";
             updateOverallProgress();
             updateVisualGuide();
         }
@@ -1267,21 +1262,15 @@
             event.preventDefault();
             const item = dialogueItems[state.dialogueIndex];
             const value = refs.dialogueInput.value.trim();
-            const isCorrect = item.accepted.some((answer) => normalize(answer) === normalize(value));
             if (!value) return;
 
-            if (isCorrect) {
-                state.completedDialogues.add(state.dialogueIndex);
-                refs.dialogueFeedback.className = "feedback ok";
-                refs.dialogueFeedback.innerHTML = `<strong>정답:</strong> ${escapeHtml(item.answer)}<br>${escapeHtml(item.explain)}`;
-                refs.dialogueInput.disabled = true;
-                refs.dialogueForm.querySelector("button").disabled = true;
-                refs.dialogueNext.disabled = false;
-                updateOverallProgress();
-            } else {
-                refs.dialogueFeedback.className = "feedback bad";
-                refs.dialogueFeedback.textContent = "걱정되는 결과를 `-(으)ㄹ까 봐서요` 형태로 다시 써 보세요.";
-            }
+            state.completedDialogues.add(state.dialogueIndex);
+            refs.dialogueFeedback.className = "feedback";
+            refs.dialogueFeedback.innerHTML = `<strong>예시 답안:</strong> ${escapeHtml(item.answer)}<br>${escapeHtml(item.explain)}<br><span>쓴 답이 예시와 달라도 상황에 맞으면 사용할 수 있어요.</span>`;
+            refs.dialogueInput.disabled = true;
+            refs.dialogueForm.querySelector("button").disabled = true;
+            refs.dialogueNext.disabled = false;
+            updateOverallProgress();
             updateVisualGuide();
         });
 
@@ -1293,7 +1282,7 @@
                 return;
             }
             refs.dialogueFeedback.className = "feedback ok";
-            refs.dialogueFeedback.textContent = "대화 완성 완료입니다. 문맥 빈칸으로 넘어가세요.";
+            refs.dialogueFeedback.textContent = "대화 예시 확인 완료입니다. 문맥 빈칸으로 넘어가세요.";
             refs.dialogueNext.disabled = true;
             updateVisualGuide();
         });

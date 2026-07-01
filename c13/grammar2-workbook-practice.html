@@ -1124,14 +1124,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="flow-control" aria-label="정답 후 진행 방식">
+                <div class="flow-control" aria-label="확인 후 진행 방식">
                     <p class="progress-title">진행 방식</p>
-                    <div class="flow-toggle" role="group" aria-label="정답 후 진행 방식 선택">
+                    <div class="flow-toggle" role="group" aria-label="확인 후 진행 방식 선택">
                         <button type="button" data-flow-mode="auto" aria-pressed="false">자동</button>
                         <button type="button" data-flow-mode="slow" aria-pressed="true">천천히</button>
                         <button type="button" data-flow-mode="manual" aria-pressed="false">수동</button>
                     </div>
-                    <p id="flowModeHint" class="flow-hint">정답 피드백을 잠깐 보고 다음으로 이동합니다.</p>
+                    <p id="flowModeHint" class="flow-hint">피드백을 잠깐 보고 다음으로 이동합니다.</p>
                 </div>
                 <div class="mini-rule">
                     <strong>핵심 형태</strong>
@@ -1217,7 +1217,6 @@
                     image: `${IMAGE_BASE}s01_bl_n15.webp`,
                     alt: "넥타이를 맨 사람",
                     tokens: ["감색 양복을", "입고", "은색 넥타이를", "매고 있는", "사람이", "신랑이에요."],
-                    required: ["양복을입고", "넥타이를매고있는", "신랑"],
                     model: "감색 양복을 입고 은색 넥타이를 매고 있는 사람이 신랑이에요."
                 },
                 {
@@ -1226,7 +1225,6 @@
                     image: `${IMAGE_BASE}s05_tl_n17.webp`,
                     alt: "귀고리를 한 사람",
                     tokens: ["분홍색 한복을", "입고", "진주 귀고리를", "하고 있는", "분이", "어머니예요."],
-                    required: ["한복을입고", "귀고리를하고있는", "어머니"],
                     model: "분홍색 한복을 입고 진주 귀고리를 하고 있는 분이 어머니예요."
                 },
                 {
@@ -1235,7 +1233,6 @@
                     image: `${IMAGE_BASE}s05_tr_n18.webp`,
                     alt: "시계를 찬 사람",
                     tokens: ["회색 재킷을", "입고", "손목시계를", "차고 있는", "분이", "아버지예요."],
-                    required: ["재킷을입고", "시계를차고있는", "아버지"],
                     model: "회색 재킷을 입고 손목시계를 차고 있는 분이 아버지예요."
                 },
                 {
@@ -1244,7 +1241,6 @@
                     image: `${IMAGE_BASE}s05_bl_n19.webp`,
                     alt: "가방을 든 사람",
                     tokens: ["꽃무늬 원피스를", "입고", "작은 가방을", "들고 있는", "사람이", "누나예요."],
-                    required: ["원피스를입고", "가방을들고있는", "누나"],
                     model: "꽃무늬 원피스를 입고 작은 가방을 들고 있는 사람이 누나예요."
                 },
                 {
@@ -1253,7 +1249,6 @@
                     image: `${IMAGE_BASE}s05_br_n20.webp`,
                     alt: "배낭을 멘 사람",
                     tokens: ["파란 셔츠를", "입고", "검은 배낭을", "메고 있는", "사람이", "동생이에요."],
-                    required: ["셔츠를입고", "배낭을메고있는", "동생"],
                     model: "파란 셔츠를 입고 검은 배낭을 메고 있는 사람이 동생이에요."
                 },
                 {
@@ -1262,7 +1257,6 @@
                     image: `${IMAGE_BASE}s01_br_n16.webp`,
                     alt: "반지를 낀 사람",
                     tokens: ["깔끔한 옷을", "차려입고", "작은 반지를", "끼고 있는", "아이가", "조카예요."],
-                    required: ["옷을차려입고", "반지를끼고있는", "조카"],
                     model: "깔끔한 옷을 차려입고 작은 반지를 끼고 있는 아이가 조카예요."
                 }
             ],
@@ -1317,12 +1311,12 @@
             auto: {
                 label: "자동",
                 delay: 1200,
-                hint: "정답이면 빠르게 다음 문제로 넘어갑니다."
+                hint: "확인하면 빠르게 다음 문제로 넘어갑니다."
             },
             slow: {
                 label: "천천히",
                 delay: 2400,
-                hint: "정답 피드백을 잠깐 보고 다음으로 이동합니다."
+                hint: "피드백을 잠깐 보고 다음으로 이동합니다."
             },
             manual: {
                 label: "수동",
@@ -1515,12 +1509,12 @@
                         </div>
                         <textarea id="describeInput" class="sentence-input" data-guide-target="describe-input" placeholder="예: 감색 양복을 입고 은색 넥타이를 매고 있는 사람이 신랑이에요." spellcheck="false"></textarea>
                         <div class="action-row">
-                            <button type="button" id="checkDescribeBtn" class="primary-button" data-guide-target="describe-check">문장 확인</button>
-                            <button type="button" id="modelDescribeBtn" class="ghost-button">모범 문장</button>
+                            <button type="button" id="checkDescribeBtn" class="primary-button" data-guide-target="describe-check">예시 확인</button>
+                            <button type="button" id="modelDescribeBtn" class="ghost-button">예시 문장</button>
                             <button type="button" id="clearDescribeBtn" class="ghost-button">지우기</button>
                             <button type="button" id="nextDescribeBtn" class="ghost-button" data-guide-target="describe-next">${nextLabel}</button>
                         </div>
-                        <div id="describeFeedback" class="feedback is-hint" data-guide-target="describe-feedback">단서 두 개와 사람 이름이 모두 들어가면 정답으로 인정됩니다.</div>
+                        <div id="describeFeedback" class="feedback is-hint" data-guide-target="describe-feedback">문장을 쓴 뒤 예시 답안과 비교하세요. 다른 표현도 가능합니다.</div>
                         <div id="describeAdvance" class="advance-panel hidden" aria-live="polite"></div>
                     </div>
                 </div>
@@ -1541,7 +1535,7 @@
             document.getElementById("clearDescribeBtn").addEventListener("click", () => {
                 clearAutoAdvance();
                 document.getElementById("describeInput").value = "";
-                setFeedback("describeFeedback", "is-hint", "단서 두 개와 사람 이름이 모두 들어가면 정답으로 인정됩니다.");
+                setFeedback("describeFeedback", "is-hint", "문장을 쓴 뒤 예시 답안과 비교하세요. 다른 표현도 가능합니다.");
                 scheduleDescribeGuide();
             });
             document.getElementById("nextDescribeBtn").addEventListener("click", nextDescribe);
@@ -1563,46 +1557,41 @@
         function checkDescribe() {
             const task = DATA.describe[state.describeIndex];
             const input = document.getElementById("describeInput");
-            const value = normalize(input.value);
-            const missing = task.required.filter((piece) => !value.includes(normalize(piece)));
             if (!input.value.trim()) {
                 clearAutoAdvance();
-                setFeedback("describeFeedback", "is-wrong", "먼저 문장을 한 번 만들어 보세요.");
+                setFeedback("describeFeedback", "is-hint", "먼저 문장을 한 번 만들어 보거나 예시 문장을 확인하세요.");
                 focusGuide('[data-guide-target="describe-input"]', "3 입력", 2);
                 return;
             }
-            if (missing.length === 0) {
-                state.describeDone[state.describeIndex] = true;
-                const nextLabel = describeNextLabel();
-                const nextDestination = describeNextDestination();
-                setFeedback("describeFeedback", "is-correct", `<b>좋아요.</b> 착용 단서와 사람 이름이 모두 들어갔어요.`);
-                prepareNowButton("nextDescribeBtn", `지금 ${nextLabel}`);
-                updateMeters();
-                startAutoAdvance({
-                    key: `describe-${state.describeIndex}`,
-                    panelId: "describeAdvance",
-                    nextButtonId: "nextDescribeBtn",
-                    destination: nextDestination,
-                    nowText: `지금 ${nextLabel}`,
-                    onNext: nextDescribe
-                });
-                runGuideSequence([
-                    { selector: '[data-guide-target="describe-feedback"]', label: "피드백", index: 3, delay: 40 },
-                    { selector: '[data-guide-target="describe-next"]', label: "5 다음", index: 4, delay: 850 }
-                ]);
-                return;
-            }
-            clearAutoAdvance();
-            setFeedback("describeFeedback", "is-wrong", `아직 단서가 부족해요. <b>${esc(task.cue)}</b>와 <b>${esc(task.person)}</b>를 모두 넣어 보세요.`);
-            focusGuide('[data-guide-target="describe-feedback"]', "다시 확인", 3);
+            completeDescribeWithExample(task);
         }
 
         function showDescribeModel() {
             clearAutoAdvance();
             const task = DATA.describe[state.describeIndex];
             document.getElementById("describeInput").value = task.model;
-            setFeedback("describeFeedback", "is-hint", `<b>모범 문장:</b> ${esc(task.model)}`);
-            focusGuide('[data-guide-target="describe-check"]', "4 확인", 3);
+            completeDescribeWithExample(task);
+        }
+
+        function completeDescribeWithExample(task) {
+            state.describeDone[state.describeIndex] = true;
+            const nextLabel = describeNextLabel();
+            const nextDestination = describeNextDestination();
+            setFeedback("describeFeedback", "is-hint", `<b>예시 답안:</b> ${esc(task.model)}<br><span>쓴 답이 예시와 달라도 단서와 상황이 맞으면 사용할 수 있어요.</span>`);
+            prepareNowButton("nextDescribeBtn", `지금 ${nextLabel}`);
+            updateMeters();
+            startAutoAdvance({
+                key: `describe-${state.describeIndex}`,
+                panelId: "describeAdvance",
+                nextButtonId: "nextDescribeBtn",
+                destination: nextDestination,
+                nowText: `지금 ${nextLabel}`,
+                onNext: nextDescribe
+            });
+            runGuideSequence([
+                { selector: '[data-guide-target="describe-feedback"]', label: "예시", index: 3, delay: 40 },
+                { selector: '[data-guide-target="describe-next"]', label: "5 다음", index: 4, delay: 850 }
+            ]);
         }
 
         function nextDescribe() {
@@ -1724,13 +1713,13 @@
             clearAutoAdvance();
             state.stage = "dialogue";
             const describeCount = state.describeDone.filter(Boolean).length;
-            const total = DATA.match.length + DATA.describe.length + DATA.dialogue.length;
-            const score = state.matchCorrect + describeCount + state.dialogueCorrect;
+            const total = DATA.match.length + DATA.dialogue.length;
+            const score = state.matchCorrect + state.dialogueCorrect;
             app.innerHTML = `
                 <div class="summary-panel">
                     <div class="summary-score">
                         <strong>${score} / ${total}</strong>
-                        <span>표현 ${state.matchCorrect}/${DATA.match.length} · 묘사 ${describeCount}/${DATA.describe.length} · 대화 ${state.dialogueCorrect}/${DATA.dialogue.length}</span>
+                        <span>표현 ${state.matchCorrect}/${DATA.match.length} · 묘사 예시 ${describeCount}/${DATA.describe.length} · 대화 ${state.dialogueCorrect}/${DATA.dialogue.length}</span>
                     </div>
                     <div class="action-row" style="justify-content:center">
                         <button type="button" id="restartWorkbookBtn" class="primary-button">처음부터 다시</button>
