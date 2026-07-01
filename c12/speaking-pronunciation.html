@@ -10,11 +10,19 @@
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>12과 말하기 발음 연습 | 건강과 동작</title>
+    <title>12과 말하기 발음 PRO | 건강과 동작</title>
     <script src="https://cdn.tailwindcss.com" defer></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <style>
-        body { margin: 0; font-family: 'Noto Sans KR', sans-serif; background: linear-gradient(180deg, #f0f4ff 0%, #f8fafc 100%); }
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(180deg, #f0f4ff 0%, #f8fafc 100%);
+        }
+        .hidden { display: none !important; }
         .safe { word-break: keep-all; overflow-wrap: break-word; }
 
         .c12-nav {
@@ -27,9 +35,70 @@
 
         .progress-fill { transition: width 0.5s ease; }
 
+        .pronunciation-shell {
+            width: min(100% - 24px, 960px);
+            margin: 0 auto;
+            padding: clamp(12px, 2.4vw, 24px) 0 48px;
+        }
+
         .scene-card {
             background: white; border: 1px solid #e2e8f0;
             border-radius: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            scroll-margin-top: 64px;
+        }
+
+        .pronunciation-shell .scene-card {
+            padding: clamp(16px, 2.8vw, 24px) !important;
+        }
+
+        .pronunciation-hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: start;
+        }
+
+        .pronunciation-hero__icon {
+            font-size: clamp(2rem, 5vw, 3rem);
+            line-height: 1;
+        }
+
+        #mainArea {
+            display: grid;
+            gap: clamp(12px, 2vw, 18px);
+        }
+
+        .stage-meta,
+        .step-indicator,
+        #stepPanel,
+        #resultPanel {
+            min-width: 0;
+        }
+
+        .dialogue-card,
+        .step-panel-card {
+            margin-bottom: 0 !important;
+        }
+
+        .step-indicator {
+            margin-bottom: 0 !important;
+        }
+
+        .step-guide {
+            padding: 12px 14px;
+        }
+
+        .step-guide-item {
+            display: grid;
+            grid-template-columns: 22px minmax(0, 1fr);
+            align-items: start;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .step-guide-item p {
+            margin: 0;
+            min-width: 0;
         }
 
         .gram-tag-g2 { background: #dbeafe; color: #1e40af; }
@@ -47,13 +116,82 @@
         .hl-g2 { color: #1d4ed8; font-weight: 700; background: #dbeafe; border-radius: 4px; padding: 0 3px; }
         .hl-g3 { color: #6d28d9; font-weight: 700; background: #ede9fe; border-radius: 4px; padding: 0 3px; }
 
-        /* 베트남어 안내 공통 스타일 */
-        .vi-guide {
+        /* 다국어 도움말 */
+        .lang-guide {
             color: #6366f1;
             font-size: 11.5px;
             line-height: 1.6;
         }
-        .vi-badge {
+
+        .lang-guide:empty,
+        .lang-inline:empty {
+            display: none !important;
+        }
+
+        .lang-inline {
+            color: #6366f1;
+            font-size: 11.5px;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .lang-guide[dir="rtl"],
+        .lang-inline[dir="rtl"] {
+            direction: rtl;
+            unicode-bidi: isolate;
+            text-align: right;
+        }
+
+        .lang-selector {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 8px;
+            border-radius: 16px;
+            border: 1px solid #dbeafe;
+            background: #f8fbff;
+            padding: 10px;
+        }
+
+        .lang-selector__eyebrow {
+            margin: 0;
+            color: #334155;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .lang-selector__status {
+            margin: 2px 0 0;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .lang-selector__bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .lang-btn {
+            min-height: 30px;
+            border: 1.5px solid #dbeafe;
+            border-radius: 999px;
+            background: #fff;
+            color: #475569;
+            padding: 0 10px;
+            font-size: 11px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .lang-btn.is-active {
+            border-color: #6366f1;
+            background: #eef2ff;
+            color: #4338ca;
+            box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+        }
+
+        .lang-badge {
             display: inline-flex; align-items: center; gap: 3px;
             background: #eef2ff; border: 1px solid #c7d2fe;
             border-radius: 6px; padding: 1px 6px;
@@ -64,10 +202,6 @@
         .step-guide {
             background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
             border: 1px solid #c7d2fe; border-radius: 16px;
-            padding: 14px 16px;
-        }
-        .step-guide-item {
-            display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px;
         }
         .step-guide-item:last-child { margin-bottom: 0; }
         .step-num {
@@ -136,6 +270,70 @@
         @keyframes glow-next  { 0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,.75)} 50%{box-shadow:0 0 0 13px rgba(37,99,235,0)} }
         @keyframes scale-up   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.035)} }
         .anim-next { animation: glow-next .9s ease-in-out 4, scale-up .9s ease-in-out 4; }
+
+        @media (min-width: 700px) and (orientation: portrait), (min-width: 900px) {
+            .lang-selector {
+                grid-template-columns: minmax(0, 180px) minmax(0, 1fr);
+                align-items: center;
+            }
+
+            #mainArea {
+                grid-template-columns: minmax(0, 1fr) minmax(320px, 0.92fr);
+                align-items: start;
+            }
+
+            .stage-meta {
+                grid-column: 1 / -1;
+                grid-row: 1;
+            }
+
+            .step-indicator {
+                grid-column: 1 / -1;
+                grid-row: 2;
+            }
+
+            .dialogue-card {
+                grid-column: 1;
+                grid-row: 3;
+            }
+
+            #stepPanel {
+                grid-column: 2;
+                grid-row: 3;
+            }
+
+            #resultPanel {
+                grid-column: 1 / -1;
+                grid-row: 3;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .c12-nav {
+                gap: 7px;
+                padding-left: max(8px, env(safe-area-inset-left));
+                padding-right: max(8px, env(safe-area-inset-right));
+            }
+
+            .pronunciation-shell {
+                width: min(100% - 20px, 430px);
+                padding-top: 10px;
+                padding-bottom: 32px;
+            }
+
+            .pronunciation-shell .scene-card {
+                border-radius: 18px;
+                padding: 16px !important;
+            }
+
+            .step-guide {
+                padding: 11px 12px;
+            }
+
+            .btn-primary {
+                padding: 12px 14px;
+            }
+        }
     </style>
         <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
@@ -150,22 +348,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <span class="text-slate-300 font-bold">|</span>
     <a href="index.html">12과</a>
     <span class="text-slate-300 font-bold">|</span>
-    <span class="text-slate-600 font-bold text-sm">말하기 연습</span>
+    <span class="text-slate-600 font-bold text-sm">발음 PRO</span>
     <span id="completeBadge" class="hidden ml-auto text-xs font-bold px-2.5 py-1 rounded-full bg-green-100 text-green-700 border border-green-300 flex-shrink-0">👍 완료됨</span>
 </nav>
 
-<main class="max-w-md mx-auto px-4 pt-4 pb-12">
+<main class="pronunciation-shell" data-multilang-scaffold="auto">
 
     <!-- 헤더 -->
     <div class="scene-card p-5 mb-4">
-        <div class="flex items-start justify-between gap-3">
+        <div class="pronunciation-hero">
             <div>
-                <p class="text-xs font-bold text-indigo-600 mb-0.5">12과 말하기 · 발음 연습</p>
-                <h1 class="text-xl font-black text-slate-800 leading-snug safe">건강과 동작 주제로<br>말하기 연습</h1>
-                <p class="vi-guide mt-1 safe">Luyện nói theo chủ đề sức khỏe và động tác</p>
+                <p class="text-xs font-bold text-indigo-600 mb-0.5">12과 말하기 · 발음 PRO</p>
+                <h1 class="text-xl font-black text-slate-800 leading-snug safe">건강과 동작 문장<br>발음 PRO</h1>
+                <p id="heroLangText" class="lang-guide mt-1 safe"></p>
             </div>
-            <div class="text-4xl mt-1">🎙️</div>
+            <div class="pronunciation-hero__icon">🎙️</div>
         </div>
+
+        <section class="lang-selector mt-4" aria-label="도움말 언어 선택">
+            <div>
+                <p class="lang-selector__eyebrow">도움말 언어</p>
+                <p id="helpLangStatus" class="lang-selector__status">한국어만 표시</p>
+            </div>
+            <div id="helpLangBar" class="lang-selector__bar"></div>
+        </section>
 
         <!-- 진행 바 -->
         <div class="mt-4">
@@ -182,12 +388,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div id="browserWarn" class="hidden mt-3 rounded-xl bg-yellow-50 border border-yellow-200 px-3 py-2 text-xs text-yellow-800">
             <i class="fa-solid fa-triangle-exclamation mr-1"></i>
             이 브라우저는 음성 인식을 지원하지 않습니다. <b>Chrome</b>을 사용해 주세요.
-            <span class="block vi-guide text-yellow-700 mt-0.5">Trình duyệt này không hỗ trợ nhận giọng nói. Vui lòng dùng <b>Chrome</b>.</span>
+            <span id="browserWarnLang" class="block lang-guide text-yellow-700 mt-0.5"></span>
         </div>
         <div id="httpsWarn" class="hidden mt-3 rounded-xl bg-orange-50 border border-orange-200 px-3 py-2 text-xs text-orange-800">
             <i class="fa-solid fa-lock-open mr-1"></i>
             마이크는 <b>HTTPS</b> 또는 <b>localhost</b>에서만 동작합니다.
-            <span class="block vi-guide text-orange-700 mt-0.5">Microphone chỉ hoạt động trên <b>HTTPS</b> hoặc <b>localhost</b>.</span>
+            <span id="httpsWarnLang" class="block lang-guide text-orange-700 mt-0.5"></span>
         </div>
     </div>
 
@@ -198,33 +404,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div id="sessionResult" class="hidden scene-card p-6 text-center">
         <div class="text-5xl mb-3">🏆</div>
         <h2 class="text-2xl font-black text-slate-800 mb-1">연습 완료!</h2>
-        <p class="vi-guide mb-1">Bạn đã hoàn thành toàn bộ bài luyện nói!</p>
+        <p id="sessionCompleteLang" class="lang-guide mb-1"></p>
         <p class="text-sm text-slate-500 mb-5">모든 건강과 동작 문장을 연습했습니다</p>
         <div class="grid grid-cols-3 gap-3 mb-6">
             <div class="rounded-xl bg-indigo-50 border border-indigo-100 p-3">
                 <p id="res-attempts" class="text-2xl font-black text-indigo-600">0</p>
-                <p class="text-xs text-slate-500 mt-0.5">총 시도<br><span class="vi-guide">Tổng số lần</span></p>
+                <p class="text-xs text-slate-500 mt-0.5">총 시도<br><span id="attemptsLang" class="lang-inline"></span></p>
             </div>
             <div class="rounded-xl bg-green-50 border border-green-100 p-3">
                 <p id="res-best" class="text-2xl font-black text-green-600">—</p>
-                <p class="text-xs text-slate-500 mt-0.5">최고 점수<br><span class="vi-guide">Điểm cao nhất</span></p>
+                <p class="text-xs text-slate-500 mt-0.5">최고 점수<br><span id="bestLang" class="lang-inline"></span></p>
             </div>
             <div class="rounded-xl bg-sky-50 border border-sky-100 p-3">
                 <p id="res-avg" class="text-2xl font-black text-sky-600">—</p>
-                <p class="text-xs text-slate-500 mt-0.5">평균 점수<br><span class="vi-guide">Điểm trung bình</span></p>
+                <p class="text-xs text-slate-500 mt-0.5">평균 점수<br><span id="avgLang" class="lang-inline"></span></p>
             </div>
         </div>
         <!-- 세션 팁 -->
         <div class="step-guide text-left mb-5">
-            <p class="text-xs font-bold text-indigo-700 mb-2"><i class="fa-solid fa-star mr-1"></i>학습 마무리 팁 / Mẹo kết thúc</p>
-            <p class="vi-guide safe">• 점수가 낮은 문장은 <b>다시 시도</b>해서 80점 이상을 목표로 하세요.<br>Với câu có điểm thấp, hãy thử lại cho đến khi đạt 80 điểm trở lên.</p>
-            <p class="vi-guide safe mt-1">• 모범 발음을 들을 때는 입 모양을 따라 하세요.<br>Khi nghe phát âm mẫu, hãy quan sát và bắt chước khẩu hình.</p>
+            <p class="text-xs font-bold text-indigo-700 mb-2"><i class="fa-solid fa-star mr-1"></i>학습 마무리 팁 <span id="finishTitleLang" class="lang-inline"></span></p>
+            <p class="text-xs font-bold text-indigo-700 safe">• 점수가 낮은 문장은 <b>다시 시도</b>해서 80점 이상을 목표로 하세요.</p>
+            <p id="finishTip1Lang" class="lang-guide safe mt-1"></p>
+            <p class="text-xs font-bold text-indigo-700 safe mt-2">• 모범 발음을 들을 때는 입 모양을 따라 하세요.</p>
+            <p id="finishTip2Lang" class="lang-guide safe mt-1"></p>
         </div>
         <!-- 연습 로그 -->
         <div id="logArea" class="text-left mb-5"></div>
 
         <button onclick="restartSession()" class="btn-primary">
-            <i class="fa-solid fa-rotate-right mr-2"></i>처음부터 다시 / Làm lại từ đầu
+            <i class="fa-solid fa-rotate-right mr-2"></i>처음부터 다시 <span id="restartLang" class="lang-inline text-blue-200"></span>
         </button>
     </div>
 
@@ -235,117 +443,287 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 const DIALOGUES = [
     {
         id: 1, gram: 'g2',
-        gramLabel: 'A/V-아/어서',
-        scene: '건강 상담', sceneVi: 'Tư vấn sức khỏe',
-        sceneIcon: '🩺',
-        q: '오늘 몸 상태가 어때요?',
-        qVi: 'Hôm nay tình trạng cơ thể của bạn thế nào?',
-        target: '어젯밤 잠을 못 자서 몸이 무겁고 많이 지쳐요.',
-        targetVi: 'Tối qua tôi không ngủ được nên cơ thể nặng nề và rất mệt.',
-        highlights: ['못 자서'],
-        tip: '못 자서 = 동사 "자다" + -아서. 이유를 말할 때 써요.',
-        tipVi: '"못 자서" = động từ "자다" + -아서. Dùng để nói lý do: "vì không ngủ được".',
-        pronunTips: ['"못 자서" → 몯-짜-서 (된소리)', '"몸이 무겁고" → 모미 무겁꼬 (연음)']
+        gramLabel: 'V-았더니/었더니',
+        scene: '목 스트레칭 후', sceneVi: 'Sau khi xoay cổ',
+        sceneIcon: '🤸',
+        q: '목을 돌리고 나서 기분이 어때요?',
+        qVi: 'Sau khi xoay cổ, tâm trạng của bạn thế nào?',
+        target: '목을 천천히 돌렸더니 기분이 상쾌해졌어요.',
+        targetVi: 'Sau khi xoay cổ từ từ, tâm trạng tôi trở nên sảng khoái.',
+        highlights: ['돌렸더니', '상쾌해졌어요'],
+        tip: 'V-았더니/었더니는 직접 한 행동 뒤에 생긴 결과를 말할 때 써요.',
+        tipVi: 'V-았더니/었더니 dùng để nói kết quả sau hành động mình đã trực tiếp làm.',
+        pronunTips: ['"목을" → 모글 (연음)', '"돌렸더니"를 한 덩어리로 말하기']
     },
     {
         id: 2, gram: 'g2',
-        gramLabel: '-(으)ㄴ/는 모양이다',
-        scene: '운동 직후', sceneVi: 'Ngay sau khi tập',
-        sceneIcon: '🏃',
-        q: '계단을 빨리 올라왔어요? 얼굴이 빨개요.',
-        qVi: 'Bạn vừa leo cầu thang nhanh phải không? Mặt đỏ lên rồi.',
-        target: '네, 숨이 차고 땀이 많이 나는 모양이에요.',
-        targetVi: 'Vâng, có vẻ như tôi đang hụt hơi và đổ mồ hôi nhiều.',
-        highlights: ['나는 모양이에요'],
-        tip: '나는 모양이에요 = 동사 "나다" + 는 모양이다. 보고 추측할 때 써요.',
-        tipVi: '"나는 모양이에요" = động từ "나다" + 는 모양이다. Dùng khi nhìn thấy và suy đoán.',
-        pronunTips: ['"숨이 차고" → 수미 차고 (연음)', '"땀이" → 따미 (된소리)']
+        gramLabel: 'V-았더니/었더니',
+        scene: '꾸준한 운동', sceneVi: 'Tập luyện đều đặn',
+        sceneIcon: '💪',
+        q: '운동을 계속했더니 몸이 달라졌어요?',
+        qVi: 'Sau khi tiếp tục tập luyện, cơ thể có thay đổi không?',
+        target: '운동을 꾸준히 했더니 몸이 좋아졌어요.',
+        targetVi: 'Sau khi tập luyện đều đặn, cơ thể tôi tốt hơn.',
+        highlights: ['꾸준히 했더니', '몸이 좋아졌어요'],
+        tip: '직접 계속한 행동과 그 결과를 한 문장으로 연결해 말해 보세요.',
+        tipVi: 'Hãy nối hành động đã duy trì với kết quả trong một câu.',
+        pronunTips: ['"운동을" → 운동을 (받침 또렷하게)', '"좋아졌어요" → 조아져써요']
     },
     {
         id: 3, gram: 'g2',
         gramLabel: '얼마나 -(으)ㄴ/는지 모르다',
-        scene: '운동 습관', sceneVi: 'Thói quen tập luyện',
-        sceneIcon: '🌿',
-        q: '요즘 운동하고 나서 기분이 어때요?',
-        qVi: 'Gần đây sau khi tập thể dục, tâm trạng của bạn thế nào?',
-        target: '운동하고 나면 기분이 얼마나 상쾌한지 몰라요.',
-        targetVi: 'Sau khi tập xong, tôi không biết tâm trạng mình sảng khoái đến mức nào.',
-        highlights: ['얼마나 상쾌한지 몰라요'],
-        tip: '얼마나 상쾌한지 몰라요 = 느낌이 아주 강할 때 쓰는 표현이에요.',
-        tipVi: '"얼마나 ...지 몰라요" dùng để nhấn mạnh mức độ cảm nhận rất lớn.',
-        pronunTips: ['"운동하고 나면" → 운동하고 나면 (끊어 읽기)', '"상쾌한지" → 상쾌한지 (또렷하게)']
+        scene: '땀이 나는 운동', sceneVi: 'Bài tập ra nhiều mồ hôi',
+        sceneIcon: '🏃',
+        q: '운동을 하면 땀이 많이 나요?',
+        qVi: 'Khi tập thể dục, bạn có ra nhiều mồ hôi không?',
+        target: '운동을 하면 땀이 얼마나 많이 나는지 몰라요.',
+        targetVi: 'Khi tập thể dục, tôi không biết mồ hôi ra nhiều đến mức nào.',
+        highlights: ['얼마나 많이 나는지 몰라요'],
+        tip: '얼마나 -는지 몰라요는 정도가 아주 강하다는 뜻을 자연스럽게 전해요.',
+        tipVi: '얼마나 -는지 몰라요 nhấn mạnh mức độ rất lớn.',
+        pronunTips: ['"땀이" → 따미 (된소리)', '"많이 나는지"를 이어 말하기']
     },
     {
         id: 4, gram: 'g2',
-        gramLabel: '-고 해서',
-        scene: '몸의 변화', sceneVi: 'Sự thay đổi của cơ thể',
-        sceneIcon: '💪',
-        q: '운동을 계속했더니 몸이 좀 달라졌어요?',
-        qVi: 'Sau khi tiếp tục tập luyện, cơ thể của bạn có thay đổi không?',
-        target: '식사도 조절하고 운동도 해서 몸이 좋아지고 살도 조금 빠졌어요.',
-        targetVi: 'Tôi điều chỉnh việc ăn uống và cũng tập luyện nên sức khỏe tốt hơn và cân nặng cũng giảm một chút.',
-        highlights: ['운동도 해서'],
-        tip: '-고 해서 = 두 가지 행동이나 이유를 자연스럽게 이을 때 써요.',
-        tipVi: '"-고 해서" dùng để nối hai hành động hoặc hai lý do với nhau một cách tự nhiên.',
-        pronunTips: ['"조절하고" → 조절하고 (리듬 있게)', '"빠졌어요" → 빠져써요 (된소리)']
+        gramLabel: '얼마나 -(으)ㄴ/는지 모르다',
+        scene: '다리 힘 변화', sceneVi: 'Sức chân thay đổi',
+        sceneIcon: '🦵',
+        q: '요즘 운동 효과가 느껴져요?',
+        qVi: 'Gần đây bạn có cảm nhận được hiệu quả tập luyện không?',
+        target: '요즘 다리 힘이 얼마나 세졌는지 몰라요.',
+        targetVi: 'Dạo này tôi không biết sức chân đã mạnh lên đến mức nào.',
+        highlights: ['얼마나 세졌는지 몰라요'],
+        tip: '좋아진 정도를 강조할 때 “얼마나”와 “-는지 몰라요”를 함께 써요.',
+        tipVi: 'Khi nhấn mạnh mức độ tốt hơn, hãy dùng 얼마나 cùng -는지 몰라요.',
+        pronunTips: ['"다리 힘이"를 끊지 않고 말하기', '"세졌는지" → 세전는지처럼 흐리지 않기']
     },
     {
         id: 5, gram: 'g3',
-        gramLabel: '-아야/어야',
-        scene: '자세 교정', sceneVi: 'Chỉnh tư thế',
-        sceneIcon: '🧍',
-        q: '요즘 자세가 안 좋아 보여요. 어떻게 해야 해요?',
-        qVi: 'Gần đây tư thế của bạn có vẻ không tốt. Bạn nên làm như thế nào?',
-        target: '가슴을 펴고 몸을 조금 젖혀야 자세가 좋아져요.',
-        targetVi: 'Bạn phải mở rộng ngực và hơi ngả người ra sau thì tư thế mới tốt hơn.',
-        highlights: ['펴고', '젖혀야'],
-        tip: '젖혀야 = 동사 "젖히다" + -어야 하다. 필요한 동작을 말할 때 써요.',
-        tipVi: '"젖혀야" = động từ "젖히다" + -어야 하다. Dùng khi nói về động tác cần phải làm.',
-        pronunTips: ['"가슴을" → 가스믈 (연음)', '"좋아져요" → 조아져요 (자연스럽게)']
+        gramLabel: '-(으)ㄴ/는 모양이다',
+        scene: '열이 나는 추측', sceneVi: 'Suy đoán bị sốt',
+        sceneIcon: '🤒',
+        q: '친구 얼굴이 빨개요. 어떻게 추측할 수 있어요?',
+        qVi: 'Mặt bạn đỏ. Bạn có thể suy đoán thế nào?',
+        target: '얼굴이 빨간 걸 보니까 열이 나는 모양이에요.',
+        targetVi: 'Nhìn mặt đỏ, có vẻ như bạn ấy đang bị sốt.',
+        highlights: ['열이 나는 모양이에요'],
+        tip: '보이는 증거를 바탕으로 추측할 때 -(으)ㄴ/는 모양이다를 써요.',
+        tipVi: 'Dùng -(으)ㄴ/는 모양이다 khi suy đoán dựa trên dấu hiệu nhìn thấy.',
+        pronunTips: ['"빨간 걸"을 자연스럽게 이어 말하기', '"열이" → 여리 (연음)']
     },
     {
         id: 6, gram: 'g3',
-        gramLabel: '-아야/어야',
-        scene: '스트레칭', sceneVi: 'Kéo giãn',
-        sceneIcon: '🤸',
-        q: '목과 어깨가 자꾸 뻐근해요. 어떤 스트레칭을 하면 돼요?',
-        qVi: 'Cổ và vai cứ bị cứng. Nên tập động tác kéo giãn nào?',
-        target: '목을 천천히 돌리고 손을 허리에 대야 해요.',
-        targetVi: 'Bạn nên xoay cổ từ từ và đặt tay lên hông.',
-        highlights: ['돌리고', '대야 해요'],
-        tip: '대야 해요 = 동사 "대다" + -어야 하다. 준비 자세를 말할 때 좋아요.',
-        tipVi: '"대야 해요" = động từ "대다" + -어야 하다. Hợp khi hướng dẫn tư thế chuẩn bị.',
-        pronunTips: ['"목을" → 모글 (연음)', '"허리에" → 허리에 (천천히 또렷하게)']
+        gramLabel: '-(으)ㄴ/는 모양이다',
+        scene: '운동 직후', sceneVi: 'Ngay sau khi tập',
+        sceneIcon: '🥵',
+        q: '계단을 빨리 올라왔어요? 지금 상태가 어때 보여요?',
+        qVi: 'Bạn vừa leo cầu thang nhanh à? Trông trạng thái thế nào?',
+        target: '숨이 차고 땀이 많이 나는 모양이에요.',
+        targetVi: 'Có vẻ như tôi đang hụt hơi và ra nhiều mồ hôi.',
+        highlights: ['땀이 많이 나는 모양이에요'],
+        tip: '상태를 보고 “-는 모양이에요”로 조심스럽게 추측해 보세요.',
+        tipVi: 'Hãy dùng -는 모양이에요 để suy đoán nhẹ nhàng qua trạng thái nhìn thấy.',
+        pronunTips: ['"숨이" → 수미 (연음)', '"땀이" → 따미 (된소리)']
     },
     {
         id: 7, gram: 'g3',
         gramLabel: '-아야/어야',
-        scene: '준비 운동', sceneVi: 'Khởi động',
-        sceneIcon: '🏋️',
-        q: '준비 운동을 시작하기 전에 먼저 뭘 해야 해요?',
-        qVi: 'Trước khi bắt đầu khởi động, trước tiên cần làm gì?',
-        target: '다리를 벌리고 발뒤꿈치를 들어야 해요.',
-        targetVi: 'Bạn phải dạng hai chân ra và nâng gót chân lên.',
-        highlights: ['벌리고', '들어야 해요'],
-        tip: '들어야 해요 = 동사 "들다" + -어야 하다. 필요한 순서를 말해요.',
-        tipVi: '"들어야 해요" = động từ "들다" + -어야 하다. Dùng khi hướng dẫn trình tự cần thiết.',
-        pronunTips: ['"발뒤꿈치" → 발뛰꿈치 (된소리)', '"들어야 해요" → 드러야 해요 (연음)']
+        scene: '자세 교정', sceneVi: 'Chỉnh tư thế',
+        sceneIcon: '🧍',
+        q: '자세를 좋게 하려면 어떻게 해야 해요?',
+        qVi: 'Muốn tư thế tốt hơn thì phải làm thế nào?',
+        target: '가슴을 펴고 몸을 조금 젖혀야 자세가 좋아져요.',
+        targetVi: 'Phải mở ngực và hơi ngả người ra sau thì tư thế sẽ tốt hơn.',
+        highlights: ['젖혀야', '자세가 좋아져요'],
+        tip: '-아야/어야는 꼭 필요한 조건이나 동작을 말할 때 좋아요.',
+        tipVi: '-아야/어야 phù hợp khi nói điều kiện hoặc động tác cần thiết.',
+        pronunTips: ['"가슴을" → 가스믈 (연음)', '"젖혀야"를 또렷하게 말하기']
     },
     {
         id: 8, gram: 'g3',
         gramLabel: '-아야/어야',
-        scene: '마무리 운동', sceneVi: 'Động tác kết thúc',
-        sceneIcon: '🧘',
-        q: '옆구리 운동도 같이 하고 싶어요. 마지막에 어떻게 하면 돼요?',
-        qVi: 'Tôi cũng muốn tập thêm động tác hông. Cuối buổi nên làm như thế nào?',
-        target: '팔을 쭉 뻗고 옆구리를 굽히는 운동도 같이 해야 해요.',
-        targetVi: 'Bạn nên vươn thẳng tay ra và cũng tập thêm động tác gập hông sang bên.',
-        highlights: ['뻗고', '굽히는 운동도 같이 해야 해요'],
-        tip: '같이 해야 해요 = 함께 하는 것이 필요하다는 뜻이에요.',
-        tipVi: '"같이 해야 해요" có nghĩa là cần thực hiện cùng nhau, dùng khi đưa ra lời khuyên.',
-        pronunTips: ['"뻗고" → 뻗꼬 (된소리)', '"옆구리를" → 엽꾸리를 (된소리)']
+        scene: '준비 운동', sceneVi: 'Khởi động',
+        sceneIcon: '🏋️',
+        q: '준비 운동을 시작할 때 기본 자세는 뭐예요?',
+        qVi: 'Khi bắt đầu khởi động, tư thế cơ bản là gì?',
+        target: '손을 허리에 대고 다리를 벌려야 해요.',
+        targetVi: 'Phải đặt tay lên hông và dang hai chân ra.',
+        highlights: ['허리에 대고', '벌려야 해요'],
+        tip: '동작 순서를 말할 때는 “-고”로 연결한 뒤 “-아야/어야 해요”로 마무리해요.',
+        tipVi: 'Khi nói trình tự động tác, nối bằng -고 rồi kết thúc bằng -아야/어야 해요.',
+        pronunTips: ['"허리에"를 천천히 또렷하게', '"벌려야 해요"를 한 호흡으로 말하기']
     }
 ];
+
+// ─── 다국어 도움말 ───────────────────────────────────────────────────────────
+const HELP_LANG_STORAGE = 'c12-pronunciation-help-lang';
+const HELP_LANGS = [
+    { code: 'none', label: '한국어만', status: '한국어만 표시' },
+    { code: 'en', label: 'English', status: 'English help on' },
+    { code: 'vi', label: 'Tiếng Việt', status: 'Đang hiển thị trợ giúp Tiếng Việt' },
+    { code: 'ar', label: 'العربية', status: 'عرض المساعدة بالعربية', dir: 'rtl' },
+    { code: 'mn', label: 'Монгол', status: 'Монгол тусламжийг харуулж байна' },
+    { code: 'kk', label: 'Қазақша', status: 'Қазақша көмек көрсетіледі' },
+    { code: 'th', label: 'ไทย', status: 'กำลังแสดงคำช่วยภาษาไทย' }
+];
+
+const UI_I18N = {
+    hero: {
+        en: 'Practice pronunciation with health and movement sentences.',
+        vi: 'Luyện phát âm bằng các câu về sức khỏe và động tác.',
+        ar: 'تدرّب على النطق بجمل عن الصحة والحركة.',
+        mn: 'Эрүүл мэнд ба хөдөлгөөний өгүүлбэрээр дуудлагаа дасгал хийгээрэй.',
+        kk: 'Денсаулық пен қимыл туралы сөйлемдермен айтылымды жаттықтырыңыз.',
+        th: 'ฝึกออกเสียงด้วยประโยคเกี่ยวกับสุขภาพและการเคลื่อนไหว'
+    },
+    browserWarn: {
+        en: 'This browser does not support speech recognition. Please use Chrome.',
+        vi: 'Trình duyệt này không hỗ trợ nhận dạng giọng nói. Vui lòng dùng Chrome.',
+        ar: 'هذا المتصفح لا يدعم التعرّف على الصوت. يُرجى استخدام Chrome.',
+        mn: 'Энэ хөтөч дуу танихыг дэмжихгүй байна. Chrome ашиглаарай.',
+        kk: 'Бұл браузер сөйлеуді тануды қолдамайды. Chrome қолданыңыз.',
+        th: 'เบราว์เซอร์นี้ไม่รองรับการรู้จำเสียง โปรดใช้ Chrome'
+    },
+    httpsWarn: {
+        en: 'The microphone usually works only on HTTPS or localhost.',
+        vi: 'Micro thường chỉ hoạt động trên HTTPS hoặc localhost.',
+        ar: 'يعمل الميكروفون عادة على HTTPS أو localhost فقط.',
+        mn: 'Микрофон ихэвчлэн HTTPS эсвэл localhost дээр ажиллана.',
+        kk: 'Микрофон әдетте HTTPS немесе localhost арқылы ғана жұмыс істейді.',
+        th: 'ไมโครโฟนมักใช้งานได้บน HTTPS หรือ localhost เท่านั้น'
+    },
+    sessionComplete: {
+        en: 'You completed the full speaking practice.',
+        vi: 'Bạn đã hoàn thành toàn bộ bài luyện nói.',
+        ar: 'لقد أكملت تدريب التحدث بالكامل.',
+        mn: 'Та ярианы бүх дасгалыг дуусгалаа.',
+        kk: 'Сіз сөйлеу жаттығуын толық аяқтадыңыз.',
+        th: 'คุณฝึกพูดครบทั้งหมดแล้ว'
+    },
+    attempts: { en: 'Total tries', vi: 'Tổng số lần', ar: 'إجمالي المحاولات', mn: 'Нийт оролдлого', kk: 'Жалпы талпыныс', th: 'จำนวนครั้งทั้งหมด' },
+    best: { en: 'Best score', vi: 'Điểm cao nhất', ar: 'أفضل درجة', mn: 'Хамгийн өндөр оноо', kk: 'Ең жоғары ұпай', th: 'คะแนนสูงสุด' },
+    avg: { en: 'Average score', vi: 'Điểm trung bình', ar: 'المتوسط', mn: 'Дундаж оноо', kk: 'Орташа ұпай', th: 'คะแนนเฉลี่ย' },
+    finishTitle: { en: 'Wrap-up tips', vi: 'Mẹo kết thúc', ar: 'نصائح الختام', mn: 'Дуусгах зөвлөгөө', kk: 'Қорытынды кеңес', th: 'เคล็ดลับสรุป' },
+    finishTip1: {
+        en: 'For low-scoring sentences, try again and aim for 80 or higher.',
+        vi: 'Với câu có điểm thấp, hãy thử lại và đặt mục tiêu từ 80 điểm trở lên.',
+        ar: 'للجمل ذات الدرجة المنخفضة، حاول مرة أخرى واستهدف 80 درجة أو أكثر.',
+        mn: 'Оноо багатай өгүүлбэрийг дахин хэлж, 80-аас дээш оноо зорь.',
+        kk: 'Ұпайы төмен сөйлемдерді қайта айтып, 80-нен жоғары ұпайға ұмтылыңыз.',
+        th: 'ประโยคที่ได้คะแนนต่ำให้ลองใหม่และตั้งเป้าอย่างน้อย 80 คะแนน'
+    },
+    finishTip2: {
+        en: 'When you listen to the model, copy the mouth shape and rhythm.',
+        vi: 'Khi nghe mẫu, hãy bắt chước khẩu hình và nhịp điệu.',
+        ar: 'عند سماع النموذج، قلّد شكل الفم والإيقاع.',
+        mn: 'Загвар дуудлагыг сонсохдоо амны хэлбэр, хэмнэлийг дуурай.',
+        kk: 'Үлгі айтылымды тыңдағанда ауыз пішіні мен ырғақты қайталаңыз.',
+        th: 'เมื่อฟังเสียงตัวอย่าง ให้เลียนแบบรูปปากและจังหวะ'
+    },
+    restart: { en: 'Start over', vi: 'Làm lại từ đầu', ar: 'ابدأ من جديد', mn: 'Эхнээс нь дахин', kk: 'Басынан қайта бастау', th: 'เริ่มใหม่' },
+    answerLabel: { en: 'Your answer (B)', vi: 'Câu trả lời của bạn (B)', ar: 'إجابتك (B)', mn: 'Таны хариулт (B)', kk: 'Сіздің жауабыңыз (B)', th: 'คำตอบของคุณ (B)' },
+    slowListen: { en: 'Slow listen', vi: 'Nghe chậm', ar: 'استماع بطيء', mn: 'Удаан сонсох', kk: 'Баяу тыңдау', th: 'ฟังช้า' },
+    startSpeak: { en: 'Start speaking', vi: 'Bắt đầu nói', ar: 'ابدأ الكلام', mn: 'Ярьж эхлэх', kk: 'Сөйлеуді бастау', th: 'เริ่มพูด' },
+    pronunPoint: { en: 'Pronunciation focus', vi: 'Điểm phát âm cần chú ý', ar: 'نقطة النطق', mn: 'Дуудлагын анхаарах зүйл', kk: 'Айтылымға назар', th: 'จุดสังเกตการออกเสียง' },
+    stepLabel: {
+        listen: { en: 'Listen', vi: 'Nghe', ar: 'استماع', mn: 'Сонсох', kk: 'Тыңдау', th: 'ฟัง' },
+        record: { en: 'Speak', vi: 'Nói', ar: 'تحدث', mn: 'Ярих', kk: 'Сөйлеу', th: 'พูด' },
+        result: { en: 'Result', vi: 'Kết quả', ar: 'النتيجة', mn: 'Үр дүн', kk: 'Нәтиже', th: 'ผลลัพธ์' }
+    },
+    stepListenTitle: { en: 'Step 1: Listen', vi: 'Hướng dẫn bước 1: Nghe', ar: 'الخطوة 1: استماع', mn: '1-р алхам: Сонсох', kk: '1-қадам: Тыңдау', th: 'ขั้นที่ 1: ฟัง' },
+    stepListen: [
+        { en: 'Press "A 듣기" to hear the interviewer question.', vi: 'Nhấn "A 듣기" để nghe câu hỏi của người phỏng vấn.', ar: 'اضغط "A 듣기" لسماع سؤال المحاور.', mn: '"A 듣기" дарж ярилцагчийн асуултыг сонсоорой.', kk: '"A 듣기" басып, сұрақты тыңдаңыз.', th: 'กด "A 듣기" เพื่อฟังคำถามของผู้ถาม' },
+        { en: 'Press "B 듣기" to hear the answer you will say.', vi: 'Nhấn "B 듣기" để nghe câu trả lời bạn cần nói.', ar: 'اضغط "B 듣기" لسماع الإجابة التي ستقولها.', mn: '"B 듣기" дарж хэлэх хариултаа сонсоорой.', kk: '"B 듣기" басып, айтатын жауабыңызды тыңдаңыз.', th: 'กด "B 듣기" เพื่อฟังคำตอบที่ต้องพูด' },
+        { en: 'Press "B 천천히" to listen slowly and copy each sound.', vi: 'Nhấn "B 천천히" để nghe chậm hơn và bắt chước từng âm.', ar: 'اضغط "B 천천히" للاستماع ببطء وتقليد كل صوت.', mn: '"B 천천히" дарж удаанаар сонсоод авиа бүрийг дуурай.', kk: '"B 천천히" басып, баяу тыңдап, әр дыбысты қайталаңыз.', th: 'กด "B 천천히" เพื่อฟังช้าและเลียนเสียงทีละเสียง' },
+        { en: 'When you feel ready, press "따라 말하기".', vi: 'Khi đã tự tin, nhấn "따라 말하기" để bắt đầu luyện nói.', ar: 'عندما تستعد، اضغط "따라 말하기".', mn: 'Бэлэн бол "따라 말하기" дарж эхлээрэй.', kk: 'Дайын болсаңыз, "따라 말하기" басыңыз.', th: 'เมื่อพร้อมแล้ว กด "따라 말하기" เพื่อเริ่มฝึกพูด' }
+    ],
+    stepRecordTitle: { en: 'Step 2: Speak', vi: 'Hướng dẫn bước 2: Nói', ar: 'الخطوة 2: تحدث', mn: '2-р алхам: Ярих', kk: '2-қадам: Сөйлеу', th: 'ขั้นที่ 2: พูด' },
+    stepRecord: [
+        { en: 'Read sentence B once before speaking.', vi: 'Đọc câu B bên dưới một lần trước khi nói.', ar: 'اقرأ الجملة B مرة قبل الكلام.', mn: 'Ярихаасаа өмнө B өгүүлбэрийг нэг удаа уншаарай.', kk: 'Сөйлемес бұрын B сөйлемін бір рет оқыңыз.', th: 'อ่านประโยค B หนึ่งครั้งก่อนพูด' },
+        { en: 'Press the purple mic button, then speak loudly and clearly.', vi: 'Nhấn nút micro màu tím rồi nói to và rõ ràng.', ar: 'اضغط زر الميكروفون البنفسجي ثم تحدث بوضوح.', mn: 'Нил ягаан микрофоны товчийг дараад чанга, тод хэлээрэй.', kk: 'Күлгін микрофонды басып, анық әрі дауыстап айтыңыз.', th: 'กดปุ่มไมค์สีม่วง แล้วพูดให้ดังและชัดเจน' },
+        { en: 'After you speak, the system shows recognition and feedback.', vi: 'Nói xong, hệ thống sẽ hiển thị kết quả nhận dạng và phản hồi.', ar: 'بعد الكلام، يعرض النظام التعرف والتغذية الراجعة.', mn: 'Хэлсний дараа систем танилт ба зөвлөгөөг харуулна.', kk: 'Айтқаннан кейін жүйе тану нәтижесі мен пікір көрсетеді.', th: 'หลังพูด ระบบจะแสดงผลการรู้จำและคำแนะนำ' },
+        { en: 'Use "다시 듣기" if you want to hear the model again.', vi: 'Nếu muốn nghe lại, nhấn "다시 듣기".', ar: 'إذا أردت السماع مرة أخرى، اضغط "다시 듣기".', mn: 'Дахин сонсмоор байвал "다시 듣기" дар.', kk: 'Қайта тыңдағыңыз келсе, "다시 듣기" басыңыз.', th: 'ถ้าต้องการฟังอีกครั้ง ให้กด "다시 듣기"' }
+    ],
+    targetLabel: { en: 'Sentence to say', vi: 'Câu bạn cần nói', ar: 'الجملة التي ستقولها', mn: 'Хэлэх өгүүлбэр', kk: 'Айтатын сөйлем', th: 'ประโยคที่ต้องพูด' },
+    recognizedLabel: { en: 'Recognition result', vi: 'Kết quả nhận dạng', ar: 'نتيجة التعرف', mn: 'Танилтын үр дүн', kk: 'Тану нәтижесі', th: 'ผลการรู้จำเสียง' },
+    ready: { en: 'Ready. Press the mic button to start.', vi: 'Sẵn sàng. Nhấn nút mic để bắt đầu.', ar: 'جاهز. اضغط زر الميكروفون للبدء.', mn: 'Бэлэн. Эхлэхийн тулд микрофон дар.', kk: 'Дайын. Бастау үшін микрофонды басыңыз.', th: 'พร้อมแล้ว กดปุ่มไมค์เพื่อเริ่ม' },
+    recording: { en: 'Recording. Speak loudly.', vi: 'Đang ghi âm. Hãy nói to.', ar: 'جار التسجيل. تحدث بصوت واضح.', mn: 'Бичиж байна. Чанга хэлээрэй.', kk: 'Жазылып жатыр. Дауыстап айтыңыз.', th: 'กำลังบันทึกเสียง พูดให้ดัง' },
+    recognizing: { en: 'Recognizing...', vi: 'Đang nhận dạng...', ar: 'جار التعرف...', mn: 'Таниж байна...', kk: 'Танылып жатыр...', th: 'กำลังรู้จำเสียง...' },
+    doneAnalyzing: { en: 'Done. Analyzing...', vi: 'Xong. Đang phân tích...', ar: 'تم. جار التحليل...', mn: 'Дууслаа. Шинжилж байна...', kk: 'Дайын. Талдау жүріп жатыр...', th: 'เสร็จแล้ว กำลังวิเคราะห์...' },
+    micPermission: { en: 'Microphone permission is required.', vi: 'Bạn cần cho phép dùng microphone.', ar: 'يلزم السماح باستخدام الميكروفون.', mn: 'Микрофон ашиглах зөвшөөрөл хэрэгтэй.', kk: 'Микрофонға рұқсат қажет.', th: 'ต้องอนุญาตให้ใช้ไมโครโฟน' },
+    noSpeech: { en: 'No speech detected. Please speak louder.', vi: 'Không nghe thấy giọng nói. Hãy nói to hơn.', ar: 'لم يتم اكتشاف صوت. تحدث بصوت أعلى.', mn: 'Дуу илрээгүй. Илүү чанга хэлээрэй.', kk: 'Дауыс анықталмады. Дауыстап айтыңыз.', th: 'ไม่พบเสียงพูด กรุณาพูดดังขึ้น' },
+    resultTitle: { en: 'Pronunciation analysis result', vi: 'Kết quả phân tích phát âm', ar: 'نتيجة تحليل النطق', mn: 'Дуудлагын шинжилгээний үр дүн', kk: 'Айтылым талдауының нәтижесі', th: 'ผลการวิเคราะห์การออกเสียง' },
+    accuracy: { en: 'Accuracy', vi: 'Độ chính xác', ar: 'الدقة', mn: 'Нарийвчлал', kk: 'Дәлдік', th: 'ความแม่นยำ' },
+    completeness: { en: 'Completeness', vi: 'Độ hoàn chỉnh', ar: 'الاكتمال', mn: 'Гүйцэтгэл', kk: 'Толықтық', th: 'ความครบถ้วน' },
+    syllableCheck: { en: 'Syllable check', vi: 'Kiểm tra từng âm tiết', ar: 'فحص المقاطع', mn: 'Үе тус бүрийн шалгалт', kk: 'Буын бойынша тексеру', th: 'ตรวจทีละพยางค์' },
+    feedbackGreat: { en: 'Excellent. Your pronunciation is very accurate.', vi: 'Xuất sắc! Phát âm của bạn rất chính xác.', ar: 'ممتاز. نطقك دقيق جدًا.', mn: 'Маш сайн. Дуудлага чинь их зөв байна.', kk: 'Өте жақсы. Айтылымыңыз өте дәл.', th: 'ยอดเยี่ยม ออกเสียงได้แม่นยำมาก' },
+    feedbackGood: { en: 'Good job. Practice a little more.', vi: 'Khá tốt! Hãy luyện thêm một chút nữa.', ar: 'أحسنت. تدرّب قليلًا أكثر.', mn: 'Сайн байна. Жаахан нэмж дасгал хийгээрэй.', kk: 'Жақсы. Тағы біраз жаттығыңыз.', th: 'ทำได้ดี ฝึกเพิ่มอีกนิด' },
+    feedbackTry: { en: 'Keep practicing. Listen slowly and repeat.', vi: 'Hãy tiếp tục luyện tập. Nghe chậm và lặp lại nhé.', ar: 'واصل التدريب. استمع ببطء وكرر.', mn: 'Үргэлжлүүлэн давтаарай. Удаанаар сонсоод давт.', kk: 'Жаттығуды жалғастырыңыз. Баяу тыңдап, қайталаңыз.', th: 'ฝึกต่อไป ฟังช้า ๆ แล้วพูดตาม' },
+    nextTipTitle: { en: 'Next suggestion', vi: 'Gợi ý tiếp theo', ar: 'اقتراح للخطوة التالية', mn: 'Дараагийн зөвлөгөө', kk: 'Келесі кеңес', th: 'คำแนะนำถัดไป' },
+    improveLow: { en: 'Use "B 천천히 듣기" to listen slowly, then try again.', vi: 'Nhấn "B 천천히 듣기" để nghe chậm, rồi nói lại.', ar: 'استخدم "B 천천히 듣기" للاستماع ببطء ثم حاول مجددًا.', mn: '"B 천천히 듣기" дарж удаан сонсоод дахин хэлээрэй.', kk: '"B 천천히 듣기" арқылы баяу тыңдап, қайта айтыңыз.', th: 'ใช้ "B 천천히 듣기" เพื่อฟังช้า แล้วลองพูดอีกครั้ง' },
+    improveMid: { en: 'Check the pronunciation focus and try once more.', vi: 'Xem lại điểm phát âm rồi thử thêm một lần nữa.', ar: 'راجع نقطة النطق ثم حاول مرة أخرى.', mn: 'Дуудлагын анхаарах хэсгийг шалгаад дахин оролдоорой.', kk: 'Айтылым назарын қарап, тағы бір рет көріңіз.', th: 'ดูจุดออกเสียงแล้วลองอีกครั้ง' },
+    improveHigh: { en: 'You can move on to the next sentence.', vi: 'Bạn có thể chuyển sang câu tiếp theo.', ar: 'يمكنك الانتقال إلى الجملة التالية.', mn: 'Дараагийн өгүүлбэр рүү шилжиж болно.', kk: 'Келесі сөйлемге өте аласыз.', th: 'ไปประโยคถัดไปได้เลย' },
+    retry: { en: 'Try again', vi: 'Thử lại', ar: 'حاول مجددًا', mn: 'Дахин оролдох', kk: 'Қайта көру', th: 'ลองอีกครั้ง' },
+    modelListen: { en: 'Model audio', vi: 'Nghe mẫu', ar: 'الصوت النموذجي', mn: 'Загвар сонсох', kk: 'Үлгіні тыңдау', th: 'ฟังตัวอย่าง' },
+    nextPrompt: { en: 'Press to continue', vi: 'Nhấn để tiếp tục', ar: 'اضغط للمتابعة', mn: 'Үргэлжлүүлэхийн тулд дар', kk: 'Жалғастыру үшін басыңыз', th: 'กดเพื่อไปต่อ' },
+    nextSentence: { en: 'Next sentence', vi: 'Câu tiếp theo', ar: 'الجملة التالية', mn: 'Дараагийн өгүүлбэр', kk: 'Келесі сөйлем', th: 'ประโยคถัดไป' },
+    viewResult: { en: 'View result', vi: 'Xem kết quả', ar: 'عرض النتيجة', mn: 'Үр дүн харах', kk: 'Нәтижені көру', th: 'ดูผลลัพธ์' },
+    logTitle: { en: 'Practice log', vi: 'Nhật ký luyện tập', ar: 'سجل التدريب', mn: 'Дасгалын тэмдэглэл', kk: 'Жаттығу журналы', th: 'บันทึกการฝึก' },
+    detailHint: { en: 'Open an item for details', vi: 'Bấm vào mục để xem chi tiết', ar: 'افتح العنصر للتفاصيل', mn: 'Дэлгэрэнгүйг харахын тулд нээ', kk: 'Толығырақ көру үшін ашыңыз', th: 'เปิดรายการเพื่อดูรายละเอียด' }
+};
+
+const DIALOGUE_I18N = {
+    en: {
+        1: { scene: 'After neck stretching', q: 'How do you feel after rotating your neck?', target: 'After slowly rotating my neck, I felt refreshed.', tip: 'Use V-았더니/었더니 to say the result after something you did.' },
+        2: { scene: 'Regular exercise', q: 'Did your body change after continuing to exercise?', target: 'After exercising regularly, my body got healthier.', tip: 'Connect an action you continued doing with its result.' },
+        3: { scene: 'Sweaty exercise', q: 'Do you sweat a lot when you exercise?', target: 'When I exercise, I sweat so much.', tip: '얼마나 -는지 몰라요 strongly emphasizes the degree.' },
+        4: { scene: 'Leg strength change', q: 'Do you feel the effect of exercise these days?', target: 'These days my leg strength has become so much stronger.', tip: 'Use 얼마나 with -는지 몰라요 to emphasize a big change.' },
+        5: { scene: 'Guessing a fever', q: 'Your friend’s face is red. What can you guess?', target: 'Seeing the red face, it looks like they have a fever.', tip: 'Use -(으)ㄴ/는 모양이다 to guess from visible evidence.' },
+        6: { scene: 'Right after exercise', q: 'Did you climb the stairs quickly? How do you look now?', target: 'It looks like I am out of breath and sweating a lot.', tip: 'Use -는 모양이에요 to make a careful guess from a condition.' },
+        7: { scene: 'Posture correction', q: 'What should you do to improve your posture?', target: 'You need to open your chest and lean back a little for better posture.', tip: 'Use -아야/어야 for a necessary condition or action.' },
+        8: { scene: 'Warm-up exercise', q: 'What is the basic posture when starting a warm-up?', target: 'You need to put your hands on your waist and spread your legs.', tip: 'Use -고 to connect actions, then finish with -아야/어야 해요.' }
+    },
+    ar: {
+        1: { scene: 'بعد تمرين الرقبة', q: 'كيف تشعر بعد تدوير الرقبة؟', target: 'بعد أن أدرت رقبتي ببطء، أصبحت منتعشًا.', tip: 'استعمل V-았더니/었더니 لذكر نتيجة فعل قمت به.' },
+        2: { scene: 'تمرين منتظم', q: 'هل تغيّر جسمك بعد الاستمرار في التمرين؟', target: 'بعد أن تمرنت بانتظام، تحسن جسمي.', tip: 'اربط الفعل الذي واظبت عليه بالنتيجة.' },
+        3: { scene: 'تمرين مع تعرّق', q: 'هل تتعرق كثيرًا عندما تتمرن؟', target: 'عندما أتمرن، أتعرق كثيرًا جدًا.', tip: '얼마나 -는지 몰라요 يبرز الدرجة القوية.' },
+        4: { scene: 'تغيّر قوة الساق', q: 'هل تشعر بأثر التمرين هذه الأيام؟', target: 'هذه الأيام أصبحت قوة ساقي أكبر كثيرًا.', tip: 'استعمل 얼마나 مع -는지 몰라요 للتأكيد على تغيّر كبير.' },
+        5: { scene: 'تخمين الحمى', q: 'وجه صديقك أحمر. ماذا يمكن أن تخمن؟', target: 'بما أن وجهه أحمر، يبدو أن لديه حمى.', tip: 'استعمل -(으)ㄴ/는 모양이다 للتخمين من دليل ظاهر.' },
+        6: { scene: 'بعد التمرين مباشرة', q: 'هل صعدت الدرج بسرعة؟ كيف تبدو الآن؟', target: 'يبدو أنني ألهث وأتعرق كثيرًا.', tip: 'استعمل -는 모양이에요 للتخمين الحذر من الحالة.' },
+        7: { scene: 'تصحيح القامة', q: 'ماذا يجب أن تفعل لتحسين القامة؟', target: 'يجب أن تفتح صدرك وتميل للخلف قليلًا لتتحسن القامة.', tip: 'استعمل -아야/어야 للشرط أو الفعل الضروري.' },
+        8: { scene: 'تمرين إحماء', q: 'ما الوضع الأساسي عند بدء الإحماء؟', target: 'يجب أن تضع يديك على الخصر وتباعد بين الساقين.', tip: 'اربط الأفعال بـ -고 ثم اختم بـ -아야/어야 해요.' }
+    },
+    mn: {
+        1: { scene: 'Хүзүү сунгасны дараа', q: 'Хүзүүгээ эргүүлсний дараа ямар байна?', target: 'Хүзүүгээ аажуухан эргүүлтэл сэтгэл сэргэсэн.', tip: 'Өөрөө хийсэн үйлдлийн дараах үр дүнг V-았더니/었더니-ээр хэлнэ.' },
+        2: { scene: 'Тогтмол дасгал', q: 'Дасгалаа үргэлжлүүлсэн чинь бие өөрчлөгдсөн үү?', target: 'Тогтмол дасгал хийтэл бие сайжирсан.', tip: 'Үргэлж хийсэн үйлдэл ба үр дүнг холбож хэл.' },
+        3: { scene: 'Хөлс гаргах дасгал', q: 'Дасгал хийхээр их хөлөрдөг үү?', target: 'Дасгал хийхээр хөлс маш их гардаг.', tip: '얼마나 -는지 몰라요 нь хэмжээг хүчтэй онцолно.' },
+        4: { scene: 'Хөлийн хүчний өөрчлөлт', q: 'Сүүлийн үед дасгалын үр дүн мэдрэгдэж байна уу?', target: 'Сүүлийн үед хөлийн хүч маш их нэмэгдсэн.', tip: 'Том өөрчлөлтийг онцлоход 얼마나 ба -는지 몰라요-г хамт хэрэглэнэ.' },
+        5: { scene: 'Халуурсан гэж таамаглах', q: 'Найзын нүүр улайсан байна. Юу гэж таамаглах вэ?', target: 'Нүүр нь улайсан болохоор халуурч байгаа бололтой.', tip: 'Харагдах нотолгоонд тулгуурлан -(으)ㄴ/는 모양이다 хэрэглэнэ.' },
+        6: { scene: 'Дасгалын дараах байдал', q: 'Шатаар хурдан өгссөн үү? Одоо ямар харагдаж байна?', target: 'Амьсгаадаж, их хөлөрч байгаа бололтой.', tip: 'Байдалд тулгуурлан болгоомжтой таамаглахдаа -는 모양이에요 хэрэглэнэ.' },
+        7: { scene: 'Биеийн байрлал засах', q: 'Байрлалаа сайжруулахын тулд яах хэрэгтэй вэ?', target: 'Цээжээ тэнийлгэж, биеэ бага зэрэг хойш гэдийлгэх хэрэгтэй.', tip: '-아야/어야 нь зайлшгүй нөхцөл эсвэл үйлдлийг хэлнэ.' },
+        8: { scene: 'Бие халаалт', q: 'Бие халаалт эхлэхэд үндсэн байрлал юу вэ?', target: 'Гараа бүсэлхийн дээр тавьж, хөлөө зайтай тавих хэрэгтэй.', tip: 'Үйлдлүүдийг -고-оор холбоод -아야/어야 해요-ээр дуусга.' }
+    },
+    kk: {
+        1: { scene: 'Мойынды созғаннан кейін', q: 'Мойынды айналдырғаннан кейін көңіл-күйіңіз қалай?', target: 'Мойнымды жай айналдырғаннан кейін сергіп қалдым.', tip: 'Өзіңіз жасаған әрекеттен кейінгі нәтижені V-았더니/었더니 арқылы айтыңыз.' },
+        2: { scene: 'Тұрақты жаттығу', q: 'Жаттығуды жалғастырғаннан кейін денеңіз өзгерді ме?', target: 'Тұрақты жаттығу жасағаннан кейін денем жақсарды.', tip: 'Жалғасқан әрекет пен нәтижені бір сөйлеммен байланыстырыңыз.' },
+        3: { scene: 'Тер шығатын жаттығу', q: 'Жаттығу кезінде көп терлейсіз бе?', target: 'Жаттығу жасасам, өте көп терлеймін.', tip: '얼마나 -는지 몰라요 дәрежені қатты көрсетеді.' },
+        4: { scene: 'Аяқ күшінің өзгеруі', q: 'Соңғы кезде жаттығудың әсерін сезесіз бе?', target: 'Соңғы кезде аяғымның күші өте қатты артты.', tip: 'Үлкен өзгерісті көрсету үшін 얼마나 және -는지 몰라요 қолданыңыз.' },
+        5: { scene: 'Қызуды болжау', q: 'Досыңыздың беті қызарып тұр. Не деп болжайсыз?', target: 'Беті қызарғанына қарағанда, қызуы бар сияқты.', tip: 'Көрінетін белгіге сүйеніп болжағанда -(으)ㄴ/는 모양이다 қолданылады.' },
+        6: { scene: 'Жаттығудан кейін', q: 'Баспалдақпен тез көтерілдіңіз бе? Қазір қалай көрінесіз?', target: 'Демігіп, көп терлеп тұрған сияқтымын.', tip: 'Жағдайға қарап жұмсақ болжау үшін -는 모양이에요 қолданыңыз.' },
+        7: { scene: 'Дене қалпын түзету', q: 'Дене қалпын жақсарту үшін не істеу керек?', target: 'Кеудені ашып, денені сәл артқа шалқайту керек.', tip: '-아야/어야 қажетті шартты немесе әрекетті білдіреді.' },
+        8: { scene: 'Қыздыру жаттығуы', q: 'Қыздыруды бастағанда негізгі қалып қандай?', target: 'Қолды белге қойып, аяқты ашу керек.', tip: 'Әрекеттерді -고 арқылы жалғап, -아야/어야 해요 деп аяқтаңыз.' }
+    },
+    th: {
+        1: { scene: 'หลังยืดคอ', q: 'หลังหมุนคอแล้วรู้สึกอย่างไร?', target: 'พอหมุนคอช้า ๆ แล้วรู้สึกสดชื่นขึ้น', tip: 'ใช้ V-았더니/었더니 เพื่อบอกผลหลังจากการกระทำที่ทำเอง' },
+        2: { scene: 'ออกกำลังกายสม่ำเสมอ', q: 'ออกกำลังกายต่อเนื่องแล้วร่างกายเปลี่ยนไหม?', target: 'พอออกกำลังกายสม่ำเสมอแล้ว ร่างกายดีขึ้น', tip: 'เชื่อมการกระทำที่ทำต่อเนื่องกับผลลัพธ์ในประโยคเดียว' },
+        3: { scene: 'ออกกำลังกายจนเหงื่อออก', q: 'เวลาออกกำลังกายเหงื่อออกมากไหม?', target: 'เวลาออกกำลังกาย เหงื่อออกมากจริง ๆ', tip: '얼마나 -는지 몰라요 ใช้เน้นระดับที่มาก' },
+        4: { scene: 'แรงขาเปลี่ยนไป', q: 'ช่วงนี้รู้สึกถึงผลของการออกกำลังกายไหม?', target: 'ช่วงนี้แรงขาแข็งแรงขึ้นมากจริง ๆ', tip: 'ใช้ 얼마나 กับ -는지 몰라요 เพื่อเน้นการเปลี่ยนแปลงมาก' },
+        5: { scene: 'เดาว่าเป็นไข้', q: 'หน้าเพื่อนแดง คุณเดาได้ว่าอย่างไร?', target: 'ดูจากหน้าแดงแล้ว เหมือนจะมีไข้', tip: 'ใช้ -(으)ㄴ/는 모양이다 เมื่อเดาจากหลักฐานที่เห็น' },
+        6: { scene: 'หลังออกกำลังกายทันที', q: 'ขึ้นบันไดเร็วมาใช่ไหม ตอนนี้ดูเป็นอย่างไร?', target: 'เหมือนจะหอบและเหงื่อออกมาก', tip: 'ใช้ -는 모양이에요 เพื่อเดาอย่างระมัดระวังจากสภาพที่เห็น' },
+        7: { scene: 'ปรับท่าทาง', q: 'ถ้าอยากให้ท่าทางดีขึ้น ต้องทำอย่างไร?', target: 'ต้องเปิดอกและเอนตัวไปข้างหลังเล็กน้อย ท่าทางจึงจะดีขึ้น', tip: '-아야/어야 ใช้บอกเงื่อนไขหรือการกระทำที่จำเป็น' },
+        8: { scene: 'ท่าวอร์มอัป', q: 'ท่าพื้นฐานตอนเริ่มวอร์มอัปคืออะไร?', target: 'ต้องวางมือที่เอวและแยกขาออก', tip: 'เชื่อมลำดับท่าด้วย -고 แล้วจบด้วย -아야/어야 해요' }
+    }
+};
 
 // ─── 상태 ───────────────────────────────────────────────────────────────────
 let currentIdx = 0;
@@ -354,9 +732,163 @@ let recognition = null;
 let isRecording = false;
 let sessionScores = [];
 let sessionLog = []; // { dialogueId, scene, target, spoken, score, ts }
+let hasRenderedDialogue = false;
+let lastResult = null;
+let helpLang = loadHelpLang();
 
 // ─── 초기화 ─────────────────────────────────────────────────────────────────
-window.onload = () => { checkSupport(); renderDialogue(); };
+window.onload = () => {
+    initLanguageControls();
+    renderStaticLanguageText();
+    checkSupport();
+    renderDialogue();
+};
+
+function loadHelpLang() {
+    try {
+        const saved = localStorage.getItem(HELP_LANG_STORAGE);
+        return HELP_LANGS.some((lang) => lang.code === saved) ? saved : 'none';
+    } catch(e) {
+        return 'none';
+    }
+}
+
+function saveHelpLang(lang) {
+    try { localStorage.setItem(HELP_LANG_STORAGE, lang); } catch(e) {}
+}
+
+function getHelpLangMeta() {
+    return HELP_LANGS.find((lang) => lang.code === helpLang) || HELP_LANGS[0];
+}
+
+function escapeHtml(value) {
+    return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function formatLangText(value) {
+    return escapeHtml(value).replace(/\n/g, '<br>');
+}
+
+function getLangText(mapOrText) {
+    if (!helpLang || helpLang === 'none') return '';
+    if (typeof mapOrText === 'string') return mapOrText;
+    return (mapOrText && (mapOrText[helpLang] || mapOrText.en)) || '';
+}
+
+function langAttrs() {
+    if (!helpLang || helpLang === 'none') return '';
+    const meta = getHelpLangMeta();
+    return ` lang="${helpLang}"${meta.dir === 'rtl' ? ' dir="rtl"' : ''}`;
+}
+
+function langBlock(mapOrText, extraClass = '') {
+    const text = getLangText(mapOrText);
+    return text ? `<p class="lang-guide ${extraClass}"${langAttrs()}>${formatLangText(text)}</p>` : '';
+}
+
+function inlineLang(mapOrText, extraClass = '') {
+    const text = getLangText(mapOrText);
+    return text ? `<span class="lang-inline ${extraClass}"${langAttrs()}>${formatLangText(text)}</span>` : '';
+}
+
+function langBadgeHtml(mapOrText) {
+    const text = getLangText(mapOrText);
+    if (!text) return '';
+    return `<span class="lang-badge"${langAttrs()}>${escapeHtml(getHelpLangMeta().label)}</span>`;
+}
+
+function dialogueLang(d, field) {
+    if (!helpLang || helpLang === 'none') return '';
+    if (helpLang === 'vi') {
+        const viKey = `${field}Vi`;
+        return d[viKey] || '';
+    }
+    return (DIALOGUE_I18N[helpLang] && DIALOGUE_I18N[helpLang][d.id] && DIALOGUE_I18N[helpLang][d.id][field]) || '';
+}
+
+function setLangSlot(id, mapOrText) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const text = getLangText(mapOrText);
+    el.innerHTML = text ? formatLangText(text) : '';
+    if (text && helpLang !== 'none') {
+        el.setAttribute('lang', helpLang);
+        const meta = getHelpLangMeta();
+        if (meta.dir === 'rtl') el.setAttribute('dir', 'rtl');
+        else el.removeAttribute('dir');
+    } else {
+        el.removeAttribute('lang');
+        el.removeAttribute('dir');
+    }
+}
+
+function initLanguageControls() {
+    const bar = document.getElementById('helpLangBar');
+    if (!bar) return;
+    renderLanguageControls();
+}
+
+function renderLanguageControls() {
+    const bar = document.getElementById('helpLangBar');
+    const status = document.getElementById('helpLangStatus');
+    if (!bar) return;
+    bar.innerHTML = HELP_LANGS.map((lang) => `
+        <button type="button" class="lang-btn ${lang.code === helpLang ? 'is-active' : ''}" data-help-lang="${lang.code}" aria-pressed="${lang.code === helpLang}">
+            ${escapeHtml(lang.label)}
+        </button>
+    `).join('');
+    bar.querySelectorAll('[data-help-lang]').forEach((btn) => {
+        btn.addEventListener('click', () => selectHelpLang(btn.dataset.helpLang));
+    });
+    if (status) status.textContent = getHelpLangMeta().status;
+    document.body.dataset.helpLang = helpLang;
+}
+
+function selectHelpLang(lang) {
+    if (!HELP_LANGS.some((item) => item.code === lang)) return;
+    helpLang = lang;
+    saveHelpLang(lang);
+    renderLanguageControls();
+    renderStaticLanguageText();
+    refreshLanguageView();
+}
+
+function renderStaticLanguageText() {
+    setLangSlot('heroLangText', UI_I18N.hero);
+    setLangSlot('browserWarnLang', UI_I18N.browserWarn);
+    setLangSlot('httpsWarnLang', UI_I18N.httpsWarn);
+    setLangSlot('sessionCompleteLang', UI_I18N.sessionComplete);
+    setLangSlot('attemptsLang', UI_I18N.attempts);
+    setLangSlot('bestLang', UI_I18N.best);
+    setLangSlot('avgLang', UI_I18N.avg);
+    setLangSlot('finishTitleLang', UI_I18N.finishTitle);
+    setLangSlot('finishTip1Lang', UI_I18N.finishTip1);
+    setLangSlot('finishTip2Lang', UI_I18N.finishTip2);
+    setLangSlot('restartLang', UI_I18N.restart);
+}
+
+function refreshLanguageView() {
+    if (!hasRenderedDialogue) return;
+    if (!document.getElementById('sessionResult').classList.contains('hidden')) {
+        renderLog();
+        return;
+    }
+
+    const savedStep = step;
+    if (savedStep === 'result' && lastResult) {
+        setDots('result');
+        showResult(lastResult.d, lastResult.spokenRaw, lastResult.target, lastResult.spoken, lastResult.accuracy, lastResult.completeness, lastResult.score, { skipScroll: true });
+        return;
+    }
+
+    renderDialogue({ scroll: false, animate: false });
+    if (savedStep === 'record') goToRecord();
+}
 
 function checkSupport() {
     if (!window.SpeechRecognition && !window.webkitSpeechRecognition)
@@ -366,10 +898,13 @@ function checkSupport() {
 }
 
 // ─── 메인 렌더 ───────────────────────────────────────────────────────────────
-function renderDialogue() {
+function renderDialogue(options = {}) {
     if (currentIdx >= DIALOGUES.length) { showSessionResult(); return; }
     const d = DIALOGUES[currentIdx];
+    const shouldScrollToDialogue = hasRenderedDialogue && options.scroll !== false;
+    hasRenderedDialogue = true;
     step = 'listen';
+    lastResult = null;
     updateProgress();
 
     const isG2 = d.gram === 'g2';
@@ -383,31 +918,31 @@ function renderDialogue() {
 
     document.getElementById('mainArea').innerHTML = `
     <!-- 씬 & 문법 태그 -->
-    <div class="flex items-center gap-2 mb-3">
+    <div class="stage-meta flex items-center gap-2 mb-3">
         <span class="text-xl">${d.sceneIcon}</span>
         <div>
             <span class="text-sm font-bold text-slate-700">${d.scene}</span>
-            <span class="vi-guide block">${d.sceneVi}</span>
+            ${langBlock(dialogueLang(d, 'scene'), 'block')}
         </div>
         <span class="ml-auto text-xs font-bold px-2.5 py-1 rounded-full ${tagClass}">${d.gramLabel}</span>
     </div>
 
     <!-- 대화 카드 -->
-    <div class="scene-card p-5 mb-4">
+    <div class="scene-card dialogue-card p-5 mb-4">
 
         <!-- A 질문 -->
         <div class="flex items-start gap-3 mb-1">
             <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-black text-slate-600 flex-shrink-0 mt-1">A</div>
             <div class="bubble-q px-4 py-3 flex-1">
                 <p class="text-sm text-slate-800 font-medium safe leading-relaxed">${qHtml}</p>
-                <p class="vi-guide mt-1 safe">${d.qVi}</p>
+                ${langBlock(dialogueLang(d, 'q'), 'mt-1 safe')}
             </div>
         </div>
         <!-- A → B 화살표 안내 -->
         <div class="flex justify-center my-2">
-            <span class="vi-guide text-slate-400 text-xs flex items-center gap-1">
+            <span class="lang-guide text-slate-400 text-xs flex items-center gap-1">
                 <i class="fa-solid fa-arrow-down text-indigo-300"></i>
-                Câu trả lời của bạn (B)
+                ${getLangText(UI_I18N.answerLabel) || 'B가 말할 대답'}
                 <i class="fa-solid fa-arrow-down text-indigo-300"></i>
             </span>
         </div>
@@ -416,7 +951,7 @@ function renderDialogue() {
         <div class="flex items-start gap-3">
             <div class="bubble-a px-4 py-3 flex-1">
                 <p class="text-sm text-slate-800 font-bold safe leading-relaxed">${targetHtml}</p>
-                <p class="vi-guide mt-1 safe">${d.targetVi}</p>
+                ${langBlock(dialogueLang(d, 'target'), 'mt-1 safe')}
             </div>
             <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-black text-blue-600 flex-shrink-0 mt-1">B</div>
         </div>
@@ -427,20 +962,20 @@ function renderDialogue() {
                 <i class="fa-solid fa-lightbulb text-amber-500 mt-0.5 flex-shrink-0"></i>
                 <div>
                     <p class="text-xs font-bold text-amber-800 safe">${d.tip}</p>
-                    <p class="vi-guide text-amber-700 mt-0.5 safe">${d.tipVi}</p>
+                    ${langBlock(dialogueLang(d, 'tip'), 'text-amber-700 mt-0.5 safe')}
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 단계 인디케이터 -->
-    <div class="flex items-center gap-2 mb-4 px-1">
+    <div class="step-indicator flex items-center gap-2 mb-4 px-1">
         <div class="step-dot active" id="dot1">1</div>
         <div class="flex-1 h-0.5 bg-slate-200"></div>
         <div class="step-dot idle" id="dot2">2</div>
         <div class="flex-1 h-0.5 bg-slate-200"></div>
         <div class="step-dot idle" id="dot3">3</div>
-        <span class="text-xs text-slate-500 ml-1 vi-guide" id="stepLabel">① Nghe</span>
+        <span class="text-xs text-slate-500 ml-1" id="stepLabel">① 듣기 ${inlineLang(UI_I18N.stepLabel.listen)}</span>
     </div>
 
     <!-- 단계 패널 -->
@@ -451,10 +986,12 @@ function renderDialogue() {
     `;
 
     speechSynthesis.getVoices();
-    // 새 문장 로드 시: 대화 카드로 스크롤 + 따라 말하기 버튼 강조
+    // 새 문장으로 넘어갈 때만 본문으로 이동하고, 최초 로드는 화면을 밀지 않는다.
     setTimeout(() => {
-        document.getElementById('mainArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setTimeout(() => {
+        if (shouldScrollToDialogue) {
+            document.getElementById('mainArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        if (options.animate !== false) setTimeout(() => {
             const sb = document.getElementById('speakBtn');
             if (sb) { sb.classList.add('anim-speak'); setTimeout(() => sb.classList.remove('anim-speak'), 3500); }
         }, 600);
@@ -468,28 +1005,40 @@ function renderListenPanel(d) {
     ).join('');
 
     return `
-    <div class="scene-card p-5">
+    <div class="scene-card step-panel-card p-5">
 
-        <!-- 베트남어 단계 가이드 -->
+        <!-- 단계 가이드 -->
         <div class="step-guide mb-4">
             <p class="text-xs font-black text-indigo-700 mb-2 flex items-center gap-1.5">
-                <span class="vi-badge">🇻🇳 VI</span> Hướng dẫn bước 1: Nghe
+                ${langBadgeHtml(UI_I18N.stepListenTitle)} 듣기 단계 안내 ${inlineLang(UI_I18N.stepListenTitle)}
             </p>
             <div class="step-guide-item">
                 <div class="step-num">1</div>
-                <p class="vi-guide safe">Nhấn <b>"A 듣기"</b> để nghe câu hỏi của người phỏng vấn.</p>
+                <div>
+                    <p class="text-xs font-bold text-indigo-700 safe">A 듣기로 질문을 먼저 들어 보세요.</p>
+                    ${langBlock(UI_I18N.stepListen[0], 'safe mt-1')}
+                </div>
             </div>
             <div class="step-guide-item">
                 <div class="step-num">2</div>
-                <p class="vi-guide safe">Nhấn <b>"B 듣기"</b> để nghe câu trả lời bạn cần nói.</p>
+                <div>
+                    <p class="text-xs font-bold text-indigo-700 safe">B 듣기로 내가 말할 대답을 확인하세요.</p>
+                    ${langBlock(UI_I18N.stepListen[1], 'safe mt-1')}
+                </div>
             </div>
             <div class="step-guide-item">
                 <div class="step-num">3</div>
-                <p class="vi-guide safe">Nhấn <b>"B 천천히"</b> để nghe chậm hơn và bắt chước từng âm.</p>
+                <div>
+                    <p class="text-xs font-bold text-indigo-700 safe">B 천천히 듣기로 리듬과 소리를 따라 하세요.</p>
+                    ${langBlock(UI_I18N.stepListen[2], 'safe mt-1')}
+                </div>
             </div>
             <div class="step-guide-item">
                 <div class="step-num">4</div>
-                <p class="vi-guide safe">Khi đã tự tin, nhấn <b>"따라 말하기"</b> để bắt đầu luyện nói.</p>
+                <div>
+                    <p class="text-xs font-bold text-indigo-700 safe">준비되면 따라 말하기를 눌러 연습하세요.</p>
+                    ${langBlock(UI_I18N.stepListen[3], 'safe mt-1')}
+                </div>
             </div>
         </div>
 
@@ -504,7 +1053,7 @@ function renderListenPanel(d) {
         </div>
         <button class="btn-slow w-full mb-4" onclick="speakBSlow()">
             <i class="fa-solid fa-snail mr-1"></i>B 천천히 듣기
-            <span class="vi-guide text-purple-600 text-xs ml-1">(Nghe chậm)</span>
+            ${inlineLang(UI_I18N.slowListen, 'text-purple-600 text-xs ml-1')}
         </button>
 
         <!-- 발음 포인트 -->
@@ -512,14 +1061,14 @@ function renderListenPanel(d) {
             <p class="text-xs font-bold text-fuchsia-700 mb-1.5 flex items-center gap-1">
                 <i class="fa-solid fa-ear-listen"></i>
                 발음 체크포인트
-                <span class="vi-guide text-fuchsia-600">/ Điểm phát âm cần chú ý</span>
+                ${inlineLang(UI_I18N.pronunPoint, 'text-fuchsia-600')}
             </p>
             <div>${pronuns}</div>
         </div>
 
         <button id="speakBtn" class="btn-primary" onclick="goToRecord()">
             <i class="fa-solid fa-microphone mr-2"></i>따라 말하기
-            <span class="vi-guide text-blue-200 text-xs ml-1">→ Bắt đầu nói</span>
+            ${inlineLang(UI_I18N.startSpeak, 'text-blue-200 text-xs ml-1')}
         </button>
     </div>`;
 }
@@ -527,43 +1076,55 @@ function renderListenPanel(d) {
 // ─── 단계 2: 말하기 패널 ─────────────────────────────────────────────────────
 function renderRecordPanel(d) {
     return `
-    <div class="scene-card p-5">
+    <div class="scene-card step-panel-card p-5">
 
-        <!-- 베트남어 단계 가이드 -->
+        <!-- 단계 가이드 -->
         <div class="step-guide mb-4">
             <p class="text-xs font-black text-indigo-700 mb-2 flex items-center gap-1.5">
-                <span class="vi-badge">🇻🇳 VI</span> Hướng dẫn bước 2: Nói
+                ${langBadgeHtml(UI_I18N.stepRecordTitle)} 말하기 단계 안내 ${inlineLang(UI_I18N.stepRecordTitle)}
             </p>
             <div class="step-guide-item">
                 <div class="step-num">1</div>
-                <p class="vi-guide safe">Đọc câu B bên dưới một lần trước khi nói.</p>
+                <div>
+                    <p class="text-xs font-bold text-indigo-700 safe">말하기 전에 B 문장을 한 번 읽어 보세요.</p>
+                    ${langBlock(UI_I18N.stepRecord[0], 'safe mt-1')}
+                </div>
             </div>
             <div class="step-guide-item">
                 <div class="step-num">2</div>
-                <p class="vi-guide safe">Nhấn nút <b>🎤 màu tím</b> → nói to và rõ ràng vào microphone.</p>
+                <div>
+                    <p class="text-xs font-bold text-indigo-700 safe">마이크 버튼을 누른 뒤 크고 또렷하게 말하세요.</p>
+                    ${langBlock(UI_I18N.stepRecord[1], 'safe mt-1')}
+                </div>
             </div>
             <div class="step-guide-item">
                 <div class="step-num">3</div>
-                <p class="vi-guide safe">Nói xong, hệ thống sẽ tự nhận diện và hiển thị kết quả.</p>
+                <div>
+                    <p class="text-xs font-bold text-indigo-700 safe">말하면 인식 결과와 피드백이 표시됩니다.</p>
+                    ${langBlock(UI_I18N.stepRecord[2], 'safe mt-1')}
+                </div>
             </div>
             <div class="step-guide-item">
                 <div class="step-num">4</div>
-                <p class="vi-guide safe">Nếu muốn nghe lại, nhấn <b>"다시 듣기"</b> trước khi nói.</p>
+                <div>
+                    <p class="text-xs font-bold text-indigo-700 safe">필요하면 다시 듣기로 모범 발음을 확인하세요.</p>
+                    ${langBlock(UI_I18N.stepRecord[3], 'safe mt-1')}
+                </div>
             </div>
         </div>
 
         <!-- 참조 문장 -->
         <div class="rounded-xl bg-blue-50 border border-blue-100 px-4 py-3 mb-3">
             <p class="text-xs text-blue-500 font-bold mb-1">
-                말할 문장 (Câu bạn cần nói)
+                말할 문장 ${inlineLang(UI_I18N.targetLabel)}
             </p>
             <p class="text-base font-bold text-slate-800 safe leading-relaxed">${d.target}</p>
-            <p class="vi-guide mt-1 safe">${d.targetVi}</p>
+            ${langBlock(dialogueLang(d, 'target'), 'mt-1 safe')}
         </div>
 
         <!-- 인식 결과 박스 -->
         <div id="recognizedBox" class="min-h-12 rounded-xl px-4 py-3 text-center text-sm mb-3 rec-status-idle">
-            <p class="text-slate-400 text-xs mb-0.5">인식 결과 / Kết quả nhận dạng</p>
+            <p class="text-slate-400 text-xs mb-0.5">인식 결과 ${inlineLang(UI_I18N.recognizedLabel)}</p>
             <p id="recognizedText" class="text-slate-500">—</p>
         </div>
 
@@ -573,7 +1134,7 @@ function renderRecordPanel(d) {
         </div>
         <p id="recStatus" class="text-xs text-center mb-4">
             <span class="text-slate-400">준비 완료</span>
-            <span class="vi-guide block">Sẵn sàng — nhấn nút mic để bắt đầu</span>
+            ${langBlock(UI_I18N.ready, 'block')}
         </p>
 
         <!-- 마이크 버튼 -->
@@ -596,7 +1157,7 @@ function renderRecordPanel(d) {
             </button>
         </div>
         <button class="btn-ghost w-full" onclick="goToListen()">
-            <i class="fa-solid fa-arrow-left mr-1"></i>뒤로 / Quay lại
+            <i class="fa-solid fa-arrow-left mr-1"></i>뒤로
         </button>
     </div>`;
 }
@@ -621,15 +1182,15 @@ function setDots(s) {
     const d3 = document.getElementById('dot3');
     const lbl = document.getElementById('stepLabel');
     const labels = {
-        listen: { d1:'active', d2:'idle', d3:'idle', lbl:'① Nghe / 듣기' },
-        record: { d1:'done',   d2:'active', d3:'idle', lbl:'② Nói / 말하기' },
-        result: { d1:'done',   d2:'done',   d3:'active', lbl:'③ Kết quả / 결과' }
+        listen: { d1:'active', d2:'idle', d3:'idle', ko:'① 듣기', lang:UI_I18N.stepLabel.listen },
+        record: { d1:'done',   d2:'active', d3:'idle', ko:'② 말하기', lang:UI_I18N.stepLabel.record },
+        result: { d1:'done',   d2:'done',   d3:'active', ko:'③ 결과', lang:UI_I18N.stepLabel.result }
     };
     const l = labels[s];
     d1.className = 'step-dot ' + l.d1;
     d2.className = 'step-dot ' + l.d2;
     d3.className = 'step-dot ' + l.d3;
-    lbl.textContent = l.lbl;
+    lbl.innerHTML = `${l.ko} ${inlineLang(l.lang)}`;
 }
 
 // ─── TTS ────────────────────────────────────────────────────────────────────
@@ -663,12 +1224,12 @@ function startRecording() {
     document.getElementById('micIcon').className = 'fa-solid fa-stop';
     document.getElementById('recStatus').innerHTML =
         '<span class="text-red-500 font-bold">● 녹음 중</span>' +
-        '<span class="vi-guide block text-red-400">Đang ghi âm... Hãy nói to!</span>';
+        langBlock(UI_I18N.recording, 'block text-red-400');
     const wf = document.getElementById('waveform');
     wf.classList.remove('hidden'); wf.style.display = 'flex';
     const box = document.getElementById('recognizedBox');
     box.className = 'min-h-12 rounded-xl px-4 py-3 text-center text-sm mb-3 rec-status-active';
-    document.getElementById('recognizedText').textContent = '인식 중... / Đang nhận dạng...';
+    document.getElementById('recognizedText').innerHTML = `인식 중... ${inlineLang(UI_I18N.recognizing)}`;
 
     function startSR() {
         recognition = new SR();
@@ -706,8 +1267,8 @@ function startRecording() {
                 return;
             }
             const msgs = {
-                'not-allowed': '마이크 권한이 필요합니다.\nBạn cần cho phép dùng microphone.',
-                'no-speech':   '음성이 감지되지 않았습니다.\nKhông nghe thấy giọng nói. Hãy nói to hơn!'
+                'not-allowed': '마이크 권한이 필요합니다.' + (getLangText(UI_I18N.micPermission) ? '\n' + getLangText(UI_I18N.micPermission) : ''),
+                'no-speech':   '음성이 감지되지 않았습니다.' + (getLangText(UI_I18N.noSpeech) ? '\n' + getLangText(UI_I18N.noSpeech) : '')
             };
             document.getElementById('recStatus').innerHTML =
                 '<span class="text-orange-500">' + (msgs[e.error] || '오류: ' + e.error).replace('\n', '<br>') + '</span>';
@@ -744,7 +1305,7 @@ function stopRecording() {
     const rs = document.getElementById('recStatus');
     if (rs) rs.innerHTML =
         '<span class="text-green-600 font-bold">완료!</span>' +
-        '<span class="vi-guide block text-green-500">Xong! Đang phân tích...</span>';
+        langBlock(UI_I18N.doneAnalyzing, 'block text-green-500');
 }
 
 // ─── 분석 엔진 ───────────────────────────────────────────────────────────────
@@ -851,26 +1412,27 @@ function analyzeResult(spoken) {
     });
     step = 'result';
     setDots('result');
+    lastResult = { d, spokenRaw: spoken, target, spoken: spokenN, accuracy, completeness, score };
     showResult(d, spoken, target, spokenN, accuracy, completeness, score);
 }
 
 // ─── 단계 3: 결과 패널 ───────────────────────────────────────────────────────
-function showResult(d, spokenRaw, target, spoken, accuracy, completeness, score) {
+function showResult(d, spokenRaw, target, spoken, accuracy, completeness, score, options = {}) {
     const color   = score >= 80 ? '#16a34a' : score >= 60 ? '#d97706' : '#dc2626';
     const bgColor = score >= 80 ? '#f0fdf4' : score >= 60 ? '#fffbeb' : '#fef2f2';
     const bdColor = score >= 80 ? '#86efac' : score >= 60 ? '#fcd34d' : '#fca5a5';
 
     const msgs = score >= 80
-        ? { ko: '훌륭합니다! 발음이 매우 정확해요. 🌟', vi: 'Xuất sắc! Phát âm của bạn rất chính xác.' }
+        ? { ko: '훌륭합니다! 발음이 매우 정확해요. 🌟', lang: UI_I18N.feedbackGreat }
         : score >= 60
-        ? { ko: '잘 했어요! 조금 더 연습해 보세요. 👍', vi: 'Khá tốt! Hãy luyện thêm một chút nữa.' }
-        : { ko: '계속 연습해 보세요. 천천히 따라 말해 보세요. 💪', vi: 'Hãy tiếp tục luyện tập. Nghe chậm và bắt chước từng âm nhé.' };
+        ? { ko: '잘 했어요! 조금 더 연습해 보세요. 👍', lang: UI_I18N.feedbackGood }
+        : { ko: '계속 연습해 보세요. 천천히 따라 말해 보세요. 💪', lang: UI_I18N.feedbackTry };
 
     const improveTip = score < 60
-        ? '"B 천천히 듣기" 버튼으로 천천히 들은 후 다시 말해 보세요.\nNhấn "B 천천히" để nghe chậm, rồi nói lại.'
+        ? { ko: '"B 천천히 듣기" 버튼으로 천천히 들은 후 다시 말해 보세요.', lang: UI_I18N.improveLow }
         : score < 80
-        ? '발음 체크포인트를 확인하고 한 번 더 도전해 보세요.\nXem lại điểm phát âm và thử một lần nữa!'
-        : '다음 문장으로 넘어가도 좋습니다.\nBạn có thể tiếp tục câu tiếp theo!';
+        ? { ko: '발음 체크포인트를 확인하고 한 번 더 도전해 보세요.', lang: UI_I18N.improveMid }
+        : { ko: '다음 문장으로 넘어가도 좋습니다.', lang: UI_I18N.improveHigh };
 
     const circ   = 251.3;
     const offset = circ - (score / 100) * circ;
@@ -884,7 +1446,7 @@ function showResult(d, spokenRaw, target, spoken, accuracy, completeness, score)
     document.getElementById('resultPanel').innerHTML = `
     <div class="scene-card p-5 mb-4" id="resultCard">
         <h2 class="text-center font-black text-slate-800 text-lg mb-1">발음 분석 결과</h2>
-        <p class="vi-guide text-center mb-3">Kết quả phân tích phát âm</p>
+        ${langBlock(UI_I18N.resultTitle, 'text-center mb-3')}
 
         <!-- 별점 -->
         <div style="text-align:center;font-size:28px;letter-spacing:3px;margin-bottom:14px">${stars}</div>
@@ -906,7 +1468,7 @@ function showResult(d, spokenRaw, target, spoken, accuracy, completeness, score)
             <div class="flex-1 space-y-3">
                 <div>
                     <div class="flex justify-between text-xs mb-1">
-                        <span class="text-slate-500">정확도 <span class="vi-guide">(Độ chính xác)</span></span>
+                        <span class="text-slate-500">정확도 ${inlineLang(UI_I18N.accuracy)}</span>
                         <span class="font-bold text-slate-700">${accuracy}%</span>
                     </div>
                     <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -915,7 +1477,7 @@ function showResult(d, spokenRaw, target, spoken, accuracy, completeness, score)
                 </div>
                 <div>
                     <div class="flex justify-between text-xs mb-1">
-                        <span class="text-slate-500">완성도 <span class="vi-guide">(Độ hoàn chỉnh)</span></span>
+                        <span class="text-slate-500">완성도 ${inlineLang(UI_I18N.completeness)}</span>
                         <span class="font-bold text-slate-700">${completeness}%</span>
                     </div>
                     <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -929,7 +1491,7 @@ function showResult(d, spokenRaw, target, spoken, accuracy, completeness, score)
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:16px">
             <p style="font-size:11.5px;font-weight:700;color:#475569;margin-bottom:10px;text-align:center">
                 📊 음절별 발음 체크
-                <span class="vi-guide" style="font-weight:400"> / Kiểm tra từng âm tiết</span>
+                ${inlineLang(UI_I18N.syllableCheck)}
             </p>
             ${syllableBlocks}
             <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:10px;color:#64748b">
@@ -940,38 +1502,39 @@ function showResult(d, spokenRaw, target, spoken, accuracy, completeness, score)
         <!-- 피드백 -->
         <div class="rounded-xl px-4 py-3 mb-4" style="background:${bgColor};border:1px solid ${bdColor}">
             <p class="text-sm font-bold safe" style="color:${color}">${msgs.ko}</p>
-            <p class="vi-guide mt-1 safe" style="color:${color}">${msgs.vi}</p>
+            ${langBlock(msgs.lang, 'mt-1 safe')}
         </div>
 
-        <!-- 개선 팁 (베트남어) -->
+        <!-- 개선 팁 -->
         <div class="step-guide mb-5">
             <p class="text-xs font-bold text-indigo-700 mb-1 flex items-center gap-1">
-                <span class="vi-badge">🇻🇳 VI</span> Gợi ý tiếp theo
+                ${langBadgeHtml(UI_I18N.nextTipTitle)} 다음 연습 제안 ${inlineLang(UI_I18N.nextTipTitle)}
             </p>
-            <p class="vi-guide safe">${improveTip.replace('\n', '<br>')}</p>
+            <p class="text-xs font-bold text-indigo-700 safe">${escapeHtml(improveTip.ko)}</p>
+            ${langBlock(improveTip.lang, 'safe mt-1')}
         </div>
 
         <!-- 버튼 -->
         <div class="grid grid-cols-2 gap-2 mb-3">
             <button class="btn-ghost" onclick="retryThis()">
                 <i class="fa-solid fa-rotate-right mr-1"></i>다시 시도
-                <span class="vi-guide block text-xs">Thử lại</span>
+                ${inlineLang(UI_I18N.retry, 'block text-xs')}
             </button>
             <button class="btn-listen" onclick="speakB()">
                 <i class="fa-solid fa-volume-high mr-1"></i>모범 발음
-                <span class="vi-guide block text-xs">Nghe mẫu</span>
+                ${inlineLang(UI_I18N.modelListen, 'block text-xs')}
             </button>
         </div>
-        ${!isLast ? '<p style="text-align:center;font-size:11px;color:#3b82f6;font-weight:700;margin-bottom:6px;animation:bounce-y 0.85s ease-in-out infinite">👆 다음 문장으로 넘어가세요 / Nhấn để tiếp tục</p>' : ''}
+        ${!isLast ? `<p style="text-align:center;font-size:11px;color:#3b82f6;font-weight:700;margin-bottom:6px;animation:bounce-y 0.85s ease-in-out infinite">👆 다음 문장으로 넘어가세요 ${inlineLang(UI_I18N.nextPrompt)}</p>` : ''}
         <button id="nextBtn" class="btn-primary" onclick="${isLast ? 'showSessionResult()' : 'nextDialogue()'}">
             ${isLast
-                ? '<i class="fa-solid fa-flag-checkered mr-2"></i>결과 보기 / Xem kết quả'
-                : '<i class="fa-solid fa-arrow-right mr-2"></i>다음 문장 / Câu tiếp theo'}
+                ? `<i class="fa-solid fa-flag-checkered mr-2"></i>결과 보기 ${inlineLang(UI_I18N.viewResult, 'text-blue-200')}`
+                : `<i class="fa-solid fa-arrow-right mr-2"></i>다음 문장 ${inlineLang(UI_I18N.nextSentence, 'text-blue-200')}`}
         </button>
     </div>`;
 
     // 애니메이션: 점수 카운트업 + 바 슬라이드인
-    _scrollToResult();
+    if (!options.skipScroll) _scrollToResult();
     setTimeout(() => {
         const ab = document.getElementById('accBar');
         const cb = document.getElementById('compBar');
@@ -1015,9 +1578,11 @@ function nextDialogue() {
     renderDialogue();
 }
 
-function updateProgress() {
-    const pct = Math.round(currentIdx / DIALOGUES.length * 100);
-    document.getElementById('progressLabel').textContent = `${currentIdx + 1} / ${DIALOGUES.length}`;
+function updateProgress(forceComplete = false) {
+    const completed = forceComplete ? DIALOGUES.length : currentIdx;
+    const labelIndex = forceComplete ? DIALOGUES.length : Math.min(currentIdx + 1, DIALOGUES.length);
+    const pct = Math.round(completed / DIALOGUES.length * 100);
+    document.getElementById('progressLabel').textContent = `${labelIndex} / ${DIALOGUES.length}`;
     document.getElementById('progressPct').textContent = pct + '%';
     document.getElementById('progressBar').style.width = pct + '%';
 }
@@ -1026,7 +1591,7 @@ function showSessionResult() {
     document.getElementById('mainArea').innerHTML = '';
     document.getElementById('sessionResult').classList.remove('hidden');
     document.getElementById('completeBadge').classList.remove('hidden');
-    updateProgress();
+    updateProgress(true);
     if (sessionScores.length > 0) {
         document.getElementById('res-attempts').textContent = sessionScores.length;
         document.getElementById('res-best').textContent = Math.max(...sessionScores);
@@ -1061,8 +1626,8 @@ function renderLog() {
     document.getElementById('logArea').innerHTML = `
         <div style="border-top:1px solid #e2e8f0;padding-top:14px">
             <p style="font-size:12px;font-weight:700;color:#4338ca;margin-bottom:8px">
-                <i class="fa-solid fa-clock-rotate-left" style="margin-right:4px"></i>연습 로그 / Nhật ký luyện tập
-                <span style="font-weight:400;color:#94a3b8;font-size:10.5px;margin-left:4px">(항목 클릭 시 상세 보기)</span>
+                <i class="fa-solid fa-clock-rotate-left" style="margin-right:4px"></i>연습 로그 ${inlineLang(UI_I18N.logTitle)}
+                <span style="font-weight:400;color:#94a3b8;font-size:10.5px;margin-left:4px">(항목 클릭 시 상세 보기 ${inlineLang(UI_I18N.detailHint)})</span>
             </p>
             ${rows}
         </div>`;
@@ -1070,6 +1635,7 @@ function renderLog() {
 
 function restartSession() {
     currentIdx = 0; sessionScores = []; sessionLog = [];
+    hasRenderedDialogue = false;
     document.getElementById('sessionResult').classList.add('hidden');
     document.getElementById('completeBadge').classList.add('hidden');
     renderDialogue();

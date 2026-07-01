@@ -43,6 +43,7 @@ const pages = [
     storyCount: 4,
     resources: [
       { href: 'grammar4-support-activity1.html', text: '보조활동 1' },
+      { href: 'grammar4-support-activity2.html', text: '보조활동 2' },
       { href: 'grammar4-form-typing.html', text: '활용형·문장 완성' },
       { href: 'grammar4-classic.html', text: '기존 버전' }
     ]
