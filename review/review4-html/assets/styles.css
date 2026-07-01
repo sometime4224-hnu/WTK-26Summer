@@ -100,7 +100,7 @@ button {
 }
 
 html[data-layout="tablet"] .app-shell {
-  width: min(100% - 34px, 920px);
+  width: min(100% - 34px, 900px);
 }
 
 .surface {
@@ -227,9 +227,9 @@ html[data-layout="tablet"] .app-shell {
 .section-title,
 .result-title {
   margin: 16px 0 10px;
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-size: 2.15rem;
   line-height: 1.1;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
 }
 
 .hero-copy,
@@ -251,7 +251,7 @@ html[data-layout="tablet"] .app-shell {
 }
 
 .stats-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
   margin: 18px 0 0;
 }
 
@@ -955,11 +955,48 @@ html[data-layout="tablet"] .option-grid.option-grid--wide {
   .hero-card,
   .result-card,
   .modal-panel {
-    padding: 22px;
+    padding: 18px;
+  }
+
+  .hero-title,
+  .section-title,
+  .result-title {
+    font-size: 1.72rem;
+    line-height: 1.16;
+  }
+
+  .hero-copy,
+  .section-copy,
+  .muted-copy {
+    line-height: 1.55;
   }
 
   .question-card {
-    padding: 20px;
+    padding: 18px;
+  }
+
+  .question-number {
+    margin: 12px 0 6px;
+    font-size: 1.65rem;
+  }
+
+  .question-prompt {
+    font-size: 1.04rem;
+    line-height: 1.58;
+  }
+
+  .section-meta,
+  .section-actions,
+  .result-actions,
+  .history-actions {
+    gap: 8px;
+  }
+
+  .primary-button,
+  .secondary-button {
+    flex: 1 1 148px;
+    min-height: 50px;
+    padding: 11px 14px;
   }
 
   .score-wrap {
@@ -967,8 +1004,7 @@ html[data-layout="tablet"] .option-grid.option-grid--wide {
     align-items: flex-start;
   }
 
-  .summary-grid,
-  .stats-grid {
+  .summary-grid {
     grid-template-columns: 1fr;
   }
 
@@ -979,5 +1015,53 @@ html[data-layout="tablet"] .option-grid.option-grid--wide {
 
   .option-button--image {
     padding: 8px;
+  }
+}
+
+@media (orientation: portrait) and (min-width: 600px) and (max-width: 1024px) {
+  html[data-layout="tablet"] .app-shell {
+    width: min(100% - 32px, 760px);
+    padding-top: 18px;
+  }
+
+  html[data-layout="tablet"] .hero-card,
+  html[data-layout="tablet"] .result-card,
+  html[data-layout="tablet"] .modal-panel,
+  html[data-layout="tablet"] .question-card {
+    padding: 24px;
+  }
+
+  html[data-layout="tablet"] .section-grid {
+    grid-template-columns: 1fr;
+  }
+
+  html[data-layout="tablet"] .option-grid.option-grid--wide {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 380px) {
+  .app-shell {
+    width: calc(100% - 12px);
+  }
+
+  .ghost-icon,
+  .nav-button {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .device-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .option-grid.option-grid--media {
+    grid-template-columns: 1fr;
+  }
+
+  .option-button {
+    padding: 14px;
   }
 }

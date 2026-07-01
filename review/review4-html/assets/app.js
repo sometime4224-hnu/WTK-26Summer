@@ -3,15 +3,18 @@
   var FEEDBACK_I18N = window.REVIEW4_FEEDBACK_I18N || {};
   var STORAGE_PREFIX = "snukorean:review4";
   var runtime = {
-    layout: loadText("layout") || "phone",
+    layoutPreference: normalizeLayoutPreference(loadText("layoutPreference") || "auto"),
+    activeLayout: "",
     sectionUi: {},
     speakingQuestionId: "",
     audioElement: null
   };
 
   document.addEventListener("DOMContentLoaded", function () {
-    applyLayout(runtime.layout);
+    applyLayout();
     document.getElementById("app").addEventListener("click", onClick);
+    window.addEventListener("resize", onViewportChange);
+    window.addEventListener("orientationchange", onViewportChange);
     window.addEventListener("beforeunload", stopAudio);
     render();
   });
@@ -27,9 +30,9 @@
     var ui = sectionId ? getUi(sectionId) : null;
 
     if (action === "set-layout") {
-      runtime.layout = target.getAttribute("data-layout");
-      saveText("layout", runtime.layout);
-      applyLayout(runtime.layout);
+      runtime.layoutPreference = normalizeLayoutPreference(target.getAttribute("data-layout"));
+      saveText("layoutPreference", runtime.layoutPreference);
+      applyLayout();
       render();
       return;
     }
@@ -139,14 +142,22 @@
   }
 
   function renderHub() {
+    var activeProgressCount = 0;
+    var totalAttemptCount = 0;
     var cards = DATA.order.map(function (sectionId) {
       var section = DATA.sections[sectionId];
       var progress = getProgress(sectionId);
       var attempts = getAttempts(sectionId);
       var latest = attempts[0];
+      var best = getBestAttempt(attempts);
       var answered = progress ? Object.keys(progress.answers).length : 0;
+      if (answered) {
+        activeProgressCount += 1;
+      }
+      totalAttemptCount += attempts.length;
       var progressLabel = answered ? answered + "/" + section.questions.length : "새로 시작";
-      var latestLabel = latest ? latest.score + "/" + latest.total : "기록 없음";
+      var latestLabel = latest ? formatScore(latest) : "기록 없음";
+      var bestLabel = best ? formatScore(best) : "기록 없음";
       var description = section.hero;
       return (
         '<article class="section-card">' +
@@ -160,6 +171,7 @@
         '<div class="section-meta">' +
         '<span class="chip"><strong>진행</strong>' + escapeHtml(progressLabel) + "</span>" +
         '<span class="chip"><strong>최근</strong>' + escapeHtml(latestLabel) + "</span>" +
+        '<span class="chip"><strong>최고</strong>' + escapeHtml(bestLabel) + "</span>" +
         '<span class="chip"><strong>기록</strong>' + String(attempts.length) + "</span>" +
         "</div>" +
         '<div class="section-actions">' +
@@ -175,10 +187,11 @@
       '<section class="hero-card surface">' +
       '<div class="eyebrow">복습 4</div>' +
       '<h1 class="hero-title">하위 단원별 퀴즈</h1>' +
-      '<p class="hero-copy">스마트폰 폭이 기본이고, 오른쪽 위 토글로 태블릿 폭으로 바로 전환됩니다. 각 단원은 자동 저장되며 결과와 과거 기록을 다시 열어볼 수 있습니다.</p>' +
+      '<p class="hero-copy">풀던 답안과 응시 점수가 이 기기에 자동 저장됩니다.</p>' +
       '<div class="stats-grid">' +
       '<div class="stats-card"><span class="stat-label">단원</span><span class="stat-value">4</span></div>' +
-      '<div class="stats-card"><span class="stat-label">저장</span><span class="stat-value">Auto</span></div>' +
+      '<div class="stats-card"><span class="stat-label">진행 중</span><span class="stat-value">' + activeProgressCount + "</span></div>" +
+      '<div class="stats-card"><span class="stat-label">응시 기록</span><span class="stat-value">' + totalAttemptCount + "</span></div>" +
       "</div>" +
       "</section>" +
       '<section class="section-grid">' + cards + "</section>" +
@@ -211,10 +224,12 @@
     var ui = getUi(sectionId);
     var attempts = getAttempts(sectionId);
     var latest = attempts[0];
+    var best = getBestAttempt(attempts);
     var answered = progress ? Object.keys(progress.answers).length : 0;
     var stats = latest
       ? '<div class="stats-grid">' +
-        '<div class="stats-card"><span class="stat-label">최근 점수</span><span class="stat-value">' + latest.score + "/" + latest.total + "</span></div>" +
+        '<div class="stats-card"><span class="stat-label">최근 점수</span><span class="stat-value">' + formatScore(latest) + "</span></div>" +
+        '<div class="stats-card"><span class="stat-label">최고 점수</span><span class="stat-value">' + formatScore(best) + "</span></div>" +
         '<div class="stats-card"><span class="stat-label">응시 기록</span><span class="stat-value">' + attempts.length + "</span></div>" +
         "</div>"
       : '<div class="empty-card">아직 기록이 없습니다. 첫 응시가 자동으로 저장됩니다.</div>';
@@ -257,6 +272,7 @@
       '<div class="section-meta">' +
       '<span class="chip"><strong>문항</strong>' + escapeHtml(section.countLabel) + "</span>" +
       '<span class="chip"><strong>진행</strong>' + (answered ? answered + "/" + section.questions.length : "0/" + section.questions.length) + "</span>" +
+      '<span class="chip"><strong>저장</strong>로컬</span>' +
       "</div>" +
       '<div class="section-actions">' + progressAction + resetAction + "</div>" +
       "</section>" +
@@ -510,8 +526,9 @@
   function renderDeviceToggle() {
     return (
       '<div class="device-toggle" role="group" aria-label="화면 전환">' +
-      '<button class="device-button' + (runtime.layout === "phone" ? " is-active" : "") + '" data-action="set-layout" data-layout="phone" aria-label="스마트폰">' + icon("phone") + "</button>" +
-      '<button class="device-button' + (runtime.layout === "tablet" ? " is-active" : "") + '" data-action="set-layout" data-layout="tablet" aria-label="태블릿">' + icon("tablet") + "</button>" +
+      '<button class="device-button' + (runtime.layoutPreference === "auto" ? " is-active" : "") + '" data-action="set-layout" data-layout="auto" aria-label="자동">' + icon("auto") + "</button>" +
+      '<button class="device-button' + (runtime.layoutPreference === "phone" ? " is-active" : "") + '" data-action="set-layout" data-layout="phone" aria-label="스마트폰">' + icon("phone") + "</button>" +
+      '<button class="device-button' + (runtime.layoutPreference === "tablet" ? " is-active" : "") + '" data-action="set-layout" data-layout="tablet" aria-label="태블릿">' + icon("tablet") + "</button>" +
       "</div>"
     );
   }
@@ -719,6 +736,31 @@
     saveJson(storageKey("attempts", sectionId), attempts.slice(0, 12));
   }
 
+  function getBestAttempt(attempts) {
+    if (!attempts || !attempts.length) {
+      return null;
+    }
+    return attempts.slice().sort(function (a, b) {
+      var aRatio = a.total ? a.score / a.total : 0;
+      var bRatio = b.total ? b.score / b.total : 0;
+      if (bRatio !== aRatio) {
+        return bRatio - aRatio;
+      }
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
+      return b.finishedAt - a.finishedAt;
+    })[0];
+  }
+
+  function formatScore(attempt) {
+    if (!attempt) {
+      return "기록 없음";
+    }
+    var ratio = attempt.total ? Math.round((attempt.score / attempt.total) * 100) : 0;
+    return attempt.score + "/" + attempt.total + " · " + ratio + "%";
+  }
+
   function storageKey(type, id) {
     return STORAGE_PREFIX + ":" + type + ":" + id;
   }
@@ -748,8 +790,43 @@
     localStorage.setItem(STORAGE_PREFIX + ":" + key, value);
   }
 
-  function applyLayout(layout) {
+  function onViewportChange() {
+    if (runtime.layoutPreference !== "auto") {
+      return;
+    }
+    var previousLayout = runtime.activeLayout;
+    applyLayout();
+    if (previousLayout !== runtime.activeLayout) {
+      render();
+    }
+  }
+
+  function applyLayout() {
+    var layout = resolveLayout(runtime.layoutPreference);
+    runtime.activeLayout = layout;
     document.documentElement.setAttribute("data-layout", layout);
+    document.documentElement.setAttribute("data-layout-preference", runtime.layoutPreference);
+  }
+
+  function resolveLayout(preference) {
+    if (preference === "phone" || preference === "tablet") {
+      return preference;
+    }
+    var width = window.innerWidth || document.documentElement.clientWidth || 0;
+    var height = window.innerHeight || document.documentElement.clientHeight || 0;
+    var isPortrait = height >= width;
+    if (isPortrait && width < 640) {
+      return "phone";
+    }
+    if (width >= 700 || (isPortrait && width >= 640)) {
+      return "tablet";
+    }
+    return "phone";
+  }
+
+  function normalizeLayoutPreference(value) {
+    var normalized = String(value || "").toLowerCase();
+    return normalized === "phone" || normalized === "tablet" || normalized === "auto" ? normalized : "auto";
   }
 
   function choiceText(question, choiceId) {
@@ -900,6 +977,9 @@
     var common = 'viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
     if (type === "home") {
       return '<svg ' + common + '><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.8V21h14V9.8"/><path d="M9.5 21v-6h5v6"/></svg>';
+    }
+    if (type === "auto") {
+      return '<svg ' + common + '><path d="M4.5 12a7.5 7.5 0 0 1 12.7-5.4"/><path d="M17.2 3.7v3.1h-3.1"/><path d="M19.5 12a7.5 7.5 0 0 1-12.7 5.4"/><path d="M6.8 20.3v-3.1h3.1"/><path d="M8.5 12h7"/></svg>';
     }
     if (type === "phone") {
       return '<svg ' + common + '><rect x="7" y="2.8" width="10" height="18.4" rx="2.2"/><path d="M11 18h2"/></svg>';
