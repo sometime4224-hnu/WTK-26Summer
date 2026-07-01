@@ -20,7 +20,8 @@
         latestByStudent: [],
         loading: false,
         error: "",
-        search: ""
+        search: "",
+        anonymous: isAnonymousSearchParam()
     };
 
     function escapeHtml(value) {
@@ -51,6 +52,47 @@
 
     function normalizeName(value) {
         return String(value || "").trim().replace(/\s+/g, " ");
+    }
+
+    function isAnonymousSearchParam() {
+        const value = new URLSearchParams(window.location.search).get("anonymous");
+        return value === "1" || value === "true" || value === "yes";
+    }
+
+    function supportsAnonymousMode() {
+        return Boolean(getAssignment().anonymousModeEnabled);
+    }
+
+    function isAnonymousModeActive() {
+        return supportsAnonymousMode() && state.anonymous;
+    }
+
+    function getStudentKey(record) {
+        const name = normalizeName(record && (record.displayName || record.studentName));
+        return name || String(record && record.id ? record.id : "(이름 없음)");
+    }
+
+    function buildDisplayContext(rows) {
+        const aliases = new Map();
+        let count = 1;
+
+        function add(record) {
+            const key = getStudentKey(record);
+            if (!aliases.has(key)) {
+                aliases.set(key, `학생 ${String(count).padStart(2, "0")}`);
+                count += 1;
+            }
+        }
+
+        rows.forEach(add);
+        state.submissions.forEach(add);
+        return { aliases };
+    }
+
+    function getVisibleStudentName(record, displayContext) {
+        const fallback = normalizeName(record && (record.displayName || record.studentName)) || "(이름 없음)";
+        if (!isAnonymousModeActive()) return fallback;
+        return displayContext.aliases.get(getStudentKey(record)) || "학생";
     }
 
     function scoreTone(percent) {
@@ -255,6 +297,7 @@
                                             <p>${escapeHtml(assignment.assignmentId)}</p>
                                             <div class="assignment-card__actions">
                                                 <a data-assignment-link="${escapeHtml(assignment.assignmentId)}" href="?assignment=${encodeURIComponent(assignment.assignmentId)}">제출 현황</a>
+                                                ${assignment.anonymousModeEnabled ? `<a class="privacy-link" data-assignment-anonymous-link="${escapeHtml(assignment.assignmentId)}" href="?assignment=${encodeURIComponent(assignment.assignmentId)}&anonymous=1">익명 현황</a>` : ""}
                                                 ${assignment.activityHref ? `<a href="${escapeHtml(resolveSiteHref(assignment.activityHref))}">활동 열기</a>` : ""}
                                             </div>
                                         </article>
@@ -364,12 +407,14 @@
         });
     }
 
-    function getFilteredRows() {
+    function getFilteredRows(rows, displayContext) {
         const query = state.search.trim().toLowerCase();
-        const rows = buildRosterRows(state.latestByStudent);
         if (!query) return rows;
         return rows.filter(function (row) {
-            return normalizeName(row.displayName || row.studentName).toLowerCase().includes(query);
+            const searchableName = isAnonymousModeActive()
+                ? getVisibleStudentName(row, displayContext)
+                : normalizeName(row.displayName || row.studentName);
+            return searchableName.toLowerCase().includes(query);
         });
     }
 
@@ -416,7 +461,7 @@
         `;
     }
 
-    function renderBars(rows) {
+    function renderBars(rows, displayContext) {
         if (!rows.length) {
             return '<p class="dashboard-empty">아직 표시할 제출 기록이 없습니다.</p>';
         }
@@ -428,7 +473,7 @@
                     return `
                         <article class="score-bar is-${tone}">
                             <div class="score-bar__head">
-                                <strong>${escapeHtml(row.displayName || row.studentName)}</strong>
+                                <strong>${escapeHtml(getVisibleStudentName(row, displayContext))}</strong>
                                 <span>${row.missing ? "미제출" : `${row.score}/${row.total} (${percent}%)`}</span>
                             </div>
                             <div class="score-bar__track">
@@ -441,7 +486,7 @@
         `;
     }
 
-    function renderWeakQuestions() {
+    function renderWeakQuestions(displayContext) {
         const weakQuestions = buildWeakQuestions(state.submissions);
         if (!weakQuestions.length) {
             return '<p class="dashboard-empty">아직 오답 문항이 없습니다.</p>';
@@ -452,7 +497,13 @@
                 <h2 id="weakTitle">오답이 많은 문항</h2>
                 <div class="weak-list">
                     ${weakQuestions.map(function (item) {
-                        const studentText = item.students.filter(Boolean).slice(0, 4).join(", ");
+                        const studentText = item.students
+                            .filter(Boolean)
+                            .slice(0, 4)
+                            .map(function (name) {
+                                return getVisibleStudentName({ displayName: name }, displayContext);
+                            })
+                            .join(", ");
                         return `
                             <article class="weak-item">
                                 <strong>Q${item.number}</strong>
@@ -468,16 +519,19 @@
         `;
     }
 
-    function renderTable(rows) {
+    function renderTable(rows, displayContext) {
         if (!rows.length) {
             return '<p class="dashboard-empty">검색 결과가 없습니다.</p>';
         }
+
+        const searchPlaceholder = isAnonymousModeActive() ? "익명 번호 검색" : "이름 검색";
+        const searchLabel = isAnonymousModeActive() ? "익명 번호 검색" : "이름 검색";
 
         return `
             <section class="table-panel" aria-labelledby="tableTitle">
                 <div class="panel-head">
                     <h2 id="tableTitle">학생별 최근 제출</h2>
-                    <input id="studentSearch" type="search" value="${escapeHtml(state.search)}" placeholder="이름 검색" aria-label="이름 검색">
+                    <input id="studentSearch" type="search" value="${escapeHtml(state.search)}" placeholder="${escapeHtml(searchPlaceholder)}" aria-label="${escapeHtml(searchLabel)}">
                 </div>
                 <div class="table-scroll">
                     <table>
@@ -496,7 +550,7 @@
                                 const wrong = (row.wrongQuestions || []).join(", ");
                                 return `
                                     <tr class="${row.missing ? "is-missing" : ""}">
-                                        <td><strong>${escapeHtml(row.displayName || row.studentName)}</strong></td>
+                                        <td><strong>${escapeHtml(getVisibleStudentName(row, displayContext))}</strong></td>
                                         <td>${row.missing ? "미제출" : "제출"}</td>
                                         <td>${row.missing ? "-" : `${row.score} / ${row.total}`}</td>
                                         <td>${row.missing ? "-" : `${row.percent}%`}</td>
@@ -512,7 +566,7 @@
         `;
     }
 
-    function renderAllSubmissions() {
+    function renderAllSubmissions(displayContext) {
         if (!state.submissions.length) return "";
 
         return `
@@ -522,7 +576,7 @@
                     ${state.submissions.map(function (submission) {
                         return `
                             <article>
-                                <strong>${escapeHtml(submission.studentName || "(이름 없음)")}</strong>
+                                <strong>${escapeHtml(getVisibleStudentName(submission, displayContext))}</strong>
                                 <span>${submission.score}/${submission.total} · ${submission.percent}%</span>
                                 <em>${escapeHtml(formatDate(submission.clientSubmittedAt || submission.submittedAt))}</em>
                             </article>
@@ -553,6 +607,33 @@
         wireAuthButtons();
     }
 
+    function renderAnonymousModeButton() {
+        if (!supportsAnonymousMode()) return "";
+        const active = isAnonymousModeActive();
+        return `
+            <button id="anonymousModeToggle" class="dashboard-button privacy" type="button" aria-pressed="${active ? "true" : "false"}">
+                ${active ? "익명 모드 끄기" : "익명 모드 켜기"}
+            </button>
+        `;
+    }
+
+    function syncAnonymousUrl() {
+        const url = new URL(window.location.href);
+        if (isAnonymousModeActive()) {
+            url.searchParams.set("anonymous", "1");
+        } else {
+            url.searchParams.delete("anonymous");
+        }
+        window.history.replaceState(null, "", url);
+    }
+
+    function toggleAnonymousMode() {
+        state.anonymous = !isAnonymousModeActive();
+        state.search = "";
+        syncAnonymousUrl();
+        renderDashboard();
+    }
+
     function renderDashboard() {
         if (isRegistryMode() && (!selectedRegistryAssignment || unknownRegistryAssignment)) {
             renderRegistryHub();
@@ -560,7 +641,14 @@
         }
 
         const assignment = getAssignment();
-        const rows = getFilteredRows();
+        if (state.anonymous && !supportsAnonymousMode()) {
+            state.anonymous = false;
+            syncAnonymousUrl();
+        }
+
+        const allRows = buildRosterRows(state.latestByStudent);
+        const displayContext = buildDisplayContext(allRows);
+        const rows = getFilteredRows(allRows, displayContext);
         root.innerHTML = `
             ${renderRegistryBackLink()}
             <header class="dashboard-hero">
@@ -569,18 +657,23 @@
                 <p>${escapeHtml(state.user && state.user.email ? state.user.email : "교사용 계정")}으로 로그인했습니다.</p>
                 <div class="dashboard-actions">
                     <button id="refreshButton" class="dashboard-button primary" type="button">${state.loading ? "불러오는 중..." : "새로고침"}</button>
+                    ${renderAnonymousModeButton()}
                     <button id="signOutButton" class="dashboard-button" type="button">로그아웃</button>
                 </div>
             </header>
             ${state.error ? `<div class="dashboard-alert">${escapeHtml(state.error)}</div>` : ""}
             ${renderSummary()}
-            ${renderBars(rows)}
-            ${renderWeakQuestions()}
-            ${renderTable(rows)}
-            ${renderAllSubmissions()}
+            ${renderBars(rows, displayContext)}
+            ${renderWeakQuestions(displayContext)}
+            ${renderTable(rows, displayContext)}
+            ${renderAllSubmissions(displayContext)}
         `;
 
         document.getElementById("refreshButton").addEventListener("click", loadAndRender);
+        const anonymousToggle = document.getElementById("anonymousModeToggle");
+        if (anonymousToggle) {
+            anonymousToggle.addEventListener("click", toggleAnonymousMode);
+        }
         wireAuthButtons();
         const search = document.getElementById("studentSearch");
         if (search) {

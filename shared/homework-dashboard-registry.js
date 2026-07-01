@@ -27,6 +27,7 @@
                         title: "3B 중간 모의고사 1회차",
                         chapter: "midterm-3b",
                         totalQuestions: 26,
+                        anonymousModeEnabled: true,
                         activityHref: "apps/vocab-grammar-mock/round1.html"
                     },
                     {

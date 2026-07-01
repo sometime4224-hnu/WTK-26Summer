@@ -51,6 +51,36 @@ async function installDashboardMock(page) {
           questionResults: []
         }
       ],
+      'vocab-grammar-mock-round1-v1': [
+        {
+          id: 'round1-sub-1',
+          assignmentId: 'vocab-grammar-mock-round1-v1',
+          studentName: '김학생',
+          score: 24,
+          total: 26,
+          percent: 92,
+          clientSubmittedAt: '2026-06-28T01:10:00.000Z',
+          wrongQuestions: [3, 11],
+          questionResults: [
+            { number: 3, area: '1부. 어휘', correctAnswer: '성격이 잘 맞다', isCorrect: false },
+            { number: 11, area: '2부. 문법', correctAnswer: '-도록', isCorrect: false }
+          ]
+        },
+        {
+          id: 'round1-sub-2',
+          assignmentId: 'vocab-grammar-mock-round1-v1',
+          studentName: '박학생',
+          score: 20,
+          total: 26,
+          percent: 77,
+          clientSubmittedAt: '2026-06-28T01:15:00.000Z',
+          wrongQuestions: [3, 9, 14, 20, 25, 26],
+          questionResults: [
+            { number: 3, area: '1부. 어휘', correctAnswer: '성격이 잘 맞다', isCorrect: false },
+            { number: 14, area: '2부. 문법', correctAnswer: '-잖아요', isCorrect: false }
+          ]
+        }
+      ],
       'vocab-grammar-mock-round2-v1': [
         {
           id: 'round2-sub-1',
@@ -150,6 +180,7 @@ test.describe('homework dashboard', () => {
     await expect(page.locator('h1')).toHaveText('제출 통계');
     await expect(page.locator('[data-assignment-card]')).toHaveCount(6);
     await expect(page.locator('[data-assignment-card="c12-review-quiz-v1"]')).toContainText('12과 어휘·문법 복습');
+    await expect(page.locator('[data-assignment-anonymous-link="vocab-grammar-mock-round1-v1"]')).toHaveText('익명 현황');
     await expect(page.locator('[data-assignment-card="vocab-grammar-mock-marathon30-v1"]')).toContainText('30문제 마라톤');
 
     await page.locator('[data-assignment-link="vocab-grammar-mock-round2-v1"]').click();
@@ -163,6 +194,39 @@ test.describe('homework dashboard', () => {
     await expect(page.locator('.summary-card').first()).toContainText('2');
     await expect(page.locator('.score-bar')).toHaveCount(2);
     await expect(page.locator('.weak-item').first()).toContainText('Q5');
+  });
+
+  test('masks round 1 student names in anonymous mode', async ({ page }) => {
+    await blockExternalRequests(page);
+    await installDashboardMock(page);
+    await page.goto('/teacher-dashboard/index.html?assignment=vocab-grammar-mock-round1-v1&anonymous=1', { waitUntil: 'load' });
+
+    await page.locator('#signInButton').click();
+
+    await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 1회차 제출 현황');
+    await expect(page.locator('#anonymousModeToggle')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.score-bar').first()).toContainText('학생 01');
+    await expect(page.locator('.score-bar').nth(1)).toContainText('학생 02');
+    await expect(page.locator('.weak-item').first()).toContainText('학생 01');
+    await expect(page.locator('tbody tr')).toHaveCount(2);
+
+    let bodyText = await page.locator('body').evaluate((body) => body.textContent);
+    expect(bodyText).not.toContain('김학생');
+    expect(bodyText).not.toContain('박학생');
+
+    await page.locator('#studentSearch').fill('학생 02');
+    await expect(page.locator('tbody tr')).toHaveCount(1);
+    await expect(page.locator('tbody tr')).toContainText('학생 02');
+
+    await page.locator('.all-submissions summary').click();
+    bodyText = await page.locator('body').evaluate((body) => body.textContent);
+    expect(bodyText).not.toContain('김학생');
+    expect(bodyText).not.toContain('박학생');
+
+    await page.locator('#anonymousModeToggle').click();
+    await expect(page.locator('#anonymousModeToggle')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page).not.toHaveURL(/anonymous=1/);
+    await expect(page.locator('body')).toContainText('김학생');
   });
 
   test('supports direct assignment queries and unknown assignment fallback', async ({ page }) => {
