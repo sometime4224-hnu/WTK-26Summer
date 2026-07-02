@@ -175,15 +175,27 @@ test.describe("c13 grammar support smoke interactions", () => {
     await expect(page.locator('[data-flow-mode="manual"]')).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator(".guide-strip")).toContainText("대상");
     await expect(page.locator('[data-guide-target="match-object"]')).toHaveClass(/guide-focus/);
+    await expect(page.locator(".image-frame img")).toHaveAttribute("src", /split-variants\/(masked|initials)\//);
     await expect(page.locator('[data-guide-target="match-options"]')).toHaveClass(/guide-focus/, { timeout: 2500 });
     await page.locator("[data-match-option]").filter({ hasText: "차려입고 있는" }).click();
     await expect(page.locator("#checkMatchBtn")).toHaveClass(/guide-focus/);
     await page.locator("#checkMatchBtn").click();
     await expect(page.locator("#matchFeedback")).toContainText("맞아요");
+    await expect(page.locator(".image-frame img")).toHaveAttribute("src", /split-variants\/full\//);
     await expect(page.locator("#nextMatchBtn")).toHaveClass(/guide-focus/, { timeout: 2500 });
 
     await page.locator('[data-stage="describe"]').click();
     await expect(page.locator('[data-guide-target="describe-cue"]')).toHaveClass(/guide-focus/);
+    await expect.poll(async () => page.locator(".cue-panel img").evaluate((img) => img.complete && img.naturalWidth > 0)).toBe(true);
+    const cueImageRatio = await page.locator(".cue-panel img").evaluate((img) => {
+      const box = img.getBoundingClientRect();
+      return Number((box.width / box.height).toFixed(3));
+    });
+    expect(cueImageRatio).toBeGreaterThan(0.98);
+    expect(cueImageRatio).toBeLessThan(1.02);
+    const tokenTexts = await page.locator("[data-token]").allTextContents();
+    expect(tokenTexts.join(" ")).not.toBe("감색 양복을 입고 은색 넥타이를 매고 있는 사람이 신랑이에요.");
+    expect(tokenTexts).toContain("메고 있는");
     await page.locator("#describeInput").fill("넥타이가 멋진 사람이 신랑인 것 같아요.");
     await expect(page.locator("#checkDescribeBtn")).toHaveClass(/guide-focus/);
     await page.locator("#checkDescribeBtn").click();
