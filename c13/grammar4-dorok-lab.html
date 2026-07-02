@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>13과 문법 4 의미 실험 | V-도록</title>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="grammar-support-responsive.css" />
+    <style>
+        :root {
+            --bg: #f7fafc;
+            --panel: #ffffff;
+            --ink: #172033;
+            --muted: #5b677a;
+            --line: #d7e2ee;
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+            --green: #15803d;
+            --green-soft: #ecfdf3;
+            --amber: #b45309;
+            --amber-soft: #fffbeb;
+            --rose: #be123c;
+            --rose-soft: #fff1f2;
+            --violet: #6d28d9;
+            --violet-soft: #f5f3ff;
+            --shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-padding-top: 58px;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+            color: var(--ink);
+            background:
+                linear-gradient(180deg, #f8fbff 0%, var(--bg) 48%, #fffaf0 100%);
+            font-family: "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+        }
+
+        button,
+        a {
+            font: inherit;
+        }
+
+        .lab-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 48px;
+            padding: 8px max(12px, calc((100vw - 1120px) / 2 + 12px));
+            border-bottom: 1px solid rgba(215, 226, 238, 0.92);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+        }
+
+        .lab-topbar__links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 7px;
+            min-width: 0;
+        }
+
+        .lab-topbar a {
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .lab-topbar span {
+            color: #cbd5e1;
+            font-weight: 900;
+        }
+
+        .lab-topbar strong {
+            min-width: 0;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 900;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .lab-main {
+            width: min(1120px, calc(100% - 24px));
+            margin: 12px auto 38px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .lab-hero,
+        .scenario-card,
+        .result-panel {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .lab-hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(180px, 280px);
+            gap: 16px;
+            align-items: center;
+            padding: 14px 16px;
+        }
+
+        .eyebrow {
+            margin: 0 0 5px;
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 950;
+            letter-spacing: 0;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            word-break: keep-all;
+            overflow-wrap: anywhere;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin: 0;
+            letter-spacing: 0;
+        }
+
+        h1 {
+            color: #0f172a;
+            font-size: clamp(1.45rem, 3vw, 2.35rem);
+            line-height: 1.16;
+        }
+
+        .lab-hero p:not(.eyebrow) {
+            margin: 7px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 780;
+            line-height: 1.58;
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 10px;
+        }
+
+        .hero-meta span,
+        .status-pill,
+        .type-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 30px;
+            padding: 0 10px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            background: var(--blue-soft);
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .hero-figure {
+            margin: 0;
+            display: grid;
+            gap: 6px;
+        }
+
+        .hero-figure img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .hero-figure figcaption {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 850;
+            text-align: center;
+        }
+
+        .scenario-card {
+            display: grid;
+            gap: 12px;
+            padding: 14px;
+        }
+
+        .scenario-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .scenario-title {
+            display: grid;
+            gap: 7px;
+        }
+
+        .type-chip[data-type="purpose"] {
+            border-color: #bfdbfe;
+            background: var(--blue-soft);
+            color: #1d4ed8;
+        }
+
+        .type-chip[data-type="degree"] {
+            border-color: #fed7aa;
+            background: var(--amber-soft);
+            color: var(--amber);
+        }
+
+        .type-chip[data-type="instruction"] {
+            border-color: #ddd6fe;
+            background: var(--violet-soft);
+            color: var(--violet);
+        }
+
+        .status-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 7px;
+        }
+
+        .sentence-box {
+            padding: 12px;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            background: #f8fbff;
+        }
+
+        .context-text {
+            margin: 0 0 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 850;
+            line-height: 1.5;
+        }
+
+        .target-sentence {
+            margin: 0;
+            color: #0f172a;
+            font-size: clamp(1.15rem, 2.2vw, 1.7rem);
+            font-weight: 950;
+            line-height: 1.42;
+        }
+
+        .grammar-hit {
+            display: inline-block;
+            padding: 0 5px;
+            border-radius: 7px;
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .work-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+            gap: 12px;
+            align-items: start;
+        }
+
+        .meaning-map,
+        .choice-panel,
+        .lens-panel {
+            min-width: 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .meaning-map {
+            display: grid;
+            gap: 12px;
+            padding: 12px;
+        }
+
+        .map-label {
+            margin: 0;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 950;
+            letter-spacing: 0;
+        }
+
+        .bridge {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .bridge-node,
+        .bridge-center {
+            display: grid;
+            align-content: center;
+            min-height: 92px;
+            padding: 12px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .bridge-node small,
+        .bridge-center small {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 950;
+        }
+
+        .bridge-node strong,
+        .bridge-center strong {
+            color: #0f172a;
+            font-size: 16px;
+            line-height: 1.35;
+        }
+
+        .bridge-center {
+            min-width: 66px;
+            text-align: center;
+            border-color: #facc15;
+            background: #fffbeb;
+        }
+
+        .degree-meter {
+            height: 12px;
+            overflow: hidden;
+            border: 1px solid #fed7aa;
+            border-radius: 999px;
+            background: #fff7ed;
+        }
+
+        .degree-meter__fill {
+            width: var(--meter, 0%);
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #f59e0b, #ea580c);
+            transition: width 0.2s ease;
+        }
+
+        .map-feedback {
+            margin: 0;
+            padding: 10px 12px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 820;
+            line-height: 1.58;
+        }
+
+        .choice-panel,
+        .lens-panel {
+            display: grid;
+            gap: 10px;
+            padding: 12px;
+        }
+
+        .section-title {
+            margin: 0;
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 950;
+            line-height: 1.35;
+        }
+
+        .choice-grid,
+        .lens-grid,
+        .evidence-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .choice-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .lens-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .choice-card,
+        .lens-button,
+        .evidence-button,
+        .action-button,
+        .footer-link {
+            min-width: 0;
+            min-height: 44px;
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #243044;
+            font-size: 14px;
+            font-weight: 900;
+            line-height: 1.35;
+            cursor: pointer;
+        }
+
+        .choice-card {
+            display: grid;
+            align-content: start;
+            gap: 6px;
+            min-height: 86px;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .choice-card small {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 850;
+        }
+
+        .lens-button,
+        .evidence-button {
+            padding: 10px 9px;
+            text-align: center;
+        }
+
+        .evidence-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .choice-card:hover:not(:disabled),
+        .lens-button:hover:not(:disabled),
+        .evidence-button:hover:not(:disabled),
+        .action-button:hover:not(:disabled),
+        .footer-link:hover {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .choice-card[aria-pressed="true"],
+        .lens-button[aria-pressed="true"],
+        .evidence-button[aria-pressed="true"] {
+            border-color: var(--blue);
+            background: var(--blue-soft);
+            color: #1d4ed8;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.12);
+        }
+
+        .choice-card.is-correct,
+        .lens-button.is-correct,
+        .evidence-button.is-correct {
+            border-color: #86efac;
+            background: var(--green-soft);
+            color: #166534;
+        }
+
+        .choice-card.is-wrong,
+        .lens-button.is-wrong,
+        .evidence-button.is-wrong {
+            border-color: #fda4af;
+            background: var(--rose-soft);
+            color: #9f1239;
+        }
+
+        .feedback {
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 780;
+            line-height: 1.58;
+        }
+
+        .feedback[hidden] {
+            display: none;
+        }
+
+        .feedback.is-correct {
+            border-color: #86efac;
+            background: var(--green-soft);
+            color: #166534;
+        }
+
+        .feedback.is-wrong {
+            border-color: #fda4af;
+            background: var(--rose-soft);
+            color: #9f1239;
+        }
+
+        .feedback strong {
+            display: block;
+            margin-bottom: 4px;
+            color: inherit;
+            font-size: 15px;
+            font-weight: 950;
+        }
+
+        .feedback b {
+            color: #0f172a;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 14px;
+            text-align: center;
+        }
+
+        .action-button.primary {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: #ffffff;
+        }
+
+        .action-button.dark {
+            border-color: #172033;
+            background: #172033;
+            color: #ffffff;
+        }
+
+        .action-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.44;
+        }
+
+        .result-panel {
+            padding: 16px;
+        }
+
+        .result-panel[hidden] {
+            display: none;
+        }
+
+        .result-score {
+            display: grid;
+            gap: 5px;
+            padding: 14px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            background: #eff6ff;
+            text-align: center;
+        }
+
+        .result-score h2 {
+            color: #0f172a;
+            font-size: 30px;
+        }
+
+        .stat-grid,
+        .result-list {
+            display: grid;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .stat-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .stat-card,
+        .result-list li {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .stat-card {
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-card strong {
+            display: block;
+            color: #0f172a;
+            font-size: 22px;
+        }
+
+        .stat-card span {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .result-list {
+            padding: 0;
+            list-style: none;
+        }
+
+        .result-list li {
+            padding: 10px 12px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 850;
+            line-height: 1.45;
+        }
+
+        .footer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .footer-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 13px;
+            color: #1d4ed8;
+            text-decoration: none;
+        }
+
+        @media (max-width: 900px) {
+            .lab-hero,
+            .work-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-figure {
+                display: none;
+            }
+
+            .choice-grid,
+            .lens-grid,
+            .evidence-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .lab-topbar {
+                min-height: 44px;
+                padding: 7px 10px;
+            }
+
+            .lab-main {
+                width: min(100% - 16px, 1120px);
+                margin-top: 8px;
+                gap: 8px;
+            }
+
+            .lab-hero {
+                padding: 11px 12px;
+            }
+
+            .lab-hero p:not(.eyebrow),
+            .hero-meta {
+                display: none;
+            }
+
+            .scenario-card {
+                padding: 10px;
+                gap: 9px;
+            }
+
+            .scenario-head {
+                display: grid;
+            }
+
+            .status-row {
+                justify-content: flex-start;
+            }
+
+            .sentence-box,
+            .meaning-map,
+            .choice-panel,
+            .lens-panel {
+                padding: 10px;
+            }
+
+            .bridge {
+                grid-template-columns: 1fr;
+            }
+
+            .bridge-center {
+                min-height: 44px;
+            }
+
+            .bridge-node {
+                min-height: 66px;
+            }
+
+            .choice-card {
+                min-height: 64px;
+            }
+
+            .action-row {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="c13-support-page c13-dorok-lab-page">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="lab-topbar" aria-label="상단 이동">
+        <div class="lab-topbar__links">
+            <a href="../index.html">메인</a>
+            <span>|</span>
+            <a href="index.html">13과 목록</a>
+            <span>|</span>
+            <a href="grammar4.html">문법 4</a>
+        </div>
+        <strong>V-도록 의미 실험</strong>
+    </nav>
+
+    <main class="lab-main c13-support-main">
+        <section class="lab-hero c13-support-hero">
+            <div>
+                <p class="eyebrow">Meaning Lab</p>
+                <h1>V-도록 의미 실험</h1>
+                <p>목표에 닿게 하기, 결과가 생길 만큼 하기, 누군가에게 하라고 하기의 차이를 바로 확인합니다.</p>
+                <div class="hero-meta" aria-label="활동 정보">
+                    <span>9라운드</span>
+                    <span>목적·정도·지시</span>
+                    <span>근거까지 선택</span>
+                </div>
+            </div>
+            <figure class="hero-figure">
+                <img data-testid="dorok-lab-hero-image" src="../assets/c13/grammar/images/grammar4-dorok/dorok-overview-640.webp" alt="V-도록 전체 구조 시각 자료" width="640" height="480" loading="eager" decoding="async" />
+                <figcaption>목표나 결과에 닿게 하는 연결</figcaption>
+            </figure>
+        </section>
+
+        <section id="scenarioCard" class="scenario-card" aria-live="polite"></section>
+        <section id="resultPanel" class="result-panel" hidden></section>
+
+        <nav class="footer-nav" aria-label="문법 4 이동">
+            <a class="footer-link" href="grammar4.html">문법 4 핵심</a>
+            <a class="footer-link" href="grammar4-wb-practice.html">문법 4 WB 보조활동</a>
+            <a class="footer-link" href="index.html">13과 목록</a>
+        </nav>
+    </main>
+
+    <script>
+        window.C13_GRAMMAR4_DOROK_LAB = {
+            rounds: [
+                {
+                    id: "purpose-hear",
+                    type: "purpose",
+                    typeLabel: "목적",
+                    context: "강의실 뒤쪽 친구들이 잘 못 들어요.",
+                    sentence: "모두가 잘 들을 수 있도록 마이크를 켰어요.",
+                    bridge: {
+                        leftLabel: "도달 상태",
+                        left: "모두가 잘 들을 수 있다",
+                        rightLabel: "그 상태를 만드는 행동",
+                        right: "마이크를 켜다",
+                        feedback: "마이크를 켜는 행동이 '잘 들을 수 있다'는 상태를 만들어요."
+                    },
+                    choices: [
+                        { id: "use-mic", label: "마이크를 켰어요", sub: "소리가 커져요", meter: 100 },
+                        { id: "open-window", label: "창문을 열었어요", sub: "소리보다 환기", meter: 35 },
+                        { id: "sing-song", label: "노래를 불렀어요", sub: "목표와 달라요", meter: 20 }
+                    ],
+                    correctChoiceId: "use-mic",
+                    lens: "why",
+                    evidence: "goal",
+                    paraphrase: "모두가 잘 들을 수 있게 / 모두가 잘 들을 수 있기 위해서",
+                    feedback: "뒤 행동의 이유가 앞 상태입니다. 그래서 목적 용법입니다."
+                },
+                {
+                    id: "purpose-memo",
+                    type: "purpose",
+                    typeLabel: "목적",
+                    context: "동창회 날짜를 자주 깜빡해요.",
+                    sentence: "잊어버리지 않도록 휴대폰에 메모했어요.",
+                    bridge: {
+                        leftLabel: "도달 상태",
+                        left: "잊어버리지 않다",
+                        rightLabel: "그 상태를 만드는 행동",
+                        right: "휴대폰에 메모하다",
+                        feedback: "메모하는 행동이 '잊어버리지 않다'는 상태를 만들어요."
+                    },
+                    choices: [
+                        { id: "phone-memo", label: "휴대폰에 메모했어요", sub: "기억을 도와요", meter: 100 },
+                        { id: "turn-off-phone", label: "휴대폰을 껐어요", sub: "기억과 멀어요", meter: 25 },
+                        { id: "buy-snack", label: "간식을 샀어요", sub: "다른 행동이에요", meter: 15 }
+                    ],
+                    correctChoiceId: "phone-memo",
+                    lens: "why",
+                    evidence: "goal",
+                    paraphrase: "잊어버리지 않게 / 잊어버리지 않기 위해서",
+                    feedback: "잊지 않으려고 메모했으므로 목적을 나타냅니다."
+                },
+                {
+                    id: "purpose-late",
+                    type: "purpose",
+                    typeLabel: "목적",
+                    context: "약속 시간에 늦으면 안 돼요.",
+                    sentence: "늦지 않도록 일찍 출발했어요.",
+                    bridge: {
+                        leftLabel: "도달 상태",
+                        left: "늦지 않다",
+                        rightLabel: "그 상태를 만드는 행동",
+                        right: "일찍 출발하다",
+                        feedback: "일찍 출발하는 행동이 '늦지 않다'는 목표에 가까워지게 해요."
+                    },
+                    choices: [
+                        { id: "leave-early", label: "일찍 출발했어요", sub: "늦지 않게 해요", meter: 100 },
+                        { id: "sleep-more", label: "더 잤어요", sub: "오히려 늦기 쉬워요", meter: 10 },
+                        { id: "watch-drama", label: "드라마를 봤어요", sub: "목표와 달라요", meter: 15 }
+                    ],
+                    correctChoiceId: "leave-early",
+                    lens: "why",
+                    evidence: "goal",
+                    paraphrase: "늦지 않기 위해서 / 늦지 않게",
+                    feedback: "왜 일찍 출발했는지 물으면 '늦지 않기 위해서'라고 답할 수 있습니다."
+                },
+                {
+                    id: "degree-voice",
+                    type: "degree",
+                    typeLabel: "정도",
+                    context: "노래를 아주 오래 많이 불렀어요.",
+                    sentence: "목이 쉬도록 노래했어요.",
+                    bridge: {
+                        leftLabel: "생긴 결과",
+                        left: "목이 쉬다",
+                        rightLabel: "많이 한 행동",
+                        right: "노래하다",
+                        feedback: "목이 쉴 만큼 노래를 많이 했다는 뜻이에요."
+                    },
+                    choices: [
+                        { id: "one-song", label: "한 곡만 불렀어요", sub: "게이지 낮음", meter: 30 },
+                        { id: "hum", label: "조금 흥얼거렸어요", sub: "결과가 약해요", meter: 18 },
+                        { id: "sing-long", label: "계속 크게 불렀어요", sub: "결과에 닿아요", meter: 100 }
+                    ],
+                    correctChoiceId: "sing-long",
+                    lens: "degree",
+                    evidence: "result",
+                    paraphrase: "목이 쉴 정도로 노래했어요.",
+                    feedback: "목이 쉬는 것은 목표가 아니라 많이 노래한 결과입니다."
+                },
+                {
+                    id: "degree-laugh",
+                    type: "degree",
+                    typeLabel: "정도",
+                    context: "친구 이야기가 너무 재미있었어요.",
+                    sentence: "눈물이 나도록 웃었어요.",
+                    bridge: {
+                        leftLabel: "생긴 결과",
+                        left: "눈물이 나다",
+                        rightLabel: "많이 한 행동",
+                        right: "웃다",
+                        feedback: "눈물이 날 만큼 많이 웃은 장면이에요."
+                    },
+                    choices: [
+                        { id: "smile", label: "살짝 웃었어요", sub: "아직 약해요", meter: 22 },
+                        { id: "laugh-hard", label: "계속 크게 웃었어요", sub: "결과에 닿아요", meter: 100 },
+                        { id: "cry-first", label: "먼저 울었어요", sub: "웃은 정도가 아니에요", meter: 34 }
+                    ],
+                    correctChoiceId: "laugh-hard",
+                    lens: "degree",
+                    evidence: "result",
+                    paraphrase: "눈물이 날 정도로 웃었어요.",
+                    feedback: "눈물이 나려고 웃은 것이 아니라, 웃음의 정도가 아주 강했다는 뜻입니다."
+                },
+                {
+                    id: "degree-night",
+                    type: "degree",
+                    typeLabel: "정도",
+                    context: "오랜만에 만난 친구와 이야기가 끊이지 않았어요.",
+                    sentence: "밤이 새도록 이야기했어요.",
+                    bridge: {
+                        leftLabel: "시간 결과",
+                        left: "밤이 새다",
+                        rightLabel: "오래 한 행동",
+                        right: "이야기하다",
+                        feedback: "밤이 샐 때까지 아주 오래 이야기했다는 뜻이에요."
+                    },
+                    choices: [
+                        { id: "short-talk", label: "10분만 이야기했어요", sub: "시간이 짧아요", meter: 20 },
+                        { id: "until-dawn", label: "새벽까지 계속 이야기했어요", sub: "결과에 닿아요", meter: 100 },
+                        { id: "early-home", label: "일찍 집에 갔어요", sub: "반대 상황이에요", meter: 12 }
+                    ],
+                    correctChoiceId: "until-dawn",
+                    lens: "degree",
+                    evidence: "result",
+                    paraphrase: "밤이 샐 때까지 이야기했어요.",
+                    feedback: "목표보다 오래 계속된 시간과 정도가 중심입니다."
+                },
+                {
+                    id: "instruction-review",
+                    type: "instruction",
+                    typeLabel: "지시",
+                    context: "시험 전날 선생님이 학생들에게 말했어요.",
+                    sentence: "선생님이 학생들에게 복습하도록 했어요.",
+                    bridge: {
+                        leftLabel: "해야 할 행동",
+                        left: "학생들이 복습하다",
+                        rightLabel: "말한 사람",
+                        right: "선생님이 하게 하다",
+                        feedback: "선생님이 학생들에게 '복습하라'고 한 흐름이에요."
+                    },
+                    choices: [
+                        { id: "students-review", label: "학생들이 복습하다", sub: "지시받은 행동", meter: 100 },
+                        { id: "teacher-review", label: "선생님이 복습하다", sub: "대상이 달라요", meter: 35 },
+                        { id: "students-rest", label: "학생들이 쉬다", sub: "행동이 달라요", meter: 20 }
+                    ],
+                    correctChoiceId: "students-review",
+                    lens: "instruction",
+                    evidence: "speaker",
+                    paraphrase: "선생님이 학생들에게 복습하라고 했어요.",
+                    feedback: "V-도록 하다는 누가 누구에게 하라고 하는 지시 흐름으로 자주 씁니다."
+                },
+                {
+                    id: "instruction-medicine",
+                    type: "instruction",
+                    typeLabel: "지시",
+                    context: "진료 후 의사가 환자에게 당부했어요.",
+                    sentence: "의사가 환자에게 약을 꼭 먹도록 했어요.",
+                    bridge: {
+                        leftLabel: "해야 할 행동",
+                        left: "환자가 약을 먹다",
+                        rightLabel: "말한 사람",
+                        right: "의사가 하게 하다",
+                        feedback: "의사가 환자에게 '약을 먹으라'고 한 뜻이에요."
+                    },
+                    choices: [
+                        { id: "patient-medicine", label: "환자가 약을 먹다", sub: "지시받은 행동", meter: 100 },
+                        { id: "doctor-medicine", label: "의사가 약을 먹다", sub: "대상이 달라요", meter: 30 },
+                        { id: "patient-exercise", label: "환자가 운동하다", sub: "행동이 달라요", meter: 22 }
+                    ],
+                    correctChoiceId: "patient-medicine",
+                    lens: "instruction",
+                    evidence: "speaker",
+                    paraphrase: "의사가 환자에게 약을 꼭 먹으라고 했어요.",
+                    feedback: "누가 누구에게 무엇을 하라고 했는지 보이면 지시 용법입니다."
+                },
+                {
+                    id: "instruction-phone",
+                    type: "instruction",
+                    typeLabel: "지시",
+                    context: "공연장 입구에서 안내 방송이 나왔어요.",
+                    sentence: "관리자가 손님들에게 휴대폰을 사용하지 않도록 안내했어요.",
+                    bridge: {
+                        leftLabel: "하지 말아야 할 행동",
+                        left: "손님들이 휴대폰을 사용하지 않다",
+                        rightLabel: "말한 사람",
+                        right: "관리자가 안내하다",
+                        feedback: "관리자가 손님들에게 '휴대폰을 사용하지 말라'고 안내한 뜻이에요."
+                    },
+                    choices: [
+                        { id: "guests-no-phone", label: "손님들이 휴대폰을 사용하지 않다", sub: "지시받은 행동", meter: 100 },
+                        { id: "manager-no-phone", label: "관리자가 휴대폰을 사용하지 않다", sub: "대상이 달라요", meter: 35 },
+                        { id: "guests-photo", label: "손님들이 사진을 많이 찍다", sub: "반대 행동이에요", meter: 12 }
+                    ],
+                    correctChoiceId: "guests-no-phone",
+                    lens: "instruction",
+                    evidence: "speaker",
+                    paraphrase: "관리자가 손님들에게 휴대폰을 사용하지 말라고 안내했어요.",
+                    feedback: "'안내했어요'가 붙어서 지시나 안내의 흐름이 분명합니다."
+                }
+            ],
+            lenses: [
+                { id: "why", label: "왜 했어요?", answer: "목적" },
+                { id: "degree", label: "얼마나/얼마나 오래?", answer: "정도" },
+                { id: "instruction", label: "누가 하라고 했어요?", answer: "지시" }
+            ],
+            evidences: [
+                { id: "goal", label: "목표 상태를 만들려고 한 행동" },
+                { id: "result", label: "많이/오래 해서 생긴 결과" },
+                { id: "speaker", label: "누가 누구에게 하라고 함" }
+            ]
+        };
+
+        (() => {
+            "use strict";
+
+            const config = window.C13_GRAMMAR4_DOROK_LAB;
+            const state = {
+                roundIndex: 0,
+                selectedChoiceId: "",
+                selectedLens: "",
+                selectedEvidence: "",
+                checked: false,
+                logs: []
+            };
+
+            const refs = {
+                scenarioCard: document.getElementById("scenarioCard"),
+                resultPanel: document.getElementById("resultPanel")
+            };
+
+            window.C13_GRAMMAR4_DOROK_LAB_APP = {
+                state,
+                getCurrentRound,
+                resetLab
+            };
+
+            function esc(value) {
+                return String(value)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            function getCurrentRound() {
+                return config.rounds[state.roundIndex];
+            }
+
+            function getScore() {
+                return state.logs.filter((log) => log.correct).length;
+            }
+
+            function renderSentence(sentence) {
+                return esc(sentence).replace(/도록/g, '<span class="grammar-hit">도록</span>');
+            }
+
+            function selectedChoice(round) {
+                return round.choices.find((choice) => choice.id === state.selectedChoiceId);
+            }
+
+            function selectedMeter(round) {
+                const choice = selectedChoice(round);
+                return choice ? choice.meter : 0;
+            }
+
+            function typeStat(type) {
+                const logs = state.logs.filter((log) => log.type === type);
+                return {
+                    total: logs.length,
+                    correct: logs.filter((log) => log.correct).length
+                };
+            }
+
+            function currentCorrect() {
+                const round = getCurrentRound();
+                return state.selectedChoiceId === round.correctChoiceId &&
+                    state.selectedLens === round.lens &&
+                    state.selectedEvidence === round.evidence;
+            }
+
+            function canCheck() {
+                return Boolean(state.selectedChoiceId && state.selectedLens && state.selectedEvidence && !state.checked);
+            }
+
+            function renderBridge(round) {
+                return `
+                    <div class="bridge" style="--meter: ${selectedMeter(round)}%">
+                        <div class="bridge-node">
+                            <small>${esc(round.bridge.leftLabel)}</small>
+                            <strong>${esc(round.bridge.left)}</strong>
+                        </div>
+                        <div class="bridge-center">
+                            <small>연결</small>
+                            <strong>도록</strong>
+                        </div>
+                        <div class="bridge-node">
+                            <small>${esc(round.bridge.rightLabel)}</small>
+                            <strong>${esc(round.bridge.right)}</strong>
+                        </div>
+                    </div>
+                    <div class="degree-meter" aria-label="선택한 행동의 도달 정도">
+                        <div class="degree-meter__fill"></div>
+                    </div>
+                    <p class="map-feedback">${esc(round.bridge.feedback)}</p>
+                `;
+            }
+
+            function choiceClass(round, choice) {
+                const classes = ["choice-card"];
+                if (!state.checked) return classes.join(" ");
+                if (choice.id === round.correctChoiceId) classes.push("is-correct");
+                if (choice.id === state.selectedChoiceId && choice.id !== round.correctChoiceId) classes.push("is-wrong");
+                return classes.join(" ");
+            }
+
+            function lensClass(round, lens) {
+                const classes = ["lens-button"];
+                if (!state.checked) return classes.join(" ");
+                if (lens.id === round.lens) classes.push("is-correct");
+                if (lens.id === state.selectedLens && lens.id !== round.lens) classes.push("is-wrong");
+                return classes.join(" ");
+            }
+
+            function evidenceClass(round, evidence) {
+                const classes = ["evidence-button"];
+                if (!state.checked) return classes.join(" ");
+                if (evidence.id === round.evidence) classes.push("is-correct");
+                if (evidence.id === state.selectedEvidence && evidence.id !== round.evidence) classes.push("is-wrong");
+                return classes.join(" ");
+            }
+
+            function renderFeedback(round) {
+                if (!state.checked) {
+                    return '<div id="feedbackBox" class="feedback" hidden></div>';
+                }
+
+                const correct = currentCorrect();
+                const selected = selectedChoice(round);
+                const correctChoice = round.choices.find((choice) => choice.id === round.correctChoiceId);
+                const correctLens = config.lenses.find((lens) => lens.id === round.lens);
+                const correctEvidence = config.evidences.find((evidence) => evidence.id === round.evidence);
+                const selectedText = selected ? selected.label : "";
+
+                if (correct) {
+                    return `
+                        <div id="feedbackBox" class="feedback is-correct">
+                            <strong>맞아요.</strong>
+                            ${esc(round.feedback)}<br>
+                            <b>바꿔 말하기:</b> ${esc(round.paraphrase)}
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div id="feedbackBox" class="feedback is-wrong">
+                        <strong>다시 구별해 보세요.</strong>
+                        선택한 조작: <b>${esc(selectedText)}</b><br>
+                        정답 흐름: <b>${esc(correctChoice.label)}</b> · <b>${esc(correctLens.label)}</b> · <b>${esc(correctEvidence.label)}</b><br>
+                        <b>바꿔 말하기:</b> ${esc(round.paraphrase)}
+                    </div>
+                `;
+            }
+
+            function renderRound() {
+                const round = getCurrentRound();
+                const total = config.rounds.length;
+                refs.resultPanel.hidden = true;
+                refs.scenarioCard.hidden = false;
+
+                refs.scenarioCard.innerHTML = `
+                    <div class="scenario-head">
+                        <div class="scenario-title">
+                            <span class="type-chip" data-type="${esc(round.type)}">${esc(round.typeLabel)}</span>
+                            <h2>${esc(round.context)}</h2>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-pill">${state.roundIndex + 1} / ${total}</span>
+                            <span class="status-pill">정답 ${getScore()} / ${state.logs.length}</span>
+                        </div>
+                    </div>
+
+                    <div class="sentence-box">
+                        <p class="context-text">문장을 보고 도록이 어떤 흐름을 만드는지 고르세요.</p>
+                        <p class="target-sentence">${renderSentence(round.sentence)}</p>
+                    </div>
+
+                    <div class="work-grid">
+                        <section class="meaning-map" aria-label="의미 지도">
+                            <p class="map-label">상황 지도</p>
+                            ${renderBridge(round)}
+                        </section>
+
+                        <section class="choice-panel" aria-label="의미 선택">
+                            <p class="section-title">1. 장면에 맞는 조작</p>
+                            <div class="choice-grid">
+                                ${round.choices.map((choice) => `
+                                    <button class="${choiceClass(round, choice)}" type="button" data-choice="${esc(choice.id)}" aria-pressed="${state.selectedChoiceId === choice.id ? "true" : "false"}" ${state.checked ? "disabled" : ""}>
+                                        <span>${esc(choice.label)}</span>
+                                        <small>${esc(choice.sub)}</small>
+                                    </button>
+                                `).join("")}
+                            </div>
+                        </section>
+                    </div>
+
+                    <section class="lens-panel" aria-label="근거 선택">
+                        <p class="section-title">2. 도록 렌즈와 근거</p>
+                        <div class="lens-grid">
+                            ${config.lenses.map((lens) => `
+                                <button class="${lensClass(round, lens)}" type="button" data-lens="${esc(lens.id)}" aria-pressed="${state.selectedLens === lens.id ? "true" : "false"}" ${state.checked ? "disabled" : ""}>
+                                    ${esc(lens.label)}
+                                </button>
+                            `).join("")}
+                        </div>
+                        <div class="evidence-grid">
+                            ${config.evidences.map((evidence) => `
+                                <button class="${evidenceClass(round, evidence)}" type="button" data-evidence="${esc(evidence.id)}" aria-pressed="${state.selectedEvidence === evidence.id ? "true" : "false"}" ${state.checked ? "disabled" : ""}>
+                                    ${esc(evidence.label)}
+                                </button>
+                            `).join("")}
+                        </div>
+                    </section>
+
+                    ${renderFeedback(round)}
+
+                    <div class="action-row">
+                        <button id="retryBtn" class="action-button" type="button" ${state.checked ? "" : "hidden"}>다시 고르기</button>
+                        <button id="checkBtn" class="action-button primary" type="button" ${canCheck() ? "" : "disabled"}>확인</button>
+                        <button id="nextScenarioBtn" class="action-button dark" type="button" ${state.checked ? "" : "disabled"}>
+                            ${state.roundIndex === total - 1 ? "결과 보기" : "다음 상황"}
+                        </button>
+                    </div>
+                `;
+
+                bindRoundEvents();
+            }
+
+            function bindRoundEvents() {
+                refs.scenarioCard.querySelectorAll("[data-choice]").forEach((button) => {
+                    button.addEventListener("click", () => {
+                        if (state.checked) return;
+                        state.selectedChoiceId = button.dataset.choice;
+                        renderRound();
+                    });
+                });
+
+                refs.scenarioCard.querySelectorAll("[data-lens]").forEach((button) => {
+                    button.addEventListener("click", () => {
+                        if (state.checked) return;
+                        state.selectedLens = button.dataset.lens;
+                        renderRound();
+                    });
+                });
+
+                refs.scenarioCard.querySelectorAll("[data-evidence]").forEach((button) => {
+                    button.addEventListener("click", () => {
+                        if (state.checked) return;
+                        state.selectedEvidence = button.dataset.evidence;
+                        renderRound();
+                    });
+                });
+
+                document.getElementById("checkBtn").addEventListener("click", checkRound);
+                document.getElementById("nextScenarioBtn").addEventListener("click", nextRound);
+                document.getElementById("retryBtn").addEventListener("click", retryRound);
+            }
+
+            function checkRound() {
+                if (!canCheck()) return;
+                const round = getCurrentRound();
+                const correct = currentCorrect();
+                state.checked = true;
+                state.logs = state.logs.filter((log) => log.id !== round.id);
+                state.logs.push({
+                    id: round.id,
+                    type: round.type,
+                    label: round.typeLabel,
+                    sentence: round.sentence,
+                    correct
+                });
+                renderRound();
+            }
+
+            function retryRound() {
+                state.selectedChoiceId = "";
+                state.selectedLens = "";
+                state.selectedEvidence = "";
+                state.checked = false;
+                renderRound();
+            }
+
+            function nextRound() {
+                if (!state.checked) return;
+                if (state.roundIndex >= config.rounds.length - 1) {
+                    renderResult();
+                    return;
+                }
+                state.roundIndex += 1;
+                state.selectedChoiceId = "";
+                state.selectedLens = "";
+                state.selectedEvidence = "";
+                state.checked = false;
+                renderRound();
+            }
+
+            function renderResult() {
+                const total = config.rounds.length;
+                const score = getScore();
+                const purpose = typeStat("purpose");
+                const degree = typeStat("degree");
+                const instruction = typeStat("instruction");
+                refs.scenarioCard.hidden = true;
+                refs.resultPanel.hidden = false;
+                refs.resultPanel.innerHTML = `
+                    <div class="result-score">
+                        <p class="eyebrow">Lab Result</p>
+                        <h2>${score} / ${total}</h2>
+                        <p>목적·정도·지시를 렌즈와 근거로 구별했습니다.</p>
+                    </div>
+                    <div class="stat-grid" aria-label="의미별 정답률">
+                        <div class="stat-card"><strong>${purpose.correct} / 3</strong><span>목적</span></div>
+                        <div class="stat-card"><strong>${degree.correct} / 3</strong><span>정도</span></div>
+                        <div class="stat-card"><strong>${instruction.correct} / 3</strong><span>지시</span></div>
+                    </div>
+                    <ul class="result-list">
+                        ${config.rounds.map((round) => {
+                            const log = state.logs.find((item) => item.id === round.id);
+                            const ok = log && log.correct;
+                            return `<li>${ok ? "맞힘" : "복습"} · ${esc(round.typeLabel)} · ${esc(round.sentence)}</li>`;
+                        }).join("")}
+                    </ul>
+                    <div class="action-row">
+                        <button id="restartBtn" class="action-button primary" type="button">다시 하기</button>
+                        <a class="footer-link" href="grammar4-wb-practice.html">WB 보조활동으로</a>
+                    </div>
+                `;
+                document.getElementById("restartBtn").addEventListener("click", resetLab);
+            }
+
+            function resetLab() {
+                state.roundIndex = 0;
+                state.selectedChoiceId = "";
+                state.selectedLens = "";
+                state.selectedEvidence = "";
+                state.checked = false;
+                state.logs = [];
+                renderRound();
+            }
+
+            renderRound();
+        })();
+    </script>
+</body>
+</html>
