@@ -37,15 +37,6 @@ test.beforeEach(async ({ page }) => {
   await blockExternalRequests(page);
 });
 
-test("c13 grammar4 dorok lab is linked from grammar4 and chapter index", async ({ page }) => {
-  await page.goto("/c13/grammar4.html", { waitUntil: "domcontentloaded" });
-  await expect(page.locator('.resource-link[href="grammar4-dorok-lab.html"]')).toContainText("V-도록 의미 실험");
-
-  await page.goto("/c13/index.html", { waitUntil: "domcontentloaded" });
-  const grammar4Card = page.locator(".path-card").filter({ hasText: "V-도록" });
-  await expect(grammar4Card.locator('a[href="grammar4-dorok-lab.html"]')).toContainText("V-도록 의미 실험");
-});
-
 test("c13 grammar4 dorok lab renders balanced scenario data and assets", async ({ page }) => {
   await page.goto("/c13/grammar4-dorok-lab.html", { waitUntil: "domcontentloaded" });
 

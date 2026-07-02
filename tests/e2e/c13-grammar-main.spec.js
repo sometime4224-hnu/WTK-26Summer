@@ -47,7 +47,6 @@ const pages = [
     title: 'V-도록',
     quizTotal: 12,
     resources: [
-      { href: 'grammar4-dorok-lab.html', text: 'V-도록 의미 실험' },
       { href: 'grammar4-wb-practice.html', text: '문법 4 WB 보조활동' }
     ],
     illustration: false,
