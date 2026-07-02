@@ -10,6 +10,7 @@ const supportPages = [
   ...miniGamePages,
   "grammar2-workbook-practice.html",
   "grammar3-wb-practice.html",
+  "grammar4-dorok-lab.html",
   "grammar4-wb-practice.html",
   "grammar1-2-speaking.html",
   "grammar1-3-quiz.html"
