@@ -111,6 +111,7 @@ test('c12 reading cuttoon renders 18 cuts and supports vocab and language intera
   await page.goto('/c12/reading-cuttoon.html', { waitUntil: 'domcontentloaded' });
 
   await expect(page.locator('h1')).toContainText('여러분의 목 건강은 어떠십니까?');
+  await expect(page.locator('[data-mobile-cut-overlay]')).toBeHidden();
   await expect(page.locator('[data-thumb]')).toHaveCount(18);
   await expect(page.locator('[data-sentence]')).toHaveCount(18);
   await expect(page.locator('[data-thumb-placeholder]')).toHaveCount(0);
@@ -176,4 +177,46 @@ test('c12 reading cuttoon renders 18 cuts and supports vocab and language intera
 
   const storedLang = await page.evaluate(() => localStorage.getItem('preferred-lang'));
   expect(storedLang).toBe('ar');
+});
+
+test('c12 reading cuttoon keeps the active cut visible while reading on a phone', async ({ page }) => {
+  await blockExternalRequests(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  await page.goto('/c12/reading-cuttoon.html', { waitUntil: 'domcontentloaded' });
+
+  const overlay = page.locator('[data-mobile-cut-overlay]');
+  const overlayImage = page.locator('#mobile-cut-image');
+  const overlayProgress = page.locator('#mobile-cut-progress');
+  const overlayToggle = page.locator('#mobile-cut-toggle');
+
+  await expect(overlay).not.toHaveClass(/is-visible/);
+  await expect(overlay).toHaveCSS('opacity', '0');
+  await expect(overlayProgress).toContainText('1 / 18');
+  await expect(overlayImage).toHaveAttribute('src', /c12-reading-cuttoon-01\.webp$/);
+
+  await page.locator('[data-sentence]').nth(14).evaluate((node) => {
+    node.scrollIntoView({ block: 'center', inline: 'nearest' });
+    window.dispatchEvent(new Event('scroll'));
+  });
+  await expect(overlay).toHaveClass(/is-visible/);
+  await expect(overlay).toHaveCSS('opacity', '1');
+  await expect(overlayProgress).toContainText('15 / 18');
+  await expect(overlayImage).toHaveAttribute('src', /c12-reading-cuttoon-15\.webp$/);
+  await expect(page.locator('[data-sentence]').nth(14)).toHaveClass(/is-active/);
+
+  const overlayBox = await overlay.boundingBox();
+  expect(overlayBox).not.toBeNull();
+  expect(overlayBox.x).toBeGreaterThanOrEqual(0);
+  expect(overlayBox.y).toBeGreaterThanOrEqual(0);
+  expect(overlayBox.x + overlayBox.width).toBeLessThanOrEqual(390);
+  expect(overlayBox.y + overlayBox.height).toBeLessThanOrEqual(844);
+
+  await overlayToggle.click();
+  await expect(overlay).toHaveClass(/is-collapsed/);
+  await expect(overlayToggle).toHaveAttribute('aria-expanded', 'false');
+
+  await overlayToggle.click();
+  await expect(overlay).not.toHaveClass(/is-collapsed/);
+  await expect(overlayToggle).toHaveAttribute('aria-expanded', 'true');
 });
