@@ -142,6 +142,7 @@
   }
 
   function renderHub() {
+    setViewState("hub");
     var activeProgressCount = 0;
     var totalAttemptCount = 0;
     var cards = DATA.order.map(function (sectionId) {
@@ -220,6 +221,7 @@
   }
 
   function renderStart(section, progress) {
+    setViewState("start");
     var sectionId = section.id;
     var ui = getUi(sectionId);
     var attempts = getAttempts(sectionId);
@@ -284,6 +286,7 @@
   }
 
   function renderQuiz(section, progress) {
+    setViewState("quiz");
     var sectionId = section.id;
     var ui = getUi(sectionId);
     var index = clamp(progress.currentIndex, 0, section.questions.length - 1);
@@ -309,13 +312,19 @@
       '<div class="dot-strip">' + renderDots(section, progress) + "</div>" +
       "</section>" +
       '<section class="question-card' + shakeClass + '">' +
+      '<div class="question-layout">' +
+      '<div class="question-main">' +
       '<div class="eyebrow">' + escapeHtml(question.tag) + "</div>" +
       '<div class="question-number">' + String(index + 1).padStart(2, "0") + "</div>" +
       (question.audio ? renderAudio(question) : "") +
       '<p class="question-prompt">' + escapeHtml(question.prompt) + "</p>" +
       renderContext(question.context) +
+      "</div>" +
+      '<div class="answer-panel">' +
       '<div class="option-grid' + optionClass + '">' + renderOptions(question, selected, progress.choiceOrder && progress.choiceOrder[question.id]) + "</div>" +
       feedback +
+      "</div>" +
+      "</div>" +
       "</section>" +
       '<nav class="nav-bar">' +
       '<button class="nav-button" data-action="prev-question" data-section="' + sectionId + '"' + (index === 0 ? " disabled" : "") + ' aria-label="이전">' + icon("left") + "</button>" +
@@ -331,6 +340,7 @@
   }
 
   function renderResult(section) {
+    setViewState("result");
     var sectionId = section.id;
     var ui = getUi(sectionId);
     var attempt = findAttempt(sectionId, ui.activeAttemptId) || getAttempts(sectionId)[0];
@@ -815,6 +825,9 @@
     var width = window.innerWidth || document.documentElement.clientWidth || 0;
     var height = window.innerHeight || document.documentElement.clientHeight || 0;
     var isPortrait = height >= width;
+    if (width >= 1100) {
+      return "desktop";
+    }
     if (isPortrait && width < 640) {
       return "phone";
     }
@@ -822,6 +835,10 @@
       return "tablet";
     }
     return "phone";
+  }
+
+  function setViewState(view) {
+    document.body.dataset.view = view;
   }
 
   function normalizeLayoutPreference(value) {
