@@ -34,6 +34,7 @@ const pages = [
     title: 'A/V-았/었어야 했는데',
     quizTotal: 10,
     resources: [
+      { href: 'grammar3-wb-practice.html', text: '문법 3 WB 보조활동' },
       { href: 'grammar1-3-quiz.html', text: '문법 1+3 융합 퀴즈' }
     ],
     illustration: true,
@@ -45,7 +46,9 @@ const pages = [
     path: '/c13/grammar4.html',
     title: 'V-도록',
     quizTotal: 12,
-    resources: [],
+    resources: [
+      { href: 'grammar4-wb-practice.html', text: '문법 4 WB 보조활동' }
+    ],
     illustration: false,
     visualCards: 4,
     prev: 'grammar3.html',

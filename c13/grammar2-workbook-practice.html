@@ -496,6 +496,7 @@
         }
 
         .image-frame {
+            position: relative;
             display: grid;
             place-items: center;
             min-height: 250px;
@@ -509,6 +510,21 @@
             display: block;
             width: min(100%, 310px);
             height: auto;
+        }
+
+        .image-frame__badge {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            z-index: 1;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            padding: 5px 8px;
+            background: rgba(239, 246, 255, 0.94);
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 950;
+            line-height: 1;
         }
 
         .object-name {
@@ -719,7 +735,7 @@
             height: 50px;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            object-fit: cover;
+            object-fit: contain;
             background: #fff;
         }
 
@@ -761,6 +777,9 @@
         .cue-panel img {
             display: block;
             width: min(180px, 100%);
+            height: auto;
+            aspect-ratio: 1 / 1;
+            object-fit: contain;
             margin-inline: auto;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
@@ -1124,14 +1143,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="flow-control" aria-label="정답 후 진행 방식">
+                <div class="flow-control" aria-label="확인 후 진행 방식">
                     <p class="progress-title">진행 방식</p>
-                    <div class="flow-toggle" role="group" aria-label="정답 후 진행 방식 선택">
+                    <div class="flow-toggle" role="group" aria-label="확인 후 진행 방식 선택">
                         <button type="button" data-flow-mode="auto" aria-pressed="false">자동</button>
                         <button type="button" data-flow-mode="slow" aria-pressed="true">천천히</button>
                         <button type="button" data-flow-mode="manual" aria-pressed="false">수동</button>
                     </div>
-                    <p id="flowModeHint" class="flow-hint">정답 피드백을 잠깐 보고 다음으로 이동합니다.</p>
+                    <p id="flowModeHint" class="flow-hint">피드백을 잠깐 보고 다음으로 이동합니다.</p>
                 </div>
                 <div class="mini-rule">
                     <strong>핵심 형태</strong>
@@ -1143,13 +1162,16 @@
 
     <script>
     (() => {
-        const IMAGE_BASE = "../assets/c13/vocabulary/images/split-variants/full/";
+        const IMAGE_BASE = "../assets/c13/vocabulary/images/split-variants/";
+        const imagePath = (variant, fileName) => `${IMAGE_BASE}${variant}/${fileName}`;
         const DATA = {
             match: [
                 {
                     object: "옷",
                     cue: "특별한 날에 갖추어 입은 옷",
-                    image: `${IMAGE_BASE}s01_tr_n14.webp`,
+                    image: imagePath("masked", "s01_tr_n14.webp"),
+                    answerImage: imagePath("full", "s01_tr_n14.webp"),
+                    clueMode: "마스킹 단서",
                     alt: "격식을 갖춘 옷차림",
                     answer: "차려입고 있는",
                     options: ["차려입고 있는", "메고 있는", "끼고 있는", "차고 있는"],
@@ -1158,7 +1180,9 @@
                 {
                     object: "넥타이",
                     cue: "목에 둘러 묶은 물건",
-                    image: `${IMAGE_BASE}s01_bl_n15.webp`,
+                    image: imagePath("masked", "s01_bl_n15.webp"),
+                    answerImage: imagePath("full", "s01_bl_n15.webp"),
+                    clueMode: "마스킹 단서",
                     alt: "넥타이",
                     answer: "매고 있는",
                     options: ["메고 있는", "매고 있는", "차고 있는", "들고 있는"],
@@ -1167,7 +1191,9 @@
                 {
                     object: "반지",
                     cue: "손가락에 넣은 장신구",
-                    image: `${IMAGE_BASE}s01_br_n16.webp`,
+                    image: imagePath("initials", "s01_br_n16.webp"),
+                    answerImage: imagePath("full", "s01_br_n16.webp"),
+                    clueMode: "초성 단서",
                     alt: "반지",
                     answer: "끼고 있는",
                     options: ["하고 있는", "신고 있는", "끼고 있는", "쓰고 있는"],
@@ -1176,7 +1202,9 @@
                 {
                     object: "귀고리",
                     cue: "귀에 착용한 장신구",
-                    image: `${IMAGE_BASE}s05_tl_n17.webp`,
+                    image: imagePath("masked", "s05_tl_n17.webp"),
+                    answerImage: imagePath("full", "s05_tl_n17.webp"),
+                    clueMode: "마스킹 단서",
                     alt: "귀고리",
                     answer: "하고 있는",
                     options: ["하고 있는", "차고 있는", "입고 있는", "매고 있는"],
@@ -1185,7 +1213,9 @@
                 {
                     object: "시계",
                     cue: "손목에 착용한 물건",
-                    image: `${IMAGE_BASE}s05_tr_n18.webp`,
+                    image: imagePath("initials", "s05_tr_n18.webp"),
+                    answerImage: imagePath("full", "s05_tr_n18.webp"),
+                    clueMode: "초성 단서",
                     alt: "손목시계",
                     answer: "차고 있는",
                     options: ["들고 있는", "차고 있는", "끼고 있는", "신고 있는"],
@@ -1194,7 +1224,9 @@
                 {
                     object: "가방",
                     cue: "손으로 잡고 있는 물건",
-                    image: `${IMAGE_BASE}s05_bl_n19.webp`,
+                    image: imagePath("masked", "s05_bl_n19.webp"),
+                    answerImage: imagePath("full", "s05_bl_n19.webp"),
+                    clueMode: "마스킹 단서",
                     alt: "손가방",
                     answer: "들고 있는",
                     options: ["메고 있는", "매고 있는", "입고 있는", "들고 있는"],
@@ -1203,7 +1235,9 @@
                 {
                     object: "배낭",
                     cue: "어깨에 걸쳐 멘 물건",
-                    image: `${IMAGE_BASE}s05_br_n20.webp`,
+                    image: imagePath("initials", "s05_br_n20.webp"),
+                    answerImage: imagePath("full", "s05_br_n20.webp"),
+                    clueMode: "초성 단서",
                     alt: "배낭",
                     answer: "메고 있는",
                     options: ["매고 있는", "메고 있는", "하고 있는", "차려입고 있는"],
@@ -1214,55 +1248,49 @@
                 {
                     person: "신랑",
                     cue: "감색 양복 + 은색 넥타이",
-                    image: `${IMAGE_BASE}s01_bl_n15.webp`,
+                    image: imagePath("full", "s01_bl_n15.webp"),
                     alt: "넥타이를 맨 사람",
-                    tokens: ["감색 양복을", "입고", "은색 넥타이를", "매고 있는", "사람이", "신랑이에요."],
-                    required: ["양복을입고", "넥타이를매고있는", "신랑"],
+                    tokens: ["사람이", "은색 넥타이를", "감색 양복을", "메고 있는", "신랑이에요.", "입고", "매고 있는", "분이"],
                     model: "감색 양복을 입고 은색 넥타이를 매고 있는 사람이 신랑이에요."
                 },
                 {
                     person: "어머니",
                     cue: "분홍색 한복 + 진주 귀고리",
-                    image: `${IMAGE_BASE}s05_tl_n17.webp`,
+                    image: imagePath("full", "s05_tl_n17.webp"),
                     alt: "귀고리를 한 사람",
-                    tokens: ["분홍색 한복을", "입고", "진주 귀고리를", "하고 있는", "분이", "어머니예요."],
-                    required: ["한복을입고", "귀고리를하고있는", "어머니"],
+                    tokens: ["하고 있는", "어머니예요.", "진주 귀고리를", "사람이", "입고", "분홍색 한복을", "끼고 있는", "분이"],
                     model: "분홍색 한복을 입고 진주 귀고리를 하고 있는 분이 어머니예요."
                 },
                 {
                     person: "아버지",
                     cue: "회색 재킷 + 손목시계",
-                    image: `${IMAGE_BASE}s05_tr_n18.webp`,
+                    image: imagePath("full", "s05_tr_n18.webp"),
                     alt: "시계를 찬 사람",
-                    tokens: ["회색 재킷을", "입고", "손목시계를", "차고 있는", "분이", "아버지예요."],
-                    required: ["재킷을입고", "시계를차고있는", "아버지"],
+                    tokens: ["손목시계를", "아버지예요.", "분이", "입고", "끼고 있는", "회색 재킷을", "차고 있는", "하고 있는"],
                     model: "회색 재킷을 입고 손목시계를 차고 있는 분이 아버지예요."
                 },
                 {
                     person: "누나",
                     cue: "꽃무늬 원피스 + 작은 가방",
-                    image: `${IMAGE_BASE}s05_bl_n19.webp`,
+                    image: imagePath("full", "s05_bl_n19.webp"),
                     alt: "가방을 든 사람",
-                    tokens: ["꽃무늬 원피스를", "입고", "작은 가방을", "들고 있는", "사람이", "누나예요."],
-                    required: ["원피스를입고", "가방을들고있는", "누나"],
+                    tokens: ["누나예요.", "메고 있는", "입고", "사람이", "작은 가방을", "들고 있는", "꽃무늬 원피스를", "분이"],
                     model: "꽃무늬 원피스를 입고 작은 가방을 들고 있는 사람이 누나예요."
                 },
                 {
                     person: "동생",
                     cue: "파란 셔츠 + 배낭",
-                    image: `${IMAGE_BASE}s05_br_n20.webp`,
+                    image: imagePath("full", "s05_br_n20.webp"),
                     alt: "배낭을 멘 사람",
-                    tokens: ["파란 셔츠를", "입고", "검은 배낭을", "메고 있는", "사람이", "동생이에요."],
-                    required: ["셔츠를입고", "배낭을메고있는", "동생"],
+                    tokens: ["검은 배낭을", "동생이에요.", "매고 있는", "파란 셔츠를", "사람이", "입고", "메고 있는", "들고 있는"],
                     model: "파란 셔츠를 입고 검은 배낭을 메고 있는 사람이 동생이에요."
                 },
                 {
                     person: "조카",
                     cue: "깔끔한 옷 + 반지",
-                    image: `${IMAGE_BASE}s01_br_n16.webp`,
+                    image: imagePath("full", "s01_br_n16.webp"),
                     alt: "반지를 낀 사람",
-                    tokens: ["깔끔한 옷을", "차려입고", "작은 반지를", "끼고 있는", "아이가", "조카예요."],
-                    required: ["옷을차려입고", "반지를끼고있는", "조카"],
+                    tokens: ["아이가", "작은 반지를", "하고 있는", "조카예요.", "차려입고", "깔끔한 옷을", "끼고 있는", "사람이"],
                     model: "깔끔한 옷을 차려입고 작은 반지를 끼고 있는 아이가 조카예요."
                 }
             ],
@@ -1317,12 +1345,12 @@
             auto: {
                 label: "자동",
                 delay: 1200,
-                hint: "정답이면 빠르게 다음 문제로 넘어갑니다."
+                hint: "확인하면 빠르게 다음 문제로 넘어갑니다."
             },
             slow: {
                 label: "천천히",
                 delay: 2400,
-                hint: "정답 피드백을 잠깐 보고 다음으로 이동합니다."
+                hint: "피드백을 잠깐 보고 다음으로 이동합니다."
             },
             manual: {
                 label: "수동",
@@ -1380,11 +1408,13 @@
             const isCorrect = state.matchAnswered && selectedMatchText() === task.answer;
             const nextLabel = state.matchIndex === DATA.match.length - 1 ? "묘사 단계로" : "다음";
             const nextDestination = state.matchIndex === DATA.match.length - 1 ? "묘사 단계" : "다음 문제";
+            const imageSrc = state.matchAnswered && task.answerImage ? task.answerImage : task.image;
+            const imageBadge = state.matchAnswered && task.answerImage ? "원본 확인" : task.clueMode || "단서 그림";
             app.innerHTML = `
                 <div class="stage-head">
                     <div>
                         <h2 class="stage-title">대상을 보고 표현을 고르세요.</h2>
-                        <p class="stage-note">착용 동사를 <b>-고 있는</b>으로 바꾸어 사람을 묘사하는 표현을 만듭니다.</p>
+                        <p class="stage-note">마스킹·초성 단서 그림을 보고 착용 동사를 <b>-고 있는</b>으로 바꿉니다. 확인 후에는 원본 그림으로 다시 볼 수 있습니다.</p>
                     </div>
                     <span class="status-pill">${progress}</span>
                 </div>
@@ -1392,7 +1422,8 @@
                 <div class="match-grid">
                     <div class="focus-object" data-guide-target="match-object">
                         <div class="image-frame">
-                            <img src="${esc(task.image)}" alt="${esc(task.alt)}" width="900" height="900" decoding="async" />
+                            <span class="image-frame__badge">${esc(imageBadge)}</span>
+                            <img src="${esc(imageSrc)}" alt="${esc(task.alt)}" width="900" height="900" decoding="async" />
                         </div>
                         <div class="object-name">
                             <strong>${esc(task.object)}</strong>
@@ -1484,7 +1515,7 @@
                 <div class="stage-head">
                     <div>
                         <h2 class="stage-title">단서를 보고 사람을 설명하세요.</h2>
-                        <p class="stage-note">한 사람을 고른 뒤 <b>옷/소품 + V-고 있는 + 사람</b>으로 문장을 만듭니다.</p>
+                        <p class="stage-note">한 사람을 고른 뒤 섞인 토큰 중 필요한 것만 골라 <b>옷/소품 + V-고 있는 + 사람</b> 문장을 만듭니다.</p>
                     </div>
                     <span class="status-pill">${completed} / ${DATA.describe.length} 완료</span>
                 </div>
@@ -1515,12 +1546,12 @@
                         </div>
                         <textarea id="describeInput" class="sentence-input" data-guide-target="describe-input" placeholder="예: 감색 양복을 입고 은색 넥타이를 매고 있는 사람이 신랑이에요." spellcheck="false"></textarea>
                         <div class="action-row">
-                            <button type="button" id="checkDescribeBtn" class="primary-button" data-guide-target="describe-check">문장 확인</button>
-                            <button type="button" id="modelDescribeBtn" class="ghost-button">모범 문장</button>
+                            <button type="button" id="checkDescribeBtn" class="primary-button" data-guide-target="describe-check">예시 확인</button>
+                            <button type="button" id="modelDescribeBtn" class="ghost-button">예시 문장</button>
                             <button type="button" id="clearDescribeBtn" class="ghost-button">지우기</button>
                             <button type="button" id="nextDescribeBtn" class="ghost-button" data-guide-target="describe-next">${nextLabel}</button>
                         </div>
-                        <div id="describeFeedback" class="feedback is-hint" data-guide-target="describe-feedback">단서 두 개와 사람 이름이 모두 들어가면 정답으로 인정됩니다.</div>
+                        <div id="describeFeedback" class="feedback is-hint" data-guide-target="describe-feedback">문장을 쓴 뒤 예시 답안과 비교하세요. 다른 표현도 가능합니다.</div>
                         <div id="describeAdvance" class="advance-panel hidden" aria-live="polite"></div>
                     </div>
                 </div>
@@ -1541,7 +1572,7 @@
             document.getElementById("clearDescribeBtn").addEventListener("click", () => {
                 clearAutoAdvance();
                 document.getElementById("describeInput").value = "";
-                setFeedback("describeFeedback", "is-hint", "단서 두 개와 사람 이름이 모두 들어가면 정답으로 인정됩니다.");
+                setFeedback("describeFeedback", "is-hint", "문장을 쓴 뒤 예시 답안과 비교하세요. 다른 표현도 가능합니다.");
                 scheduleDescribeGuide();
             });
             document.getElementById("nextDescribeBtn").addEventListener("click", nextDescribe);
@@ -1563,46 +1594,41 @@
         function checkDescribe() {
             const task = DATA.describe[state.describeIndex];
             const input = document.getElementById("describeInput");
-            const value = normalize(input.value);
-            const missing = task.required.filter((piece) => !value.includes(normalize(piece)));
             if (!input.value.trim()) {
                 clearAutoAdvance();
-                setFeedback("describeFeedback", "is-wrong", "먼저 문장을 한 번 만들어 보세요.");
+                setFeedback("describeFeedback", "is-hint", "먼저 문장을 한 번 만들어 보거나 예시 문장을 확인하세요.");
                 focusGuide('[data-guide-target="describe-input"]', "3 입력", 2);
                 return;
             }
-            if (missing.length === 0) {
-                state.describeDone[state.describeIndex] = true;
-                const nextLabel = describeNextLabel();
-                const nextDestination = describeNextDestination();
-                setFeedback("describeFeedback", "is-correct", `<b>좋아요.</b> 착용 단서와 사람 이름이 모두 들어갔어요.`);
-                prepareNowButton("nextDescribeBtn", `지금 ${nextLabel}`);
-                updateMeters();
-                startAutoAdvance({
-                    key: `describe-${state.describeIndex}`,
-                    panelId: "describeAdvance",
-                    nextButtonId: "nextDescribeBtn",
-                    destination: nextDestination,
-                    nowText: `지금 ${nextLabel}`,
-                    onNext: nextDescribe
-                });
-                runGuideSequence([
-                    { selector: '[data-guide-target="describe-feedback"]', label: "피드백", index: 3, delay: 40 },
-                    { selector: '[data-guide-target="describe-next"]', label: "5 다음", index: 4, delay: 850 }
-                ]);
-                return;
-            }
-            clearAutoAdvance();
-            setFeedback("describeFeedback", "is-wrong", `아직 단서가 부족해요. <b>${esc(task.cue)}</b>와 <b>${esc(task.person)}</b>를 모두 넣어 보세요.`);
-            focusGuide('[data-guide-target="describe-feedback"]', "다시 확인", 3);
+            completeDescribeWithExample(task);
         }
 
         function showDescribeModel() {
             clearAutoAdvance();
             const task = DATA.describe[state.describeIndex];
             document.getElementById("describeInput").value = task.model;
-            setFeedback("describeFeedback", "is-hint", `<b>모범 문장:</b> ${esc(task.model)}`);
-            focusGuide('[data-guide-target="describe-check"]', "4 확인", 3);
+            completeDescribeWithExample(task);
+        }
+
+        function completeDescribeWithExample(task) {
+            state.describeDone[state.describeIndex] = true;
+            const nextLabel = describeNextLabel();
+            const nextDestination = describeNextDestination();
+            setFeedback("describeFeedback", "is-hint", `<b>예시 답안:</b> ${esc(task.model)}<br><span>쓴 답이 예시와 달라도 단서와 상황이 맞으면 사용할 수 있어요.</span>`);
+            prepareNowButton("nextDescribeBtn", `지금 ${nextLabel}`);
+            updateMeters();
+            startAutoAdvance({
+                key: `describe-${state.describeIndex}`,
+                panelId: "describeAdvance",
+                nextButtonId: "nextDescribeBtn",
+                destination: nextDestination,
+                nowText: `지금 ${nextLabel}`,
+                onNext: nextDescribe
+            });
+            runGuideSequence([
+                { selector: '[data-guide-target="describe-feedback"]', label: "예시", index: 3, delay: 40 },
+                { selector: '[data-guide-target="describe-next"]', label: "5 다음", index: 4, delay: 850 }
+            ]);
         }
 
         function nextDescribe() {
@@ -1724,13 +1750,13 @@
             clearAutoAdvance();
             state.stage = "dialogue";
             const describeCount = state.describeDone.filter(Boolean).length;
-            const total = DATA.match.length + DATA.describe.length + DATA.dialogue.length;
-            const score = state.matchCorrect + describeCount + state.dialogueCorrect;
+            const total = DATA.match.length + DATA.dialogue.length;
+            const score = state.matchCorrect + state.dialogueCorrect;
             app.innerHTML = `
                 <div class="summary-panel">
                     <div class="summary-score">
                         <strong>${score} / ${total}</strong>
-                        <span>표현 ${state.matchCorrect}/${DATA.match.length} · 묘사 ${describeCount}/${DATA.describe.length} · 대화 ${state.dialogueCorrect}/${DATA.dialogue.length}</span>
+                        <span>표현 ${state.matchCorrect}/${DATA.match.length} · 묘사 예시 ${describeCount}/${DATA.describe.length} · 대화 ${state.dialogueCorrect}/${DATA.dialogue.length}</span>
                     </div>
                     <div class="action-row" style="justify-content:center">
                         <button type="button" id="restartWorkbookBtn" class="primary-button">처음부터 다시</button>
