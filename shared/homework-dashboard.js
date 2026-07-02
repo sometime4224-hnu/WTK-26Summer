@@ -21,7 +21,9 @@
         loading: false,
         error: "",
         search: "",
-        anonymous: isAnonymousSearchParam()
+        anonymous: isAnonymousSearchParam(),
+        dateStart: getDateRangeSearchParam("from"),
+        dateEnd: getDateRangeSearchParam("to")
     };
 
     function escapeHtml(value) {
@@ -37,17 +39,101 @@
         return String(value || "homeworkAssignments").replace(/^\/+|\/+$/g, "") || "homeworkAssignments";
     }
 
-    function formatDate(value) {
+    function toValidDate(value) {
+        if (!value) return null;
         const date = value && typeof value.toDate === "function"
             ? value.toDate()
             : new Date(value || 0);
-        if (!Number.isFinite(date.getTime())) return "-";
+        return Number.isFinite(date.getTime()) ? date : null;
+    }
+
+    function formatDate(value) {
+        const date = toValidDate(value);
+        if (!date) return "-";
         return new Intl.DateTimeFormat("ko-KR", {
             month: "2-digit",
             day: "2-digit",
             hour: "2-digit",
             minute: "2-digit"
         }).format(date);
+    }
+
+    function getSubmittedAtDate(record) {
+        return toValidDate(record && (record.clientSubmittedAt || record.submittedAt));
+    }
+
+    function padDatePart(value) {
+        return String(value).padStart(2, "0");
+    }
+
+    function toDateTimeLocalValue(date) {
+        if (!date || !Number.isFinite(date.getTime())) return "";
+        return [
+            date.getFullYear(),
+            padDatePart(date.getMonth() + 1),
+            padDatePart(date.getDate())
+        ].join("-") + "T" + [
+            padDatePart(date.getHours()),
+            padDatePart(date.getMinutes())
+        ].join(":");
+    }
+
+    function normalizeDateTimeLocalValue(value) {
+        const text = String(value || "").trim();
+        if (!text) return "";
+
+        const inputMatch = text.match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})/);
+        if (inputMatch) return `${inputMatch[1]}T${inputMatch[2]}`;
+
+        const date = toValidDate(text);
+        return date ? toDateTimeLocalValue(date) : "";
+    }
+
+    function getDateRangeSearchParam(name) {
+        return normalizeDateTimeLocalValue(new URLSearchParams(window.location.search).get(name));
+    }
+
+    function parseDateTimeLocal(value, includeFullMinute) {
+        const normalized = normalizeDateTimeLocalValue(value);
+        if (!normalized) return null;
+
+        const date = new Date(normalized);
+        if (!Number.isFinite(date.getTime())) return null;
+        if (includeFullMinute) {
+            date.setMilliseconds(date.getMilliseconds() + 59999);
+        }
+        return date;
+    }
+
+    function getDateRangeBounds() {
+        return {
+            start: parseDateTimeLocal(state.dateStart, false),
+            end: parseDateTimeLocal(state.dateEnd, true)
+        };
+    }
+
+    function isDateRangeActive() {
+        return Boolean(state.dateStart || state.dateEnd);
+    }
+
+    function isDateRangeInvalid() {
+        const bounds = getDateRangeBounds();
+        return Boolean(bounds.start && bounds.end && bounds.start.getTime() > bounds.end.getTime());
+    }
+
+    function getDateFilteredSubmissions() {
+        if (!isDateRangeActive()) return state.submissions;
+
+        const bounds = getDateRangeBounds();
+        if (bounds.start && bounds.end && bounds.start.getTime() > bounds.end.getTime()) return [];
+
+        return state.submissions.filter(function (submission) {
+            const submittedAt = getSubmittedAtDate(submission);
+            if (!submittedAt) return false;
+            if (bounds.start && submittedAt.getTime() < bounds.start.getTime()) return false;
+            if (bounds.end && submittedAt.getTime() > bounds.end.getTime()) return false;
+            return true;
+        });
     }
 
     function normalizeName(value) {
@@ -362,6 +448,13 @@
         wireAuthButtons();
     }
 
+    function getWrongChoiceLabel(item) {
+        const selectedLetter = normalizeName(item.selectedLetter || item.selectedOriginalLetter);
+        const selectedAnswer = normalizeName(item.studentAnswer || item.selectedText || item.selectedAnswer);
+        if (selectedLetter && selectedAnswer) return `${selectedLetter}. ${selectedAnswer}`;
+        return selectedLetter || selectedAnswer || "선택 기록 없음";
+    }
+
     function buildWeakQuestions(submissions) {
         const counts = new Map();
         submissions.forEach(function (submission) {
@@ -374,14 +467,32 @@
                     area: item.area || "",
                     correctAnswer: item.correctAnswer || "",
                     wrongCount: 0,
+                    students: [],
+                    choices: new Map()
+                };
+                const studentName = normalizeName(submission.studentName);
+                const choiceLabel = getWrongChoiceLabel(item);
+                const choice = previous.choices.get(choiceLabel) || {
+                    label: choiceLabel,
+                    count: 0,
                     students: []
                 };
                 previous.wrongCount += 1;
-                previous.students.push(normalizeName(submission.studentName));
+                previous.students.push(studentName);
+                choice.count += 1;
+                choice.students.push(studentName);
+                previous.choices.set(choiceLabel, choice);
                 counts.set(number, previous);
             });
         });
         return Array.from(counts.values())
+            .map(function (item) {
+                return Object.assign({}, item, {
+                    choices: Array.from(item.choices.values()).sort(function (left, right) {
+                        return right.count - left.count || left.label.localeCompare(right.label, "ko");
+                    })
+                });
+            })
             .sort(function (left, right) {
                 return right.wrongCount - left.wrongCount || left.number - right.number;
             })
@@ -429,9 +540,8 @@
         }, 0) / scored.length);
     }
 
-    function renderSummary() {
+    function renderSummary(filteredSubmissions, latestRows) {
         const assignment = getAssignment();
-        const latestRows = state.latestByStudent;
         const rosterCount = (assignment.roster || []).filter(Boolean).length;
         const submittedCount = latestRows.length;
         const denominator = rosterCount || submittedCount;
@@ -448,7 +558,7 @@
                 </article>
                 <article class="summary-card">
                     <span>전체 제출</span>
-                    <strong>${state.submissions.length}</strong>
+                    <strong>${filteredSubmissions.length}</strong>
                 </article>
                 <article class="summary-card">
                     <span>평균</span>
@@ -458,6 +568,38 @@
                     <span>최고</span>
                     <strong>${topScore}%</strong>
                 </article>
+            </section>
+        `;
+    }
+
+    function renderDateRangeFilter(filteredSubmissions) {
+        const active = isDateRangeActive();
+        const invalid = isDateRangeInvalid();
+        const statusText = invalid
+            ? "시작 시간이 끝 시간보다 늦습니다."
+            : active
+                ? `범위 내 제출 ${filteredSubmissions.length} / 전체 ${state.submissions.length}건`
+                : `전체 ${state.submissions.length}건`;
+
+        return `
+            <section class="date-filter" aria-labelledby="dateFilterTitle">
+                <div class="date-filter__head">
+                    <h2 id="dateFilterTitle">제출 시간 필터</h2>
+                    <span class="date-filter__status${invalid ? " is-warning" : ""}">${escapeHtml(statusText)}</span>
+                </div>
+                <div class="date-filter__controls">
+                    <label for="submittedFromFilter">
+                        <span>시작</span>
+                        <input id="submittedFromFilter" type="datetime-local" step="60" value="${escapeHtml(state.dateStart)}">
+                    </label>
+                    <label for="submittedToFilter">
+                        <span>끝</span>
+                        <input id="submittedToFilter" type="datetime-local" step="60" value="${escapeHtml(state.dateEnd)}">
+                    </label>
+                    <div class="date-filter__actions">
+                        <button id="dateFilterReset" class="dashboard-button" type="button" ${active ? "" : "disabled"}>초기화</button>
+                    </div>
+                </div>
             </section>
         `;
     }
@@ -487,8 +629,39 @@
         `;
     }
 
-    function renderWeakQuestions(displayContext) {
-        const weakQuestions = buildWeakQuestions(state.submissions);
+    function renderChoiceDistribution(item, displayContext) {
+        const visibleChoices = (item.choices || []).slice(0, 5);
+        const hiddenCount = Math.max(0, (item.choices || []).length - visibleChoices.length);
+        if (!visibleChoices.length) return "";
+
+        return `
+            <div class="choice-distribution" aria-label="오답 선택 분포">
+                <span class="choice-distribution__title">선택 분포</span>
+                ${visibleChoices.map(function (choice) {
+                    const studentText = choice.students
+                        .filter(Boolean)
+                        .slice(0, 4)
+                        .map(function (name) {
+                            return getVisibleStudentName({ displayName: name }, displayContext);
+                        })
+                        .join(", ");
+                    return `
+                        <div class="choice-item">
+                            <div class="choice-item__head">
+                                <b>${choice.count}명</b>
+                                <span>${escapeHtml(choice.label)}</span>
+                            </div>
+                            ${studentText ? `<small>${escapeHtml(studentText)}</small>` : ""}
+                        </div>
+                    `;
+                }).join("")}
+                ${hiddenCount ? `<span class="choice-distribution__more">외 ${hiddenCount}개 답안</span>` : ""}
+            </div>
+        `;
+    }
+
+    function renderWeakQuestions(submissions, displayContext) {
+        const weakQuestions = buildWeakQuestions(submissions);
         if (!weakQuestions.length) {
             return '<p class="dashboard-empty">아직 오답 문항이 없습니다.</p>';
         }
@@ -511,6 +684,7 @@
                                 <span>${escapeHtml(item.area || "영역 없음")}</span>
                                 <b>${item.wrongCount}명 오답</b>
                                 <em>정답: ${escapeHtml(item.correctAnswer || "-")}</em>
+                                ${renderChoiceDistribution(item, displayContext)}
                                 ${studentText ? `<small>${escapeHtml(studentText)}</small>` : ""}
                             </article>
                         `;
@@ -567,14 +741,14 @@
         `;
     }
 
-    function renderAllSubmissions(displayContext) {
-        if (!state.submissions.length) return "";
+    function renderAllSubmissions(submissions, displayContext) {
+        if (!submissions.length) return "";
 
         return `
             <details class="all-submissions">
                 <summary>전체 제출 기록 보기</summary>
                 <div class="submission-list">
-                    ${state.submissions.map(function (submission) {
+                    ${submissions.map(function (submission) {
                         return `
                             <article>
                                 <strong>${escapeHtml(getVisibleStudentName(submission, displayContext))}</strong>
@@ -628,11 +802,50 @@
         window.history.replaceState(null, "", url);
     }
 
+    function syncDateRangeUrl() {
+        const url = new URL(window.location.href);
+        if (state.dateStart) {
+            url.searchParams.set("from", state.dateStart);
+        } else {
+            url.searchParams.delete("from");
+        }
+        if (state.dateEnd) {
+            url.searchParams.set("to", state.dateEnd);
+        } else {
+            url.searchParams.delete("to");
+        }
+        window.history.replaceState(null, "", url);
+    }
+
     function toggleAnonymousMode() {
         state.anonymous = !isAnonymousModeActive();
         state.search = "";
         syncAnonymousUrl();
         renderDashboard();
+    }
+
+    function wireDateRangeFilter() {
+        const fromInput = document.getElementById("submittedFromFilter");
+        const toInput = document.getElementById("submittedToFilter");
+        const resetButton = document.getElementById("dateFilterReset");
+
+        function updateDateRange() {
+            state.dateStart = normalizeDateTimeLocalValue(fromInput && fromInput.value);
+            state.dateEnd = normalizeDateTimeLocalValue(toInput && toInput.value);
+            syncDateRangeUrl();
+            renderDashboard();
+        }
+
+        if (fromInput) fromInput.addEventListener("change", updateDateRange);
+        if (toInput) toInput.addEventListener("change", updateDateRange);
+        if (resetButton) {
+            resetButton.addEventListener("click", function () {
+                state.dateStart = "";
+                state.dateEnd = "";
+                syncDateRangeUrl();
+                renderDashboard();
+            });
+        }
     }
 
     function renderDashboard() {
@@ -647,7 +860,9 @@
             syncAnonymousUrl();
         }
 
-        const allRows = buildRosterRows(state.latestByStudent);
+        const filteredSubmissions = getDateFilteredSubmissions();
+        const latestRows = buildLatestByStudent(filteredSubmissions);
+        const allRows = buildRosterRows(latestRows);
         const displayContext = buildDisplayContext(allRows);
         const rows = getFilteredRows(allRows, displayContext);
         root.innerHTML = `
@@ -663,11 +878,12 @@
                 </div>
             </header>
             ${state.error ? `<div class="dashboard-alert">${escapeHtml(state.error)}</div>` : ""}
-            ${renderSummary()}
+            ${renderSummary(filteredSubmissions, latestRows)}
+            ${renderDateRangeFilter(filteredSubmissions)}
             ${renderBars(rows, displayContext)}
-            ${renderWeakQuestions(displayContext)}
+            ${renderWeakQuestions(filteredSubmissions, displayContext)}
             ${renderTable(rows, displayContext)}
-            ${renderAllSubmissions(displayContext)}
+            ${renderAllSubmissions(filteredSubmissions, displayContext)}
         `;
 
         document.getElementById("refreshButton").addEventListener("click", loadAndRender);
@@ -675,6 +891,7 @@
         if (anonymousToggle) {
             anonymousToggle.addEventListener("click", toggleAnonymousMode);
         }
+        wireDateRangeFilter();
         wireAuthButtons();
         const search = document.getElementById("studentSearch");
         if (search) {

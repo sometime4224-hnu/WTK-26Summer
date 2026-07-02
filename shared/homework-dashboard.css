@@ -34,6 +34,7 @@ body.homework-dashboard-page {
 
 .dashboard-hero,
 .dashboard-summary,
+.date-filter,
 .score-bars,
 .weak-panel,
 .table-panel,
@@ -98,6 +99,11 @@ body.homework-dashboard-page {
     border-color: var(--dash-blue);
     background: var(--dash-blue);
     color: #fff;
+}
+
+.dashboard-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
 }
 
 .dashboard-button.privacy[aria-pressed="true"],
@@ -285,11 +291,81 @@ body.homework-dashboard-page {
 }
 
 .score-bars,
+.date-filter,
 .weak-panel,
 .table-panel,
 .all-submissions {
     margin-top: 14px;
     padding: 14px;
+}
+
+.date-filter {
+    display: grid;
+    gap: 12px;
+}
+
+.date-filter__head,
+.date-filter__controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-filter__head {
+    justify-content: space-between;
+}
+
+.date-filter__head h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.date-filter__status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    border-radius: 999px;
+    padding: 0 10px;
+    background: #eff6ff;
+    color: var(--dash-blue);
+    font-size: 12px;
+    font-weight: 950;
+}
+
+.date-filter__status.is-warning {
+    background: #fff1f2;
+    color: var(--dash-red);
+}
+
+.date-filter__controls {
+    flex-wrap: wrap;
+}
+
+.date-filter label {
+    display: grid;
+    flex: 1 1 220px;
+    gap: 6px;
+    color: var(--dash-muted);
+    font-size: 12px;
+    font-weight: 950;
+}
+
+.date-filter input {
+    width: 100%;
+    min-height: 38px;
+    border: 1px solid var(--dash-line);
+    border-radius: 8px;
+    padding: 0 11px;
+    color: #334155;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 850;
+}
+
+.date-filter__actions {
+    display: flex;
+    align-self: end;
+    min-height: 38px;
 }
 
 .score-bar {
@@ -375,6 +451,51 @@ body.homework-dashboard-page {
 .weak-item b {
     color: var(--dash-red);
     font-size: 13px;
+}
+
+.choice-distribution {
+    display: grid;
+    gap: 6px;
+    margin-top: 3px;
+    border-top: 1px solid rgba(194, 65, 12, 0.18);
+    padding-top: 8px;
+}
+
+.choice-distribution__title,
+.choice-distribution__more {
+    color: var(--dash-orange);
+    font-size: 11px;
+    font-weight: 950;
+}
+
+.choice-item {
+    display: grid;
+    gap: 2px;
+    border-radius: 8px;
+    padding: 7px 8px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.choice-item__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+}
+
+.choice-item__head b {
+    flex: 0 0 auto;
+    color: var(--dash-blue);
+    font-size: 12px;
+}
+
+.choice-item__head span {
+    overflow-wrap: anywhere;
+}
+
+.choice-item small {
+    color: var(--dash-muted);
+    font-size: 11px;
+    font-weight: 800;
 }
 
 .panel-head {
@@ -481,6 +602,21 @@ tr.is-missing td {
     .panel-head {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    .date-filter__head,
+    .date-filter__controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .date-filter label,
+    .date-filter__actions {
+        width: 100%;
+    }
+
+    .date-filter__actions .dashboard-button {
+        width: 100%;
     }
 
     #studentSearch {

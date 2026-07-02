@@ -21,8 +21,8 @@ async function installDashboardMock(page) {
           wrongQuestions: [3, 7],
           questionResults: [
             { number: 1, area: '어휘', correctAnswer: '살이 찌다', isCorrect: true },
-            { number: 3, area: '어휘', correctAnswer: '(가슴을) 펴다', isCorrect: false },
-            { number: 7, area: 'V-았더니/었더니', correctAnswer: '했더니', isCorrect: false }
+            { number: 3, area: '어휘', studentAnswer: '가슴을 굽히다', selectedLetter: 'B', correctAnswer: '(가슴을) 펴다', isCorrect: false },
+            { number: 7, area: 'V-았더니/었더니', studentAnswer: '하면', selectedLetter: 'A', correctAnswer: '했더니', isCorrect: false }
           ]
         },
         {
@@ -35,8 +35,8 @@ async function installDashboardMock(page) {
           clientSubmittedAt: '2026-06-26T01:30:00.000Z',
           wrongQuestions: [3, 10, 12, 20, 22, 24],
           questionResults: [
-            { number: 3, area: '어휘', correctAnswer: '(가슴을) 펴다', isCorrect: false },
-            { number: 10, area: '얼마나 -(으)ㄴ/는지 모르다', correctAnswer: '좋아하는지', isCorrect: false }
+            { number: 3, area: '어휘', studentAnswer: '가슴을 굽히다', selectedLetter: 'B', correctAnswer: '(가슴을) 펴다', isCorrect: false },
+            { number: 10, area: '얼마나 -(으)ㄴ/는지 모르다', studentAnswer: '좋아하니까', selectedLetter: 'C', correctAnswer: '좋아하는지', isCorrect: false }
           ]
         },
         {
@@ -62,8 +62,8 @@ async function installDashboardMock(page) {
           clientSubmittedAt: '2026-06-28T01:10:00.000Z',
           wrongQuestions: [3, 11],
           questionResults: [
-            { number: 3, area: '1부. 어휘', correctAnswer: '성격이 잘 맞다', isCorrect: false },
-            { number: 11, area: '2부. 문법', correctAnswer: '-도록', isCorrect: false }
+            { number: 3, area: '1부. 어휘', studentAnswer: '사이가 멀다', selectedLetter: 'D', correctAnswer: '성격이 잘 맞다', isCorrect: false },
+            { number: 11, area: '2부. 문법', studentAnswer: '-더니', selectedLetter: 'B', correctAnswer: '-도록', isCorrect: false }
           ]
         },
         {
@@ -76,8 +76,8 @@ async function installDashboardMock(page) {
           clientSubmittedAt: '2026-06-28T01:15:00.000Z',
           wrongQuestions: [3, 9, 14, 20, 25, 26],
           questionResults: [
-            { number: 3, area: '1부. 어휘', correctAnswer: '성격이 잘 맞다', isCorrect: false },
-            { number: 14, area: '2부. 문법', correctAnswer: '-잖아요', isCorrect: false }
+            { number: 3, area: '1부. 어휘', studentAnswer: '사이가 멀다', selectedLetter: 'D', correctAnswer: '성격이 잘 맞다', isCorrect: false },
+            { number: 14, area: '2부. 문법', studentAnswer: '-더라고요', selectedLetter: 'A', correctAnswer: '-잖아요', isCorrect: false }
           ]
         }
       ],
@@ -92,8 +92,8 @@ async function installDashboardMock(page) {
           clientSubmittedAt: '2026-06-29T01:30:00.000Z',
           wrongQuestions: [5, 8],
           questionResults: [
-            { number: 5, area: '1부. 어휘', correctAnswer: '매력이 있다', isCorrect: false },
-            { number: 8, area: '2부. 문법', correctAnswer: '-더니', isCorrect: false }
+            { number: 5, area: '1부. 어휘', studentAnswer: '마음에 들다', selectedLetter: 'B', correctAnswer: '매력이 있다', isCorrect: false },
+            { number: 8, area: '2부. 문법', studentAnswer: '-도록', selectedLetter: 'C', correctAnswer: '-더니', isCorrect: false }
           ]
         },
         {
@@ -137,6 +137,21 @@ async function installDashboardMock(page) {
   });
 }
 
+async function toLocalDateTimeInput(page, isoText) {
+  return page.evaluate((isoValue) => {
+    const date = new Date(isoValue);
+    const pad = (value) => String(value).padStart(2, '0');
+    return [
+      date.getFullYear(),
+      pad(date.getMonth() + 1),
+      pad(date.getDate())
+    ].join('-') + 'T' + [
+      pad(date.getHours()),
+      pad(date.getMinutes())
+    ].join(':');
+  }, isoText);
+}
+
 test.describe('homework dashboard', () => {
   test('shows c12 dashboard summaries after teacher sign-in', async ({ page }) => {
     await blockExternalRequests(page);
@@ -152,11 +167,51 @@ test.describe('homework dashboard', () => {
     await expect(page.locator('.score-bar')).toHaveCount(2);
     await expect(page.locator('.score-bar').first()).toContainText('김학생');
     await expect(page.locator('.weak-item').first()).toContainText('Q3');
+    await expect(page.locator('.weak-item').first().locator('.choice-item').first()).toContainText('2명');
+    await expect(page.locator('.weak-item').first().locator('.choice-item').first()).toContainText('B. 가슴을 굽히다');
     await expect(page.locator('tbody tr')).toHaveCount(2);
 
     await page.locator('#studentSearch').fill('박');
     await expect(page.locator('tbody tr')).toHaveCount(1);
     await expect(page.locator('tbody tr')).toContainText('박학생');
+  });
+
+  test('filters dashboard submissions by submitted date and time range', async ({ page }) => {
+    await blockExternalRequests(page);
+    await installDashboardMock(page);
+    await page.goto('/c12/review-quiz-results.html', { waitUntil: 'load' });
+
+    await page.locator('#signInButton').click();
+
+    await expect(page.locator('.summary-card').nth(1)).toContainText('3');
+    await expect(page.locator('#submittedFromFilter')).toBeVisible();
+
+    const fromValue = await toLocalDateTimeInput(page, '2026-06-26T00:00:00.000Z');
+    await page.locator('#submittedFromFilter').fill(fromValue);
+    await page.locator('#submittedFromFilter').dispatchEvent('change');
+
+    await expect(page.locator('.date-filter__status')).toContainText('범위 내 제출 2 / 전체 3건');
+    await expect(page.locator('.summary-card').first()).toContainText('2');
+    await expect(page.locator('.summary-card').nth(1)).toContainText('2');
+    await expect(page.locator('tbody tr')).toHaveCount(2);
+
+    const toValue = await toLocalDateTimeInput(page, '2026-06-26T01:45:00.000Z');
+    await page.locator('#submittedToFilter').fill(toValue);
+    await page.locator('#submittedToFilter').dispatchEvent('change');
+
+    await expect(page.locator('.date-filter__status')).toContainText('범위 내 제출 1 / 전체 3건');
+    await expect(page.locator('.summary-card').first()).toContainText('1');
+    await expect(page.locator('tbody tr')).toHaveCount(1);
+    await expect(page.locator('tbody tr')).toContainText('박학생');
+    await expect(page).toHaveURL(/from=/);
+    await expect(page).toHaveURL(/to=/);
+
+    await page.locator('#dateFilterReset').click();
+
+    await expect(page.locator('.date-filter__status')).toContainText('전체 3건');
+    await expect(page.locator('.summary-card').nth(1)).toContainText('3');
+    await expect(page).not.toHaveURL(/from=/);
+    await expect(page).not.toHaveURL(/to=/);
   });
 
   test('keeps teacher dashboard off the c12 hub and available from the root corner', async ({ page }) => {
