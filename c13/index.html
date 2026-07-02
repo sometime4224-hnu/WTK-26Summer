@@ -24,6 +24,7 @@
             --vocab: #fb923c;
             --grammar: #4f46e5;
             --listening: #0f766e;
+            --reading: #0f766e;
             --writing: #be185d;
         }
 
@@ -226,6 +227,10 @@
             background: linear-gradient(180deg, rgba(240, 253, 250, 0.96) 0%, rgba(255, 255, 255, 0.88) 100%);
         }
 
+        .path-card[data-tone="reading"] {
+            background: linear-gradient(180deg, rgba(240, 253, 250, 0.96) 0%, rgba(255, 255, 255, 0.9) 100%);
+        }
+
         .path-card[data-tone="writing"] {
             background: linear-gradient(180deg, rgba(253, 242, 248, 0.97) 0%, rgba(255, 255, 255, 0.9) 100%);
         }
@@ -233,12 +238,15 @@
         .path-card__badge {
             display: inline-flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 8px;
-            width: max-content;
+            width: fit-content;
+            max-width: 100%;
             padding: 7px 11px;
             border-radius: 999px;
             font-weight: 800;
             font-size: 0.82rem;
+            line-height: 1.25;
         }
 
         .path-card[data-tone="vocab"] .path-card__badge {
@@ -252,6 +260,11 @@
         }
 
         .path-card[data-tone="listening"] .path-card__badge {
+            color: #0f766e;
+            background: rgba(153, 246, 228, 0.86);
+        }
+
+        .path-card[data-tone="reading"] .path-card__badge {
             color: #0f766e;
             background: rgba(153, 246, 228, 0.86);
         }
@@ -273,6 +286,21 @@
             grid-column: 1 / -1;
             gap: 8px;
             margin-top: 0;
+        }
+
+        @media (max-width: 420px) {
+            .shell {
+                width: min(100% - 18px, 1200px);
+            }
+
+            .path-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .path-card {
+                grid-template-columns: minmax(0, 1fr);
+                padding: 14px;
+            }
         }
 
         .support-activity-group {
@@ -505,7 +533,7 @@
                 <span class="hero__chip"><i class="fa-solid fa-layer-group"></i> 어휘 7개</span>
                 <span class="hero__chip"><i class="fa-solid fa-book-open"></i> 문법 4개</span>
                 <span class="hero__chip"><i class="fa-solid fa-headphones"></i> 듣기 2개</span>
-                <span class="hero__chip"><i class="fa-solid fa-pen-to-square"></i> 읽기·쓰기 2개</span>
+                <span class="hero__chip"><i class="fa-solid fa-pen-to-square"></i> 읽기·쓰기 4개</span>
             </div>
         </section>
 
@@ -718,6 +746,13 @@
                             </div>
                             <i class="fa-solid fa-chevron-right lesson-arrow"></i>
                         </a>
+                        <a class="lesson-link" href="grammar4-dorok-lab.html">
+                            <div>
+                                <span class="lesson-kind">보조</span>
+                                <span class="lesson-title">V-도록 의미 실험</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                        </a>
                         <a class="lesson-link" href="grammar4-wb-practice.html">
                             <div>
                                 <span class="lesson-kind">WB</span>
@@ -738,9 +773,9 @@
                 </div>
             </div>
             <div class="path-grid">
-                <article class="path-card" data-tone="writing">
-                    <span class="path-card__badge"><i class="fa-solid fa-book-open"></i> 읽기 지문 + 컷 쓰기</span>
-                    <h3>「초대의 글」 읽기 흐름</h3>
+                <article class="path-card" data-tone="reading">
+                    <span class="path-card__badge"><i class="fa-solid fa-book-open"></i> 읽기 활동</span>
+                    <h3>「동물 사랑 바자회」 읽기 흐름</h3>
                     <div class="lesson-list">
                         <a class="lesson-link lesson-link--main" href="reading.html">
                             <div>
@@ -749,10 +784,24 @@
                             </div>
                             <i class="fa-solid fa-chevron-right lesson-arrow"></i>
                         </a>
+                        <a class="lesson-link" href="reading-quiz.html">
+                            <div>
+                                <span class="lesson-kind">문제</span>
+                                <span class="lesson-title">읽기 문제 풀기</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                        </a>
+                        <a class="lesson-link" href="reading-cuttoon.html">
+                            <div>
+                                <span class="lesson-kind">컷툰</span>
+                                <span class="lesson-title">읽기 컷툰 탐색</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right lesson-arrow"></i>
+                        </a>
                         <a class="lesson-link" href="writing-cut.html">
                             <div>
                                 <span class="lesson-kind">쓰기</span>
-                                <span class="lesson-title">컷 쓰기</span>
+                                <span class="lesson-title">컷 쓰기 활동</span>
                             </div>
                             <i class="fa-solid fa-chevron-right lesson-arrow"></i>
                         </a>

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13과 읽기 문제 풀기 - 동물 사랑 바자회</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <style>
+        :root {
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #dbe3ea;
+            --orange: #ea580c;
+            --orange-dark: #c2410c;
+            --orange-soft: #ffedd5;
+            --amber-soft: #fef3c7;
+            --green: #15803d;
+            --red: #b91c1c;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background:
+                linear-gradient(135deg, rgba(234, 88, 12, 0.13), transparent 34%),
+                linear-gradient(315deg, rgba(20, 184, 166, 0.12), transparent 38%),
+                #f4f6f8;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 54px;
+            padding: 8px 14px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .topbar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--orange);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 850;
+        }
+
+        .topbar a:hover,
+        .topbar a:focus-visible {
+            color: var(--orange-dark);
+        }
+
+        .topbar span,
+        .topbar strong {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .shell {
+            width: min(100% - 24px, 1280px);
+            margin: 18px auto 36px;
+        }
+
+        .page-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: end;
+            margin-bottom: 16px;
+        }
+
+        .eyebrow {
+            margin: 0 0 4px;
+            color: var(--orange);
+            font-size: 0.78rem;
+            font-weight: 950;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin-top: 0;
+        }
+
+        h1 {
+            margin-bottom: 4px;
+            font-size: clamp(1.7rem, 3.6vw, 3rem);
+            line-height: 1.08;
+        }
+
+        .page-head p:last-child {
+            margin-bottom: 0;
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 40px;
+            border: 1px solid rgba(234, 88, 12, 0.22);
+            border-radius: 999px;
+            padding: 0 13px;
+            background: #ffffff;
+            color: var(--orange);
+            font-weight: 950;
+            white-space: nowrap;
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.2fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .panel {
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.07);
+        }
+
+        .passage-panel {
+            position: sticky;
+            top: 68px;
+            max-height: calc(100vh - 86px);
+            overflow: auto;
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--line);
+            background: #fff7ed;
+        }
+
+        .panel-head h2 {
+            margin: 0;
+            font-size: 1.05rem;
+        }
+
+        .panel-head a,
+        .small-link {
+            color: var(--orange);
+            font-size: 0.84rem;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .passage {
+            padding: 16px;
+            color: #334155;
+            font-size: 1rem;
+            line-height: 1.9;
+        }
+
+        .passage h3 {
+            margin: 14px 0 6px;
+            color: var(--orange-dark);
+            font-size: 1.02rem;
+        }
+
+        .highlight {
+            border-radius: 5px;
+            padding: 1px 4px;
+            background: var(--orange-soft);
+            color: #9a3412;
+            font-weight: 850;
+        }
+
+        .stretch-box {
+            margin: 12px 0;
+            border-left: 4px solid var(--orange);
+            border-radius: 0 8px 8px 0;
+            padding: 12px;
+            background: #fff7ed;
+        }
+
+        .stretch-box h3 {
+            margin-top: 0;
+        }
+
+        .stretch-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .stretch-box li + li {
+            margin-top: 6px;
+        }
+
+        .quiz-panel {
+            display: grid;
+            gap: 12px;
+            padding: 14px;
+        }
+
+        .question-card {
+            display: grid;
+            gap: 12px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 8px;
+            padding: 14px;
+            background: #ffffff;
+        }
+
+        .question-card.is-correct {
+            border-color: rgba(34, 197, 94, 0.45);
+            background: #f0fdf4;
+        }
+
+        .question-card.is-wrong {
+            border-color: rgba(239, 68, 68, 0.45);
+            background: #fef2f2;
+        }
+
+        .question-head {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .question-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 30px;
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            background: var(--amber-soft);
+            color: #92400e;
+            font-size: 0.82rem;
+            font-weight: 950;
+        }
+
+        .question-title {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.55;
+        }
+
+        .choice-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .choice-btn {
+            display: grid;
+            grid-template-columns: 26px minmax(0, 1fr);
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+            min-height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: #ffffff;
+            color: #334155;
+            font: inherit;
+            font-weight: 760;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .choice-btn span:last-child {
+            min-width: 0;
+        }
+
+        .choice-btn:hover,
+        .choice-btn:focus-visible {
+            border-color: var(--orange);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.13);
+        }
+
+        .choice-btn.is-selected.is-correct {
+            border-color: #22c55e;
+            background: #dcfce7;
+            color: var(--green);
+        }
+
+        .choice-btn.is-selected.is-wrong {
+            border-color: #ef4444;
+            background: #fee2e2;
+            color: var(--red);
+        }
+
+        .choice-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            font-weight: 950;
+        }
+
+        .answer-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 11px 12px;
+            color: var(--ink);
+            font: inherit;
+            font-weight: 750;
+            background: #ffffff;
+        }
+
+        input {
+            max-width: 300px;
+        }
+
+        textarea {
+            min-height: 116px;
+            resize: vertical;
+            line-height: 1.65;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--orange);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.13);
+        }
+
+        .primary-btn,
+        .ghost-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            border-radius: 8px;
+            padding: 0 13px;
+            font: inherit;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .primary-btn {
+            border: 1px solid var(--orange);
+            background: var(--orange);
+            color: #ffffff;
+        }
+
+        .primary-btn:hover,
+        .primary-btn:focus-visible {
+            background: var(--orange-dark);
+            border-color: var(--orange-dark);
+        }
+
+        .ghost-btn {
+            border: 1px solid var(--line);
+            background: #ffffff;
+            color: var(--orange);
+        }
+
+        .ghost-btn:hover,
+        .ghost-btn:focus-visible {
+            border-color: var(--orange);
+            background: #fff7ed;
+        }
+
+        .feedback {
+            min-height: 24px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+            font-weight: 850;
+            line-height: 1.55;
+        }
+
+        .feedback.is-correct {
+            color: var(--green);
+        }
+
+        .feedback.is-wrong {
+            color: var(--red);
+        }
+
+        .sample-answer {
+            display: none;
+            margin: 0;
+            border-left: 4px solid var(--orange);
+            padding: 10px 12px;
+            border-radius: 0 8px 8px 0;
+            background: #fff7ed;
+            color: #9a3412;
+            font-size: 0.92rem;
+            font-weight: 760;
+            line-height: 1.65;
+        }
+
+        .sample-answer.is-visible {
+            display: block;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            padding: 2px 0 0;
+        }
+
+        @media (max-width: 920px) {
+            .page-head,
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .passage-panel {
+                position: static;
+                max-height: none;
+            }
+
+            .score-pill {
+                justify-self: start;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .shell {
+                width: min(100% - 16px, 1280px);
+                margin-top: 10px;
+            }
+
+            .topbar {
+                gap: 9px;
+            }
+
+            .panel-head {
+                display: grid;
+                justify-content: stretch;
+            }
+
+            .answer-row {
+                display: grid;
+            }
+
+            input,
+            .primary-btn,
+            .ghost-btn {
+                max-width: none;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar">
+        <a href="../index.html"><i class="fa-solid fa-house" aria-hidden="true"></i><span>메인</span></a>
+        <span>|</span>
+        <a href="./index.html"><i class="fa-solid fa-folder-open" aria-hidden="true"></i><span>13과 홈</span></a>
+        <span>|</span>
+        <a href="./reading.html"><i class="fa-solid fa-book-open" aria-hidden="true"></i><span>읽기</span></a>
+        <span>|</span>
+        <a href="./reading-cuttoon.html"><i class="fa-solid fa-images" aria-hidden="true"></i><span>읽기 컷툰</span></a>
+        <span>|</span>
+        <strong>읽기 문제</strong>
+    </nav>
+
+    <main class="shell">
+        <header class="page-head">
+            <div>
+                <p class="eyebrow">C13 Reading Quiz</p>
+                <h1>동물 사랑 바자회</h1>
+                <p>행사 안내문을 읽고 4지선다, 단답, 서술형 문제를 차례대로 풉니다.</p>
+            </div>
+            <div class="score-pill" aria-live="polite">
+                <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+                <span id="score-label">자동 채점 0 / 5</span>
+            </div>
+        </header>
+
+        <section class="layout" aria-label="읽기 지문과 문제 풀기">
+            <article class="panel passage-panel" aria-label="읽기 지문">
+                <div class="panel-head">
+                    <h2>읽기 지문</h2>
+                    <a href="./reading-cuttoon.html">컷툰으로 보기</a>
+                </div>
+                <div class="passage">
+                    <p>
+                        "<span class="highlight">동물 사랑 바자회</span>"에 여러분을 초대합니다.
+                        저희 "<span class="highlight">동사모</span>"는 동물을 사랑하는 사람들이 모여서
+                        <span class="highlight">버려진 동물</span>들을 돌보는 일을 합니다.
+                        매년 바자회를 열어서 <span class="highlight">동물 보호 기금</span>도 마련하고 버려진 동물에게
+                        <span class="highlight">새 주인</span>을 찾아 주고 있습니다.
+                    </p>
+                    <p>
+                        <span class="highlight">경험</span>이 없어 동물을 잘 돌볼 수 없을까 봐 걱정하시는 분들을 위해
+                        여러 가지 <span class="highlight">도움</span>도 드립니다.
+                        바자회에 오셔서 물건도 싸게 구입하시고 새로운 동물 가족도 만나 보시기 바랍니다.
+                    </p>
+                    <p>
+                        낮 12시부터 2시까지는 <span class="highlight">밴드 음악</span>을 들으면서
+                        <span class="highlight">채식 뷔페</span>를 즐기실 수 있도록 했습니다.
+                        또 동물 사진을 <span class="highlight">전시</span>해서 구경하면서 바자회를 즐길 수 있도록 했습니다.
+                        3시부터는 <span class="highlight">다큐멘터리</span> "멸종 위기의 동물"도 상영할 예정입니다.
+                        많은 관심 부탁드립니다. 감사합니다.
+                    </p>
+                    <div class="stretch-box">
+                        <h3>행사 정보</h3>
+                        <ul>
+                            <li><strong>날짜:</strong> 5월 3일</li>
+                            <li><strong>장소:</strong> 동대문 문화 공원</li>
+                            <li><strong>시간:</strong> 오전 11시 ~ 오후 5시</li>
+                            <li><strong>회비:</strong> 10,000원</li>
+                        </ul>
+                    </div>
+                    <p>
+                        모아진 돈은 모두 버려진 동물, 멸종 위기 동물을 위해 쓰입니다.
+                        바자회에 오신 모든 분께 천으로 만든 가방을 드립니다.
+                        동물 가죽이나 <span class="highlight">모피</span>로 만든 옷을 입으신 분은 입장할 수 없습니다.
+                    </p>
+                </div>
+            </article>
+
+            <section class="panel quiz-panel" aria-label="읽기 문제">
+                <article class="question-card" data-question="q1" data-question-type="mc">
+                    <div class="question-head">
+                        <span class="question-number">1</span>
+                        <h2 class="question-title">이 글을 쓴 가장 중요한 목적은 무엇입니까?</h2>
+                    </div>
+                    <div class="choice-grid">
+                        <button class="choice-btn" type="button" data-choice="1"><span class="choice-label">①</span><span>동물 병원 이용 방법을 설명하려고</span></button>
+                        <button class="choice-btn" type="button" data-choice="2"><span class="choice-label">②</span><span>동물 사랑 바자회에 사람들을 초대하려고</span></button>
+                        <button class="choice-btn" type="button" data-choice="3"><span class="choice-label">③</span><span>채식 식단의 장점만 소개하려고</span></button>
+                        <button class="choice-btn" type="button" data-choice="4"><span class="choice-label">④</span><span>다큐멘터리 제작자를 모집하려고</span></button>
+                    </div>
+                    <p class="feedback" data-feedback></p>
+                </article>
+
+                <article class="question-card" data-question="q2" data-question-type="mc">
+                    <div class="question-head">
+                        <span class="question-number">2</span>
+                        <h2 class="question-title">"동사모"는 어떤 일을 하는 모임입니까?</h2>
+                    </div>
+                    <div class="choice-grid">
+                        <button class="choice-btn" type="button" data-choice="1"><span class="choice-label">①</span><span>동물을 사랑하는 사람들이 모여 버려진 동물을 돌본다.</span></button>
+                        <button class="choice-btn" type="button" data-choice="2"><span class="choice-label">②</span><span>공연장을 빌려 밴드 음악만 연습한다.</span></button>
+                        <button class="choice-btn" type="button" data-choice="3"><span class="choice-label">③</span><span>모피 옷을 판매하는 가게를 운영한다.</span></button>
+                        <button class="choice-btn" type="button" data-choice="4"><span class="choice-label">④</span><span>동물 사진을 찍는 방법만 가르친다.</span></button>
+                    </div>
+                    <p class="feedback" data-feedback></p>
+                </article>
+
+                <article class="question-card" data-question="q3" data-question-type="mc">
+                    <div class="question-head">
+                        <span class="question-number">3</span>
+                        <h2 class="question-title">낮 12시부터 2시까지 할 수 있는 활동은 무엇입니까?</h2>
+                    </div>
+                    <div class="choice-grid">
+                        <button class="choice-btn" type="button" data-choice="1"><span class="choice-label">①</span><span>다큐멘터리 "멸종 위기의 동물" 보기</span></button>
+                        <button class="choice-btn" type="button" data-choice="2"><span class="choice-label">②</span><span>밴드 음악을 들으며 채식 뷔페 즐기기</span></button>
+                        <button class="choice-btn" type="button" data-choice="3"><span class="choice-label">③</span><span>동물 가죽 옷 만들기</span></button>
+                        <button class="choice-btn" type="button" data-choice="4"><span class="choice-label">④</span><span>입장권을 무료로 나누어 주기</span></button>
+                    </div>
+                    <p class="feedback" data-feedback></p>
+                </article>
+
+                <article class="question-card" data-question="q4" data-question-type="mc">
+                    <div class="question-head">
+                        <span class="question-number">4</span>
+                        <h2 class="question-title">이 바자회에 입장할 수 없는 사람은 누구입니까?</h2>
+                    </div>
+                    <div class="choice-grid">
+                        <button class="choice-btn" type="button" data-choice="1"><span class="choice-label">①</span><span>동물을 돌본 경험이 없는 사람</span></button>
+                        <button class="choice-btn" type="button" data-choice="2"><span class="choice-label">②</span><span>천으로 만든 가방을 받고 싶은 사람</span></button>
+                        <button class="choice-btn" type="button" data-choice="3"><span class="choice-label">③</span><span>동물 가죽이나 모피로 만든 옷을 입은 사람</span></button>
+                        <button class="choice-btn" type="button" data-choice="4"><span class="choice-label">④</span><span>동물 사진 전시를 보고 싶은 사람</span></button>
+                    </div>
+                    <p class="feedback" data-feedback></p>
+                </article>
+
+                <article class="question-card" data-question="q5" data-question-type="short">
+                    <div class="question-head">
+                        <span class="question-number">5</span>
+                        <h2 class="question-title">행사 장소는 어디입니까?</h2>
+                    </div>
+                    <div class="answer-row">
+                        <input id="short-answer" type="text" autocomplete="off" placeholder="예: 동대문 문화 공원">
+                        <button class="primary-btn" type="button" id="check-short">정답 확인</button>
+                    </div>
+                    <p class="feedback" id="short-feedback" data-feedback></p>
+                </article>
+
+                <article class="question-card" data-question="q6" data-question-type="subjective">
+                    <div class="question-head">
+                        <span class="question-number">6</span>
+                        <h2 class="question-title">내가 이 바자회에 참여한다면 어떤 활동을 하고 싶은지, 그 이유와 함께 쓰세요.</h2>
+                    </div>
+                    <textarea id="essay-answer" placeholder="예: 저는 동물 사진 전시를 보고 싶습니다. 멸종 위기 동물에 대해 더 알고 싶기 때문입니다."></textarea>
+                    <div class="answer-row">
+                        <button class="primary-btn" type="button" id="check-essay">답안 확인</button>
+                        <button class="ghost-btn" type="button" id="show-sample">예시 보기</button>
+                    </div>
+                    <p class="feedback" id="essay-feedback" data-feedback></p>
+                    <p class="sample-answer" id="sample-answer">
+                        예시 답안: 저는 바자회에서 물건을 사고 동물 사진 전시를 보고 싶습니다. 모아진 돈이 버려진 동물과 멸종 위기 동물을 위해 쓰이기 때문입니다.
+                    </p>
+                </article>
+
+                <div class="actions">
+                    <button class="ghost-btn" type="button" id="reset-quiz">다시 풀기</button>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        const answers = {
+            q1: "2",
+            q2: "1",
+            q3: "2",
+            q4: "3",
+        };
+        const graded = new Map();
+
+        function updateScore() {
+            const correctCount = Array.from(graded.values()).filter(Boolean).length;
+            document.getElementById("score-label").textContent = `자동 채점 ${correctCount} / 5`;
+        }
+
+        function setQuestionState(card, isCorrect, message) {
+            card.classList.toggle("is-correct", isCorrect);
+            card.classList.toggle("is-wrong", !isCorrect);
+            const feedback = card.querySelector("[data-feedback]");
+            feedback.textContent = message;
+            feedback.classList.toggle("is-correct", isCorrect);
+            feedback.classList.toggle("is-wrong", !isCorrect);
+        }
+
+        document.querySelectorAll("[data-question-type='mc']").forEach((card) => {
+            card.addEventListener("click", (event) => {
+                const choice = event.target.closest("[data-choice]");
+                if (!choice) {
+                    return;
+                }
+
+                const questionId = card.dataset.question;
+                const isCorrect = choice.dataset.choice === answers[questionId];
+                card.querySelectorAll("[data-choice]").forEach((button) => {
+                    button.classList.remove("is-selected", "is-correct", "is-wrong");
+                });
+                choice.classList.add("is-selected", isCorrect ? "is-correct" : "is-wrong");
+                graded.set(questionId, isCorrect);
+                setQuestionState(card, isCorrect, isCorrect ? "정답입니다." : "다시 지문에서 근거를 찾아 보세요.");
+                updateScore();
+            });
+        });
+
+        function normalizeShortAnswer(value) {
+            return value.trim().replace(/\s+/g, "").replace(/[.,!?]/g, "");
+        }
+
+        document.getElementById("check-short").addEventListener("click", () => {
+            const card = document.querySelector("[data-question='q5']");
+            const value = normalizeShortAnswer(document.getElementById("short-answer").value);
+            const isCorrect = value.includes("동대문문화공원");
+            graded.set("q5", isCorrect);
+            setQuestionState(
+                card,
+                isCorrect,
+                isCorrect ? "맞았습니다. 행사 장소는 동대문 문화 공원입니다." : "다시 확인해 보세요. 행사 정보에 장소가 나옵니다."
+            );
+            updateScore();
+        });
+
+        document.getElementById("check-essay").addEventListener("click", () => {
+            const value = document.getElementById("essay-answer").value.trim();
+            const feedback = document.getElementById("essay-feedback");
+            const hasActivity = /바자회|물건|전시|사진|다큐멘터리|채식|뷔페|밴드|동물|가족|구입/.test(value);
+            const hasReason = /때문|위해|알고|돕고|좋아서|보고 싶|참여하고 싶|관심/.test(value);
+            if (value.length < 12 || !hasActivity || !hasReason) {
+                feedback.textContent = "참여하고 싶은 활동과 이유가 모두 보이도록 한 문장 이상 써 보세요.";
+                feedback.className = "feedback is-wrong";
+                return;
+            }
+            feedback.textContent = "좋습니다. 참여하고 싶은 활동과 이유가 들어갔는지 예시 답안과 비교해 보세요.";
+            feedback.className = "feedback is-correct";
+        });
+
+        document.getElementById("show-sample").addEventListener("click", () => {
+            document.getElementById("sample-answer").classList.add("is-visible");
+        });
+
+        document.getElementById("reset-quiz").addEventListener("click", () => {
+            graded.clear();
+            document.querySelectorAll(".question-card").forEach((card) => {
+                card.classList.remove("is-correct", "is-wrong");
+                const feedback = card.querySelector("[data-feedback]");
+                if (feedback) {
+                    feedback.textContent = "";
+                    feedback.className = "feedback";
+                }
+            });
+            document.querySelectorAll(".choice-btn").forEach((button) => {
+                button.classList.remove("is-selected", "is-correct", "is-wrong");
+            });
+            document.getElementById("short-answer").value = "";
+            document.getElementById("essay-answer").value = "";
+            document.getElementById("sample-answer").classList.remove("is-visible");
+            updateScore();
+        });
+    </script>
+    <script src="../shared/page-qr.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>
