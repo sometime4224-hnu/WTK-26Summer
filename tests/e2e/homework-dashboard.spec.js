@@ -180,6 +180,8 @@ test.describe('homework dashboard', () => {
     await expect(page.locator('h1')).toHaveText('제출 통계');
     await expect(page.locator('[data-assignment-card]')).toHaveCount(6);
     await expect(page.locator('[data-assignment-card="c12-review-quiz-v1"]')).toContainText('12과 어휘·문법 복습');
+    await expect(page.locator('[data-assignment-anonymous-link]')).toHaveCount(6);
+    await expect(page.locator('[data-assignment-anonymous-link="c12-review-quiz-v1"]')).toHaveText('익명 현황');
     await expect(page.locator('[data-assignment-anonymous-link="vocab-grammar-mock-round1-v1"]')).toHaveText('익명 현황');
     await expect(page.locator('[data-assignment-card="vocab-grammar-mock-marathon30-v1"]')).toContainText('30문제 마라톤');
 
@@ -227,6 +229,23 @@ test.describe('homework dashboard', () => {
     await expect(page.locator('#anonymousModeToggle')).toHaveAttribute('aria-pressed', 'false');
     await expect(page).not.toHaveURL(/anonymous=1/);
     await expect(page.locator('body')).toContainText('김학생');
+  });
+
+  test('masks every registered assignment in anonymous mode', async ({ page }) => {
+    await blockExternalRequests(page);
+    await installDashboardMock(page);
+    await page.goto('/teacher-dashboard/index.html?assignment=c12-review-quiz-v1&anonymous=1', { waitUntil: 'load' });
+
+    await page.locator('#signInButton').click();
+
+    await expect(page.locator('h1')).toHaveText('12과 어휘·문법 복습 제출 현황');
+    await expect(page.locator('#anonymousModeToggle')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.score-bar').first()).toContainText('학생 01');
+    await expect(page.locator('tbody tr')).toHaveCount(2);
+
+    const bodyText = await page.locator('body').evaluate((body) => body.textContent);
+    expect(bodyText).not.toContain('김학생');
+    expect(bodyText).not.toContain('박학생');
   });
 
   test('supports direct assignment queries and unknown assignment fallback', async ({ page }) => {

@@ -132,6 +132,7 @@
             title,
             chapter: String(assignment.chapter || ""),
             totalQuestions: Number(assignment.totalQuestions) || 0,
+            anonymousModeEnabled: assignment.anonymousModeEnabled !== false,
             roster: Array.isArray(assignment.roster) ? assignment.roster : [],
             groupId: group.id || "",
             groupTitle: group.title || ""

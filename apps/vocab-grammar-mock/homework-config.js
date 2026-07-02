@@ -7,8 +7,7 @@
             assignmentTitle: "3B 중간 모의고사 1회차",
             roundId: "1",
             roundLabel: "1회차",
-            totalQuestions: 26,
-            anonymousModeEnabled: true
+            totalQuestions: 26
         },
         "2": {
             assignmentId: "vocab-grammar-mock-round2-v1",
@@ -73,7 +72,7 @@
             assignmentTitle: current.assignmentTitle,
             chapter: "midterm-3b",
             totalQuestions: current.totalQuestions,
-            anonymousModeEnabled: Boolean(current.anonymousModeEnabled),
+            anonymousModeEnabled: current.anonymousModeEnabled !== false,
             roster: []
         })
     });
