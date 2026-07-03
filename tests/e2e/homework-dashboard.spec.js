@@ -107,6 +107,35 @@ async function installDashboardMock(page) {
           wrongQuestions: [],
           questionResults: []
         }
+      ],
+      'review4-listening-v1': [
+        {
+          id: 'review4-listening-sub-1',
+          assignmentId: 'review4-listening-v1',
+          studentName: '이학생',
+          score: 15,
+          total: 16,
+          percent: 94,
+          clientSubmittedAt: '2026-07-01T01:10:00.000Z',
+          wrongQuestions: [6],
+          questionResults: [
+            { number: 6, area: '듣기', studentAnswer: '1. 다른 답', selectedLetter: '1', correctAnswer: '정답 선택지', correctLetter: '3', isCorrect: false }
+          ]
+        },
+        {
+          id: 'review4-listening-sub-2',
+          assignmentId: 'review4-listening-v1',
+          studentName: '오학생',
+          score: 14,
+          total: 16,
+          percent: 88,
+          clientSubmittedAt: '2026-07-01T01:20:00.000Z',
+          wrongQuestions: [6, 10],
+          questionResults: [
+            { number: 6, area: '듣기', studentAnswer: '1. 다른 답', selectedLetter: '1', correctAnswer: '정답 선택지', correctLetter: '3', isCorrect: false },
+            { number: 10, area: '듣기', studentAnswer: '2. 보기', selectedLetter: '2', correctAnswer: '정답', correctLetter: '4', isCorrect: false }
+          ]
+        }
       ]
     };
 
@@ -233,24 +262,27 @@ test.describe('homework dashboard', () => {
     await page.goto('/teacher-dashboard/index.html', { waitUntil: 'load' });
 
     await expect(page.locator('h1')).toHaveText('제출 통계');
-    await expect(page.locator('[data-assignment-card]')).toHaveCount(6);
+    await expect(page.locator('[data-assignment-card]')).toHaveCount(10);
     await expect(page.locator('[data-assignment-card="c12-review-quiz-v1"]')).toContainText('12과 어휘·문법 복습');
-    await expect(page.locator('[data-assignment-anonymous-link]')).toHaveCount(6);
+    await expect(page.locator('[data-assignment-card="review4-listening-v1"]')).toContainText('복습 4 듣기');
+    await expect(page.locator('[data-assignment-card="review4-reading-writing-v1"]')).toContainText('복습 4 읽기와 쓰기');
+    await expect(page.locator('[data-assignment-anonymous-link]')).toHaveCount(10);
     await expect(page.locator('[data-assignment-anonymous-link="c12-review-quiz-v1"]')).toHaveText('익명 현황');
+    await expect(page.locator('[data-assignment-anonymous-link="review4-listening-v1"]')).toHaveText('익명 현황');
     await expect(page.locator('[data-assignment-anonymous-link="vocab-grammar-mock-round1-v1"]')).toHaveText('익명 현황');
     await expect(page.locator('[data-assignment-card="vocab-grammar-mock-marathon30-v1"]')).toContainText('30문제 마라톤');
 
-    await page.locator('[data-assignment-link="vocab-grammar-mock-round2-v1"]').click();
+    await page.locator('[data-assignment-link="review4-listening-v1"]').click();
 
-    await expect(page).toHaveURL(/assignment=vocab-grammar-mock-round2-v1/);
-    await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 2회차 제출 현황');
+    await expect(page).toHaveURL(/assignment=review4-listening-v1/);
+    await expect(page.locator('h1')).toHaveText('복습 4 듣기 제출 현황');
     await expect(page.locator('#signInButton')).toBeVisible();
 
     await page.locator('#signInButton').click();
 
     await expect(page.locator('.summary-card').first()).toContainText('2');
     await expect(page.locator('.score-bar')).toHaveCount(2);
-    await expect(page.locator('.weak-item').first()).toContainText('Q5');
+    await expect(page.locator('.weak-item').first()).toContainText('Q6');
   });
 
   test('masks round 1 student names in anonymous mode', async ({ page }) => {
@@ -315,6 +347,6 @@ test.describe('homework dashboard', () => {
 
     await expect(page.locator('h1')).toHaveText('제출 통계');
     await expect(page.locator('.dashboard-alert')).toContainText('등록되지 않은 통계 항목입니다');
-    await expect(page.locator('[data-assignment-card]')).toHaveCount(6);
+    await expect(page.locator('[data-assignment-card]')).toHaveCount(10);
   });
 });

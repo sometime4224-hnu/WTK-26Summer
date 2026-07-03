@@ -40,6 +40,7 @@ service cloud.firestore {
         && (
           isC12ReviewSubmission(assignmentId)
           || isVocabGrammarMockSubmission(assignmentId)
+          || isReview4Submission(assignmentId)
         );
     }
 
@@ -51,6 +52,35 @@ service cloud.firestore {
         && request.resource.data.score >= 0
         && request.resource.data.score <= 24
         && request.resource.data.questionResults.size() == 24;
+    }
+
+    function isReview4Assignment(assignmentId) {
+      return assignmentId in [
+        "review4-listening-v1",
+        "review4-reading-writing-v1"
+      ];
+    }
+
+    function review4SectionId(assignmentId) {
+      return assignmentId == "review4-listening-v1"
+        ? "listening"
+        : "readingWriting";
+    }
+
+    function review4Total(assignmentId) {
+      return assignmentId == "review4-listening-v1" ? 16 : 15;
+    }
+
+    function isReview4Submission(assignmentId) {
+      return isReview4Assignment(assignmentId)
+        && request.resource.data.chapter == "review4"
+        && request.resource.data.sectionId == review4SectionId(assignmentId)
+        && request.resource.data.sectionTitle is string
+        && request.resource.data.total == review4Total(assignmentId)
+        && request.resource.data.answered == review4Total(assignmentId)
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= review4Total(assignmentId)
+        && request.resource.data.questionResults.size() == review4Total(assignmentId);
     }
 
     function isVocabGrammarMockAssignment(assignmentId) {

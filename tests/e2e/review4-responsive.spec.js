@@ -25,6 +25,10 @@ async function expectNoHorizontalOverflow(page) {
 
 async function startQuizIfNeeded(page, target) {
   if (!target.quiz) return;
+  const nameInput = page.locator('#studentNameInput');
+  if (await nameInput.count()) {
+    await nameInput.fill('테스트학생');
+  }
   await page.locator('[data-action="start"], [data-action="resume"]').first().click();
   await expect(page.locator('.question-card')).toBeVisible();
 }

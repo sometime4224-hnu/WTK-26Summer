@@ -393,6 +393,118 @@ html[data-layout="desktop"] .section-grid {
   gap: 10px;
 }
 
+.homework-panel {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+}
+
+html[data-layout="tablet"] .homework-panel,
+html[data-layout="desktop"] .homework-panel {
+  grid-template-columns: minmax(0, 1.3fr) minmax(240px, 0.7fr);
+  align-items: end;
+}
+
+.homework-panel.is-name-missing {
+  border-color: rgba(181, 76, 63, 0.3);
+}
+
+.homework-panel__text {
+  min-width: 0;
+}
+
+.homework-panel__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(70, 113, 127, 0.12);
+  color: var(--teal);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.homework-panel h2 {
+  margin: 10px 0 6px;
+  font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+}
+
+.homework-panel p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.student-name-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.student-name-field span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.student-name-field input {
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid rgba(159, 111, 38, 0.18);
+  border-radius: 16px;
+  background: rgba(255, 250, 241, 0.86);
+  color: var(--ink);
+  padding: 12px 14px;
+  outline: none;
+}
+
+.student-name-field input:focus {
+  border-color: rgba(70, 113, 127, 0.56);
+  box-shadow: 0 0 0 4px rgba(70, 113, 127, 0.12);
+}
+
+.homework-status {
+  grid-column: 1 / -1;
+  min-height: 34px;
+  margin: 0;
+  padding: 9px 12px;
+  border-radius: 14px;
+  background: rgba(255, 250, 241, 0.72);
+  border: 1px solid rgba(159, 111, 38, 0.12);
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.homework-status.is-pending {
+  color: var(--teal);
+  border-color: rgba(70, 113, 127, 0.22);
+}
+
+.homework-status.is-success {
+  color: var(--correct);
+  border-color: rgba(53, 117, 93, 0.24);
+}
+
+.homework-status.is-error {
+  color: var(--wrong);
+  border-color: rgba(181, 76, 63, 0.28);
+  background: rgba(255, 244, 240, 0.82);
+}
+
+.homework-status--quiz {
+  margin: 0 0 14px;
+}
+
+.homework-status--result {
+  margin-top: 12px;
+}
+
 .history-list {
   margin-top: 18px;
 }

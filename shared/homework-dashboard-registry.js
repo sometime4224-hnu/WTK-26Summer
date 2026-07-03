@@ -19,6 +19,26 @@
                 ]
             },
             {
+                id: "review4",
+                title: "복습 4",
+                assignments: [
+                    {
+                        assignmentId: "review4-listening-v1",
+                        title: "복습 4 듣기",
+                        chapter: "review4",
+                        totalQuestions: 16,
+                        activityHref: "review/review4-html/listening.html"
+                    },
+                    {
+                        assignmentId: "review4-reading-writing-v1",
+                        title: "복습 4 읽기와 쓰기",
+                        chapter: "review4",
+                        totalQuestions: 15,
+                        activityHref: "review/review4-html/reading-writing.html"
+                    }
+                ]
+            },
+            {
                 id: "midterm-vocab-grammar",
                 title: "중간 모의고사",
                 assignments: [

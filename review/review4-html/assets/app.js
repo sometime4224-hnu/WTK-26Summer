@@ -2,6 +2,8 @@
   var DATA = window.REVIEW4_DATA;
   var FEEDBACK_I18N = window.REVIEW4_FEEDBACK_I18N || {};
   var STORAGE_PREFIX = "snukorean:review4";
+  var STUDENT_NAME_KEY = "homeworkStudentName";
+  var CHOICE_LABELS = ["1", "2", "3", "4"];
   var runtime = {
     layoutPreference: normalizeLayoutPreference(loadText("layoutPreference") || "auto"),
     activeLayout: "",
@@ -13,6 +15,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     applyLayout();
     document.getElementById("app").addEventListener("click", onClick);
+    document.getElementById("app").addEventListener("input", onInput);
     window.addEventListener("resize", onViewportChange);
     window.addEventListener("orientationchange", onViewportChange);
     window.addEventListener("beforeunload", stopAudio);
@@ -39,6 +42,9 @@
 
     if (action === "start" || action === "restart") {
       if (sectionId) {
+        if (!ensureHomeworkName(sectionId)) {
+          return;
+        }
         stopAudio();
         clearProgress(sectionId);
         setProgress(sectionId, createProgress(sectionId));
@@ -53,6 +59,9 @@
 
     if (action === "resume") {
       if (sectionId) {
+        if (!ensureHomeworkName(sectionId)) {
+          return;
+        }
         stopAudio();
         ui.view = "quiz";
         ui.activeAttemptId = "";
@@ -130,6 +139,16 @@
         ui.filter = target.getAttribute("data-filter");
       }
       render();
+    }
+  }
+
+  function onInput(event) {
+    if (event.target && event.target.id === "studentNameInput") {
+      saveStudentName(event.target.value);
+      if (document.body.dataset.section && readStudentName()) {
+        clearHomeworkStatus(document.body.dataset.section);
+      }
+      updateHomeworkPanelState(event.target.closest(".homework-panel"), readStudentName());
     }
   }
 
@@ -220,6 +239,105 @@
     renderStart(section, progress);
   }
 
+  function isHomeworkEnabled(section) {
+    return Boolean(section && section.homework && section.homework.enabled && section.homework.assignmentId);
+  }
+
+  function readStudentName() {
+    return String(loadText(STUDENT_NAME_KEY) || "").trim();
+  }
+
+  function saveStudentName(value) {
+    saveText(STUDENT_NAME_KEY, String(value || "").trim().slice(0, 40));
+  }
+
+  function homeworkStatusText(section, studentName) {
+    if (!studentName) {
+      return "이름을 입력하면 퀴즈를 시작할 수 있습니다.";
+    }
+    return "이름이 저장되었습니다. 모든 문항을 푼 뒤 온라인으로 제출됩니다.";
+  }
+
+  function renderHomeworkPanel(section) {
+    if (!isHomeworkEnabled(section)) {
+      return "";
+    }
+    var ui = getUi(section.id);
+    var studentName = readStudentName();
+    var statusKind = ui.homeworkStatusKind || (studentName ? "idle" : "pending");
+    var statusText = ui.homeworkStatusText || homeworkStatusText(section, studentName);
+    var attentionClass = !studentName || statusKind === "error" ? " is-name-missing" : "";
+    return (
+      '<section class="homework-panel surface' + attentionClass + '" aria-labelledby="homeworkPanelTitle">' +
+      '<div class="homework-panel__text">' +
+      '<span class="homework-panel__badge">온라인 제출</span>' +
+      '<h2 id="homeworkPanelTitle">먼저 이름을 입력하세요</h2>' +
+      '<p>' + escapeHtml(section.homework.assignmentTitle || section.title) + " 결과가 선생님 대시보드에 제출됩니다.</p>" +
+      "</div>" +
+      '<label class="student-name-field" for="studentNameInput">' +
+      "<span>학생 이름</span>" +
+      '<input id="studentNameInput" type="text" maxlength="40" autocomplete="name" value="' + escapeHtml(studentName) + '" placeholder="여기에 이름 입력">' +
+      "</label>" +
+      '<p id="homeworkStatus" class="homework-status is-' + escapeHtml(statusKind) + '">' + escapeHtml(statusText) + "</p>" +
+      "</section>"
+    );
+  }
+
+  function renderHomeworkQuizNotice(section) {
+    if (!isHomeworkEnabled(section)) {
+      return "";
+    }
+    var ui = getUi(section.id);
+    var studentName = readStudentName();
+    if (!ui.homeworkStatusText && studentName) {
+      return "";
+    }
+    var kind = ui.homeworkStatusKind || (studentName ? "idle" : "error");
+    var text = ui.homeworkStatusText || "이름을 먼저 입력해야 제출할 수 있습니다.";
+    return '<p class="homework-status homework-status--quiz is-' + escapeHtml(kind) + '">' + escapeHtml(text) + "</p>";
+  }
+
+  function updateHomeworkPanelState(panel, studentName) {
+    if (!panel) {
+      return;
+    }
+    var hasName = Boolean(String(studentName || "").trim());
+    var status = panel.querySelector("#homeworkStatus");
+    panel.classList.toggle("is-name-missing", !hasName);
+    if (status) {
+      status.className = "homework-status is-" + (hasName ? "idle" : "pending");
+      status.textContent = hasName
+        ? "이름이 저장되었습니다. 모든 문항을 푼 뒤 온라인으로 제출됩니다."
+        : "이름을 입력하면 퀴즈를 시작할 수 있습니다.";
+    }
+  }
+
+  function showMissingHomeworkName(sectionId) {
+    var ui = getUi(sectionId);
+    ui.homeworkStatusKind = "error";
+    ui.homeworkStatusText = "이름을 먼저 입력해야 시작하거나 제출할 수 있습니다.";
+    render();
+  }
+
+  function clearHomeworkStatus(sectionId) {
+    var ui = getUi(sectionId);
+    ui.homeworkStatusKind = "";
+    ui.homeworkStatusText = "";
+  }
+
+  function ensureHomeworkName(sectionId) {
+    var section = DATA.sections[sectionId];
+    if (!isHomeworkEnabled(section) || !section.homework.requireStudentName) {
+      return true;
+    }
+    if (readStudentName()) {
+      clearHomeworkStatus(sectionId);
+      return true;
+    }
+    showMissingHomeworkName(sectionId);
+    return false;
+  }
+
   function renderStart(section, progress) {
     setViewState("start");
     var sectionId = section.id;
@@ -267,6 +385,7 @@
     document.getElementById("app").innerHTML =
       '<main class="app-shell">' +
       renderTopbar("index.html") +
+      renderHomeworkPanel(section) +
       '<section class="hero-card surface">' +
       '<div class="eyebrow">REVIEW 4</div>' +
       '<h1 class="hero-title">' + escapeHtml(section.title) + "</h1>" +
@@ -274,7 +393,7 @@
       '<div class="section-meta">' +
       '<span class="chip"><strong>문항</strong>' + escapeHtml(section.countLabel) + "</span>" +
       '<span class="chip"><strong>진행</strong>' + (answered ? answered + "/" + section.questions.length : "0/" + section.questions.length) + "</span>" +
-      '<span class="chip"><strong>저장</strong>로컬</span>' +
+      '<span class="chip"><strong>저장</strong>' + (isHomeworkEnabled(section) ? "온라인" : "로컬") + "</span>" +
       "</div>" +
       '<div class="section-actions">' + progressAction + resetAction + "</div>" +
       "</section>" +
@@ -306,6 +425,7 @@
     document.getElementById("app").innerHTML =
       '<main class="app-shell">' +
       renderTopbar("index.html") +
+      renderHomeworkQuizNotice(section) +
       '<section class="progress-card surface">' +
       '<div class="progress-bar"><div class="progress-fill" style="width:' + percent + '%"></div></div>' +
       '<div class="progress-meta"><span>' + escapeHtml(section.title) + '</span><span>' + (index + 1) + " / " + section.questions.length + "</span></div>" +
@@ -378,6 +498,7 @@
       '<span class="chip"><strong>오답</strong>' + incorrectCount + "</span>" +
       '<span class="chip"><strong>응시</strong>' + getAttempts(sectionId).length + "</span>" +
       "</div>" +
+      renderSubmissionStatus(attempt) +
       "</div>" +
       "</div>" +
       '<div class="result-actions">' +
@@ -390,6 +511,15 @@
       "</section>" +
       '<section class="review-list">' + renderReviewItems(attempt, items) + "</section>" +
       "</main>";
+  }
+
+  function renderSubmissionStatus(attempt) {
+    if (!attempt || !attempt.submission) {
+      return "";
+    }
+    var status = attempt.submission.status || "pending";
+    var message = attempt.submission.message || "";
+    return '<p class="homework-status homework-status--result is-' + escapeHtml(status) + '">' + escapeHtml(message) + "</p>";
   }
 
   function renderAttemptModal(section, attemptId) {
@@ -578,7 +708,7 @@
     render();
   }
 
-  function finishSection(sectionId) {
+  async function finishSection(sectionId) {
     var section = DATA.sections[sectionId];
     var progress = getProgress(sectionId);
     var ui = getUi(sectionId);
@@ -601,13 +731,44 @@
       return;
     }
 
+    if (!ensureHomeworkName(sectionId)) {
+      return;
+    }
+
     stopAudio();
-    var attempt = buildAttempt(section, progress.answers);
+    var attempt = buildAttempt(section, progress);
+    if (isHomeworkEnabled(section)) {
+      attempt.startedAt = progress.startedAt || Date.now();
+      attempt.submission = {
+        status: "pending",
+        message: "온라인 제출 중입니다..."
+      };
+    }
     saveAttempt(sectionId, attempt);
     clearProgress(sectionId);
     ui.view = "result";
     ui.activeAttemptId = attempt.id;
     ui.filter = "incorrect";
+    render();
+
+    if (!isHomeworkEnabled(section)) {
+      return;
+    }
+
+    try {
+      var response = await submitHomeworkAttempt(section, attempt);
+      attempt.submission = {
+        status: "success",
+        message: "온라인 제출이 완료되었습니다.",
+        path: response && response.path ? response.path : ""
+      };
+    } catch (error) {
+      attempt.submission = {
+        status: "error",
+        message: "온라인 제출 실패: " + (error && error.message ? error.message : "알 수 없는 오류")
+      };
+    }
+    updateAttempt(sectionId, attempt);
     render();
   }
 
@@ -654,9 +815,12 @@
     runtime.speakingQuestionId = "";
   }
 
-  function buildAttempt(section, answers) {
+  function buildAttempt(section, progressOrAnswers) {
+    var answers = progressOrAnswers && progressOrAnswers.answers ? progressOrAnswers.answers : (progressOrAnswers || {});
+    var choiceOrderMap = progressOrAnswers && progressOrAnswers.choiceOrder ? progressOrAnswers.choiceOrder : {};
     var results = section.questions.map(function (question, index) {
       var selectedId = answers[question.id] || "";
+      var choiceOrder = choiceOrderMap[question.id];
       return {
         id: question.id,
         number: index + 1,
@@ -666,8 +830,10 @@
         audio: question.audio || null,
         selectedId: selectedId,
         selectedText: choiceText(question, selectedId),
+        selectedLetter: choiceDisplayLabel(question, selectedId, choiceOrder),
         answerId: question.answer,
         answerText: choiceText(question, question.answer),
+        correctLetter: choiceDisplayLabel(question, question.answer, choiceOrder),
         correct: selectedId === question.answer,
         feedback: getFeedbackEntry(question.id, question.feedback)
       };
@@ -682,6 +848,79 @@
       total: results.length,
       results: results
     };
+  }
+
+  function signatureHash(signature) {
+    var hash = 2166136261;
+    var source = String(signature || "");
+    for (var index = 0; index < source.length; index += 1) {
+      hash ^= source.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(36);
+  }
+
+  function buildHomeworkSignature(section, attempt) {
+    return [
+      section.homework.assignmentId,
+      attempt.id,
+      attempt.results.map(function (item) {
+        return item.id + ":" + item.selectedId;
+      }).join("|")
+    ].join(":");
+  }
+
+  function buildHomeworkPayload(section, attempt) {
+    var score = Number(attempt.score || 0);
+    var total = Number(attempt.total || 0);
+    var percent = total ? Math.round((score / total) * 100) : 0;
+    var questionResults = attempt.results.map(function (item) {
+      return {
+        number: item.number,
+        area: item.tag || section.title,
+        prompt: item.prompt || "",
+        studentAnswer: item.selectedText || "",
+        selectedLetter: item.selectedLetter || "",
+        correctAnswer: item.answerText || "",
+        correctLetter: item.correctLetter || "",
+        isCorrect: Boolean(item.correct)
+      };
+    });
+    return {
+      assignmentId: section.homework.assignmentId,
+      assignmentTitle: section.homework.assignmentTitle || section.title,
+      chapter: "review4",
+      sectionId: section.id,
+      sectionTitle: section.title,
+      studentName: readStudentName(),
+      anonymousUid: "",
+      seed: attempt.id,
+      signatureHash: signatureHash(buildHomeworkSignature(section, attempt)),
+      score: score,
+      total: total,
+      percent: percent,
+      completed: true,
+      answered: total,
+      correctQuestions: questionResults
+        .filter(function (item) { return item.isCorrect; })
+        .map(function (item) { return item.number; }),
+      wrongQuestions: questionResults
+        .filter(function (item) { return !item.isCorrect; })
+        .map(function (item) { return item.number; }),
+      questionResults: questionResults,
+      clientSubmittedAt: new Date().toISOString()
+    };
+  }
+
+  async function submitHomeworkAttempt(section, attempt) {
+    var submitter = window.HomeworkSubmitter;
+    if (!submitter || typeof submitter.submitHomework !== "function") {
+      throw new Error("온라인 제출 모듈을 찾을 수 없습니다.");
+    }
+    if (!readStudentName()) {
+      throw new Error("학생 이름이 없습니다.");
+    }
+    return submitter.submitHomework(buildHomeworkPayload(section, attempt));
   }
 
   function createProgress(sectionId) {
@@ -714,7 +953,9 @@
         activeAttemptId: "",
         modalAttemptId: "",
         filter: "incorrect",
-        shakeQuestionId: ""
+        shakeQuestionId: "",
+        homeworkStatusKind: "",
+        homeworkStatusText: ""
       };
     }
     return runtime.sectionUi[sectionId];
@@ -743,6 +984,13 @@
   function saveAttempt(sectionId, attempt) {
     var attempts = getAttempts(sectionId);
     attempts.unshift(attempt);
+    saveJson(storageKey("attempts", sectionId), attempts.slice(0, 12));
+  }
+
+  function updateAttempt(sectionId, attempt) {
+    var attempts = getAttempts(sectionId).map(function (item) {
+      return item.id === attempt.id ? attempt : item;
+    });
     saveJson(storageKey("attempts", sectionId), attempts.slice(0, 12));
   }
 
@@ -862,6 +1110,16 @@
         return choice.id === String(choiceId);
       });
     }).filter(Boolean);
+  }
+
+  function choiceDisplayLabel(question, choiceId, choiceOrder) {
+    if (!choiceId) {
+      return "";
+    }
+    var index = getOrderedChoices(question, choiceOrder).findIndex(function (choice) {
+      return choice.id === String(choiceId);
+    });
+    return index >= 0 ? (CHOICE_LABELS[index] || String(index + 1)) : "";
   }
 
   function getFeedbackEntry(questionId, fallbackText) {
@@ -1021,4 +1279,28 @@
     }
     return '<svg ' + common + '><path d="M6 6 18 18"/><path d="M18 6 6 18"/></svg>';
   }
+
+  window.__review4App = {
+    readStudentName: readStudentName,
+    saveStudentName: saveStudentName,
+    getProgress: getProgress,
+    getAttempts: getAttempts,
+    buildHomeworkPayload: buildHomeworkPayload,
+    fillAnswers: function (sectionId, correct) {
+      var section = DATA.sections[sectionId];
+      if (!section) {
+        return;
+      }
+      var progress = getProgress(sectionId) || createProgress(sectionId);
+      section.questions.forEach(function (question) {
+        progress.answers[question.id] = correct === false
+          ? question.choices.find(function (choice) { return choice.id !== question.answer; }).id
+          : question.answer;
+      });
+      progress.currentIndex = section.questions.length - 1;
+      progress.updatedAt = Date.now();
+      setProgress(sectionId, progress);
+      render();
+    }
+  };
 })();

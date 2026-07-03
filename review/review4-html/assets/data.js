@@ -374,6 +374,12 @@
         title: "듣기",
         hero: "재생 버튼으로 듣고 바로 고르는 흐름",
         countLabel: "16문항",
+        homework: {
+          enabled: true,
+          assignmentId: "review4-listening-v1",
+          assignmentTitle: "복습 4 듣기",
+          requireStudentName: true
+        },
         questions: [
           q(
             "l1",
@@ -753,6 +759,12 @@
         title: "읽기와 쓰기",
         hero: "읽고 고르고, 짧은 쓰기만 선택형으로 전환한 흐름",
         countLabel: "15문항",
+        homework: {
+          enabled: true,
+          assignmentId: "review4-reading-writing-v1",
+          assignmentTitle: "복습 4 읽기와 쓰기",
+          requireStudentName: true
+        },
         questions: [
           q(
             "r1",
