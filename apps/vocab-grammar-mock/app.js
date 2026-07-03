@@ -1,8 +1,8 @@
 const ROUND_LINKS = [
-    { id: "1", href: "./round1.html", label: "1회차", enabled: true },
-    { id: "2", href: "./round2.html", label: "2회차", enabled: true },
     { id: "1-ibt", href: "./round1-ibt.html", label: "1회차 IBT 형식", enabled: true, sourceRoundId: "1", experimental: true },
     { id: "2-ibt", href: "./round2-ibt.html", label: "2회차 IBT 형식", enabled: true, sourceRoundId: "2", experimental: true },
+    { id: "1", href: "./round1.html", label: "1회차", enabled: false },
+    { id: "2", href: "./round2.html", label: "2회차", enabled: false },
     { id: "3", href: "./round3.html", label: "3회차", enabled: false },
     { id: "4", href: "./round4.html", label: "4회차", enabled: false },
     { id: "marathon30", href: "./marathon30.html", label: "30문제 마라톤", enabled: false }
@@ -2017,7 +2017,7 @@ function renderLandingIndex() {
                         <span class="round-card__status">${averageText}</span>
                         <span class="round-card__status">${progressText}</span>
                     `
-                    : '<span class="round-card__status">현재 1~2회차만 열려 있습니다.</span>'}
+                    : '<span class="round-card__status">현재 IBT 형식만 열려 있습니다.</span>'}
         `;
 
         if (!isEnabled) {

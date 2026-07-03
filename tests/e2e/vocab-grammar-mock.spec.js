@@ -259,12 +259,15 @@ test('vocab grammar mock landing exposes only the visible rounds', async ({ page
   await page.goto('/apps/vocab-grammar-mock/index.html', { waitUntil: 'domcontentloaded' });
 
   await expect(page.locator('.round-card')).toHaveCount(7);
-  await expect(page.locator('a.round-card')).toHaveCount(4);
-  await expect(page.locator('a.round-card[href="./round1.html"]')).toContainText('1회차');
-  await expect(page.locator('a.round-card[href="./round2.html"]')).toContainText('2회차');
+  await expect(page.locator('a.round-card')).toHaveCount(2);
+  await expect(page.locator('.round-card').nth(0)).toContainText('1회차 IBT 형식');
+  await expect(page.locator('.round-card').nth(1)).toContainText('2회차 IBT 형식');
   await expect(page.locator('a.round-card[href="./round1-ibt.html"]')).toContainText('1회차 IBT 형식');
   await expect(page.locator('a.round-card[href="./round2-ibt.html"]')).toContainText('2회차 IBT 형식');
-  await expect(page.locator('.round-card.is-disabled')).toHaveCount(3);
+  await expect(page.locator('.round-card.is-disabled')).toHaveCount(5);
+  await expect(page.locator('.round-card.is-disabled').first()).toContainText('현재 IBT 형식만 열려 있습니다.');
+  await expect(page.locator('a.round-card[href="./round1.html"]')).toHaveCount(0);
+  await expect(page.locator('a.round-card[href="./round2.html"]')).toHaveCount(0);
   await expect(page.locator('.round-card.is-disabled').filter({ hasText: '30문제 마라톤' })).toContainText('비활성화');
   await expect(page.locator('a.round-card[href="./round3.html"]')).toHaveCount(0);
   await expect(page.locator('a.round-card[href="./round4.html"]')).toHaveCount(0);
@@ -274,12 +277,14 @@ test('vocab grammar mock landing exposes only the visible rounds', async ({ page
 
 test('vocab grammar mock round navigation disables unavailable rounds', async ({ page }) => {
   await page.goto('/apps/vocab-grammar-mock/round1.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#roundNav a')).toHaveCount(4);
-  await expect(page.locator('#roundNav a[href="./round1.html"]')).toContainText('1회차');
-  await expect(page.locator('#roundNav a[href="./round2.html"]')).toContainText('2회차');
+  await expect(page.locator('#roundNav a')).toHaveCount(2);
+  await expect(page.locator('#roundNav a').nth(0)).toContainText('1회차 IBT 형식');
+  await expect(page.locator('#roundNav a').nth(1)).toContainText('2회차 IBT 형식');
   await expect(page.locator('#roundNav a[href="./round1-ibt.html"]')).toContainText('1회차 IBT 형식');
   await expect(page.locator('#roundNav a[href="./round2-ibt.html"]')).toContainText('2회차 IBT 형식');
-  await expect(page.locator('#roundNav .is-disabled')).toHaveCount(3);
+  await expect(page.locator('#roundNav a[href="./round1.html"]')).toHaveCount(0);
+  await expect(page.locator('#roundNav a[href="./round2.html"]')).toHaveCount(0);
+  await expect(page.locator('#roundNav .is-disabled')).toHaveCount(5);
   await expect(page.locator('#roundNav .is-disabled').filter({ hasText: '30문제 마라톤' })).toHaveAttribute('aria-disabled', 'true');
 });
 
