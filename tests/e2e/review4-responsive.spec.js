@@ -13,6 +13,7 @@ const pages = [
   { name: 'confirm', path: '/review/review4-html/confirm.html', quiz: true },
   { name: 'evaluate', path: '/review/review4-html/evaluate.html', quiz: true },
   { name: 'listening', path: '/review/review4-html/listening.html', quiz: true },
+  { name: 'listening transcripts', path: '/review/review4-html/listening-transcripts.html', quiz: false },
   { name: 'reading writing', path: '/review/review4-html/reading-writing.html', quiz: true }
 ];
 

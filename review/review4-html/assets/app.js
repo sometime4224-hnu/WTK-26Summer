@@ -9,7 +9,8 @@
     activeLayout: "",
     sectionUi: {},
     speakingQuestionId: "",
-    audioElement: null
+    audioElement: null,
+    transcriptSearch: ""
   };
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -149,12 +150,21 @@
         clearHomeworkStatus(document.body.dataset.section);
       }
       updateHomeworkPanelState(event.target.closest(".homework-panel"), readStudentName());
+      return;
+    }
+    if (event.target && event.target.id === "transcriptSearch") {
+      runtime.transcriptSearch = event.target.value;
+      applyTranscriptFilter(runtime.transcriptSearch);
     }
   }
 
   function render() {
     if (document.body.dataset.role === "hub") {
       renderHub();
+      return;
+    }
+    if (document.body.dataset.role === "transcript") {
+      renderTranscriptPage(document.body.dataset.section);
       return;
     }
     renderSection(document.body.dataset.section);
@@ -196,6 +206,7 @@
         "</div>" +
         '<div class="section-actions">' +
         '<a class="primary-button" href="' + escapeHtml(section.href) + '">열기</a>' +
+        (section.transcriptHref ? '<a class="secondary-button" href="' + escapeHtml(section.transcriptHref) + '">지문 보기</a>' : "") +
         "</div>" +
         "</article>"
       );
@@ -368,6 +379,9 @@
     var resetAction = answered
       ? '<button class="secondary-button" data-action="restart" data-section="' + sectionId + '">새 시도</button>'
       : "";
+    var transcriptAction = section.transcriptHref
+      ? '<a class="secondary-button" href="' + escapeHtml(section.transcriptHref) + '">듣기 지문 보기</a>'
+      : "";
 
     var historyHtml = attempts.length
       ? attempts.map(function (attempt) {
@@ -402,7 +416,7 @@
       '<span class="chip"><strong>진행</strong>' + (answered ? answered + "/" + section.questions.length : "0/" + section.questions.length) + "</span>" +
       '<span class="chip"><strong>저장</strong>' + (isHomeworkEnabled(section) ? "온라인" : "로컬") + "</span>" +
       "</div>" +
-      '<div class="section-actions">' + progressAction + resetAction + "</div>" +
+      '<div class="section-actions">' + progressAction + resetAction + transcriptAction + "</div>" +
       "</section>" +
       stats +
       '<div class="divider-title"><h2>기록</h2></div>' +
@@ -630,6 +644,123 @@
       }).join("") +
       "</div>"
     );
+  }
+
+  function getTranscriptQuestions(section) {
+    return (section.questions || []).filter(function (question) {
+      return question.audio && Array.isArray(question.audio.transcript) && question.audio.transcript.length;
+    });
+  }
+
+  function transcriptSearchText(question, index) {
+    return [
+      String(index + 1),
+      question.id,
+      question.tag,
+      question.prompt,
+      question.audio && question.audio.label,
+      (question.audio && question.audio.transcript || []).map(function (part) {
+        return [part.speaker, part.text].join(" ");
+      }).join(" ")
+    ].join(" ");
+  }
+
+  function renderTranscriptLines(question) {
+    return question.audio.transcript.map(function (part) {
+      return (
+        '<p class="transcript-line">' +
+        '<span class="transcript-speaker">' + escapeHtml(part.speaker || "지문") + "</span>" +
+        '<span>' + escapeHtml(part.text || "") + "</span>" +
+        "</p>"
+      );
+    }).join("");
+  }
+
+  function renderTranscriptCard(question, index) {
+    return (
+      '<article class="transcript-card surface" id="transcript-' + escapeHtml(question.id) + '" data-transcript-card data-search-text="' + escapeHtml(transcriptSearchText(question, index)) + '">' +
+      '<div class="transcript-card__head">' +
+      '<span class="transcript-number">' + String(index + 1).padStart(2, "0") + "</span>" +
+      '<div>' +
+      '<h2>' + escapeHtml(question.audio.label || (index + 1) + "번") + "</h2>" +
+      '<p>' + escapeHtml(question.prompt || "") + "</p>" +
+      "</div>" +
+      "</div>" +
+      '<div class="transcript-dialogue">' + renderTranscriptLines(question) + "</div>" +
+      "</article>"
+    );
+  }
+
+  function renderTranscriptPage(sectionId) {
+    var section = DATA.sections[sectionId];
+    if (!section) {
+      renderHub();
+      return;
+    }
+    setViewState("transcript");
+    var questions = getTranscriptQuestions(section);
+    var jumpLinks = questions.map(function (question, index) {
+      return '<a href="#transcript-' + escapeHtml(question.id) + '">' + String(index + 1).padStart(2, "0") + "</a>";
+    }).join("");
+
+    document.getElementById("app").innerHTML =
+      '<main class="app-shell">' +
+      renderTopbar(section.href || "index.html") +
+      '<section class="hero-card surface transcript-hero">' +
+      '<div class="eyebrow">REVIEW 4 LISTENING</div>' +
+      '<h1 class="hero-title">듣기 지문</h1>' +
+      '<p class="hero-copy">복습 4 듣기 문항의 음성 지문을 한곳에서 확인합니다.</p>' +
+      '<div class="section-meta">' +
+      '<span class="chip"><strong>지문</strong>' + questions.length + "개</span>" +
+      '<span class="chip"><strong>단원</strong>' + escapeHtml(section.title) + "</span>" +
+      "</div>" +
+      '<div class="section-actions">' +
+      '<a class="primary-button" href="' + escapeHtml(section.href) + '">듣기 문제로 가기</a>' +
+      '<a class="secondary-button" href="index.html">복습 4 목록</a>' +
+      "</div>" +
+      "</section>" +
+      '<section class="transcript-tools surface">' +
+      '<label class="transcript-search" for="transcriptSearch">' +
+      "<span>지문 검색</span>" +
+      '<input id="transcriptSearch" type="search" autocomplete="off" value="' + escapeHtml(runtime.transcriptSearch) + '" placeholder="단어, 문항 번호, 트랙명 검색">' +
+      "</label>" +
+      '<div class="transcript-jump-list" aria-label="문항 바로가기">' + jumpLinks + "</div>" +
+      '<p id="transcriptFilterStatus" class="transcript-filter-status"></p>' +
+      "</section>" +
+      '<section class="transcript-list" aria-label="듣기 지문 목록">' +
+      questions.map(renderTranscriptCard).join("") +
+      '<p id="transcriptEmpty" class="empty-card transcript-empty" hidden>검색 결과가 없습니다.</p>' +
+      "</section>" +
+      "</main>";
+    applyTranscriptFilter(runtime.transcriptSearch);
+  }
+
+  function applyTranscriptFilter(query) {
+    var cards = Array.prototype.slice.call(document.querySelectorAll("[data-transcript-card]"));
+    if (!cards.length) {
+      return;
+    }
+    var normalizedQuery = normalizeSearch(query);
+    var visibleCount = 0;
+    cards.forEach(function (card) {
+      var matches = !normalizedQuery || normalizeSearch(card.getAttribute("data-search-text")).indexOf(normalizedQuery) !== -1;
+      card.hidden = !matches;
+      if (matches) {
+        visibleCount += 1;
+      }
+    });
+    var status = document.getElementById("transcriptFilterStatus");
+    if (status) {
+      status.textContent = normalizedQuery ? "검색 결과 " + visibleCount + "개" : "전체 지문 " + cards.length + "개";
+    }
+    var empty = document.getElementById("transcriptEmpty");
+    if (empty) {
+      empty.hidden = visibleCount > 0;
+    }
+  }
+
+  function normalizeSearch(value) {
+    return String(value || "").toLowerCase().replace(/\s+/g, "");
   }
 
   function renderAudio(question) {

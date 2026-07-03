@@ -370,6 +370,7 @@
       listening: {
         id: "listening",
         href: "listening.html",
+        transcriptHref: "listening-transcripts.html",
         nextHref: "reading-writing.html",
         title: "듣기",
         hero: "재생 버튼으로 듣고 바로 고르는 흐름",
