@@ -1494,11 +1494,12 @@ function ensureQuestionPalette(sectionsRoot, questionNumbers) {
         sectionsRoot.parentElement.insertBefore(palette, sectionsRoot);
     }
 
+    const compactLabels = isIbtMode();
     palette.innerHTML = `
         <div class="question-palette__title">문항</div>
         <div class="question-palette__grid">
             ${questionNumbers.map((number) => `
-                <button class="question-jump" type="button" data-question-jump="${number}">Q${number}</button>
+                <button class="question-jump" type="button" data-question-jump="${number}" aria-label="${number}번 문항으로 이동">${compactLabels ? String(number).padStart(2, "0") : `Q${number}`}</button>
             `).join("")}
         </div>
     `;

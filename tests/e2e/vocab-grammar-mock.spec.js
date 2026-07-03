@@ -528,6 +528,31 @@ test('vocab grammar mock IBT pages fit mobile and desktop without horizontal ove
       await expect(page.locator('.ibt-question-card')).toHaveCount(quizPage.count);
       await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveCount(1);
       await expectNoHorizontalOverflow(page);
+
+      const paletteAudit = await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('#questionPalette .question-jump'));
+        return {
+          count: buttons.length,
+          maxWidth: Math.max(...buttons.map((button) => button.getBoundingClientRect().width)),
+          labels: buttons.map((button) => button.textContent.trim())
+        };
+      });
+      expect(paletteAudit.count).toBe(quizPage.count);
+      expect(paletteAudit.maxWidth).toBeLessThanOrEqual(44);
+      expect(paletteAudit.labels.every((label) => /^\d{2}$/.test(label))).toBe(true);
+
+      await page.locator('[data-ibt-action="open-questions"]').click();
+      await expect(page.locator('#ibtQuestionModal')).toBeVisible();
+      const overviewAudit = await page.evaluate(() => {
+        const cells = Array.from(document.querySelectorAll('#ibtQuestionModal .ibt-answer-cell'));
+        return {
+          count: cells.length,
+          maxWidth: Math.max(...cells.map((cell) => cell.getBoundingClientRect().width))
+        };
+      });
+      expect(overviewAudit.count).toBe(quizPage.count);
+      expect(overviewAudit.maxWidth).toBeLessThanOrEqual(50);
+      await page.locator('#ibtQuestionModal .summary-modal__close').click();
     }
   }
 });
