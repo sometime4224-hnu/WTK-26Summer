@@ -441,30 +441,158 @@ html[data-layout="desktop"] .homework-panel {
 
 .student-name-field {
   display: grid;
-  gap: 8px;
+  position: relative;
+  isolation: isolate;
+  gap: 9px;
   min-width: 0;
+  padding: 13px;
+  border: 2px solid rgba(222, 127, 31, 0.42);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 250, 241, 0.76)),
+    repeating-linear-gradient(90deg, rgba(222, 127, 31, 0.08) 0 8px, transparent 8px 18px);
+  box-shadow: 0 14px 34px rgba(222, 127, 31, 0.18);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 
-.student-name-field span {
+.student-name-field::before,
+.student-name-field::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+  border: 2px solid rgba(222, 127, 31, 0.42);
+  border-radius: 28px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.homework-panel.is-name-missing .student-name-field::before,
+.homework-panel.is-name-missing .student-name-field::after {
+  animation: nameFieldWave 1.35s ease-out infinite;
+}
+
+.homework-panel.is-name-missing .student-name-field::after {
+  animation-delay: 0.48s;
+}
+
+.student-name-field.is-complete {
+  border-color: rgba(53, 117, 93, 0.36);
+  background: rgba(248, 255, 250, 0.74);
+  box-shadow: 0 12px 28px rgba(53, 117, 93, 0.12);
+}
+
+.student-name-label {
   color: var(--muted);
   font-size: 0.82rem;
   font-weight: 900;
 }
 
+.student-name-label b {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  margin-left: 6px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(181, 76, 63, 0.13);
+  color: var(--wrong);
+  font-size: 0.72rem;
+}
+
+.student-name-field.is-complete .student-name-label b {
+  background: rgba(53, 117, 93, 0.12);
+  color: var(--correct);
+}
+
+.name-wave-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  min-height: 30px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(255, 239, 214, 0.92);
+  color: var(--accent-deep);
+  font-size: 0.78rem;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px rgba(222, 127, 31, 0.18);
+}
+
+.name-wave-cue i {
+  display: block;
+  width: 4px;
+  height: 15px;
+  border-radius: 999px;
+  background: currentColor;
+  transform-origin: center;
+  animation: nameWaveBar 0.82s ease-in-out infinite;
+}
+
+.name-wave-cue i:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.name-wave-cue i:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.name-wave-cue i:nth-child(4) {
+  animation-delay: 0.24s;
+}
+
+.name-wave-cue i:nth-child(5) {
+  animation-delay: 0.32s;
+}
+
+.name-wave-cue em {
+  margin-left: 4px;
+  font-style: normal;
+}
+
+.student-name-field.is-complete .name-wave-cue {
+  background: rgba(237, 250, 242, 0.92);
+  color: var(--correct);
+}
+
+.student-name-field.is-complete .name-wave-cue i {
+  animation: none;
+}
+
 .student-name-field input {
   width: 100%;
-  min-height: 50px;
-  border: 1px solid rgba(159, 111, 38, 0.18);
+  min-height: 58px;
+  border: 2px solid rgba(222, 127, 31, 0.42);
   border-radius: 16px;
-  background: rgba(255, 250, 241, 0.86);
+  background: rgba(255, 255, 255, 0.94);
   color: var(--ink);
-  padding: 12px 14px;
+  padding: 13px 15px;
   outline: none;
+  font-size: 1.08rem;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.74);
 }
 
 .student-name-field input:focus {
-  border-color: rgba(70, 113, 127, 0.56);
-  box-shadow: 0 0 0 4px rgba(70, 113, 127, 0.12);
+  border-color: rgba(222, 127, 31, 0.78);
+  box-shadow:
+    0 0 0 5px rgba(242, 165, 65, 0.18),
+    0 14px 26px rgba(222, 127, 31, 0.18);
+}
+
+.student-name-field.is-complete input {
+  border-color: rgba(53, 117, 93, 0.4);
+}
+
+.name-input-guide {
+  color: var(--accent-deep);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.student-name-field.is-complete .name-input-guide {
+  color: var(--correct);
 }
 
 .homework-status {
@@ -503,6 +631,36 @@ html[data-layout="desktop"] .homework-panel {
 
 .homework-status--result {
   margin-top: 12px;
+}
+
+@keyframes nameFieldWave {
+  0% {
+    opacity: 0.72;
+    transform: scale(0.98);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes nameWaveBar {
+  0%,
+  100% {
+    transform: scaleY(0.42);
+  }
+  50% {
+    transform: scaleY(1.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .homework-panel.is-name-missing .student-name-field::before,
+  .homework-panel.is-name-missing .student-name-field::after,
+  .name-wave-cue i {
+    animation: none;
+  }
 }
 
 .history-list {

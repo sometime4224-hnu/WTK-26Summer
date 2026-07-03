@@ -50,6 +50,9 @@ test.describe('Review 4 homework submission', () => {
       await page.goto(target.path, { waitUntil: 'load' });
 
       await expect(page.locator('.homework-panel')).toBeVisible();
+      await expect(page.locator('.student-name-field')).not.toHaveClass(/is-complete/);
+      await expect(page.locator('.name-wave-cue')).toContainText('이름 쓰는 곳');
+      await expect(page.locator('#nameInputGuide')).toContainText('이름을 쓰고 시작');
       await page.locator('[data-action="start"]').click();
 
       await expect(page.locator('body')).toHaveAttribute('data-view', 'start');
@@ -62,6 +65,7 @@ test.describe('Review 4 homework submission', () => {
       await page.goto(target.path, { waitUntil: 'load' });
 
       await page.locator('#studentNameInput').fill('김학생');
+      await expect(page.locator('.student-name-field')).toHaveClass(/is-complete/);
       await page.locator('[data-action="start"]').click();
       await expect(page.locator('.question-card')).toBeVisible();
 

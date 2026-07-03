@@ -267,6 +267,7 @@
     var statusKind = ui.homeworkStatusKind || (studentName ? "idle" : "pending");
     var statusText = ui.homeworkStatusText || homeworkStatusText(section, studentName);
     var attentionClass = !studentName || statusKind === "error" ? " is-name-missing" : "";
+    var cueClass = studentName ? " is-complete" : "";
     return (
       '<section class="homework-panel surface' + attentionClass + '" aria-labelledby="homeworkPanelTitle">' +
       '<div class="homework-panel__text">' +
@@ -274,9 +275,11 @@
       '<h2 id="homeworkPanelTitle">먼저 이름을 입력하세요</h2>' +
       '<p>' + escapeHtml(section.homework.assignmentTitle || section.title) + " 결과가 선생님 대시보드에 제출됩니다.</p>" +
       "</div>" +
-      '<label class="student-name-field" for="studentNameInput">' +
-      "<span>학생 이름</span>" +
-      '<input id="studentNameInput" type="text" maxlength="40" autocomplete="name" value="' + escapeHtml(studentName) + '" placeholder="여기에 이름 입력">' +
+      '<label class="student-name-field' + cueClass + '" for="studentNameInput">' +
+      '<span class="student-name-label">학생 이름 <b>필수</b></span>' +
+      '<span class="name-wave-cue" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><em>이름 쓰는 곳</em></span>' +
+      '<input id="studentNameInput" type="text" maxlength="40" autocomplete="name" value="' + escapeHtml(studentName) + '" placeholder="여기에 이름 입력" aria-describedby="nameInputGuide homeworkStatus">' +
+      '<span id="nameInputGuide" class="name-input-guide">여기에 이름을 쓰고 시작하세요.</span>' +
       "</label>" +
       '<p id="homeworkStatus" class="homework-status is-' + escapeHtml(statusKind) + '">' + escapeHtml(statusText) + "</p>" +
       "</section>"
@@ -303,7 +306,11 @@
     }
     var hasName = Boolean(String(studentName || "").trim());
     var status = panel.querySelector("#homeworkStatus");
+    var field = panel.querySelector(".student-name-field");
     panel.classList.toggle("is-name-missing", !hasName);
+    if (field) {
+      field.classList.toggle("is-complete", hasName);
+    }
     if (status) {
       status.className = "homework-status is-" + (hasName ? "idle" : "pending");
       status.textContent = hasName
