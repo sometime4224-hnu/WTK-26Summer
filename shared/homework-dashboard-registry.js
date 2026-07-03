@@ -37,6 +37,20 @@
                         activityHref: "apps/vocab-grammar-mock/round2.html"
                     },
                     {
+                        assignmentId: "vocab-grammar-mock-round1-ibt-v1",
+                        title: "3B 중간 모의고사 1회차 IBT 형식",
+                        chapter: "midterm-3b",
+                        totalQuestions: 26,
+                        activityHref: "apps/vocab-grammar-mock/round1-ibt.html"
+                    },
+                    {
+                        assignmentId: "vocab-grammar-mock-round2-ibt-v1",
+                        title: "3B 중간 모의고사 2회차 IBT 형식",
+                        chapter: "midterm-3b",
+                        totalQuestions: 25,
+                        activityHref: "apps/vocab-grammar-mock/round2-ibt.html"
+                    },
+                    {
                         assignmentId: "vocab-grammar-mock-round3-v1",
                         title: "3B 중간 모의고사 3회차",
                         chapter: "midterm-3b",

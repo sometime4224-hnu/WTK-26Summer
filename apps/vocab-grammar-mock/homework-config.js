@@ -16,6 +16,20 @@
             roundLabel: "2회차",
             totalQuestions: 25
         },
+        "1-ibt": {
+            assignmentId: "vocab-grammar-mock-round1-ibt-v1",
+            assignmentTitle: "3B 중간 모의고사 1회차 IBT 형식",
+            roundId: "1-ibt",
+            roundLabel: "1회차 IBT 형식",
+            totalQuestions: 26
+        },
+        "2-ibt": {
+            assignmentId: "vocab-grammar-mock-round2-ibt-v1",
+            assignmentTitle: "3B 중간 모의고사 2회차 IBT 형식",
+            roundId: "2-ibt",
+            roundLabel: "2회차 IBT 형식",
+            totalQuestions: 25
+        },
         "3": {
             assignmentId: "vocab-grammar-mock-round3-v1",
             assignmentTitle: "3B 중간 모의고사 3회차",

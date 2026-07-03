@@ -1,6 +1,8 @@
 const ROUND_LINKS = [
     { id: "1", href: "./round1.html", label: "1회차", enabled: true },
     { id: "2", href: "./round2.html", label: "2회차", enabled: true },
+    { id: "1-ibt", href: "./round1-ibt.html", label: "1회차 IBT 형식", enabled: true, sourceRoundId: "1", experimental: true },
+    { id: "2-ibt", href: "./round2-ibt.html", label: "2회차 IBT 형식", enabled: true, sourceRoundId: "2", experimental: true },
     { id: "3", href: "./round3.html", label: "3회차", enabled: false },
     { id: "4", href: "./round4.html", label: "4회차", enabled: false },
     { id: "marathon30", href: "./marathon30.html", label: "30문제 마라톤", enabled: false }
@@ -10,7 +12,9 @@ const STORAGE_NAMESPACE = "vocab-grammar-mock";
 const LEGACY_STORAGE_NAMESPACE = "private-listening-review";
 const ATTEMPT_VERSION = 1;
 const OPTION_LETTERS = ["A", "B", "C", "D"];
+const IBT_DISPLAY_LETTERS = ["①", "②", "③", "④"];
 const DEFAULT_HOMEWORK_STUDENT_NAME_KEY = "vocab-grammar-mock-homework-name";
+let ibtClockTimer = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     renderLandingIndex();
@@ -18,9 +22,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const pageSource = document.body.dataset.quizSource;
     const roundId = document.body.dataset.roundId;
+    const sourceRoundId = document.body.dataset.sourceRoundId || getRoundSourceId(roundId);
     if (!pageSource && !roundId) return;
 
-    initializeQuiz(pageSource, roundId).catch((error) => {
+    initializeQuiz(pageSource, roundId, sourceRoundId).catch((error) => {
         const errorCard = document.getElementById("loadError");
         if (!errorCard) return;
         errorCard.hidden = false;
@@ -28,8 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-async function initializeQuiz(sourcePath, roundId) {
-    const markdown = await loadQuizMarkdown(sourcePath, roundId);
+async function initializeQuiz(sourcePath, roundId, sourceRoundId = roundId) {
+    const markdown = await loadQuizMarkdown(sourcePath, sourceRoundId);
     const quiz = parseQuizMarkdown(markdown);
     validateQuiz(quiz);
 
@@ -37,6 +42,7 @@ async function initializeQuiz(sourcePath, roundId) {
     const savedSelections = readStoredSelections(storageKey);
     quiz.attempt = getOrCreateAttemptState(roundId, quiz, savedSelections);
     quiz.roundId = roundId;
+    quiz.sourceRoundId = sourceRoundId;
     quiz.homework = getHomeworkAssignment(roundId);
 
     window.renderQuiz(quiz);
@@ -176,7 +182,237 @@ function parseFocusItems(rawTail) {
         .map((line) => line.slice(2).trim());
 }
 
+function isIbtMode() {
+    return document.body.dataset.quizMode === "ibt";
+}
+
+function renderIbtQuiz(quiz) {
+    const root = document.getElementById("ibtExamRoot");
+    if (!root) return;
+
+    const questionNumbers = getQuestionNumbers(quiz.sections);
+    const questionCount = questionNumbers.length;
+    const savedName = getHomeworkStudentName();
+
+    root.innerHTML = `
+        <header class="ibt-exam-header">
+            <div class="ibt-exam-header__cell">
+                <span>수험번호</span>
+                <strong>${escapeHtml(buildIbtCandidateNumber(quiz.roundId))}</strong>
+            </div>
+            <div class="ibt-exam-header__title">
+                <strong>한국어능력시험(TOPIK) IBT 체험</strong>
+                <span>${escapeHtml(getRoundLabel(quiz.roundId))}</span>
+            </div>
+            <div class="ibt-exam-header__cell ibt-exam-header__clock">
+                <span>현재시간</span>
+                <strong id="ibtCurrentTime">--:--:--</strong>
+            </div>
+        </header>
+
+        <section class="ibt-title-box">
+            <div>
+                <h1>${escapeHtml(quiz.title)}</h1>
+                <p>TOPIK IBT 방식으로 한 문항씩 풀고 마지막에 답안을 확인합니다.</p>
+            </div>
+            <div class="ibt-language" aria-label="언어 선택">
+                <span class="is-active">한국어</span>
+                <span aria-disabled="true">English</span>
+            </div>
+        </section>
+
+        ${quiz.homework ? renderIbtIdentityPanel(quiz, savedName) : ""}
+
+        <section class="ibt-exam-stage" aria-label="IBT 시험 화면">
+            <section class="ibt-progress-panel">
+                <div class="ibt-progress-main">
+                    <div class="progress-track" aria-hidden="true"><div id="progressFill" class="progress-fill"></div></div>
+                    <div class="ibt-progress-meta">
+                        <span id="progressText">0 / ${questionCount}</span>
+                        <span id="quizMeta">총 ${questionCount}문항</span>
+                        <span id="scoreText">아직 ${questionCount}문항이 남았습니다.</span>
+                    </div>
+                </div>
+                <div class="ibt-tool-actions">
+                    <button class="action-button" type="button" data-ibt-action="open-questions">전체 문제</button>
+                    <button class="action-button action-button--primary" type="button" data-ibt-action="open-submit">답안 제출로 이동</button>
+                    <button id="resetButton" data-action="reset" class="action-button" type="button">다시</button>
+                </div>
+            </section>
+
+            <div id="quizSections" class="section-stack ibt-section-stack"></div>
+        </section>
+
+        <footer class="ibt-footer" aria-label="문항 이동">
+            <div class="ibt-footer__side">
+                <button class="ibt-nav-button" type="button" data-ibt-action="prev">
+                    <span aria-hidden="true">‹</span>
+                    <span>이전</span>
+                </button>
+            </div>
+            <div class="ibt-footer__center">
+                <span id="ibtFooterStatus">현재 문항 1/${questionCount}</span>
+            </div>
+            <div class="ibt-footer__side ibt-footer__side--right">
+                <button class="ibt-nav-button ibt-nav-button--primary" type="button" data-ibt-action="next">
+                    <span>다음</span>
+                    <span aria-hidden="true">›</span>
+                </button>
+            </div>
+        </footer>
+
+        ${renderIbtModalShells()}
+    `;
+
+    const sectionsRoot = document.getElementById("quizSections");
+    if (!sectionsRoot) return;
+    ensureQuestionPalette(sectionsRoot, questionNumbers);
+    sectionsRoot.innerHTML = buildIbtQuestionEntries(quiz).map((entry) => renderIbtQuestionEntry(entry, quiz.answers, quiz.attempt)).join("");
+    applyIbtStartedState(quiz);
+    setIbtCurrentQuestion(readIbtCurrentIndex(quiz.roundId, questionCount), { save: false });
+    updateIbtClock();
+    startIbtClock();
+}
+
+function renderIbtIdentityPanel(quiz, savedName) {
+    return `
+        <section id="homeworkPanel" class="homework-panel ibt-identity-card ${savedName ? "" : "is-name-missing"}">
+            <div class="ibt-identity-card__seat">
+                <span>좌석</span>
+                <strong>1</strong>
+            </div>
+            <div class="homework-panel__text">
+                <span class="homework-panel__badge">본인확인</span>
+                <h2>수험자 이름을 확인하세요</h2>
+                <p>${escapeHtml(quiz.homework.roundLabel)} 답안은 별도 IBT 형식 기록으로 제출됩니다.</p>
+            </div>
+            <label class="student-name-field" for="studentNameInput">
+                <span>성명</span>
+                <input id="studentNameInput" type="text" maxlength="40" autocomplete="name" value="${escapeHtml(savedName)}" placeholder="여기에 이름 입력">
+            </label>
+            <p id="homeworkStatus" class="homework-status ${savedName ? "is-idle" : "is-pending"}">
+                ${savedName ? "이름이 저장되었습니다. 다음 버튼을 눌러 시험 화면으로 이동하세요." : "이름을 입력한 뒤 다음 버튼을 눌러 주세요."}
+            </p>
+            <div class="ibt-identity-card__actions">
+                <button id="ibtStartButton" class="action-button action-button--primary" type="button" data-ibt-action="start-exam" ${savedName ? "" : "disabled"}>다음</button>
+            </div>
+        </section>
+    `;
+}
+
+function renderIbtModalShells() {
+    return `
+        <div id="ibtQuestionModal" class="ibt-modal" hidden>
+            <div class="ibt-modal__backdrop" data-ibt-action="close-modal"></div>
+            <section class="ibt-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="ibtQuestionModalTitle">
+                <div class="ibt-modal__head">
+                    <h2 id="ibtQuestionModalTitle">전체 문제</h2>
+                    <button class="summary-modal__close" type="button" data-ibt-action="close-modal">닫기</button>
+                </div>
+                <div class="ibt-modal__body">
+                    <div id="ibtQuestionOverview"></div>
+                </div>
+            </section>
+        </div>
+        <div id="ibtSubmitModal" class="ibt-modal" hidden>
+            <div class="ibt-modal__backdrop" data-ibt-action="close-modal"></div>
+            <section class="ibt-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="ibtSubmitModalTitle">
+                <div class="ibt-modal__head">
+                    <h2 id="ibtSubmitModalTitle">답안 제출</h2>
+                    <button class="summary-modal__close" type="button" data-ibt-action="close-modal">닫기</button>
+                </div>
+                <div class="ibt-modal__body">
+                    <p class="ibt-submit-guide">아래 표에서 답안 상태를 확인하고, 모든 문항에 답한 뒤 채점하세요.</p>
+                    <div id="ibtSubmitOverview"></div>
+                </div>
+                <div class="ibt-modal__foot">
+                    <button data-action="grade" class="action-button action-button--primary" type="button">채점하기</button>
+                </div>
+            </section>
+        </div>
+    `;
+}
+
+function buildIbtQuestionEntries(quiz) {
+    const entries = [];
+    quiz.sections.forEach((section) => {
+        let shared = null;
+        section.items.forEach((item) => {
+            if (item.type === "shared" || item.type === "note") {
+                shared = {
+                    label: item.type === "shared" ? item.range : item.title,
+                    html: item.contentHtml
+                };
+                return;
+            }
+
+            if (item.type !== "question") return;
+            entries.push({
+                question: item,
+                sectionTitle: section.title,
+                shared
+            });
+        });
+    });
+    return entries;
+}
+
+function renderIbtQuestionEntry(entry, answers, attempt) {
+    const item = entry.question;
+    const answer = answers.get(item.number);
+    const optionOrder = getOptionOrderForQuestion(item, attempt);
+    const sharedMarkup = entry.shared
+        ? `
+            <aside class="ibt-source-panel">
+                <div class="shared-card__range">${escapeHtml(entry.shared.label)}</div>
+                ${entry.shared.html}
+            </aside>
+        `
+        : `
+            <aside class="ibt-source-panel ibt-source-panel--empty">
+                <div class="shared-card__range">${escapeHtml(entry.sectionTitle)}</div>
+                <p>왼쪽에는 공통 지문이 있는 문항에서 제시문이 표시됩니다.</p>
+            </aside>
+        `;
+
+    return `
+        <article class="question-card ibt-question-card" data-question="${item.number}" data-section-title="${escapeHtml(entry.sectionTitle)}">
+            ${sharedMarkup}
+            <section class="ibt-question-panel">
+                <div class="question-card__head">
+                    <div class="question-number">${String(item.number).padStart(2, "0")}</div>
+                    <div>
+                        <div class="ibt-question-section">${escapeHtml(entry.sectionTitle)}</div>
+                        <div class="question-stem">${item.stemHtml}</div>
+                    </div>
+                </div>
+                <div class="option-list ibt-option-list" role="radiogroup" aria-label="${item.number}번 답 선택">
+                    ${optionOrder.map((originalLetter, index) => {
+                        const option = item.options.find((candidate) => candidate.letter === originalLetter);
+                        const displayLetter = IBT_DISPLAY_LETTERS[index];
+                        return `
+                            <div class="option" data-choice="${originalLetter}" data-display-choice="${displayLetter}" data-correct="${answer.correct === originalLetter}">
+                                <input id="q${item.number}-${originalLetter}" class="option-input" type="radio" name="q${item.number}" value="${originalLetter}">
+                                <label for="q${item.number}-${originalLetter}">
+                                    <span class="option-letter">${displayLetter}</span>
+                                    <span class="option-text">${renderInline(option.text)}</span>
+                                </label>
+                            </div>
+                        `;
+                    }).join("")}
+                </div>
+                <div class="feedback-panel" hidden></div>
+            </section>
+        </article>
+    `;
+}
+
 function renderQuiz(quiz) {
+    if (isIbtMode()) {
+        renderIbtQuiz(quiz);
+        return;
+    }
+
     const questionNumbers = getQuestionNumbers(quiz.sections);
     const questionCount = questionNumbers.length;
     const meta = document.getElementById("quizMeta");
@@ -343,6 +579,11 @@ function bindHomeworkPanel(quiz) {
         const value = input.value.trim();
         setHomeworkStudentName(value);
         applyHomeworkLockState(quiz);
+        if (isIbtMode()) {
+            updateIbtStartButton(quiz);
+            updateProgress(getQuestionNumbers(quiz.sections).length);
+            return;
+        }
         if (value) {
             clearHomeworkNameAttention();
             setHomeworkStatus(quiz, "idle", "이름이 저장되었습니다. 모든 문항을 푼 뒤 제출하세요.");
@@ -374,7 +615,7 @@ function applyHomeworkLockState(quiz) {
     });
 
     if (locked) {
-        setHomeworkStatus(quiz, "pending", "이름을 입력하면 퀴즈가 시작됩니다.");
+        setHomeworkStatus(quiz, "pending", isIbtMode() ? "이름을 입력한 뒤 다음 버튼을 눌러 주세요." : "이름을 입력하면 퀴즈가 시작됩니다.");
     }
 }
 
@@ -493,6 +734,7 @@ function wireQuizInteractions(quiz) {
     restoreAnswers(storageKey);
     wasReadyToGrade = updateProgress(totalQuestions);
     applyHomeworkLockState(quiz);
+    if (isIbtMode()) wireIbtInteractions(quiz, totalQuestions);
     window.addEventListener("pagehide", () => saveAnswers(storageKey));
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "hidden") saveAnswers(storageKey);
@@ -511,6 +753,7 @@ function wireQuizInteractions(quiz) {
                 clearReadyToSubmitHighlight();
                 setHomeworkStatus(quiz, "idle", "답안이 자동 저장되었습니다. 모든 문항을 푼 뒤 제출하세요.");
             }
+            updateIbtChrome(totalQuestions);
             wasReadyToGrade = readyToGrade;
         });
 
@@ -539,6 +782,14 @@ function wireQuizInteractions(quiz) {
             if (!button) return;
             const card = document.querySelector(`.question-card[data-question="${button.dataset.questionJump}"]`);
             if (!card) return;
+            if (isIbtMode()) {
+                const cards = getIbtQuestionCards();
+                const index = cards.indexOf(card);
+                if (index >= 0) {
+                    setIbtCurrentQuestion(index, { scroll: true });
+                    return;
+                }
+            }
             card.scrollIntoView({ behavior: "smooth", block: "center" });
         });
     }
@@ -562,6 +813,8 @@ function wireQuizInteractions(quiz) {
         saveRoundSummary(roundId, result, totalQuestions, signature);
         window.showGradeSummaryModal(result);
         updateQuestionPalette();
+        updateIbtChrome(totalQuestions);
+        closeIbtModals();
         await submitHomeworkResult(quiz, result, signature);
     }));
 
@@ -865,6 +1118,7 @@ function updateProgress(totalCount) {
     }
     if (progressFill) progressFill.style.width = `${percent}%`;
     updateQuestionPalette();
+    updateIbtChrome(totalCount);
     return readyToGrade;
 }
 
@@ -939,9 +1193,296 @@ function focusFirstUnansweredQuestion() {
     const firstUnanswered = [...document.querySelectorAll(".question-card")]
         .find((card) => !card.querySelector(".option-input:checked"));
     if (!firstUnanswered) return;
+    if (isIbtMode()) {
+        const cards = getIbtQuestionCards();
+        const targetIndex = cards.indexOf(firstUnanswered);
+        if (targetIndex >= 0) setIbtCurrentQuestion(targetIndex);
+    }
     firstUnanswered.scrollIntoView({ behavior: "smooth", block: "center" });
     const firstInput = firstUnanswered.querySelector(".option-input");
     if (firstInput) firstInput.focus({ preventScroll: true });
+}
+
+function getIbtQuestionCards() {
+    return [...document.querySelectorAll(".ibt-question-card")];
+}
+
+function getIbtCurrentIndex() {
+    const cards = getIbtQuestionCards();
+    const index = cards.findIndex((card) => card.classList.contains("is-current"));
+    return index >= 0 ? index : 0;
+}
+
+function getIbtCurrentIndexKey(roundId) {
+    return `${STORAGE_NAMESPACE}-ibt-current-${roundId}`;
+}
+
+function getIbtStartedKey(roundId) {
+    return `${STORAGE_NAMESPACE}-ibt-started-${roundId}`;
+}
+
+function isIbtStarted(roundId) {
+    if (!getHomeworkStudentName()) return false;
+    try {
+        return localStorage.getItem(getIbtStartedKey(roundId)) === "true";
+    } catch {
+        return document.body.classList.contains("ibt-started");
+    }
+}
+
+function setIbtStarted(roundId, started) {
+    try {
+        if (started) {
+            localStorage.setItem(getIbtStartedKey(roundId), "true");
+        } else {
+            localStorage.removeItem(getIbtStartedKey(roundId));
+        }
+    } catch {
+        // The CSS state still updates for the current session.
+    }
+}
+
+function applyIbtStartedState(quiz) {
+    if (!isIbtMode()) return;
+    const started = isIbtStarted(quiz?.roundId || document.body.dataset.roundId);
+    document.body.classList.toggle("ibt-started", started);
+    updateIbtStartButton(quiz);
+}
+
+function updateIbtStartButton(quiz) {
+    if (!isIbtMode()) return;
+    const hasName = Boolean(getHomeworkStudentName());
+    const button = document.getElementById("ibtStartButton");
+    if (button) button.disabled = !hasName;
+    if (hasName) {
+        clearHomeworkNameAttention();
+        setHomeworkStatus(quiz, "idle", "이름이 저장되었습니다. 다음 버튼을 눌러 시험 화면으로 이동하세요.");
+    } else {
+        setIbtStarted(document.body.dataset.roundId, false);
+        document.body.classList.remove("ibt-started");
+        setHomeworkStatus(quiz, "pending", "이름을 입력한 뒤 다음 버튼을 눌러 주세요.");
+    }
+}
+
+function startIbtExam(quiz) {
+    if (!getHomeworkStudentName()) {
+        showMissingHomeworkName(quiz);
+        updateIbtStartButton(quiz);
+        return;
+    }
+
+    setIbtStarted(quiz?.roundId || document.body.dataset.roundId, true);
+    document.body.classList.add("ibt-started");
+    applyHomeworkLockState(quiz);
+    updateProgress(getQuestionNumbers(quiz.sections).length);
+    scrollIbtCurrentQuestionIntoView("smooth");
+}
+
+function readIbtCurrentIndex(roundId, totalCount) {
+    try {
+        const value = Number(localStorage.getItem(getIbtCurrentIndexKey(roundId)));
+        if (Number.isInteger(value) && value >= 0 && value < totalCount) return value;
+    } catch {
+        // The first question is a safe fallback when localStorage is blocked.
+    }
+    return 0;
+}
+
+function writeIbtCurrentIndex(roundId, index) {
+    try {
+        localStorage.setItem(getIbtCurrentIndexKey(roundId), String(index));
+    } catch {
+        // Navigation still works for the current session.
+    }
+}
+
+function setIbtCurrentQuestion(index, { save = true, scroll = false } = {}) {
+    if (!isIbtMode()) return;
+    const cards = getIbtQuestionCards();
+    if (!cards.length) return;
+
+    const bounded = Math.max(0, Math.min(index, cards.length - 1));
+    cards.forEach((card, cardIndex) => {
+        const active = cardIndex === bounded;
+        card.classList.toggle("is-current", active);
+        card.hidden = !active;
+        card.setAttribute("aria-hidden", String(!active));
+    });
+
+    const roundId = document.body.dataset.roundId;
+    if (save && roundId) writeIbtCurrentIndex(roundId, bounded);
+    updateIbtChrome(cards.length);
+    if (scroll) scrollIbtCurrentQuestionIntoView("smooth");
+}
+
+function scrollIbtCurrentQuestionIntoView(behavior = "auto") {
+    const currentCard = getIbtQuestionCards()[getIbtCurrentIndex()];
+    if (!currentCard || currentCard.hidden) return;
+    window.setTimeout(() => {
+        currentCard.scrollIntoView({ behavior, block: "start" });
+    }, 40);
+}
+
+function updateIbtChrome(totalCount = getIbtQuestionCards().length) {
+    if (!isIbtMode()) return;
+    const cards = getIbtQuestionCards();
+    const currentIndex = getIbtCurrentIndex();
+    const currentCard = cards[currentIndex];
+    const answeredCount = document.querySelectorAll(".option-input:checked").length;
+    const remainingCount = Math.max(totalCount - answeredCount, 0);
+    const footerStatus = document.getElementById("ibtFooterStatus");
+    const prevButton = document.querySelector('[data-ibt-action="prev"]');
+    const nextButton = document.querySelector('[data-ibt-action="next"]');
+
+    if (footerStatus) {
+        const currentNumber = currentCard?.dataset.question || String(currentIndex + 1);
+        footerStatus.textContent = `현재 문항 ${currentNumber}/${totalCount} · 남은 문항 ${remainingCount}`;
+    }
+
+    if (prevButton) prevButton.disabled = currentIndex <= 0;
+    if (nextButton) nextButton.querySelector("span:first-child")?.replaceChildren(document.createTextNode(currentIndex >= totalCount - 1 ? "제출" : "다음"));
+
+    document.querySelectorAll("[data-question-jump]").forEach((button) => {
+        const card = document.querySelector(`.question-card[data-question="${button.dataset.questionJump}"]`);
+        button.classList.toggle("is-current", Boolean(card && card === currentCard));
+    });
+
+    updateIbtOverviewTables();
+}
+
+function getIbtAnswerRowsHtml() {
+    const cards = getIbtQuestionCards();
+    return `
+        <div class="ibt-answer-grid" role="table" aria-label="문항별 답안">
+            ${cards.map((card, index) => {
+                const checked = card.querySelector(".option-input:checked");
+                const selected = checked ? card.querySelector(`.option[data-choice="${checked.value}"]`)?.dataset.displayChoice : "";
+                const isCurrent = card.classList.contains("is-current");
+                const isMissing = !selected;
+                return `
+                    <button
+                        class="ibt-answer-cell ${isCurrent ? "is-current" : ""} ${isMissing ? "is-missing" : "is-answered"}"
+                        type="button"
+                        data-question-jump="${card.dataset.question}"
+                        aria-label="${index + 1}번 ${selected || "미응답"}"
+                    >
+                        <span>${String(index + 1).padStart(2, "0")}</span>
+                        <strong>${selected || "-"}</strong>
+                    </button>
+                `;
+            }).join("")}
+        </div>
+    `;
+}
+
+function updateIbtOverviewTables() {
+    if (!isIbtMode()) return;
+    const html = getIbtAnswerRowsHtml();
+    const questionOverview = document.getElementById("ibtQuestionOverview");
+    const submitOverview = document.getElementById("ibtSubmitOverview");
+    if (questionOverview) questionOverview.innerHTML = html;
+    if (submitOverview) submitOverview.innerHTML = html;
+}
+
+function openIbtModal(id) {
+    const modal = document.getElementById(id);
+    if (!modal) return;
+    updateIbtOverviewTables();
+    modal.hidden = false;
+    document.body.classList.add("has-summary-modal");
+    const firstButton = modal.querySelector("button");
+    if (firstButton) firstButton.focus();
+}
+
+function closeIbtModals() {
+    document.querySelectorAll(".ibt-modal").forEach((modal) => {
+        modal.hidden = true;
+    });
+    if (!document.querySelector(".summary-modal:not([hidden])")) {
+        document.body.classList.remove("has-summary-modal");
+    }
+}
+
+function startIbtClock() {
+    if (ibtClockTimer) return;
+    ibtClockTimer = window.setInterval(updateIbtClock, 1000);
+}
+
+function updateIbtClock() {
+    const target = document.getElementById("ibtCurrentTime");
+    if (!target) return;
+    try {
+        target.textContent = new Intl.DateTimeFormat("ko-KR", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false
+        }).format(new Date());
+    } catch {
+        target.textContent = new Date().toLocaleTimeString();
+    }
+}
+
+function wireIbtInteractions(quiz, totalQuestions) {
+    updateIbtChrome(totalQuestions);
+
+    document.addEventListener("click", (event) => {
+        const jump = event.target.closest("[data-question-jump]");
+        if (jump && isIbtMode()) {
+            const card = document.querySelector(`.question-card[data-question="${jump.dataset.questionJump}"]`);
+            const cards = getIbtQuestionCards();
+            const index = cards.indexOf(card);
+            if (index >= 0) {
+                setIbtCurrentQuestion(index, { scroll: true });
+                closeIbtModals();
+            }
+            return;
+        }
+
+        const control = event.target.closest("[data-ibt-action]");
+        if (!control || !isIbtMode()) return;
+
+        const action = control.dataset.ibtAction;
+        if (action === "start-exam") {
+            startIbtExam(quiz);
+            return;
+        }
+        if (action === "prev") {
+            setIbtCurrentQuestion(getIbtCurrentIndex() - 1, { scroll: true });
+            return;
+        }
+        if (action === "next") {
+            const current = getIbtCurrentIndex();
+            if (current >= totalQuestions - 1) {
+                openIbtModal("ibtSubmitModal");
+                return;
+            }
+            setIbtCurrentQuestion(current + 1, { scroll: true });
+            return;
+        }
+        if (action === "open-questions") {
+            openIbtModal("ibtQuestionModal");
+            return;
+        }
+        if (action === "open-submit") {
+            openIbtModal("ibtSubmitModal");
+            return;
+        }
+        if (action === "close-modal") {
+            closeIbtModals();
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (!isIbtMode()) return;
+        if (event.key === "Escape") {
+            closeIbtModals();
+            return;
+        }
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+        if (event.key === "ArrowLeft") setIbtCurrentQuestion(getIbtCurrentIndex() - 1, { scroll: true });
+        if (event.key === "ArrowRight") setIbtCurrentQuestion(getIbtCurrentIndex() + 1, { scroll: true });
+    });
 }
 
 function ensureQuestionPalette(sectionsRoot, questionNumbers) {
@@ -966,9 +1507,11 @@ function ensureQuestionPalette(sectionsRoot, questionNumbers) {
 function updateQuestionPalette() {
     document.querySelectorAll("[data-question-jump]").forEach((button) => {
         const card = document.querySelector(`.question-card[data-question="${button.dataset.questionJump}"]`);
+        const currentCard = isIbtMode() ? getIbtQuestionCards()[getIbtCurrentIndex()] : null;
         button.classList.toggle("is-answered", Boolean(card?.querySelector(".option-input:checked")));
         button.classList.toggle("is-correct", Boolean(card?.classList.contains("is-correct")));
         button.classList.toggle("is-wrong", Boolean(card?.classList.contains("is-incorrect") || card?.classList.contains("is-unanswered")));
+        button.classList.toggle("is-current", Boolean(currentCard && card === currentCard));
     });
 }
 
@@ -1163,6 +1706,23 @@ function getRoundStorageKey(roundId) {
     return `${STORAGE_NAMESPACE}-round-${roundId}`;
 }
 
+function getRoundConfig(roundId) {
+    return ROUND_LINKS.find((round) => round.id === roundId) || null;
+}
+
+function getRoundSourceId(roundId) {
+    return getRoundConfig(roundId)?.sourceRoundId || roundId;
+}
+
+function getRoundLabel(roundId) {
+    return getRoundConfig(roundId)?.label || `${roundId}회차`;
+}
+
+function buildIbtCandidateNumber(roundId) {
+    const digits = String(roundId || "1").replace(/\D/g, "") || "1";
+    return `IBT-${digits.padStart(4, "0")}`;
+}
+
 function getLegacyRoundStorageKey(roundId) {
     return `${LEGACY_STORAGE_NAMESPACE}-round-${roundId}`;
 }
@@ -1288,7 +1848,7 @@ function saveRoundSummary(roundId, result, totalQuestions, signature) {
 }
 
 function getRoundQuestionTotal(roundId) {
-    const markdown = window.PRIVATE_QUIZ_MARKDOWN?.[roundId];
+    const markdown = window.PRIVATE_QUIZ_MARKDOWN?.[getRoundSourceId(roundId)];
     if (typeof markdown !== "string" || !markdown.trim()) return 0;
     const quiz = parseQuizMarkdown(markdown);
     return getQuestionNumbers(quiz.sections).length;
