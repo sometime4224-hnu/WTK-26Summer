@@ -376,6 +376,91 @@ a { color: inherit; }
     animation: submitPulse 1.05s ease-in-out infinite;
 }
 
+.floating-submit-button[hidden] {
+    display: none;
+}
+
+.floating-submit-button {
+    position: fixed;
+    right: max(18px, env(safe-area-inset-right));
+    bottom: max(22px, env(safe-area-inset-bottom));
+    z-index: 45;
+    display: grid;
+    grid-template-columns: 24px auto;
+    column-gap: 10px;
+    align-items: center;
+    min-width: 164px;
+    min-height: 58px;
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 10px;
+    background: #0f766e;
+    color: #fff;
+    box-shadow: 0 18px 42px rgba(15, 118, 110, 0.32);
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+}
+
+.floating-submit-button::before,
+.floating-submit-button::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    z-index: -1;
+    border: 2px solid rgba(15, 118, 110, 0.42);
+    border-radius: 14px;
+    animation: floatingSubmitWave 1.8s ease-out infinite;
+}
+
+.floating-submit-button::after {
+    animation-delay: 0.55s;
+}
+
+.floating-submit-button__wave {
+    grid-row: 1 / span 2;
+    position: relative;
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(255, 255, 255, 0.82);
+    border-radius: 50%;
+}
+
+.floating-submit-button__wave::before,
+.floating-submit-button__wave::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    animation: floatingSubmitDotWave 1.25s ease-out infinite;
+}
+
+.floating-submit-button__wave::after {
+    animation-delay: 0.35s;
+}
+
+.floating-submit-button__text {
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1.15;
+}
+
+.floating-submit-button__hint {
+    font-size: 0.76rem;
+    font-weight: 800;
+    line-height: 1.15;
+    opacity: 0.86;
+}
+
+.quiz-page--ibt .floating-submit-button {
+    bottom: max(84px, env(safe-area-inset-bottom));
+}
+
 .section-stack {
     display: grid;
     gap: 12px;
@@ -1141,6 +1226,15 @@ a { color: inherit; }
         font-size: 0.78rem;
     }
 
+    .floating-submit-button {
+        right: 12px;
+        left: 12px;
+        bottom: max(86px, env(safe-area-inset-bottom));
+        min-width: 0;
+        min-height: 54px;
+        padding: 9px 14px;
+    }
+
     .toolbar--bottom {
         position: sticky;
         bottom: 0;
@@ -1247,6 +1341,10 @@ a { color: inherit; }
         bottom: 8px;
         grid-template-columns: 94px minmax(0, 1fr) 94px;
         width: min(100% - 14px, 680px);
+    }
+
+    .quiz-page--ibt .floating-submit-button {
+        bottom: max(78px, env(safe-area-inset-bottom));
     }
 
     .ibt-footer__center {
@@ -1578,5 +1676,41 @@ body.has-summary-modal {
 
     50% {
         box-shadow: 0 0 0 7px rgba(15, 118, 110, 0.08), 0 16px 30px rgba(15, 118, 110, 0.24);
+    }
+}
+
+@keyframes floatingSubmitWave {
+    0% {
+        opacity: 0.64;
+        transform: scale(0.98);
+    }
+
+    70%,
+    100% {
+        opacity: 0;
+        transform: scale(1.18);
+    }
+}
+
+@keyframes floatingSubmitDotWave {
+    0% {
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(0.65);
+    }
+
+    80%,
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2.3);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .floating-submit-button,
+    .floating-submit-button::before,
+    .floating-submit-button::after,
+    .floating-submit-button__wave::before,
+    .floating-submit-button__wave::after {
+        animation: none;
     }
 }

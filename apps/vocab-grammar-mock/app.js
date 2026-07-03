@@ -730,6 +730,7 @@ function wireQuizInteractions(quiz) {
     let wasReadyToGrade = false;
 
     ensureGradeSummaryModal();
+    ensureFloatingSubmitButton();
     bindHomeworkPanel(quiz);
     restoreAnswers(storageKey);
     wasReadyToGrade = updateProgress(totalQuestions);
@@ -1119,6 +1120,7 @@ function updateProgress(totalCount) {
     if (progressFill) progressFill.style.width = `${percent}%`;
     updateQuestionPalette();
     updateIbtChrome(totalCount);
+    updateFloatingSubmitButton(totalCount, readyToGrade);
     return readyToGrade;
 }
 
@@ -1157,6 +1159,47 @@ function setGradeButtonsState(answeredCount, totalCount) {
     return readyToGrade;
 }
 
+function ensureFloatingSubmitButton() {
+    if (document.getElementById("floatingSubmitButton")) return;
+
+    const button = document.createElement("button");
+    button.id = "floatingSubmitButton";
+    button.className = "floating-submit-button";
+    button.type = "button";
+    button.hidden = true;
+    button.setAttribute("aria-live", "polite");
+    button.innerHTML = `
+        <span class="floating-submit-button__wave" aria-hidden="true"></span>
+        <span class="floating-submit-button__text">제출하기</span>
+        <span class="floating-submit-button__hint">모든 문항 완료</span>
+    `;
+    button.addEventListener("click", () => {
+        const totalCount = getIbtQuestionCards().length || document.querySelectorAll(".question-card").length;
+        if (!isReadyToGrade(totalCount)) {
+            focusFirstUnansweredQuestion();
+            return;
+        }
+        if (isIbtMode()) {
+            openIbtModal("ibtSubmitModal");
+            return;
+        }
+        getPreferredGradeButton()?.click();
+    });
+    document.body.appendChild(button);
+}
+
+function updateFloatingSubmitButton(totalCount, readyToGrade = isReadyToGrade(totalCount)) {
+    const button = document.getElementById("floatingSubmitButton");
+    if (!button) return;
+
+    const ibtExamReady = !isIbtMode() || document.body.classList.contains("ibt-started");
+    const modalOpen = document.querySelector(".summary-modal:not([hidden]), .ibt-modal:not([hidden])");
+    const shouldShow = readyToGrade && ibtExamReady && !isHomeworkLocked() && !modalOpen;
+    button.hidden = !shouldShow;
+    button.setAttribute("aria-hidden", String(!shouldShow));
+    document.body.classList.toggle("has-floating-submit", shouldShow);
+}
+
 function promptReadyToSubmit(quiz) {
     if (isHomeworkLocked(quiz)) return;
     const gradeButton = getPreferredGradeButton();
@@ -1164,7 +1207,21 @@ function promptReadyToSubmit(quiz) {
     document.querySelectorAll('[data-action="grade"]').forEach((button) => {
         button.classList.add("is-ready-to-submit");
     });
-    setHomeworkStatus(quiz, "ready", "모든 문항이 자동 저장되었습니다. 채점 버튼을 눌러 제출을 완료하세요.");
+    updateFloatingSubmitButton(getIbtQuestionCards().length || document.querySelectorAll(".question-card").length, true);
+    setHomeworkStatus(
+        quiz,
+        "ready",
+        isIbtMode()
+            ? "모든 문항이 자동 저장되었습니다. 오른쪽 아래 제출하기 버튼을 눌러 답안을 확인하세요."
+            : "모든 문항이 자동 저장되었습니다. 제출하기 버튼을 눌러 제출을 완료하세요."
+    );
+    if (isIbtMode()) {
+        window.setTimeout(() => {
+            const floatingSubmitButton = document.getElementById("floatingSubmitButton");
+            if (floatingSubmitButton && !floatingSubmitButton.hidden) floatingSubmitButton.focus({ preventScroll: true });
+        }, 120);
+        return;
+    }
     if (!gradeButton) return;
     window.setTimeout(() => {
         gradeButton.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1183,6 +1240,12 @@ function clearReadyToSubmitHighlight() {
     document.querySelectorAll('[data-action="grade"]').forEach((button) => {
         button.classList.remove("is-ready-to-submit");
     });
+    const floatingSubmitButton = document.getElementById("floatingSubmitButton");
+    if (floatingSubmitButton) {
+        floatingSubmitButton.hidden = true;
+        floatingSubmitButton.setAttribute("aria-hidden", "true");
+    }
+    document.body.classList.remove("has-floating-submit");
 }
 
 function isReadyToGrade(totalCount) {
@@ -1390,6 +1453,7 @@ function openIbtModal(id) {
     updateIbtOverviewTables();
     modal.hidden = false;
     document.body.classList.add("has-summary-modal");
+    updateFloatingSubmitButton(getIbtQuestionCards().length);
     const firstButton = modal.querySelector("button");
     if (firstButton) firstButton.focus();
 }
@@ -1401,6 +1465,7 @@ function closeIbtModals() {
     if (!document.querySelector(".summary-modal:not([hidden])")) {
         document.body.classList.remove("has-summary-modal");
     }
+    updateFloatingSubmitButton(getIbtQuestionCards().length);
 }
 
 function startIbtClock() {

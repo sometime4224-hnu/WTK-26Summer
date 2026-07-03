@@ -415,7 +415,8 @@ test('vocab grammar mock autosaves progress and guides completed students to gra
   await expect(page.locator('.option-input:checked')).toHaveCount(3);
 
   await answerAllCorrect(page);
-  await expect(page.locator('#homeworkStatus')).toContainText('채점 버튼');
+  await expect(page.locator('#homeworkStatus')).toContainText('제출하기 버튼');
+  await expect(page.locator('#floatingSubmitButton')).toBeVisible();
   await expect(page.locator('[data-action="grade"]').first()).toHaveClass(/is-ready-to-submit/);
   await expect.poll(async () => page.locator('.toolbar--bottom [data-action="grade"]').evaluate((button) => {
     const rect = button.getBoundingClientRect();
@@ -487,6 +488,33 @@ test('vocab grammar mock IBT whole-question and submit tables mark unanswered qu
   await expect(page.locator('#ibtSubmitModal .ibt-answer-cell.is-missing')).toHaveCount(26);
   await expect(page.locator('#ibtSubmitModal [data-action="grade"]')).toBeDisabled();
   await expectNoHorizontalOverflow(page);
+});
+
+test('vocab grammar mock IBT shows a floating submit prompt after every answer', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/apps/vocab-grammar-mock/round1-ibt.html', { waitUntil: 'domcontentloaded' });
+  await enterStudentName(page, '제출 유도 학생');
+
+  const floatingSubmit = page.locator('#floatingSubmitButton');
+  await expect(floatingSubmit).toBeHidden();
+
+  await answerAllCorrect(page);
+  await expect(floatingSubmit).toBeVisible();
+  await expect(floatingSubmit).toContainText('제출하기');
+
+  const box = await floatingSubmit.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.y).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(390);
+  expect(box.y + box.height).toBeLessThanOrEqual(844);
+
+  await floatingSubmit.click();
+  await expect(page.locator('#ibtSubmitModal')).toBeVisible();
+  await expect(floatingSubmit).toBeHidden();
+
+  await page.locator('#ibtSubmitModal .summary-modal__close').click();
+  await expect(floatingSubmit).toBeVisible();
 });
 
 test('vocab grammar mock IBT submissions use separate assignment ids', async ({ page }) => {
