@@ -21,9 +21,10 @@ test.describe('Review 4 listening transcripts', () => {
   test('links to the transcript page from the listening start screen', async ({ page }) => {
     await page.goto('/review/review4-html/listening.html', { waitUntil: 'load' });
 
-    const transcriptLink = page.locator('a[href="listening-transcripts.html"]');
+    const transcriptLink = page.getByRole('link', { name: '듣기 지문 보기' });
     await expect(transcriptLink).toBeVisible();
     await expect(transcriptLink).toContainText('듣기 지문 보기');
+    await expect(page.locator('#listeningTranscriptFallback')).toBeHidden();
 
     await transcriptLink.click();
     await expect(page).toHaveURL(/listening-transcripts\.html$/);
