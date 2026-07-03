@@ -38,6 +38,10 @@
     return choiceText(answer);
   }
 
+  function usesImageOnlyPractice(question) {
+    return question && (question.id === "l1" || question.id === "l2");
+  }
+
   function updateLayout() {
     var width = window.innerWidth || document.documentElement.clientWidth || 0;
     var layout = width >= 1100 ? "desktop" : (width >= 700 ? "tablet" : "phone");
@@ -81,9 +85,13 @@
         var isSelected = selectedId === choice.id;
         var isCorrect = answered && choice.id === question.answer;
         var isWrong = answered && isSelected && choice.id !== question.answer;
+        var imageOnly = usesImageOnlyPractice(question) && Boolean(choice.image);
         var classes = "practice-option option-button";
         if (choice.image) {
           classes += " option-button--image";
+        }
+        if (imageOnly) {
+          classes += " practice-option--image-only";
         }
         if (isSelected) {
           classes += " is-selected";
@@ -95,14 +103,18 @@
           classes += " is-wrong";
         }
         return (
-          '<button class="' + classes + '" type="button" data-action="choose-practice" data-question="' + escapeHtml(question.id) + '" data-choice="' + escapeHtml(choice.id) + '">' +
+          '<button class="' + classes + '" type="button"' +
+          (imageOnly ? ' aria-label="' + escapeHtml(optionLabel(index) + "번 " + choiceText(choice)) + '"' : "") +
+          ' data-action="choose-practice" data-question="' + escapeHtml(question.id) + '" data-choice="' + escapeHtml(choice.id) + '">' +
           (choice.image
-            ? '<span class="option-image-wrap"><img class="option-image" src="' + escapeHtml(choice.image) + '" alt="' + escapeHtml(choiceText(choice)) + '"></span>'
+            ? '<span class="option-image-wrap"><img class="option-image" src="' + escapeHtml(choice.image) + '" alt="' + (imageOnly ? "" : escapeHtml(choiceText(choice))) + '"></span>'
             : "") +
-          '<span class="practice-option-copy">' +
-          '<span class="option-index">' + optionLabel(index) + "</span>" +
-          '<span class="option-text">' + escapeHtml(choiceText(choice)) + "</span>" +
-          "</span>" +
+          (imageOnly
+            ? ""
+            : '<span class="practice-option-copy">' +
+              '<span class="option-index">' + optionLabel(index) + "</span>" +
+              '<span class="option-text">' + escapeHtml(choiceText(choice)) + "</span>" +
+              "</span>") +
           "</button>"
         );
       }).join("") +
@@ -119,7 +131,7 @@
     return (
       '<div class="practice-feedback ' + (correct ? "correct" : "wrong") + '">' +
       '<span class="status-pill ' + (correct ? "correct" : "wrong") + '">' + (correct ? "정답" : "오답") + "</span>" +
-      '<p><strong>정답 ' + escapeHtml(question.answer) + "번</strong> " + escapeHtml(answerText(question)) + "</p>" +
+      '<p><strong>정답 ' + escapeHtml(question.answer) + "번</strong>" + (usesImageOnlyPractice(question) ? "" : " " + escapeHtml(answerText(question))) + "</p>" +
       "</div>"
     );
   }

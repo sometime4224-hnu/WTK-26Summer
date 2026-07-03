@@ -74,6 +74,20 @@ test.describe('Review 4 listening transcript audio page', () => {
     await expect(card.locator('.practice-hint')).toContainText('선택하면 바로 정오 판정');
   });
 
+  test('shows image-only choices for the first two practice questions', async ({ page }) => {
+    await page.goto('/review/review4-html/listening-transcripts.html', { waitUntil: 'load' });
+
+    for (const questionId of ['l1', 'l2']) {
+      const panel = page.locator(`#${questionId} .practice-panel`);
+      await expect(panel.locator('.practice-option')).toHaveCount(4);
+      await expect(panel.locator('.option-image')).toHaveCount(4);
+      await expect(panel.locator('.practice-option-copy')).toHaveCount(0);
+      await expect(panel.locator('.option-text')).toHaveCount(0);
+    }
+
+    await expect(page.locator('#l3 .practice-panel .option-text')).toHaveCount(4);
+  });
+
   test('fits the transcript page on mobile and desktop', async ({ page }) => {
     for (const viewport of [
       { width: 390, height: 844, layout: 'phone' },
