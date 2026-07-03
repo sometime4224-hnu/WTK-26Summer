@@ -189,6 +189,9 @@
       var latestLabel = latest ? formatScore(latest) : "기록 없음";
       var bestLabel = best ? formatScore(best) : "기록 없음";
       var description = section.hero;
+      var supplementalAction = section.transcriptHref
+        ? '<a class="secondary-button" href="' + escapeHtml(section.transcriptHref) + '">지문 원음</a>'
+        : "";
       return (
         '<article class="section-card">' +
         '<div class="section-row">' +
@@ -206,7 +209,7 @@
         "</div>" +
         '<div class="section-actions">' +
         '<a class="primary-button" href="' + escapeHtml(section.href) + '">열기</a>' +
-        (section.transcriptHref ? '<a class="secondary-button" href="' + escapeHtml(section.transcriptHref) + '">지문 보기</a>' : "") +
+        supplementalAction +
         "</div>" +
         "</article>"
       );
