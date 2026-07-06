@@ -16,7 +16,12 @@ const ATTEMPT_VERSION = 1;
 const OPTION_LETTERS = ["A", "B", "C", "D"];
 const IBT_DISPLAY_LETTERS = ["①", "②", "③", "④"];
 const DEFAULT_HOMEWORK_STUDENT_NAME_KEY = "vocab-grammar-mock-homework-name";
+const SUBMISSION_PENDING_KEY = `${STORAGE_NAMESPACE}-pending-submissions-v1`;
+const SUBMISSION_RECEIPT_KEY = `${STORAGE_NAMESPACE}-submission-receipts-v1`;
+const SUBMISSION_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
+const SUBMISSION_RETRY_DELAYS_MS = [30 * 1000, 60 * 1000, 2 * 60 * 1000, 4 * 60 * 1000, 10 * 60 * 1000];
 let ibtClockTimer = null;
+let pendingSubmissionRetryActive = false;
 
 document.addEventListener("DOMContentLoaded", () => {
     renderLandingIndex();
@@ -699,23 +704,302 @@ function buildHomeworkPayload(quiz, result, signature) {
     };
 }
 
+function getSubmissionKey(assignmentId, submissionHash) {
+    return `${assignmentId}:${submissionHash}`;
+}
+
+function getSubmissionKeyFromPayload(payload) {
+    return getSubmissionKey(payload.assignmentId, payload.signatureHash);
+}
+
+function writeSubmissionStore(storageKey, store) {
+    try {
+        localStorage.setItem(storageKey, JSON.stringify(store));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+function readSubmissionStore(storageKey) {
+    try {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return {};
+
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+            localStorage.removeItem(storageKey);
+            return {};
+        }
+
+        const now = Date.now();
+        const nextStore = {};
+        let changed = false;
+        Object.entries(parsed).forEach(([key, record]) => {
+            if (!record || typeof record !== "object") {
+                changed = true;
+                return;
+            }
+
+            const timestamp = Date.parse(record.updatedAt || record.submittedAt || record.createdAt || "");
+            if (!Number.isFinite(timestamp) || now - timestamp > SUBMISSION_RETENTION_MS) {
+                changed = true;
+                return;
+            }
+
+            nextStore[key] = record;
+        });
+
+        if (changed) writeSubmissionStore(storageKey, nextStore);
+        return nextStore;
+    } catch {
+        try {
+            localStorage.removeItem(storageKey);
+        } catch {
+            // Nothing else can be done when localStorage is blocked.
+        }
+        return {};
+    }
+}
+
+function readPendingSubmissions() {
+    return readSubmissionStore(SUBMISSION_PENDING_KEY);
+}
+
+function readSubmissionReceipts() {
+    return readSubmissionStore(SUBMISSION_RECEIPT_KEY);
+}
+
+function getSubmissionReceipt(submissionKey) {
+    return readSubmissionReceipts()[submissionKey] || null;
+}
+
+function savePendingSubmission(payload) {
+    const submissionKey = getSubmissionKeyFromPayload(payload);
+    const pending = readPendingSubmissions();
+    const existing = pending[submissionKey] || {};
+    const now = new Date().toISOString();
+    pending[submissionKey] = {
+        payload,
+        attempts: Number(existing.attempts) || 0,
+        nextRetryAt: Number(existing.nextRetryAt) || 0,
+        lastError: existing.lastError || "",
+        createdAt: existing.createdAt || now,
+        updatedAt: now
+    };
+
+    return {
+        submissionKey,
+        saved: writeSubmissionStore(SUBMISSION_PENDING_KEY, pending)
+    };
+}
+
+function getRetryDelayMs(attempts) {
+    const index = Math.max(0, Math.min(attempts - 1, SUBMISSION_RETRY_DELAYS_MS.length - 1));
+    return SUBMISSION_RETRY_DELAYS_MS[index];
+}
+
+function markPendingSubmissionFailed(submissionKey, error) {
+    const pending = readPendingSubmissions();
+    const record = pending[submissionKey];
+    if (!record) return false;
+
+    const attempts = (Number(record.attempts) || 0) + 1;
+    pending[submissionKey] = Object.assign({}, record, {
+        attempts,
+        nextRetryAt: Date.now() + getRetryDelayMs(attempts),
+        lastError: error?.message || "온라인 제출 실패",
+        updatedAt: new Date().toISOString()
+    });
+
+    return writeSubmissionStore(SUBMISSION_PENDING_KEY, pending);
+}
+
+function clearPendingSubmission(submissionKey) {
+    const pending = readPendingSubmissions();
+    if (!pending[submissionKey]) return true;
+    delete pending[submissionKey];
+    return writeSubmissionStore(SUBMISSION_PENDING_KEY, pending);
+}
+
+function markSubmissionSucceeded(payload, response) {
+    const submissionKey = getSubmissionKeyFromPayload(payload);
+    clearPendingSubmission(submissionKey);
+
+    const receipts = readSubmissionReceipts();
+    receipts[submissionKey] = {
+        assignmentId: payload.assignmentId,
+        roundId: payload.roundId,
+        roundLabel: payload.roundLabel,
+        signatureHash: payload.signatureHash,
+        score: payload.score,
+        total: payload.total,
+        percent: payload.percent,
+        documentId: response?.documentId || "",
+        path: response?.path || "",
+        anonymousUid: response?.anonymousUid || "",
+        submittedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    return writeSubmissionStore(SUBMISSION_RECEIPT_KEY, receipts);
+}
+
+function setPendingSubmissionStatus(quiz) {
+    setHomeworkStatus(quiz, "pending", "답안은 이 기기에 저장되어 있습니다. 연결이 돌아오면 자동 제출됩니다.");
+}
+
+function setStorageUnavailableStatus(quiz) {
+    setHomeworkStatus(quiz, "error", "브라우저 저장소를 사용할 수 없어 자동 재전송을 보관할 수 없습니다.");
+}
+
+function getCurrentSubmissionKey(quiz, totalQuestions) {
+    if (!quiz?.homework) return "";
+    const answeredCount = document.querySelectorAll(".option-input:checked").length;
+    if (answeredCount !== totalQuestions) return "";
+    return getSubmissionKey(quiz.homework.assignmentId, signatureHash(getAnswerSignature(quiz.roundId)));
+}
+
+function syncStoredSubmissionStatus(quiz, totalQuestions) {
+    const submissionKey = getCurrentSubmissionKey(quiz, totalQuestions);
+    if (!submissionKey || isHomeworkLocked(quiz)) return false;
+
+    if (getSubmissionReceipt(submissionKey)) {
+        setHomeworkStatus(quiz, "success", "온라인 제출이 완료되었습니다.");
+        return true;
+    }
+
+    if (readPendingSubmissions()[submissionKey]) {
+        setPendingSubmissionStatus(quiz);
+        return true;
+    }
+    return false;
+}
+
+function pruneStalePendingSubmissions(roundId, currentSignatureHash = "") {
+    const pending = readPendingSubmissions();
+    let changed = false;
+
+    Object.entries(pending).forEach(([key, record]) => {
+        const payload = record?.payload;
+        if (!payload || payload.roundId !== roundId) return;
+        if (currentSignatureHash && payload.signatureHash === currentSignatureHash) return;
+        delete pending[key];
+        changed = true;
+    });
+
+    if (changed) writeSubmissionStore(SUBMISSION_PENDING_KEY, pending);
+}
+
+function clearPendingSubmissionsForRound(roundId) {
+    pruneStalePendingSubmissions(roundId, "");
+}
+
+async function retryPendingSubmissions(quiz, { force = false, totalQuestions = 0 } = {}) {
+    if (pendingSubmissionRetryActive || !quiz?.homework) return;
+    const submitter = window.HomeworkSubmitter;
+    if (!submitter || typeof submitter.submitHomework !== "function") {
+        syncStoredSubmissionStatus(quiz, totalQuestions);
+        return;
+    }
+
+    if (!force && navigator.onLine === false) {
+        syncStoredSubmissionStatus(quiz, totalQuestions);
+        return;
+    }
+
+    const now = Date.now();
+    const entries = Object.entries(readPendingSubmissions()).filter(([, record]) => {
+        if (!record?.payload) return false;
+        if (getSubmissionReceipt(getSubmissionKeyFromPayload(record.payload))) return true;
+        return force || !record.nextRetryAt || Number(record.nextRetryAt) <= now;
+    });
+
+    if (!entries.length) {
+        syncStoredSubmissionStatus(quiz, totalQuestions);
+        return;
+    }
+
+    pendingSubmissionRetryActive = true;
+    try {
+        for (const [submissionKey, record] of entries) {
+            const payload = record.payload;
+            const currentRound = payload.roundId === quiz.roundId;
+            if (getSubmissionReceipt(submissionKey)) {
+                clearPendingSubmission(submissionKey);
+                continue;
+            }
+
+            if (currentRound) {
+                setHomeworkStatus(quiz, "pending", "저장된 답안을 온라인 제출 중입니다...");
+            }
+
+            try {
+                const response = await submitter.submitHomework(payload);
+                markSubmissionSucceeded(payload, response);
+                if (currentRound) {
+                    setHomeworkStatus(quiz, "success", "저장된 답안의 온라인 제출이 완료되었습니다.");
+                }
+            } catch (error) {
+                markPendingSubmissionFailed(submissionKey, error);
+                if (currentRound) setPendingSubmissionStatus(quiz);
+            }
+        }
+    } finally {
+        pendingSubmissionRetryActive = false;
+    }
+}
+
+function bindPendingSubmissionRetry(quiz, totalQuestions) {
+    if (!quiz?.homework) return;
+    syncStoredSubmissionStatus(quiz, totalQuestions);
+
+    const retry = (force = false) => retryPendingSubmissions(quiz, { force, totalQuestions });
+    window.setTimeout(() => retry(true), 0);
+    window.addEventListener("online", () => retry(true));
+    window.addEventListener("focus", () => retry(false));
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") retry(false);
+    });
+}
+
 async function submitHomeworkResult(quiz, result, signature) {
     if (!quiz.homework || result.answeredCount !== result.totalCount) return null;
 
+    const payload = buildHomeworkPayload(quiz, result, signature);
+    const submissionKey = getSubmissionKeyFromPayload(payload);
+    pruneStalePendingSubmissions(payload.roundId, payload.signatureHash);
+
+    const receipt = getSubmissionReceipt(submissionKey);
+    if (receipt) {
+        setHomeworkStatus(quiz, "success", "온라인 제출이 완료되었습니다.");
+        return receipt;
+    }
+
+    const pendingState = savePendingSubmission(payload);
     const submitter = window.HomeworkSubmitter;
     if (!submitter || typeof submitter.submitHomework !== "function") {
-        setHomeworkStatus(quiz, "error", "온라인 제출 모듈을 찾을 수 없습니다.");
+        if (pendingState.saved) {
+            markPendingSubmissionFailed(submissionKey, new Error("온라인 제출 모듈을 찾을 수 없습니다."));
+            setPendingSubmissionStatus(quiz);
+        } else {
+            setStorageUnavailableStatus(quiz);
+        }
         return null;
     }
 
     setHomeworkStatus(quiz, "pending", "온라인 제출 중입니다...");
     try {
-        const response = await submitter.submitHomework(buildHomeworkPayload(quiz, result, signature));
+        const response = await submitter.submitHomework(payload);
+        markSubmissionSucceeded(payload, response);
         setHomeworkStatus(quiz, "success", "온라인 제출이 완료되었습니다.");
         return response;
     } catch (error) {
-        const message = error?.message || "알 수 없는 오류";
-        setHomeworkStatus(quiz, "error", `온라인 제출 실패: ${message}`);
+        if (pendingState.saved) {
+            markPendingSubmissionFailed(submissionKey, error);
+            setPendingSubmissionStatus(quiz);
+        } else {
+            setStorageUnavailableStatus(quiz);
+        }
         return null;
     }
 }
@@ -738,6 +1022,7 @@ function wireQuizInteractions(quiz) {
     wasReadyToGrade = updateProgress(totalQuestions);
     applyHomeworkLockState(quiz);
     if (isIbtMode()) wireIbtInteractions(quiz, totalQuestions);
+    bindPendingSubmissionRetry(quiz, totalQuestions);
     window.addEventListener("pagehide", () => saveAnswers(storageKey));
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "hidden") saveAnswers(storageKey);
@@ -750,8 +1035,22 @@ function wireQuizInteractions(quiz) {
             clearFeedback();
             closeGradeSummaryModal({ scrollTop: false });
             const readyToGrade = updateProgress(totalQuestions);
-            if (readyToGrade && !wasReadyToGrade) {
+            let restoredSubmissionStatus = false;
+            if (quiz.homework) {
+                const currentSubmissionHash = readyToGrade ? signatureHash(getAnswerSignature(roundId)) : "";
+                pruneStalePendingSubmissions(roundId, currentSubmissionHash);
+                if (readyToGrade) restoredSubmissionStatus = syncStoredSubmissionStatus(quiz, totalQuestions);
+            }
+            if (readyToGrade && !wasReadyToGrade && !restoredSubmissionStatus) {
                 promptReadyToSubmit(quiz);
+            } else if (readyToGrade && !restoredSubmissionStatus) {
+                setHomeworkStatus(
+                    quiz,
+                    "ready",
+                    isIbtMode()
+                        ? "모든 문항이 자동 저장되었습니다. 오른쪽 아래 제출하기 버튼을 눌러 답안을 확인하세요."
+                        : "모든 문항이 자동 저장되었습니다. 제출하기 버튼을 눌러 제출을 완료하세요."
+                );
             } else if (!readyToGrade) {
                 clearReadyToSubmitHighlight();
                 setHomeworkStatus(quiz, "idle", "답안이 자동 저장되었습니다. 모든 문항을 푼 뒤 제출하세요.");
@@ -825,6 +1124,7 @@ function wireQuizInteractions(quiz) {
         if (!window.confirm("선택한 답을 모두 지우고 처음부터 다시 풀까요?")) return;
         localStorage.removeItem(storageKey);
         localStorage.removeItem(attemptKey);
+        clearPendingSubmissionsForRound(roundId);
         clearReadyToSubmitHighlight();
         closeGradeSummaryModal({ scrollTop: false });
         window.location.reload();

@@ -143,9 +143,18 @@ async function enterStudentName(page, name = '테스트 학생') {
 async function installHomeworkMock(page, options = {}) {
   await page.addInitScript((settings) => {
     window.__homeworkSubmissions = [];
+    if (typeof settings.failCount === 'number' && !sessionStorage.getItem('__homeworkMockFailureSeeded')) {
+      localStorage.setItem('__homeworkMockFailuresRemaining', String(settings.failCount));
+      sessionStorage.setItem('__homeworkMockFailureSeeded', '1');
+    }
     window.HomeworkSubmitter = {
       async submitHomework(payload) {
+        const failuresRemaining = Number(localStorage.getItem('__homeworkMockFailuresRemaining') || '0');
         if (settings.fail) {
+          throw new Error('mock firebase failure');
+        }
+        if (failuresRemaining > 0) {
+          localStorage.setItem('__homeworkMockFailuresRemaining', String(failuresRemaining - 1));
           throw new Error('mock firebase failure');
         }
         const storedPayload = Object.assign({}, payload, {
@@ -161,6 +170,13 @@ async function installHomeworkMock(page, options = {}) {
       }
     };
   }, options);
+}
+
+async function getSubmissionStores(page) {
+  return page.evaluate(() => ({
+    pending: JSON.parse(localStorage.getItem('vocab-grammar-mock-pending-submissions-v1') || '{}'),
+    receipts: JSON.parse(localStorage.getItem('vocab-grammar-mock-submission-receipts-v1') || '{}')
+  }));
 }
 
 async function installDashboardMock(page) {
@@ -740,9 +756,109 @@ test('vocab grammar mock keeps local grading visible when online submission fail
 
   await expect(page.locator('#progressText')).toHaveText('25 / 25');
   await expect(page.locator('#summaryModalScore')).toContainText('25문항 중 25문항 정답');
-  await expect(page.locator('#homeworkStatus')).toContainText('온라인 제출 실패');
+  await expect(page.locator('#homeworkStatus')).toContainText('연결이 돌아오면 자동 제출');
   const submissions = await page.evaluate(() => window.__homeworkSubmissions);
   expect(submissions).toHaveLength(0);
+});
+
+test('vocab grammar mock retries queued round 3 and 4 IBT submissions after reload', async ({ page }) => {
+  await installHomeworkMock(page, { failCount: 1 });
+
+  for (const quizPage of ibtQuizPages.filter((item) => ['3-ibt', '4-ibt'].includes(item.roundId))) {
+    await page.goto(quizPage.path, { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('.ibt-question-card')).toHaveCount(quizPage.count);
+    await enterStudentName(page, '자동 제출 학생');
+    await page.locator('[data-ibt-action="open-questions"]').click();
+    await page.locator('#ibtQuestionModal [data-question-jump="10"]').click();
+    await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveAttribute('data-question', '10');
+    await answerAllCorrect(page);
+    await page.locator('[data-ibt-action="open-submit"]').click();
+    await page.locator('#ibtSubmitModal [data-action="grade"]').click();
+    await expect(page.locator('#homeworkStatus')).toContainText('연결이 돌아오면 자동 제출');
+
+    const queued = await getSubmissionStores(page);
+    const pendingEntries = Object.values(queued.pending);
+    expect(pendingEntries).toHaveLength(1);
+    expect(pendingEntries[0].payload).toMatchObject({
+      assignmentId: quizPage.assignmentId,
+      roundId: quizPage.roundId,
+      roundLabel: quizPage.roundLabel,
+      score: quizPage.count,
+      total: quizPage.count
+    });
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveAttribute('data-question', '10');
+    await expect(page.locator('.option-input:checked')).toHaveCount(quizPage.count);
+    await expect(page.locator('#homeworkStatus')).toContainText('저장된 답안의 온라인 제출이 완료되었습니다.');
+
+    const submission = await page.evaluate(() => window.__homeworkSubmissions.at(-1));
+    expect(submission).toMatchObject({
+      assignmentId: quizPage.assignmentId,
+      roundId: quizPage.roundId,
+      studentName: '자동 제출 학생',
+      score: quizPage.count,
+      total: quizPage.count
+    });
+
+    const completed = await getSubmissionStores(page);
+    expect(Object.keys(completed.pending)).toHaveLength(0);
+    expect(Object.values(completed.receipts)).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        assignmentId: quizPage.assignmentId,
+        roundId: quizPage.roundId,
+        score: quizPage.count,
+        total: quizPage.count
+      })
+    ]));
+
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
+  }
+});
+
+test('vocab grammar mock keeps completed receipts and skips duplicate writes', async ({ page }) => {
+  await installHomeworkMock(page);
+  await page.goto('/apps/vocab-grammar-mock/round4-ibt.html', { waitUntil: 'domcontentloaded' });
+  await enterStudentName(page, '중복 방지 학생');
+  await answerAllCorrect(page);
+  await page.locator('[data-ibt-action="open-submit"]').click();
+  await page.locator('#ibtSubmitModal [data-action="grade"]').click();
+  await expect(page.locator('#homeworkStatus')).toContainText('온라인 제출이 완료되었습니다.');
+  await expect.poll(() => page.evaluate(() => window.__homeworkSubmissions.length)).toBe(1);
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#homeworkStatus')).toContainText('온라인 제출이 완료되었습니다.');
+  await expect.poll(() => page.evaluate(() => window.__homeworkSubmissions.length)).toBe(0);
+  await page.locator('[data-ibt-action="open-submit"]').click();
+  await page.locator('#ibtSubmitModal [data-action="grade"]').click();
+  await expect(page.locator('#homeworkStatus')).toContainText('온라인 제출이 완료되었습니다.');
+  await expect.poll(() => page.evaluate(() => window.__homeworkSubmissions.length)).toBe(0);
+});
+
+test('vocab grammar mock removes queued submission when answers change', async ({ page }) => {
+  await installHomeworkMock(page, { fail: true });
+  await page.goto('/apps/vocab-grammar-mock/round3-ibt.html', { waitUntil: 'domcontentloaded' });
+  await enterStudentName(page, '수정 학생');
+  await answerAllCorrect(page);
+  await page.locator('[data-ibt-action="open-submit"]').click();
+  await page.locator('#ibtSubmitModal [data-action="grade"]').click();
+  await expect(page.locator('#homeworkStatus')).toContainText('연결이 돌아오면 자동 제출');
+  await expect.poll(async () => Object.keys((await getSubmissionStores(page)).pending).length).toBe(1);
+
+  await page.evaluate(() => {
+    const card = document.querySelector('.question-card[data-question="1"]');
+    const correct = card.querySelector('.option[data-correct="true"]');
+    const wrong = Array.from(card.querySelectorAll('.option')).find((option) => option !== correct);
+    const input = wrong.querySelector('.option-input');
+    input.checked = true;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+
+  await expect.poll(async () => Object.keys((await getSubmissionStores(page)).pending).length).toBe(0);
+  await expect(page.locator('#homeworkStatus')).toContainText('제출하기 버튼');
 });
 
 test('vocab grammar mock dashboard switches assignments by round query', async ({ page }) => {
