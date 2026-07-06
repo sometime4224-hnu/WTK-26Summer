@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>15과 문법 1 | V-게 하다 영향력 실험실</title>
+  <link rel="stylesheet" href="grammar1-ge-hada-influence-lab.css" />
+</head>
+<body>
+  <main class="lab-shell">
+    <nav class="lab-topbar" aria-label="15과 학습 이동">
+      <a href="index.html">15과 목록으로</a>
+      <a href="grammar1.html">문법 1로</a>
+      <span id="saveState" aria-live="polite">저장됨</span>
+    </nav>
+
+    <header class="lab-heading">
+      <p>15과 문법 1</p>
+      <h1><span>V-게 하다</span> 영향력 실험실</h1>
+    </header>
+
+    <section class="sentence-strip" aria-label="문장 흐름">
+      <div class="sentence-piece sentence-piece--causer" id="causerPiece">
+        <small>사동주</small>
+        <strong id="causerPhrase">선생님이</strong>
+      </div>
+      <div class="sentence-arrow" aria-hidden="true">→</div>
+      <div class="sentence-piece sentence-piece--causee" id="causeePiece">
+        <small>피사동주</small>
+        <strong id="causeePhrase">학생에게</strong>
+      </div>
+      <div class="sentence-arrow" aria-hidden="true">→</div>
+      <div class="sentence-piece sentence-piece--action" id="actionPiece">
+        <small>동사</small>
+        <strong id="baseAction">숙제를 하다</strong>
+      </div>
+      <div class="sentence-arrow" aria-hidden="true">→</div>
+      <div class="sentence-piece sentence-piece--result" id="resultPiece" data-testid="result-piece">
+        <small>결과</small>
+        <strong id="resultPhrase">숙제를 하게 했다</strong>
+      </div>
+    </section>
+
+    <section class="lab-layout">
+      <section class="stage-panel" aria-labelledby="stageTitle">
+        <div class="stage-head">
+          <div>
+            <p id="caseKind">지시/부담</p>
+            <h2 id="stageTitle">선생님이 학생에게 숙제를 하게 했어요.</h2>
+          </div>
+          <span class="motion-note">움직임 줄임</span>
+        </div>
+
+        <div class="stage-board" id="stageBoard" data-testid="stage-board">
+          <img class="scene-image" id="sceneImage" src="../assets/c15/grammar/images/ge-hada-influence-lab/bg-classroom.webp" alt="" aria-hidden="true" />
+          <div class="scene-cover" aria-hidden="true"></div>
+          <div class="path-line" id="pathLine" aria-hidden="true"></div>
+          <div class="wave-field" id="waveField" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div class="target-zone" id="targetZone" data-testid="action-zone">
+            <span id="targetLabel">숙제 자리</span>
+            <strong id="targetAction">숙제를 하다</strong>
+          </div>
+
+          <button class="actor-node actor-node--causer" id="causerNode" data-testid="causer-button" type="button" aria-label="선생님이 영향 주기">
+            <span class="actor-portrait" id="causerPortrait" aria-hidden="true">
+              <img class="actor-art" id="causerArt" src="../assets/c15/grammar/images/ge-hada-influence-lab/sprites/teacher.webp" alt="" />
+              <span class="actor-symbol" id="causerSymbol">선</span>
+            </span>
+            <strong id="causerLabel">선생님</strong>
+            <em id="causerToken">선생님이</em>
+          </button>
+
+          <button class="actor-node actor-node--causee" id="causeeNode" data-testid="causee-node" type="button" aria-label="학생 위치" tabindex="-1">
+            <span class="actor-portrait" id="causeePortrait" aria-hidden="true">
+              <img class="actor-art" id="causeeArt" src="../assets/c15/grammar/images/ge-hada-influence-lab/sprites/student.webp" alt="" />
+              <span class="actor-symbol" id="causeeSymbol">학</span>
+            </span>
+            <strong id="causeeLabel">학생</strong>
+            <em id="causeeToken">학생에게</em>
+          </button>
+        </div>
+
+        <div class="stage-controls" aria-label="영향 조작">
+          <button class="hold-button" id="holdButton" data-testid="hold-button" type="button">
+            <span>누르고 있기</span>
+          </button>
+          <button class="reset-button" id="retryButton" type="button">다시 하기</button>
+          <div class="power-meter" aria-hidden="true">
+            <span id="powerFill"></span>
+          </div>
+          <p id="feedbackText" role="status" aria-live="polite">사동주를 눌러 보세요.</p>
+        </div>
+      </section>
+
+      <aside class="scenario-panel" aria-labelledby="scenarioTitle">
+        <div class="scenario-head">
+          <h2 id="scenarioTitle">사례</h2>
+          <span id="progressText">0 / 6</span>
+        </div>
+        <div class="scenario-list" id="scenarioList"></div>
+
+        <details class="meaning-note">
+          <summary>뜻 보기</summary>
+          <p>사동주가 힘이나 영향을 줘요. 그래서 피사동주가 어떤 행동을 해요.</p>
+          <p><strong>V-게 하다</strong>는 그 결과를 말할 때 써요.</p>
+        </details>
+      </aside>
+    </section>
+
+    <section class="result-summary" aria-labelledby="summaryTitle">
+      <h2 id="summaryTitle">오늘의 정리</h2>
+      <p id="sentenceLine" data-testid="sentence-line">선생님이 학생에게 숙제를 하게 했어요.</p>
+      <div class="formula-row" aria-label="형태">
+        <span>동사</span>
+        <strong id="formulaBase">숙제를 하다</strong>
+        <span>→</span>
+        <strong id="formulaResult">숙제를 하게 하다</strong>
+      </div>
+    </section>
+  </main>
+
+  <script src="grammar1-ge-hada-influence-lab.js"></script>
+</body>
+</html>
