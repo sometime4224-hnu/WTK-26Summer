@@ -22,6 +22,20 @@ const ibtQuizPages = [
     assignmentId: 'vocab-grammar-mock-round2-ibt-v1',
     roundId: '2-ibt',
     roundLabel: '2회차 IBT 형식'
+  },
+  {
+    path: '/apps/vocab-grammar-mock/round3-ibt.html',
+    count: 25,
+    assignmentId: 'vocab-grammar-mock-round3-ibt-v1',
+    roundId: '3-ibt',
+    roundLabel: '3회차 IBT 형식'
+  },
+  {
+    path: '/apps/vocab-grammar-mock/round4-ibt.html',
+    count: 25,
+    assignmentId: 'vocab-grammar-mock-round4-ibt-v1',
+    roundId: '4-ibt',
+    roundLabel: '4회차 IBT 형식'
   }
 ];
 
@@ -222,6 +236,34 @@ async function installDashboardMock(page) {
           wrongQuestions: [],
           questionResults: []
         }
+      ],
+      'vocab-grammar-mock-round3-ibt-v1': [
+        {
+          id: 'round3-ibt-sub-1',
+          assignmentId: 'vocab-grammar-mock-round3-ibt-v1',
+          studentName: 'IBT최학생',
+          score: 24,
+          total: 25,
+          percent: 96,
+          clientSubmittedAt: '2026-06-29T01:50:00.000Z',
+          wrongQuestions: [7],
+          questionResults: [
+            { number: 7, area: '1부. 어휘', correctAnswer: '매력이 있다', isCorrect: false }
+          ]
+        }
+      ],
+      'vocab-grammar-mock-round4-ibt-v1': [
+        {
+          id: 'round4-ibt-sub-1',
+          assignmentId: 'vocab-grammar-mock-round4-ibt-v1',
+          studentName: 'IBT정학생',
+          score: 25,
+          total: 25,
+          percent: 100,
+          clientSubmittedAt: '2026-06-29T02:00:00.000Z',
+          wrongQuestions: [],
+          questionResults: []
+        }
       ]
     };
 
@@ -258,12 +300,16 @@ test.beforeEach(async ({ page }) => {
 test('vocab grammar mock landing exposes only the visible rounds', async ({ page }) => {
   await page.goto('/apps/vocab-grammar-mock/index.html', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.locator('.round-card')).toHaveCount(7);
-  await expect(page.locator('a.round-card')).toHaveCount(2);
+  await expect(page.locator('.round-card')).toHaveCount(9);
+  await expect(page.locator('a.round-card')).toHaveCount(4);
   await expect(page.locator('.round-card').nth(0)).toContainText('1회차 IBT 형식');
   await expect(page.locator('.round-card').nth(1)).toContainText('2회차 IBT 형식');
+  await expect(page.locator('.round-card').nth(2)).toContainText('3회차 IBT 형식');
+  await expect(page.locator('.round-card').nth(3)).toContainText('4회차 IBT 형식');
   await expect(page.locator('a.round-card[href="./round1-ibt.html"]')).toContainText('1회차 IBT 형식');
   await expect(page.locator('a.round-card[href="./round2-ibt.html"]')).toContainText('2회차 IBT 형식');
+  await expect(page.locator('a.round-card[href="./round3-ibt.html"]')).toContainText('3회차 IBT 형식');
+  await expect(page.locator('a.round-card[href="./round4-ibt.html"]')).toContainText('4회차 IBT 형식');
   await expect(page.locator('.round-card.is-disabled')).toHaveCount(5);
   await expect(page.locator('.round-card.is-disabled').first()).toContainText('현재 IBT 형식만 열려 있습니다.');
   await expect(page.locator('a.round-card[href="./round1.html"]')).toHaveCount(0);
@@ -277,11 +323,15 @@ test('vocab grammar mock landing exposes only the visible rounds', async ({ page
 
 test('vocab grammar mock round navigation disables unavailable rounds', async ({ page }) => {
   await page.goto('/apps/vocab-grammar-mock/round1.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#roundNav a')).toHaveCount(2);
+  await expect(page.locator('#roundNav a')).toHaveCount(4);
   await expect(page.locator('#roundNav a').nth(0)).toContainText('1회차 IBT 형식');
   await expect(page.locator('#roundNav a').nth(1)).toContainText('2회차 IBT 형식');
+  await expect(page.locator('#roundNav a').nth(2)).toContainText('3회차 IBT 형식');
+  await expect(page.locator('#roundNav a').nth(3)).toContainText('4회차 IBT 형식');
   await expect(page.locator('#roundNav a[href="./round1-ibt.html"]')).toContainText('1회차 IBT 형식');
   await expect(page.locator('#roundNav a[href="./round2-ibt.html"]')).toContainText('2회차 IBT 형식');
+  await expect(page.locator('#roundNav a[href="./round3-ibt.html"]')).toContainText('3회차 IBT 형식');
+  await expect(page.locator('#roundNav a[href="./round4-ibt.html"]')).toContainText('4회차 IBT 형식');
   await expect(page.locator('#roundNav a[href="./round1.html"]')).toHaveCount(0);
   await expect(page.locator('#roundNav a[href="./round2.html"]')).toHaveCount(0);
   await expect(page.locator('#roundNav .is-disabled')).toHaveCount(5);
@@ -431,39 +481,44 @@ test('vocab grammar mock autosaves progress and guides completed students to gra
 
 test('vocab grammar mock IBT pages show one question, navigate, and restore state', async ({ page }) => {
   await page.setViewportSize({ width: 1180, height: 820 });
-  await page.goto('/apps/vocab-grammar-mock/round2-ibt.html', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.locator('.ibt-exam-header')).toBeVisible();
-  await expect(page.locator('.ibt-title-box')).toContainText('TOPIK IBT');
-  await expect(page.locator('.ibt-question-card')).toHaveCount(25);
-  await expect(page.locator('body')).toHaveClass(/homework-locked/);
+  for (const quizPage of ibtQuizPages) {
+    await page.goto('/apps/vocab-grammar-mock/index.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => localStorage.removeItem('vocab-grammar-mock-homework-name'));
+    await page.goto(quizPage.path, { waitUntil: 'domcontentloaded' });
 
-  await enterStudentName(page, 'IBT 저장 학생');
-  await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveAttribute('data-question', '1');
-  await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveCount(1);
+    await expect(page.locator('.ibt-exam-header')).toBeVisible();
+    await expect(page.locator('.ibt-title-box')).toContainText('TOPIK IBT');
+    await expect(page.locator('.ibt-question-card')).toHaveCount(quizPage.count);
+    await expect(page.locator('body')).toHaveClass(/homework-locked/);
 
-  await page.locator('[data-ibt-action="next"]').click();
-  await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveAttribute('data-question', '2');
-  await page.locator('[data-ibt-action="prev"]').click();
-  await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveAttribute('data-question', '1');
+    await enterStudentName(page, 'IBT 저장 학생');
+    await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveAttribute('data-question', '1');
+    await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveCount(1);
 
-  await page.locator('[data-ibt-action="open-questions"]').click();
-  await expect(page.locator('#ibtQuestionModal')).toBeVisible();
-  await page.locator('#ibtQuestionModal [data-question-jump="10"]').click();
-  await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveAttribute('data-question', '10');
+    await page.locator('[data-ibt-action="next"]').click();
+    await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveAttribute('data-question', '2');
+    await page.locator('[data-ibt-action="prev"]').click();
+    await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveAttribute('data-question', '1');
 
-  const answer = await page.evaluate(() => {
-    const card = document.querySelector('.ibt-question-card:not([hidden])');
-    const correct = card.querySelector('.option[data-correct="true"]');
-    const input = correct.querySelector('.option-input');
-    input.checked = true;
-    input.dispatchEvent(new Event('change', { bubbles: true }));
-    return { number: card.dataset.question, original: correct.dataset.choice };
-  });
+    await page.locator('[data-ibt-action="open-questions"]').click();
+    await expect(page.locator('#ibtQuestionModal')).toBeVisible();
+    await page.locator('#ibtQuestionModal [data-question-jump="10"]').click();
+    await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveAttribute('data-question', '10');
 
-  await page.reload({ waitUntil: 'domcontentloaded' });
-  await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveAttribute('data-question', answer.number);
-  await expect(page.locator(`#q${answer.number}-${answer.original}`)).toBeChecked();
+    const answer = await page.evaluate(() => {
+      const card = document.querySelector('.ibt-question-card:not([hidden])');
+      const correct = card.querySelector('.option[data-correct="true"]');
+      const input = correct.querySelector('.option-input');
+      input.checked = true;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      return { number: card.dataset.question, original: correct.dataset.choice };
+    });
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('.ibt-question-card:not([hidden])')).toHaveAttribute('data-question', answer.number);
+    await expect(page.locator(`#q${answer.number}-${answer.original}`)).toBeChecked();
+  }
 });
 
 test('vocab grammar mock IBT identity waits for the next button after typing a name', async ({ page }) => {
@@ -485,41 +540,47 @@ test('vocab grammar mock IBT identity waits for the next button after typing a n
 
 test('vocab grammar mock IBT whole-question and submit tables mark unanswered questions', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/apps/vocab-grammar-mock/round1-ibt.html', { waitUntil: 'domcontentloaded' });
-  await enterStudentName(page, 'IBT 표 학생');
 
-  await page.locator('[data-ibt-action="open-submit"]').click();
-  await expect(page.locator('#ibtSubmitModal')).toBeVisible();
-  await expect(page.locator('#ibtSubmitModal .ibt-answer-cell.is-missing')).toHaveCount(26);
-  await expect(page.locator('#ibtSubmitModal [data-action="grade"]')).toBeDisabled();
-  await expectNoHorizontalOverflow(page);
+  for (const quizPage of ibtQuizPages) {
+    await page.goto(quizPage.path, { waitUntil: 'domcontentloaded' });
+    await enterStudentName(page, 'IBT 표 학생');
+
+    await page.locator('[data-ibt-action="open-submit"]').click();
+    await expect(page.locator('#ibtSubmitModal')).toBeVisible();
+    await expect(page.locator('#ibtSubmitModal .ibt-answer-cell.is-missing')).toHaveCount(quizPage.count);
+    await expect(page.locator('#ibtSubmitModal [data-action="grade"]')).toBeDisabled();
+    await expectNoHorizontalOverflow(page);
+  }
 });
 
 test('vocab grammar mock IBT shows a floating submit prompt after every answer', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/apps/vocab-grammar-mock/round1-ibt.html', { waitUntil: 'domcontentloaded' });
-  await enterStudentName(page, '제출 유도 학생');
 
-  const floatingSubmit = page.locator('#floatingSubmitButton');
-  await expect(floatingSubmit).toBeHidden();
+  for (const quizPage of ibtQuizPages) {
+    await page.goto(quizPage.path, { waitUntil: 'domcontentloaded' });
+    await enterStudentName(page, '제출 유도 학생');
 
-  await answerAllCorrect(page);
-  await expect(floatingSubmit).toBeVisible();
-  await expect(floatingSubmit).toContainText('제출하기');
+    const floatingSubmit = page.locator('#floatingSubmitButton');
+    await expect(floatingSubmit).toBeHidden();
 
-  const box = await floatingSubmit.boundingBox();
-  expect(box).not.toBeNull();
-  expect(box.x).toBeGreaterThanOrEqual(0);
-  expect(box.y).toBeGreaterThanOrEqual(0);
-  expect(box.x + box.width).toBeLessThanOrEqual(390);
-  expect(box.y + box.height).toBeLessThanOrEqual(844);
+    await answerAllCorrect(page);
+    await expect(floatingSubmit).toBeVisible();
+    await expect(floatingSubmit).toContainText('제출하기');
 
-  await floatingSubmit.click();
-  await expect(page.locator('#ibtSubmitModal')).toBeVisible();
-  await expect(floatingSubmit).toBeHidden();
+    const box = await floatingSubmit.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(390);
+    expect(box.y + box.height).toBeLessThanOrEqual(844);
 
-  await page.locator('#ibtSubmitModal .summary-modal__close').click();
-  await expect(floatingSubmit).toBeVisible();
+    await floatingSubmit.click();
+    await expect(page.locator('#ibtSubmitModal')).toBeVisible();
+    await expect(floatingSubmit).toBeHidden();
+
+    await page.locator('#ibtSubmitModal .summary-modal__close').click();
+    await expect(floatingSubmit).toBeVisible();
+  }
 });
 
 test('vocab grammar mock IBT submissions use separate assignment ids', async ({ page }) => {
@@ -708,8 +769,31 @@ test('vocab grammar mock dashboard switches assignments by round query', async (
   await expect(page.locator('.score-bar').first()).toContainText('IBT김학생');
   await expect(page.locator('.weak-item').first()).toContainText('Q3');
 
+  await page.goto('/apps/vocab-grammar-mock/results.html?round=3-ibt', { waitUntil: 'load' });
+  await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 3회차 IBT 형식 제출 현황');
+  await page.locator('#signInButton').click();
+  await expect(page.locator('.summary-card').first()).toContainText('1');
+  await expect(page.locator('.score-bar').first()).toContainText('IBT최학생');
+  await expect(page.locator('.weak-item').first()).toContainText('Q7');
+
+  await page.goto('/apps/vocab-grammar-mock/results.html?round=4-ibt', { waitUntil: 'load' });
+  await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 4회차 IBT 형식 제출 현황');
+  await page.locator('#signInButton').click();
+  await expect(page.locator('.summary-card').first()).toContainText('1');
+  await expect(page.locator('.score-bar').first()).toContainText('IBT정학생');
+
   await page.goto('/teacher-dashboard/index.html?assignment=vocab-grammar-mock-round1-ibt-v1', { waitUntil: 'load' });
   await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 1회차 IBT 형식 제출 현황');
   await page.locator('#signInButton').click();
   await expect(page.locator('.score-bar').first()).toContainText('IBT김학생');
+
+  await page.goto('/teacher-dashboard/index.html?assignment=vocab-grammar-mock-round3-ibt-v1', { waitUntil: 'load' });
+  await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 3회차 IBT 형식 제출 현황');
+  await page.locator('#signInButton').click();
+  await expect(page.locator('.score-bar').first()).toContainText('IBT최학생');
+
+  await page.goto('/teacher-dashboard/index.html?assignment=vocab-grammar-mock-round4-ibt-v1', { waitUntil: 'load' });
+  await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 4회차 IBT 형식 제출 현황');
+  await page.locator('#signInButton').click();
+  await expect(page.locator('.score-bar').first()).toContainText('IBT정학생');
 });

@@ -1,6 +1,8 @@
 const ROUND_LINKS = [
     { id: "1-ibt", href: "./round1-ibt.html", label: "1회차 IBT 형식", enabled: true, sourceRoundId: "1", experimental: true },
     { id: "2-ibt", href: "./round2-ibt.html", label: "2회차 IBT 형식", enabled: true, sourceRoundId: "2", experimental: true },
+    { id: "3-ibt", href: "./round3-ibt.html", label: "3회차 IBT 형식", enabled: true, sourceRoundId: "3", experimental: true },
+    { id: "4-ibt", href: "./round4-ibt.html", label: "4회차 IBT 형식", enabled: true, sourceRoundId: "4", experimental: true },
     { id: "1", href: "./round1.html", label: "1회차", enabled: false },
     { id: "2", href: "./round2.html", label: "2회차", enabled: false },
     { id: "3", href: "./round3.html", label: "3회차", enabled: false },

@@ -262,11 +262,11 @@ test.describe('homework dashboard', () => {
     await page.goto('/teacher-dashboard/index.html', { waitUntil: 'load' });
 
     await expect(page.locator('h1')).toHaveText('제출 통계');
-    await expect(page.locator('[data-assignment-card]')).toHaveCount(10);
+    await expect(page.locator('[data-assignment-card]')).toHaveCount(12);
     await expect(page.locator('[data-assignment-card="c12-review-quiz-v1"]')).toContainText('12과 어휘·문법 복습');
     await expect(page.locator('[data-assignment-card="review4-listening-v1"]')).toContainText('복습 4 듣기');
     await expect(page.locator('[data-assignment-card="review4-reading-writing-v1"]')).toContainText('복습 4 읽기와 쓰기');
-    await expect(page.locator('[data-assignment-anonymous-link]')).toHaveCount(10);
+    await expect(page.locator('[data-assignment-anonymous-link]')).toHaveCount(12);
     await expect(page.locator('[data-assignment-anonymous-link="c12-review-quiz-v1"]')).toHaveText('익명 현황');
     await expect(page.locator('[data-assignment-anonymous-link="review4-listening-v1"]')).toHaveText('익명 현황');
     await expect(page.locator('[data-assignment-anonymous-link="vocab-grammar-mock-round1-v1"]')).toHaveText('익명 현황');
@@ -347,6 +347,6 @@ test.describe('homework dashboard', () => {
 
     await expect(page.locator('h1')).toHaveText('제출 통계');
     await expect(page.locator('.dashboard-alert')).toContainText('등록되지 않은 통계 항목입니다');
-    await expect(page.locator('[data-assignment-card]')).toHaveCount(10);
+    await expect(page.locator('[data-assignment-card]')).toHaveCount(12);
   });
 });
