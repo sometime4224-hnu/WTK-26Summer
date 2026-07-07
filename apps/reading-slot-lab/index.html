@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+    <title>빈칸 성분 연습</title>
+    <link rel="stylesheet" href="../../shared/design-tokens.css" />
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="reading-bg">
+    <main class="app-shell">
+        <header class="app-head">
+            <div>
+                <p class="eyebrow">10과-13과 읽기</p>
+                <h1>빈칸 성분 연습</h1>
+            </div>
+            <div class="head-status" aria-live="polite">
+                <span id="scoreText">0 / 20</span>
+                <span id="saveStatus">자동 저장</span>
+            </div>
+        </header>
+
+        <section class="toolbar" aria-label="과 선택">
+            <div class="lesson-filters" id="lessonFilters"></div>
+            <div class="progress-box">
+                <span id="itemCountText">전체 20문항</span>
+                <div class="progress-track" aria-hidden="true">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="work-area" aria-label="빈칸 연습">
+            <nav class="question-rail" aria-label="문항 이동">
+                <div id="questionRail" class="question-rail__grid"></div>
+            </nav>
+
+            <article class="practice-panel" id="practicePanel">
+                <div class="practice-panel__top">
+                    <div>
+                        <p class="source-label" id="sourceLabel"></p>
+                        <h2 id="questionTitle"></h2>
+                    </div>
+                    <span id="questionProgress" class="question-progress"></span>
+                </div>
+
+                <div class="passage-box" id="passageBox"></div>
+                <div class="hint-area" id="hintArea" aria-label="힌트"></div>
+
+                <section class="choice-section" aria-label="성분 선택">
+                    <h3>빈칸 자리는 무엇입니까?</h3>
+                    <div id="componentChoices" class="component-grid"></div>
+                </section>
+
+                <section class="answer-section" aria-label="답 쓰기">
+                    <label for="draftInput">들어갈 말을 써 보세요.</label>
+                    <input id="draftInput" type="text" autocomplete="off" />
+                </section>
+
+                <div class="action-row">
+                    <button id="prevButton" class="btn secondary" type="button">이전</button>
+                    <button id="checkButton" class="btn primary" type="button">확인</button>
+                    <button id="nextButton" class="btn secondary" type="button">다음</button>
+                </div>
+
+                <div id="feedbackPanel" class="feedback-panel" aria-live="polite" hidden></div>
+            </article>
+
+            <aside class="result-panel" aria-label="결과">
+                <h2>결과</h2>
+                <div id="resultSummary" class="result-summary"></div>
+                <div id="weakSummary" class="weak-summary"></div>
+                <button id="resetButton" class="reset-button" type="button">처음부터</button>
+            </aside>
+        </section>
+    </main>
+
+    <script src="./data.js"></script>
+    <script defer src="./app.js"></script>
+</body>
+</html>
