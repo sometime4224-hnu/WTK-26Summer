@@ -4,32 +4,675 @@
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-NB76SV96');</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>발표 순서 뽑기</title>
-  <meta name="description" content="학생 명단을 섞는 모션과 최종 발표 순서를 한 화면에서 보여 주는 페이지입니다.">
-<style>
-    :root{--bg1:#f9f4ec;--bg2:#e8f4ff;--panel:rgba(255,255,255,.88);--panel2:rgba(255,255,255,.95);--line:rgba(148,163,184,.2);--ink:#1b2430;--muted:#66768c;--accent:#ea580c;--blue:#2563eb;--shadow:0 24px 56px rgba(15,23,42,.12)}
-    *{box-sizing:border-box}html,body{height:100%}body{margin:0;font-family:"Noto Sans KR",sans-serif;color:var(--ink);background:radial-gradient(circle at 8% 18%,rgba(249,115,22,.18),transparent 24%),radial-gradient(circle at 88% 16%,rgba(59,130,246,.18),transparent 26%),linear-gradient(180deg,var(--bg1),var(--bg2))}
-    .shell{width:min(1200px,calc(100% - 24px));margin:12px auto}.app{min-height:calc(100vh - 24px);padding:14px;border-radius:28px;background:var(--panel);border:1px solid rgba(255,255,255,.78);box-shadow:var(--shadow);backdrop-filter:blur(18px)}
-    .toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px;border-radius:24px;background:rgba(255,255,255,.76)}.title h1{margin:0;font-size:clamp(1.9rem,4vw,3rem);line-height:1}.meta,.actions{display:flex;gap:8px;flex-wrap:wrap}.meta{margin-top:8px}
-    .pill,.status,.count{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:999px;font-size:.85rem;font-weight:900;white-space:nowrap}.pill{background:rgba(255,255,255,.9);border:1px solid var(--line);color:var(--muted)}.pill strong{color:var(--ink)}.status{min-width:96px;background:rgba(15,118,110,.1);color:#0f766e;text-transform:uppercase}.status.mix{background:rgba(249,115,22,.14);color:#c2410c}.status.done{background:rgba(37,99,235,.12);color:#1d4ed8}.count{background:rgba(37,99,235,.12);color:#1d4ed8}
-    .btn{border:none;border-radius:999px;padding:13px 18px;font:inherit;font-weight:800;cursor:pointer;transition:transform .18s ease,opacity .18s ease}.btn:hover:not(:disabled){transform:translateY(-1px)}.btn:disabled{opacity:.55;cursor:not-allowed}.btn-primary{color:#fff;background:linear-gradient(135deg,#f97316,#ea580c)}.btn-secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn-danger{background:rgba(239,68,68,.12);color:#b91c1c}
-    .grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:14px;min-height:calc(100vh - 146px);margin-top:14px}.panel{display:flex;flex-direction:column;min-height:0;padding:18px;border-radius:26px;background:var(--panel2);box-shadow:0 16px 32px rgba(15,23,42,.06)}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.head h2{margin:0;font-size:1.15rem}
-    .progress{height:10px;border-radius:999px;overflow:hidden;background:rgba(209,213,219,.46)}.progress span{display:block;width:100%;height:100%;transform-origin:left center;transform:scaleX(0);background:linear-gradient(90deg,#fb923c,#38bdf8);transition:transform .2s ease}
-    .board{position:relative;flex:1;min-height:340px;margin-top:14px;border-radius:24px;overflow:hidden;border:1px solid var(--line);background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.96),rgba(239,246,255,.92) 44%,rgba(224,242,254,.86))}.zone{position:absolute;left:16px;top:16px;z-index:2;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.82);color:var(--muted);font-size:.76rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
-    .chip{position:absolute;left:50%;top:50%;display:inline-flex;align-items:center;justify-content:center;min-width:128px;max-width:min(40vw,220px);padding:12px 16px;border-radius:999px;white-space:nowrap;font-size:.94rem;font-weight:800;border:1px solid rgba(255,255,255,.94);box-shadow:0 18px 26px rgba(30,41,59,.12);transform:translate(-50%,-50%);transition:left .46s cubic-bezier(.2,.82,.2,1),top .46s cubic-bezier(.2,.82,.2,1),transform .46s cubic-bezier(.2,.82,.2,1),opacity .22s ease}
-    .chip.compact{justify-content:flex-start;gap:8px;min-width:0;max-width:none;padding:8px 10px;border-radius:16px;font-size:.78rem;white-space:normal;line-height:1.15}
-    .chip-order{display:inline-flex;align-items:center;justify-content:center;flex:0 0 24px;width:24px;height:24px;border-radius:999px;background:rgba(255,255,255,.82);font-size:.72rem;font-weight:900}
-    .chip-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .chip[data-tone="0"]{background:linear-gradient(135deg,rgba(255,247,237,.98),rgba(254,215,170,.88));color:#9a3412}.chip[data-tone="1"]{background:linear-gradient(135deg,rgba(240,249,255,.98),rgba(191,219,254,.88));color:#1d4ed8}.chip[data-tone="2"]{background:linear-gradient(135deg,rgba(240,253,250,.98),rgba(153,246,228,.88));color:#0f766e}.chip[data-tone="3"]{background:linear-gradient(135deg,rgba(253,242,248,.98),rgba(251,207,232,.88));color:#be185d}
-    .spot{display:grid;gap:8px;margin-top:14px;padding:16px 18px;border-radius:20px;background:rgba(255,255,255,.78);border:1px solid var(--line)}.spot em{font-style:normal;color:var(--muted);font-size:.76rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.spot strong{font-size:1.18rem}.spot span{color:var(--muted);line-height:1.55}
-    .empty{display:flex;align-items:center;justify-content:center;flex:1;min-height:220px;border-radius:22px;border:1px dashed rgba(148,163,184,.34);color:var(--muted);text-align:center;line-height:1.7}.empty.hide{display:none}.results{flex:1;min-height:0;margin:0;padding:0;list-style:none;display:grid;gap:10px;overflow:auto;padding-right:4px}
-    .result{display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;padding:12px 14px;border-radius:18px;background:#fff;border:1px solid rgba(148,163,184,.14);opacity:0;transform:translateY(14px);animation:rise .5s cubic-bezier(.2,.82,.2,1) forwards}.num{display:inline-flex;align-items:center;justify-content:center;height:40px;border-radius:14px;background:linear-gradient(135deg,rgba(249,115,22,.14),rgba(37,99,235,.14));color:#9a3412;font-size:.92rem;font-weight:900}.name{font-weight:800;line-height:1.45;word-break:keep-all}
-    .modal{position:fixed;inset:0;display:none;place-items:center;padding:18px;background:rgba(15,23,42,.38);backdrop-filter:blur(8px);z-index:20}.modal.open{display:grid}.dialog{width:min(720px,100%);max-height:min(86vh,920px);display:flex;flex-direction:column;overflow:hidden;border-radius:28px;background:rgba(255,255,255,.98);box-shadow:0 28px 64px rgba(15,23,42,.2)}
-    .mhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:20px 22px 14px;border-bottom:1px solid rgba(148,163,184,.14)}.mhead h2{margin:0;font-size:1.3rem}.mhead p{margin:6px 0 0;color:var(--muted);line-height:1.55}.mmeta{display:flex;gap:8px;flex-wrap:wrap;padding:14px 22px 0}.mbody{overflow:auto;padding:14px 22px 22px}
-    .roster{margin:0;padding:0;list-style:none;display:grid;gap:10px}.row{display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:rgba(248,250,252,.95);border:1px solid rgba(148,163,184,.16)}.row.off{background:rgba(254,242,242,.96)}.rnum{display:inline-flex;align-items:center;justify-content:center;height:38px;border-radius:14px;background:rgba(15,118,110,.08);color:#0f766e;font-size:.9rem;font-weight:900}.rinfo{display:grid;gap:6px}.badge{display:inline-flex;width:fit-content;padding:5px 10px;border-radius:999px;background:rgba(239,68,68,.12);color:#b91c1c;font-size:.74rem;font-weight:800}.toggle{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:.9rem;font-weight:700;cursor:pointer}.toggle input{width:18px;height:18px;margin:0;accent-color:#dc2626;cursor:pointer}
-    @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-    @media (max-width:980px){.app{min-height:auto}.grid{grid-template-columns:1fr;min-height:auto}.board{min-height:320px}.panel:last-child{min-height:420px}}
-    @media (max-width:720px){.shell{width:min(100%,calc(100% - 16px));margin:8px auto}.app{min-height:calc(100vh - 16px);padding:12px;border-radius:22px}.toolbar{grid-template-columns:1fr}.actions .btn{flex:1 1 calc(50% - 4px)}.chip{min-width:104px;max-width:176px;padding:10px 12px;font-size:.82rem}.chip.compact{padding:8px 9px;font-size:.72rem}.chip-order{flex-basis:22px;width:22px;height:22px;font-size:.68rem}.result,.row{grid-template-columns:44px minmax(0,1fr)}.toggle{grid-column:2}}
+  <title>7반 발표 순서 뽑기</title>
+  <meta name="description" content="7반 학생 명단을 섞고 최종 발표 순서를 번호대로 보여 주는 페이지입니다.">
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --panel-soft: #f8fafc;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --blue: #2563eb;
+      --blue-soft: #eaf1ff;
+      --green: #0f766e;
+      --orange: #ea580c;
+      --red: #b91c1c;
+      --shadow: 0 18px 42px rgba(15, 23, 42, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .shell {
+      width: min(1240px, calc(100% - 24px));
+      margin: 12px auto;
+    }
+
+    .app {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 12px;
+      min-height: calc(100dvh - 24px);
+      padding: 12px;
+      border: 1px solid rgba(217, 224, 234, 0.9);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 2.15rem;
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .meta,
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .meta {
+      margin-top: 8px;
+    }
+
+    .pill,
+    .status,
+    .count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+      color: var(--muted);
+    }
+
+    .pill strong {
+      margin-left: 4px;
+      color: var(--ink);
+    }
+
+    .status {
+      min-width: 86px;
+      background: #e8f6f3;
+      color: var(--green);
+    }
+
+    .status.mix {
+      background: #fff1e7;
+      color: #c2410c;
+    }
+
+    .status.done {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .count {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .btn {
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 8px;
+      font-weight: 900;
+      transition: transform 120ms ease, opacity 120ms ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .btn-primary {
+      background: var(--orange);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: var(--red);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.16fr) minmax(300px, 0.84fr);
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.96);
+    }
+
+    .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 38px;
+      margin-bottom: 8px;
+    }
+
+    .progress {
+      flex: 0 0 auto;
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e5e7eb;
+    }
+
+    .progress span {
+      display: block;
+      width: 100%;
+      height: 100%;
+      transform: scaleX(0);
+      transform-origin: left center;
+      background: linear-gradient(90deg, #fb923c, #2563eb);
+      transition: transform 180ms ease;
+    }
+
+    .board {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 310px;
+      margin-top: 10px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 247, 237, 0.92), transparent 46%),
+        linear-gradient(225deg, rgba(234, 241, 255, 0.92), transparent 48%),
+        #f8fbff;
+    }
+
+    .zone {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 5;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .chip {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 126px;
+      max-width: min(42vw, 230px);
+      min-height: 42px;
+      padding: 10px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.94);
+      border-radius: 999px;
+      box-shadow: 0 14px 24px rgba(30, 41, 59, 0.12);
+      font-size: 0.94rem;
+      font-weight: 900;
+      line-height: 1.1;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      transition:
+        left 420ms cubic-bezier(0.2, 0.82, 0.2, 1),
+        top 420ms cubic-bezier(0.2, 0.82, 0.2, 1),
+        transform 420ms cubic-bezier(0.2, 0.82, 0.2, 1),
+        opacity 160ms ease;
+    }
+
+    .chip.compact {
+      justify-content: flex-start;
+      gap: var(--chip-gap, 6px);
+      min-width: 0;
+      min-height: var(--chip-height, 32px);
+      height: var(--chip-height, 32px);
+      max-width: none;
+      padding: 0 var(--chip-pad, 8px);
+      border-radius: 8px;
+      font-size: var(--chip-font, 12px);
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .chip.no-motion {
+      transition: none;
+    }
+
+    .chip-order {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 var(--order-size, 22px);
+      width: var(--order-size, 22px);
+      height: var(--order-size, 22px);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.84);
+      font-size: var(--order-font, 0.72rem);
+      font-weight: 900;
+    }
+
+    .chip-label {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .chip[data-tone="0"] {
+      background: linear-gradient(135deg, #fff7ed, #fed7aa);
+      color: #9a3412;
+    }
+
+    .chip[data-tone="1"] {
+      background: linear-gradient(135deg, #eff6ff, #bfdbfe);
+      color: #1d4ed8;
+    }
+
+    .chip[data-tone="2"] {
+      background: linear-gradient(135deg, #f0fdfa, #99f6e4);
+      color: #0f766e;
+    }
+
+    .chip[data-tone="3"] {
+      background: linear-gradient(135deg, #fdf2f8, #fbcfe8);
+      color: #be185d;
+    }
+
+    .spot {
+      display: grid;
+      gap: 6px;
+      flex: 0 0 auto;
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+    }
+
+    .spot em {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-style: normal;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .spot strong {
+      font-size: 1.08rem;
+      line-height: 1.25;
+      word-break: keep-all;
+    }
+
+    .spot span {
+      color: var(--muted);
+      line-height: 1.42;
+      word-break: keep-all;
+    }
+
+    .empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 auto;
+      min-height: 180px;
+      padding: 16px;
+      border: 1px dashed #b7c3d5;
+      border-radius: 8px;
+      color: var(--muted);
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .empty.hide {
+      display: none;
+    }
+
+    .results {
+      display: grid;
+      gap: 8px;
+      flex: 1 1 auto;
+      min-height: 0;
+      margin: 0;
+      padding: 0 4px 0 0;
+      overflow: auto;
+      list-style: none;
+    }
+
+    .result {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      min-height: 48px;
+      padding: 8px 10px;
+      border: 1px solid #e8edf4;
+      border-radius: 8px;
+      background: #fff;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: rise 420ms cubic-bezier(0.2, 0.82, 0.2, 1) forwards;
+    }
+
+    .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 34px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #fff1e7, #eaf1ff);
+      color: #9a3412;
+      font-size: 0.9rem;
+      font-weight: 900;
+    }
+
+    .name {
+      min-width: 0;
+      font-weight: 900;
+      line-height: 1.35;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(15, 23, 42, 0.42);
+    }
+
+    .modal.open {
+      display: grid;
+    }
+
+    .dialog {
+      display: flex;
+      flex-direction: column;
+      width: min(720px, 100%);
+      max-height: min(86vh, 920px);
+      overflow: hidden;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 28px 64px rgba(15, 23, 42, 0.22);
+    }
+
+    .mhead {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mhead p {
+      margin-top: 6px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .mmeta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 16px 0;
+    }
+
+    .mbody {
+      overflow: auto;
+      padding: 12px 16px 16px;
+    }
+
+    .roster {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 52px;
+      padding: 8px 10px;
+      border: 1px solid #e8edf4;
+      border-radius: 8px;
+      background: var(--panel-soft);
+    }
+
+    .row.off {
+      background: #fff1f2;
+    }
+
+    .rnum {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 34px;
+      border-radius: 8px;
+      background: #e8f6f3;
+      color: var(--green);
+      font-size: 0.88rem;
+      font-weight: 900;
+    }
+
+    .rinfo {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      width: fit-content;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: #fee2e2;
+      color: var(--red);
+      font-size: 0.74rem;
+      font-weight: 900;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .toggle input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: #dc2626;
+      cursor: pointer;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-height: 760px) and (min-width: 981px) {
+      .shell {
+        margin: 8px auto;
+      }
+
+      .app {
+        min-height: calc(100dvh - 16px);
+        padding: 10px;
+      }
+
+      .toolbar,
+      .panel {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 1.85rem;
+      }
+
+      .btn {
+        min-height: 38px;
+      }
+
+      .board {
+        min-height: 280px;
+      }
+
+      .spot {
+        padding: 10px;
+      }
+
+      .result {
+        min-height: 43px;
+        padding: 6px 8px;
+      }
+    }
+
+    @media (max-width: 980px) {
+      body {
+        overflow: auto;
+      }
+
+      .app {
+        min-height: auto;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .board {
+        min-height: 320px;
+      }
+
+      .panel:last-child {
+        min-height: 420px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(100%, calc(100% - 16px));
+        margin: 8px auto;
+      }
+
+      .app {
+        padding: 10px;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 1.65rem;
+      }
+
+      .actions .btn {
+        flex: 1 1 calc(50% - 4px);
+      }
+
+      .chip {
+        min-width: 104px;
+        max-width: 184px;
+        min-height: 38px;
+        padding: 8px 10px;
+        font-size: 0.82rem;
+      }
+
+      .result,
+      .row {
+        grid-template-columns: 42px minmax(0, 1fr);
+      }
+
+      .toggle {
+        grid-column: 2;
+      }
+    }
   </style>
 </head>
 <body>
@@ -37,10 +680,10 @@
   <main class="shell">
     <section class="app">
       <div class="toolbar">
-        <div class="title">
-          <h1>발표 순서 뽑기</h1>
+        <div>
+          <h1>7반 발표 순서 뽑기</h1>
           <div class="meta">
-            <span class="status" id="status-pill">Ready</span>
+            <span class="status" id="status-pill">준비</span>
             <span class="pill">참여 <strong id="active-count">25</strong>명</span>
             <span class="pill">제외 <strong id="excluded-count">0</strong>명</span>
           </div>
@@ -54,13 +697,15 @@
 
       <div class="grid">
         <article class="panel">
-          <div class="head"><h2>섞는 화면</h2></div>
+          <div class="head">
+            <h2>섞는 화면</h2>
+          </div>
           <div class="progress"><span id="progress-fill"></span></div>
-          <div class="board" data-mix-board><span class="zone">shuffle zone</span></div>
+          <div class="board" data-mix-board><span class="zone">섞는 영역</span></div>
           <div class="spot" aria-live="polite">
             <em>현재 안내</em>
             <strong id="spotlight-name">버튼을 눌러 발표 순서를 뽑아 주세요.</strong>
-            <span id="spotlight-note">왼쪽 화면에서 이름이 섞이고, 오른쪽에 최종 발표 순서가 바로 정리됩니다.</span>
+            <span id="spotlight-note">이름을 섞은 뒤 최종 발표 순서가 번호대로 정리됩니다.</span>
           </div>
         </article>
 
@@ -69,7 +714,7 @@
             <h2>최종 결과</h2>
             <div class="count"><span id="result-count">0</span>&nbsp;/&nbsp;<span id="result-total">25</span></div>
           </div>
-          <div class="empty" id="results-empty">결과가 아직 없습니다.<br>순서 뽑기를 시작하면 이 자리에서 바로 확인할 수 있습니다.</div>
+          <div class="empty" id="results-empty">결과가 아직 없습니다.<br>순서 뽑기를 시작하면 바로 확인할 수 있습니다.</div>
           <ol class="results" id="result-list" data-result-list aria-live="polite"></ol>
         </article>
       </div>
@@ -99,8 +744,38 @@
   <script>
     (() => {
       'use strict';
-      const students = ['짠 하 로안 안','즈엉 반 바오','부 딩 프엉','짠 티 김 응옥','응웬 하 미','응웬 반 람','부 티 민 프엉','짠 투안 아잉','반 티 하이 옌','딘 녓 주이','부이 바오 옌','응웬 반 퐁','르엉 득 뚜','팜 득 러이','라님 알 하마드','간바트 운졸','호앙 후이 리에우','레티느','부 후옌 린','응웬 티 김 풍','응오 티 번 니','황 티 탄 쭉','보 후인 안','도득흥','원 티 응옥 린'];
-      const mixDurationMs = 3800, mixFrameMs = 160, mixVisibleChipCount = 12, chipPoolCount = students.length;
+
+      const students = [
+        '짠 하 로안 안',
+        '즈엉 반 바오',
+        '부 딩 프엉',
+        '짠 티 김 응옥',
+        '응웬 하 미',
+        '응웬 반 람',
+        '부 티 민 프엉',
+        '짠 투안 아잉',
+        '반 티 하이 옌',
+        '딘 녓 주이',
+        '부이 바오 옌',
+        '응웬 반 퐁',
+        '르엉 득 뚜',
+        '팜 득 러이',
+        '라님 알 하마드',
+        '간바트 운졸',
+        '호앙 후이 리에우',
+        '레티느',
+        '부 후옌 린',
+        '응웬 티 김 풍',
+        '응오 티 번 니',
+        '황 티 탄 쭉',
+        '보 후인 안',
+        '도득흥',
+        '원 티 응옥 린'
+      ];
+
+      const mixDurationMs = 3200;
+      const mixFrameMs = 150;
+      const mixVisibleChipCount = 12;
       const board = document.querySelector('[data-mix-board]');
       const progressFill = document.getElementById('progress-fill');
       const startButton = document.querySelector('[data-action="start-draw"]');
@@ -121,152 +796,499 @@
       const spotlightName = document.getElementById('spotlight-name');
       const spotlightNote = document.getElementById('spotlight-note');
       const modal = document.getElementById('exclusion-modal');
-      let mixIntervalId = null, copyResetId = null, hasDrawnResult = false, finalOrder = [], lastFocusedElement = null;
+
       const excludedStudents = new Set();
-      const chips = Array.from({ length: chipPoolCount }, (_, index) => {
+      const chips = Array.from({ length: students.length }, (value, index) => {
         const chip = document.createElement('div');
         chip.className = 'chip';
         chip.dataset.tone = String(index % 4);
-        chip.style.opacity = '0';
-        board.appendChild(chip);
+        board.append(chip);
         return chip;
       });
 
-      const escapeHtml = (value) => value.replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
-      const getActiveStudents = () => students.filter((name) => !excludedStudents.has(name));
-      const shuffle = (list) => { const cloned = [...list]; for (let index = cloned.length - 1; index > 0; index -= 1) { const randomIndex = Math.floor(Math.random() * (index + 1)); [cloned[index], cloned[randomIndex]] = [cloned[randomIndex], cloned[index]]; } return cloned; };
-      const setProgress = (value) => { progressFill.style.transform = 'scaleX(' + Math.max(0, Math.min(1, value)) + ')'; };
-      const getFinalColumns = () => {
-        const width = board.clientWidth || window.innerWidth;
-        if (width <= 320) return 2;
-        if (width <= 620) return 3;
-        return width <= 980 ? 3 : 4;
-      };
-      const getFinalVisibleCount = (order) => order.length;
-      function setStatus(mode) { statusPill.classList.remove('mix', 'done'); if (mode === 'mixing') { statusPill.textContent = 'Mixing'; statusPill.classList.add('mix'); return; } if (mode === 'complete') { statusPill.textContent = 'Done'; statusPill.classList.add('done'); return; } statusPill.textContent = 'Ready'; }
-      function clearBoard() { board.style.height = ''; chips.forEach((chip) => { chip.innerHTML = ''; chip.classList.remove('compact'); chip.style.width = ''; chip.style.opacity = '0'; }); }
-      function placeChip(chip, html, left, top, rotate, scale, zIndex, compact = false, width = '') { chip.innerHTML = html; chip.classList.toggle('compact', compact); chip.style.width = width; chip.style.left = left; chip.style.top = top; chip.style.opacity = '1'; chip.style.zIndex = String(zIndex); chip.style.transform = 'translate(-50%, -50%) rotate(' + rotate + 'deg) scale(' + scale + ')'; }
-      function renderMixFrame(source) {
-        const visibleNames = shuffle(source).slice(0, mixVisibleChipCount);
-        board.style.height = '';
-        if (!visibleNames.length) { clearBoard(); spotlightName.textContent = '참여 학생이 없습니다.'; spotlightNote.textContent = '학생 제외 메뉴에서 최소 한 명은 포함해 주세요.'; return; }
-        chips.forEach((chip, index) => {
-          const name = visibleNames[index];
-          if (!name) { chip.innerHTML = ''; chip.classList.remove('compact'); chip.style.opacity = '0'; return; }
-          const left = 14 + Math.random() * 72, top = 18 + Math.random() * 56, rotate = -18 + Math.random() * 36, scale = 0.9 + Math.random() * 0.18, zIndex = 10 + Math.round((100 - top) + index);
-          placeChip(chip, escapeHtml(name), left + '%', top + '%', rotate, scale.toFixed(2), zIndex, false);
-          chip.dataset.tone = String((index + Math.floor(Math.random() * 4)) % 4);
-        });
-        spotlightName.textContent = visibleNames[0];
-        spotlightNote.textContent = '이름을 섞는 중입니다. 잠시 후 오른쪽에 최종 순서가 정리됩니다.';
-      }
-      function renderFinalChipLayout(order) {
-        const finalColumns = getFinalColumns();
-        const visibleNames = order.slice(0, getFinalVisibleCount(order));
-        if (!visibleNames.length) { clearBoard(); return; }
-        const boardPadding = window.innerWidth <= 720 ? 16 : 18;
-        const gapX = window.innerWidth <= 720 ? 8 : 10;
-        const gapY = 10;
-        const cardHeight = window.innerWidth <= 720 ? 38 : 42;
-        const startY = window.innerWidth <= 720 ? 74 : 82;
-        const totalRows = Math.ceil(visibleNames.length / finalColumns);
-        const requiredHeight = startY + (totalRows * cardHeight) + ((totalRows - 1) * gapY) + 18;
-        board.style.height = Math.max(board.clientHeight || 0, window.innerWidth <= 980 ? 320 : 340, requiredHeight) + 'px';
-        chips.forEach((chip, index) => {
-          const name = visibleNames[index];
-          if (!name) { chip.innerHTML = ''; chip.classList.remove('compact'); chip.style.opacity = '0'; return; }
-          const cardWidth = Math.floor((board.clientWidth - (boardPadding * 2) - (gapX * (finalColumns - 1))) / finalColumns);
-          const column = index % finalColumns, row = Math.floor(index / finalColumns);
-          const left = (boardPadding + (cardWidth / 2) + (column * (cardWidth + gapX))) + 'px';
-          const top = (startY + (cardHeight / 2) + (row * (cardHeight + gapY))) + 'px';
-          const compactMarkup = '<span class="chip-order">' + (index + 1) + '</span><span class="chip-label">' + escapeHtml(name) + '</span>';
-          placeChip(chip, compactMarkup, left, top, 0, 1, 40 - row, true, cardWidth + 'px');
-          chip.dataset.tone = String(row % 4);
-        });
-      }
-      function renderResults(order) {
-        if (!order.length) { resultList.innerHTML = ''; resultsEmpty.classList.remove('hide'); resultCount.textContent = '0'; return; }
-        resultList.innerHTML = order.map((name, index) => '<li class="result" data-result-item style="animation-delay:' + (index * 50) + 'ms"><span class="num">' + (index + 1) + '</span><span class="name">' + escapeHtml(name) + '</span></li>').join('');
-        resultsEmpty.classList.add('hide');
-        resultCount.textContent = String(order.length);
-      }
-      function renderRoster() {
-        rosterList.innerHTML = students.map((name, index) => {
-          const off = excludedStudents.has(name);
-          return '<li class="row' + (off ? ' off' : '') + '"><span class="rnum">' + (index + 1) + '</span><span class="rinfo"><span class="name">' + escapeHtml(name) + '</span>' + (off ? '<span class="badge">이번 추첨에서 제외</span>' : '') + '</span><label class="toggle"><input type="checkbox" data-action="toggle-exclusion" data-index="' + index + '"' + (off ? ' checked' : '') + (mixIntervalId !== null ? ' disabled' : '') + '><span>제외</span></label></li>';
-        }).join('');
-      }
-      function updateSummary() {
-        const activeStudentCount = getActiveStudents().length, excludedStudentCount = excludedStudents.size;
-        activeCount.textContent = String(activeStudentCount);
-        excludedCount.textContent = String(excludedStudentCount);
-        modalActiveCount.textContent = String(activeStudentCount);
-        modalExcludedCount.textContent = String(excludedStudentCount);
-        resultTotal.textContent = String(activeStudentCount);
-        startButton.disabled = mixIntervalId !== null || activeStudentCount === 0;
-        openExclusionsButton.disabled = mixIntervalId !== null;
-        resetExclusionsButton.disabled = mixIntervalId !== null || excludedStudentCount === 0;
-        copyButton.disabled = mixIntervalId !== null || !hasDrawnResult || !finalOrder.length;
-        if (mixIntervalId === null) startButton.textContent = activeStudentCount === 0 ? '참여 학생 없음' : (hasDrawnResult ? '다시 뽑기' : '순서 뽑기');
-      }
-      function updateIdlePreview() {
-        const activeStudents = getActiveStudents();
-        if (!activeStudents.length) { clearBoard(); spotlightName.textContent = '참여 학생이 없습니다.'; spotlightNote.textContent = '학생 제외 메뉴에서 최소 한 명은 포함해 주세요.'; return; }
-        renderFinalChipLayout(activeStudents);
-        if (excludedStudents.size) { spotlightName.textContent = '현재 ' + activeStudents.length + '명이 추첨에 참여합니다.'; spotlightNote.textContent = '제외 학생 ' + excludedStudents.size + '명은 이번 발표 순서에서 빠집니다.'; return; }
-        spotlightName.textContent = '버튼을 눌러 발표 순서를 뽑아 주세요.';
-        spotlightNote.textContent = '왼쪽 화면에서 이름이 섞이고, 오른쪽에 최종 발표 순서가 바로 정리됩니다.';
-      }
-      function resetDrawState() {
-        if (copyResetId !== null) { window.clearTimeout(copyResetId); copyResetId = null; }
-        finalOrder = []; hasDrawnResult = false; copyButton.textContent = '결과 복사'; renderResults([]); setProgress(0); setStatus('ready'); updateSummary(); updateIdlePreview();
-      }
-      function finishDraw() {
-        if (mixIntervalId !== null) { window.clearInterval(mixIntervalId); mixIntervalId = null; }
-        hasDrawnResult = true; renderFinalChipLayout(finalOrder); renderResults(finalOrder); setProgress(1); setStatus('complete'); spotlightName.textContent = '1번 ' + finalOrder[0]; spotlightNote.textContent = '셔플 존에는 앞 순서가 번호와 함께 촘촘하게 표시됩니다.'; renderRoster(); updateSummary();
-      }
-      function startDraw() {
-        const activeStudents = getActiveStudents();
-        if (mixIntervalId !== null || !activeStudents.length) return;
-        if (copyResetId !== null) { window.clearTimeout(copyResetId); copyResetId = null; }
-        finalOrder = shuffle(activeStudents); hasDrawnResult = false; copyButton.textContent = '결과 복사'; renderResults([]); setProgress(0); setStatus('mixing'); renderRoster(); updateSummary(); renderMixFrame(activeStudents);
-        const startedAt = performance.now();
-        mixIntervalId = window.setInterval(() => { const elapsed = performance.now() - startedAt; const progress = elapsed / mixDurationMs; setProgress(Math.min(progress, 0.96)); renderMixFrame(progress > 0.58 ? finalOrder : activeStudents); if (elapsed >= mixDurationMs) finishDraw(); }, mixFrameMs);
-      }
-      async function copyResult() {
-        if (!finalOrder.length) return;
-        try { await navigator.clipboard.writeText(finalOrder.map((name, index) => (index + 1) + '. ' + name).join('\n')); copyButton.textContent = '복사 완료'; }
-        catch (error) { copyButton.textContent = '복사 실패'; }
-        if (copyResetId !== null) window.clearTimeout(copyResetId);
-        copyResetId = window.setTimeout(() => { copyButton.textContent = '결과 복사'; }, 1400);
-      }
-      function openModal() { if (mixIntervalId !== null) return; lastFocusedElement = document.activeElement; modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; closeExclusionsButton.focus(); }
-      function closeModal() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; if (lastFocusedElement instanceof HTMLElement) lastFocusedElement.focus(); }
-      function handleRosterChange(event) {
-        const target = event.target;
-        if (!(target instanceof HTMLInputElement) || target.dataset.action !== 'toggle-exclusion') return;
-        const studentName = students[Number(target.dataset.index)];
-        if (target.checked) excludedStudents.add(studentName); else excludedStudents.delete(studentName);
-        renderRoster(); resetDrawState();
-      }
-      function resetExclusions() { if (!excludedStudents.size || mixIntervalId !== null) return; excludedStudents.clear(); renderRoster(); resetDrawState(); }
-      function handleResize() {
-        if (mixIntervalId !== null) return;
-        if (hasDrawnResult && finalOrder.length) { renderFinalChipLayout(finalOrder); return; }
-        updateIdlePreview();
-      }
-      renderRoster(); renderResults([]); setProgress(0); setStatus('ready'); updateSummary(); updateIdlePreview();
+      let mixIntervalId = null;
+      let copyResetId = null;
+      let hasDrawnResult = false;
+      let finalOrder = [];
+      let lastFocusedElement = null;
+
+      chips.forEach((chip) => chip.classList.add('no-motion'));
+
+      renderRoster();
+      renderResults([]);
+      setProgress(0);
+      setStatus('ready');
+      updateSummary();
+      updateIdlePreview();
+
+      window.setTimeout(() => {
+        chips.forEach((chip) => chip.classList.remove('no-motion'));
+      }, 550);
+
       startButton.addEventListener('click', startDraw);
       copyButton.addEventListener('click', copyResult);
       openExclusionsButton.addEventListener('click', openModal);
       closeExclusionsButton.addEventListener('click', closeModal);
       resetExclusionsButton.addEventListener('click', resetExclusions);
       rosterList.addEventListener('change', handleRosterChange);
-      modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
-      document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          closeModal();
+        }
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('open')) {
+          closeModal();
+        }
+      });
       window.addEventListener('resize', handleResize);
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (character) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[character]));
+      }
+
+      function getActiveStudents() {
+        return students.filter((name) => !excludedStudents.has(name));
+      }
+
+      function shuffle(list) {
+        const cloned = [...list];
+
+        for (let index = cloned.length - 1; index > 0; index -= 1) {
+          const randomIndex = Math.floor(Math.random() * (index + 1));
+          [cloned[index], cloned[randomIndex]] = [cloned[randomIndex], cloned[index]];
+        }
+
+        return cloned;
+      }
+
+      function setProgress(value) {
+        progressFill.style.transform = `scaleX(${Math.max(0, Math.min(1, value))})`;
+      }
+
+      function setStatus(mode) {
+        statusPill.classList.remove('mix', 'done');
+
+        if (mode === 'mixing') {
+          statusPill.textContent = '섞는 중';
+          statusPill.classList.add('mix');
+          return;
+        }
+
+        if (mode === 'complete') {
+          statusPill.textContent = '완료';
+          statusPill.classList.add('done');
+          return;
+        }
+
+        statusPill.textContent = '준비';
+      }
+
+      function clearBoard() {
+        chips.forEach((chip) => {
+          chip.innerHTML = '';
+          chip.classList.remove('compact');
+          chip.style.opacity = '0';
+          chip.style.width = '';
+        });
+      }
+
+      function placeChip(chip, options) {
+        chip.innerHTML = options.html;
+        chip.classList.toggle('compact', Boolean(options.compact));
+        chip.style.left = options.left;
+        chip.style.top = options.top;
+        chip.style.opacity = '1';
+        chip.style.zIndex = String(options.zIndex);
+        chip.style.width = options.width || '';
+        chip.style.transform = `translate(-50%, -50%) rotate(${options.rotate}deg) scale(${options.scale})`;
+      }
+
+      function renderMixFrame(source) {
+        const visibleNames = shuffle(source).slice(0, mixVisibleChipCount);
+
+        if (!visibleNames.length) {
+          clearBoard();
+          spotlightName.textContent = '참여 학생이 없습니다.';
+          spotlightNote.textContent = '학생 제외 메뉴에서 최소 한 명은 포함해 주세요.';
+          return;
+        }
+
+        chips.forEach((chip, index) => {
+          const name = visibleNames[index];
+
+          if (!name) {
+            chip.innerHTML = '';
+            chip.classList.remove('compact');
+            chip.style.opacity = '0';
+            return;
+          }
+
+          const left = 14 + Math.random() * 72;
+          const top = 18 + Math.random() * 58;
+          const rotate = -16 + Math.random() * 32;
+          const scale = 0.9 + Math.random() * 0.18;
+
+          placeChip(chip, {
+            html: escapeHtml(name),
+            left: `${left}%`,
+            top: `${top}%`,
+            rotate,
+            scale: scale.toFixed(2),
+            zIndex: 10 + Math.round((100 - top) + index),
+            compact: false
+          });
+
+          chip.dataset.tone = String((index + Math.floor(Math.random() * 4)) % 4);
+        });
+
+        spotlightName.textContent = visibleNames[0];
+        spotlightNote.textContent = '이름을 섞는 중입니다. 잠시 후 최종 순서가 정리됩니다.';
+      }
+
+      function getFinalLayout(total) {
+        const width = Math.max(260, board.clientWidth || window.innerWidth);
+        const height = Math.max(220, board.clientHeight || 320);
+        const paddingX = width <= 520 ? 10 : 14;
+        const gapX = width <= 520 ? 6 : 8;
+        const gapY = height <= 280 ? 5 : 6;
+        const minimumCardWidth = width <= 520 ? 106 : width < 850 ? 132 : 136;
+        const maximumColumns = width >= 850 ? 5 : width >= 470 ? 4 : width >= 330 ? 3 : 2;
+        let columns = Math.max(
+          1,
+          Math.min(
+            maximumColumns,
+            total,
+            Math.floor((width - (paddingX * 2) + gapX) / (minimumCardWidth + gapX))
+          )
+        );
+
+        let rows = Math.ceil(total / columns);
+        let cardWidth = Math.floor((width - (paddingX * 2) - (gapX * (columns - 1))) / columns);
+        let topPadding = height <= 280 ? 30 : 34;
+        let availableHeight = height - topPadding - 10 - (gapY * (rows - 1));
+        let cardHeight = Math.floor(availableHeight / rows);
+
+        while (cardHeight < 25 && columns < maximumColumns) {
+          const nextColumns = columns + 1;
+          const nextCardWidth = Math.floor((width - (paddingX * 2) - (gapX * (nextColumns - 1))) / nextColumns);
+
+          if (nextCardWidth < 92) {
+            break;
+          }
+
+          columns = nextColumns;
+          rows = Math.ceil(total / columns);
+          cardWidth = nextCardWidth;
+          availableHeight = height - topPadding - 10 - (gapY * (rows - 1));
+          cardHeight = Math.floor(availableHeight / rows);
+        }
+
+        cardHeight = Math.max(22, Math.min(38, cardHeight));
+
+        const fontSize = cardHeight <= 24 || cardWidth < 106
+          ? 10
+          : cardHeight <= 29 || cardWidth < 126
+            ? 11
+            : 13;
+        const orderSize = cardHeight <= 24 ? 18 : cardHeight <= 29 ? 20 : 22;
+
+        return {
+          columns,
+          rows,
+          cardWidth,
+          cardHeight,
+          paddingX,
+          gapX,
+          gapY,
+          topPadding,
+          fontSize,
+          orderSize
+        };
+      }
+
+      function renderFinalChipLayout(order) {
+        if (!order.length) {
+          clearBoard();
+          return;
+        }
+
+        const layout = getFinalLayout(order.length);
+
+        chips.forEach((chip, index) => {
+          const name = order[index];
+
+          if (!name) {
+            chip.innerHTML = '';
+            chip.classList.remove('compact');
+            chip.style.opacity = '0';
+            return;
+          }
+
+          const column = index % layout.columns;
+          const row = Math.floor(index / layout.columns);
+          const left = layout.paddingX + (layout.cardWidth / 2) + (column * (layout.cardWidth + layout.gapX));
+          const top = layout.topPadding + (layout.cardHeight / 2) + (row * (layout.cardHeight + layout.gapY));
+          const compactMarkup = `<span class="chip-order">${index + 1}</span><span class="chip-label">${escapeHtml(name)}</span>`;
+
+          chip.style.setProperty('--chip-height', `${layout.cardHeight}px`);
+          chip.style.setProperty('--chip-font', `${layout.fontSize}px`);
+          chip.style.setProperty('--order-size', `${layout.orderSize}px`);
+          chip.style.setProperty('--order-font', layout.orderSize <= 18 ? '0.62rem' : '0.72rem');
+          chip.style.setProperty('--chip-gap', layout.cardWidth < 110 ? '4px' : '6px');
+          chip.style.setProperty('--chip-pad', layout.cardWidth < 110 ? '5px' : '7px');
+
+          placeChip(chip, {
+            html: compactMarkup,
+            left: `${left}px`,
+            top: `${top}px`,
+            rotate: 0,
+            scale: 1,
+            zIndex: 40 - row,
+            compact: true,
+            width: `${layout.cardWidth}px`
+          });
+
+          chip.dataset.tone = String(row % 4);
+        });
+      }
+
+      function renderResults(order) {
+        if (!order.length) {
+          resultList.innerHTML = '';
+          resultsEmpty.classList.remove('hide');
+          resultCount.textContent = '0';
+          return;
+        }
+
+        resultList.innerHTML = order.map((name, index) => (
+          `<li class="result" data-result-item style="animation-delay:${index * 38}ms">`
+          + `<span class="num">${index + 1}</span><span class="name">${escapeHtml(name)}</span></li>`
+        )).join('');
+        resultsEmpty.classList.add('hide');
+        resultCount.textContent = String(order.length);
+      }
+
+      function renderRoster() {
+        rosterList.innerHTML = students.map((name, index) => {
+          const isExcluded = excludedStudents.has(name);
+          const disabled = mixIntervalId !== null ? ' disabled' : '';
+          const checked = isExcluded ? ' checked' : '';
+          const badge = isExcluded ? '<span class="badge">이번 추첨에서 제외</span>' : '';
+
+          return (
+            `<li class="row${isExcluded ? ' off' : ''}">`
+            + `<span class="rnum">${index + 1}</span>`
+            + `<span class="rinfo"><span class="name">${escapeHtml(name)}</span>${badge}</span>`
+            + `<label class="toggle"><input type="checkbox" data-action="toggle-exclusion" data-index="${index}"${checked}${disabled}><span>제외</span></label>`
+            + '</li>'
+          );
+        }).join('');
+      }
+
+      function updateSummary() {
+        const activeStudentCount = getActiveStudents().length;
+        const excludedStudentCount = excludedStudents.size;
+
+        activeCount.textContent = String(activeStudentCount);
+        excludedCount.textContent = String(excludedStudentCount);
+        modalActiveCount.textContent = String(activeStudentCount);
+        modalExcludedCount.textContent = String(excludedStudentCount);
+        resultTotal.textContent = String(activeStudentCount);
+
+        startButton.disabled = mixIntervalId !== null || activeStudentCount === 0;
+        openExclusionsButton.disabled = mixIntervalId !== null;
+        resetExclusionsButton.disabled = mixIntervalId !== null || excludedStudentCount === 0;
+        copyButton.disabled = mixIntervalId !== null || !hasDrawnResult || !finalOrder.length;
+
+        if (mixIntervalId === null) {
+          startButton.textContent = activeStudentCount === 0 ? '참여 학생 없음' : (hasDrawnResult ? '다시 뽑기' : '순서 뽑기');
+        }
+      }
+
+      function updateIdlePreview() {
+        const activeStudents = getActiveStudents();
+
+        if (!activeStudents.length) {
+          clearBoard();
+          spotlightName.textContent = '참여 학생이 없습니다.';
+          spotlightNote.textContent = '학생 제외 메뉴에서 최소 한 명은 포함해 주세요.';
+          return;
+        }
+
+        renderFinalChipLayout(activeStudents);
+
+        if (excludedStudents.size) {
+          spotlightName.textContent = `현재 ${activeStudents.length}명이 추첨에 참여합니다.`;
+          spotlightNote.textContent = `제외 학생 ${excludedStudents.size}명은 이번 발표 순서에서 빠집니다.`;
+          return;
+        }
+
+        spotlightName.textContent = '버튼을 눌러 발표 순서를 뽑아 주세요.';
+        spotlightNote.textContent = '이름을 섞은 뒤 최종 발표 순서가 번호대로 정리됩니다.';
+      }
+
+      function resetDrawState() {
+        if (copyResetId !== null) {
+          window.clearTimeout(copyResetId);
+          copyResetId = null;
+        }
+
+        finalOrder = [];
+        hasDrawnResult = false;
+        copyButton.textContent = '결과 복사';
+        renderResults([]);
+        setProgress(0);
+        setStatus('ready');
+        updateSummary();
+        updateIdlePreview();
+      }
+
+      function finishDraw() {
+        if (mixIntervalId !== null) {
+          window.clearInterval(mixIntervalId);
+          mixIntervalId = null;
+        }
+
+        hasDrawnResult = true;
+        renderFinalChipLayout(finalOrder);
+        renderResults(finalOrder);
+        setProgress(1);
+        setStatus('complete');
+        spotlightName.textContent = `1번 ${finalOrder[0]}`;
+        spotlightNote.textContent = '섞는 화면과 최종 결과에서 발표 순서를 확인할 수 있습니다.';
+        renderRoster();
+        updateSummary();
+      }
+
+      function startDraw() {
+        const activeStudents = getActiveStudents();
+
+        if (mixIntervalId !== null || !activeStudents.length) {
+          return;
+        }
+
+        if (copyResetId !== null) {
+          window.clearTimeout(copyResetId);
+          copyResetId = null;
+        }
+
+        finalOrder = shuffle(activeStudents);
+        hasDrawnResult = false;
+        copyButton.textContent = '결과 복사';
+        renderResults([]);
+        setProgress(0);
+        setStatus('mixing');
+        renderRoster();
+        updateSummary();
+        renderMixFrame(activeStudents);
+
+        const startedAt = performance.now();
+        mixIntervalId = window.setInterval(() => {
+          const elapsed = performance.now() - startedAt;
+          const progress = elapsed / mixDurationMs;
+
+          setProgress(Math.min(progress, 0.96));
+          renderMixFrame(progress > 0.58 ? finalOrder : activeStudents);
+
+          if (elapsed >= mixDurationMs) {
+            finishDraw();
+          }
+        }, mixFrameMs);
+      }
+
+      async function copyResult() {
+        if (!finalOrder.length) {
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(finalOrder.map((name, index) => `${index + 1}. ${name}`).join('\n'));
+          copyButton.textContent = '복사 완료';
+        } catch {
+          copyButton.textContent = '복사 실패';
+        }
+
+        if (copyResetId !== null) {
+          window.clearTimeout(copyResetId);
+        }
+
+        copyResetId = window.setTimeout(() => {
+          copyButton.textContent = '결과 복사';
+        }, 1400);
+      }
+
+      function openModal() {
+        if (mixIntervalId !== null) {
+          return;
+        }
+
+        lastFocusedElement = document.activeElement;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        closeExclusionsButton.focus();
+      }
+
+      function closeModal() {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+
+        if (lastFocusedElement instanceof HTMLElement) {
+          lastFocusedElement.focus();
+        }
+      }
+
+      function handleRosterChange(event) {
+        const target = event.target;
+
+        if (!(target instanceof HTMLInputElement) || target.dataset.action !== 'toggle-exclusion') {
+          return;
+        }
+
+        const studentName = students[Number(target.dataset.index)];
+
+        if (target.checked) {
+          excludedStudents.add(studentName);
+        } else {
+          excludedStudents.delete(studentName);
+        }
+
+        renderRoster();
+        resetDrawState();
+      }
+
+      function resetExclusions() {
+        if (!excludedStudents.size || mixIntervalId !== null) {
+          return;
+        }
+
+        excludedStudents.clear();
+        renderRoster();
+        resetDrawState();
+      }
+
+      function handleResize() {
+        if (mixIntervalId !== null) {
+          return;
+        }
+
+        if (hasDrawnResult && finalOrder.length) {
+          renderFinalChipLayout(finalOrder);
+          return;
+        }
+
+        updateIdlePreview();
+      }
     })();
   </script>
-    <script src="../../shared/page-qr.js"></script>
+  <script src="../../shared/page-qr.js"></script>
 </body>
 </html>

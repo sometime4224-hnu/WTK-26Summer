@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3B 말하기 질문</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --ink: #101828;
+      --muted: #667085;
+      --line: #d7deea;
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --green: #0f766e;
+      --yellow: #f4c430;
+      --shadow: 0 22px 52px rgba(16, 24, 40, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button {
+      border: 0;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .app {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 14px;
+      min-height: 100dvh;
+      padding: 16px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 48px;
+    }
+
+    .title {
+      margin: 0;
+      color: var(--blue-dark);
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .progress {
+      min-width: 76px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 900;
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .stage {
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 26px;
+      min-height: 0;
+      padding: 36px;
+      border: 2px solid #dbeafe;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(244, 196, 48, 0.18), transparent 34%),
+        linear-gradient(225deg, rgba(15, 118, 110, 0.12), transparent 36%),
+        var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .grammar-label {
+      max-width: min(960px, 100%);
+      padding: 10px 18px;
+      border: 2px solid rgba(15, 118, 110, 0.24);
+      border-radius: 8px;
+      background: rgba(240, 253, 250, 0.92);
+      color: var(--green);
+      font-size: 1.65rem;
+      font-weight: 900;
+      line-height: 1.25;
+      letter-spacing: 0;
+      text-align: center;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .question {
+      width: min(1120px, 100%);
+      max-height: 100%;
+      margin: 0;
+      overflow: hidden;
+      color: var(--ink);
+      font-size: 76px;
+      font-weight: 900;
+      line-height: 1.22;
+      letter-spacing: 0;
+      text-align: center;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .primary-button,
+    .utility-button,
+    .number-button {
+      min-height: 44px;
+      border-radius: 8px;
+      font-weight: 900;
+      transition: transform 120ms ease, background 120ms ease, color 120ms ease;
+    }
+
+    .primary-button {
+      min-width: 104px;
+      padding: 0 18px;
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .utility-button {
+      min-width: 92px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .number-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .number-button {
+      width: 40px;
+      padding: 0;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--muted);
+    }
+
+    .number-button[aria-current="true"] {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+
+    .primary-button:active,
+    .utility-button:active,
+    .number-button:active {
+      transform: translateY(1px);
+    }
+
+    .primary-button:focus-visible,
+    .utility-button:focus-visible,
+    .number-button:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.32);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 860px) {
+      body {
+        overflow: auto;
+      }
+
+      .app {
+        min-height: 100svh;
+        padding: 12px;
+      }
+
+      .stage {
+        padding: 24px;
+      }
+
+      .grammar-label {
+        font-size: 1.35rem;
+      }
+
+      .question {
+        font-size: 54px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .number-list {
+        grid-column: 1 / -1;
+        order: -1;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .progress {
+        align-self: stretch;
+      }
+
+      .stage {
+        padding: 18px;
+      }
+
+      .grammar-label {
+        font-size: 1.05rem;
+      }
+
+      .question {
+        font-size: 38px;
+        line-height: 1.24;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .primary-button,
+      .utility-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <h1 class="title">3B 말하기 질문</h1>
+      <div class="progress" id="progress" aria-live="polite">1 / 15</div>
+    </header>
+
+    <section class="stage" aria-label="현재 질문">
+      <div class="grammar-label" id="grammar-label"></div>
+      <p class="question" id="question-text"></p>
+    </section>
+
+    <nav class="controls" aria-label="질문 이동">
+      <button type="button" class="primary-button" id="prev-button">이전</button>
+      <button type="button" class="primary-button" id="random-button">랜덤</button>
+      <div class="number-list" id="number-list" aria-label="질문 번호"></div>
+      <button type="button" class="primary-button" id="next-button">다음</button>
+      <button type="button" class="utility-button" id="fullscreen-button">전체화면</button>
+    </nav>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const questions = [
+        {
+          grammar: 'A/V-던',
+          question: '다른 사람이 쓰던 물건을 사용한 적이 있어요?'
+        },
+        {
+          grammar: 'A/V-잖아요',
+          question: '한국 드라마를 많이 보는 편이에요? / 좋아하는 배우·가수가 있어요?'
+        },
+        {
+          grammar: 'V-(으)ㄹ 생각/계획/예정이다',
+          question: '언제쯤 취직할 생각이에요? / 언제쯤 결혼할 생각이에요?'
+        },
+        {
+          grammar: 'V-(으)려면 멀었다',
+          question: '이제 한국말을 잘하지요? / 언제 대학교에 입학해요?'
+        },
+        {
+          grammar: '사동사',
+          question: '감기에 걸린 아이에게 해 줘야 하는 것과 하면 안 되는 것은 무엇이에요?'
+        },
+        {
+          grammar: '사동사-아/어 주다',
+          question: '다른 사람을 도와준 경험이 있어요?'
+        },
+        {
+          grammar: 'A/V-(ㄴ/는)다면',
+          question: '만약에 내일 지구가 없어진다면, 또는 다시 태어난다면 뭘 하고 싶어요?'
+        },
+        {
+          grammar: '무엇이든(지), 무슨 N(이)든(지)',
+          question: '무슨 요일에, 어디에서 만나고, 만나서 뭘 할까요?'
+        },
+        {
+          grammar: 'A/V-았/었더니, A-아/어졌어요',
+          question: '건강이나 한국어 실력이 좋아진/나빠진 이유는 무엇이에요?'
+        },
+        {
+          grammar: '얼마나 A/V-(으)ㄴ지/는지 모르다',
+          question: '좋아하는 음식이나 자주 하는 운동이 얼마나 좋은지 말해 보세요.'
+        },
+        {
+          grammar: 'A-(으)ㄴ 모양이다 / V-는 모양이다 / N인 모양이다',
+          question: '상황을 보고 어떤 모양인지 말해 보세요.'
+        },
+        {
+          grammar: 'A/V-아/어야, N이어야/여야',
+          question: '면접을 잘 보는 방법이나 건강하게 사는 방법은 무엇이에요?'
+        },
+        {
+          grammar: 'A/V-(으)ㄹ까 봐',
+          question: '친구, 공부, 생활 중 걱정되는 일에 대해 말해 보세요.'
+        },
+        {
+          grammar: 'V-고 있다',
+          question: '친구들이 입고 있는 옷에 대해 말해 보세요.'
+        },
+        {
+          grammar: 'A/V-았/었어야 했는데',
+          question: '어렸을 때, 고등학교 때, 작년에 하지 못해서 후회되는 일은 무엇이에요?'
+        }
+      ];
+
+      const storageKey = 'korean3b:speaking-question-board-3b7:index';
+      const randomPoolStorageKey = 'korean3b:speaking-question-board-3b7:random-pool';
+      const grammarLabel = document.getElementById('grammar-label');
+      const questionText = document.getElementById('question-text');
+      const progress = document.getElementById('progress');
+      const numberList = document.getElementById('number-list');
+      const prevButton = document.getElementById('prev-button');
+      const randomButton = document.getElementById('random-button');
+      const nextButton = document.getElementById('next-button');
+      const fullscreenButton = document.getElementById('fullscreen-button');
+
+      let currentIndex = loadSavedIndex();
+      let randomPool = loadRandomPool();
+      const numberButtons = questions.map((question, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'number-button';
+        button.textContent = String(index + 1);
+        button.setAttribute('aria-label', `${index + 1}번 질문`);
+        button.addEventListener('click', () => {
+          showQuestion(index);
+        });
+        numberList.append(button);
+        return button;
+      });
+
+      prevButton.addEventListener('click', () => {
+        showQuestion(currentIndex - 1);
+      });
+
+      randomButton.addEventListener('click', () => {
+        showRandomQuestion();
+      });
+
+      nextButton.addEventListener('click', () => {
+        showQuestion(currentIndex + 1);
+      });
+
+      fullscreenButton.addEventListener('click', () => {
+        toggleFullscreen();
+      });
+
+      document.addEventListener('fullscreenchange', updateFullscreenButton);
+
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          showQuestion(currentIndex - 1);
+        }
+
+        if (event.key === 'ArrowRight' || event.key === ' ') {
+          event.preventDefault();
+          showQuestion(currentIndex + 1);
+        }
+
+        if (event.key === 'r' || event.key === 'R') {
+          event.preventDefault();
+          showRandomQuestion();
+        }
+      });
+
+      window.addEventListener('resize', fitQuestionText);
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(fitQuestionText);
+      }
+
+      showQuestion(currentIndex);
+
+      function showQuestion(nextIndex) {
+        currentIndex = wrapIndex(nextIndex);
+        grammarLabel.textContent = questions[currentIndex].grammar;
+        questionText.textContent = questions[currentIndex].question;
+        progress.textContent = `${currentIndex + 1} / ${questions.length}`;
+
+        numberButtons.forEach((button, index) => {
+          button.setAttribute('aria-current', index === currentIndex ? 'true' : 'false');
+        });
+
+        saveIndex();
+        fitQuestionText();
+      }
+
+      function showRandomQuestion() {
+        if (!randomPool.length) {
+          randomPool = createFreshRandomPool();
+        }
+
+        if (randomPool.length > 1) {
+          randomPool = randomPool.filter((index) => index !== currentIndex);
+        }
+
+        const poolIndex = Math.floor(Math.random() * randomPool.length);
+        const selectedIndex = randomPool.splice(poolIndex, 1)[0];
+        saveRandomPool();
+        showQuestion(selectedIndex);
+      }
+
+      function fitQuestionText() {
+        const baseSize = getBaseFontSize();
+        let fontSize = baseSize;
+
+        questionText.style.fontSize = `${fontSize}px`;
+
+        requestAnimationFrame(() => {
+          while (
+            fontSize > 28
+            && (
+              questionText.scrollHeight > questionText.clientHeight
+              || questionText.scrollWidth > questionText.clientWidth
+            )
+          ) {
+            fontSize -= 2;
+            questionText.style.fontSize = `${fontSize}px`;
+          }
+        });
+      }
+
+      function getBaseFontSize() {
+        if (window.matchMedia('(max-width: 520px)').matches) {
+          return 38;
+        }
+
+        if (window.matchMedia('(max-width: 860px)').matches) {
+          return 54;
+        }
+
+        return 76;
+      }
+
+      function wrapIndex(index) {
+        if (index < 0) {
+          return questions.length - 1;
+        }
+
+        if (index >= questions.length) {
+          return 0;
+        }
+
+        return index;
+      }
+
+      function loadSavedIndex() {
+        const savedIndex = Number(localStorage.getItem(storageKey));
+        return Number.isInteger(savedIndex) && savedIndex >= 0 && savedIndex < questions.length
+          ? savedIndex
+          : 0;
+      }
+
+      function saveIndex() {
+        localStorage.setItem(storageKey, String(currentIndex));
+      }
+
+      function loadRandomPool() {
+        try {
+          const savedPool = JSON.parse(localStorage.getItem(randomPoolStorageKey));
+
+          if (!Array.isArray(savedPool)) {
+            return createFreshRandomPool();
+          }
+
+          const validIndexes = new Set(createFreshRandomPool());
+          const normalizedPool = savedPool.filter((index, position, list) => (
+            Number.isInteger(index)
+            && validIndexes.has(index)
+            && list.indexOf(index) === position
+          ));
+
+          return normalizedPool.length ? normalizedPool : createFreshRandomPool();
+        } catch {
+          return createFreshRandomPool();
+        }
+      }
+
+      function saveRandomPool() {
+        localStorage.setItem(randomPoolStorageKey, JSON.stringify(randomPool));
+      }
+
+      function createFreshRandomPool() {
+        return questions.map((question, index) => index);
+      }
+
+      async function toggleFullscreen() {
+        try {
+          if (document.fullscreenElement) {
+            await document.exitFullscreen();
+            return;
+          }
+
+          await document.documentElement.requestFullscreen();
+        } catch {
+          fullscreenButton.textContent = '전체화면';
+        }
+      }
+
+      function updateFullscreenButton() {
+        fullscreenButton.textContent = document.fullscreenElement ? '화면복귀' : '전체화면';
+      }
+    })();
+  </script>
+</body>
+</html>
