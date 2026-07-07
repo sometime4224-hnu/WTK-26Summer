@@ -323,6 +323,22 @@
         `;
     }
 
+    function renderMobileDateControls(columns) {
+        return `
+            <div class="mobile-date-panel" aria-label="날짜 입력">
+                ${columns.map(function (column, index) {
+                    return `
+                        <div class="mobile-date-item">
+                            <span>날짜 ${index + 1}</span>
+                            <input type="text" value="${escapeHtml(column.value)}" placeholder="날짜" data-mobile-date-input data-column-id="${escapeHtml(column.id)}" aria-label="${escapeHtml(`${index + 1}번째 날짜`)}">
+                            ${deleteMode ? `<button class="date-delete-button mobile-delete-button" type="button" data-mobile-delete-date data-action="delete-date" data-column-id="${escapeHtml(column.id)}">삭제</button>` : ""}
+                        </div>
+                    `;
+                }).join("")}
+            </div>
+        `;
+    }
+
     function renderMarkButton(studentIndex, column) {
         const value = getMark(studentIndex, column.id);
         const label = value === "o" ? "O" : value === "x" ? "X" : "";
@@ -333,6 +349,46 @@
                     ${escapeHtml(label)}
                 </button>
             </td>
+        `;
+    }
+
+    function renderMobileMarkButton(studentIndex, column, columnIndex) {
+        const value = getMark(studentIndex, column.id);
+        const label = value === "o" ? "O" : value === "x" ? "X" : "";
+        const dateLabel = column.value || `날짜 ${columnIndex + 1}`;
+
+        return `
+            <div class="mobile-mark-item">
+                <span>${escapeHtml(dateLabel)}</span>
+                <button class="mark-button mobile-mark-button" type="button" data-state="${escapeHtml(value)}" data-mobile-mark-cell="${studentIndex}-${escapeHtml(column.id)}" data-action="toggle-mark" data-student-index="${studentIndex}" data-column-id="${escapeHtml(column.id)}" aria-label="${escapeHtml(`${studentIndex + 1}번 ${dateLabel} ${label || "미확인"}`)}">
+                    ${escapeHtml(label)}
+                </button>
+            </div>
+        `;
+    }
+
+    function renderMobileCards(roster, columns) {
+        return `
+            <div class="mobile-checker-board" data-mobile-checker-board>
+                ${renderMobileDateControls(columns)}
+                <div class="mobile-student-list">
+                    ${roster.names.map(function (name, studentIndex) {
+                        return `
+                            <article class="mobile-student-card" data-mobile-student-card>
+                                <div class="mobile-student-head">
+                                    <strong>${escapeHtml(name)}</strong>
+                                    <span>${studentIndex + 1}</span>
+                                </div>
+                                <div class="mobile-mark-grid">
+                                    ${columns.map(function (column, columnIndex) {
+                                        return renderMobileMarkButton(studentIndex, column, columnIndex);
+                                    }).join("")}
+                                </div>
+                            </article>
+                        `;
+                    }).join("")}
+                </div>
+            </div>
         `;
     }
 
@@ -376,6 +432,7 @@
                     </table>
                     ${classData.columns.length ? "" : `<p class="checker-empty">날짜 없음</p>`}
                 </div>
+                ${renderMobileCards(roster, classData.columns)}
             </section>
         `;
     }
@@ -458,7 +515,8 @@
 
     function syncVisibleDateInputs() {
         let changed = false;
-        root.querySelectorAll("[data-date-input]").forEach(function (input) {
+        root.querySelectorAll("[data-date-input], [data-mobile-date-input]").forEach(function (input) {
+            if (input.offsetParent === null) return;
             changed = storeDateInputValue(input) || changed;
         });
         return changed;
@@ -506,7 +564,7 @@
     });
 
     function handleDateValueEvent(event) {
-        const input = event.target.closest("[data-date-input]");
+        const input = event.target.closest("[data-date-input], [data-mobile-date-input]");
         if (!input || !root.contains(input)) return;
 
         if (!storeDateInputValue(input)) return;

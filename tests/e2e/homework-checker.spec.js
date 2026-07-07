@@ -86,23 +86,23 @@ test.describe('teacher homework checker', () => {
     await expect(page.locator('[data-mark-cell="0-date-1"]')).toHaveText('O');
   });
 
-  test('keeps the checker usable on a narrow screen with horizontal table scrolling', async ({ page }) => {
-    await openFreshChecker(page);
+  test('uses a portrait-phone layout without page-wide horizontal overflow', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 800 });
+    await openFreshChecker(page);
 
-    const tableScroll = page.locator('.checker-table-scroll');
-    await expect(tableScroll).toBeVisible();
+    await expect(page.locator('.checker-table-scroll')).toBeHidden();
+    await expect(page.locator('[data-mobile-checker-board]')).toBeVisible();
+    await expect(page.locator('[data-mobile-student-card]')).toHaveCount(25);
+    await expect(page.locator('[data-mobile-student-card]').first()).toContainText('짠 하 로안 안');
 
-    const sizes = await tableScroll.evaluate((element) => ({
-      clientWidth: element.clientWidth,
-      scrollWidth: element.scrollWidth
+    await page.locator('[data-mobile-date-input]').first().fill('7/7');
+    await page.locator('[data-mobile-mark-cell="0-date-1"]').click();
+    await expect(page.locator('[data-mobile-mark-cell="0-date-1"]')).toHaveText('O');
+
+    const pageWidth = await page.evaluate(() => ({
+      viewport: window.innerWidth,
+      scroll: document.documentElement.scrollWidth
     }));
-    expect(sizes.scrollWidth).toBeGreaterThan(sizes.clientWidth);
-
-    const nameBox = await page.locator('[data-student-row]').first().locator('.name-column').boundingBox();
-    const cellBox = await page.locator('[data-mark-cell="0-date-1"]').boundingBox();
-    expect(nameBox).not.toBeNull();
-    expect(cellBox).not.toBeNull();
-    expect(nameBox.x + nameBox.width).toBeLessThanOrEqual(cellBox.x + 1);
+    expect(pageWidth.scroll).toBeLessThanOrEqual(pageWidth.viewport + 1);
   });
 });
