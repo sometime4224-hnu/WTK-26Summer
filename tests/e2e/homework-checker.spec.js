@@ -92,12 +92,21 @@ test.describe('teacher homework checker', () => {
 
     await expect(page.locator('.checker-table-scroll')).toBeHidden();
     await expect(page.locator('[data-mobile-checker-board]')).toBeVisible();
+    await expect(page.locator('[data-mobile-date-select]')).toHaveCount(5);
     await expect(page.locator('[data-mobile-student-card]')).toHaveCount(25);
+    await expect(page.locator('[data-mobile-mark-cell]')).toHaveCount(25);
     await expect(page.locator('[data-mobile-student-card]').first()).toContainText('짠 하 로안 안');
 
     await page.locator('[data-mobile-date-input]').first().fill('7/7');
     await page.locator('[data-mobile-mark-cell="0-date-1"]').click();
     await expect(page.locator('[data-mobile-mark-cell="0-date-1"]')).toHaveText('O');
+
+    await page.locator('[data-mobile-date-select][data-column-id="date-2"]').click();
+    await expect(page.locator('[data-mobile-mark-cell$="-date-1"]')).toHaveCount(0);
+    await expect(page.locator('[data-mobile-mark-cell$="-date-2"]')).toHaveCount(25);
+    await page.locator('[data-mobile-date-input]').fill('7/8');
+    await page.locator('[data-mobile-mark-cell="0-date-2"]').click();
+    await expect(page.locator('[data-mobile-mark-cell="0-date-2"]')).toHaveText('O');
 
     const pageWidth = await page.evaluate(() => ({
       viewport: window.innerWidth,

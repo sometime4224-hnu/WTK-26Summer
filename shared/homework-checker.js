@@ -176,14 +176,24 @@
         const normalized = {
             version: 1,
             activeClassId: rosters[0].id,
+            mobileActiveColumnIds: {},
             classes: {}
         };
 
         rosters.forEach(function (roster) {
-            normalized.classes[roster.id] = normalizeClassState(
+            const classState = normalizeClassState(
                 source && source.classes && source.classes[roster.id],
                 roster
             );
+            const savedMobileColumnId = source
+                && source.mobileActiveColumnIds
+                && source.mobileActiveColumnIds[roster.id];
+            const mobileColumn = classState.columns.find(function (column) {
+                return column.id === savedMobileColumnId;
+            }) || classState.columns[0];
+
+            normalized.classes[roster.id] = classState;
+            normalized.mobileActiveColumnIds[roster.id] = mobileColumn ? mobileColumn.id : "";
         });
 
         if (rosters.some(function (roster) {
@@ -220,6 +230,21 @@
 
     function getActiveClassData() {
         return getClassData(state.activeClassId);
+    }
+
+    function getMobileActiveColumn(classData) {
+        const selectedId = state.mobileActiveColumnIds[state.activeClassId];
+        return classData.columns.find(function (column) {
+            return column.id === selectedId;
+        }) || classData.columns[0] || null;
+    }
+
+    function setMobileActiveColumnId(columnId) {
+        state.mobileActiveColumnIds[state.activeClassId] = String(columnId || "");
+    }
+
+    function getColumnLabel(column, index) {
+        return column.value || `날짜 ${index + 1}`;
     }
 
     function getMark(studentIndex, columnId) {
@@ -324,17 +349,34 @@
     }
 
     function renderMobileDateControls(columns) {
+        const activeColumn = getMobileActiveColumn(getActiveClassData());
+        const activeColumnIndex = columns.findIndex(function (column) {
+            return activeColumn && column.id === activeColumn.id;
+        });
+
+        if (!activeColumn) {
+            return '<div class="mobile-date-panel"><p class="mobile-date-empty">날짜를 추가해주세요.</p></div>';
+        }
+
         return `
             <div class="mobile-date-panel" aria-label="날짜 입력">
-                ${columns.map(function (column, index) {
-                    return `
-                        <div class="mobile-date-item">
-                            <span>날짜 ${index + 1}</span>
-                            <input type="text" value="${escapeHtml(column.value)}" placeholder="날짜" data-mobile-date-input data-column-id="${escapeHtml(column.id)}" aria-label="${escapeHtml(`${index + 1}번째 날짜`)}">
-                            ${deleteMode ? `<button class="date-delete-button mobile-delete-button" type="button" data-mobile-delete-date data-action="delete-date" data-column-id="${escapeHtml(column.id)}">삭제</button>` : ""}
-                        </div>
-                    `;
-                }).join("")}
+                <div class="mobile-date-selector" role="tablist" aria-label="날짜 선택">
+                    ${columns.map(function (column, index) {
+                        const active = column.id === activeColumn.id;
+                        return `
+                            <button class="mobile-date-tab" type="button" role="tab" aria-selected="${active ? "true" : "false"}" data-mobile-date-select data-action="select-mobile-date" data-column-id="${escapeHtml(column.id)}">
+                                ${escapeHtml(getColumnLabel(column, index))}
+                            </button>
+                        `;
+                    }).join("")}
+                </div>
+                <div class="mobile-date-edit">
+                    <label>
+                        <span>선택 날짜</span>
+                        <input type="text" value="${escapeHtml(activeColumn.value)}" placeholder="날짜" data-mobile-date-input data-column-id="${escapeHtml(activeColumn.id)}" aria-label="${escapeHtml(`${activeColumnIndex + 1}번째 날짜`)}">
+                    </label>
+                    ${deleteMode ? `<button class="date-delete-button mobile-delete-button" type="button" data-mobile-delete-date data-action="delete-date" data-column-id="${escapeHtml(activeColumn.id)}">삭제</button>` : ""}
+                </div>
             </div>
         `;
     }
@@ -355,39 +397,42 @@
     function renderMobileMarkButton(studentIndex, column, columnIndex) {
         const value = getMark(studentIndex, column.id);
         const label = value === "o" ? "O" : value === "x" ? "X" : "";
-        const dateLabel = column.value || `날짜 ${columnIndex + 1}`;
+        const dateLabel = getColumnLabel(column, columnIndex);
 
         return `
-            <div class="mobile-mark-item">
-                <span>${escapeHtml(dateLabel)}</span>
-                <button class="mark-button mobile-mark-button" type="button" data-state="${escapeHtml(value)}" data-mobile-mark-cell="${studentIndex}-${escapeHtml(column.id)}" data-action="toggle-mark" data-student-index="${studentIndex}" data-column-id="${escapeHtml(column.id)}" aria-label="${escapeHtml(`${studentIndex + 1}번 ${dateLabel} ${label || "미확인"}`)}">
-                    ${escapeHtml(label)}
-                </button>
-            </div>
+            <button class="mark-button mobile-mark-button" type="button" data-state="${escapeHtml(value)}" data-mobile-mark-cell="${studentIndex}-${escapeHtml(column.id)}" data-action="toggle-mark" data-student-index="${studentIndex}" data-column-id="${escapeHtml(column.id)}" aria-label="${escapeHtml(`${studentIndex + 1}번 ${dateLabel} ${label || "미확인"}`)}">
+                ${escapeHtml(label)}
+            </button>
         `;
     }
 
-    function renderMobileCards(roster, columns) {
+    function renderMobileCards(roster, classData) {
+        const activeColumn = getMobileActiveColumn(classData);
+        const activeColumnIndex = activeColumn
+            ? classData.columns.findIndex(function (column) {
+                return column.id === activeColumn.id;
+            })
+            : -1;
+
         return `
             <div class="mobile-checker-board" data-mobile-checker-board>
-                ${renderMobileDateControls(columns)}
-                <div class="mobile-student-list">
-                    ${roster.names.map(function (name, studentIndex) {
-                        return `
-                            <article class="mobile-student-card" data-mobile-student-card>
-                                <div class="mobile-student-head">
-                                    <strong>${escapeHtml(name)}</strong>
-                                    <span>${studentIndex + 1}</span>
-                                </div>
-                                <div class="mobile-mark-grid">
-                                    ${columns.map(function (column, columnIndex) {
-                                        return renderMobileMarkButton(studentIndex, column, columnIndex);
-                                    }).join("")}
-                                </div>
-                            </article>
-                        `;
-                    }).join("")}
-                </div>
+                ${renderMobileDateControls(classData.columns)}
+                ${activeColumn ? `
+                    <div class="mobile-selected-date">${escapeHtml(getColumnLabel(activeColumn, activeColumnIndex))}</div>
+                    <div class="mobile-student-list">
+                        ${roster.names.map(function (name, studentIndex) {
+                            return `
+                                <article class="mobile-student-card" data-mobile-student-card>
+                                    <div class="mobile-student-head">
+                                        <strong>${escapeHtml(name)}</strong>
+                                        <span>${studentIndex + 1}</span>
+                                    </div>
+                                    ${renderMobileMarkButton(studentIndex, activeColumn, activeColumnIndex)}
+                                </article>
+                            `;
+                        }).join("")}
+                    </div>
+                ` : '<p class="checker-empty">표시할 날짜가 없습니다.</p>'}
             </div>
         `;
     }
@@ -432,7 +477,7 @@
                     </table>
                     ${classData.columns.length ? "" : `<p class="checker-empty">날짜 없음</p>`}
                 </div>
-                ${renderMobileCards(roster, classData.columns)}
+                ${renderMobileCards(roster, classData)}
             </section>
         `;
     }
@@ -475,6 +520,7 @@
 
         classData.columns.push({ id, value: "" });
         classData.nextColumnNumber = nextNumber + 1;
+        setMobileActiveColumnId(id);
         saveState();
         render();
     }
@@ -491,6 +537,10 @@
         if (!window.confirm(`${label} 열을 삭제할까요?`)) return;
 
         classData.columns.splice(columnIndex, 1);
+        const nextMobileColumn = classData.columns[columnIndex]
+            || classData.columns[columnIndex - 1]
+            || classData.columns[0];
+        setMobileActiveColumnId(nextMobileColumn ? nextMobileColumn.id : "");
         Object.keys(classData.marks).forEach(function (studentIndex) {
             delete classData.marks[studentIndex][columnId];
             if (!Object.keys(classData.marks[studentIndex]).length) {
@@ -507,17 +557,37 @@
         const column = classData.columns.find(function (item) {
             return item.id === input.dataset.columnId;
         });
-        if (!column) return false;
+        if (!column) return null;
 
         column.value = input.value;
-        return true;
+        return column;
+    }
+
+    function updateMobileDateLabels(column) {
+        const classData = getActiveClassData();
+        const columnIndex = classData.columns.findIndex(function (item) {
+            return item.id === column.id;
+        });
+        const label = getColumnLabel(column, columnIndex);
+
+        root.querySelectorAll("[data-mobile-date-select]").forEach(function (button) {
+            if (button.dataset.columnId === column.id) {
+                button.textContent = label;
+            }
+        });
+
+        const selectedDate = root.querySelector(".mobile-selected-date");
+        const activeColumn = getMobileActiveColumn(classData);
+        if (selectedDate && activeColumn && activeColumn.id === column.id) {
+            selectedDate.textContent = label;
+        }
     }
 
     function syncVisibleDateInputs() {
         let changed = false;
         root.querySelectorAll("[data-date-input], [data-mobile-date-input]").forEach(function (input) {
             if (input.offsetParent === null) return;
-            changed = storeDateInputValue(input) || changed;
+            changed = Boolean(storeDateInputValue(input)) || changed;
         });
         return changed;
     }
@@ -531,6 +601,13 @@
 
         if (action === "select-class") {
             state.activeClassId = button.dataset.classId;
+            saveState();
+            render();
+            return;
+        }
+
+        if (action === "select-mobile-date") {
+            setMobileActiveColumnId(button.dataset.columnId);
             saveState();
             render();
             return;
@@ -567,7 +644,9 @@
         const input = event.target.closest("[data-date-input], [data-mobile-date-input]");
         if (!input || !root.contains(input)) return;
 
-        if (!storeDateInputValue(input)) return;
+        const column = storeDateInputValue(input);
+        if (!column) return;
+        updateMobileDateLabels(column);
         saveState();
     }
 
