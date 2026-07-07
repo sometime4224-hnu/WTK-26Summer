@@ -4,8 +4,7 @@ const quizPages = [
   { path: '/apps/vocab-grammar-mock/round1.html', count: 26 },
   { path: '/apps/vocab-grammar-mock/round2.html', count: 25 },
   { path: '/apps/vocab-grammar-mock/round3.html', count: 25 },
-  { path: '/apps/vocab-grammar-mock/round4.html', count: 25 },
-  { path: '/apps/vocab-grammar-mock/marathon30.html', count: 30, marathon: true }
+  { path: '/apps/vocab-grammar-mock/round4.html', count: 25 }
 ];
 
 const ibtQuizPages = [
@@ -36,6 +35,13 @@ const ibtQuizPages = [
     assignmentId: 'vocab-grammar-mock-round4-ibt-v1',
     roundId: '4-ibt',
     roundLabel: '4회차 IBT 형식'
+  },
+  {
+    path: '/apps/vocab-grammar-mock/marathon30.html',
+    count: 30,
+    assignmentId: 'vocab-grammar-mock-marathon30-ibt-v1',
+    roundId: 'marathon30-ibt',
+    roundLabel: '30문제 마라톤 IBT 형식'
   }
 ];
 
@@ -209,11 +215,11 @@ async function installDashboardMock(page) {
           questionResults: []
         }
       ],
-      'vocab-grammar-mock-marathon30-v1': [
+      'vocab-grammar-mock-marathon30-ibt-v1': [
         {
-          id: 'marathon-sub-1',
-          assignmentId: 'vocab-grammar-mock-marathon30-v1',
-          studentName: '마라톤학생',
+          id: 'marathon-ibt-sub-1',
+          assignmentId: 'vocab-grammar-mock-marathon30-ibt-v1',
+          studentName: '마라톤IBT학생',
           score: 28,
           total: 30,
           percent: 93,
@@ -317,41 +323,42 @@ test('vocab grammar mock landing exposes only the visible rounds', async ({ page
   await page.goto('/apps/vocab-grammar-mock/index.html', { waitUntil: 'domcontentloaded' });
 
   await expect(page.locator('.round-card')).toHaveCount(9);
-  await expect(page.locator('a.round-card')).toHaveCount(4);
+  await expect(page.locator('a.round-card')).toHaveCount(5);
   await expect(page.locator('.round-card').nth(0)).toContainText('1회차 IBT 형식');
   await expect(page.locator('.round-card').nth(1)).toContainText('2회차 IBT 형식');
   await expect(page.locator('.round-card').nth(2)).toContainText('3회차 IBT 형식');
   await expect(page.locator('.round-card').nth(3)).toContainText('4회차 IBT 형식');
+  await expect(page.locator('.round-card').nth(4)).toContainText('30문제 마라톤 IBT 형식');
   await expect(page.locator('a.round-card[href="./round1-ibt.html"]')).toContainText('1회차 IBT 형식');
   await expect(page.locator('a.round-card[href="./round2-ibt.html"]')).toContainText('2회차 IBT 형식');
   await expect(page.locator('a.round-card[href="./round3-ibt.html"]')).toContainText('3회차 IBT 형식');
   await expect(page.locator('a.round-card[href="./round4-ibt.html"]')).toContainText('4회차 IBT 형식');
-  await expect(page.locator('.round-card.is-disabled')).toHaveCount(5);
+  await expect(page.locator('a.round-card[href="./marathon30.html"]')).toContainText('30문제 마라톤 IBT 형식');
+  await expect(page.locator('.round-card.is-disabled')).toHaveCount(4);
   await expect(page.locator('.round-card.is-disabled').first()).toContainText('현재 IBT 형식만 열려 있습니다.');
   await expect(page.locator('a.round-card[href="./round1.html"]')).toHaveCount(0);
   await expect(page.locator('a.round-card[href="./round2.html"]')).toHaveCount(0);
-  await expect(page.locator('.round-card.is-disabled').filter({ hasText: '30문제 마라톤' })).toContainText('비활성화');
   await expect(page.locator('a.round-card[href="./round3.html"]')).toHaveCount(0);
   await expect(page.locator('a.round-card[href="./round4.html"]')).toHaveCount(0);
-  await expect(page.locator('a.round-card[href="./marathon30.html"]')).toHaveCount(0);
   await expect(page.locator('body')).not.toContainText('5회차');
 });
 
 test('vocab grammar mock round navigation disables unavailable rounds', async ({ page }) => {
   await page.goto('/apps/vocab-grammar-mock/round1.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#roundNav a')).toHaveCount(4);
+  await expect(page.locator('#roundNav a')).toHaveCount(5);
   await expect(page.locator('#roundNav a').nth(0)).toContainText('1회차 IBT 형식');
   await expect(page.locator('#roundNav a').nth(1)).toContainText('2회차 IBT 형식');
   await expect(page.locator('#roundNav a').nth(2)).toContainText('3회차 IBT 형식');
   await expect(page.locator('#roundNav a').nth(3)).toContainText('4회차 IBT 형식');
+  await expect(page.locator('#roundNav a').nth(4)).toContainText('30문제 마라톤 IBT 형식');
   await expect(page.locator('#roundNav a[href="./round1-ibt.html"]')).toContainText('1회차 IBT 형식');
   await expect(page.locator('#roundNav a[href="./round2-ibt.html"]')).toContainText('2회차 IBT 형식');
   await expect(page.locator('#roundNav a[href="./round3-ibt.html"]')).toContainText('3회차 IBT 형식');
   await expect(page.locator('#roundNav a[href="./round4-ibt.html"]')).toContainText('4회차 IBT 형식');
+  await expect(page.locator('#roundNav a[href="./marathon30.html"]')).toContainText('30문제 마라톤 IBT 형식');
   await expect(page.locator('#roundNav a[href="./round1.html"]')).toHaveCount(0);
   await expect(page.locator('#roundNav a[href="./round2.html"]')).toHaveCount(0);
-  await expect(page.locator('#roundNav .is-disabled')).toHaveCount(5);
-  await expect(page.locator('#roundNav .is-disabled').filter({ hasText: '30문제 마라톤' })).toHaveAttribute('aria-disabled', 'true');
+  await expect(page.locator('#roundNav .is-disabled')).toHaveCount(4);
 });
 
 test('vocab grammar mock pages render balanced shuffled choices responsively', async ({ page }) => {
@@ -425,7 +432,7 @@ test('vocab grammar mock keeps a shuffled attempt stable across reload and creat
   expect(resetAudit.orders).not.toEqual(firstAudit.orders);
 });
 
-test('vocab grammar mock grades perfect submissions including marathon summary', async ({ page }) => {
+test('vocab grammar mock grades perfect submissions', async ({ page }) => {
   await installHomeworkMock(page);
 
   for (const quizPage of quizPages) {
@@ -438,11 +445,6 @@ test('vocab grammar mock grades perfect submissions including marathon summary',
     await expect(page.locator('#progressText')).toHaveText(`${quizPage.count} / ${quizPage.count}`);
     await expect(page.locator('#summaryModalScore')).toContainText(`${quizPage.count}문항 중 ${quizPage.count}문항 정답`);
     await expect(page.locator('#homeworkStatus')).toContainText('완료');
-
-    if (quizPage.marathon) {
-      await expect(page.locator('#coachSummary')).toBeVisible();
-      await expect(page.locator('#summaryModalCoach')).toBeVisible();
-    }
   }
 });
 
@@ -725,21 +727,22 @@ test('vocab grammar mock submits round payload with answer details', async ({ pa
   });
 });
 
-test('vocab grammar mock submits marathon with its own assignment id', async ({ page }) => {
+test('vocab grammar mock submits marathon IBT with its own assignment id', async ({ page }) => {
   await installHomeworkMock(page);
   await page.goto('/apps/vocab-grammar-mock/marathon30.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('.question-card')).toHaveCount(30);
-  await enterStudentName(page, '마라톤 학생');
+  await expect(page.locator('.ibt-question-card')).toHaveCount(30);
+  await enterStudentName(page, '마라톤 IBT 학생');
   await answerAllCorrect(page);
-  await page.locator('[data-action="grade"]').first().click();
+  await page.locator('[data-ibt-action="open-submit"]').click();
+  await page.locator('#ibtSubmitModal [data-action="grade"]').click();
   await expect(page.locator('#homeworkStatus')).toContainText('완료');
 
   const submission = await page.evaluate(() => window.__homeworkSubmissions[0]);
   expect(submission).toMatchObject({
-    assignmentId: 'vocab-grammar-mock-marathon30-v1',
-    roundId: 'marathon30',
-    roundLabel: '30문제 마라톤',
-    studentName: '마라톤 학생',
+    assignmentId: 'vocab-grammar-mock-marathon30-ibt-v1',
+    roundId: 'marathon30-ibt',
+    roundLabel: '30문제 마라톤 IBT 형식',
+    studentName: '마라톤 IBT 학생',
     score: 30,
     total: 30,
     percent: 100
@@ -872,11 +875,14 @@ test('vocab grammar mock dashboard switches assignments by round query', async (
   await expect(page.locator('.score-bar')).toContainText(['김학생', '박학생']);
   await expect(page.locator('.weak-item').first()).toContainText('Q1');
 
-  await page.goto('/apps/vocab-grammar-mock/results.html?round=marathon30', { waitUntil: 'load' });
-  await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 30문제 마라톤 제출 현황');
+  await page.goto('/apps/vocab-grammar-mock/results.html?round=marathon30-ibt', { waitUntil: 'load' });
+  await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 30문제 마라톤 IBT 형식 제출 현황');
   await page.locator('#signInButton').click();
   await expect(page.locator('.summary-card').first()).toContainText('1');
-  await expect(page.locator('.score-bar').first()).toContainText('마라톤학생');
+  await expect(page.locator('.score-bar').first()).toContainText('마라톤IBT학생');
+
+  await page.goto('/apps/vocab-grammar-mock/results.html?round=marathon30', { waitUntil: 'load' });
+  await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 30문제 마라톤 IBT 형식 제출 현황');
 
   await page.goto('/apps/vocab-grammar-mock/results.html?round=1-ibt', { waitUntil: 'load' });
   await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 1회차 IBT 형식 제출 현황');
@@ -912,4 +918,9 @@ test('vocab grammar mock dashboard switches assignments by round query', async (
   await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 4회차 IBT 형식 제출 현황');
   await page.locator('#signInButton').click();
   await expect(page.locator('.score-bar').first()).toContainText('IBT정학생');
+
+  await page.goto('/teacher-dashboard/index.html?assignment=vocab-grammar-mock-marathon30-ibt-v1', { waitUntil: 'load' });
+  await expect(page.locator('h1')).toHaveText('3B 중간 모의고사 30문제 마라톤 IBT 형식 제출 현황');
+  await page.locator('#signInButton').click();
+  await expect(page.locator('.score-bar').first()).toContainText('마라톤IBT학생');
 });

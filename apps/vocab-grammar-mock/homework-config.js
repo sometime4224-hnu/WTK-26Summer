@@ -58,18 +58,18 @@
             roundLabel: "4회차",
             totalQuestions: 25
         },
-        marathon30: {
-            assignmentId: "vocab-grammar-mock-marathon30-v1",
-            assignmentTitle: "3B 중간 모의고사 30문제 마라톤",
-            roundId: "marathon30",
-            roundLabel: "30문제 마라톤",
+        "marathon30-ibt": {
+            assignmentId: "vocab-grammar-mock-marathon30-ibt-v1",
+            assignmentTitle: "3B 중간 모의고사 30문제 마라톤 IBT 형식",
+            roundId: "marathon30-ibt",
+            roundLabel: "30문제 마라톤 IBT 형식",
             totalQuestions: 30
         }
     };
 
     function normalizeRoundId(value) {
         const normalized = String(value || "").trim().toLowerCase();
-        if (normalized === "marathon" || normalized === "marathon30") return "marathon30";
+        if (normalized === "marathon" || normalized === "marathon30") return "marathon30-ibt";
         if (Object.prototype.hasOwnProperty.call(assignments, normalized)) return normalized;
         return "1";
     }

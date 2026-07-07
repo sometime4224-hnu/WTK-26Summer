@@ -99,8 +99,8 @@
                         activityHref: "apps/vocab-grammar-mock/round4.html"
                     },
                     {
-                        assignmentId: "vocab-grammar-mock-marathon30-v1",
-                        title: "3B 중간 모의고사 30문제 마라톤",
+                        assignmentId: "vocab-grammar-mock-marathon30-ibt-v1",
+                        title: "3B 중간 모의고사 30문제 마라톤 IBT 형식",
                         chapter: "midterm-3b",
                         totalQuestions: 30,
                         activityHref: "apps/vocab-grammar-mock/marathon30.html"
