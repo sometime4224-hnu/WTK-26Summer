@@ -24,17 +24,17 @@ test('reading slot lab renders 20-item practice set', async ({ page }) => {
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
   await expect(page.locator('h1')).toHaveText('빈칸 성분 연습');
   await expect(page.locator('.rail-button')).toHaveCount(20);
-  await expect(page.locator('.component-button')).toHaveCount(7);
-  await expect(page.locator('[data-component-option="subject"]')).toContainText('주어 (S)');
-  await expect(page.locator('[data-component-option="predicate"]')).toContainText('동사/형용사 (V/Adj)');
-  await expect(page.locator('[data-component-option="adverbial"]')).toContainText('부사어 (Adv)');
-  await expect(page.locator('[data-component-option="subject"] .component-support')).toContainText('조사');
-  await expect(page.locator('[data-component-option="subject"] .support-chip')).toContainText('이/가');
-  await expect(page.locator('[data-component-option="object"] .support-chip')).toContainText('을/를');
-  await expect(page.locator('[data-component-option="adverbial"] .support-chip')).toContainText(['에', '에서', '(으)로']);
+  await expect(page.locator('.component-button')).toHaveCount(4);
+  await expect(page.locator('[data-component-option="noun"]')).toContainText('명사 자리 (N)');
+  await expect(page.locator('[data-component-option="predicate"]')).toContainText('동사·형용사 자리 (V/Adj)');
+  await expect(page.locator('[data-component-option="modifier"]')).toContainText('꾸며 주는 말 (Mod)');
+  await expect(page.locator('[data-component-option="connective"]')).toContainText('이어 주는 말 (Conn)');
+  await expect(page.locator('[data-component-option="noun"] .component-support')).toContainText('예');
+  await expect(page.locator('[data-component-option="noun"] .support-chip')).toContainText(['유통 기한', '취미']);
   await expect(page.locator('[data-component-option="predicate"] .component-support')).toContainText('예');
   await expect(page.locator('[data-component-option="predicate"] .support-chip')).toContainText(['하다', '좋다']);
-  await expect(page.locator('[data-component-option="connective"] .support-chip')).toContainText(['그리고', '-고']);
+  await expect(page.locator('[data-component-option="modifier"] .support-chip')).toContainText(['좋은', '뜨겁게']);
+  await expect(page.locator('[data-component-option="connective"] .support-chip')).toContainText(['-고', '-면서']);
   await expect(page.locator('#itemCountText')).toHaveText('전체 20문항');
 
   const dataAudit = await page.evaluate(() => ({
@@ -54,6 +54,14 @@ test('reading slot lab renders 20-item practice set', async ({ page }) => {
     exposedParticleItems: window.READING_SLOT_LAB_DATA.items
       .filter((item) => /^(은|는|이|가|을|를|의)\s*/.test(item.after.trim()))
       .map((item) => item.id),
+    invalidComponentItems: window.READING_SLOT_LAB_DATA.items
+      .flatMap((item) => {
+        const ids = (item.possibilities?.length ? item.possibilities : [item])
+          .map((entry) => entry.componentId);
+        return ids
+          .filter((id) => !window.READING_SLOT_LAB_DATA.components.some((component) => component.id === id))
+          .map((id) => `${item.id}:${id}`);
+      }),
     hintProblems: window.READING_SLOT_LAB_DATA.items.flatMap((item) => {
       const lineTexts = item.passage.map((line) => (
         Object.prototype.hasOwnProperty.call(line, 'text')
@@ -76,6 +84,7 @@ test('reading slot lab renders 20-item practice set', async ({ page }) => {
   expect(dataAudit.shortPassageItems).toEqual([]);
   expect(dataAudit.invalidTargetItems).toEqual([]);
   expect(dataAudit.exposedParticleItems).toEqual([]);
+  expect(dataAudit.invalidComponentItems).toEqual([]);
   expect(dataAudit.hintProblems).toEqual([]);
   await expect(page.locator('.passage-sentence')).toHaveCount(3);
   await expect(page.locator('.passage-sentence.is-target')).toHaveCount(1);
@@ -130,12 +139,12 @@ test('reading slot lab filters lessons and scores only component choices', async
   await expect(page.locator('#sourceLabel')).toContainText('10과 읽기');
 
   await page.locator('#draftInput').fill('다른 답');
-  await page.locator('[data-component-option="subject"]').click();
+  await page.locator('[data-component-option="noun"]').click();
   await page.locator('#checkButton').click();
 
   await expect(page.locator('#feedbackPanel')).toContainText('맞았습니다.');
   await expect(page.locator('#feedbackPanel')).toContainText('유통 기한이');
-  await expect(page.locator('#feedbackPanel')).toContainText('누가/무엇이 - 주어 (S)');
+  await expect(page.locator('#feedbackPanel')).toContainText('명사 자리 (N)');
   await expect(page.locator('#feedbackPanel')).toContainText('내 답: 다른 답');
   await expect(page.locator('#scoreText')).toHaveText('1 / 20');
 });
@@ -146,12 +155,11 @@ test('reading slot lab accepts reviewed alternative components for flexible blan
   await page.locator('.rail-button').nth(1).click();
   await expect(page.locator('#questionTitle')).toHaveText('2번');
   await page.locator('#draftInput').fill('행복한');
-  await page.locator('[data-component-option="adnominal"]').click();
+  await page.locator('[data-component-option="modifier"]').click();
   await page.locator('#checkButton').click();
 
-  await expect(page.locator('#feedbackPanel')).toContainText('가능합니다.');
-  await expect(page.locator('#feedbackPanel')).toContainText('언제/어디서/어떻게/왜 - 부사어 (Adv)');
-  await expect(page.locator('#feedbackPanel')).toContainText('어떤/무슨 - 관형어 (Adn)');
+  await expect(page.locator('#feedbackPanel')).toContainText('맞았습니다.');
+  await expect(page.locator('#feedbackPanel')).toContainText('꾸며 주는 말 (Mod)');
   await expect(page.locator('#feedbackPanel')).toContainText('행복한');
   await expect(page.locator('#feedbackPanel')).toContainText('좋은');
   await expect(page.locator('#scoreText')).toHaveText('1 / 20');
@@ -180,12 +188,12 @@ test('reading slot lab restores saved progress after reload', async ({ page }) =
 test('reading slot lab marks wrong component without grading the draft answer', async ({ page }) => {
   await page.goto('/apps/reading-slot-lab/index.html', { waitUntil: 'domcontentloaded' });
 
-  await page.locator('[data-component-option="object"]').click();
+  await page.locator('[data-component-option="predicate"]').click();
   await page.locator('#draftInput').fill('유통 기한이');
   await page.locator('#checkButton').click();
 
   await expect(page.locator('#feedbackPanel')).toContainText('다시 보세요.');
-  await expect(page.locator('#feedbackPanel')).toContainText('가능한 분류: 누가/무엇이 - 주어 (S)');
+  await expect(page.locator('#feedbackPanel')).toContainText('가능한 형태: 명사 자리 (N)');
   await expect(page.locator('#scoreText')).toHaveText('0 / 20');
   await expect(page.locator('.rail-button').first()).toHaveClass(/is-wrong/);
 });
@@ -202,7 +210,7 @@ test('reading slot lab fits mobile and desktop without horizontal overflow', asy
     await page.goto('/apps/reading-slot-lab/index.html', { waitUntil: 'domcontentloaded' });
 
     await expect(page.locator('.rail-button')).toHaveCount(20);
-    await expect(page.locator('.component-button')).toHaveCount(7);
+    await expect(page.locator('.component-button')).toHaveCount(4);
     await page.locator('[data-hint-type="logic"]').click();
     await expectNoHorizontalOverflow(page);
 

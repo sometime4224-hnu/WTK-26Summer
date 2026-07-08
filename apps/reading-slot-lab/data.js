@@ -1,60 +1,36 @@
 window.READING_SLOT_LAB_DATA = {
     components: [
         {
-            id: "subject",
-            label: "누가/무엇이",
-            name: "주어",
-            abbr: "S",
-            hint: "문장의 주인공입니다.",
-            particles: ["이/가"]
-        },
-        {
-            id: "object",
-            label: "무엇을/누구를",
-            name: "목적어",
-            abbr: "O",
-            hint: "행동의 대상입니다.",
-            particles: ["을/를"]
+            id: "noun",
+            label: "명사 자리",
+            name: "명사",
+            abbr: "N",
+            hint: "사람, 물건, 생각처럼 이름을 넣습니다.",
+            examples: ["유통 기한", "취미"]
         },
         {
             id: "predicate",
-            label: "무엇을 하다/어떻다",
+            label: "동사·형용사 자리",
             name: "동사/형용사",
             abbr: "V/Adj",
-            hint: "행동이나 상태를 말합니다.",
+            hint: "행동이나 상태를 넣습니다.",
             examples: ["하다", "좋다"]
         },
         {
-            id: "complement",
-            label: "무엇이 되다/아니다",
-            name: "보어",
-            abbr: "Comp",
-            hint: "되다, 아니다 앞에 오는 말입니다.",
-            particles: ["이/가"]
-        },
-        {
-            id: "adnominal",
-            label: "어떤/무슨",
-            name: "관형어",
-            abbr: "Adn",
-            hint: "뒤의 이름을 꾸밉니다.",
-            examples: ["좋은", "여러"]
-        },
-        {
-            id: "adverbial",
-            label: "언제/어디서/어떻게/왜",
-            name: "부사어",
-            abbr: "Adv",
-            hint: "동작이나 상태를 자세히 말합니다.",
-            particles: ["에", "에서", "(으)로"]
+            id: "modifier",
+            label: "꾸며 주는 말",
+            name: "꾸밈말",
+            abbr: "Mod",
+            hint: "명사나 행동을 더 자세히 말합니다.",
+            examples: ["좋은", "뜨겁게"]
         },
         {
             id: "connective",
-            label: "앞뒤 문장 연결",
+            label: "이어 주는 말",
             name: "연결 표현",
             abbr: "Conn",
             hint: "두 내용을 이어 줍니다.",
-            examples: ["그리고", "-고"]
+            examples: ["-고", "-면서"]
         }
     ],
     items: [
@@ -70,7 +46,7 @@ window.READING_SLOT_LAB_DATA = {
             context: "사랑이 처음과 다르게 변할 수 있다는 부분입니다.",
             before: "하지만 사랑에도 ",
             after: " 있다고 합니다.",
-            componentId: "subject",
+            componentId: "noun",
             modelAnswers: ["유통 기한이"],
             clue: "있다 앞에서 무엇이 있는지 말합니다.",
             explanation: "무엇이 있다고 하는지 찾으면 됩니다. 그래서 이 자리는 주어입니다.",
@@ -96,18 +72,13 @@ window.READING_SLOT_LAB_DATA = {
             context: "처음 사랑할 때의 뜨거운 마음을 설명하는 부분입니다.",
             before: "",
             after: " 연애를 하던 사람들도 시간이 지나면 가슴이 두근거리지 않는다고 합니다.",
-            componentId: "adverbial",
+            componentId: "modifier",
             modelAnswers: ["뜨겁게"],
             possibilities: [
                 {
-                    componentId: "adverbial",
-                    answers: ["뜨겁게", "열정적으로", "오랫동안"],
-                    note: "연애를 어떻게 했는지 말하면 부사어입니다."
-                },
-                {
-                    componentId: "adnominal",
-                    answers: ["행복한", "즐거운", "좋은"],
-                    note: "어떤 연애인지 말하면 뒤의 연애를 꾸미는 관형어입니다."
+                    componentId: "modifier",
+                    answers: ["뜨겁게", "열정적으로", "오랫동안", "행복한", "즐거운", "좋은"],
+                    note: "연애를 어떻게 했는지 말하거나, 어떤 연애인지 말하면 됩니다."
                 }
             ],
             reviewNote: "이 빈칸은 뒤의 '연애'를 직접 꾸밀 수도 있고, '연애를 하던' 행동 전체를 꾸밀 수도 있습니다.",
@@ -190,7 +161,7 @@ window.READING_SLOT_LAB_DATA = {
             context: "함께하는 시간을 만드는 방법입니다.",
             before: "함께 할 수 있는 ",
             after: " 만듭니다.",
-            componentId: "object",
+            componentId: "noun",
             modelAnswers: ["취미를"],
             clue: "무엇을 만드는지 찾습니다.",
             explanation: "만드는 대상이 무엇인지 묻는 자리입니다. 그래서 목적어입니다.",
@@ -216,7 +187,7 @@ window.READING_SLOT_LAB_DATA = {
             context: "직장인이 되고 싶은 모습을 말하는 부분입니다.",
             before: "회사에서 꼭 필요한 ",
             after: " 되고 싶을 것이다.",
-            componentId: "complement",
+            componentId: "noun",
             modelAnswers: ["사람이"],
             clue: "무엇이 되고 싶은지 말합니다.",
             explanation: "되다 앞에서 무엇이 되는지 말합니다. 그래서 보어입니다.",
@@ -295,7 +266,7 @@ window.READING_SLOT_LAB_DATA = {
             context: "책을 읽으면 얻을 수 있는 것을 말하는 부분입니다.",
             before: "경제 경영 서적을 읽으면 업무에 필요한 ",
             after: " 얻을 수 있다.",
-            componentId: "object",
+            componentId: "noun",
             modelAnswers: ["지식을"],
             clue: "무엇을 얻을 수 있는지 찾습니다.",
             explanation: "얻는 대상이 무엇인지 묻는 자리입니다. 그래서 목적어입니다.",
@@ -322,7 +293,7 @@ window.READING_SLOT_LAB_DATA = {
             context: "한국 직장인의 독서량을 말하는 부분입니다.",
             before: "한국의 직장인들은 1년에 평균 ",
             after: " 책을 읽는다.",
-            componentId: "adnominal",
+            componentId: "modifier",
             modelAnswers: ["16권의"],
             clue: "뒤의 책을 수량으로 꾸밉니다.",
             explanation: "몇 권의 책인지 뒤의 말을 꾸며 줍니다. 그래서 관형어입니다.",
@@ -375,7 +346,7 @@ window.READING_SLOT_LAB_DATA = {
             context: "컴퓨터를 보는 자세를 설명하는 부분입니다.",
             before: "많은 사람들이 거북처럼 목을 앞으로 ",
             after: " 빼고 컴퓨터를 봅니다.",
-            componentId: "adverbial",
+            componentId: "modifier",
             modelAnswers: ["길게"],
             clue: "목을 어떻게 빼는지 말합니다.",
             explanation: "동작의 모습을 자세히 말합니다. 그래서 부사어입니다.",
@@ -455,7 +426,7 @@ window.READING_SLOT_LAB_DATA = {
             context: "바른 자세의 필요성을 말하는 부분입니다.",
             before: "자세가 좋아야 ",
             after: " 지킬 수 있습니다.",
-            componentId: "object",
+            componentId: "noun",
             modelAnswers: ["건강을"],
             clue: "무엇을 지키는지 찾습니다.",
             explanation: "지키는 대상이 무엇인지 묻는 자리입니다. 그래서 목적어입니다.",
@@ -481,7 +452,7 @@ window.READING_SLOT_LAB_DATA = {
             context: "동사모가 어떤 모임인지 소개하는 부분입니다.",
             before: "동사모는 동물을 사랑하는 사람들이 ",
             after: " 모임입니다.",
-            componentId: "adnominal",
+            componentId: "modifier",
             modelAnswers: ["모인"],
             clue: "뒤의 모임을 설명합니다.",
             explanation: "어떤 모임인지 뒤의 말을 꾸며 줍니다. 그래서 관형어입니다.",
@@ -533,7 +504,7 @@ window.READING_SLOT_LAB_DATA = {
             context: "동물을 잘 돌볼 수 있을지 걱정하는 사람들을 말합니다.",
             before: "동물을 잘 돌볼 수 없을까 봐 ",
             after: " 분들을 위해 여러 가지 도움도 드립니다.",
-            componentId: "adnominal",
+            componentId: "modifier",
             modelAnswers: ["걱정하시는"],
             clue: "뒤의 분들을 설명합니다.",
             explanation: "어떤 분들인지 꾸며 주는 자리입니다. 그래서 관형어입니다.",

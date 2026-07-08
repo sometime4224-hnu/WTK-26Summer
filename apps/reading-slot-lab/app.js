@@ -2,7 +2,7 @@
     "use strict";
 
     const DATA = window.READING_SLOT_LAB_DATA;
-    const STORAGE_KEY = "korean3b.reading-slot-lab.v1";
+    const STORAGE_KEY = "korean3b.reading-slot-lab.v2";
     const ALL_FILTER = "all";
     const HINT_TYPES = {
         syntax: {
@@ -120,7 +120,7 @@
             if (!state.selections[item.id]) {
                 refs.feedbackPanel.hidden = false;
                 refs.feedbackPanel.className = "feedback-panel is-bad";
-                refs.feedbackPanel.innerHTML = "<p>성분을 먼저 고르세요.</p>";
+                refs.feedbackPanel.innerHTML = "<p>형태를 먼저 고르세요.</p>";
                 return;
             }
             state.checked[item.id] = true;
@@ -248,16 +248,16 @@
             : "다시 보세요.";
         const headlineBody = isCorrect
             ? selectedId === item.componentId
-                ? "원문에서 쓰인 성분을 잘 찾았습니다."
-                : "선택한 성분으로도 자연스러운 문장을 만들 수 있습니다."
-            : "이 자리에서 자연스러운 성분을 다시 확인하세요.";
+                ? "빈칸에 들어갈 말의 형태를 잘 찾았습니다."
+                : "선택한 형태로도 자연스러운 문장을 만들 수 있습니다."
+            : "이 자리에서 자연스러운 형태를 다시 확인하세요.";
 
         refs.feedbackPanel.hidden = false;
         refs.feedbackPanel.className = `feedback-panel ${isCorrect ? "is-good" : "is-bad"}`;
         refs.feedbackPanel.innerHTML = `
             <p><strong>${headline}</strong> ${headlineBody}</p>
-            <p>가능한 분류: ${uniqueAcceptedLabels.map(escapeHtml).join(", ")}</p>
-            <p>내가 고른 분류: ${escapeHtml(selected ? formatComponent(selected) : "없음")}</p>
+            <p>가능한 형태: ${uniqueAcceptedLabels.map(escapeHtml).join(", ")}</p>
+            <p>내가 고른 형태: ${escapeHtml(selected ? formatComponent(selected) : "없음")}</p>
             <p>단서: ${escapeHtml(item.clue)}</p>
             <p>${escapeHtml(item.explanation)}</p>
             ${item.reviewNote ? `<p>${escapeHtml(item.reviewNote)}</p>` : ""}
@@ -400,7 +400,7 @@
 
         refs.weakSummary.innerHTML = weakRows.length
             ? weakRows.map(([label, count]) => `<div class="result-pill"><span>${escapeHtml(label)}</span><b>${count}</b></div>`).join("")
-            : '<div class="result-pill"><span>약한 성분</span><b>없음</b></div>';
+            : '<div class="result-pill"><span>약한 형태</span><b>없음</b></div>';
     }
 
     function moveQuestion(delta) {
@@ -491,7 +491,7 @@
     }
 
     function formatComponent(component) {
-        return `${component.label} - ${component.name} (${component.abbr})`;
+        return `${component.label} (${component.abbr})`;
     }
 
     function restoreState() {
