@@ -35,6 +35,7 @@ test('reading slot lab renders 20-item practice set', async ({ page }) => {
   await expect(page.locator('[data-component-option="predicate"] .support-chip')).toContainText(['하다', '좋다']);
   await expect(page.locator('[data-component-option="modifier"] .support-chip')).toContainText(['좋은', '뜨겁게']);
   await expect(page.locator('[data-component-option="connective"] .support-chip')).toContainText(['-고', '-면서']);
+  await expect(page.locator('#checkButton')).toBeEnabled();
   await expect(page.locator('#itemCountText')).toHaveText('전체 20문항');
 
   const dataAudit = await page.evaluate(() => ({
@@ -149,6 +150,23 @@ test('reading slot lab filters lessons and scores only component choices', async
   await expect(page.locator('#scoreText')).toHaveText('1 / 20');
 });
 
+test('reading slot lab can reveal feedback without choosing a form', async ({ page }) => {
+  await page.goto('/apps/reading-slot-lab/index.html', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('#checkButton')).toBeEnabled();
+  await page.locator('#checkButton').click();
+
+  await expect(page.locator('#feedbackPanel')).toContainText('정답을 확인하세요.');
+  await expect(page.locator('#feedbackPanel')).toContainText('선택하지 않아도 예시 답과 형태를 볼 수 있습니다.');
+  await expect(page.locator('#feedbackPanel')).toContainText('가능한 형태: 명사 자리 (N)');
+  await expect(page.locator('#feedbackPanel')).toContainText('내가 고른 형태: 없음');
+  await expect(page.locator('#scoreText')).toHaveText('0 / 20');
+  await expect(page.locator('.rail-button').first()).toHaveClass(/is-wrong/);
+
+  await page.locator('#nextButton').click();
+  await expect(page.locator('#questionTitle')).toHaveText('2번');
+});
+
 test('reading slot lab accepts reviewed alternative components for flexible blanks', async ({ page }) => {
   await page.goto('/apps/reading-slot-lab/index.html', { waitUntil: 'domcontentloaded' });
 
@@ -196,6 +214,19 @@ test('reading slot lab marks wrong component without grading the draft answer', 
   await expect(page.locator('#feedbackPanel')).toContainText('가능한 형태: 명사 자리 (N)');
   await expect(page.locator('#scoreText')).toHaveText('0 / 20');
   await expect(page.locator('.rail-button').first()).toHaveClass(/is-wrong/);
+
+  const colors = await page.evaluate(() => {
+    const panel = document.querySelector('#feedbackPanel');
+    const rail = document.querySelector('.rail-button');
+    return {
+      panelBackground: getComputedStyle(panel).backgroundColor,
+      panelColor: getComputedStyle(panel).color,
+      railBackground: getComputedStyle(rail).backgroundColor
+    };
+  });
+  expect(colors.panelBackground).toBe('rgb(255, 251, 235)');
+  expect(colors.panelColor).toBe('rgb(113, 63, 18)');
+  expect(colors.railBackground).toBe('rgb(255, 251, 235)');
 });
 
 test('reading slot lab fits mobile and desktop without horizontal overflow', async ({ page }) => {

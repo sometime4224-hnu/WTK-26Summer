@@ -117,12 +117,6 @@
 
         refs.checkButton.addEventListener("click", () => {
             const item = getCurrentItem();
-            if (!state.selections[item.id]) {
-                refs.feedbackPanel.hidden = false;
-                refs.feedbackPanel.className = "feedback-panel is-bad";
-                refs.feedbackPanel.innerHTML = "<p>형태를 먼저 고르세요.</p>";
-                return;
-            }
             state.checked[item.id] = true;
             saveState();
             render();
@@ -217,7 +211,7 @@
 
         refs.draftInput.value = state.drafts[item.id] || "";
         refs.draftInput.placeholder = "답을 써 보세요.";
-        refs.checkButton.disabled = !selected;
+        refs.checkButton.disabled = false;
         refs.prevButton.disabled = currentIndex <= 0;
         refs.nextButton.disabled = currentIndex >= items.length - 1;
 
@@ -234,6 +228,7 @@
 
         const selectedId = state.selections[item.id];
         const acceptedIds = getAcceptedComponentIds(item);
+        const hasSelection = Boolean(selectedId);
         const isCorrect = acceptedIds.includes(selectedId);
         const selected = componentMap.get(selectedId);
         const possibilities = getPossibilities(item);
@@ -243,10 +238,14 @@
             .map(formatComponent);
         const uniqueAcceptedLabels = Array.from(new Set(acceptedLabels));
         const draft = (state.drafts[item.id] || "").trim();
-        const headline = isCorrect
+        const headline = !hasSelection
+            ? "정답을 확인하세요."
+            : isCorrect
             ? selectedId === item.componentId ? "맞았습니다." : "가능합니다."
             : "다시 보세요.";
-        const headlineBody = isCorrect
+        const headlineBody = !hasSelection
+            ? "선택하지 않아도 예시 답과 형태를 볼 수 있습니다."
+            : isCorrect
             ? selectedId === item.componentId
                 ? "빈칸에 들어갈 말의 형태를 잘 찾았습니다."
                 : "선택한 형태로도 자연스러운 문장을 만들 수 있습니다."
