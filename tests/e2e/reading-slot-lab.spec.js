@@ -89,6 +89,8 @@ test('reading slot lab renders 20-item practice set', async ({ page }) => {
   expect(dataAudit.hintProblems).toEqual([]);
   await expect(page.locator('.passage-sentence')).toHaveCount(3);
   await expect(page.locator('.passage-sentence.is-target')).toHaveCount(1);
+  await expect(page.locator('.blank-mark')).toHaveText('빈칸');
+  await expect(page.locator('.blank-mark')).toHaveAttribute('aria-pressed', 'false');
 });
 
 test('midterm hub links to reading slot lab', async ({ page }) => {
@@ -167,6 +169,25 @@ test('reading slot lab can reveal feedback without choosing a form', async ({ pa
   await expect(page.locator('#questionTitle')).toHaveText('2번');
 });
 
+test('reading slot lab reveals original text by tapping the blank', async ({ page }) => {
+  await page.goto('/apps/reading-slot-lab/index.html', { waitUntil: 'domcontentloaded' });
+
+  const blank = page.locator('.blank-mark');
+  await expect(blank).toHaveText('빈칸');
+  await blank.click();
+  await expect(blank).toHaveText('유통 기한이');
+  await expect(blank).toHaveClass(/is-revealed/);
+  await expect(blank).toHaveAttribute('aria-pressed', 'true');
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.blank-mark')).toHaveText('유통 기한이');
+  await expect(page.locator('.blank-mark')).toHaveAttribute('aria-pressed', 'true');
+
+  await page.locator('.blank-mark').click();
+  await expect(page.locator('.blank-mark')).toHaveText('빈칸');
+  await expect(page.locator('.blank-mark')).toHaveAttribute('aria-pressed', 'false');
+});
+
 test('reading slot lab accepts reviewed alternative components for flexible blanks', async ({ page }) => {
   await page.goto('/apps/reading-slot-lab/index.html', { waitUntil: 'domcontentloaded' });
 
@@ -242,6 +263,10 @@ test('reading slot lab fits mobile and desktop without horizontal overflow', asy
 
     await expect(page.locator('.rail-button')).toHaveCount(20);
     await expect(page.locator('.component-button')).toHaveCount(4);
+    if ((await page.locator('.blank-mark').textContent()).trim() === '빈칸') {
+      await page.locator('.blank-mark').click();
+    }
+    await expect(page.locator('.blank-mark')).not.toHaveText('빈칸');
     await page.locator('[data-hint-type="logic"]').click();
     await expectNoHorizontalOverflow(page);
 

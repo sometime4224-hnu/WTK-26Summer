@@ -30,7 +30,8 @@
         currentItemId: DATA.items[0]?.id || "",
         selections: {},
         drafts: {},
-        checked: {}
+        checked: {},
+        revealed: {}
     };
     let activeHintType = "";
 
@@ -96,6 +97,15 @@
             renderPractice();
         });
 
+        refs.passageBox.addEventListener("click", (event) => {
+            const button = event.target.closest("[data-blank-reveal]");
+            if (!button) return;
+            const item = getCurrentItem();
+            state.revealed[item.id] = !state.revealed[item.id];
+            saveState();
+            renderPractice();
+        });
+
         refs.componentChoices.addEventListener("click", (event) => {
             const button = event.target.closest("[data-component-option]");
             if (!button) return;
@@ -133,6 +143,7 @@
             state.selections = {};
             state.drafts = {};
             state.checked = {};
+            state.revealed = {};
             activeHintType = "";
             try {
                 window.localStorage.removeItem(STORAGE_KEY);
@@ -184,6 +195,7 @@
         const currentIndex = Math.max(0, items.findIndex((candidate) => candidate.id === item.id));
         const selected = state.selections[item.id] || "";
         const checked = Boolean(state.checked[item.id]);
+        const revealed = Boolean(state.revealed[item.id]);
 
         refs.sourceLabel.textContent = `${item.lesson}과 읽기 · ${item.sourceTitle}`;
         refs.questionTitle.textContent = `${currentIndex + 1}번`;
@@ -191,7 +203,7 @@
         refs.passageBox.innerHTML = `
             <p class="passage-context">${escapeHtml(item.context)}</p>
             <div class="passage-lines">
-                ${renderPassageLines(item, activeHintType)}
+                ${renderPassageLines(item, activeHintType, revealed)}
             </div>
         `;
         renderHintControls(item);
@@ -267,7 +279,7 @@
         `;
     }
 
-    function renderPassageLines(item, hintType) {
+    function renderPassageLines(item, hintType, revealed) {
         const lines = Array.isArray(item.passage) && item.passage.length
             ? item.passage
             : [{ before: item.before, after: item.after }];
@@ -280,7 +292,7 @@
             if (Object.prototype.hasOwnProperty.call(line, "before") || Object.prototype.hasOwnProperty.call(line, "after")) {
                 return `
                     <p class="passage-sentence is-target" data-passage-line="${lineNumber}">
-                        ${renderTextWithHints(line.before || "", lineHints, typeConfig)}<span class="blank-mark">빈칸</span>${renderTextWithHints(line.after || "", lineHints, typeConfig)}
+                        ${renderTextWithHints(line.before || "", lineHints, typeConfig)}${renderBlankMark(item, revealed)}${renderTextWithHints(line.after || "", lineHints, typeConfig)}
                     </p>
                 `;
             }
@@ -291,6 +303,17 @@
                 </p>
             `;
         }).join("");
+    }
+
+    function renderBlankMark(item, revealed) {
+        const originalText = getOriginalBlankText(item);
+        const label = revealed && originalText ? originalText : "빈칸";
+        const ariaLabel = revealed ? "원문 숨기기" : "원문 보기";
+        return `
+            <button class="blank-mark ${revealed ? "is-revealed" : ""}" type="button" data-blank-reveal aria-pressed="${revealed}" aria-label="${escapeHtml(ariaLabel)}">
+                ${escapeHtml(label)}
+            </button>
+        `;
     }
 
     function renderHintControls(item) {
@@ -451,6 +474,10 @@
         return Array.from(new Set(getPossibilities(item).map((possibility) => possibility.componentId)));
     }
 
+    function getOriginalBlankText(item) {
+        return item.originalAnswer || (Array.isArray(item.modelAnswers) ? item.modelAnswers[0] : "") || "";
+    }
+
     function getHints(item, hintType) {
         if (!hintType || !item.hints || !Array.isArray(item.hints[hintType])) {
             return [];
@@ -512,6 +539,7 @@
         state.selections = cleanRecord(saved.selections, (value) => componentMap.has(value));
         state.drafts = cleanRecord(saved.drafts, (value) => typeof value === "string");
         state.checked = cleanRecord(saved.checked, (value) => typeof value === "boolean");
+        state.revealed = cleanRecord(saved.revealed, (value) => typeof value === "boolean");
     }
 
     function saveState() {
