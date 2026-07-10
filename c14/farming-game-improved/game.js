@@ -246,7 +246,7 @@ const DEVICE_PROFILES = {
     touchActionHeight: 72
   },
   tablet: {
-    worldWidth: 900,
+    worldWidth: 960,
     worldHeight: 600,
     activityWidth: 620,
     activityHeight: 349,
@@ -303,8 +303,8 @@ function getPortraitProfileOverrides(id, isTouch, isPortrait) {
   switch (id) {
     case "tablet":
       return {
-        worldWidth: 840,
-        worldHeight: 1120,
+        worldWidth: 780,
+        worldHeight: 936,
         activityWidth: 620,
         activityHeight: 430,
         miniMapSize: 140,
@@ -363,6 +363,17 @@ function detectDeviceProfile() {
   const portraitOverrides = getPortraitProfileOverrides(id, isTouch, isPortrait);
   const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 
+  if (/^phone/.test(id) && isPortrait) {
+    const resolvedTouchButtonSize = portraitOverrides.touchButtonSize ?? DEVICE_PROFILES[id].touchButtonSize;
+    const resolvedTouchActionHeight = portraitOverrides.touchActionHeight ?? DEVICE_PROFILES[id].touchActionHeight;
+    const touchUiReserve = isTouch
+      ? Math.round(Math.max(resolvedTouchActionHeight, resolvedTouchButtonSize * 2.2) + 18)
+      : 0;
+    const gameplayHeight = Math.max(1, viewportHeight - 40 - touchUiReserve);
+    const worldHeight = portraitOverrides.worldHeight ?? DEVICE_PROFILES[id].worldHeight;
+    portraitOverrides.worldWidth = clamp(Math.round((worldHeight * viewportWidth) / gameplayHeight), 360, 720);
+  }
+
   return {
     id,
     isTouch,
@@ -392,8 +403,10 @@ const DAY_CYCLE_DURATION = 240;
 const dialogueAudioManifest = {
   busStop: ["./audio/bus-stop-1.mp3", "./audio/bus-stop-2.mp3"],
   pondChild: ["./audio/pond-child-1.mp3", "./audio/pond-child-2.mp3"],
+  porchAuntMorning: ["./audio/porch-aunt-morning-1.mp3", "./audio/porch-aunt-morning-2.mp3"],
   porchAuntMidday: ["./audio/porch-aunt-midday-1.mp3", "./audio/porch-aunt-midday-2.mp3"],
-  porchAuntEvening: ["./audio/porch-aunt-evening-1.mp3", "./audio/porch-aunt-evening-2.mp3"]
+  porchAuntEvening: ["./audio/porch-aunt-evening-1.mp3", "./audio/porch-aunt-evening-2.mp3"],
+  porchAuntNight: ["./audio/porch-aunt-night-1.mp3", "./audio/porch-aunt-night-2.mp3"]
 };
 
 const dialogueAudioPlayer = new Audio();
@@ -446,7 +459,7 @@ const sfxCooldowns = new Map();
 const nounWords = [
   { id: "garden", label: "정원", hint: "집 주변의 작은 뜰" },
   { id: "grass", label: "잔디", hint: "땅에 낮게 나는 풀" },
-  { id: "vegetable", label: "채소", hint: "밭에서 기르는 먹는 식물" },
+  { id: "vegetable", label: "채소", hint: "밭에서 길러 먹는 식물" },
   { id: "farming", label: "농사", hint: "밭에서 작물을 기르는 일" },
   { id: "livestock", label: "가축", hint: "집에서 기르는 동물" },
   { id: "fish", label: "물고기", hint: "물에서 사는 동물" }
@@ -514,7 +527,7 @@ const collocations = [
 ];
 
 const taskRewards = {
-  gardenCare: "꽃단정",
+  gardenCare: "꽃단장",
   lawnTrim: "잔디향",
   vegetablePlant: "모종상자",
   vegetableGrow: "싱싱한 채소",
@@ -542,12 +555,12 @@ const moodExpressions = [
   {
     id: "loseTrack",
     label: "시간 가는 줄 모르다",
-    hint: "몇 가지 일을 끝내고 나면 어느새 해가 낮아져 있다."
+    hint: "몇 가지 일을 끝내고 나면 어느새 해가 기울어 있다."
   },
   {
     id: "inconvenient",
     label: "불편하다",
-    hint: "비 온 뒤 흙길은 푹푹 젖어 걷는 속도가 늦어진다."
+    hint: "비 온 뒤 흙길이 질퍽해져 걷는 속도가 늦어진다."
   },
   {
     id: "boring",
@@ -570,7 +583,7 @@ const listeningExpressions = [
   {
     id: "growDirectly",
     label: "직접 채소를 키우다",
-    hint: "직접 채소를 키우면 기다리는 시간도 맛이 된다."
+    hint: "직접 채소를 키우면 기다리는 시간도 즐겁다."
   },
   {
     id: "firstFarm",
@@ -592,8 +605,8 @@ const storySteps = [
   },
   {
     id: "morningCleanup",
-    title: "정원과 공터를 정리하기",
-    body: "집 앞 정원과 공터 잔디를 다듬어 마을의 첫인상을 환하게 만드세요.",
+    title: "정원을 가꾸고 잔디를 깎기",
+    body: "집 앞 정원을 가꾸고 공터의 잔디를 깎아 마을의 첫인상을 환하게 만드세요.",
     targetZoneIds: ["gardenCare", "lawnTrim", "noticeBoard"],
     check: (state) => state.completedTasks.has("gardenCare") && state.completedTasks.has("lawnTrim"),
     reward: 14,
@@ -602,8 +615,8 @@ const storySteps = [
   },
   {
     id: "middayFields",
-    title: "채소를 심고 큰 밭을 손보기",
-    body: "채소 밭에 모종을 심고 큰 밭을 다져 한낮의 농사 흐름을 만드세요.",
+    title: "채소를 심고 농사를 짓기",
+    body: "채소 밭에 모종을 심고 큰 밭에서 농사를 지으며 한낮의 흐름을 만드세요.",
     targetZoneIds: ["vegetablePlant", "farmWork", "noticeBoard"],
     check: (state) => state.completedTasks.has("vegetablePlant") && state.completedTasks.has("farmWork"),
     reward: 16,
@@ -622,8 +635,8 @@ const storySteps = [
   },
   {
     id: "eveningErrands",
-    title: "외양간과 연못까지 오후 심부름",
-    body: "가축을 돌보고 물고기를 잡은 뒤, 연못가 아이의 이야기도 들어 보세요.",
+    title: "가축을 키우고 물고기를 잡기",
+    body: "가축을 키우고 물고기를 잡은 뒤, 연못가 아이의 이야기도 들어 보세요.",
     targetZoneIds: ["raiseLivestock", "catchFish", "pondChild", "noticeBoard"],
     check: (state) =>
       state.completedTasks.has("raiseLivestock") &&
@@ -736,7 +749,7 @@ const zoneDefinitions = [
     y: 462,
     radius: 98,
     taskId: "raiseLivestock",
-    afterText: "사료통이 채워지자 닭과 염소가 금세 가까이 다가온다."
+    afterText: "사료통이 채워지자 소와 돼지, 양이 금세 가까이 다가온다."
   },
   {
     id: "catchFish",
@@ -761,6 +774,11 @@ const zoneDefinitions = [
       state.flags.add("benchRest");
       advanceDayCycleForAction(28, "벤치에 앉아 숨을 고르는 사이");
       maybeUnlockMood("relaxed");
+      startWorldExpressionMoment(
+        "relaxed",
+        "여유가 있다",
+        "잠깐 멈춰도 재촉하는 소리가 없습니다. 바람과 그늘 사이로 하루가 느긋하게 흐릅니다."
+      );
       showToast("여유가 있다", "잠깐 쉬어도 하루가 조급하지 않게 흐릅니다.");
     }
   },
@@ -788,7 +806,7 @@ const zoneDefinitions = [
       if (state.dayStage === 4) {
         return {
           speaker: "이모",
-          audioId: "porchAuntEvening",
+          audioId: "porchAuntNight",
           visitFlag: "talkedPorchAuntNight",
           lines: [
             "밤이 되면 시골은 더 조용해지지. 대신 반딧불이랑 개구리 소리가 더 잘 들려.",
@@ -812,7 +830,7 @@ const zoneDefinitions = [
       if (state.dayStage === 0) {
         return {
           speaker: "이모",
-          audioId: "porchAuntMidday",
+          audioId: "porchAuntMorning",
           visitFlag: "talkedPorchAuntMorning",
           lines: [
             "아침 공기는 다르지? 마당이 아직 축축해서 꽃잎 끝에 이슬이 맺혀 있단다.",
@@ -846,6 +864,11 @@ const zoneDefinitions = [
       if (state.completedTasks.size >= 4) {
         maybeUnlockMood("loseTrack");
       }
+      startWorldExpressionMoment(
+        "peaceful",
+        "평화롭다",
+        "멀리서 들리는 트랙터 소리도 바람 속으로 잦아들고, 마을 전체가 고요하게 이어집니다."
+      );
       showToast("평화롭다", "멀리서 트랙터 소리만 희미하게 들릴 만큼 마을이 고요합니다.");
     }
   },
@@ -973,7 +996,7 @@ const followerDefinitions = {
   duck: { label: "오리", palette: ["#f7f0b9", "#f1d45f", "#e58f4e"], shape: "duck", asset: `${IMAGE_ASSET_ROOT}/followers/baby-05-duckling.png`, assetScale: 1.08 },
   cat: { label: "고양이", palette: ["#f1dac6", "#d6b18b", "#7b6047"], shape: "cat", asset: `${IMAGE_ASSET_ROOT}/followers/baby-02-kitten.png`, assetScale: 1.1 },
   lamb: { label: "양", palette: ["#fcf7ef", "#e8ddcf", "#8d765e"], shape: "lamb", asset: `${IMAGE_ASSET_ROOT}/followers/baby-08-lamb.png`, assetScale: 1.1 },
-  puppy: { label: "강아지", palette: ["#f0dfc3", "#c89d73", "#6f543f"], shape: "puppy", asset: `${IMAGE_ASSET_ROOT}/followers/baby-01-puppy.png`, assetScale: 1.1 },
+  puppy: { label: "강아지", palette: ["#f0dfc3", "#c89d73", "#6f543f"], shape: "puppy", asset: "", assetScale: 1.1 },
   frog: { label: "개구리", palette: ["#b5dd83", "#78b15a", "#f5f1df"], shape: "frog", asset: `${IMAGE_ASSET_ROOT}/followers/baby-25-froglet.png`, assetScale: 1.04 }
 };
 
@@ -1032,7 +1055,8 @@ const state = {
   voiceEnabled: true,
   device: initialDeviceProfile,
   uiFrame: {
-    miniMapLastRender: -Infinity
+    miniMapLastRender: -Infinity,
+    miniGameUiSignature: ""
   },
   keys: new Set(),
   touchKeys: new Set(),
@@ -1073,10 +1097,12 @@ const state = {
     journalOpen: false
   },
   toastTimer: 0,
+  expressionMoment: null,
   dayCycle: 0,
   dayCount: 1,
   dayStage: 0,
   endingShown: false,
+  pendingEnding: false,
   lastFocusedElement: null,
   saveMessage: "저장되지 않음",
   worldPractice: createWorldPracticeState(),
@@ -1278,7 +1304,7 @@ function createWorldPracticeState() {
     pond: {
       source: { x: 1408, y: 956 },
       basket: { x: 1418, y: 1044, stored: 0, resetTimer: 0 },
-      cast: { x: 1490, y: 996, timer: 0, hooked: false },
+      cast: { x: 1490, y: 996, timer: 0, hooked: false, hookSoundTimer: 0 },
       fish: [
         createWorldPracticeFish(1478, 986, 0.3),
         createWorldPracticeFish(1496, 1034, 1.4),
@@ -1452,7 +1478,36 @@ function applyResponsiveCanvasProfile() {
   setCanvasResolution(ui.activityCanvas, profile.activityWidth, profile.activityHeight);
   if (state.activeMiniGame) {
     rebuildActiveMiniGameState();
+    window.requestAnimationFrame(renderWorldScene);
+  } else if (state.activeDialogue || state.activeQuiz || state.endingShown) {
+    window.requestAnimationFrame(renderWorldScene);
   }
+  state.uiFrame.miniMapLastRender = -Infinity;
+  clampCameraToViewport();
+}
+
+function syncPhoneCanvasToFrame() {
+  const profile = state.device;
+  if (
+    !/^phone/.test(profile?.id ?? "") ||
+    !profile.isPortrait ||
+    !state.started ||
+    !document.body.classList.contains("is-mobile-playing")
+  ) {
+    return;
+  }
+  const frame = canvas.closest(".canvas-frame");
+  const rect = frame?.getBoundingClientRect();
+  if (!rect || rect.width < 1 || rect.height < 1) {
+    return;
+  }
+  const nextWorldWidth = clamp(Math.round((profile.worldHeight * rect.width) / rect.height), 360, 780);
+  if (Math.abs(canvas.width - nextWorldWidth) <= 1) {
+    return;
+  }
+  profile.worldWidth = nextWorldWidth;
+  document.documentElement.style.setProperty("--world-aspect", `${profile.worldWidth} / ${profile.worldHeight}`);
+  setCanvasResolution(canvas, profile.worldWidth, profile.worldHeight);
   state.uiFrame.miniMapLastRender = -Infinity;
   clampCameraToViewport();
 }
@@ -1630,6 +1685,9 @@ function syncMobileViewportMode() {
   document.body.classList.toggle("is-quiz-open", isQuizOpen);
   document.body.classList.toggle("is-ending-open", isEndingOpen);
   document.body.classList.toggle("is-journal-open", state.uiPanels.journalOpen);
+  if (isPhoneProfile && state.started && !hasOverlay) {
+    window.requestAnimationFrame(syncPhoneCanvasToFrame);
+  }
 }
 
 function getEffectDensity() {
@@ -1692,6 +1750,7 @@ function snapshotActivityState(game) {
 
   return {
     kind: game.kind,
+    canvasSize: { width: game.width, height: game.height },
     player: {
       xRatio: game.player.x / Math.max(game.width, 1),
       yRatio: game.player.y / Math.max(game.height, 1),
@@ -1706,6 +1765,9 @@ function snapshotActivityState(game) {
     expressionPulse: game.expressionPulse,
     sweatSpawnTimer: game.sweatSpawnTimer,
     actionPose: game.actionPose,
+    completion: game.completion ? { ...game.completion } : null,
+    particles: game.particles?.map((particle) => ({ ...particle })) ?? [],
+    sweatDrops: game.sweatDrops?.map((drop) => ({ ...drop })) ?? [],
     shrubs: game.shrubs?.map((entry) => ({ trimmed: entry.trimmed, trimProgress: entry.trimProgress, shake: entry.shake })),
     mower: game.mower ? { attached: game.mower.attached, tilt: game.mower.tilt } : null,
     lanes: game.lanes?.map((entry) => ({ cut: entry.cut, reaction: entry.reaction, cells: [...entry.cells] })),
@@ -1744,6 +1806,25 @@ function restoreActivityState(snapshot, nextGame) {
   nextGame.expressionPulse = snapshot.expressionPulse ?? nextGame.expressionPulse;
   nextGame.sweatSpawnTimer = snapshot.sweatSpawnTimer ?? nextGame.sweatSpawnTimer;
   nextGame.actionPose = snapshot.actionPose ?? 0;
+  if (snapshot.completion && nextGame.completion) {
+    Object.assign(nextGame.completion, snapshot.completion);
+  }
+  const effectScaleX = nextGame.width / Math.max(snapshot.canvasSize?.width ?? nextGame.width, 1);
+  const effectScaleY = nextGame.height / Math.max(snapshot.canvasSize?.height ?? nextGame.height, 1);
+  nextGame.particles = snapshot.particles?.map((particle) => ({
+    ...particle,
+    x: particle.x * effectScaleX,
+    y: particle.y * effectScaleY,
+    vx: particle.vx * effectScaleX,
+    vy: particle.vy * effectScaleY
+  })) ?? nextGame.particles;
+  nextGame.sweatDrops = snapshot.sweatDrops?.map((drop) => ({
+    ...drop,
+    x: drop.x * effectScaleX,
+    y: drop.y * effectScaleY,
+    vx: drop.vx * effectScaleX,
+    vy: drop.vy * effectScaleY
+  })) ?? nextGame.sweatDrops;
 
   snapshot.shrubs?.forEach((entry, index) => Object.assign(nextGame.shrubs?.[index] ?? {}, entry));
   if (snapshot.mower && nextGame.mower) {
@@ -1756,6 +1837,10 @@ function restoreActivityState(snapshot, nextGame) {
     nextGame.lanes[index].cut = entry.cut;
     nextGame.lanes[index].reaction = entry.reaction;
     nextGame.lanes[index].cells = [...entry.cells];
+    if (isActivityCoverageComplete(nextGame.lanes[index].cut)) {
+      nextGame.lanes[index].cells.fill(1);
+      nextGame.lanes[index].cut = 1;
+    }
   });
   if (snapshot.tray && nextGame.tray) {
     Object.assign(nextGame.tray, snapshot.tray);
@@ -1772,6 +1857,10 @@ function restoreActivityState(snapshot, nextGame) {
     nextGame.rows[index].progress = entry.progress;
     nextGame.rows[index].ripple = entry.ripple;
     nextGame.rows[index].cells = [...entry.cells];
+    if (isActivityCoverageComplete(nextGame.rows[index].progress)) {
+      nextGame.rows[index].cells.fill(1);
+      nextGame.rows[index].progress = 1;
+    }
   });
   if (snapshot.feedBag && nextGame.feedBag) {
     Object.assign(nextGame.feedBag, snapshot.feedBag);
@@ -2001,13 +2090,11 @@ function toggleUiPanel(panelKey) {
   if (!(panelKey in state.uiPanels)) {
     return;
   }
-  if (panelKey === "journalOpen") {
-    state.uiPanels.storyOpen = false;
-    state.uiPanels.statsOpen = false;
-  } else {
-    state.uiPanels.journalOpen = false;
-  }
-  state.uiPanels[panelKey] = !state.uiPanels[panelKey];
+  const willOpen = !state.uiPanels[panelKey];
+  state.uiPanels.storyOpen = false;
+  state.uiPanels.statsOpen = false;
+  state.uiPanels.journalOpen = false;
+  state.uiPanels[panelKey] = willOpen;
   syncUiPanels();
   if (panelKey === "journalOpen") {
     if (state.uiPanels.journalOpen) {
@@ -2181,6 +2268,10 @@ function openQuiz(quizId) {
   if (!quiz) {
     return false;
   }
+  if (!state.completedTasks.has(quiz.taskId) && !state.solvedQuizSigns.has(quiz.id)) {
+    showToast("먼저 몸으로 해 보기", `‘${quiz.expression}’ 활동을 마치면 이 팻말이 열립니다.`);
+    return false;
+  }
   closeOptionalPanels();
   setPrompt("");
   state.activeQuiz = quiz;
@@ -2253,12 +2344,24 @@ function submitQuizAnswer() {
   renderSidebar();
   persistGame("퀴즈");
   closeQuiz();
+  emitWorldPracticeBurst(
+    state.player.x,
+    state.player.y - 18,
+    ["rgba(255, 229, 166, 0.92)", "rgba(245, 184, 121, 0.9)", "rgba(174, 214, 147, 0.88)"],
+    { count: 10, minLife: 0.48, maxLife: 0.8, minSize: 3, maxSize: 5 }
+  );
+  startWorldExpressionMoment(
+    `quiz-${quiz.taskId}`,
+    quiz.expression,
+    `직접 해 본 동작과 ‘${quiz.answer}’가 한 표현으로 다시 이어졌습니다.`,
+    3.2
+  );
   if (firstSolved && unlockedFollower) {
-    showToast(`${quiz.answer}`, `${unlockedFollower.label}가 캐릭터를 졸졸 따라옵니다.`);
+    showToast(quiz.expression, `${unlockedFollower.label}가 캐릭터를 졸졸 따라옵니다.`);
   } else if (firstSolved) {
-    showToast(`${quiz.answer}`, "팻말 퀴즈를 맞혀 표현이 더 또렷해졌습니다.");
+    showToast(quiz.expression, "팻말 퀴즈를 맞혀 표현이 더 또렷해졌습니다.");
   } else {
-    showToast(`${quiz.answer}`, "이미 푼 팻말이지만 다시 한 번 정확히 떠올렸습니다.");
+    showToast(quiz.expression, "이미 푼 팻말이지만 다시 한 번 정확히 떠올렸습니다.");
   }
   return true;
 }
@@ -2292,6 +2395,7 @@ function serializeState() {
     dayCount: state.dayCount,
     dayStage: state.dayStage,
     endingShown: state.endingShown,
+    pendingEnding: state.pendingEnding,
     pausedActivity: state.pausedActivity,
     activeMiniGame: state.activeMiniGame
       ? {
@@ -2389,7 +2493,7 @@ function restoreSavedOverlay(data) {
     if (zone && !state.completedTasks.has(zone.taskId)) {
       state.activeMiniGame = restoreActivityState(data.activeMiniGame.snapshot, createActivityState(zone));
       ui.miniGame.classList.remove("hidden");
-      updateMiniGameUi();
+      updateMiniGameUi({ force: true });
       renderActivityScene();
       syncMobileViewportMode();
       focusOverlay(ui.miniGame);
@@ -2446,6 +2550,24 @@ function applySavedGame(data) {
   state.unlockedMood = new Set(data.unlockedMood ?? []);
   state.unlockedListening = new Set(data.unlockedListening ?? []);
   state.flags = new Set(data.flags ?? []);
+  if (!state.flags.has("talkedAunt")) {
+    listeningExpressions.forEach((expression) => state.unlockedListening.delete(expression.id));
+  }
+  if (!state.flags.has("lookoutSeen")) {
+    state.unlockedMood.delete("peaceful");
+  }
+  if (!state.flags.has("benchRest")) {
+    state.unlockedMood.delete("relaxed");
+  }
+  if (!state.flags.has("talkedChild")) {
+    state.unlockedMood.delete("boring");
+  }
+  if (!state.flags.has("mudNotice")) {
+    state.unlockedMood.delete("inconvenient");
+  }
+  if (state.completedTasks.size < 4) {
+    state.unlockedMood.delete("loseTrack");
+  }
   state.uiPanels.heroExpanded = false;
   state.uiPanels.storyOpen = false;
   state.uiPanels.statsOpen = false;
@@ -2454,16 +2576,19 @@ function applySavedGame(data) {
   state.dayCount = Math.max(1, data.dayCount ?? 1);
   state.dayStage = getDayStageFromCycle(state.dayCycle);
   state.endingShown = Boolean(data.endingShown);
+  state.pendingEnding = !state.endingShown && (Boolean(data.pendingEnding) || state.storyIndex >= storySteps.length);
   state.pausedActivity = data.pausedActivity ?? null;
   state.activeDialogue = null;
   state.dialogueIndex = 0;
   state.activeMiniGame = null;
-  state.pausedActivity = null;
   state.activeQuiz = null;
   state.quizAssembly = createQuizAssemblyState();
   state.hoveredZone = null;
   state.hoveredPractice = null;
   state.toastTimer = 0;
+  state.expressionMoment = null;
+  delete canvas.dataset.expressionMoment;
+  canvas.removeAttribute("aria-description");
   resetTouchJoystick();
   state.uiFrame.miniMapLastRender = -Infinity;
   state.ambient = createAmbientState();
@@ -2485,6 +2610,13 @@ function applySavedGame(data) {
     showEndingCard();
   } else {
     restoreSavedOverlay(data);
+    if (state.pendingEnding) {
+      startWorldExpressionMoment(
+        "peaceful",
+        "평화롭다",
+        "언덕에서 바라본 고요한 마을을 잠깐 더 느낀 뒤 오늘의 하루를 정리합니다."
+      );
+    }
   }
   updateSaveSummary(data);
   return true;
@@ -2496,11 +2628,52 @@ function showToast(title, description) {
   state.toastTimer = 3.4;
 }
 
+function startWorldExpressionMoment(id, label, detail, duration = 3.6) {
+  state.expressionMoment = {
+    id,
+    label,
+    detail,
+    duration,
+    timer: duration
+  };
+  canvas.dataset.expressionMoment = id;
+  canvas.setAttribute("aria-description", `${label}. ${detail}`);
+}
+
+function updateWorldExpressionMoment(dt) {
+  if (
+    !state.expressionMoment ||
+    state.activeMiniGame ||
+    state.activeDialogue ||
+    state.activeQuiz ||
+    state.endingShown ||
+    state.uiPanels.heroExpanded ||
+    state.uiPanels.journalOpen ||
+    state.uiPanels.storyOpen ||
+    state.uiPanels.statsOpen
+  ) {
+    return;
+  }
+  state.expressionMoment.timer = Math.max(0, state.expressionMoment.timer - dt);
+  if (state.expressionMoment.timer <= 0) {
+    state.expressionMoment = null;
+    delete canvas.dataset.expressionMoment;
+    canvas.removeAttribute("aria-description");
+    if (state.pendingEnding) {
+      state.pendingEnding = false;
+      showEndingCard();
+      persistGame("하루 마무리");
+    }
+  }
+}
+
 function maybeUnlockMood(id) {
   if (!state.unlockedMood.has(id)) {
     state.unlockedMood.add(id);
     renderSidebar();
+    return true;
   }
+  return false;
 }
 
 function maybeUnlockListening(ids = []) {
@@ -2652,8 +2825,26 @@ function getCurrentStoryStep() {
 }
 
 function getCurrentTargetZones() {
-  const targetIds = new Set(getCurrentStoryStep()?.targetZoneIds ?? []);
-  return getAvailableZones().filter((zone) => targetIds.has(zone.id));
+  const availableById = new Map(getAvailableZones().map((zone) => [zone.id, zone]));
+  const completionFlags = {
+    busStop: "talkedAunt",
+    bench: "benchRest",
+    pondChild: "talkedChild",
+    dinnerTable: "dinnerServed",
+    lookout: "lookoutSeen"
+  };
+  return (getCurrentStoryStep()?.targetZoneIds ?? [])
+    .map((id) => availableById.get(id))
+    .filter((zone) => {
+      if (!zone) {
+        return false;
+      }
+      if (zone.taskId && state.completedTasks.has(zone.taskId)) {
+        return false;
+      }
+      const completionFlag = completionFlags[zone.id];
+      return !completionFlag || !state.flags.has(completionFlag);
+    });
 }
 
 function getStoryProgressPercent() {
@@ -2706,7 +2897,9 @@ function renderTimeHud() {
     ui.timeOfDayValue.textContent = stageLabel;
   }
   if (ui.timeOfDayDetail) {
-    ui.timeOfDayDetail.textContent = `${clockText} · ${state.dayCount}일차 · ${DAY_STAGE_HINTS[state.dayStage]}`;
+    ui.timeOfDayDetail.textContent = state.device?.prefersCompactHud
+      ? `${clockText} · ${state.dayCount}일차`
+      : `${clockText} · ${state.dayCount}일차 · ${DAY_STAGE_HINTS[state.dayStage]}`;
   }
   if (ui.timeProgressFill) {
     ui.timeProgressFill.style.width = `${(normalizeDayCycle(state.dayCycle) * 100).toFixed(1)}%`;
@@ -2715,6 +2908,7 @@ function renderTimeHud() {
 
 function showEndingCard() {
   closeOptionalPanels();
+  state.pendingEnding = false;
   state.endingShown = true;
   ui.endingTitle.textContent = "시골 마을의 하루가 저녁빛에 닿았습니다";
   ui.endingBody.textContent =
@@ -2725,9 +2919,28 @@ function showEndingCard() {
   const missedExpressions = quizSignDefinitions
     .filter((quiz) => !state.solvedQuizSigns.has(quiz.id))
     .map((quiz) => quiz.expression);
-  ui.endingExpressionSummary.textContent = missedExpressions.length
-    ? `아직 확인하지 않은 표현: ${missedExpressions.join(", ")}`
-    : `모든 표현을 확인했습니다: ${quizSignDefinitions.map((quiz) => quiz.expression).join(", ")}`;
+  const feltMoodExpressions = moodExpressions
+    .filter((expression) => state.unlockedMood.has(expression.id))
+    .map((expression) => expression.label);
+  const metListeningExpressions = listeningExpressions
+    .filter((expression) => state.unlockedListening.has(expression.id))
+    .map((expression) => expression.label);
+  const missedMoodExpressions = moodExpressions
+    .filter((expression) => !state.unlockedMood.has(expression.id))
+    .map((expression) => expression.label);
+  const missedListeningExpressions = listeningExpressions
+    .filter((expression) => !state.unlockedListening.has(expression.id))
+    .map((expression) => expression.label);
+  const reviewLines = [
+    missedExpressions.length
+      ? `팻말에서 다시 확인할 표현: ${missedExpressions.join(", ")}`
+      : `몸으로 익히고 팻말에서 확인한 표현: ${quizSignDefinitions.map((quiz) => quiz.expression).join(", ")}`,
+    feltMoodExpressions.length ? `마을에서 느낀 표현: ${feltMoodExpressions.join(", ")}` : "",
+    metListeningExpressions.length ? `대사에서 만난 표현: ${metListeningExpressions.join(", ")}` : "",
+    missedMoodExpressions.length ? `아직 못 느낀 표현: ${missedMoodExpressions.join(", ")}` : "",
+    missedListeningExpressions.length ? `아직 못 만난 대사 표현: ${missedListeningExpressions.join(", ")}` : ""
+  ].filter(Boolean);
+  ui.endingExpressionSummary.textContent = reviewLines.join(" · ");
   ui.endingCard.classList.remove("hidden");
   syncMobileViewportMode();
   focusOverlay(ui.endingCard);
@@ -2744,11 +2957,16 @@ function advanceStoryProgress() {
   }
   syncDayStage();
   if (advanced && state.storyIndex >= storySteps.length && !state.endingShown) {
-    showEndingCard();
+    if (state.expressionMoment) {
+      state.pendingEnding = true;
+    } else {
+      showEndingCard();
+    }
   }
   if (advanced) {
     persistGame("진행");
   }
+  return advanced;
 }
 
 function getDinnerMissingItems() {
@@ -2808,6 +3026,8 @@ function renderMiniMap() {
   miniMapCtx.fillStyle = skyGradient;
   miniMapCtx.fillRect(0, 0, mapWidth, mapHeight);
 
+  miniMapCtx.save();
+  miniMapCtx.scale(mapWidth / MINIMAP_BASE_SIZE, mapHeight / MINIMAP_BASE_SIZE);
   miniMapCtx.fillStyle = "rgba(126, 174, 104, 0.18)";
   miniMapCtx.fillRect(16, 12, 58, 40);
   miniMapCtx.fillRect(80, 16, 40, 24);
@@ -2826,6 +3046,7 @@ function renderMiniMap() {
   miniMapCtx.lineTo(100, 94);
   miniMapCtx.lineTo(142, 94);
   miniMapCtx.stroke();
+  miniMapCtx.restore();
 
   zoneDefinitions.forEach((zone) => {
     if (zone.type === "story") {
@@ -2916,10 +3137,15 @@ function renderSidebar() {
       const completed = state.completedTasks.has(item.id);
       const quiz = getQuizSignDefinition(item.id);
       const checked = quiz ? state.solvedQuizSigns.has(quiz.id) : false;
+      const quizStatus = checked
+        ? "표현 확인 완료"
+        : completed
+          ? "마을 팻말이 열림"
+          : "활동을 마치면 팻말이 열림";
       return `
         <li class="progress-item ${completed ? "is-complete" : ""} ${locked && !completed ? "is-locked" : ""}">
           <strong>${completed ? "완료" : locked ? "잠김" : "진행 가능"} · ${item.label}</strong>
-          <span>${locked && !completed ? "모종을 심고 벤치에서 잠시 쉬면 열립니다." : item.hint} ${checked ? "· 표현 확인 완료" : "· 마을 팥말에서 표현 확인 가능"}</span>
+          <span>${locked && !completed ? "모종을 심고 벤치에서 잠시 쉬면 열립니다." : item.hint} · ${quizStatus}</span>
         </li>
       `;
     })
@@ -2942,7 +3168,7 @@ function renderSidebar() {
       const unlocked = state.unlockedListening.has(item.id);
       return `
         <li class="progress-item ${unlocked ? "is-complete" : ""}">
-          <strong>${unlocked ? "들음" : "아직 못 들음"} · ${item.label}</strong>
+          <strong>${unlocked ? "대사에서 만남" : "아직 못 만남"} · ${item.label}</strong>
           <span>${item.hint}</span>
         </li>
       `;
@@ -2986,6 +3212,7 @@ function resetState(options = {}) {
   state.activeDialogue = null;
   state.dialogueIndex = 0;
   state.activeMiniGame = null;
+  state.pausedActivity = null;
   state.activeQuiz = null;
   state.quizAssembly = createQuizAssemblyState();
   state.storyIndex = 0;
@@ -3005,6 +3232,9 @@ function resetState(options = {}) {
   state.uiPanels.statsOpen = false;
   state.uiPanels.journalOpen = false;
   state.toastTimer = 0;
+  state.expressionMoment = null;
+  delete canvas.dataset.expressionMoment;
+  canvas.removeAttribute("aria-description");
   state.uiFrame.miniMapLastRender = -Infinity;
   state.ambient = createAmbientState();
   state.worldPractice = createWorldPracticeState();
@@ -3012,6 +3242,7 @@ function resetState(options = {}) {
   state.dayCount = 1;
   state.dayStage = 0;
   state.endingShown = false;
+  state.pendingEnding = false;
   ui.resetButton.textContent = "하루 다시 시작";
   ui.resetButton.classList.remove("is-confirming");
   state.saveMessage = "새 하루 준비 중";
@@ -3035,7 +3266,10 @@ function setPrompt(text) {
     return;
   }
   ui.promptBubble.textContent = state.device?.isTouch
-    ? text.replace(/^E\s*-\s*/, "행동 버튼 · ")
+    ? text
+        .replace(/^E\s*-\s*/, "행동 버튼 · ")
+        .replace(/E로/g, "행동 버튼으로")
+        .replace(/E 키/g, "행동 버튼")
     : text;
   ui.promptBubble.classList.remove("hidden");
 }
@@ -3125,6 +3359,7 @@ function storeCarriedWorldTool() {
   if (practice.carriedTool === "rod") {
     practice.pond.cast.timer = 0;
     practice.pond.cast.hooked = false;
+    practice.pond.cast.hookSoundTimer = 0;
   }
   if (practice.carriedTool === "mower") {
     practice.lawn.source.attached = false;
@@ -3745,6 +3980,9 @@ function buildWorldPracticeTargets() {
   };
 
   quizSignDefinitions.forEach((quiz) => {
+    if (!state.completedTasks.has(quiz.taskId) && !state.solvedQuizSigns.has(quiz.id)) {
+      return;
+    }
     addTarget({
       id: quiz.id,
       x: quiz.x,
@@ -5016,10 +5254,6 @@ function handleWorldPracticeAction() {
       playbackRate: randomRange(0.96, 1.08),
       cooldownKey: `world-fish-cast-${target.fishIndex}`
     });
-    playSfx("fishHook", {
-      playbackRate: randomRange(0.98, 1.12),
-      cooldownKey: `world-fish-hook-${target.fishIndex}`
-    });
     fish.caught = true;
     fish.respawn = 8;
     practice.carryingCatch = true;
@@ -5027,6 +5261,7 @@ function handleWorldPracticeAction() {
     practice.pond.cast.y = fish.y;
     practice.pond.cast.timer = 0.95;
     practice.pond.cast.hooked = true;
+    practice.pond.cast.hookSoundTimer = 0.16;
     emitWorldPracticeBurst(fish.x, fish.y, ["rgba(173, 226, 242, 0.84)", "rgba(255, 248, 238, 0.82)"], {
       count: 7,
       minVx: -22,
@@ -5082,6 +5317,12 @@ function movePlayer(dt) {
     if (!state.flags.has("mudNotice")) {
       state.flags.add("mudNotice");
       maybeUnlockMood("inconvenient");
+      startWorldExpressionMoment(
+        "inconvenient",
+        "불편하다",
+        "젖은 흙이 신발을 붙잡아 걸음이 무거워집니다. 같은 길도 평소보다 천천히 지나갑니다.",
+        3.2
+      );
       showToast("불편하다", "젖은 흙길에서는 발이 조금씩 빠집니다.");
     }
   }
@@ -5151,6 +5392,11 @@ function completeDialogue(dialogueState) {
   }
   if (firstTalkWithChild) {
     awardWarmth(6);
+    startWorldExpressionMoment(
+      "boring",
+      "따분하다",
+      "같은 고요한 풍경도 누군가에게는 심심하게 느껴집니다. 연못 아이는 그 고요 속에서 재미를 찾습니다."
+    );
   }
   if (firstVisitThisDialogue) {
     awardWarmth(5);
@@ -5191,11 +5437,17 @@ function nextDialogue() {
   ui.dialogueNext.textContent =
     state.dialogueIndex >= state.activeDialogue.lines.length - 1 ? "대화 마치기" : "다음";
   persistGame("대화 저장");
-  playSfx("uiClick", {
-    volume: 0.2,
-    playbackRate: 1.06
-  });
+  if (!state.voiceEnabled || !dialogueAudioManifest[state.activeDialogue.audioId]?.[state.dialogueIndex]) {
+    playSfx("uiClick", {
+      volume: 0.12,
+      playbackRate: 1.1
+    });
+  }
   playDialogueAudio(state.activeDialogue.audioId, state.dialogueIndex);
+}
+
+function isActivityCoverageComplete(progress) {
+  return progress >= 0.94;
 }
 
 function buildActivityObjectives(activity) {
@@ -5222,8 +5474,8 @@ function buildActivityObjectives(activity) {
         },
         {
           label: "긴 잔디 세 줄 밀기",
-          detail: `${activity.lanes.filter((lane) => lane.cut >= 1).length}/3줄을 깎았습니다.`,
-          done: activity.lanes.every((lane) => lane.cut >= 1)
+          detail: `${activity.lanes.filter((lane) => isActivityCoverageComplete(lane.cut)).length}/3줄을 깎았습니다.`,
+          done: activity.lanes.every((lane) => isActivityCoverageComplete(lane.cut))
         }
       ];
     case "vegetablePlant":
@@ -5261,8 +5513,8 @@ function buildActivityObjectives(activity) {
         },
         {
           label: "고랑 세 줄 다지기",
-          detail: `${activity.rows.filter((row) => row.progress >= 1).length}/3줄을 다졌습니다.`,
-          done: activity.rows.every((row) => row.progress >= 1)
+          detail: `${activity.rows.filter((row) => isActivityCoverageComplete(row.progress)).length}/3줄을 다졌습니다.`,
+          done: activity.rows.every((row) => isActivityCoverageComplete(row.progress))
         }
       ];
     case "raiseLivestock":
@@ -5363,6 +5615,11 @@ function createActivityState(zone) {
     particles: [],
     actionPose: 0,
     toolPose: null,
+    completion: {
+      active: false,
+      timer: 0,
+      duration: 2.7
+    },
     player: {
       x: 92,
       y: 300,
@@ -5657,6 +5914,10 @@ function spawnActivityParticles(
       rotation: Math.random() * Math.PI
     });
   }
+  const particleLimit = Math.round(42 + getEffectDensity() * 24);
+  if (game.particles.length > particleLimit) {
+    game.particles.splice(0, game.particles.length - particleLimit);
+  }
 }
 
 function buildActivityTargets(game) {
@@ -5666,8 +5927,8 @@ function buildActivityTargets(game) {
         return [{ ...game.tool, label: "전지가위", prompt: "E 집기", requiresAction: true }];
       }
       return game.shrubs
-        .filter((shrub) => !shrub.trimmed)
-        .map((shrub, index) => ({ ...shrub, label: `덤불 ${index + 1}`, prompt: "E 다듬기", requiresAction: true }));
+        .map((shrub, index) => ({ ...shrub, label: `덤불 ${index + 1}`, prompt: "E 다듬기", requiresAction: true }))
+        .filter((shrub) => !shrub.trimmed);
     case "lawnTrim":
       if (!game.mower.attached) {
         return [
@@ -5684,24 +5945,25 @@ function buildActivityTargets(game) {
         ];
       }
       return game.lanes
-        .filter((lane) => lane.cut < 1)
         .map((lane, index) => ({
           x: lane.x1,
           y: lane.y,
           w: lane.w,
           h: lane.h,
+          progress: lane.cut,
           shape: "rect",
           label: `잔디 줄 ${index + 1}`,
           prompt: "밀어 지나가기",
           requiresAction: false
-        }));
+        }))
+        .filter((lane) => !isActivityCoverageComplete(lane.progress));
     case "vegetablePlant":
       if (!game.tray.taken) {
         return [{ ...game.tray, label: "모종 상자", prompt: "E 들기", requiresAction: true }];
       }
       return game.plots
-        .filter((plot) => !plot.planted)
-        .map((plot, index) => ({ ...plot, label: `모종 자리 ${index + 1}`, prompt: "E 심기", requiresAction: true }));
+        .map((plot, index) => ({ ...plot, label: `모종 자리 ${index + 1}`, prompt: "E 심기", requiresAction: true }))
+        .filter((plot) => !plot.planted);
     case "vegetableGrow":
       if (!game.bucket.taken) {
         return [{ ...game.bucket, label: "양동이", prompt: "E 들기", requiresAction: true }];
@@ -5710,40 +5972,42 @@ function buildActivityTargets(game) {
         return [{ ...game.well, label: "우물", prompt: "E 물 채우기", requiresAction: true }];
       }
       return game.plants
-        .filter((plant) => !plant.watered)
-        .map((plant, index) => ({ ...plant, label: `채소 줄 ${index + 1}`, prompt: "E 물 주기", requiresAction: true }));
+        .map((plant, index) => ({ ...plant, label: `채소 줄 ${index + 1}`, prompt: "E 물 주기", requiresAction: true }))
+        .filter((plant) => !plant.watered);
     case "farmWork":
       if (game.player.carrying !== "hoe") {
         return [{ ...game.tool, label: "호미", prompt: "E 들기", requiresAction: true }];
       }
       return game.rows
-        .filter((row) => row.progress < 1)
         .map((row, index) => ({
           x: row.x1,
           y: row.y - 10,
           w: row.x2 - row.x1,
           h: 20,
+          progress: row.progress,
           shape: "rect",
           label: `고랑 ${index + 1}`,
           prompt: "고랑 위로 걷기",
           requiresAction: false
-        }));
+        }))
+        .filter((row) => !isActivityCoverageComplete(row.progress));
     case "raiseLivestock":
       if (!game.feedBag.taken) {
         return [{ ...game.feedBag, label: "사료 자루", prompt: "E 들기", requiresAction: true }];
       }
       return game.troughs
-        .filter((trough) => !trough.filled)
         .map((trough, index) => ({
           x: trough.x - 18,
           y: trough.y - 12,
           w: 36,
           h: 24,
+          filled: trough.filled,
           shape: "rect",
           label: `먹이통 ${index + 1}`,
           prompt: "E 사료 붓기",
           requiresAction: true
-        }));
+        }))
+        .filter((trough) => !trough.filled);
     case "catchFish":
       if (!game.net.taken) {
         return [{ ...game.net, label: "뜰채", prompt: "E 집기", requiresAction: true }];
@@ -5752,8 +6016,8 @@ function buildActivityTargets(game) {
         return [{ ...game.basket, label: "바구니", prompt: "E 담기", requiresAction: true }];
       }
       return game.fish
-        .filter((fish) => !fish.caught)
-        .map((fish, index) => ({ ...fish, r: 18, label: `물고기 ${index + 1}`, prompt: "E 건지기", requiresAction: true }));
+        .map((fish, index) => ({ ...fish, r: 18, label: `물고기 ${index + 1}`, prompt: "E 건지기", requiresAction: true }))
+        .filter((fish) => !fish.caught);
     default:
       return [];
   }
@@ -5878,9 +6142,15 @@ function getTouchActionLabel() {
   }
 
   const game = state.activeMiniGame;
+  if (game.completion?.active) {
+    return "완료";
+  }
   const target = getNearestActivityTarget(game, 150);
   if (!target) {
     return "행동";
+  }
+  if (target.requiresAction === false) {
+    return "이동";
   }
 
   switch (game.kind) {
@@ -5911,40 +6181,82 @@ function getTouchActionLabel() {
 
 function updateTouchActionLabel() {
   ui.touchAction.textContent = getTouchActionLabel();
+  const nearbyActivityTarget = state.activeMiniGame
+    ? getNearestActivityTarget(state.activeMiniGame, 150)
+    : null;
+  const movementTarget = nearbyActivityTarget?.requiresAction === false;
+  const completionActive = Boolean(state.activeMiniGame?.completion?.active);
   const unavailable =
     state.device?.isTouch &&
     state.started &&
     !state.activeDialogue &&
     !state.activeQuiz &&
-    !state.activeMiniGame &&
-    !state.hoveredZone &&
-    !state.hoveredPractice;
+    (state.activeMiniGame
+      ? !nearbyActivityTarget || movementTarget || completionActive
+      : !state.hoveredZone && !state.hoveredPractice);
   ui.touchAction.classList.toggle("is-idle", Boolean(unavailable));
-  ui.touchAction.setAttribute("aria-label", unavailable ? "행동할 대상에 가까이 가세요" : ui.touchAction.textContent);
+  ui.touchAction.disabled = completionActive;
+  const unavailableLabel = movementTarget
+    ? `${nearbyActivityTarget.prompt}. 조이스틱으로 움직이세요.`
+    : state.activeMiniGame?.completion?.active
+      ? "작업 완료"
+      : "행동할 대상에 가까이 가세요";
+  ui.touchAction.setAttribute("aria-label", unavailable ? unavailableLabel : ui.touchAction.textContent);
 }
 
-function updateMiniGameUi() {
+function updateMiniGameUi(options = {}) {
+  const { force = false } = options;
   if (!state.activeMiniGame) {
     return;
   }
   const game = state.activeMiniGame;
-  ui.miniGame.classList.toggle("is-touch-activity", Boolean(state.device?.isTouch));
-  const target = getNearestActivityTarget(game);
+  const isCompleting = Boolean(game.completion?.active);
+  const target = isCompleting ? null : getNearestActivityTarget(game);
   const targetHint = target ? `${target.label} · ${target.prompt}` : "주변을 움직여 손에 닿는 대상 앞까지 가 보세요.";
-  ui.miniGameType.textContent = "몸으로 하는 일";
   const resolvedTargetHint = state.device?.isTouch
     ? target
-      ? `${target.label} 근처에서 행동 버튼`
+      ? target.requiresAction === false
+        ? `${target.label} · ${target.prompt}. 조이스틱으로 움직이세요.`
+        : `${target.label} 근처에서 행동 버튼`
       : "가까운 대상으로 움직여 보세요."
     : targetHint;
+  const goals = buildActivityObjectives(game);
+  const currentGoalIndex = goals.findIndex((goal) => !goal.done);
+  const hintText = isCompleting
+    ? `${game.phrase} · 바뀐 장면을 잠깐 눈에 담아 보세요.`
+    : game.feedback || `${getActivityHint(game)} ${resolvedTargetHint}`;
+  const actionLabel = getTouchActionLabel();
+  const signature = JSON.stringify([
+    Boolean(state.device?.isTouch),
+    game.kind,
+    game.title,
+    game.instruction,
+    isCompleting,
+    target?.id ?? target?.label ?? "",
+    target?.prompt ?? "",
+    hintText,
+    actionLabel,
+    goals.map((goal) => [goal.done, goal.label, goal.detail])
+  ]);
+  if (!force && signature === state.uiFrame.miniGameUiSignature) {
+    return;
+  }
+  state.uiFrame.miniGameUiSignature = signature;
+
+  ui.miniGame.classList.toggle("is-touch-activity", Boolean(state.device?.isTouch));
+  ui.miniGame.classList.toggle("is-complete", isCompleting);
+  ui.miniGameType.textContent = isCompleting ? "장면에 남은 표현" : "몸으로 하는 일";
   ui.miniGameTitle.textContent = game.title;
-  ui.miniGameInstruction.textContent = game.instruction;
-  ui.activityHint.textContent = game.feedback || `${getActivityHint(game)} ${resolvedTargetHint}`;
-  ui.activityObjectives.innerHTML = buildActivityObjectives(game)
+  ui.miniGameInstruction.textContent = isCompleting
+    ? "도구와 손길이 만든 전후 변화를 확인하세요."
+    : game.instruction;
+  ui.miniGameClose.disabled = isCompleting;
+  ui.activityHint.textContent = hintText;
+  ui.activityObjectives.innerHTML = goals
     .map(
-      (goal) => `
-        <div class="activity-goal ${goal.done ? "is-complete" : ""}">
-          <strong>${goal.done ? "완료" : "진행 중"} · ${goal.label}</strong>
+      (goal, index) => `
+        <div class="activity-goal ${goal.done ? "is-complete" : index === currentGoalIndex ? "is-current" : "is-pending"}">
+          <strong>${goal.done ? "완료" : index === currentGoalIndex ? "지금 할 일" : "다음 할 일"} · ${goal.label}</strong>
           <span>${goal.detail}</span>
         </div>
       `
@@ -5962,8 +6274,10 @@ function startMiniGame(zone) {
     state.pausedActivity = null;
   }
   ui.miniGame.classList.remove("hidden");
+  ui.miniGame.classList.toggle("is-complete", Boolean(state.activeMiniGame.completion?.active));
+  ui.miniGameClose.disabled = Boolean(state.activeMiniGame.completion?.active);
   syncMobileViewportMode();
-  updateMiniGameUi();
+  updateMiniGameUi({ force: true });
   renderActivityScene();
   persistGame(pausedSnapshot ? "작업 불러오기" : "작업 시작");
   focusOverlay(ui.miniGame);
@@ -5971,8 +6285,11 @@ function startMiniGame(zone) {
 
 function closeMiniGame() {
   state.activeMiniGame = null;
+  state.uiFrame.miniGameUiSignature = "";
   ui.miniGame.classList.add("hidden");
-  ui.miniGame.classList.remove("is-touch-activity");
+  ui.miniGame.classList.remove("is-touch-activity", "is-complete");
+  ui.miniGameClose.disabled = false;
+  resetTouchJoystick();
   syncMobileViewportMode();
   activityCtx.clearRect(0, 0, ui.activityCanvas.width, ui.activityCanvas.height);
   updateTouchActionLabel();
@@ -5989,13 +6306,18 @@ function pauseMiniGame() {
   if (!game) {
     return;
   }
+  if (game.completion?.active) {
+    return;
+  }
   state.pausedActivity = {
     zoneId: game.zone.id,
     snapshot: snapshotActivityState(game)
   };
   state.activeMiniGame = null;
+  state.uiFrame.miniGameUiSignature = "";
   ui.miniGame.classList.add("hidden");
-  ui.miniGame.classList.remove("is-touch-activity");
+  ui.miniGame.classList.remove("is-touch-activity", "is-complete");
+  ui.miniGameClose.disabled = false;
   syncMobileViewportMode();
   activityCtx.clearRect(0, 0, ui.activityCanvas.width, ui.activityCanvas.height);
   updateTouchActionLabel();
@@ -6012,23 +6334,33 @@ function completeTask(zone) {
   addBasketItem(taskRewards[zone.taskId]);
   awardWarmth(10);
 
-  if (zone.taskId === "vegetablePlant") {
-    maybeUnlockListening(["growDirectly"]);
-  }
-  if (state.completedTasks.size >= 4) {
+  const discoveredLoseTrack = state.completedTasks.size >= 4 && !state.unlockedMood.has("loseTrack");
+  if (discoveredLoseTrack) {
     maybeUnlockMood("loseTrack");
   }
 
   advanceDayCycleForAction(22, `${task.label}에 몰두하는 동안`);
-  advanceStoryProgress();
+  const storyAdvanced = advanceStoryProgress();
   renderSidebar();
   persistGame("일과");
   closeMiniGame();
-  playSfx("taskComplete");
-  showToast(task.label, zone.afterText);
+  emitWorldPracticeBurst(
+    state.player.x,
+    state.player.y - 18,
+    ["rgba(255, 229, 166, 0.92)", "rgba(245, 184, 121, 0.9)", "rgba(174, 214, 147, 0.88)"],
+    { count: 12, minLife: 0.52, maxLife: 0.86, minSize: 3, maxSize: 5.4 }
+  );
+  if (discoveredLoseTrack) {
+    startWorldExpressionMoment(
+      "loseTrack",
+      "시간 가는 줄 모르다",
+      "한 가지씩 몰두하다 보니 어느새 햇빛의 색과 마을 소리가 달라졌습니다."
+    );
+  } else if (!storyAdvanced && !state.endingShown) {
+    showToast(task.label, zone.afterText);
+  }
 
   if (state.completedTasks.size === collocations.length) {
-    maybeUnlockMood("peaceful");
     showToast("하루가 다 익었습니다", "표현들이 퀘스트가 아니라 장면처럼 기억될 때까지 마을을 한 바퀴 돌았습니다.");
   }
 }
@@ -6038,10 +6370,20 @@ function handleActivityAction() {
   if (!game) {
     return false;
   }
+  if (game.completion?.active) {
+    return false;
+  }
   const assistedTarget = assistTouchActivityAction(game);
+  if (assistedTarget?.requiresAction === false) {
+    setActivityFeedback(`${game.phrase} · ${assistedTarget.prompt}. 조이스틱으로 움직이세요.`);
+    updateMiniGameUi({ force: true });
+    renderActivityScene();
+    return false;
+  }
   const player = game.player;
   const toolPose = getActivityToolPose(game);
   let didAction = false;
+  let didLearningAction = false;
   game.actionPose = 0.24;
 
   if (game.kind === "gardenCare") {
@@ -6072,8 +6414,13 @@ function handleActivityAction() {
           size: 4,
           life: 0.52
         });
-        setActivityFeedback(shrub.trimmed ? "덤불을 보기 좋게 다듬었습니다." : "가지 끝이 조금씩 다듬어집니다.");
+        setActivityFeedback(
+          shrub.trimmed
+            ? "정원을 가꾸다 · 덤불이 보기 좋게 단정해졌습니다."
+            : "정원을 가꾸다 · 가지 끝을 조금씩 손질하고 있습니다."
+        );
         didAction = true;
+        didLearningAction = true;
       }
     }
   } else if (game.kind === "lawnTrim") {
@@ -6115,8 +6462,9 @@ function handleActivityAction() {
           size: 3,
           life: 0.48
         });
-        setActivityFeedback("모종을 흙에 심었습니다.");
+        setActivityFeedback("채소를 심다 · 빈 흙자리에 모종이 하나 자리 잡았습니다.");
         didAction = true;
+        didLearningAction = true;
         if (game.tray.seedlings <= 0) {
           player.carrying = null;
         }
@@ -6171,8 +6519,9 @@ function handleActivityAction() {
           size: 3,
           life: 0.44
         });
-        setActivityFeedback("채소에 물을 줬습니다.");
+        setActivityFeedback("채소를 키우다 · 물을 머금은 잎이 다시 힘을 얻었습니다.");
         didAction = true;
+        didLearningAction = true;
       }
     }
   } else if (game.kind === "farmWork") {
@@ -6220,8 +6569,9 @@ function handleActivityAction() {
           size: 3,
           life: 0.5
         });
-        setActivityFeedback("먹이통에 사료를 부었습니다.");
+        setActivityFeedback("가축을 키우다 · 먹이를 채우자 동물들이 가까이 옵니다.");
         didAction = true;
+        didLearningAction = true;
         if (game.feedBag.servings <= 0) {
           player.carrying = null;
         }
@@ -6252,7 +6602,7 @@ function handleActivityAction() {
         size: 3,
         life: 0.4
       });
-      setActivityFeedback("물고기를 바구니에 담았습니다.");
+      setActivityFeedback("물고기를 잡다 · 잡은 물고기를 바구니에 담았습니다.");
       didAction = true;
     } else if (game.net.taken && !game.player.carryingCatch) {
       const fish = game.fish.find(
@@ -6278,8 +6628,9 @@ function handleActivityAction() {
           size: 4,
           life: 0.5
         });
-        setActivityFeedback("물고기를 건졌습니다. 바구니까지 옮기세요.");
+        setActivityFeedback("물고기를 잡다 · 뜰채에 걸렸습니다. 바구니까지 옮기세요.");
         didAction = true;
+        didLearningAction = true;
       }
     }
   }
@@ -6292,8 +6643,10 @@ function handleActivityAction() {
       setActivityFeedback("손에 닿는 대상이 보이는 쪽으로 움직여 보세요.");
     }
   }
-  if (didAction) {
+  if (didLearningAction) {
     accentActivityExpression(game, 1);
+  }
+  if (didAction) {
     persistGame("작업 저장");
   }
   updateMiniGameUi();
@@ -6304,6 +6657,9 @@ function handleActivityAction() {
 function moveActivityPlayer(dt) {
   const game = state.activeMiniGame;
   if (!game) {
+    return;
+  }
+  if (game.completion?.active) {
     return;
   }
 
@@ -6378,13 +6734,13 @@ function isActivityComplete(game) {
     case "gardenCare":
       return game.shrubs.every((shrub) => shrub.trimmed);
     case "lawnTrim":
-      return game.lanes.every((lane) => lane.cut >= 1);
+      return game.lanes.every((lane) => isActivityCoverageComplete(lane.cut));
     case "vegetablePlant":
       return game.plots.every((plot) => plot.planted);
     case "vegetableGrow":
       return game.plants.every((plant) => plant.watered);
     case "farmWork":
-      return game.rows.every((row) => row.progress >= 1);
+      return game.rows.every((row) => isActivityCoverageComplete(row.progress));
     case "raiseLivestock":
       return game.troughs.every((trough) => trough.filled);
     case "catchFish":
@@ -6394,13 +6750,71 @@ function isActivityComplete(game) {
   }
 }
 
+function prepareActivityFinalScene(game) {
+  if (game.kind === "lawnTrim") {
+    game.lanes.forEach((lane) => {
+      lane.cells.fill(1);
+      lane.cut = 1;
+      lane.reaction = 1;
+    });
+  }
+  if (game.kind === "farmWork") {
+    game.rows.forEach((row) => {
+      row.cells.fill(1);
+      row.progress = 1;
+      row.ripple = 1;
+    });
+  }
+  if (game.kind === "raiseLivestock") {
+    game.animals.forEach((animal) => {
+      animal.interest = 1;
+    });
+    game.troughs.forEach((trough) => {
+      trough.fillLevel = 1;
+      trough.reaction = 1;
+    });
+  }
+}
+
+function beginActivityCompletion(game) {
+  if (!game || game.completion.active) {
+    return;
+  }
+  prepareActivityFinalScene(game);
+  resetTouchJoystick();
+  game.completion.active = true;
+  game.completion.timer = game.completion.duration;
+  game.feedback = `${game.phrase} · 내 손으로 장면을 바꿨습니다.`;
+  game.feedbackTimer = game.completion.duration;
+  accentActivityExpression(game, 1.55);
+  spawnActivityParticles(game, game.width / 2, 98, {
+    count: 18,
+    kind: "sparkle",
+    palette: ["#fff0b0", "#f1b56b", "#f7d6e0", "#b8d99a"],
+    speed: 62,
+    lift: 30,
+    spread: 190,
+    size: 6,
+    life: game.completion.duration * 0.82
+  });
+  playSfx("taskComplete", { playbackRate: 1.02, volume: 0.64 });
+  ui.miniGame.classList.add("is-complete");
+  ui.miniGameClose.disabled = true;
+  updateMiniGameUi({ force: true });
+}
+
 function updateActivityState(dt) {
   const game = state.activeMiniGame;
   if (!game) {
     return;
   }
 
-  moveActivityPlayer(dt);
+  if (!game.completion.active) {
+    moveActivityPlayer(dt);
+  } else {
+    game.player.prevX = game.player.x;
+    game.player.prevY = game.player.y;
+  }
   const movedDistance = Math.hypot(game.player.x - game.player.prevX, game.player.y - game.player.prevY);
   const movedHorizontally = Math.abs(game.player.x - game.player.prevX) >= Math.abs(game.player.y - game.player.prevY);
   game.actionPose = Math.max(game.actionPose - dt, 0);
@@ -6415,21 +6829,30 @@ function updateActivityState(dt) {
     game.lanes.forEach((lane) => {
       lane.reaction = Math.max(lane.reaction - dt * 2.8, 0);
       const withinBand = Math.abs(game.mower.y - (lane.y + lane.h / 2)) < lane.h / 2 + 6 + mobileBandAssist;
-      if (withinBand && movedHorizontally && movedDistance > 0.9) {
+      if (withinBand && movedHorizontally && movedDistance > 0.04) {
         const sideAssist = state.device?.isTouch ? 6 : 0;
         const startRatio = (game.mower.x - 22 - sideAssist - lane.x1) / lane.w;
         const endRatio = (game.mower.x + 18 + sideAssist - lane.x1) / lane.w;
+        const previousCellCount = lane.cells.reduce((sum, cell) => sum + cell, 0);
+        const wasComplete = isActivityCoverageComplete(lane.cut);
         markCoverageCells(lane.cells, startRatio, endRatio);
         lane.cut = getCoverageProgress(lane.cells);
-        lane.reaction = 1;
-        playSfx("mowerPass", {
-          playbackRate: 0.96,
-          cooldownKey: "activity-mower-pass"
-        });
-        if (Math.random() < 0.12) {
-          accentActivityExpression(game, 0.3);
+        const nextCellCount = lane.cells.reduce((sum, cell) => sum + cell, 0);
+        if (nextCellCount > previousCellCount) {
+          lane.reaction = 1;
+          playSfx("mowerPass", {
+            playbackRate: 0.96,
+            cooldownKey: "activity-mower-pass"
+          });
         }
-        if (Math.random() < 0.2) {
+        if (!wasComplete && isActivityCoverageComplete(lane.cut)) {
+          lane.cells.fill(1);
+          lane.cut = 1;
+          setActivityFeedback("잔디를 깎다 · 긴 잔디 한 줄이 짧고 환하게 정리됐습니다.");
+          accentActivityExpression(game, 0.82);
+          persistGame("작업 저장");
+        }
+        if (nextCellCount > previousCellCount && shouldEmitEffect(0.48)) {
           spawnActivityParticles(game, game.mower.x + 18, game.mower.y + 4, {
             count: 3,
             kind: "grass",
@@ -6455,22 +6878,31 @@ function updateActivityState(dt) {
         game.toolPose.tipX > row.x1 &&
         game.toolPose.tipX < row.x2 &&
         movedHorizontally &&
-        movedDistance > 0.6
+        movedDistance > 0.04
       ) {
         const tipAssist = state.device?.isTouch ? 6 : 0;
         const startRatio = (game.toolPose.tipX - 12 - tipAssist - row.x1) / (row.x2 - row.x1);
         const endRatio = (game.toolPose.tipX + 12 + tipAssist - row.x1) / (row.x2 - row.x1);
+        const previousCellCount = row.cells.reduce((sum, cell) => sum + cell, 0);
+        const wasComplete = isActivityCoverageComplete(row.progress);
         markCoverageCells(row.cells, startRatio, endRatio);
         row.progress = getCoverageProgress(row.cells);
-        row.ripple = 1;
-        playSfx("hoeDig", {
-          playbackRate: 1.02,
-          cooldownKey: "activity-hoe-dig"
-        });
-        if (Math.random() < 0.12) {
-          accentActivityExpression(game, 0.26);
+        const nextCellCount = row.cells.reduce((sum, cell) => sum + cell, 0);
+        if (nextCellCount > previousCellCount) {
+          row.ripple = 1;
+          playSfx("hoeDig", {
+            playbackRate: 1.02,
+            cooldownKey: "activity-hoe-dig"
+          });
         }
-        if (rowTravel > 0.6 && Math.random() < 0.18) {
+        if (!wasComplete && isActivityCoverageComplete(row.progress)) {
+          row.cells.fill(1);
+          row.progress = 1;
+          setActivityFeedback("농사를 짓다 · 흙 고랑 한 줄이 반듯하게 다져졌습니다.");
+          accentActivityExpression(game, 0.82);
+          persistGame("작업 저장");
+        }
+        if (nextCellCount > previousCellCount && rowTravel > 0.6 && shouldEmitEffect(0.44)) {
           spawnActivityParticles(game, game.toolPose.tipX, row.y + 4, {
             count: 3,
             kind: "soil",
@@ -6595,9 +7027,14 @@ function updateActivityState(dt) {
   }
 }
 
+function getActivityCanvasUiScale() {
+  return /^phone/.test(state.device?.id ?? "") && state.device.viewportHeight <= 650 ? 1.45 : 1;
+}
+
 function drawActivityLabel(text, x, y, fillStyle = "rgba(32, 46, 28, 0.78)") {
+  const uiScale = getActivityCanvasUiScale();
   activityCtx.fillStyle = fillStyle;
-  activityCtx.font = '12px "Gowun Dodum", sans-serif';
+  activityCtx.font = `${(state.device?.isTouch ? 16 : 12) * uiScale}px "Gowun Dodum", sans-serif`;
   activityCtx.textAlign = "center";
   activityCtx.fillText(text, x, y);
 }
@@ -6618,7 +7055,9 @@ function drawActivityTargetHighlight(target) {
   if (!target) {
     return;
   }
-  const pulse = 0.72 + Math.sin(performance.now() / 180) * 0.12;
+  const pulse = state.device?.prefersReducedMotion
+    ? 0.72
+    : 0.72 + Math.sin(performance.now() / 180) * 0.12;
   activityCtx.save();
   activityCtx.strokeStyle = `rgba(214, 114, 78, ${0.58 + pulse * 0.2})`;
   activityCtx.lineWidth = 3;
@@ -6632,7 +7071,10 @@ function drawActivityTargetHighlight(target) {
   activityCtx.restore();
 
   const anchor = getActivityTargetAnchor(target);
-  drawActivityLabel(target.prompt, anchor.x, anchor.y - (target.r ?? 24) - 18, "#a55336");
+  const prompt = state.device?.isTouch
+    ? `${target.label ?? "대상"} · ${getTouchActionLabel()}`
+    : target.prompt;
+  drawActivityLabel(prompt, anchor.x, anchor.y - (target.r ?? 24) - 18, "#8f3f2b");
 }
 
 function drawActivityAnimal(animal) {
@@ -6709,27 +7151,31 @@ function drawActivityExpression(game) {
     return;
   }
 
-  const labelY = game.player.y - 58 - Math.sin(performance.now() / 260) * 2.2;
-  const labelX = game.player.x;
+  const rawLabelY = game.player.y - 58 - (state.device?.prefersReducedMotion ? 0 : Math.sin(performance.now() / 260) * 2.2);
+  const rawLabelX = game.player.x;
+  const uiScale = getActivityCanvasUiScale();
 
   activityCtx.save();
-  activityCtx.font = '600 15px "Gowun Dodum", sans-serif';
+  const expressionFontSize = (state.device?.isTouch ? 20 : 15) * uiScale;
+  activityCtx.font = `700 ${expressionFontSize}px "Gowun Dodum", sans-serif`;
   activityCtx.textAlign = "center";
 
   const textWidth = activityCtx.measureText(game.phrase).width;
-  const bubbleWidth = textWidth + 24;
-  const bubbleHeight = 24;
+  const bubbleWidth = textWidth + (state.device?.isTouch ? 32 : 24) * uiScale;
+  const bubbleHeight = (state.device?.isTouch ? 32 : 24) * uiScale;
+  const labelX = clamp(rawLabelX, bubbleWidth / 2 + 10, game.width - bubbleWidth / 2 - 10);
+  const labelY = clamp(rawLabelY, bubbleHeight + 8, game.height - 58);
 
   fillActivityRoundedRect(
     labelX - bubbleWidth / 2,
-    labelY - 18,
+    labelY - (state.device?.isTouch ? 24 : 18) * uiScale,
     bubbleWidth,
     bubbleHeight,
     12,
-    `rgba(255, 249, 239, ${0.12 + alpha * 0.26})`
+    `rgba(255, 249, 239, ${0.5 + alpha * 0.42})`
   );
 
-  activityCtx.fillStyle = `rgba(132, 69, 46, ${0.3 + alpha * 0.6})`;
+  activityCtx.fillStyle = `rgba(112, 50, 31, ${0.72 + alpha * 0.28})`;
   activityCtx.fillText(game.phrase, labelX, labelY - 1);
 
   game.sweatDrops.forEach((drop) => {
@@ -6740,6 +7186,83 @@ function drawActivityExpression(game) {
     activityCtx.fill();
   });
 
+  activityCtx.restore();
+}
+
+function wrapCanvasTextLines(targetContext, text, maxWidth, maxLines = 2) {
+  const characters = Array.from(String(text ?? ""));
+  const lines = [];
+  let current = "";
+  let index = 0;
+  while (index < characters.length && lines.length < maxLines) {
+    const next = current + characters[index];
+    if (current && targetContext.measureText(next).width > maxWidth) {
+      lines.push(current.trim());
+      current = "";
+      continue;
+    }
+    current = next;
+    index += 1;
+  }
+  if (current && lines.length < maxLines) {
+    lines.push(current.trim());
+  }
+  if (index < characters.length && lines.length > 0) {
+    let last = lines[lines.length - 1];
+    while (last && targetContext.measureText(`${last}…`).width > maxWidth) {
+      last = Array.from(last).slice(0, -1).join("");
+    }
+    lines[lines.length - 1] = `${last.trim()}…`;
+  }
+  return lines.length > 0 ? lines : [""];
+}
+
+function drawActivityCompletion(game) {
+  if (!game.completion?.active) {
+    return;
+  }
+  const progress = clamp(1 - game.completion.timer / Math.max(game.completion.duration, 0.01), 0, 1);
+  const remaining = clamp(game.completion.timer / Math.max(game.completion.duration, 0.01), 0, 1);
+  const alpha = Math.min(1, progress * 5, remaining * 4 + 0.12);
+  const eased = 1 - Math.pow(1 - progress, 3);
+  const overlayScale = Math.min(getActivityCanvasUiScale(), 1.22);
+  const cardWidth = Math.min(game.width - 46, 500 * overlayScale);
+  const cardHeight = 108 * overlayScale;
+  const cardX = (game.width - cardWidth) / 2;
+  const cardY = 22;
+  const checkX = cardX + 48 * overlayScale;
+  const checkY = cardY + 48 * overlayScale;
+
+  activityCtx.save();
+  activityCtx.globalAlpha = alpha;
+  fillActivityRoundedRect(cardX, cardY, cardWidth, cardHeight, 22 * overlayScale, "rgba(37, 55, 36, 0.92)");
+  strokeActivityRoundedRect(cardX, cardY, cardWidth, cardHeight, 22 * overlayScale, "rgba(255, 239, 188, 0.62)", 2);
+
+  activityCtx.fillStyle = "#f6d88c";
+  activityCtx.beginPath();
+  activityCtx.arc(checkX, checkY, (19 + eased * 5) * overlayScale, 0, Math.PI * 2);
+  activityCtx.fill();
+  activityCtx.strokeStyle = "#40583b";
+  activityCtx.lineWidth = 4 * overlayScale;
+  activityCtx.lineCap = "round";
+  activityCtx.beginPath();
+  activityCtx.moveTo(checkX - 9 * overlayScale, checkY);
+  activityCtx.lineTo(checkX - 2 * overlayScale, checkY + 8 * overlayScale);
+  activityCtx.lineTo(checkX + 12 * overlayScale, checkY - 10 * overlayScale);
+  activityCtx.stroke();
+
+  const textX = checkX + 38 * overlayScale;
+  const textWidth = cardX + cardWidth - textX - 22 * overlayScale;
+  activityCtx.textAlign = "left";
+  activityCtx.fillStyle = "#fff7df";
+  activityCtx.font = `800 ${24 * overlayScale}px "Gowun Dodum", sans-serif`;
+  activityCtx.fillText(game.phrase, textX, cardY + 38 * overlayScale);
+  activityCtx.fillStyle = "#f4dcae";
+  activityCtx.font = `700 ${15.5 * overlayScale}px "Gowun Dodum", sans-serif`;
+  const lines = wrapCanvasTextLines(activityCtx, game.zone.afterText, textWidth, 2);
+  lines.forEach((line, index) => {
+    activityCtx.fillText(line, textX, cardY + (64 + index * 20) * overlayScale);
+  });
   activityCtx.restore();
 }
 
@@ -7657,25 +8180,29 @@ function renderActivityScene() {
       game.plants.forEach((plant, index) => {
         const bounce = Math.sin(plant.bounce * Math.PI) * 6;
         const droop = plant.droop * 0.85;
+        const growthReveal = game.completion?.active
+          ? 1 - game.completion.timer / Math.max(game.completion.duration, 0.01)
+          : 0;
+        const growthScale = 1 + clamp(growthReveal, 0, 1) * 0.34;
         drawActivityEllipseShadow(plant.x, plant.y + 16, 10, 4, 0.08);
         activityCtx.strokeStyle = "#588649";
-        activityCtx.lineWidth = 3;
+        activityCtx.lineWidth = 3 * growthScale;
         activityCtx.beginPath();
         activityCtx.moveTo(plant.x, plant.y + 8);
-        activityCtx.lineTo(plant.x, plant.y - 8 - bounce);
+        activityCtx.lineTo(plant.x, plant.y - 8 * growthScale - bounce);
         activityCtx.stroke();
         activityCtx.fillStyle = plant.watered ? "#72b259" : "#95a85d";
         activityCtx.beginPath();
-        activityCtx.ellipse(plant.x - 6, plant.y - 10 - bounce, 7, plant.watered ? 6 : 4, -0.5 - droop, 0, Math.PI * 2);
-        activityCtx.ellipse(plant.x + 6, plant.y - 10 - bounce, 7, plant.watered ? 6 : 4, 0.5 + droop, 0, Math.PI * 2);
+        activityCtx.ellipse(plant.x - 6 * growthScale, plant.y - 10 * growthScale - bounce, 7 * growthScale, (plant.watered ? 6 : 4) * growthScale, -0.5 - droop, 0, Math.PI * 2);
+        activityCtx.ellipse(plant.x + 6 * growthScale, plant.y - 10 * growthScale - bounce, 7 * growthScale, (plant.watered ? 6 : 4) * growthScale, 0.5 + droop, 0, Math.PI * 2);
         activityCtx.fill();
         drawCenteredImageAssetOn(
           activityCtx,
           PLANTER_ASSETS[index % PLANTER_ASSETS.length],
           plant.x,
-          plant.y - 15 - bounce,
-          plant.watered ? 30 : 25,
-          plant.watered ? 30 : 25,
+          plant.y - 15 * growthScale - bounce,
+          (plant.watered ? 30 : 25) * growthScale,
+          (plant.watered ? 30 : 25) * growthScale,
           { alpha: plant.watered ? 0.98 : 0.78 }
         );
       });
@@ -7821,11 +8348,27 @@ function renderActivityScene() {
   drawActivityParticles(game);
   drawActivityPlayer(game);
   drawActivityExpression(game);
-  fillActivityRoundedRect(24, game.height - 48, game.width - 48, 28, 14, "rgba(255, 248, 235, 0.72)");
+  const uiScale = getActivityCanvasUiScale();
+  const fallbackGuide = state.device?.isTouch
+    ? uiScale > 1
+      ? "조이스틱 이동 · 행동 버튼"
+      : "조이스틱으로 이동 · 오른쪽 행동 버튼"
+    : "이동: 방향키/WASD · 행동: E 또는 Space";
+  const footerMessage = game.feedback || fallbackGuide;
+  const footerFontSize = (state.device?.isTouch ? 15.5 : 13) * uiScale;
+  activityCtx.font = `700 ${footerFontSize}px "Gowun Dodum", sans-serif`;
+  const footerLines = wrapCanvasTextLines(activityCtx, footerMessage, game.width - 88, 2);
+  const footerLineHeight = footerFontSize * 1.22;
+  const footerHeight = Math.max((state.device?.isTouch ? 36 : 28) * uiScale, footerLineHeight * footerLines.length + 14 * uiScale);
+  const footerTop = game.height - footerHeight - 18;
+  fillActivityRoundedRect(24, footerTop, game.width - 48, footerHeight, footerHeight / 2, "rgba(255, 250, 241, 0.92)");
   activityCtx.fillStyle = "#4a6140";
-  activityCtx.font = '13px "Gowun Dodum", sans-serif';
   activityCtx.textAlign = "left";
-  activityCtx.fillText(game.feedback || "이동: 방향키/WASD · 행동: E 또는 Space", 40, game.height - 29);
+  const footerTextTop = footerTop + footerHeight / 2 - ((footerLines.length - 1) * footerLineHeight) / 2;
+  footerLines.forEach((line, index) => {
+    activityCtx.fillText(line, 42, footerTextTop + index * footerLineHeight + footerFontSize * 0.34);
+  });
+  drawActivityCompletion(game);
 }
 
 function startGame() {
@@ -7842,7 +8385,6 @@ function startGame() {
       ? "왼쪽 조이스틱으로 이모에게 가서 오른쪽 행동 버튼을 누르세요."
       : "방향키로 이모에게 가서 E 키를 누르세요."
   );
-  maybeUnlockListening(["weekendFarm"]);
   renderSidebar();
   syncMobileViewportMode();
   persistGame("시작");
@@ -7960,8 +8502,14 @@ function interactWithZone(zone) {
 function handleWorldEvents() {
   if (state.player.y < 260 || state.player.x > 1520) {
     if (!state.unlockedMood.has("cleanAir")) {
+      state.flags.add("cleanAirSeen");
       maybeUnlockMood("cleanAir");
       awardWarmth(4);
+      startWorldExpressionMoment(
+        "cleanAir",
+        "공기가 맑다",
+        "들판 끝까지 시야가 트이고, 바람이 지나갈 때마다 숨이 한층 가볍게 느껴집니다."
+      );
       showToast("공기가 맑다", "들판 끝으로 갈수록 숨이 한층 가벼워집니다.");
       persistGame("발견");
     }
@@ -8231,6 +8779,15 @@ function updateWorldPractice(dt) {
       }
     }
   });
+  if (practice.pond.cast.hookSoundTimer > 0) {
+    practice.pond.cast.hookSoundTimer = Math.max(0, practice.pond.cast.hookSoundTimer - dt);
+    if (practice.pond.cast.hookSoundTimer <= 0 && practice.pond.cast.hooked) {
+      playSfx("fishHook", {
+        playbackRate: randomRange(0.98, 1.12),
+        cooldownKey: "world-fish-hook"
+      });
+    }
+  }
   if (practice.pond.cast.timer > 0) {
     practice.pond.cast.timer = Math.max(0, practice.pond.cast.timer - dt);
     if (practice.pond.cast.timer <= 0) {
@@ -8252,9 +8809,15 @@ function updateMiniGame(dt) {
   }
   const game = state.activeMiniGame;
   updateActivityState(dt);
+  if (isActivityComplete(game) && !game.completion.active) {
+    beginActivityCompletion(game);
+  }
+  if (game.completion.active) {
+    game.completion.timer = Math.max(0, game.completion.timer - dt);
+  }
   updateMiniGameUi();
   renderActivityScene();
-  if (isActivityComplete(game)) {
+  if (game.completion.active && game.completion.timer <= 0) {
     completeTask(game.zone);
   }
 }
@@ -8316,12 +8879,26 @@ function update(dt) {
     advanceDayCycle(dt, { announce: !state.activeMiniGame });
   }
 
-  updateAmbientLife(dt);
+  const optionalPanelOpen =
+    state.uiPanels.heroExpanded ||
+    state.uiPanels.storyOpen ||
+    state.uiPanels.statsOpen ||
+    state.uiPanels.journalOpen;
+  const worldIsInteractive =
+    !state.activeMiniGame &&
+    !state.activeDialogue &&
+    !state.activeQuiz &&
+    !state.endingShown &&
+    !optionalPanelOpen;
+  if (worldIsInteractive) {
+    updateAmbientLife(dt);
+  }
+  updateWorldExpressionMoment(dt);
   renderTimeHud();
-  if (state.started && !state.activeMiniGame) {
+  if (state.started && worldIsInteractive) {
     updateWorldPractice(dt);
   }
-  if (state.started && !state.activeMiniGame) {
+  if (state.started && worldIsInteractive) {
     updateFollowerCompanions(dt);
   }
 
@@ -10068,6 +10645,16 @@ function drawGrassTexture(x, y, w, h, density = 18) {
 function drawWorldGroundFloor(cameraX, cameraY) {
   ctx.save();
   ctx.translate(-cameraX, -cameraY);
+  const isVisibleWorldPoint = (x, y, padding = 48) =>
+    x >= cameraX - padding &&
+    x <= cameraX + canvas.width + padding &&
+    y >= cameraY - padding &&
+    y <= cameraY + canvas.height + padding;
+  const isVisibleWorldRect = (x, y, width, height, padding = 64) =>
+    x + width >= cameraX - padding &&
+    x <= cameraX + canvas.width + padding &&
+    y + height >= cameraY - padding &&
+    y <= cameraY + canvas.height + padding;
 
   const { current, next, blend } = getCurrentDayBlendInfo();
   const groundStops = [
@@ -10092,6 +10679,9 @@ function drawWorldGroundFloor(cameraX, cameraY) {
   ];
 
   fieldBands.forEach((band, bandIndex) => {
+    if (!isVisibleWorldRect(0, band.y - band.wave - 12, world.width, band.depth + band.wave * 2 + 24)) {
+      return;
+    }
     ctx.fillStyle = band.color;
     ctx.beginPath();
     ctx.moveTo(-40, band.y + band.depth);
@@ -10115,6 +10705,9 @@ function drawWorldGroundFloor(cameraX, cameraY) {
     { x: 1156, y: 908, w: 282, h: 128, color: "rgba(173, 186, 126, 0.1)" }
   ];
   meadowPatches.forEach((patch, index) => {
+    if (!isVisibleWorldRect(patch.x, patch.y, patch.w, patch.h)) {
+      return;
+    }
     const glow = ctx.createRadialGradient(
       patch.x + patch.w * 0.5,
       patch.y + patch.h * 0.5,
@@ -10143,6 +10736,9 @@ function drawWorldGroundFloor(cameraX, cameraY) {
   ctx.lineWidth = 2;
   for (let line = 0; line < 16; line += 1) {
     const y = 286 + line * 68;
+    if (!isVisibleWorldPoint(cameraX + canvas.width / 2, y, 18)) {
+      continue;
+    }
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(world.width, y + Math.sin(line * 0.6) * 8);
@@ -10152,7 +10748,7 @@ function drawWorldGroundFloor(cameraX, cameraY) {
   for (let index = 0; index < 180; index += 1) {
     const x = 48 + ((index * 117) % (world.width - 96));
     const y = 252 + ((index * 83) % (world.height - 320));
-    if (isRoadSurface(x, y)) {
+    if (!isVisibleWorldPoint(x, y) || isRoadSurface(x, y)) {
       continue;
     }
     ctx.strokeStyle = index % 4 === 0 ? "rgba(121, 157, 89, 0.22)" : "rgba(102, 136, 76, 0.18)";
@@ -10166,7 +10762,7 @@ function drawWorldGroundFloor(cameraX, cameraY) {
   for (let patch = 0; patch < 64; patch += 1) {
     const x = 72 + ((patch * 79) % (world.width - 144));
     const y = 246 + ((patch * 131) % (world.height - 332));
-    if (isRoadSurface(x, y)) {
+    if (!isVisibleWorldPoint(x, y, 72) || isRoadSurface(x, y)) {
       continue;
     }
     ctx.fillStyle = patch % 3 === 0 ? "rgba(87, 113, 70, 0.08)" : "rgba(203, 190, 144, 0.06)";
@@ -10178,7 +10774,7 @@ function drawWorldGroundFloor(cameraX, cameraY) {
   for (let pebble = 0; pebble < 110; pebble += 1) {
     const x = 64 + ((pebble * 67) % (world.width - 128));
     const y = 238 + ((pebble * 107) % (world.height - 308));
-    if (isRoadSurface(x, y)) {
+    if (!isVisibleWorldPoint(x, y) || isRoadSurface(x, y)) {
       continue;
     }
     ctx.fillStyle = pebble % 2 === 0 ? "rgba(231, 222, 188, 0.12)" : "rgba(110, 126, 96, 0.1)";
@@ -10190,7 +10786,7 @@ function drawWorldGroundFloor(cameraX, cameraY) {
   for (let bloom = 0; bloom < 22; bloom += 1) {
     const x = 90 + ((bloom * 173) % (world.width - 180));
     const y = 300 + ((bloom * 149) % (world.height - 380));
-    if (isRoadSurface(x, y)) {
+    if (!isVisibleWorldPoint(x, y, 72) || isRoadSurface(x, y)) {
       continue;
     }
     drawFlowerCluster(x, y, ["#f1b56b", "#f7d6e0", "#f4f0d0"]);
@@ -10593,6 +11189,46 @@ function isOnScreen(x, y, padding = 96) {
   return x > -padding && x < canvas.width + padding && y > -padding && y < canvas.height + padding;
 }
 
+function getCanvasUiScale() {
+  if (/^phone/.test(state.device?.id ?? "")) {
+    const viewportWidth = Math.max(state.device.viewportWidth, 1);
+    return clamp(canvas.width / viewportWidth, 1.36, 2.5);
+  }
+  if (state.device?.id === "tablet") {
+    return state.device.isPortrait ? 1.28 : 1.12;
+  }
+  return 1;
+}
+
+function getWorldHudSafeRect() {
+  const uiScale = getCanvasUiScale();
+  const isPhone = /^phone/.test(state.device?.id ?? "");
+  const isTablet = state.device?.id === "tablet";
+  if (isPhone) {
+    return {
+      left: 32 * uiScale,
+      right: canvas.width - 32 * uiScale,
+      top: 66 * uiScale,
+      bottom: canvas.height - 60 * uiScale
+    };
+  }
+
+  const viewportScale = canvas.width / Math.max(state.device?.viewportWidth ?? canvas.width, 1);
+  const touchReserve = state.device?.isTouch
+    ? Math.max(state.device.touchActionHeight, state.device.touchButtonSize * 2.2) + 18
+    : 0;
+  return {
+    left: 42,
+    right: canvas.width - 42,
+    top: isTablet ? 76 : 42,
+    bottom: canvas.height - (isTablet ? Math.max(54, touchReserve * viewportScale + 18) : 42)
+  };
+}
+
+function isInsideWorldHudSafeRect(x, y, rect = getWorldHudSafeRect()) {
+  return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+}
+
 function getInteractionPalette(kind = "default") {
   if (kind === "dialogue") {
     return {
@@ -10678,21 +11314,24 @@ function getInteractionPalette(kind = "default") {
 function drawInteractionTag(x, y, label, keycap, palette, compact = false) {
   const text = label || "";
   const keyText = keycap || "";
+  const uiScale = getCanvasUiScale();
   ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(uiScale, uiScale);
   ctx.font = `${compact ? 11 : 12}px "Gowun Dodum", sans-serif`;
   const labelWidth = text ? Math.max(compact ? 44 : 52, ctx.measureText(text).width + (compact ? 14 : 18)) : 0;
   const keyWidth = keyText ? (compact ? 22 : 24) : 0;
   const gap = keyWidth && labelWidth ? 6 : 0;
   const totalWidth = Math.max(keyWidth + gap + labelWidth, keyWidth || labelWidth);
-  const left = x - totalWidth / 2;
-  const tagY = y - (compact ? 38 : 46);
+  const left = -totalWidth / 2;
+  const tagY = -(compact ? 38 : 46);
   const keyY = tagY + (compact ? 2 : 3);
 
   ctx.strokeStyle = "rgba(255, 250, 239, 0.24)";
   ctx.lineWidth = 1.4;
   ctx.beginPath();
-  ctx.moveTo(x, y - 9);
-  ctx.lineTo(x, tagY + 22);
+  ctx.moveTo(0, -9);
+  ctx.lineTo(0, tagY + 22);
   ctx.stroke();
 
   if (keyWidth) {
@@ -10718,12 +11357,18 @@ function drawInteractionTag(x, y, label, keycap, palette, compact = false) {
 
 function drawInteractionBeacon(x, y, options = {}) {
   const palette = options.palette ?? getInteractionPalette();
-  const size = options.size ?? 11;
+  const phoneMarkerScale = /^phone/.test(state.device?.id ?? "")
+    ? clamp(getCanvasUiScale() / 1.36, 1, 1.5)
+    : 1;
+  const size = (options.size ?? 11) * phoneMarkerScale;
   const subtle = options.subtle ?? false;
   const showTag = options.showTag ?? false;
   const label = options.label ?? "";
   const keycap = options.keycap ?? "";
-  const phase = performance.now() / (subtle ? 280 : 210) + x * 0.008 + y * 0.006;
+  const phase =
+    (state.device?.prefersReducedMotion ? 0 : performance.now() / (subtle ? 280 : 210)) +
+    x * 0.008 +
+    y * 0.006;
   const pulse = Math.sin(phase);
   const rise = subtle ? 1.5 : 2.4;
   const markerY = y - 10 + pulse * rise;
@@ -10738,6 +11383,14 @@ function drawInteractionBeacon(x, y, options = {}) {
     "rgba(255,255,255,0)",
     -0.14
   );
+
+  if (!subtle) {
+    ctx.strokeStyle = "rgba(31, 42, 28, 0.42)";
+    ctx.lineWidth = 4.6;
+    ctx.beginPath();
+    ctx.arc(x, markerY, size + 4 + pulse * 0.45, 0, Math.PI * 2);
+    ctx.stroke();
+  }
 
   ctx.save();
   ctx.setLineDash(subtle ? [4, 8] : [6, 6]);
@@ -10774,6 +11427,13 @@ function drawWorldPracticeHighlight() {
     return;
   }
   const focusedId = state.hoveredPractice?.id ?? null;
+  const nearbyTargetIds = new Set(
+    targets
+      .filter((target) => target.kind !== "nature")
+      .sort((left, right) => left.distance - right.distance)
+      .slice(0, 2)
+      .map((target) => target.id)
+  );
 
   targets.forEach((target) => {
     const isNature = target.kind === "nature";
@@ -10782,7 +11442,7 @@ function drawWorldPracticeHighlight() {
       if (!isFocused || target.distance > Math.min(target.radius, 44)) {
         return;
       }
-    } else if (target.distance > 260 && !isFocused) {
+    } else if (!nearbyTargetIds.has(target.id) && !isFocused) {
       return;
     }
     const { x, y } = worldToScreen(target.x, target.y);
@@ -10791,12 +11451,13 @@ function drawWorldPracticeHighlight() {
     }
     const showNatureKeycap = isNature && isFocused && target.distance < Math.min(target.radius * 0.58, 24);
     const emphasized = isFocused && !isNature;
+    const showNatureTag = showNatureKeycap && state.device?.isTouch;
     drawInteractionBeacon(x, y, {
       palette: getInteractionPalette(target.kind),
       size: isNature ? 5.6 : emphasized ? 15 : target.kind === "work" ? 8.5 : 10.5,
       subtle: isNature ? true : !emphasized,
-      label: emphasized ? target.label : "",
-      keycap: emphasized ? "E" : showNatureKeycap ? "E" : "",
+      label: emphasized || showNatureTag ? target.label : "",
+      keycap: state.device?.isTouch ? "" : emphasized || showNatureKeycap ? "E" : "",
       showTag: emphasized || showNatureKeycap
     });
   });
@@ -10873,8 +11534,6 @@ function drawWorld() {
   }
   drawNpc(cameraX, cameraY, 1390, 896, "#5c77a8");
   drawBench(cameraX, cameraY);
-  drawLanterns(cameraX, cameraY);
-  drawFireflies(cameraX, cameraY);
 }
 
 function drawHouse(cameraX, cameraY) {
@@ -11308,27 +11967,29 @@ function drawPond(cameraX, cameraY) {
   }
 }
 
+const STATIC_TREE_POSITIONS = [
+  [580, 146],
+  [640, 210],
+  [905, 126],
+  [1295, 164],
+  [1788, 330],
+  [1840, 1010],
+  [1250, 1230],
+  [418, 1230],
+  [894, 1178]
+];
+
+const STATIC_TREE_PALETTES = [
+  { base: "#5c8d4c", accent: "#7fb067", trunk: "#7a5637" },
+  { base: "#729f57", accent: "#8fbc73", trunk: "#6e5035" },
+  { base: "#4f7d43", accent: "#79a564", trunk: "#6b4e33" }
+];
+
 function drawTrees(cameraX, cameraY) {
-  const treePositions = [
-    [580, 146],
-    [640, 210],
-    [905, 126],
-    [1295, 164],
-    [1788, 330],
-    [1840, 1010],
-    [1250, 1230],
-    [418, 1230],
-    [894, 1178]
-  ];
-  const palettes = [
-    { base: "#5c8d4c", accent: "#7fb067", trunk: "#7a5637" },
-    { base: "#729f57", accent: "#8fbc73", trunk: "#6e5035" },
-    { base: "#4f7d43", accent: "#79a564", trunk: "#6b4e33" }
-  ];
-  treePositions.forEach(([x, y], index) => {
+  STATIC_TREE_POSITIONS.forEach(([x, y], index) => {
     const sx = x - cameraX;
     const sy = y - cameraY;
-    const palette = palettes[index % palettes.length];
+    const palette = STATIC_TREE_PALETTES[index % STATIC_TREE_PALETTES.length];
     drawTreeShape(sx, sy, 20 + (index % 3) * 3, 22 + (index % 2) * 4, palette, index, TREE_ASSETS[index % TREE_ASSETS.length]);
     if (index % 3 === 0) {
       drawFlowerCluster(sx - 6, sy + 2, ["#f7d6e0", "#f1b56b", "#f4f0d0"]);
@@ -11749,16 +12410,18 @@ function drawQuizSigns(cameraX, cameraY) {
       return;
     }
     const solved = state.solvedQuizSigns.has(quiz.id);
+    const unlocked = solved || state.completedTasks.has(quiz.taskId);
     const sway = Math.sin(performance.now() / 620 + index * 0.7) * 0.03;
     const label = quiz.label.replace(" 팻말", "");
     drawEllipseShadow(x, y + 28, 22, 6, 0.1);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(sway);
+    ctx.globalAlpha = unlocked ? 1 : 0.42;
     ctx.fillStyle = "#8a613f";
     ctx.fillRect(-14, 2, 7, 54);
     ctx.fillRect(7, 2, 7, 54);
-    drawRoundedRect(-30, -34, 60, 38, 10, solved ? "#f3e4ba" : "#f0d7a2");
+    drawRoundedRect(-30, -34, 60, 38, 10, solved ? "#f3e4ba" : unlocked ? "#f0d7a2" : "#c8bea7");
     strokeRoundedRect(-30, -34, 60, 38, 10, "rgba(115, 80, 48, 0.24)", 2);
     ctx.fillStyle = "rgba(255, 248, 233, 0.42)";
     ctx.fillRect(-24, -26, 48, 8);
@@ -11766,7 +12429,7 @@ function drawQuizSigns(cameraX, cameraY) {
     ctx.font = '10px "Gowun Dodum", sans-serif';
     ctx.textAlign = "center";
     ctx.fillText(label, 0, -11);
-    ctx.fillStyle = solved ? "#7eb067" : "#d97f56";
+    ctx.fillStyle = solved ? "#7eb067" : unlocked ? "#d97f56" : "#8d887d";
     ctx.beginPath();
     ctx.arc(18, -22, 7, 0, Math.PI * 2);
     ctx.fill();
@@ -11777,11 +12440,13 @@ function drawQuizSigns(cameraX, cameraY) {
       ctx.moveTo(14, -22);
       ctx.lineTo(17, -18);
       ctx.lineTo(22, -26);
-    } else {
+    } else if (unlocked) {
       ctx.moveTo(18, -26);
       ctx.lineTo(18, -21);
       ctx.moveTo(18, -17);
       ctx.lineTo(18, -16);
+    } else {
+      ctx.arc(18, -22, 2.4, 0, Math.PI * 2);
     }
     ctx.stroke();
     ctx.restore();
@@ -11861,9 +12526,20 @@ function drawFireflies(cameraX, cameraY) {
   });
 }
 
+function getPlayerVisualScale() {
+  const phoneProfile = /^phone/.test(state.device?.id ?? "");
+  return phoneProfile ? 1.2 : state.device?.id === "tablet" ? 1.12 : 1.08;
+}
+
+function getPlayerMarkerPulse() {
+  return state.device?.prefersReducedMotion ? 0 : Math.sin(performance.now() / 260) * 1.2;
+}
+
 function drawPlayer() {
   const { x, y } = worldToScreen(state.player.x, state.player.y);
   const bob = Math.sin(state.player.step * 5) * 1.8;
+  const personScale = getPlayerVisualScale();
+
   drawWorldPersonFigure(x, y, {
     bodyColor: "#c15f3f",
     accentColor: "rgba(246, 232, 207, 0.96)",
@@ -11872,10 +12548,115 @@ function drawPlayer() {
     facing: state.player.facing,
     stride: Math.sin(state.player.step * 5),
     bob,
-    scale: 1.05,
+    scale: personScale,
     style: "player"
   });
   drawWorldHeldTool(x, y, bob);
+}
+
+function drawPlayerFocusMarker() {
+  const { x, y } = worldToScreen(state.player.x, state.player.y);
+  const personScale = getPlayerVisualScale();
+  const markerPulse = getPlayerMarkerPulse();
+  drawScaledGlow(
+    ctx,
+    x,
+    y + 11,
+    34 * personScale,
+    16 * personScale,
+    "rgba(255, 240, 202, 0.38)",
+    "rgba(255, 255, 255, 0)"
+  );
+  ctx.strokeStyle = "rgba(116, 55, 35, 0.72)";
+  ctx.lineWidth = 3.2;
+  ctx.beginPath();
+  ctx.ellipse(x, y + 11, 23 * personScale + markerPulse, 9 * personScale + markerPulse * 0.3, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.strokeStyle = "rgba(255, 248, 225, 0.94)";
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.ellipse(x, y + 11, 18 * personScale, 6.4 * personScale, 0, 0, Math.PI * 2);
+  ctx.stroke();
+}
+
+function drawPlayerDirectionMarker() {
+  const { x, y } = worldToScreen(state.player.x, state.player.y);
+  const personScale = getPlayerVisualScale();
+  const markerPulse = getPlayerMarkerPulse();
+  const directionAngles = {
+    up: 0,
+    right: Math.PI / 2,
+    down: Math.PI,
+    left: -Math.PI / 2
+  };
+  ctx.save();
+  ctx.translate(x, y - 54 * personScale + markerPulse * 0.25);
+  ctx.rotate(directionAngles[state.player.facing] ?? 0);
+  ctx.fillStyle = "rgba(255, 249, 225, 0.96)";
+  ctx.strokeStyle = "rgba(123, 58, 37, 0.82)";
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(0, -8);
+  ctx.lineTo(7, 6);
+  ctx.lineTo(0, 3.5);
+  ctx.lineTo(-7, 6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawForegroundOccluders() {
+  const playerX = state.player.x;
+  const playerY = state.player.y;
+  const candidates = [];
+
+  STATIC_TREE_POSITIONS.forEach(([x, y], index) => {
+    const size = 20 + (index % 3) * 3;
+    const trunkHeight = 22 + (index % 2) * 4;
+    const baseY = y + trunkHeight;
+    const depth = baseY - playerY;
+    if (depth < -4 || depth > 92 || Math.abs(x - playerX) > size * 1.8 + 10) {
+      return;
+    }
+    candidates.push({ type: "static", x, y, size, trunkHeight, baseY, index });
+  });
+
+  state.ambient.nature.trees.forEach((tree) => {
+    const baseY = tree.y + tree.trunkHeight;
+    const depth = baseY - playerY;
+    if (depth < -4 || depth > 104 || Math.abs(tree.x - playerX) > tree.size * 1.9 + 12) {
+      return;
+    }
+    candidates.push({ type: "nature", tree, baseY });
+  });
+
+  if (!candidates.length) {
+    return;
+  }
+
+  ctx.save();
+  candidates
+    .sort((left, right) => left.baseY - right.baseY)
+    .slice(0, 2)
+    .forEach((candidate) => {
+      if (candidate.type === "nature") {
+        drawNatureTree(candidate.tree);
+        return;
+      }
+      const sx = candidate.x - state.camera.x;
+      const sy = candidate.y - state.camera.y;
+      drawTreeShape(
+        sx,
+        sy,
+        candidate.size,
+        candidate.trunkHeight,
+        STATIC_TREE_PALETTES[candidate.index % STATIC_TREE_PALETTES.length],
+        candidate.index,
+        TREE_ASSETS[candidate.index % TREE_ASSETS.length]
+      );
+    });
+  ctx.restore();
 }
 
 function drawFollowerCompanion(entry) {
@@ -12048,77 +12829,366 @@ function drawFollowers() {
   state.followers.forEach(drawFollowerCompanion);
 }
 
+function getWorldExpressionMomentTheme(id) {
+  if (id === "cleanAir") {
+    return { panel: "rgba(36, 79, 86, 0.92)", border: "rgba(205, 242, 238, 0.72)", accent: "#cdeee9", wash: "rgba(159, 216, 224, 0.08)" };
+  }
+  if (id === "relaxed") {
+    return { panel: "rgba(64, 78, 48, 0.92)", border: "rgba(239, 223, 164, 0.72)", accent: "#f0dda0", wash: "rgba(225, 206, 137, 0.08)" };
+  }
+  if (id === "peaceful") {
+    return { panel: "rgba(43, 52, 70, 0.94)", border: "rgba(223, 228, 203, 0.64)", accent: "#e8e3b1", wash: "rgba(63, 78, 108, 0.1)" };
+  }
+  if (id === "loseTrack") {
+    return { panel: "rgba(92, 59, 42, 0.94)", border: "rgba(255, 211, 146, 0.74)", accent: "#ffd392", wash: "rgba(215, 129, 79, 0.1)" };
+  }
+  if (id === "inconvenient") {
+    return { panel: "rgba(82, 60, 45, 0.94)", border: "rgba(224, 196, 155, 0.7)", accent: "#e2c39a", wash: "rgba(103, 73, 50, 0.11)" };
+  }
+  if (id === "boring") {
+    return { panel: "rgba(67, 65, 75, 0.94)", border: "rgba(218, 211, 221, 0.62)", accent: "#ddd3df", wash: "rgba(94, 91, 105, 0.08)" };
+  }
+  return { panel: "rgba(49, 69, 43, 0.94)", border: "rgba(247, 221, 153, 0.72)", accent: "#f6d88c", wash: "rgba(244, 199, 105, 0.08)" };
+}
+
+function drawWorldExpressionAtmosphere(moment, alpha, progress, theme) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = theme.wash;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const motion = state.device?.prefersReducedMotion ? 0 : performance.now() / 1000;
+
+  if (moment.id === "cleanAir" || moment.id === "relaxed") {
+    ctx.strokeStyle = moment.id === "cleanAir" ? "rgba(224, 249, 246, 0.46)" : "rgba(244, 232, 179, 0.34)";
+    ctx.lineWidth = 2.2;
+    for (let index = 0; index < 4; index += 1) {
+      const y = canvas.height * (0.28 + index * 0.12);
+      const offset = ((motion * (42 + index * 8) + index * 110) % (canvas.width + 180)) - 90;
+      ctx.beginPath();
+      ctx.moveTo(offset - 92, y);
+      ctx.bezierCurveTo(offset - 34, y - 18, offset + 28, y + 18, offset + 92, y - 2);
+      ctx.stroke();
+    }
+  } else if (moment.id === "peaceful") {
+    for (let index = 0; index < 12; index += 1) {
+      const x = ((index * 83 + 37) % Math.max(canvas.width, 1));
+      const y = ((index * 47 + 96) % Math.max(canvas.height, 1));
+      const twinkle = state.device?.prefersReducedMotion ? 0.52 : 0.38 + Math.sin(motion * 2 + index) * 0.2;
+      ctx.fillStyle = `rgba(244, 232, 157, ${twinkle})`;
+      ctx.beginPath();
+      ctx.arc(x, y, 1.6 + (index % 3) * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (moment.id === "loseTrack") {
+    const arcX = canvas.width * 0.5;
+    const arcY = canvas.height * 0.72;
+    ctx.strokeStyle = "rgba(255, 214, 146, 0.36)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(arcX, arcY, Math.min(canvas.width, canvas.height) * 0.28, Math.PI * 1.08, Math.PI * 1.92);
+    ctx.stroke();
+    const angle = Math.PI * (1.08 + 0.84 * progress);
+    ctx.fillStyle = "rgba(255, 211, 132, 0.7)";
+    ctx.beginPath();
+    ctx.arc(arcX + Math.cos(angle) * Math.min(canvas.width, canvas.height) * 0.28, arcY + Math.sin(angle) * Math.min(canvas.width, canvas.height) * 0.28, 8, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (moment.id === "inconvenient") {
+    ctx.fillStyle = "rgba(100, 70, 46, 0.28)";
+    for (let index = 0; index < 7; index += 1) {
+      const x = canvas.width * 0.14 + index * canvas.width * 0.12;
+      const y = canvas.height * 0.68 + (index % 2) * 18;
+      ctx.beginPath();
+      ctx.ellipse(x, y, 13, 7, index % 2 ? -0.28 : 0.28, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+function drawWorldExpressionMoment() {
+  const moment = state.expressionMoment;
+  if (!moment) {
+    return;
+  }
+  const progress = clamp(1 - moment.timer / Math.max(moment.duration, 0.01), 0, 1);
+  const remaining = clamp(moment.timer / Math.max(moment.duration, 0.01), 0, 1);
+  const alpha = Math.min(1, progress * 4.5, remaining * 4.5);
+  const theme = getWorldExpressionMomentTheme(moment.id);
+  drawWorldExpressionAtmosphere(moment, alpha, progress, theme);
+
+  const safeRect = getWorldHudSafeRect();
+  const uiScale = Math.min(getCanvasUiScale(), 1.58);
+  const maxWidth = Math.max(180, safeRect.right - safeRect.left - 18 * uiScale);
+  const cardWidth = Math.min(maxWidth, 500 * uiScale);
+  const cardHeight = 104 * uiScale;
+  const cardX = clamp((canvas.width - cardWidth) / 2, safeRect.left, Math.max(safeRect.left, safeRect.right - cardWidth));
+  const safeHeight = Math.max(cardHeight, safeRect.bottom - safeRect.top);
+  const cardY = clamp(safeRect.top + safeHeight * 0.26, safeRect.top, Math.max(safeRect.top, safeRect.bottom - cardHeight));
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  drawRoundedRect(cardX, cardY, cardWidth, cardHeight, 20 * uiScale, theme.panel);
+  strokeRoundedRect(cardX, cardY, cardWidth, cardHeight, 20 * uiScale, theme.border, 2.2 * uiScale);
+  ctx.textAlign = "center";
+  ctx.fillStyle = theme.accent;
+  ctx.font = `800 ${11.5 * uiScale}px "Gowun Dodum", sans-serif`;
+  ctx.fillText("장면으로 느낀 표현", cardX + cardWidth / 2, cardY + 21 * uiScale);
+  ctx.fillStyle = "#fff9ea";
+  ctx.font = `900 ${25 * uiScale}px "Gowun Dodum", sans-serif`;
+  ctx.fillText(moment.label, cardX + cardWidth / 2, cardY + 51 * uiScale);
+  ctx.fillStyle = "rgba(255, 249, 234, 0.84)";
+  ctx.font = `600 ${12.5 * uiScale}px "Gowun Dodum", sans-serif`;
+  const lines = wrapCanvasTextLines(ctx, moment.detail, cardWidth - 38 * uiScale, 2);
+  lines.forEach((line, index) => {
+    ctx.fillText(line, cardX + cardWidth / 2, cardY + (73 + index * 17) * uiScale);
+  });
+  const progressWidth = (cardWidth - 32 * uiScale) * remaining;
+  drawRoundedRect(cardX + 16 * uiScale, cardY + cardHeight - 7 * uiScale, cardWidth - 32 * uiScale, 3 * uiScale, 1.5 * uiScale, "rgba(255,255,255,0.14)");
+  if (progressWidth > 1) {
+    drawRoundedRect(cardX + 16 * uiScale, cardY + cardHeight - 7 * uiScale, progressWidth, 3 * uiScale, Math.min(1.5 * uiScale, progressWidth / 2), theme.accent);
+  }
+  ctx.restore();
+}
+
+function drawWorldColorGrade() {
+  const nightAmount = getNightAmount();
+  const { current, next, blend } = getCurrentDayBlendInfo();
+  const eveningStops = [0, 0, 0, 1, 0.15];
+  const eveningAmount = lerp(eveningStops[current], eveningStops[next], blend);
+
+  if (eveningAmount > 0.04) {
+    ctx.fillStyle = `rgba(132, 65, 48, ${(0.045 * eveningAmount).toFixed(3)})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  if (nightAmount > 0.04) {
+    ctx.fillStyle = `rgba(24, 35, 68, ${(0.11 * nightAmount).toFixed(3)})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const vignette = ctx.createRadialGradient(
+      canvas.width / 2,
+      canvas.height * 0.46,
+      canvas.width * 0.18,
+      canvas.width / 2,
+      canvas.height * 0.5,
+      canvas.width * 0.72
+    );
+    vignette.addColorStop(0, "rgba(16, 23, 46, 0)");
+    vignette.addColorStop(1, `rgba(12, 20, 42, ${(0.1 * nightAmount).toFixed(3)})`);
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+function drawCurrentRouteGuide() {
+  if (!state.started) {
+    return;
+  }
+  const target = getCurrentTargetZones()[0];
+  if (!target) {
+    return;
+  }
+
+  const start = worldToScreen(state.player.x, state.player.y + 10);
+  const targetCenter = worldToScreen(target.x, target.y);
+  const safeRect = getWorldHudSafeRect();
+  if (!isInsideWorldHudSafeRect(targetCenter.x, targetCenter.y, safeRect)) {
+    return;
+  }
+  const worldDx = state.player.x - target.x;
+  const worldDy = state.player.y - target.y;
+  const worldDistance = Math.max(1, Math.hypot(worldDx, worldDy));
+  const approachDistance = Math.min(target.radius * 0.72, 78);
+  const end = worldToScreen(
+    target.x + (worldDx / worldDistance) * approachDistance,
+    target.y + (worldDy / worldDistance) * approachDistance
+  );
+  const distance = Math.hypot(end.x - start.x, end.y - start.y);
+  if (distance < 92 || distance > Math.max(canvas.width, canvas.height) * 0.88) {
+    return;
+  }
+
+  const middleX = (start.x + end.x) / 2;
+  const middleY = (start.y + end.y) / 2 - Math.min(34, distance * 0.08);
+  const dashOffset = state.device?.prefersReducedMotion ? 0 : -(performance.now() / 90) % 18;
+
+  ctx.save();
+  ctx.setLineDash([4, 14]);
+  ctx.lineDashOffset = dashOffset;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "rgba(49, 57, 36, 0.28)";
+  ctx.lineWidth = 5.2;
+  ctx.beginPath();
+  ctx.moveTo(start.x, start.y);
+  ctx.quadraticCurveTo(middleX, middleY, end.x, end.y);
+  ctx.stroke();
+  ctx.strokeStyle = "rgba(255, 244, 205, 0.76)";
+  ctx.lineWidth = 2.4;
+  ctx.stroke();
+  ctx.restore();
+}
+
 function drawZoneHints() {
-  const targetZoneIds = new Set(getCurrentStoryStep()?.targetZoneIds ?? []);
+  const currentTargets = getCurrentTargetZones();
+  const targetZoneIds = new Set(currentTargets.map((zone) => zone.id));
+  const primaryTargetId = currentTargets[0]?.id ?? null;
   getAvailableZones().forEach((zone) => {
     const { x, y } = worldToScreen(zone.x, zone.y);
     if (!isOnScreen(x, y, 120)) {
       return;
     }
     const isTarget = targetZoneIds.has(zone.id);
+    const isPrimaryTarget = zone.id === primaryTargetId;
     const isFocused = !state.hoveredPractice && state.hoveredZone?.id === zone.id;
     const palette = getInteractionPalette(isTarget ? "story" : zone.type);
     drawInteractionBeacon(x, y, {
       palette,
-      size: isFocused ? 16 : isTarget ? 12 : 9,
-      subtle: !isFocused && !isTarget,
-      label: isFocused || isTarget ? zone.label : "",
-      keycap: isFocused ? "E" : "",
-      showTag: isFocused || isTarget
+      size: isFocused ? 18 : isPrimaryTarget ? 17 : isTarget ? 10 : 8,
+      subtle: !isFocused && !isPrimaryTarget,
+      label: isFocused || isPrimaryTarget ? zone.label : "",
+      keycap: isFocused && !state.device?.isTouch ? "E" : "",
+      showTag: isFocused || isPrimaryTarget
     });
   });
 }
 
 function drawTargetPointers() {
-  const targets = getCurrentTargetZones();
+  const target = getCurrentTargetZones()[0];
+  if (!target) {
+    return;
+  }
+
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
+  const safeRect = getWorldHudSafeRect();
+  const leftMargin = safeRect.left;
+  const rightEdge = safeRect.right;
+  const topMargin = safeRect.top;
+  const bottomEdge = safeRect.bottom;
+  const { x, y } = worldToScreen(target.x, target.y);
 
-  targets.slice(0, 3).forEach((zone) => {
-    const { x, y } = worldToScreen(zone.x, zone.y);
-    const onScreen = x > 40 && x < canvas.width - 40 && y > 40 && y < canvas.height - 40;
-    if (onScreen) {
-      return;
-    }
+  if (isInsideWorldHudSafeRect(x, y, safeRect)) {
+    return;
+  }
 
-    const angle = Math.atan2(y - centerY, x - centerX);
-    const radiusX = canvas.width / 2 - 34;
-    const radiusY = canvas.height / 2 - 34;
-    const px = centerX + Math.cos(angle) * radiusX;
-    const py = centerY + Math.sin(angle) * radiusY;
+  const dx = x - centerX;
+  const dy = y - centerY;
+  const angle = Math.atan2(dy, dx);
+  let rayScale = Infinity;
+  if (dx > 0) {
+    rayScale = Math.min(rayScale, (rightEdge - centerX) / dx);
+  } else if (dx < 0) {
+    rayScale = Math.min(rayScale, (leftMargin - centerX) / dx);
+  }
+  if (dy > 0) {
+    rayScale = Math.min(rayScale, (bottomEdge - centerY) / dy);
+  } else if (dy < 0) {
+    rayScale = Math.min(rayScale, (topMargin - centerY) / dy);
+  }
+  if (!Number.isFinite(rayScale)) {
+    return;
+  }
 
-    ctx.save();
-    ctx.translate(px, py);
-    ctx.rotate(angle);
-    ctx.fillStyle = "rgba(214, 114, 78, 0.92)";
-    ctx.beginPath();
-    ctx.moveTo(14, 0);
-    ctx.lineTo(-10, -9);
-    ctx.lineTo(-10, 9);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
+  const px = centerX + dx * rayScale;
+  const py = centerY + dy * rayScale;
+  const uiScale = getCanvasUiScale();
+  const iconRadius = 14 * uiScale;
 
-    ctx.fillStyle = "rgba(32, 46, 28, 0.78)";
-    ctx.font = '12px "Gowun Dodum", sans-serif';
-    ctx.textAlign = "center";
-    ctx.fillText(zone.label, px, py - 14);
-  });
+  drawScaledGlow(
+    ctx,
+    px,
+    py,
+    iconRadius * 2.2,
+    iconRadius * 2.2,
+    "rgba(255, 207, 154, 0.34)",
+    "rgba(255, 255, 255, 0)"
+  );
+  ctx.fillStyle = "rgba(31, 43, 29, 0.9)";
+  ctx.strokeStyle = "rgba(255, 246, 221, 0.88)";
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.arc(px, py, iconRadius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.rotate(angle);
+  ctx.fillStyle = "#e48958";
+  ctx.beginPath();
+  ctx.moveTo(iconRadius * 0.72, 0);
+  ctx.lineTo(-iconRadius * 0.42, -iconRadius * 0.5);
+  ctx.lineTo(-iconRadius * 0.2, 0);
+  ctx.lineTo(-iconRadius * 0.42, iconRadius * 0.5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  const fontSize = 13 * uiScale;
+  ctx.font = `700 ${fontSize}px "Gowun Dodum", sans-serif`;
+  const maxLabelWidth = Math.max(96, rightEdge - leftMargin - 12);
+  const labelWidth = Math.min(ctx.measureText(target.label).width + 22 * uiScale, maxLabelWidth);
+  const labelHeight = 25 * uiScale;
+  const placeBelow = py - iconRadius - labelHeight - 8 < topMargin;
+  const labelCenterY = clamp(
+    py + (placeBelow ? iconRadius + labelHeight / 2 + 7 : -iconRadius - labelHeight / 2 - 7),
+    topMargin + labelHeight / 2,
+    bottomEdge - labelHeight / 2
+  );
+  const labelCenterX = clamp(px, leftMargin + labelWidth / 2, rightEdge - labelWidth / 2);
+  drawRoundedRect(
+    labelCenterX - labelWidth / 2,
+    labelCenterY - labelHeight / 2,
+    labelWidth,
+    labelHeight,
+    labelHeight / 2,
+    "rgba(29, 40, 27, 0.9)"
+  );
+  strokeRoundedRect(
+    labelCenterX - labelWidth / 2,
+    labelCenterY - labelHeight / 2,
+    labelWidth,
+    labelHeight,
+    labelHeight / 2,
+    "rgba(255, 242, 211, 0.34)",
+    1.4
+  );
+  ctx.fillStyle = "#fff8e9";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(target.label, labelCenterX, labelCenterY + 0.5);
+  ctx.restore();
 }
 
-function render() {
+function renderWorldScene() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawSkyAndGround();
   drawClouds();
   drawWorld();
   drawFollowers();
   drawPlayer();
+  drawForegroundOccluders();
+  drawWorldColorGrade();
+  drawLanterns(state.camera.x, state.camera.y);
+  drawFireflies(state.camera.x, state.camera.y);
+  drawCurrentRouteGuide();
+  drawPlayerFocusMarker();
+  drawPlayerDirectionMarker();
   drawZoneHints();
   drawTargetPointers();
   drawWorldPracticeHighlight();
+  drawWorldExpressionMoment();
   if (!ui.statsPanel.classList.contains("hidden") && shouldRefreshMiniMap()) {
     renderMiniMap();
   }
+}
+
+function render() {
+  if (state.activeMiniGame || state.activeDialogue || state.activeQuiz || state.endingShown) {
+    return;
+  }
+  renderWorldScene();
 }
 
 function loop(timestamp) {
