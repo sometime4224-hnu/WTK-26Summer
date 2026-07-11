@@ -40,6 +40,20 @@ LINES = [
         "text": "물가에 오래 있으면 공기가 맑다는 말을 왜 하는지 바로 알 수 있어.",
     },
     {
+        "output": "porch-aunt-morning-1.mp3",
+        "voice": "ko-KR-SunHiNeural",
+        "rate": "-5%",
+        "pitch": "+2Hz",
+        "text": "아침 공기는 다르지? 마당이 아직 축축해서 꽃잎 끝에 이슬이 맺혀 있단다.",
+    },
+    {
+        "output": "porch-aunt-morning-2.mp3",
+        "voice": "ko-KR-SunHiNeural",
+        "rate": "-5%",
+        "pitch": "+2Hz",
+        "text": "해가 더 올라오기 전에 정원 쪽부터 천천히 둘러보면 하루가 훨씬 길게 느껴질 거야.",
+    },
+    {
         "output": "porch-aunt-midday-1.mp3",
         "voice": "ko-KR-SunHiNeural",
         "rate": "-4%",
@@ -66,6 +80,20 @@ LINES = [
         "rate": "-5%",
         "pitch": "-5Hz",
         "text": "저녁상을 차리고 언덕에서 노을을 보면, 왜 이 동네가 평화롭다고 하는지 알게 될 거야.",
+    },
+    {
+        "output": "porch-aunt-night-1.mp3",
+        "voice": "ko-KR-SunHiNeural",
+        "rate": "-7%",
+        "pitch": "-7Hz",
+        "text": "밤이 되면 시골은 더 조용해지지. 대신 반딧불이랑 개구리 소리가 더 잘 들려.",
+    },
+    {
+        "output": "porch-aunt-night-2.mp3",
+        "voice": "ko-KR-SunHiNeural",
+        "rate": "-7%",
+        "pitch": "-7Hz",
+        "text": "조금만 더 걸어 보면 낮에 봤던 마을이랑 또 다른 얼굴처럼 느껴질 거야.",
     },
 ]
 

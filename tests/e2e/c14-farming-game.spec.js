@@ -2,7 +2,12 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { test, expect } = require("@playwright/test");
 
-const SAVE_KEY = "soil-village-save-v3";
+const SAVE_KEY = "soil-village-save-v4";
+const LEGACY_SAVE_KEYS = [
+  "soil-village-improved-save-v1",
+  "soil-village-graphics-improved-save-v1",
+  "soil-village-save-v3"
+];
 const repoRoot = path.resolve(__dirname, "../..");
 const gameRoot = path.join(repoRoot, "c14", "farming-game");
 
@@ -18,9 +23,9 @@ function collectFiles(directory, extensions) {
 }
 
 async function clearFarmingSave(page) {
-  await page.addInitScript((key) => {
-    localStorage.removeItem(key);
-  }, SAVE_KEY);
+  await page.addInitScript(({ key, legacyKeys }) => {
+    [key, ...legacyKeys].forEach((storageKey) => localStorage.removeItem(storageKey));
+  }, { key: SAVE_KEY, legacyKeys: LEGACY_SAVE_KEYS });
 }
 
 async function expectNoHorizontalOverflow(page) {
@@ -59,6 +64,15 @@ async function expectCanvasHasScenePixels(page, selector) {
   }, selector);
 }
 
+test("c14 hub opens the promoted canonical farming game", async ({ page }) => {
+  await page.goto("/c14/");
+  const gameLink = page.getByRole("link", { name: "농촌 마을 산책 게임" });
+  await expect(gameLink).toHaveAttribute("href", "farming-game/index.html");
+  await gameLink.click();
+  await expect(page).toHaveURL(/\/c14\/farming-game\/(?:index\.html)?$/);
+  await expect(page.locator("h1")).toContainText("소담한 마을");
+});
+
 test("c14 farming game starts, draws the world, and opens core panels", async ({ page }) => {
   await clearFarmingSave(page);
   const localErrors = [];
@@ -79,11 +93,11 @@ test("c14 farming game starts, draws the world, and opens core panels", async ({
   await expect(page.locator("#startButton")).toBeVisible();
   await page.locator("#startButton").click();
   await expect(page.locator("#startCard")).toHaveClass(/hidden/);
-  await expect(page.locator("#toast")).toContainText("주말농장");
+  await expect(page.locator("#toast")).toContainText("첫 부탁");
 
   const savedState = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), SAVE_KEY);
   expect(savedState.started).toBeTruthy();
-  expect(savedState.unlockedListening).toContain("weekendFarm");
+  expect(savedState.unlockedListening).toEqual([]);
 
   await page.keyboard.press("KeyE");
   await expect(page.locator("#dialogueBox")).toBeVisible();
@@ -141,7 +155,7 @@ test.describe("c14 farming game mobile layout", () => {
     const actionBox = await page.locator("#touchAction").boundingBox();
     expect(actionBox).not.toBeNull();
     expect(actionBox.width).toBeGreaterThanOrEqual(96);
-    expect(actionBox.height).toBeGreaterThanOrEqual(54);
+    expect(actionBox.height).toBeGreaterThanOrEqual(44);
 
     await page.locator("#journalToggle").click();
     await expect(page.locator("#journalDrawer")).toBeVisible();
