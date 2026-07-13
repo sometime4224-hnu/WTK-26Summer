@@ -40,6 +40,15 @@ async function expectInsideViewport(page, selector, minimumSize = 0) {
   }
 }
 
+async function expectCenterHitTarget(page, selector) {
+  const hit = await page.locator(selector).evaluate((target) => {
+    const box = target.getBoundingClientRect();
+    const element = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+    return element === target || target.contains(element);
+  });
+  expect(hit).toBeTruthy();
+}
+
 async function expectCanvasIsRichAndOpaque(page, selector) {
   const stats = await page.locator(selector).evaluate((canvas) => {
     const context = canvas.getContext("2d");
@@ -95,15 +104,24 @@ for (const profile of deviceProfiles) {
       await clearSave(page);
       await page.goto(GAME_URL);
       await expectInsideViewport(page, "#fullscreenButton", 44);
-      await page.locator("#gameShell").evaluate((shell) => {
-        Object.defineProperty(document, "fullscreenElement", { configurable: true, get: () => shell });
-        document.querySelector(".top-nav").style.display = "none";
-        shell.requestFullscreen = () => {
-          document.dispatchEvent(new Event("fullscreenchange"));
-          return Promise.resolve();
-        };
-      });
-      await page.locator("#fullscreenButton").click();
+      if (profile.viewport.height >= profile.viewport.width) {
+        await page.locator("#gameShell").evaluate((shell) => {
+          window.__testFullscreenElement = null;
+          Object.defineProperty(document, "fullscreenElement", {
+            configurable: true,
+            get: () => window.__testFullscreenElement
+          });
+          shell.requestFullscreen = () => {
+            window.__testFullscreenElement = shell;
+            document.querySelector(".top-nav").style.display = "none";
+            document.dispatchEvent(new Event("fullscreenchange"));
+            return Promise.resolve();
+          };
+        });
+        await page.locator("#fullscreenButton").click();
+      } else {
+        await page.locator("#startButton").click();
+      }
       await expectInsideViewport(page, "#controlTutorial");
       await expectInsideViewport(page, "#touchJoystick", 44);
       await expectInsideViewport(page, "#tutorialNext", 44);
@@ -119,8 +137,24 @@ for (const profile of deviceProfiles) {
       await expectInsideViewport(page, "#storyToggle", 44);
       await expectCanvasIsRichAndOpaque(page, "#game");
 
+      if (profile.viewport.height >= profile.viewport.width && profile.viewport.width <= 480) {
+        await expectInsideViewport(page, "#fullscreenToggle", 44);
+        for (const selector of ["#storyToggle", "#statsToggle", "#journalToggle", "#fullscreenToggle"]) {
+          await expectCenterHitTarget(page, selector);
+        }
+        const hudOverlap = await page.evaluate(() => {
+          const exit = document.querySelector("#fullscreenToggle").getBoundingClientRect();
+          return ["#storyToggle", "#statsToggle", "#journalToggle"].some((selector) => {
+            const button = document.querySelector(selector).getBoundingClientRect();
+            return exit.left < button.right && exit.right > button.left && exit.top < button.bottom && exit.bottom > button.top;
+          });
+        });
+        expect(hudOverlap).toBeFalsy();
+      }
+
       const layout = await page.evaluate(() => {
-        const canvas = document.querySelector("#game").getBoundingClientRect();
+        const canvasElement = document.querySelector("#game");
+        const canvas = canvasElement.getBoundingClientRect();
         const frame = document.querySelector(".canvas-frame").getBoundingClientRect();
         const promptElement = document.querySelector("#promptBubble");
         const prompt = promptElement.getBoundingClientRect();
@@ -134,6 +168,7 @@ for (const profile of deviceProfiles) {
           verticalOverflow: document.documentElement.scrollHeight > window.innerHeight + 1,
           promptOverlapsControls:
             !promptElement.classList.contains("hidden") && controls.some((control) => overlaps(prompt, control)),
+          canvasAspectDelta: Math.abs(canvasElement.width / canvasElement.height - canvas.width / canvas.height),
           edgeDelta: Math.max(
             Math.abs(canvas.left - frame.left),
             Math.abs(canvas.top - frame.top),
@@ -146,9 +181,13 @@ for (const profile of deviceProfiles) {
         horizontalOverflow: false,
         verticalOverflow: false,
         promptOverlapsControls: false,
+        canvasAspectDelta: expect.any(Number),
         edgeDelta: expect.any(Number)
       });
       expect(layout.edgeDelta).toBeLessThan(1.5);
+      if (profile.viewport.width <= 480 || profile.viewport.height <= 480) {
+        expect(layout.canvasAspectDelta).toBeLessThan(0.02);
+      }
       expect(pageErrors).toEqual([]);
     });
   });
@@ -232,6 +271,11 @@ test.describe("정식 그래픽 버전 저장과 활동 장면", () => {
       await page.waitForTimeout(180);
 
       await expect(page.locator("#miniGameTitle")).toHaveText(activity.title);
+      await expect(page.locator("#activityGuide")).toBeVisible();
+      await expect(page.locator("#activityGuide .activity-guide-step")).toHaveCount(
+        activity.zoneId === "vegetableGrow" || activity.zoneId === "catchFish" ? 3 : 2
+      );
+      await expect(page.locator("#activityGuide .activity-guide-step.is-current")).toBeVisible();
       await expectInsideViewport(page, "#activityCanvas", 180);
       await expectCanvasIsRichAndOpaque(page, "#activityCanvas");
       const canvasSize = await page.locator("#activityCanvas").evaluate((canvas) => ({
@@ -272,6 +316,71 @@ test.describe("정식 그래픽 버전 저장과 활동 장면", () => {
     await expect(page.locator("#timeOfDayDetail")).toHaveText(/21:|22:/);
     await expectCanvasIsRichAndOpaque(page, "#game");
   });
+
+  test("채소 키우기에서 물 뜨기와 물 주기 표현이 행동 순서대로 바뀐다", async ({ page }) => {
+    await seedSave(page, {
+      started: true,
+      storyIndex: 1,
+      flags: ["talkedAunt"],
+      activeMiniGame: {
+        zoneId: "vegetableGrow",
+        snapshot: {
+          kind: "vegetableGrow",
+          player: { xRatio: 112 / 640, yRatio: 108 / 360, carrying: "bucket", facing: "right" },
+          bucket: { taken: true, water: 0, capacity: 2, filledTrips: 0 }
+        }
+      }
+    });
+    await page.goto(GAME_URL);
+    await page.locator("#continueButton").click();
+
+    await expect(page.locator("#activityGuide")).toContainText("양동이 들기");
+    await expect(page.locator("#activityGuide .activity-guide-step.is-current")).toContainText("우물에서 물 뜨기");
+    await page.locator("#touchAction").click();
+    await expect(page.locator("#activityHint")).toContainText("물을 뜨다");
+    await expect(page.locator("#activityGuide .activity-guide-step.is-current")).toContainText("채소에 물 주기");
+
+    await page.evaluate(() => {
+      const game = state.activeMiniGame;
+      game.player.x = 360;
+      game.player.y = 118;
+      game.player.prevX = 360;
+      game.player.prevY = 118;
+      game.bucket.water = 2;
+      updateMiniGameUi({ force: true });
+    });
+    await page.locator("#touchAction").click();
+    await expect(page.locator("#activityHint")).toContainText("물을 주다");
+  });
+
+  test("마지막 채소에 물을 주면 채소를 키우다가 완료 표현으로 뜬다", async ({ page }) => {
+    await seedSave(page, {
+      started: true,
+      storyIndex: 1,
+      flags: ["talkedAunt"],
+      activeMiniGame: {
+        zoneId: "vegetableGrow",
+        snapshot: {
+          kind: "vegetableGrow",
+          player: { xRatio: 470 / 640, yRatio: 248 / 360, carrying: "bucket", facing: "right" },
+          bucket: { taken: true, water: 1, capacity: 2, filledTrips: 2 },
+          plants: [
+            { watered: true, bounce: 0, droop: 0 },
+            { watered: true, bounce: 0, droop: 0 },
+            { watered: true, bounce: 0, droop: 0 },
+            { watered: false, bounce: 0, droop: 1 }
+          ]
+        }
+      }
+    });
+    await page.goto(GAME_URL);
+    await page.locator("#continueButton").click();
+    await page.locator("#touchAction").click();
+
+    await expect(page.locator("#miniGame")).toHaveClass(/is-complete/);
+    await expect(page.locator("#activityHint")).toContainText("채소를 키우다");
+    await expect(page.locator("#activityGuide .activity-guide-step.is-complete")).toHaveCount(3);
+  });
 });
 
 test.describe("스마트폰 가로 활동 조작", () => {
@@ -305,3 +414,60 @@ test.describe("스마트폰 가로 활동 조작", () => {
     expect(overlap).toBeFalsy();
   });
 });
+
+const portraitActivityProfiles = [
+  { name: "320x568 세로 전체화면 활동", viewport: { width: 320, height: 568 } },
+  { name: "390x844 세로 전체화면 활동", viewport: { width: 390, height: 844 } },
+  { name: "430x932 세로 전체화면 활동", viewport: { width: 430, height: 932 } }
+];
+
+for (const profile of portraitActivityProfiles) {
+  test.describe(profile.name, () => {
+    test.use({ viewport: profile.viewport, isMobile: true, hasTouch: true });
+
+    test("작업 장면과 세로 조작부가 분리되어 유지된다", async ({ page }) => {
+      await seedSave(page, {
+        started: true,
+        storyIndex: 1,
+        flags: ["talkedAunt"],
+        activeMiniGame: { zoneId: "gardenCare", snapshot: null }
+      });
+      await page.goto(GAME_URL);
+      await page.locator("#gameShell").evaluate((shell) => {
+        window.__testFullscreenElement = null;
+        Object.defineProperty(document, "fullscreenElement", {
+          configurable: true,
+          get: () => window.__testFullscreenElement
+        });
+        shell.requestFullscreen = () => {
+          window.__testFullscreenElement = shell;
+          document.querySelector(".top-nav").style.display = "none";
+          document.dispatchEvent(new Event("fullscreenchange"));
+          return Promise.resolve();
+        };
+        Object.defineProperty(screen.orientation, "lock", {
+          configurable: true,
+          value: () => Promise.resolve()
+        });
+      });
+
+      await page.locator("#fullscreenButton").click();
+      await expect(page.locator("html")).toHaveAttribute("data-orientation", "portrait");
+      await expectInsideViewport(page, "#miniGame");
+      await expectInsideViewport(page, "#activityCanvas", 180);
+      await expectInsideViewport(page, "#touchJoystick", 44);
+      await expectInsideViewport(page, "#touchAction", 44);
+      await expectCenterHitTarget(page, "#miniGameClose");
+      await expectCenterHitTarget(page, "#touchAction");
+
+      const overlap = await page.evaluate(() => {
+        const stage = document.querySelector(".activity-stage").getBoundingClientRect();
+        return ["#touchJoystick", "#touchAction"].some((selector) => {
+          const control = document.querySelector(selector).getBoundingClientRect();
+          return stage.left < control.right && stage.right > control.left && stage.top < control.bottom && stage.bottom > control.top;
+        });
+      });
+      expect(overlap).toBeFalsy();
+    });
+  });
+}

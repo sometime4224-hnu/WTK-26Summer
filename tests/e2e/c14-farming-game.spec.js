@@ -172,6 +172,8 @@ test.describe("c14 farming game mobile layout", () => {
     await page.goto("/c14/farming-game/");
     await page.locator("#gameShell").evaluate((shell) => {
       window.__fullscreenRequestCount = 0;
+      window.__orientationLocks = [];
+      window.__orientationUnlocks = 0;
       window.__testFullscreenElement = null;
       Object.defineProperty(document, "fullscreenElement", {
         configurable: true,
@@ -190,12 +192,26 @@ test.describe("c14 farming game mobile layout", () => {
         document.dispatchEvent(new Event("fullscreenchange"));
         return Promise.resolve();
       };
+      Object.defineProperty(screen.orientation, "lock", {
+        configurable: true,
+        value: (mode) => {
+          window.__orientationLocks.push(mode);
+          return Promise.resolve();
+        }
+      });
+      Object.defineProperty(screen.orientation, "unlock", {
+        configurable: true,
+        value: () => {
+          window.__orientationUnlocks += 1;
+        }
+      });
     });
 
     await expect(page.locator("#fullscreenButton")).toContainText("전체화면으로 시작");
     await page.locator("#fullscreenButton").click();
 
     await expect.poll(() => page.evaluate(() => window.__fullscreenRequestCount)).toBe(1);
+    await expect.poll(() => page.evaluate(() => window.__orientationLocks)).toEqual(["portrait"]);
     await expect(page.locator("html")).toHaveAttribute("data-fullscreen", "on");
     await expect(page.locator("#controlTutorial")).toBeVisible();
     await expect(page.locator("body")).toHaveClass(/is-control-tutorial/);
@@ -241,11 +257,97 @@ test.describe("c14 farming game mobile layout", () => {
 
     await page.locator("#fullscreenToggle").click();
     await expect(page.locator("html")).toHaveAttribute("data-fullscreen", "off");
+    await expect.poll(() => page.evaluate(() => window.__orientationUnlocks)).toBeGreaterThan(0);
     await page.evaluate(() => resetState());
     await expect(page.locator("#fullscreenStatus")).toContainText("주소창");
     await page.locator("#fullscreenButton").click();
     await expect(page.locator("#controlTutorial")).toBeHidden();
     await expect(page.locator("body")).toHaveClass(/is-game-started/);
+  });
+
+  test("가로로 진입하면 세로 전환을 기다린 뒤 튜토리얼을 연다", async ({ page }) => {
+    await clearFarmingSave(page);
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.goto("/c14/farming-game/");
+    await page.locator("#gameShell").evaluate((shell) => {
+      window.__testFullscreenElement = null;
+      window.__orientationLocks = [];
+      Object.defineProperty(document, "fullscreenElement", {
+        configurable: true,
+        get: () => window.__testFullscreenElement
+      });
+      shell.requestFullscreen = () => {
+        window.__testFullscreenElement = shell;
+        document.querySelector(".top-nav").style.display = "none";
+        document.dispatchEvent(new Event("fullscreenchange"));
+        return Promise.resolve();
+      };
+      Object.defineProperty(screen.orientation, "lock", {
+        configurable: true,
+        value: (mode) => {
+          window.__orientationLocks.push(mode);
+          return Promise.reject(new DOMException("denied", "NotAllowedError"));
+        }
+      });
+    });
+
+    await page.locator("#fullscreenButton").click();
+    await expect.poll(() => page.evaluate(() => window.__orientationLocks)).toEqual(["portrait"]);
+    await expect(page.locator("#portraitGate")).toBeVisible();
+    await expect(page.locator("#controlTutorial")).toBeHidden();
+    await expect(page.locator("#portraitGateStatus")).toContainText("직접 세로로");
+    await expect(page.locator("#portraitRetry")).toBeVisible();
+    await expect(page.locator("#portraitCancel")).toBeVisible();
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(page.locator("html")).toHaveAttribute("data-orientation", "portrait");
+    await expect(page.locator("#portraitGate")).toBeHidden();
+    await expect(page.locator("#controlTutorial")).toBeVisible();
+    await page.locator("#tutorialSkip").click();
+    await expect(page.locator("body")).toHaveClass(/is-game-started/);
+
+    await page.setViewportSize({ width: 844, height: 390 });
+    await expect(page.locator("#portraitGate")).toBeVisible();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(page.locator("#portraitGate")).toBeHidden();
+    await expect(page.locator("body")).toHaveClass(/is-game-started/);
+  });
+
+  test("자동 세로 전환이 끝나기 전에는 게임을 시작하지 않는다", async ({ page }) => {
+    await clearFarmingSave(page);
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.goto("/c14/farming-game/");
+    await page.locator("#gameShell").evaluate((shell) => {
+      window.__testFullscreenElement = null;
+      window.__resolvePortraitLock = null;
+      Object.defineProperty(document, "fullscreenElement", {
+        configurable: true,
+        get: () => window.__testFullscreenElement
+      });
+      shell.requestFullscreen = () => {
+        window.__testFullscreenElement = shell;
+        document.querySelector(".top-nav").style.display = "none";
+        document.dispatchEvent(new Event("fullscreenchange"));
+        return Promise.resolve();
+      };
+      Object.defineProperty(screen.orientation, "lock", {
+        configurable: true,
+        value: () => new Promise((resolve) => {
+          window.__resolvePortraitLock = resolve;
+        })
+      });
+    });
+
+    await page.locator("#fullscreenButton").click();
+    await expect(page.locator("#fullscreenButton")).toBeDisabled();
+    await expect(page.locator("#controlTutorial")).toBeHidden();
+    await expect.poll(() => page.evaluate(() => typeof window.__resolvePortraitLock)).toBe("function");
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.evaluate(() => window.__resolvePortraitLock());
+    await expect(page.locator("html")).toHaveAttribute("data-orientation", "portrait");
+    await expect(page.locator("#fullscreenButton")).toBeEnabled();
+    await expect(page.locator("#controlTutorial")).toBeVisible();
   });
 
   test("전체화면 API가 없어도 안내 후 일반 화면에서 계속한다", async ({ page }) => {
