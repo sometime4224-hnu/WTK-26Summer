@@ -44,6 +44,21 @@ test("14과 28개 원본 어휘를 상징 학습과 퀴즈로 연결한다", asy
 
   await page.goto("/c14/index.html", { waitUntil: "domcontentloaded" });
   await expect(page.locator('a[href="vocab-support-symbol-quiz.html"]')).toContainText("상징으로 익히는 14과 어휘");
+  const supportActivityOrder = await page.evaluate(() => {
+    const supportHrefs = new Set([
+      "farming-game/index.html",
+      "vocab-support-lab.html",
+      "vocab-support-symbol-quiz.html"
+    ]);
+    return [...document.querySelectorAll(".lesson-list a[href]")]
+      .map((link) => link.getAttribute("href"))
+      .filter((href) => supportHrefs.has(href));
+  });
+  expect(supportActivityOrder).toEqual([
+    "vocab-support-symbol-quiz.html",
+    "vocab-support-lab.html",
+    "farming-game/index.html"
+  ]);
   await expect(page.locator(".hero__chip").filter({ hasText: "어휘 4개" })).toHaveCount(1);
   await expect(page.locator(".path-card__badge").filter({ hasText: "어휘 메인 + 활동 3개" })).toHaveCount(1);
 
