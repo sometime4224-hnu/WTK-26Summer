@@ -317,6 +317,27 @@ test.describe("정식 그래픽 버전 저장과 활동 장면", () => {
     await expectCanvasIsRichAndOpaque(page, "#game");
   });
 
+  test("맵 가운데 큰 밭에 들어가면 불편하다 장면 연출이 다시 열린다", async ({ page }) => {
+    await seedSave(page, {
+      started: true,
+      player: { x: 540, y: 900, facing: "right", step: 0 },
+      storyIndex: 1,
+      flags: ["talkedAunt", "mudNotice"],
+      unlockedMood: ["inconvenient"]
+    });
+    await page.goto(GAME_URL);
+    await page.locator("#continueButton").click();
+
+    await page.evaluate(() => {
+      state.keys.add("ArrowRight");
+      movePlayer(0.12);
+      state.keys.delete("ArrowRight");
+    });
+
+    await expect(page.locator("#game")).toHaveAttribute("data-expression-moment", "inconvenient");
+    await expect(page.locator("#game")).toHaveAttribute("aria-description", /불편하다.*큰 밭의 젖은 흙/);
+  });
+
   test("채소 키우기에서 물 뜨기와 물 주기 표현이 행동 순서대로 바뀐다", async ({ page }) => {
     await seedSave(page, {
       started: true,

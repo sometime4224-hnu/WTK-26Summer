@@ -1066,7 +1066,18 @@ const obstacles = [
   { x: 1680, y: 120, w: 150, h: 120 }
 ];
 
-const slowZones = [{ x: 560, y: 860, w: 270, h: 170 }];
+const slowZones = [
+  {
+    id: "largeField",
+    x: 520,
+    y: 820,
+    w: 330,
+    h: 220,
+    expression: "불편하다",
+    detail: "큰 밭의 젖은 흙이 신발을 붙잡아 걸음이 무거워집니다. 고랑 사이를 평소보다 천천히 지나갑니다.",
+    toast: "큰 밭의 젖은 흙에서는 발이 조금씩 빠집니다."
+  }
+];
 
 function createFollowerState(ids = []) {
   return ids
@@ -1140,6 +1151,7 @@ const state = {
   },
   toastTimer: 0,
   expressionMoment: null,
+  activeSlowZoneId: null,
   dayCycle: 0,
   dayCount: 1,
   dayStage: 0,
@@ -3212,6 +3224,7 @@ function applySavedGame(data) {
   state.hoveredPractice = null;
   state.toastTimer = 0;
   state.expressionMoment = null;
+  state.activeSlowZoneId = null;
   delete canvas.dataset.expressionMoment;
   canvas.removeAttribute("aria-description");
   resetTouchJoystick();
@@ -3877,6 +3890,7 @@ function resetState(options = {}) {
   state.uiPanels.journalOpen = false;
   state.toastTimer = 0;
   state.expressionMoment = null;
+  state.activeSlowZoneId = null;
   delete canvas.dataset.expressionMoment;
   canvas.removeAttribute("aria-description");
   state.uiFrame.miniMapLastRender = -Infinity;
@@ -5940,8 +5954,32 @@ function handleWorldPracticeAction() {
   return false;
 }
 
+function getSlowZone(x, y) {
+  return slowZones.find((zone) => x > zone.x && x < zone.x + zone.w && y > zone.y && y < zone.y + zone.h) ?? null;
+}
+
 function isSlowZone(x, y) {
-  return slowZones.some((zone) => x > zone.x && x < zone.x + zone.w && y > zone.y && y < zone.y + zone.h);
+  return Boolean(getSlowZone(x, y));
+}
+
+function updateSlowZoneExpression() {
+  const zone = getSlowZone(state.player.x, state.player.y);
+  const nextZoneId = zone?.id ?? null;
+  if (nextZoneId === state.activeSlowZoneId) {
+    return;
+  }
+  state.activeSlowZoneId = nextZoneId;
+  if (!zone) {
+    return;
+  }
+
+  if (!state.flags.has("mudNotice")) {
+    state.flags.add("mudNotice");
+    maybeUnlockMood("inconvenient");
+    persistGame("발견");
+  }
+  startWorldExpressionMoment("inconvenient", zone.expression, zone.detail, 3.2);
+  showToast(zone.expression, zone.toast);
 }
 
 function collidesWithObstacle(x, y) {
@@ -5974,17 +6012,6 @@ function movePlayer(dt) {
   }
   if (isSlowZone(state.player.x, state.player.y)) {
     speed *= 0.62;
-    if (!state.flags.has("mudNotice")) {
-      state.flags.add("mudNotice");
-      maybeUnlockMood("inconvenient");
-      startWorldExpressionMoment(
-        "inconvenient",
-        "불편하다",
-        "젖은 흙이 신발을 붙잡아 걸음이 무거워집니다. 같은 길도 평소보다 천천히 지나갑니다.",
-        3.2
-      );
-      showToast("불편하다", "젖은 흙길에서는 발이 조금씩 빠집니다.");
-    }
   }
 
   let nextX = clamp(state.player.x + dx * speed * dt, state.player.r, world.width - state.player.r);
@@ -5996,6 +6023,7 @@ function movePlayer(dt) {
   if (!collidesWithObstacle(state.player.x, nextY)) {
     state.player.y = nextY;
   }
+  updateSlowZoneExpression();
 }
 
 function buildDialogueState(zone) {
