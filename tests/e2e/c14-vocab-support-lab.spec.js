@@ -55,7 +55,7 @@ test.beforeEach(async ({ page }) => {
 test("남은 10개 어휘만 네 가지 의미 활동으로 구성하고 두 어휘 화면에서 연결한다", async ({ page }) => {
   await page.goto(PAGE_PATH, { waitUntil: "domcontentloaded" });
 
-  await expect(page.locator("h1")).toHaveText("도시와 변화 어휘 연구소");
+  await expect(page.locator("h1")).toHaveText("도시와 변화 어휘");
   await expect(page.locator(".activity-tab")).toHaveCount(4);
   await expect(page.locator(".word-chip")).toHaveCount(10);
 
@@ -84,11 +84,31 @@ test("남은 10개 어휘만 네 가지 의미 활동으로 구성하고 두 어
   expect(scope.itemCount).toBe(20);
 
   await page.goto("/c14/index.html", { waitUntil: "domcontentloaded" });
-  await expect(page.locator('a[href="vocab-support-lab.html"]')).toContainText("도시와 변화 어휘 연구소");
+  await expect(page.locator('a[href="vocab-support-lab.html"]')).toContainText("도시와 변화 어휘");
 
   await page.goto("/c14/vocabulary.html", { waitUntil: "domcontentloaded" });
   await expect(page.locator('.topbar a[href="vocab-support-lab.html"]')).toContainText("유형별 활동");
   await expect(page.locator('.footer-nav a[href="vocab-support-lab.html"]')).toContainText("유형별 활동");
+});
+
+test("도시 단서의 정답 위치가 1번과 3번에 고정되지 않는다", async ({ page }) => {
+  await page.goto(PAGE_PATH, { waitUntil: "domcontentloaded" });
+
+  const keyPositions = await page.evaluate(() => window.C14_VOCAB_SUPPORT.activities
+    .find((activity) => activity.id === "city")
+    .items
+    .map((item) => item.clues
+      .map((clue, index) => clue.key ? index + 1 : null)
+      .filter(Number.isInteger)));
+
+  expect(keyPositions).toEqual([
+    [2, 4], [1, 4], [2, 3], [1, 3],
+    [3, 4], [1, 2], [2, 4], [1, 3]
+  ]);
+  expect(keyPositions.flat().sort()).toEqual([
+    1, 1, 1, 1, 2, 2, 2, 2,
+    3, 3, 3, 3, 4, 4, 4, 4
+  ]);
 });
 
 test("좌측 장면은 20개의 경량 WebP 에셋을 현재 문항에만 불러온다", async ({ page }) => {

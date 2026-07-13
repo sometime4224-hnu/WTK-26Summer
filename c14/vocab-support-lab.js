@@ -51,10 +51,10 @@
                     scene: "민지는 아침부터 저녁까지 회의가 있어요.",
                     prompt: "민지의 상태를 알려 주는 단서 두 개는 무엇일까요?",
                     clues: [
-                        { id: "lunch-work", label: "점심에도 일해요", key: true },
                         { id: "new-bag", label: "새 가방이 있어요", key: false },
-                        { id: "no-break", label: "쉴 시간이 없어요", key: true },
-                        { id: "rain", label: "창밖에 비가 와요", key: false }
+                        { id: "lunch-work", label: "점심에도 일해요", key: true },
+                        { id: "rain", label: "창밖에 비가 와요", key: false },
+                        { id: "no-break", label: "쉴 시간이 없어요", key: true }
                     ],
                     answer: "여유가 없다",
                     options: ["활기차다", "편의 시설이 잘되어 있다", "여유가 없다", "공해가 심하다"],
@@ -69,8 +69,8 @@
                     clues: [
                         { id: "many-people", label: "사람이 많이 오가요", key: true },
                         { id: "closed-door", label: "문 하나가 닫혀 있어요", key: false },
-                        { id: "bright-voices", label: "밝은 목소리가 들려요", key: true },
-                        { id: "blue-sign", label: "간판이 파란색이에요", key: false }
+                        { id: "blue-sign", label: "간판이 파란색이에요", key: false },
+                        { id: "bright-voices", label: "밝은 목소리가 들려요", key: true }
                     ],
                     answer: "활기차다",
                     options: ["활기차다", "공해가 심하다", "여유가 없다", "편의 시설이 잘되어 있다"],
@@ -83,8 +83,8 @@
                     scene: "큰길의 하늘이 회색이고 숨쉬기가 답답해요.",
                     prompt: "환경의 문제를 알려 주는 단서 두 개는 무엇일까요?",
                     clues: [
-                        { id: "many-cars", label: "차에서 매연이 나와요", key: true },
                         { id: "red-bus", label: "버스가 빨간색이에요", key: false },
+                        { id: "many-cars", label: "차에서 매연이 나와요", key: true },
                         { id: "gray-air", label: "공기가 뿌옇고 답답해요", key: true },
                         { id: "wide-road", label: "길이 넓어요", key: false }
                     ],
@@ -115,10 +115,10 @@
                     scene: "수진은 수업이 끝나자마자 아르바이트를 하러 뛰어가요.",
                     prompt: "수진의 바쁜 하루를 알려 주는 단서 두 개는 무엇일까요?",
                     clues: [
-                        { id: "class-work", label: "수업 뒤 바로 일해요", key: true },
                         { id: "green-book", label: "책 표지가 초록색이에요", key: false },
-                        { id: "late-study", label: "밤에는 시험 공부를 해요", key: true },
-                        { id: "favorite-song", label: "좋아하는 노래가 있어요", key: false }
+                        { id: "favorite-song", label: "좋아하는 노래가 있어요", key: false },
+                        { id: "class-work", label: "수업 뒤 바로 일해요", key: true },
+                        { id: "late-study", label: "밤에는 시험 공부를 해요", key: true }
                     ],
                     answer: "여유가 없다",
                     options: ["편의 시설이 잘되어 있다", "공해가 심하다", "활기차다", "여유가 없다"],
@@ -132,8 +132,8 @@
                     prompt: "축제 거리의 생기를 알려 주는 단서 두 개는 무엇일까요?",
                     clues: [
                         { id: "dance", label: "사람들이 춤을 춰요", key: true },
-                        { id: "stone-road", label: "길에 돌이 있어요", key: false },
                         { id: "cheer", label: "박수와 응원이 이어져요", key: true },
+                        { id: "stone-road", label: "길에 돌이 있어요", key: false },
                         { id: "long-shadow", label: "그림자가 길어요", key: false }
                     ],
                     answer: "활기차다",
@@ -147,10 +147,10 @@
                     scene: "공장 옆 강에서 나쁜 냄새가 나고 물빛도 어두워요.",
                     prompt: "오염을 알려 주는 단서 두 개는 무엇일까요?",
                     clues: [
-                        { id: "bad-smell", label: "강에서 나쁜 냄새가 나요", key: true },
                         { id: "bridge", label: "다리가 하나 있어요", key: false },
-                        { id: "factory-smoke", label: "공장 연기가 퍼져요", key: true },
-                        { id: "walking", label: "한 사람이 걸어가요", key: false }
+                        { id: "bad-smell", label: "강에서 나쁜 냄새가 나요", key: true },
+                        { id: "walking", label: "한 사람이 걸어가요", key: false },
+                        { id: "factory-smoke", label: "공장 연기가 퍼져요", key: true }
                     ],
                     answer: "공해가 심하다",
                     options: ["공해가 심하다", "여유가 없다", "편의 시설이 잘되어 있다", "활기차다"],
@@ -164,9 +164,9 @@
                     prompt: "시설이 잘 갖추어진 단서 두 개는 무엇일까요?",
                     clues: [
                         { id: "library-bank", label: "도서관과 은행이 있어요", key: true },
-                        { id: "yellow-chair", label: "의자가 노란색이에요", key: false },
+                        { id: "cloud", label: "구름이 두 개 보여요", key: false },
                         { id: "pharmacy-bus", label: "약국과 버스 정류장이 있어요", key: true },
-                        { id: "cloud", label: "구름이 두 개 보여요", key: false }
+                        { id: "yellow-chair", label: "의자가 노란색이에요", key: false }
                     ],
                     answer: "편의 시설이 잘되어 있다",
                     options: ["활기차다", "여유가 없다", "공해가 심하다", "편의 시설이 잘되어 있다"],
