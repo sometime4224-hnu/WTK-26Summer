@@ -44,7 +44,7 @@
       <a href="../vocabulary.html">어휘</a>
     </nav>
 
-    <div class="page-shell">
+    <div id="gameShell" class="page-shell">
       <header id="heroPanel" class="hero-panel">
         <div class="hero-compact">
           <div>
@@ -53,6 +53,8 @@
           </div>
           <div class="hero-actions">
             <button id="heroToggle" class="mini-button" type="button" aria-expanded="false" aria-controls="heroDetails">안내 펼치기</button>
+            <button id="fullscreenToggle" class="mini-button fullscreen-toggle" type="button">전체화면</button>
+            <button id="tutorialReplay" class="secondary-button touch-only" type="button">조작 안내 다시 보기</button>
             <button id="resetButton" class="secondary-button" type="button">하루 다시 시작</button>
             <button id="voiceToggle" class="secondary-button" type="button" aria-pressed="true">소리 켜짐</button>
           </div>
@@ -124,15 +126,32 @@
 
             <div id="startCard" class="floating-card" role="dialog" aria-modal="true" aria-labelledby="startTitle" tabindex="-1">
               <div class="start-card-copy">
-                <p class="card-tag">첫 부탁</p>
-                <h2 id="startTitle">이모에게 가서 오늘의 부탁을 들어 보세요</h2>
+                <p class="card-tag">산책 준비</p>
+                <h2 id="startTitle">전체화면으로 더 편하게 걸어 보세요</h2>
                 <p class="touch-only">왼쪽 조이스틱으로 걷고, 가까이 가서 오른쪽 <strong>행동</strong> 버튼을 누르세요.</p>
                 <p class="keyboard-only">방향키로 걷고, 가까이 가서 <strong>E</strong> 키를 누르세요.</p>
+                <p id="fullscreenStatus" class="fullscreen-status touch-only" role="status" aria-live="polite">브라우저의 주소창을 줄여 게임과 조작부를 넓게 보여 줍니다.</p>
                 <p id="saveSummary" class="save-summary hidden" role="status"></p>
               </div>
               <div class="start-actions">
-                <button id="startButton" class="primary-button" type="button">하루 시작</button>
+                <button id="fullscreenButton" class="primary-button fullscreen-launch-button" type="button">전체화면으로 시작</button>
+                <button id="startButton" class="secondary-button" type="button">현재 화면으로 시작</button>
                 <button id="continueButton" class="secondary-button hidden" type="button">이어서 걷기</button>
+              </div>
+            </div>
+
+            <div id="controlTutorial" class="control-tutorial hidden" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle" aria-describedby="tutorialBody" tabindex="-1">
+              <div class="tutorial-progress" aria-hidden="true">
+                <span class="is-active"></span>
+                <span></span>
+              </div>
+              <p id="tutorialStepLabel" class="card-tag">조작 안내 1 / 2</p>
+              <h2 id="tutorialTitle">왼쪽 이동 패드를 밀어 보세요</h2>
+              <p id="tutorialBody">손가락을 패드에 올린 채 가고 싶은 방향으로 밀면 마을을 걸을 수 있어요.</p>
+              <p id="tutorialStatus" class="tutorial-status hidden" role="status"></p>
+              <div class="tutorial-actions">
+                <button id="tutorialSkip" class="mini-button" type="button">건너뛰기</button>
+                <button id="tutorialNext" class="primary-button" type="button">다음: 행동 버튼</button>
               </div>
             </div>
 
@@ -150,7 +169,7 @@
               </div>
             </div>
 
-            <div id="miniGame" class="mini-game hidden" role="dialog" aria-modal="true" aria-labelledby="miniGameTitle" tabindex="-1">
+            <div id="miniGame" class="mini-game hidden" role="dialog" aria-modal="true" aria-labelledby="miniGameTitle" aria-describedby="miniGameInstruction" tabindex="-1">
               <div class="mini-game-head">
                 <div>
                   <p id="miniGameType" class="mini-game-type"></p>
@@ -237,11 +256,18 @@
             <div id="touchJoystick" class="touch-joystick" role="group" aria-label="이동 조이스틱">
               <div class="touch-joystick-base">
                 <div class="touch-joystick-ring"></div>
+                <span class="joystick-direction joystick-direction-up" aria-hidden="true">▲</span>
+                <span class="joystick-direction joystick-direction-right" aria-hidden="true">▶</span>
+                <span class="joystick-direction joystick-direction-down" aria-hidden="true">▼</span>
+                <span class="joystick-direction joystick-direction-left" aria-hidden="true">◀</span>
                 <div id="touchStickKnob" class="touch-joystick-knob"></div>
               </div>
               <span class="touch-control-label" aria-hidden="true">이동</span>
             </div>
-            <button id="touchAction" class="touch-action" type="button">행동</button>
+            <button id="touchAction" class="touch-action" type="button">
+              <strong id="touchActionLabel">행동</strong>
+              <small id="touchActionHint" aria-hidden="true">가까이에서 누르기</small>
+            </button>
           </div>
         </section>
       </main>

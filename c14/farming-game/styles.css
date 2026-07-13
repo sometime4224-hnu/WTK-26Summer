@@ -2854,6 +2854,496 @@ body.is-journal-open .toast {
   filter: saturate(0.72);
 }
 
+/* Immersive browser-game launch and thumb-friendly touch controls. */
+html[data-fullscreen="on"] {
+  --top-nav-height: 0px;
+}
+
+.page-shell:fullscreen,
+.page-shell:-webkit-full-screen {
+  width: 100vw;
+  max-width: none;
+  min-height: 100dvh;
+  height: 100dvh;
+  margin: 0;
+  background: linear-gradient(180deg, #eef2dd 0%, #dce7ca 48%, #f5ebd7 100%);
+  overflow: hidden;
+}
+
+html[data-input-mode="touch"] button.touch-only {
+  display: inline-flex;
+}
+
+.fullscreen-launch-button {
+  flex: 1 0 100%;
+  width: 100%;
+}
+
+.fullscreen-status {
+  margin: 8px 0 0 !important;
+  padding: 9px 11px;
+  border-radius: 12px;
+  background: rgba(221, 235, 210, 0.76);
+  color: #3f593d !important;
+  font-size: 0.82rem;
+  line-height: 1.45 !important;
+}
+
+.fullscreen-status.is-error,
+.tutorial-status {
+  background: rgba(255, 235, 211, 0.92);
+  color: #70412f !important;
+}
+
+.control-tutorial {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 23;
+  width: min(480px, calc(100% - 32px));
+  padding: 22px;
+  border: 1px solid rgba(80, 101, 67, 0.22);
+  border-radius: 24px;
+  background: rgba(255, 252, 246, 0.98);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 24px 56px rgba(25, 38, 24, 0.34);
+  transform: translate(-50%, -50%);
+}
+
+.control-tutorial h2 {
+  margin: 0;
+  font-size: clamp(1.22rem, 3vw, 1.65rem);
+  line-height: 1.28;
+}
+
+.control-tutorial > p:not(.card-tag) {
+  margin: 12px 0 18px;
+  color: var(--muted);
+  line-height: 1.62;
+}
+
+.tutorial-progress {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 16px;
+}
+
+.tutorial-progress span {
+  width: 26px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(92, 116, 78, 0.18);
+}
+
+.tutorial-progress span.is-active {
+  background: #b25837;
+}
+
+.tutorial-status {
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 0.82rem;
+}
+
+.tutorial-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.tutorial-actions .primary-button {
+  flex: 1 1 auto;
+}
+
+body.is-control-tutorial .canvas-frame::after {
+  opacity: 1;
+}
+
+body.is-control-tutorial .hud-overlay,
+body.is-control-tutorial .hero-panel {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.is-control-tutorial .touch-controls {
+  display: flex !important;
+  z-index: 22;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+  transform: none !important;
+}
+
+body.is-control-tutorial .touch-joystick,
+body.is-control-tutorial .touch-action {
+  pointer-events: none !important;
+  transition: opacity 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+body.is-control-tutorial[data-tutorial-step="move"] .touch-action,
+body.is-control-tutorial[data-tutorial-step="action"] .touch-joystick {
+  opacity: 0.34;
+  filter: saturate(0.5);
+}
+
+.touch-joystick.is-tutorial-target,
+.touch-action.is-tutorial-target {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  filter: drop-shadow(0 0 10px rgba(255, 244, 183, 0.92));
+  animation: tutorial-target-pulse 1.15s ease-in-out infinite;
+}
+
+body.is-control-tutorial .touch-joystick.is-tutorial-target,
+body.is-control-tutorial .touch-action.is-tutorial-target {
+  pointer-events: auto !important;
+}
+
+.touch-joystick.is-tutorial-target::after,
+.touch-action.is-tutorial-target::after {
+  position: absolute;
+  top: -38px;
+  left: 50%;
+  width: max-content;
+  max-width: 150px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(29, 45, 28, 0.94);
+  color: #fffdf7;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  box-shadow: 0 8px 18px rgba(20, 33, 20, 0.28);
+}
+
+.touch-joystick.is-tutorial-target::after {
+  content: "밀어서 이동";
+}
+
+.touch-action.is-tutorial-target::after {
+  content: "가까이에서 누르기";
+}
+
+@keyframes tutorial-target-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+
+.touch-action {
+  position: relative;
+  width: var(--touch-action-width);
+  min-width: var(--touch-action-width);
+  height: var(--touch-action-height);
+  min-height: var(--touch-action-height);
+  padding: 9px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.touch-action strong {
+  font-size: 1.05rem;
+  line-height: 1.05;
+}
+
+.touch-action small {
+  font-size: 0.67rem;
+  font-weight: 700;
+  line-height: 1.05;
+  opacity: 0.84;
+  white-space: nowrap;
+}
+
+.joystick-direction {
+  position: absolute;
+  z-index: 1;
+  color: rgba(37, 61, 37, 0.56);
+  font-size: 0.64rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.joystick-direction-up,
+.joystick-direction-down {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.joystick-direction-left,
+.joystick-direction-right {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.joystick-direction-up { top: 10%; }
+.joystick-direction-right { right: 10%; }
+.joystick-direction-down { bottom: 10%; }
+.joystick-direction-left { left: 10%; }
+
+.touch-joystick-knob {
+  z-index: 2;
+}
+
+html[data-device-profile^="phone"] .start-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+html[data-device-profile^="phone"] .fullscreen-launch-button {
+  grid-column: 1 / -1;
+}
+
+html[data-device-profile^="phone"] #startCard {
+  max-height: min(72dvh, 470px);
+}
+
+html[data-device-profile^="phone"] .control-tutorial {
+  top: auto;
+  bottom: calc(var(--safe-bottom) + var(--touch-ui-reserve) + 36px);
+  width: calc(100% - 24px);
+  max-height: calc(100% - var(--touch-ui-reserve) - var(--safe-bottom) - 52px);
+  padding: 17px;
+  overflow: auto;
+  transform: translateX(-50%);
+}
+
+html[data-device-profile^="phone"][data-orientation="portrait"] .prompt-bubble {
+  bottom: calc(var(--safe-bottom) + var(--touch-ui-reserve) + 8px);
+}
+
+html[data-device-profile^="phone"] .control-tutorial > p:not(.card-tag) {
+  margin: 9px 0 12px;
+  font-size: 0.88rem;
+  line-height: 1.48;
+}
+
+html[data-device-profile^="phone"] .tutorial-progress {
+  margin-bottom: 10px;
+}
+
+html[data-device-profile^="phone"] .tutorial-actions {
+  margin-top: 12px;
+}
+
+html[data-device-profile^="phone"] body.is-mobile-playing .hero-panel:not(.is-expanded) #fullscreenToggle {
+  display: none;
+}
+
+html[data-device-profile^="phone"] body.is-mobile-playing.is-fullscreen .hero-panel:not(.is-expanded) #heroToggle {
+  display: none;
+}
+
+html[data-device-profile^="phone"] body.is-mobile-playing.is-fullscreen .hero-panel:not(.is-expanded) #fullscreenToggle {
+  display: inline-flex;
+}
+
+/* Phone landscape previously centered a portrait-ratio canvas above the viewport. */
+html[data-device-profile^="phone"][data-orientation="landscape"] .page-shell {
+  width: 100%;
+  max-width: none;
+  height: calc(100dvh - var(--top-nav-height));
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .main-layout,
+html[data-device-profile^="phone"][data-orientation="landscape"] .play-panel,
+html[data-device-profile^="phone"][data-orientation="landscape"] .canvas-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .play-panel {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .canvas-frame {
+  border-radius: 0;
+  overflow: hidden;
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] #game {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0;
+  max-width: none;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .prompt-bubble {
+  left: 50%;
+  right: auto;
+  bottom: calc(var(--safe-bottom) + 8px);
+  width: min(46vw, 420px);
+  transform: translateX(-50%);
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] #startCard {
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  width: min(520px, calc(100% - 32px));
+  max-height: calc(100% - 24px);
+  transform: translate(-50%, -50%);
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .control-tutorial {
+  top: 50%;
+  bottom: auto;
+  width: min(420px, calc(100% - 270px));
+  max-height: calc(100% - 20px);
+  transform: translate(-50%, -50%);
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .mini-game.is-touch-activity {
+  inset: 6px;
+  padding: 8px;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 5px;
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .mini-game.is-touch-activity .mini-game-head {
+  min-height: 44px;
+  align-items: center;
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .mini-game.is-touch-activity .mini-game-type {
+  display: none;
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .mini-game.is-touch-activity .activity-sidebar {
+  display: none;
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .mini-game.is-touch-activity .mini-game-instruction {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .mini-game.is-touch-activity .activity-layout {
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding-inline: calc(var(--touch-button-size) * 2.18 + 14px);
+  display: block;
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .mini-game.is-touch-activity .activity-stage {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  padding: 4px;
+}
+
+html[data-device-profile^="phone"][data-orientation="landscape"] .mini-game.is-touch-activity #activityCanvas {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+}
+
+@media (max-height: 440px) {
+  html[data-device-profile^="phone"][data-orientation="landscape"] .control-tutorial {
+    padding: 12px 14px;
+  }
+
+  html[data-device-profile^="phone"][data-orientation="landscape"] .control-tutorial h2 {
+    font-size: 1.05rem;
+  }
+
+  html[data-device-profile^="phone"][data-orientation="landscape"] .control-tutorial > p:not(.card-tag) {
+    margin: 6px 0 8px;
+    font-size: 0.78rem;
+  }
+
+  html[data-device-profile^="phone"][data-orientation="landscape"] .tutorial-progress,
+  html[data-device-profile^="phone"][data-orientation="landscape"] .tutorial-actions {
+    margin-block: 6px;
+  }
+}
+
+@media (max-width: 600px) and (max-height: 360px) and (orientation: landscape) {
+  html[data-device-profile^="phone"][data-orientation="landscape"] .control-tutorial {
+    top: 3px;
+    left: 8px;
+    right: 8px;
+    bottom: auto;
+    width: auto;
+    max-height: 150px;
+    padding: 8px 10px;
+    overflow: auto;
+    transform: none;
+  }
+
+  html[data-device-profile^="phone"][data-orientation="landscape"] .control-tutorial .tutorial-progress {
+    display: none;
+  }
+
+  html[data-device-profile^="phone"][data-orientation="landscape"] .control-tutorial .card-tag {
+    display: none;
+  }
+
+  html[data-device-profile^="phone"][data-orientation="landscape"] .control-tutorial h2 {
+    font-size: 0.96rem;
+    line-height: 1.15;
+  }
+
+  html[data-device-profile^="phone"][data-orientation="landscape"] .control-tutorial > p:not(.card-tag) {
+    margin: 3px 0 5px;
+    font-size: 0.7rem;
+    line-height: 1.26;
+  }
+
+  html[data-device-profile^="phone"][data-orientation="landscape"] .control-tutorial .tutorial-status {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    max-width: 46%;
+    margin: 0 !important;
+    padding: 3px 6px;
+    overflow: hidden;
+    font-size: 0.62rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  html[data-device-profile^="phone"][data-orientation="landscape"] .control-tutorial .tutorial-actions {
+    gap: 6px;
+    margin-top: 5px;
+  }
+
+  html[data-device-profile^="phone"][data-orientation="landscape"] .control-tutorial .tutorial-actions button {
+    min-height: 44px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+}
+
 /* 그래픽 개선 사본: 세계 화면을 한 장의 따뜻한 동화책 장면처럼 묶는다. */
 .canvas-frame {
   border: 1px solid rgba(66, 84, 55, 0.2);

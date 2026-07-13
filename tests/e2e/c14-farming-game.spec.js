@@ -3,6 +3,7 @@ const path = require("node:path");
 const { test, expect } = require("@playwright/test");
 
 const SAVE_KEY = "soil-village-save-v4";
+const CONTROL_TUTORIAL_KEY = "soil-village-controls-tutorial-v1";
 const LEGACY_SAVE_KEYS = [
   "soil-village-improved-save-v1",
   "soil-village-graphics-improved-save-v1",
@@ -23,9 +24,9 @@ function collectFiles(directory, extensions) {
 }
 
 async function clearFarmingSave(page) {
-  await page.addInitScript(({ key, legacyKeys }) => {
-    [key, ...legacyKeys].forEach((storageKey) => localStorage.removeItem(storageKey));
-  }, { key: SAVE_KEY, legacyKeys: LEGACY_SAVE_KEYS });
+  await page.addInitScript(({ key, legacyKeys, tutorialKey }) => {
+    [key, tutorialKey, ...legacyKeys].forEach((storageKey) => localStorage.removeItem(storageKey));
+  }, { key: SAVE_KEY, legacyKeys: LEGACY_SAVE_KEYS, tutorialKey: CONTROL_TUTORIAL_KEY });
 }
 
 async function expectNoHorizontalOverflow(page) {
@@ -149,6 +150,9 @@ test.describe("c14 farming game mobile layout", () => {
     expect(startBox.height).toBeGreaterThanOrEqual(44);
 
     await page.locator("#startButton").click();
+    await expect(page.locator("#controlTutorial")).toBeVisible();
+    await page.locator("#tutorialNext").click();
+    await page.locator("#tutorialNext").click();
     await expect(page.locator("#touchAction")).toBeVisible();
     await expect(page.locator("#touchJoystick")).toBeVisible();
 
@@ -161,6 +165,138 @@ test.describe("c14 farming game mobile layout", () => {
     await expect(page.locator("#journalDrawer")).toBeVisible();
     await expect(page.locator("#journalClose")).toBeVisible();
     await expectNoHorizontalOverflow(page);
+  });
+
+  test("전체화면 요청 뒤 첫 방문 조작 안내를 마치고 바로 시작한다", async ({ page }) => {
+    await clearFarmingSave(page);
+    await page.goto("/c14/farming-game/");
+    await page.locator("#gameShell").evaluate((shell) => {
+      window.__fullscreenRequestCount = 0;
+      window.__testFullscreenElement = null;
+      Object.defineProperty(document, "fullscreenElement", {
+        configurable: true,
+        get: () => window.__testFullscreenElement
+      });
+      shell.requestFullscreen = () => {
+        window.__fullscreenRequestCount += 1;
+        window.__testFullscreenElement = shell;
+        document.querySelector(".top-nav").style.display = "none";
+        document.dispatchEvent(new Event("fullscreenchange"));
+        return Promise.resolve();
+      };
+      document.exitFullscreen = () => {
+        window.__testFullscreenElement = null;
+        document.querySelector(".top-nav").style.display = "";
+        document.dispatchEvent(new Event("fullscreenchange"));
+        return Promise.resolve();
+      };
+    });
+
+    await expect(page.locator("#fullscreenButton")).toContainText("전체화면으로 시작");
+    await page.locator("#fullscreenButton").click();
+
+    await expect.poll(() => page.evaluate(() => window.__fullscreenRequestCount)).toBe(1);
+    await expect(page.locator("html")).toHaveAttribute("data-fullscreen", "on");
+    await expect(page.locator("#controlTutorial")).toBeVisible();
+    await expect(page.locator("body")).toHaveClass(/is-control-tutorial/);
+    await expect(page.locator("#tutorialStepLabel")).toHaveText("조작 안내 1 / 2");
+    await expect(page.locator("#touchJoystick")).toHaveClass(/is-tutorial-target/);
+    await expect(page.locator("#touchAction")).toBeVisible();
+    await page.keyboard.press("Tab");
+    await expect(page.locator("#tutorialSkip")).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.locator("#tutorialNext")).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.locator("#tutorialSkip")).toBeFocused();
+
+    const joystick = await page.locator("#touchJoystick").boundingBox();
+    const centerX = joystick.x + joystick.width / 2;
+    const centerY = joystick.y + joystick.height / 2;
+    await page.locator("#touchJoystick").dispatchEvent("pointerdown", { pointerId: 7, clientX: centerX, clientY: centerY });
+    await page.locator("#touchJoystick").dispatchEvent("pointermove", {
+      pointerId: 7,
+      clientX: joystick.x + joystick.width * 0.8,
+      clientY: centerY
+    });
+    await page.locator("#touchJoystick").dispatchEvent("pointerup", {
+      pointerId: 7,
+      clientX: joystick.x + joystick.width * 0.8,
+      clientY: centerY
+    });
+    await expect(page.locator("#tutorialStepLabel")).toHaveText("조작 안내 2 / 2");
+    await expect(page.locator("#touchAction")).toHaveClass(/is-tutorial-target/);
+    const actionHitTarget = await page.locator("#touchAction").evaluate((button) => {
+      const rect = button.getBoundingClientRect();
+      const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      return hit === button || button.contains(hit);
+    });
+    expect(actionHitTarget).toBeTruthy();
+    await page.locator("#touchAction").dispatchEvent("pointerdown", { pointerId: 8 });
+
+    await expect(page.locator("#controlTutorial")).toBeHidden();
+    await expect(page.locator("body")).toHaveClass(/is-game-started/);
+    await expect(page.locator("#touchJoystick")).toBeVisible();
+    await expect(page.locator("#touchAction")).toBeVisible();
+    await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), CONTROL_TUTORIAL_KEY)).toBe("done");
+
+    await page.locator("#fullscreenToggle").click();
+    await expect(page.locator("html")).toHaveAttribute("data-fullscreen", "off");
+    await page.evaluate(() => resetState());
+    await expect(page.locator("#fullscreenStatus")).toContainText("주소창");
+    await page.locator("#fullscreenButton").click();
+    await expect(page.locator("#controlTutorial")).toBeHidden();
+    await expect(page.locator("body")).toHaveClass(/is-game-started/);
+  });
+
+  test("전체화면 API가 없어도 안내 후 일반 화면에서 계속한다", async ({ page }) => {
+    await clearFarmingSave(page);
+    await page.goto("/c14/farming-game/");
+    await page.locator("#gameShell").evaluate((shell) => {
+      Object.defineProperty(shell, "requestFullscreen", { value: undefined, configurable: true });
+      Object.defineProperty(shell, "webkitRequestFullscreen", { value: undefined, configurable: true });
+    });
+
+    await page.locator("#fullscreenButton").click();
+    await expect(page.locator("#controlTutorial")).toBeVisible();
+    await expect(page.locator("#tutorialStatus")).toContainText("지원하지 않아요");
+    await page.locator("#tutorialSkip").click();
+    await expect(page.locator("body")).toHaveClass(/is-game-started/);
+  });
+
+  test("브라우저가 전체화면 요청을 거부해도 게임 진입을 막지 않는다", async ({ page }) => {
+    await clearFarmingSave(page);
+    await page.goto("/c14/farming-game/");
+    await page.locator("#gameShell").evaluate((shell) => {
+      shell.requestFullscreen = () => Promise.reject(new DOMException("denied", "NotAllowedError"));
+    });
+
+    await page.locator("#fullscreenButton").click();
+    await expect(page.locator("#tutorialStatus")).toContainText("허용되지 않았어요");
+    await page.locator("#tutorialSkip").click();
+    await expect(page.locator("body")).toHaveClass(/is-game-started/);
+  });
+
+  test("구형 WebKit 방식의 전체화면 전환도 확인한 뒤 안내를 연다", async ({ page }) => {
+    await clearFarmingSave(page);
+    await page.goto("/c14/farming-game/");
+    await page.locator("#gameShell").evaluate((shell) => {
+      window.__webkitFullscreenElement = null;
+      Object.defineProperty(shell, "requestFullscreen", { value: undefined, configurable: true });
+      Object.defineProperty(document, "webkitFullscreenElement", {
+        configurable: true,
+        get: () => window.__webkitFullscreenElement
+      });
+      shell.webkitRequestFullscreen = () => {
+        window.__webkitFullscreenElement = shell;
+        document.dispatchEvent(new Event("webkitfullscreenchange"));
+      };
+    });
+
+    await page.locator("#fullscreenButton").click();
+    await expect(page.locator("html")).toHaveAttribute("data-fullscreen", "on");
+    await expect(page.locator("#controlTutorial")).toBeVisible();
+    await page.locator("#tutorialSkip").click();
+    await expect(page.locator("body")).toHaveClass(/is-game-started/);
   });
 });
 

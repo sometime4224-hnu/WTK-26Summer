@@ -2,10 +2,15 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
 const ui = {
+  gameShell: document.getElementById("gameShell"),
   heroPanel: document.getElementById("heroPanel"),
   heroToggle: document.getElementById("heroToggle"),
   heroDetails: document.getElementById("heroDetails"),
+  fullscreenToggle: document.getElementById("fullscreenToggle"),
+  tutorialReplay: document.getElementById("tutorialReplay"),
   startCard: document.getElementById("startCard"),
+  fullscreenButton: document.getElementById("fullscreenButton"),
+  fullscreenStatus: document.getElementById("fullscreenStatus"),
   startButton: document.getElementById("startButton"),
   continueButton: document.getElementById("continueButton"),
   resetButton: document.getElementById("resetButton"),
@@ -75,7 +80,16 @@ const ui = {
   endingReview: document.getElementById("endingReview"),
   endingRestart: document.getElementById("endingRestart"),
   endingContinue: document.getElementById("endingContinue"),
+  controlTutorial: document.getElementById("controlTutorial"),
+  tutorialStepLabel: document.getElementById("tutorialStepLabel"),
+  tutorialTitle: document.getElementById("tutorialTitle"),
+  tutorialBody: document.getElementById("tutorialBody"),
+  tutorialStatus: document.getElementById("tutorialStatus"),
+  tutorialNext: document.getElementById("tutorialNext"),
+  tutorialSkip: document.getElementById("tutorialSkip"),
   touchAction: document.getElementById("touchAction"),
+  touchActionLabel: document.getElementById("touchActionLabel"),
+  touchActionHint: document.getElementById("touchActionHint"),
   touchJoystick: document.getElementById("touchJoystick"),
   touchStickKnob: document.getElementById("touchStickKnob")
 };
@@ -258,9 +272,9 @@ const DEVICE_PROFILES = {
     activitySpeedMultiplier: 1.03,
     effectDensity: 0.92,
     prefersCompactHud: true,
-    touchButtonSize: 62,
-    touchActionWidth: 124,
-    touchActionHeight: 70
+    touchButtonSize: 66,
+    touchActionWidth: 132,
+    touchActionHeight: 76
   },
   "phone-high": {
     worldWidth: 840,
@@ -274,9 +288,9 @@ const DEVICE_PROFILES = {
     activitySpeedMultiplier: 1.06,
     effectDensity: 0.8,
     prefersCompactHud: true,
-    touchButtonSize: 50,
-    touchActionWidth: 102,
-    touchActionHeight: 56
+    touchButtonSize: 54,
+    touchActionWidth: 112,
+    touchActionHeight: 62
   },
   "phone-low": {
     worldWidth: 760,
@@ -290,9 +304,9 @@ const DEVICE_PROFILES = {
     activitySpeedMultiplier: 1.08,
     effectDensity: 0.66,
     prefersCompactHud: true,
-    touchButtonSize: 54,
+    touchButtonSize: 52,
     touchActionWidth: 108,
-    touchActionHeight: 58
+    touchActionHeight: 60
   }
 };
 
@@ -309,9 +323,9 @@ function getPortraitProfileOverrides(id, isTouch, isPortrait) {
         activityWidth: 640,
         activityHeight: 400,
         miniMapSize: 140,
-        touchButtonSize: 56,
-        touchActionWidth: 112,
-        touchActionHeight: 60
+        touchButtonSize: 62,
+        touchActionWidth: 124,
+        touchActionHeight: 70
       };
     case "phone-high":
       return {
@@ -320,9 +334,9 @@ function getPortraitProfileOverrides(id, isTouch, isPortrait) {
         activityWidth: 640,
         activityHeight: 400,
         miniMapSize: 132,
-        touchButtonSize: 44,
-        touchActionWidth: 92,
-        touchActionHeight: 54
+        touchButtonSize: 52,
+        touchActionWidth: 112,
+        touchActionHeight: 62
       };
     case "phone-low":
       return {
@@ -331,9 +345,9 @@ function getPortraitProfileOverrides(id, isTouch, isPortrait) {
         activityWidth: 640,
         activityHeight: 400,
         miniMapSize: 118,
-        touchButtonSize: 46,
-        touchActionWidth: 96,
-        touchActionHeight: 54
+        touchButtonSize: 50,
+        touchActionWidth: 108,
+        touchActionHeight: 60
       };
     default:
       return {};
@@ -391,6 +405,7 @@ function detectDeviceProfile() {
 const initialDeviceProfile = detectDeviceProfile();
 
 const SAVE_KEY = "soil-village-save-v4";
+const CONTROL_TUTORIAL_KEY = "soil-village-controls-tutorial-v1";
 const LEGACY_SAVE_KEYS = [
   "soil-village-improved-save-v1",
   "soil-village-graphics-improved-save-v1",
@@ -1125,6 +1140,12 @@ const state = {
   dayStage: 0,
   endingShown: false,
   pendingEnding: false,
+  controlTutorial: {
+    open: false,
+    step: 0,
+    pendingLaunch: null,
+    fallbackMessage: ""
+  },
   lastFocusedElement: null,
   saveMessage: "저장되지 않음",
   worldPractice: createWorldPracticeState(),
@@ -1132,6 +1153,8 @@ const state = {
   lastTimestamp: 0,
   frameAccumulator: 0
 };
+
+const tutorialBackgroundTabIndexes = new Map();
 
 const cloudAnchors = [
   { x: 180, y: 110, scale: 1.1, speed: 0.7 },
@@ -1458,6 +1481,277 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function getFullscreenElement() {
+  return document.fullscreenElement || document.webkitFullscreenElement || null;
+}
+
+function getFullscreenRequest() {
+  if (!ui.gameShell) {
+    return null;
+  }
+  return ui.gameShell.requestFullscreen || ui.gameShell.webkitRequestFullscreen || null;
+}
+
+function getFullscreenExit() {
+  return document.exitFullscreen || document.webkitExitFullscreen || null;
+}
+
+function setFullscreenStatus(message, isError = false) {
+  if (!ui.fullscreenStatus) {
+    return;
+  }
+  ui.fullscreenStatus.textContent = message;
+  ui.fullscreenStatus.classList.toggle("is-error", isError);
+}
+
+function syncFullscreenUi() {
+  const isFullscreen = Boolean(getFullscreenElement());
+  document.documentElement.dataset.fullscreen = isFullscreen ? "on" : "off";
+  document.body.classList.toggle("is-fullscreen", isFullscreen);
+  if (ui.fullscreenToggle) {
+    ui.fullscreenToggle.textContent = isFullscreen ? "전체화면 나가기" : "전체화면";
+    ui.fullscreenToggle.setAttribute("aria-pressed", String(isFullscreen));
+    ui.fullscreenToggle.classList.toggle("hidden", !getFullscreenRequest() && !isFullscreen);
+  }
+  if (isFullscreen) {
+    setFullscreenStatus("전체화면을 사용하고 있어요. 이제 조작 안내를 확인해 보세요.");
+  } else {
+    setFullscreenStatus("브라우저의 주소창을 줄여 게임과 조작부를 넓게 보여 줍니다.");
+  }
+  window.setTimeout(() => syncDeviceProfile({ force: true }), 80);
+}
+
+function waitForFullscreenActivation(timeout = 900) {
+  if (getFullscreenElement()) {
+    return Promise.resolve(true);
+  }
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      document.removeEventListener("fullscreenchange", check);
+      document.removeEventListener("webkitfullscreenchange", check);
+      window.clearTimeout(timer);
+      resolve(Boolean(getFullscreenElement()));
+    };
+    const check = () => {
+      if (getFullscreenElement()) {
+        finish();
+      }
+    };
+    const timer = window.setTimeout(finish, timeout);
+    document.addEventListener("fullscreenchange", check);
+    document.addEventListener("webkitfullscreenchange", check);
+  });
+}
+
+async function requestGameFullscreen() {
+  if (getFullscreenElement()) {
+    return { active: true, message: "" };
+  }
+  const request = getFullscreenRequest();
+  if (!request) {
+    const message = "이 브라우저는 일반 웹 화면의 전체화면 전환을 지원하지 않아요. 현재 화면에서 계속할게요.";
+    setFullscreenStatus(message, true);
+    return { active: false, message };
+  }
+  setFullscreenStatus("전체화면으로 전환하는 중이에요…");
+  try {
+    await Promise.resolve(request.call(ui.gameShell));
+    const active = await waitForFullscreenActivation();
+    if (active) {
+      syncFullscreenUi();
+      return { active: true, message: "" };
+    }
+    const message = "전체화면 전환을 확인하지 못했어요. 현재 화면에서도 그대로 플레이할 수 있어요.";
+    setFullscreenStatus(message, true);
+    return { active: false, message };
+  } catch (error) {
+    const message = "전체화면 전환이 허용되지 않았어요. 현재 화면에서도 그대로 플레이할 수 있어요.";
+    setFullscreenStatus(message, true);
+    return { active: false, message };
+  }
+}
+
+async function toggleGameFullscreen() {
+  if (getFullscreenElement()) {
+    const exit = getFullscreenExit();
+    if (exit) {
+      try {
+        await Promise.resolve(exit.call(document));
+      } catch {}
+    }
+    syncFullscreenUi();
+    return;
+  }
+  await requestGameFullscreen();
+}
+
+function hasSeenControlTutorial() {
+  try {
+    return window.localStorage.getItem(CONTROL_TUTORIAL_KEY) === "done";
+  } catch {
+    return false;
+  }
+}
+
+function rememberControlTutorial() {
+  try {
+    window.localStorage.setItem(CONTROL_TUTORIAL_KEY, "done");
+  } catch {}
+}
+
+function lockTutorialBackgroundFocus() {
+  unlockTutorialBackgroundFocus();
+  document.querySelectorAll("a, button, input, textarea, select, summary, [tabindex]").forEach((element) => {
+    if (ui.controlTutorial.contains(element)) {
+      return;
+    }
+    tutorialBackgroundTabIndexes.set(element, element.hasAttribute("tabindex") ? element.getAttribute("tabindex") : null);
+    element.setAttribute("tabindex", "-1");
+  });
+}
+
+function unlockTutorialBackgroundFocus() {
+  tutorialBackgroundTabIndexes.forEach((previousValue, element) => {
+    if (!element.isConnected) {
+      return;
+    }
+    if (previousValue === null) {
+      element.removeAttribute("tabindex");
+    } else {
+      element.setAttribute("tabindex", previousValue);
+    }
+  });
+  tutorialBackgroundTabIndexes.clear();
+}
+
+function trapTutorialTab(event) {
+  if (!state.controlTutorial.open || event.key !== "Tab") {
+    return false;
+  }
+  const stops = [ui.tutorialSkip, ui.tutorialNext].filter((element) => !element.disabled);
+  if (!stops.length) {
+    return false;
+  }
+  const currentIndex = stops.indexOf(document.activeElement);
+  const nextIndex = event.shiftKey
+    ? currentIndex <= 0
+      ? stops.length - 1
+      : currentIndex - 1
+    : currentIndex < 0 || currentIndex === stops.length - 1
+      ? 0
+      : currentIndex + 1;
+  event.preventDefault();
+  stops[nextIndex].focus({ preventScroll: true });
+  return true;
+}
+
+function renderControlTutorialStep() {
+  const step = clamp(state.controlTutorial.step, 0, 1);
+  const isMovementStep = step === 0;
+  state.controlTutorial.step = step;
+  document.body.dataset.tutorialStep = isMovementStep ? "move" : "action";
+  ui.tutorialStepLabel.textContent = `조작 안내 ${step + 1} / 2`;
+  ui.tutorialTitle.textContent = isMovementStep
+    ? "왼쪽 이동 패드를 밀어 보세요"
+    : "오른쪽 행동 버튼을 누르세요";
+  ui.tutorialBody.textContent = isMovementStep
+    ? "손가락을 패드에 올린 채 가고 싶은 방향으로 밀면 마을을 걸을 수 있어요."
+    : "사람이나 물건 가까이에 가면 버튼이 할 수 있는 행동으로 바뀌어요. 그때 한 번 눌러 주세요.";
+  ui.tutorialNext.textContent = isMovementStep ? "다음: 행동 버튼" : "알겠어요, 산책 시작";
+  ui.tutorialStatus.textContent = state.controlTutorial.fallbackMessage;
+  ui.tutorialStatus.classList.toggle("hidden", !state.controlTutorial.fallbackMessage);
+  [...ui.controlTutorial.querySelectorAll(".tutorial-progress span")].forEach((dot, index) => {
+    dot.classList.toggle("is-active", index <= step);
+  });
+  ui.touchJoystick.classList.toggle("is-tutorial-target", isMovementStep);
+  ui.touchAction.classList.toggle("is-tutorial-target", !isMovementStep);
+}
+
+function showControlTutorial(pendingLaunch = null, fallbackMessage = "") {
+  state.controlTutorial.open = true;
+  state.controlTutorial.step = 0;
+  state.controlTutorial.pendingLaunch = pendingLaunch;
+  state.controlTutorial.fallbackMessage = fallbackMessage;
+  ui.startCard.classList.add("hidden");
+  ui.controlTutorial.classList.remove("hidden");
+  lockTutorialBackgroundFocus();
+  renderControlTutorialStep();
+  syncMobileViewportMode();
+  focusOverlay(ui.controlTutorial);
+}
+
+function launchPreparedSession(mode) {
+  if (mode === "continue") {
+    const saved = loadSavedGame();
+    if (saved?.started && applySavedGame(saved)) {
+      return;
+    }
+  }
+  startGame();
+}
+
+function completeControlTutorial() {
+  const pendingLaunch = state.controlTutorial.pendingLaunch;
+  rememberControlTutorial();
+  state.controlTutorial.open = false;
+  state.controlTutorial.step = 0;
+  state.controlTutorial.pendingLaunch = null;
+  state.controlTutorial.fallbackMessage = "";
+  delete document.body.dataset.tutorialStep;
+  ui.controlTutorial.classList.add("hidden");
+  ui.touchJoystick.classList.remove("is-tutorial-target");
+  ui.touchAction.classList.remove("is-tutorial-target");
+  unlockTutorialBackgroundFocus();
+  if (pendingLaunch) {
+    launchPreparedSession(pendingLaunch);
+  } else {
+    syncMobileViewportMode();
+    restoreOverlayFocus();
+  }
+}
+
+function advanceControlTutorial() {
+  if (!state.controlTutorial.open) {
+    return;
+  }
+  if (state.controlTutorial.step === 0) {
+    state.controlTutorial.step = 1;
+    renderControlTutorialStep();
+    return;
+  }
+  completeControlTutorial();
+}
+
+async function beginFullscreenLaunch() {
+  const saved = loadSavedGame();
+  const launchMode = saved?.started ? "continue" : "new";
+  ui.fullscreenButton.disabled = true;
+  const result = await requestGameFullscreen();
+  ui.fullscreenButton.disabled = false;
+  syncDeviceProfile({ force: true });
+  if (state.device?.isTouch && !hasSeenControlTutorial()) {
+    showControlTutorial(launchMode, result.message);
+    return;
+  }
+  launchPreparedSession(launchMode);
+  if (result.message) {
+    showToast("현재 화면으로 시작", result.message);
+  }
+}
+
+function beginWindowLaunch(mode) {
+  if (state.device?.isTouch && !hasSeenControlTutorial()) {
+    showControlTutorial(mode);
+    return;
+  }
+  launchPreparedSession(mode);
+}
+
 function setCanvasResolution(targetCanvas, width, height) {
   if (!targetCanvas) {
     return;
@@ -1513,7 +1807,6 @@ function syncPhoneCanvasToFrame() {
   const profile = state.device;
   if (
     !/^phone/.test(profile?.id ?? "") ||
-    !profile.isPortrait ||
     !state.started ||
     !document.body.classList.contains("is-mobile-playing")
   ) {
@@ -1524,7 +1817,8 @@ function syncPhoneCanvasToFrame() {
   if (!rect || rect.width < 1 || rect.height < 1) {
     return;
   }
-  const nextWorldWidth = clamp(Math.round((profile.worldHeight * rect.width) / rect.height), 360, 780);
+  const maximumWorldWidth = profile.isPortrait ? 780 : 1240;
+  const nextWorldWidth = clamp(Math.round((profile.worldHeight * rect.width) / rect.height), 360, maximumWorldWidth);
   if (Math.abs(canvas.width - nextWorldWidth) <= 1) {
     return;
   }
@@ -1687,6 +1981,7 @@ function syncMobileViewportMode() {
   const isMiniGameOpen = !ui.miniGame.classList.contains("hidden");
   const isQuizOpen = !ui.quizCard.classList.contains("hidden");
   const isEndingOpen = !ui.endingCard.classList.contains("hidden");
+  const isControlTutorialOpen = state.controlTutorial.open && !ui.controlTutorial.classList.contains("hidden");
   const hasOverlay =
     state.uiPanels.heroExpanded ||
     state.uiPanels.storyOpen ||
@@ -1696,7 +1991,8 @@ function syncMobileViewportMode() {
     isDialogueOpen ||
     isMiniGameOpen ||
     isQuizOpen ||
-    isEndingOpen;
+    isEndingOpen ||
+    isControlTutorialOpen;
 
   document.body.classList.toggle("is-mobile-playing", isPhoneProfile && state.started && !hasOverlay);
   document.body.classList.toggle("is-mobile-overlay-active", isPhoneProfile && hasOverlay);
@@ -1707,6 +2003,7 @@ function syncMobileViewportMode() {
   document.body.classList.toggle("is-mini-game-open", isMiniGameOpen);
   document.body.classList.toggle("is-quiz-open", isQuizOpen);
   document.body.classList.toggle("is-ending-open", isEndingOpen);
+  document.body.classList.toggle("is-control-tutorial", isControlTutorialOpen);
   document.body.classList.toggle("is-journal-open", state.uiPanels.journalOpen);
   if (isPhoneProfile && state.started && !hasOverlay) {
     window.requestAnimationFrame(syncPhoneCanvasToFrame);
@@ -2456,9 +2753,10 @@ function updateSaveSummary(snapshot = null) {
   if (!data || !data.started) {
     ui.continueButton.classList.add("hidden");
     ui.saveSummary.classList.add("hidden");
-    ui.startButton.textContent = "하루 시작";
-    ui.startButton.classList.add("primary-button");
-    ui.startButton.classList.remove("secondary-button");
+    ui.fullscreenButton.textContent = "전체화면으로 시작";
+    ui.startButton.textContent = "현재 화면으로 시작";
+    ui.startButton.classList.add("secondary-button");
+    ui.startButton.classList.remove("primary-button");
     ui.continueButton.classList.add("secondary-button");
     ui.continueButton.classList.remove("primary-button");
     ui.saveStatus.textContent = state.saveMessage;
@@ -2474,11 +2772,13 @@ function updateSaveSummary(snapshot = null) {
 
   ui.continueButton.classList.remove("hidden");
   ui.saveSummary.classList.remove("hidden");
+  ui.fullscreenButton.textContent = "전체화면으로 이어서 걷기";
   ui.startButton.textContent = "새로 시작";
   ui.startButton.classList.add("secondary-button");
   ui.startButton.classList.remove("primary-button");
-  ui.continueButton.classList.add("primary-button");
-  ui.continueButton.classList.remove("secondary-button");
+  ui.continueButton.textContent = "현재 화면으로 이어서 걷기";
+  ui.continueButton.classList.add("secondary-button");
+  ui.continueButton.classList.remove("primary-button");
   ui.saveSummary.textContent = `저장된 산책이 있습니다. ${dayCount}일차 ${stage} ${clockText} · 부탁 ${Math.min((data.storyIndex ?? 0) + 1, storySteps.length)}/${storySteps.length} · 완료한 일 ${completedCount}개 · 온기 ${warmth}${draftLabel}`;
   ui.saveStatus.textContent = state.started ? state.saveMessage : "이어서 걷기 가능";
 }
@@ -3308,6 +3608,11 @@ function resetState(options = {}) {
   state.dayStage = 0;
   state.endingShown = false;
   state.pendingEnding = false;
+  state.controlTutorial.open = false;
+  state.controlTutorial.step = 0;
+  state.controlTutorial.pendingLaunch = null;
+  state.controlTutorial.fallbackMessage = "";
+  delete document.body.dataset.tutorialStep;
   ui.resetButton.textContent = "하루 다시 시작";
   ui.resetButton.classList.remove("is-confirming");
   state.saveMessage = "새 하루 준비 중";
@@ -3317,6 +3622,10 @@ function resetState(options = {}) {
   ui.quizCard.classList.add("hidden");
   ui.promptBubble.classList.add("hidden");
   ui.endingCard.classList.add("hidden");
+  ui.controlTutorial.classList.add("hidden");
+  ui.touchJoystick.classList.remove("is-tutorial-target");
+  ui.touchAction.classList.remove("is-tutorial-target");
+  unlockTutorialBackgroundFocus();
   syncUiPanels();
   updateVoiceButton();
   syncDayStage();
@@ -6272,12 +6581,25 @@ function updateTouchActionLabel() {
       ? "작업 완료"
       : "행동할 대상에 가까이 가세요";
   const ariaLabel = unavailable ? unavailableLabel : actionText;
-  const signature = `${actionText}|${Boolean(unavailable)}|${completionActive}|${ariaLabel}`;
+  const hintText = completionActive
+    ? ""
+    : movementTarget
+      ? "조이스틱 사용"
+      : unavailable
+        ? "대상 가까이 가기"
+        : state.activeDialogue
+          ? "눌러서 계속"
+          : state.activeQuiz
+            ? "눌러서 확인"
+            : "가까이에서 누르기";
+  const signature = `${actionText}|${Boolean(unavailable)}|${completionActive}|${ariaLabel}|${hintText}`;
   if (signature === state.uiFrame.touchActionSignature) {
     return;
   }
   state.uiFrame.touchActionSignature = signature;
-  ui.touchAction.textContent = actionText;
+  ui.touchActionLabel.textContent = actionText;
+  ui.touchActionHint.textContent = hintText;
+  ui.touchActionHint.classList.toggle("hidden", !hintText);
   ui.touchAction.classList.toggle("is-idle", Boolean(unavailable));
   ui.touchAction.disabled = completionActive;
   ui.touchAction.setAttribute("aria-label", ariaLabel);
@@ -8758,6 +9080,9 @@ function startGame() {
 }
 
 function handleActionPress() {
+  if (state.controlTutorial.open) {
+    return;
+  }
   if (!state.started) {
     if (loadSavedGame()?.started) {
       showToast("저장된 산책이 있습니다", "이어서 걷기 또는 새로 시작을 선택하세요.");
@@ -9238,11 +9563,12 @@ function update(dt) {
     }
   }
 
-  if (state.started && !state.activeDialogue && !state.activeQuiz && !state.endingShown) {
+  if (state.started && !state.controlTutorial.open && !state.activeDialogue && !state.activeQuiz && !state.endingShown) {
     advanceDayCycle(dt, { announce: !state.activeMiniGame });
   }
 
   const optionalPanelOpen =
+    state.controlTutorial.open ||
     state.uiPanels.heroExpanded ||
     state.uiPanels.storyOpen ||
     state.uiPanels.statsOpen ||
@@ -9265,7 +9591,7 @@ function update(dt) {
     updateFollowerCompanions(dt);
   }
 
-  if (!state.started || state.activeDialogue || state.activeQuiz || state.endingShown) {
+  if (!state.started || state.controlTutorial.open || state.activeDialogue || state.activeQuiz || state.endingShown) {
     setPrompt("");
     state.hoveredPractice = null;
     updateTouchActionLabel();
@@ -14065,6 +14391,15 @@ function setupInput() {
     }
   });
 
+  document.addEventListener("fullscreenchange", syncFullscreenUi);
+  document.addEventListener("webkitfullscreenchange", syncFullscreenUi);
+  document.addEventListener("fullscreenerror", () => {
+    setFullscreenStatus("전체화면 전환이 허용되지 않았어요. 현재 화면에서도 그대로 플레이할 수 있어요.", true);
+  });
+  document.addEventListener("webkitfullscreenerror", () => {
+    setFullscreenStatus("전체화면 전환이 허용되지 않았어요. 현재 화면에서도 그대로 플레이할 수 있어요.", true);
+  });
+
   window.setInterval(() => {
     if (state.started) {
       persistGame("자동 저장");
@@ -14082,6 +14417,9 @@ function setupInput() {
   window.addEventListener("blur", resetTouchJoystick);
 
   window.addEventListener("keydown", (event) => {
+    if (trapTutorialTab(event)) {
+      return;
+    }
     if (!isGameKeyTarget(event.target) && event.code !== "Escape") {
       return;
     }
@@ -14128,10 +14466,11 @@ function setupInput() {
   });
 
   const startJoystick = (event) => {
-    if (!state.device?.isTouch) {
+    if (!state.device?.isTouch || (state.controlTutorial.open && state.controlTutorial.step !== 0)) {
       return;
     }
     event.preventDefault();
+    navigator.vibrate?.(8);
     state.touchStick.active = true;
     state.touchStick.pointerId = event.pointerId;
     try {
@@ -14153,10 +14492,15 @@ function setupInput() {
       return;
     }
     event.preventDefault();
+    const completedTutorialPractice =
+      state.controlTutorial.open && state.controlTutorial.step === 0 && state.touchStick.magnitude >= 0.12;
     try {
       ui.touchJoystick?.releasePointerCapture?.(event.pointerId);
     } catch {}
     resetTouchJoystick();
+    if (completedTutorialPractice) {
+      advanceControlTutorial();
+    }
   };
 
   ui.touchJoystick.addEventListener("pointerdown", startJoystick);
@@ -14167,6 +14511,14 @@ function setupInput() {
 
   const pressAction = (event) => {
     event.preventDefault();
+    if (state.controlTutorial.open) {
+      if (state.controlTutorial.step === 1) {
+        navigator.vibrate?.(10);
+        completeControlTutorial();
+      }
+      return;
+    }
+    navigator.vibrate?.(10);
     state.touchKeys.add("Action");
     handleActionPress();
   };
@@ -14230,11 +14582,19 @@ function setupInput() {
       playbackRate: 0.88
     });
   });
+  ui.fullscreenToggle.addEventListener("click", toggleGameFullscreen);
+  ui.fullscreenButton.addEventListener("click", beginFullscreenLaunch);
+  ui.tutorialReplay.addEventListener("click", () => {
+    closeOptionalPanels();
+    showControlTutorial(null);
+  });
+  ui.tutorialNext.addEventListener("click", advanceControlTutorial);
+  ui.tutorialSkip.addEventListener("click", completeControlTutorial);
   ui.startButton.addEventListener("click", () => {
     if (loadSavedGame()?.started) {
-      requestDestructiveAction(ui.startButton, "한 번 더 눌러 새로 시작", startGame);
+      requestDestructiveAction(ui.startButton, "한 번 더 눌러 새로 시작", () => beginWindowLaunch("new"));
     } else {
-      startGame();
+      beginWindowLaunch("new");
     }
   });
   ui.continueButton.addEventListener("click", () => {
@@ -14242,10 +14602,12 @@ function setupInput() {
     if (!saved) {
       return;
     }
-    playSfx("uiStart", {
-      playbackRate: 0.96
-    });
-    applySavedGame(saved);
+    if (hasSeenControlTutorial() || !state.device?.isTouch) {
+      playSfx("uiStart", {
+        playbackRate: 0.96
+      });
+    }
+    beginWindowLaunch("continue");
   });
   ui.endingRestart.addEventListener("click", () => {
     requestDestructiveAction(ui.endingRestart, "한 번 더 눌러 다시 시작", () => {
@@ -14306,6 +14668,7 @@ resetState({ clearSave: false });
 applyDeviceCss(initialDeviceProfile);
 applyResponsiveCanvasProfile();
 setupInput();
+syncFullscreenUi();
 syncDeviceProfile({ force: true });
 renderSidebar();
 updateTouchActionLabel();

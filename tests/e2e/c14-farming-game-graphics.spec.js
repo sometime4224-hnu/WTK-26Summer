@@ -2,6 +2,7 @@ const { test, expect } = require("@playwright/test");
 
 const GAME_URL = "/c14/farming-game/";
 const SAVE_KEY = "soil-village-save-v4";
+const CONTROL_TUTORIAL_KEY = "soil-village-controls-tutorial-v1";
 const PREVIOUS_SAVE_KEY = "soil-village-improved-save-v1";
 const LEGACY_SAVE_KEYS = [
   PREVIOUS_SAVE_KEY,
@@ -10,15 +11,16 @@ const LEGACY_SAVE_KEYS = [
 ];
 
 async function clearSave(page) {
-  await page.addInitScript(({ key, legacyKeys }) => {
-    [key, ...legacyKeys].forEach((storageKey) => localStorage.removeItem(storageKey));
-  }, { key: SAVE_KEY, legacyKeys: LEGACY_SAVE_KEYS });
+  await page.addInitScript(({ key, tutorialKey, legacyKeys }) => {
+    [key, tutorialKey, ...legacyKeys].forEach((storageKey) => localStorage.removeItem(storageKey));
+  }, { key: SAVE_KEY, tutorialKey: CONTROL_TUTORIAL_KEY, legacyKeys: LEGACY_SAVE_KEYS });
 }
 
 async function seedSave(page, data) {
-  await page.addInitScript(({ key, saved }) => {
+  await page.addInitScript(({ key, tutorialKey, saved }) => {
     localStorage.setItem(key, JSON.stringify(saved));
-  }, { key: SAVE_KEY, saved: data });
+    localStorage.setItem(tutorialKey, "done");
+  }, { key: SAVE_KEY, tutorialKey: CONTROL_TUTORIAL_KEY, saved: data });
 }
 
 async function expectInsideViewport(page, selector, minimumSize = 0) {
@@ -65,6 +67,10 @@ const deviceProfiles = [
   { name: "320x568 스마트폰 세로", viewport: { width: 320, height: 568 } },
   { name: "390x844 스마트폰 세로", viewport: { width: 390, height: 844 } },
   { name: "430x932 스마트폰 세로", viewport: { width: 430, height: 932 } },
+  { name: "480x320 작은 스마트폰 가로", viewport: { width: 480, height: 320 } },
+  { name: "568x320 스마트폰 가로", viewport: { width: 568, height: 320 } },
+  { name: "667x375 스마트폰 가로", viewport: { width: 667, height: 375 } },
+  { name: "844x390 스마트폰 가로", viewport: { width: 844, height: 390 } },
   { name: "768x1024 태블릿 세로", viewport: { width: 768, height: 1024 } },
   { name: "1024x768 태블릿 가로", viewport: { width: 1024, height: 768 } }
 ];
@@ -88,7 +94,22 @@ for (const profile of deviceProfiles) {
       page.on("pageerror", (error) => pageErrors.push(error.message));
       await clearSave(page);
       await page.goto(GAME_URL);
-      await page.locator("#startButton").click();
+      await expectInsideViewport(page, "#fullscreenButton", 44);
+      await page.locator("#gameShell").evaluate((shell) => {
+        Object.defineProperty(document, "fullscreenElement", { configurable: true, get: () => shell });
+        document.querySelector(".top-nav").style.display = "none";
+        shell.requestFullscreen = () => {
+          document.dispatchEvent(new Event("fullscreenchange"));
+          return Promise.resolve();
+        };
+      });
+      await page.locator("#fullscreenButton").click();
+      await expectInsideViewport(page, "#controlTutorial");
+      await expectInsideViewport(page, "#touchJoystick", 44);
+      await expectInsideViewport(page, "#tutorialNext", 44);
+      await page.locator("#tutorialNext").click();
+      await expectInsideViewport(page, "#touchAction", 44);
+      await page.locator("#tutorialNext").click();
       await page.waitForTimeout(300);
 
       await expectInsideViewport(page, ".canvas-frame", 180);
@@ -101,9 +122,18 @@ for (const profile of deviceProfiles) {
       const layout = await page.evaluate(() => {
         const canvas = document.querySelector("#game").getBoundingClientRect();
         const frame = document.querySelector(".canvas-frame").getBoundingClientRect();
+        const promptElement = document.querySelector("#promptBubble");
+        const prompt = promptElement.getBoundingClientRect();
+        const controls = ["#touchJoystick", "#touchAction"].map((selector) =>
+          document.querySelector(selector).getBoundingClientRect()
+        );
+        const overlaps = (a, b) =>
+          a.width > 0 && a.height > 0 && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
         return {
           horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth + 1,
           verticalOverflow: document.documentElement.scrollHeight > window.innerHeight + 1,
+          promptOverlapsControls:
+            !promptElement.classList.contains("hidden") && controls.some((control) => overlaps(prompt, control)),
           edgeDelta: Math.max(
             Math.abs(canvas.left - frame.left),
             Math.abs(canvas.top - frame.top),
@@ -112,7 +142,12 @@ for (const profile of deviceProfiles) {
           )
         };
       });
-      expect(layout).toEqual({ horizontalOverflow: false, verticalOverflow: false, edgeDelta: expect.any(Number) });
+      expect(layout).toEqual({
+        horizontalOverflow: false,
+        verticalOverflow: false,
+        promptOverlapsControls: false,
+        edgeDelta: expect.any(Number)
+      });
       expect(layout.edgeDelta).toBeLessThan(1.5);
       expect(pageErrors).toEqual([]);
     });
@@ -149,6 +184,8 @@ test.describe("정식 그래픽 버전 저장과 활동 장면", () => {
     await expect(page.locator("#continueButton")).toBeVisible();
     await page.locator("#startButton").click();
     await page.locator("#startButton").click();
+    await expect(page.locator("#controlTutorial")).toBeVisible();
+    await page.locator("#tutorialSkip").click();
 
     const stored = await page.evaluate(({ nextKey, legacyKeys }) => ({
       next: JSON.parse(localStorage.getItem(nextKey)),
@@ -234,5 +271,37 @@ test.describe("정식 그래픽 버전 저장과 활동 장면", () => {
     await expect(page.locator("#timeOfDayValue")).toHaveText("밤");
     await expect(page.locator("#timeOfDayDetail")).toHaveText(/21:|22:/);
     await expectCanvasIsRichAndOpaque(page, "#game");
+  });
+});
+
+test.describe("스마트폰 가로 활동 조작", () => {
+  test.use({ viewport: { width: 667, height: 375 }, isMobile: true, hasTouch: true });
+
+  test("활동 장면을 확보하고 양쪽 엄지 조작부와 겹치지 않는다", async ({ page }) => {
+    await seedSave(page, {
+      started: true,
+      storyIndex: 1,
+      flags: ["talkedAunt"],
+      activeMiniGame: { zoneId: "gardenCare", snapshot: null }
+    });
+    await page.goto(GAME_URL);
+    await page.locator("#continueButton").click();
+    await page.waitForTimeout(250);
+
+    await expectInsideViewport(page, "#miniGame");
+    await expectInsideViewport(page, "#activityCanvas", 150);
+    await expectInsideViewport(page, "#touchJoystick", 44);
+    await expectInsideViewport(page, "#touchAction", 44);
+
+    const overlap = await page.evaluate(() => {
+      const stage = document.querySelector(".activity-stage").getBoundingClientRect();
+      const controls = ["#touchJoystick", "#touchAction"].map((selector) =>
+        document.querySelector(selector).getBoundingClientRect()
+      );
+      return controls.some((control) =>
+        stage.left < control.right && stage.right > control.left && stage.top < control.bottom && stage.bottom > control.top
+      );
+    });
+    expect(overlap).toBeFalsy();
   });
 });
