@@ -176,7 +176,7 @@
 
 ## 10. 구현 메모
 
-- UI 스타일은 `c14/grammar1-mini-game.html`과 `c13/grammar2-mini-game.html`의 중간 톤이 잘 맞는다.
+- UI 스타일은 `c14/grammar1-block-studio.html`과 `c13/grammar2-mini-game.html`의 중간 톤이 잘 맞는다.
 - 별도 이미지 없이도 시작 가능하지만, 콘셉트를 살리려면 `폴라로이드 사진 카드` 느낌의 일러스트 4~6장이 있으면 좋다.
 - 기존 페이지와 맞추기 위해 아래 요소를 유지한다.
 - 상단 글로벌 네비게이션

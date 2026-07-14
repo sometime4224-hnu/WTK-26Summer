@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#173142" />
+    <title>14과 문법 1 보조 활동 | 표현 블록 맞추기</title>
+    <link rel="stylesheet" href="grammar1-block-studio.css" />
+</head>
+<body data-stage-type="tutorial" data-stage-id="tutorial">
+    <a class="skip-link" href="#workbench">표현 블록 작업대로 바로 가기</a>
+
+    <header class="topbar">
+        <nav class="breadcrumb" aria-label="현재 위치" data-copy-layer="PRIMARY">
+            <a href="../index.html">메인</a><span aria-hidden="true">›</span>
+            <a href="index.html">14과</a><span aria-hidden="true">›</span>
+            <a href="grammar1.html">문법 1</a><span aria-hidden="true">›</span>
+            <span>표현 블록 맞추기</span>
+        </nav>
+        <div class="top-actions">
+            <p id="saveStatus" class="save-status" role="status" aria-live="polite">
+                <span class="save-light" aria-hidden="true"></span><span data-copy-layer="PRIMARY">자동 저장됨</span>
+            </p>
+            <button id="soundToggle" class="tool-button" type="button" aria-pressed="true" aria-label="소리 켜짐" data-copy-layer="PRIMARY">
+                <span class="sound-icon" aria-hidden="true">♪</span><span>소리 켜짐</span>
+            </button>
+            <button id="undoButton" class="tool-button" type="button" disabled data-copy-layer="PRIMARY">되돌리기</button>
+            <button id="resetButton" class="tool-button tool-button--reset" type="button" data-copy-layer="PRIMARY">이 스테이지 초기화</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" aria-labelledby="stageTitle">
+            <div class="hero-copy">
+                <p id="stageEyebrow" class="eyebrow" data-copy-layer="PRIMARY">튜토리얼 · 블록 모양 익히기</p>
+                <h1 id="stageTitle" tabindex="-1" data-copy-layer="PRIMARY">표현 블록 맞추기</h1>
+                <p class="hero-instruction" data-copy-layer="PRIMARY">표현 블록을 잡아 빈칸 위에 놓아 보세요. 알맞은 자리에 놓으면 철컥 들어가고, 맞지 않으면 통통 튕겨 나와요.</p>
+            </div>
+            <div class="hero-demo" aria-label="블록 모양 안내" data-copy-layer="PRIMARY">
+                <span class="demo-label">블록의 모양이 자리의 모양이에요</span>
+                <div class="demo-row" aria-hidden="true">
+                    <span class="demo-hado demo-hado--empty">
+                        <svg class="demo-hado-shape" viewBox="0 0 300 110" preserveAspectRatio="none" focusable="false">
+                            <path d="M14 4H286Q296 4 296 14V106H185V43H95V106H4V14Q4 4 14 4Z"></path>
+                        </svg>
+                        <b class="demo-hado-start">하도</b>
+                        <b class="demo-hado-end">-아서/어서</b>
+                    </span>
+                    <span class="demo-arrow">→</span>
+                    <span class="demo-hado demo-hado--filled">
+                        <svg class="demo-hado-shape" viewBox="0 0 300 110" preserveAspectRatio="none" focusable="false">
+                            <path d="M14 4H286Q296 4 296 14V106H185V43H95V106H4V14Q4 4 14 4Z"></path>
+                        </svg>
+                        <b class="demo-hado-start">하도</b>
+                        <em class="demo-hado-stem">재미있</em>
+                        <b class="demo-hado-end">어서</b>
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <section id="stageRail" class="stage-rail" aria-labelledby="stageRailTitle">
+            <div class="stage-rail-heading">
+                <span id="stageRailTitle" data-copy-layer="PRIMARY">학습 순서</span>
+                <strong id="currentStageLabel" data-copy-layer="PRIMARY">튜토리얼</strong>
+            </div>
+            <nav id="stageNav" class="stage-nav" aria-label="연습 단계"></nav>
+        </section>
+
+        <section class="progress-panel" aria-label="활동 진행">
+            <div>
+                <span class="progress-label" data-copy-layer="PRIMARY">결합한 문장</span>
+                <strong id="progressCount">0 / 6</strong>
+            </div>
+            <div id="progressDots" class="progress-dots" aria-hidden="true"></div>
+            <p id="statusMessage" class="status-message" role="status" aria-live="polite" data-copy-layer="PRIMARY">블록을 잡아 문장판으로 옮기세요.</p>
+        </section>
+
+        <section id="workbench" class="workbench" aria-label="표현 블록 작업대">
+            <aside class="block-bank" aria-labelledby="bankTitle">
+                <div class="bank-heading">
+                    <div>
+                        <p class="bank-kicker" data-copy-layer="PRIMARY">BLOCK BANK</p>
+                        <h2 id="bankTitle" data-copy-layer="PRIMARY">표현 블록</h2>
+                    </div>
+                    <span class="grab-cue" aria-hidden="true"><i></i><i></i><i></i></span>
+                </div>
+                <p class="bank-instruction" data-copy-layer="PRIMARY">블록을 끌거나, 블록과 빈칸을 차례로 누르세요.</p>
+                <div id="blockBank" class="block-shelf" aria-label="이동할 표현 블록"></div>
+                <details class="shape-help">
+                    <summary data-copy-layer="OPTIONAL_HELP">모양 힌트</summary>
+                    <p data-copy-layer="OPTIONAL_HELP">하도는 혼자 놓지 않아요. 문장 둘은 그래서, 절과 결과는 -아서/어서로 이어요.</p>
+                </details>
+            </aside>
+
+            <section class="sentence-canvas" aria-labelledby="canvasTitle">
+                <header class="canvas-heading">
+                    <div>
+                        <p class="canvas-kicker" data-copy-layer="PRIMARY">MAGNETIC SENTENCE BOARD</p>
+                        <h2 id="canvasTitle" data-copy-layer="PRIMARY">문장 자석판</h2>
+                    </div>
+                    <div class="canvas-legend" aria-hidden="true"><span></span> 빈칸 위에서 놓기</div>
+                </header>
+                <div id="sentenceGrid" class="sentence-grid"></div>
+            </section>
+        </section>
+
+        <section id="completionCard" class="completion-card" hidden aria-labelledby="completionTitle">
+            <span class="completion-mark" aria-hidden="true">✓</span>
+            <div>
+                <p class="completion-kicker" data-copy-layer="PRIMARY">ALL CONNECTED</p>
+                <h2 id="completionTitle" data-copy-layer="PRIMARY">모든 문장을 완성했어요.</h2>
+                <p data-copy-layer="PRIMARY">하도 블록, 단독 부사, 문장 연결 블록의 자리를 모두 확인했어요.</p>
+            </div>
+            <div class="completion-actions">
+                <button id="completionReset" class="completion-reset" type="button" data-copy-layer="PRIMARY">이 스테이지 다시 배치</button>
+                <button id="nextStageButton" class="completion-next" type="button" data-copy-layer="PRIMARY">본 연습 시작</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="effectsLayer" class="effects-layer" aria-hidden="true"></div>
+    <script src="grammar1-block-studio.js"></script>
+</body>
+</html>

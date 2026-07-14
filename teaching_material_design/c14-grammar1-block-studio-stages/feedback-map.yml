@@ -1,0 +1,101 @@
+{
+  "contract_version": 2,
+  "material_id": "c14-grammar1-block-studio-stages",
+  "allowed_judgements": [
+    "BEST",
+    "PARTIAL",
+    "ALLOWED",
+    "NOT_RECOMMENDED",
+    "INCORRECT"
+  ],
+  "feedback_rules": [
+    {
+      "id": "F-HADO-C",
+      "judgement": "BEST",
+      "learner_message": "맞아요, 양쪽이 함께 붙었어요.",
+      "optional_help": "하도와 -아서/어서가 용언을 감싸요.",
+      "teacher_rationale": "하도 묶음의 양쪽 결합과 용언 중심 공간을 정확히 선택한 경우다.",
+      "system_condition": "item.kind == 'wrap' && block.kind == 'hado'",
+      "learner_message_ref": "COPY-F-HADO-C-L",
+      "optional_help_ref": "COPY-F-HADO-C-H",
+      "teacher_rationale_ref": "COPY-F-HADO-C-T"
+    },
+    {
+      "id": "F-HADO-W",
+      "judgement": "INCORRECT",
+      "learner_message": "이 자리는 양쪽이 붙은 블록이 필요해요.",
+      "optional_help": "하도와 어미가 함께 움직이는 모양을 찾아보세요.",
+      "teacher_rationale": "이 활동에서 하도는 -아서/어서와 묶인 뒤집힌 U자 형태로만 배치한다.",
+      "system_condition": "item.kind == 'wrap' && block.kind != 'hado'",
+      "learner_message_ref": "COPY-F-HADO-W-L",
+      "optional_help_ref": "COPY-F-HADO-W-H",
+      "teacher_rationale_ref": "COPY-F-HADO-W-T"
+    },
+    {
+      "id": "F-DEGREE-C",
+      "judgement": "BEST",
+      "learner_message": "맞아요, 이 부사는 혼자 놓을 수 있어요.",
+      "optional_help": "한 칸짜리 부사 블록은 다른 조각과 붙어 있지 않아요.",
+      "teacher_rationale": "해당 스테이지 재고의 단독 정도 부사를 한 문장 안의 독립 부사 자리에 배치했다.",
+      "system_condition": "item.kind == 'inline' && block.kind == item.answer_kind",
+      "learner_message_ref": "COPY-F-DEGREE-C-L",
+      "optional_help_ref": "COPY-F-DEGREE-C-H",
+      "teacher_rationale_ref": "COPY-F-DEGREE-C-T"
+    },
+    {
+      "id": "F-DEGREE-W",
+      "judgement": "INCORRECT",
+      "learner_message": "이 자리에는 혼자 놓는 부사 블록이 필요해요.",
+      "optional_help": "양쪽이나 왼쪽에 붙은 모양 말고 한 칸 블록을 보세요.",
+      "teacher_rationale": "하도 묶음, 연결 어미, 접속 부사는 이 단독 정도 부사 자리의 정답이 아니다.",
+      "system_condition": "item.kind == 'inline' && block.kind != item.answer_kind",
+      "learner_message_ref": "COPY-F-DEGREE-W-L",
+      "optional_help_ref": "COPY-F-DEGREE-W-H",
+      "teacher_rationale_ref": "COPY-F-DEGREE-W-T"
+    },
+    {
+      "id": "F-CLAUSE-C",
+      "judgement": "BEST",
+      "learner_message": "맞아요, 어미가 앞 절의 끝에 붙었어요.",
+      "optional_help": "앞부분은 끝난 문장이 아니고 뒤 결과로 이어져요.",
+      "teacher_rationale": "비종결 앞 절의 용언 뒤에 연결 어미 -아서/어서가 부착된 경우다.",
+      "system_condition": "item.kind == 'clause' && block.kind == 'aso'",
+      "learner_message_ref": "COPY-F-CLAUSE-C-L",
+      "optional_help_ref": "COPY-F-CLAUSE-C-H",
+      "teacher_rationale_ref": "COPY-F-CLAUSE-C-T"
+    },
+    {
+      "id": "F-CLAUSE-W",
+      "judgement": "INCORRECT",
+      "learner_message": "앞부분 끝에 붙는 어미 블록을 찾아보세요.",
+      "optional_help": "왼쪽 부착부가 있는 -아서/어서 모양을 확인하세요.",
+      "teacher_rationale": "앞부분이 종결되지 않았으므로 독립 접속 부사 그래서가 아니라 연결 어미가 필요하다.",
+      "system_condition": "item.kind == 'clause' && block.kind != 'aso'",
+      "learner_message_ref": "COPY-F-CLAUSE-W-L",
+      "optional_help_ref": "COPY-F-CLAUSE-W-H",
+      "teacher_rationale_ref": "COPY-F-CLAUSE-W-T"
+    },
+    {
+      "id": "F-SENTENCE-C",
+      "judgement": "BEST",
+      "learner_message": "맞아요, 그래서가 끝난 문장 둘을 이었어요.",
+      "optional_help": "앞뒤가 모두 마침표로 끝난 문장인지 확인해 보세요.",
+      "teacher_rationale": "각각 종결된 두 문장의 원인·결과 관계를 접속 부사 그래서로 연결했다.",
+      "system_condition": "item.kind == 'pair' && block.kind == 'geuraeseo'",
+      "learner_message_ref": "COPY-F-SENTENCE-C-L",
+      "optional_help_ref": "COPY-F-SENTENCE-C-H",
+      "teacher_rationale_ref": "COPY-F-SENTENCE-C-T"
+    },
+    {
+      "id": "F-SENTENCE-W",
+      "judgement": "INCORRECT",
+      "learner_message": "끝난 문장 둘 사이에는 그래서가 필요해요.",
+      "optional_help": "앞 문장이 이미 끝났으니 붙는 어미는 쓸 수 없어요.",
+      "teacher_rationale": "앞 문장이 종결형과 문장부호로 끝났으므로 연결 어미가 아니라 독립 접속 부사가 필요하다.",
+      "system_condition": "item.kind == 'pair' && block.kind != 'geuraeseo'",
+      "learner_message_ref": "COPY-F-SENTENCE-W-L",
+      "optional_help_ref": "COPY-F-SENTENCE-W-H",
+      "teacher_rationale_ref": "COPY-F-SENTENCE-W-T"
+    }
+  ]
+}
