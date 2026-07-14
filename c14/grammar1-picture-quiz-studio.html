@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#173142" />
+    <title>14과 문법 1 개선 활동 | 그림 말하기 스튜디오</title>
+    <link rel="stylesheet" href="grammar1-picture-quiz-studio.css" />
+</head>
+<body>
+    <header class="studio-topbar">
+        <a class="back-link" href="grammar1.html">문법 1</a>
+        <span id="statusPill" class="status-pill" role="status" aria-live="polite">READY</span>
+    </header>
+
+    <main id="activityTop" class="studio-shell">
+        <header class="studio-intro">
+            <p class="studio-kicker">보조 말하기</p>
+            <h1>그림 말하기 스튜디오</h1>
+            <p>장면을 보고 문장 만들기</p>
+        </header>
+
+        <section class="stage" aria-labelledby="activityHeading">
+            <h2 id="activityHeading" class="sr-only">그림 말하기 스튜디오</h2>
+
+            <header class="stage-progress">
+                <div class="metrics">
+                    <span class="metric">
+                        <strong id="progressText">1 / 16</strong>
+                    </span>
+                    <span class="metric">
+                        <span>정답</span>
+                        <strong id="correctCount">0</strong>
+                    </span>
+                    <span class="metric metric--hidden">
+                        <strong id="attemptCount">0</strong>
+                    </span>
+                </div>
+                <div class="progress-track">
+                    <div
+                        id="progressBar"
+                        class="progress-fill"
+                        role="progressbar"
+                        aria-labelledby="progressText"
+                        aria-valuemin="1"
+                        aria-valuemax="16"
+                        aria-valuenow="1"
+                        aria-valuetext="1 / 16"
+                    ></div>
+                </div>
+                <p id="supportNote" class="support-note" role="status" aria-live="polite"></p>
+            </header>
+
+            <div id="quizWorkspace" class="workspace">
+                <article class="scene-panel" aria-labelledby="sceneTitle">
+                    <header class="scene-heading">
+                        <h2 id="sceneTitle" tabindex="-1">그림 카드</h2>
+                        <span id="promptText" class="scene-counter">01</span>
+                    </header>
+                    <figure class="scene-frame">
+                        <img id="sceneImage" src="" alt="" loading="eager" decoding="async" />
+                        <div id="sceneImageFallback" class="scene-image-fallback" role="img" aria-label="그림 카드" hidden>
+                            <span>그림 카드</span>
+                        </div>
+                    </figure>
+                </article>
+
+                <article class="quiz-panel">
+                    <section class="cue-flow" aria-label="하도 -아서/어서">
+                        <div class="pattern-lock">
+                            <span class="cue-prefix">하도</span>
+                            <span class="pattern-space" aria-hidden="true"></span>
+                            <span class="connector-word">-아서/어서</span>
+                            <span class="connector-arrow" aria-hidden="true">→</span>
+                            <span class="pattern-space pattern-space--tail" aria-hidden="true"></span>
+                        </div>
+                        <div class="clue-deck">
+                            <div class="cue-group cue-group--lead">
+                                <div id="leadWords" class="word-pills"></div>
+                            </div>
+                            <div class="connector" aria-hidden="true">→</div>
+                            <div class="cue-group cue-group--tail">
+                                <div id="tailWords" class="word-pills"></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="action-row">
+                        <button id="micBtn" class="btn btn--accent" type="button" aria-pressed="false">
+                            <span id="micBtnText">말하기 시작</span>
+                        </button>
+                        <button id="manualFocusBtn" class="btn btn--accent" type="button" hidden>직접 입력</button>
+                        <button id="exampleBtn" class="btn btn--ghost" type="button" disabled>정답 듣기</button>
+                        <button id="retryBtn" class="btn btn--ghost" type="button">다시</button>
+                        <button id="nextBtn" class="btn btn--primary" type="button" disabled>다음</button>
+                    </div>
+
+                    <section class="voice-stack" aria-labelledby="speechMeta">
+                        <div class="transcript-box">
+                            <h2 id="speechMeta" class="transcript-meta">READY</h2>
+                            <p id="transcriptBox" class="transcript-text is-placeholder" role="status" aria-live="polite">...</p>
+                        </div>
+
+                        <div id="feedbackBox" class="feedback-box hidden" role="status" aria-live="polite"></div>
+
+                        <div id="modelWrap" class="model-wrap hidden">
+                            <p id="modelSentence"></p>
+                        </div>
+
+                        <details id="manualTools" class="manual-tools" open>
+                            <summary>직접 입력</summary>
+                            <label for="manualInput">직접 입력</label>
+                            <textarea id="manualInput" placeholder="문장을 입력하세요."></textarea>
+                            <div class="action-row">
+                                <button id="manualCheckBtn" class="btn btn--ghost" type="button">확인</button>
+                            </div>
+                        </details>
+                    </section>
+                </article>
+            </div>
+
+            <section id="summaryPanel" class="summary-panel hidden" aria-labelledby="summaryTitle">
+                <header class="summary-head">
+                    <h2 id="summaryTitle" tabindex="-1">FINISH</h2>
+                    <button id="restartBtn" class="btn btn--primary" type="button">처음부터</button>
+                </header>
+                <div class="summary-grid">
+                    <article class="summary-stat">
+                        <span>정답</span>
+                        <strong id="summaryCorrect">0 / 16</strong>
+                    </article>
+                    <article class="summary-stat">
+                        <strong id="summaryRate">0%</strong>
+                    </article>
+                </div>
+                <div id="summaryRetry" class="summary-list"></div>
+            </section>
+        </section>
+    </main>
+
+    <script src="grammar1-picture-quiz.js"></script>
+    <script src="grammar1-picture-quiz-studio.js"></script>
+</body>
+</html>
