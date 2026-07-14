@@ -4,6 +4,8 @@ const { test, expect } = require("@playwright/test");
 
 const SAVE_KEY = "soil-village-save-v4";
 const CONTROL_TUTORIAL_KEY = "soil-village-controls-tutorial-v1";
+const CONTROL_TUTORIAL_MODES_KEY = "soil-village-controls-tutorial-v2";
+const CONTROL_MODE_KEY = "soil-village-control-mode-v1";
 const LEGACY_SAVE_KEYS = [
   "soil-village-improved-save-v1",
   "soil-village-graphics-improved-save-v1",
@@ -24,9 +26,16 @@ function collectFiles(directory, extensions) {
 }
 
 async function clearFarmingSave(page) {
-  await page.addInitScript(({ key, legacyKeys, tutorialKey }) => {
-    [key, tutorialKey, ...legacyKeys].forEach((storageKey) => localStorage.removeItem(storageKey));
-  }, { key: SAVE_KEY, legacyKeys: LEGACY_SAVE_KEYS, tutorialKey: CONTROL_TUTORIAL_KEY });
+  await page.addInitScript(({ key, legacyKeys, tutorialKeys, controlModeKey }) => {
+    if (sessionStorage.getItem("farming-test-storage-cleared") === "yes") return;
+    [key, controlModeKey, ...tutorialKeys, ...legacyKeys].forEach((storageKey) => localStorage.removeItem(storageKey));
+    sessionStorage.setItem("farming-test-storage-cleared", "yes");
+  }, {
+    key: SAVE_KEY,
+    legacyKeys: LEGACY_SAVE_KEYS,
+    tutorialKeys: [CONTROL_TUTORIAL_KEY, CONTROL_TUTORIAL_MODES_KEY],
+    controlModeKey: CONTROL_MODE_KEY
+  });
 }
 
 async function expectNoHorizontalOverflow(page) {
@@ -165,6 +174,113 @@ test.describe("c14 farming game mobile layout", () => {
     await expect(page.locator("#journalDrawer")).toBeVisible();
     await expect(page.locator("#journalClose")).toBeVisible();
     await expectNoHorizontalOverflow(page);
+  });
+
+  test("화면 터치 방식을 선택하고 대상을 눌러 자동 이동·상호작용한다", async ({ page }) => {
+    await clearFarmingSave(page);
+    const pageErrors = [];
+    page.on("pageerror", (error) => pageErrors.push(error.message));
+    await page.goto("/c14/farming-game/");
+
+    await expect(page.locator("#controlModeSelector")).toBeVisible();
+    await page.locator("input[name='controlMode'][value='tap']").check();
+    await expect(page.locator("html")).toHaveAttribute("data-control-mode", "tap");
+    await page.locator("#startButton").click();
+
+    await expect(page.locator("#controlTutorial")).toBeVisible();
+    await expect(page.locator("#tutorialTitle")).toContainText("땅을 눌러");
+    await page.locator("#tutorialNext").click();
+    await expect(page.locator("#tapTutorialTarget")).toBeVisible();
+    await page.locator("#tapTutorialTarget").click();
+    await expect(page.locator("body")).toHaveClass(/is-game-started/);
+    await expect(page.locator("#touchJoystick")).toBeHidden();
+    await expect(page.locator("#touchAction")).toBeHidden();
+
+    await expect.poll(() => page.evaluate(() => window.eval("state.camera.y"))).toBeGreaterThan(350);
+    const target = await page.evaluate(() => {
+      const values = window.eval("({ cameraX: state.camera.x, cameraY: state.camera.y, canvasWidth: canvas.width, canvasHeight: canvas.height })");
+      return { x: 220 - values.cameraX, y: 1180 - values.cameraY, ...values };
+    });
+    const canvasBox = await page.locator("#game").boundingBox();
+    await page.mouse.click(
+      canvasBox.x + (target.x / target.canvasWidth) * canvasBox.width,
+      canvasBox.y + (target.y / target.canvasHeight) * canvasBox.height
+    );
+    await expect(page.locator("#dialogueBox")).toBeVisible();
+    await expect(page.locator("#dialogueSpeaker")).toContainText("이모");
+
+    const saved = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), SAVE_KEY);
+    expect(saved.controlMode).toBe("tap");
+    expect(pageErrors).toEqual([]);
+  });
+
+  test("게임 안에서 조작 방식을 바꾸고 다시 열어도 선택을 유지한다", async ({ page }) => {
+    await clearFarmingSave(page);
+    await page.goto("/c14/farming-game/");
+    await page.locator("input[name='controlMode'][value='tap']").check();
+    await page.locator("#startButton").click();
+    await page.locator("#tutorialSkip").click();
+    await page.locator("#heroToggle").click();
+    await expect(page.locator("#controlModeToggle")).toContainText("화면 터치");
+    await page.reload();
+    await expect(page.locator("input[name='controlMode'][value='tap']")).toBeChecked();
+    await expect(page.locator("html")).toHaveAttribute("data-control-mode", "tap");
+  });
+
+  test("일곱 미니게임에서 첫 작업 대상을 터치해 자동으로 도구를 집는다", async ({ page }) => {
+    await clearFarmingSave(page);
+    await page.goto("/c14/farming-game/");
+    await page.evaluate(() => window.eval("state.started = true; setControlMode('tap', { savePreference: false, saveGame: false });"));
+
+    for (const zoneId of ["gardenCare", "lawnTrim", "vegetablePlant", "vegetableGrow", "farmWork", "raiseLivestock", "catchFish"]) {
+      await page.evaluate((id) => window.eval(`
+        cancelAutoNavigation();
+        const zone = zoneDefinitions.find((entry) => entry.id === ${JSON.stringify(id)});
+        startMiniGame(zone);
+        const target = buildActivityTargets(state.activeMiniGame)[0];
+        beginActivityTapNavigation(getActivityTargetAnchor(target));
+      `), zoneId);
+      await expect.poll(() => page.evaluate(() => window.eval("buildActivityGuide(state.activeMiniGame)[0].done"))).toBeTruthy();
+    }
+  });
+
+  test("잔디와 고랑을 누르면 가까운 끝에서 반대편까지 자동 주행한다", async ({ page }) => {
+    await clearFarmingSave(page);
+    await page.goto("/c14/farming-game/");
+    await page.evaluate(() => window.eval("state.started = true; setControlMode('tap', { savePreference: false, saveGame: false });"));
+
+    await page.evaluate(() => window.eval(`
+      startMiniGame(zoneDefinitions.find((entry) => entry.id === 'lawnTrim'));
+      state.activeMiniGame.mower.attached = true;
+      state.activeMiniGame.player.carrying = 'mower';
+      const lane = buildActivityTargets(state.activeMiniGame)[0];
+      beginActivityTapNavigation(getActivityTargetAnchor(lane));
+    `));
+    await expect.poll(() => page.evaluate(() => window.eval("isActivityCoverageComplete(state.activeMiniGame.lanes[0].cut)")), { timeout: 12_000 }).toBeTruthy();
+
+    await page.evaluate(() => window.eval(`
+      cancelAutoNavigation();
+      startMiniGame(zoneDefinitions.find((entry) => entry.id === 'farmWork'));
+      state.activeMiniGame.player.carrying = 'hoe';
+      const row = buildActivityTargets(state.activeMiniGame)[0];
+      beginActivityTapNavigation(getActivityTargetAnchor(row));
+    `));
+    await expect.poll(() => page.evaluate(() => window.eval("isActivityCoverageComplete(state.activeMiniGame.rows[0].progress)")), { timeout: 12_000 }).toBeTruthy();
+  });
+
+  test("월드 터치 이동은 건물을 피해 경로를 만든다", async ({ page }) => {
+    await clearFarmingSave(page);
+    await page.goto("/c14/farming-game/");
+    const waypointCount = await page.evaluate(() => window.eval(`
+      state.started = true;
+      setControlMode('tap', { savePreference: false, saveGame: false });
+      state.player.x = 180;
+      state.player.y = 240;
+      beginWorldTapNavigation({ x: 560, y: 240 });
+      state.autoNavigation.waypoints.length;
+    `));
+    expect(waypointCount).toBeGreaterThan(1);
+    await expect.poll(() => page.evaluate(() => window.eval("state.player.x")), { timeout: 10_000 }).toBeGreaterThan(520);
   });
 
   test("전체화면 요청 뒤 첫 방문 조작 안내를 마치고 바로 시작한다", async ({ page }) => {

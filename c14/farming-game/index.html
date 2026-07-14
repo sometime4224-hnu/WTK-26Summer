@@ -63,6 +63,7 @@
           <p class="lead">
             이모의 부탁을 따라 마을을 걷고 일을 도우며, 농촌 생활 표현을 장면과 함께 익혀 보세요.
           </p>
+          <button id="controlModeToggle" class="secondary-button touch-only" type="button">조작 방식 · 조이스틱</button>
         </div>
       </header>
 
@@ -131,6 +132,23 @@
                 <p class="touch-only">왼쪽 조이스틱으로 걷고, 가까이 가서 오른쪽 <strong>행동</strong> 버튼을 누르세요.</p>
                 <p class="keyboard-only">방향키로 걷고, 가까이 가서 <strong>E</strong> 키를 누르세요.</p>
                 <p id="fullscreenStatus" class="fullscreen-status touch-only" role="status" aria-live="polite">주소창을 줄이고 스마트폰을 세로로 맞춰 게임과 조작부를 편하게 보여 줍니다.</p>
+                <fieldset id="controlModeSelector" class="control-mode-selector touch-only">
+                  <legend>조작 방식을 선택하세요</legend>
+                  <label class="control-mode-option">
+                    <input type="radio" name="controlMode" value="joystick" checked />
+                    <span>
+                      <strong>조이스틱 + 행동</strong>
+                      <small>직접 움직이고 가까이에서 행동 버튼을 눌러요.</small>
+                    </span>
+                  </label>
+                  <label class="control-mode-option">
+                    <input type="radio" name="controlMode" value="tap" />
+                    <span>
+                      <strong>화면 터치</strong>
+                      <small>장소나 대상을 누르면 걸어가서 자동으로 행동해요.</small>
+                    </span>
+                  </label>
+                </fieldset>
                 <p id="saveSummary" class="save-summary hidden" role="status"></p>
               </div>
               <div class="start-actions">
@@ -169,6 +187,11 @@
                 <button id="tutorialNext" class="primary-button" type="button">다음: 행동 버튼</button>
               </div>
             </div>
+
+            <button id="tapTutorialTarget" class="tap-tutorial-target hidden" type="button" aria-label="연습 대상 누르기">
+              <span aria-hidden="true">!</span>
+              <strong>이모</strong>
+            </button>
 
             <div id="promptBubble" class="prompt-bubble hidden" role="status" aria-live="polite"></div>
             <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>

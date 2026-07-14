@@ -8,6 +8,7 @@ const ui = {
   heroDetails: document.getElementById("heroDetails"),
   fullscreenToggle: document.getElementById("fullscreenToggle"),
   tutorialReplay: document.getElementById("tutorialReplay"),
+  controlModeToggle: document.getElementById("controlModeToggle"),
   startCard: document.getElementById("startCard"),
   fullscreenButton: document.getElementById("fullscreenButton"),
   fullscreenStatus: document.getElementById("fullscreenStatus"),
@@ -16,6 +17,7 @@ const ui = {
   resetButton: document.getElementById("resetButton"),
   voiceToggle: document.getElementById("voiceToggle"),
   saveSummary: document.getElementById("saveSummary"),
+  controlModeSelector: document.getElementById("controlModeSelector"),
   promptBubble: document.getElementById("promptBubble"),
   toast: document.getElementById("toast"),
   dialogueBox: document.getElementById("dialogueBox"),
@@ -88,6 +90,7 @@ const ui = {
   tutorialStatus: document.getElementById("tutorialStatus"),
   tutorialNext: document.getElementById("tutorialNext"),
   tutorialSkip: document.getElementById("tutorialSkip"),
+  tapTutorialTarget: document.getElementById("tapTutorialTarget"),
   portraitGate: document.getElementById("portraitGate"),
   portraitGateStatus: document.getElementById("portraitGateStatus"),
   portraitRetry: document.getElementById("portraitRetry"),
@@ -411,6 +414,8 @@ const initialDeviceProfile = detectDeviceProfile();
 
 const SAVE_KEY = "soil-village-save-v4";
 const CONTROL_TUTORIAL_KEY = "soil-village-controls-tutorial-v1";
+const CONTROL_TUTORIAL_MODES_KEY = "soil-village-controls-tutorial-v2";
+const CONTROL_MODE_KEY = "soil-village-control-mode-v1";
 const LEGACY_SAVE_KEYS = [
   "soil-village-improved-save-v1",
   "soil-village-graphics-improved-save-v1",
@@ -1100,9 +1105,29 @@ function createQuizAssemblyState(choices = [], selection = []) {
   };
 }
 
+function createAutoNavigationState() {
+  return {
+    active: false,
+    scope: null,
+    waypoints: [],
+    waypointIndex: 0,
+    destination: null,
+    targetType: null,
+    targetId: null,
+    targetLabel: "",
+    autoInteract: false,
+    traversal: null,
+    actionCooldown: 0,
+    actionAttempts: 0,
+    stuckTimer: 0,
+    lastDistance: Infinity
+  };
+}
+
 const state = {
   started: false,
   voiceEnabled: true,
+  controlMode: "joystick",
   device: initialDeviceProfile,
   uiFrame: {
     miniMapLastRender: -Infinity,
@@ -1121,6 +1146,7 @@ const state = {
     magnitude: 0
   },
   interactQueued: false,
+  autoNavigation: createAutoNavigationState(),
   player: { x: 245, y: 1110, r: 16, speed: 232, facing: "down", step: 0 },
   camera: { x: 0, y: 0, targetX: 0, targetY: 0 },
   hoveredZone: null,
@@ -1858,17 +1884,89 @@ async function toggleGameFullscreen() {
   }
 }
 
-function hasSeenControlTutorial() {
+function normalizeControlMode(value) {
+  return value === "tap" ? "tap" : "joystick";
+}
+
+function getStoredControlMode() {
   try {
-    return window.localStorage.getItem(CONTROL_TUTORIAL_KEY) === "done";
+    return normalizeControlMode(window.localStorage.getItem(CONTROL_MODE_KEY));
+  } catch {
+    return "joystick";
+  }
+}
+
+function syncControlModeUi() {
+  const isTap = state.controlMode === "tap";
+  document.documentElement.dataset.controlMode = state.controlMode;
+  ui.controlModeSelector?.querySelectorAll("input[name='controlMode']").forEach((input) => {
+    input.checked = input.value === state.controlMode;
+  });
+  if (ui.controlModeToggle) {
+    ui.controlModeToggle.textContent = `조작 방식 · ${isTap ? "화면 터치" : "조이스틱"}`;
+    ui.controlModeToggle.setAttribute("aria-label", `${isTap ? "조이스틱" : "화면 터치"} 방식으로 변경`);
+  }
+  applyDeviceCss(state.device);
+  updateTouchActionLabel();
+}
+
+function setControlMode(value, options = {}) {
+  const { savePreference = true, saveGame = true, announce = false } = options;
+  const nextMode = normalizeControlMode(value);
+  const changed = state.controlMode !== nextMode;
+  state.controlMode = nextMode;
+  if (changed) {
+    cancelAutoNavigation();
+    resetTouchJoystick();
+  }
+  if (savePreference) {
+    try {
+      window.localStorage.setItem(CONTROL_MODE_KEY, nextMode);
+    } catch {}
+  }
+  syncControlModeUi();
+  syncMobileViewportMode();
+  if (saveGame && state.started) {
+    persistGame("조작 방식 저장");
+  }
+  if (announce && changed) {
+    showToast(
+      "조작 방식 변경",
+      nextMode === "tap" ? "장소나 대상을 누르면 걸어가서 자동으로 행동합니다." : "왼쪽 조이스틱과 오른쪽 행동 버튼을 사용합니다."
+    );
+  }
+}
+
+function readTutorialModes() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(CONTROL_TUTORIAL_MODES_KEY) || "{}");
+    return stored && typeof stored === "object" ? stored : {};
+  } catch {
+    return {};
+  }
+}
+
+function hasSeenControlTutorial(mode = state.controlMode) {
+  try {
+    const seenModes = readTutorialModes();
+    if (seenModes[normalizeControlMode(mode)] === true) {
+      return true;
+    }
+    return normalizeControlMode(mode) === "joystick" && window.localStorage.getItem(CONTROL_TUTORIAL_KEY) === "done";
   } catch {
     return false;
   }
 }
 
-function rememberControlTutorial() {
+function rememberControlTutorial(mode = state.controlMode) {
   try {
-    window.localStorage.setItem(CONTROL_TUTORIAL_KEY, "done");
+    const normalizedMode = normalizeControlMode(mode);
+    const seenModes = readTutorialModes();
+    seenModes[normalizedMode] = true;
+    window.localStorage.setItem(CONTROL_TUTORIAL_MODES_KEY, JSON.stringify(seenModes));
+    if (normalizedMode === "joystick") {
+      window.localStorage.setItem(CONTROL_TUTORIAL_KEY, "done");
+    }
   } catch {}
 }
 
@@ -1921,23 +2019,38 @@ function trapTutorialTab(event) {
 function renderControlTutorialStep() {
   const step = clamp(state.controlTutorial.step, 0, 1);
   const isMovementStep = step === 0;
+  const isTapMode = state.controlMode === "tap";
   state.controlTutorial.step = step;
   document.body.dataset.tutorialStep = isMovementStep ? "move" : "action";
+  document.body.dataset.tutorialMode = state.controlMode;
   ui.tutorialStepLabel.textContent = `조작 안내 ${step + 1} / 2`;
-  ui.tutorialTitle.textContent = isMovementStep
-    ? "왼쪽 이동 패드를 밀어 보세요"
-    : "오른쪽 행동 버튼을 누르세요";
-  ui.tutorialBody.textContent = isMovementStep
-    ? "손가락을 패드에 올린 채 가고 싶은 방향으로 밀면 마을을 걸을 수 있어요."
-    : "사람이나 물건 가까이에 가면 버튼이 할 수 있는 행동으로 바뀌어요. 그때 한 번 눌러 주세요.";
-  ui.tutorialNext.textContent = isMovementStep ? "다음: 행동 버튼" : "알겠어요, 산책 시작";
+  ui.tutorialTitle.textContent = isTapMode
+    ? isMovementStep
+      ? "가고 싶은 땅을 눌러 보세요"
+      : "표시된 이모를 눌러 보세요"
+    : isMovementStep
+      ? "왼쪽 이동 패드를 밀어 보세요"
+      : "오른쪽 행동 버튼을 누르세요";
+  ui.tutorialBody.textContent = isTapMode
+    ? isMovementStep
+      ? "화면의 빈 땅을 누르면 그곳까지 자동으로 걸어갑니다. 아래 게임 화면을 한 번 눌러 연습해 보세요."
+      : "사람이나 물건을 한 번 누르면 가까이 걸어간 뒤 대화하거나 행동합니다."
+    : isMovementStep
+      ? "손가락을 패드에 올린 채 가고 싶은 방향으로 밀면 마을을 걸을 수 있어요."
+      : "사람이나 물건 가까이에 가면 버튼이 할 수 있는 행동으로 바뀌어요. 그때 한 번 눌러 주세요.";
+  ui.tutorialNext.textContent = isMovementStep
+    ? isTapMode
+      ? "다음: 대상 터치"
+      : "다음: 행동 버튼"
+    : "알겠어요, 산책 시작";
   ui.tutorialStatus.textContent = state.controlTutorial.fallbackMessage;
   ui.tutorialStatus.classList.toggle("hidden", !state.controlTutorial.fallbackMessage);
   [...ui.controlTutorial.querySelectorAll(".tutorial-progress span")].forEach((dot, index) => {
     dot.classList.toggle("is-active", index <= step);
   });
-  ui.touchJoystick.classList.toggle("is-tutorial-target", isMovementStep);
-  ui.touchAction.classList.toggle("is-tutorial-target", !isMovementStep);
+  ui.touchJoystick.classList.toggle("is-tutorial-target", !isTapMode && isMovementStep);
+  ui.touchAction.classList.toggle("is-tutorial-target", !isTapMode && !isMovementStep);
+  ui.tapTutorialTarget.classList.toggle("hidden", !isTapMode || isMovementStep);
 }
 
 function showControlTutorial(pendingLaunch = null, fallbackMessage = "") {
@@ -1954,12 +2067,15 @@ function showControlTutorial(pendingLaunch = null, fallbackMessage = "") {
 }
 
 function launchPreparedSession(mode) {
+  const selectedControlMode = state.controlMode;
   if (mode === "continue") {
     const saved = loadSavedGame();
     if (saved?.started && applySavedGame(saved)) {
+      setControlMode(selectedControlMode, { savePreference: true, saveGame: true });
       return;
     }
   }
+  setControlMode(selectedControlMode, { savePreference: true, saveGame: false });
   startGame();
 }
 
@@ -1975,8 +2091,10 @@ function completeControlTutorial() {
   state.portraitGate.fullscreenMessage = "";
   state.portraitGate.reason = "";
   delete document.body.dataset.tutorialStep;
+  delete document.body.dataset.tutorialMode;
   ui.controlTutorial.classList.add("hidden");
   ui.portraitGate.classList.add("hidden");
+  ui.tapTutorialTarget.classList.add("hidden");
   ui.touchJoystick.classList.remove("is-tutorial-target");
   ui.touchAction.classList.remove("is-tutorial-target");
   unlockTutorialBackgroundFocus();
@@ -2073,7 +2191,7 @@ function applyDeviceCss(profile) {
   document.documentElement.dataset.inputMode = profile.isTouch ? "touch" : "mouse";
   document.documentElement.dataset.orientation = profile.isPortrait ? "portrait" : "landscape";
   document.documentElement.dataset.touchUi = profile.isTouch ? "on" : "off";
-  const touchUiReserve = profile.isTouch
+  const touchUiReserve = profile.isTouch && state.controlMode === "joystick"
     ? Math.round(Math.max(profile.touchActionHeight, profile.touchButtonSize * 2.2) + 18)
     : 0;
   document.documentElement.style.setProperty("--mini-map-size", `${profile.miniMapSize}px`);
@@ -2268,7 +2386,350 @@ function getMovementIntent() {
 }
 
 function hasMovementInput(threshold = 0.12) {
-  return getMovementIntent().magnitude > threshold;
+  return getMovementIntent().magnitude > threshold || state.autoNavigation.active;
+}
+
+function cancelAutoNavigation(options = {}) {
+  const { announce = false } = options;
+  const wasActive = state.autoNavigation?.active;
+  state.autoNavigation = createAutoNavigationState();
+  if (announce && wasActive) {
+    showToast("이동을 멈췄습니다", "다른 장소나 대상을 누르면 다시 이동합니다.");
+  }
+}
+
+function getCanvasPointerPoint(event, targetCanvas) {
+  const rect = targetCanvas.getBoundingClientRect();
+  if (!rect.width || !rect.height) {
+    return null;
+  }
+  return {
+    x: (event.clientX - rect.left) * (targetCanvas.width / rect.width),
+    y: (event.clientY - rect.top) * (targetCanvas.height / rect.height)
+  };
+}
+
+function isWorldNavigationPointOpen(x, y, padding = state.player.r + 7) {
+  if (x < padding || y < padding || x > world.width - padding || y > world.height - padding) {
+    return false;
+  }
+  return !obstacles.some(
+    (obstacle) =>
+      x > obstacle.x - padding &&
+      x < obstacle.x + obstacle.w + padding &&
+      y > obstacle.y - padding &&
+      y < obstacle.y + obstacle.h + padding
+  );
+}
+
+function isWorldNavigationSegmentOpen(start, end) {
+  const distance = Math.hypot(end.x - start.x, end.y - start.y);
+  const steps = Math.max(1, Math.ceil(distance / 12));
+  for (let index = 1; index <= steps; index += 1) {
+    const ratio = index / steps;
+    if (!isWorldNavigationPointOpen(lerp(start.x, end.x, ratio), lerp(start.y, end.y, ratio))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function findWorldNavigationPath(start, goal) {
+  if (isWorldNavigationSegmentOpen(start, goal)) {
+    return [{ x: goal.x, y: goal.y }];
+  }
+
+  const cell = 32;
+  const cols = Math.ceil(world.width / cell);
+  const rows = Math.ceil(world.height / cell);
+  const toCell = (point) => ({
+    x: clamp(Math.floor(point.x / cell), 0, cols - 1),
+    y: clamp(Math.floor(point.y / cell), 0, rows - 1)
+  });
+  const cellPoint = (entry) => ({ x: entry.x * cell + cell / 2, y: entry.y * cell + cell / 2 });
+  const keyOf = (x, y) => `${x},${y}`;
+  const startCell = toCell(start);
+  let goalCell = toCell(goal);
+  if (!isWorldNavigationPointOpen(cellPoint(goalCell).x, cellPoint(goalCell).y)) {
+    const alternatives = [];
+    for (let radius = 1; radius <= 4; radius += 1) {
+      for (let dy = -radius; dy <= radius; dy += 1) {
+        for (let dx = -radius; dx <= radius; dx += 1) {
+          const candidate = { x: goalCell.x + dx, y: goalCell.y + dy };
+          if (candidate.x < 0 || candidate.y < 0 || candidate.x >= cols || candidate.y >= rows) continue;
+          const point = cellPoint(candidate);
+          if (isWorldNavigationPointOpen(point.x, point.y)) {
+            alternatives.push({ ...candidate, distance: Math.hypot(point.x - goal.x, point.y - goal.y) });
+          }
+        }
+      }
+      if (alternatives.length) break;
+    }
+    alternatives.sort((a, b) => a.distance - b.distance);
+    if (alternatives[0]) goalCell = alternatives[0];
+  }
+
+  const resolvedGoal = isWorldNavigationPointOpen(goal.x, goal.y) ? goal : cellPoint(goalCell);
+  const open = [{ ...startCell, g: 0, f: 0 }];
+  const scores = new Map([[keyOf(startCell.x, startCell.y), 0]]);
+  const parents = new Map();
+  const closed = new Set();
+  const directions = [
+    [-1, 0, 1], [1, 0, 1], [0, -1, 1], [0, 1, 1],
+    [-1, -1, Math.SQRT2], [1, -1, Math.SQRT2], [-1, 1, Math.SQRT2], [1, 1, Math.SQRT2]
+  ];
+
+  while (open.length) {
+    open.sort((a, b) => a.f - b.f);
+    const current = open.shift();
+    const currentKey = keyOf(current.x, current.y);
+    if (closed.has(currentKey)) continue;
+    if (current.x === goalCell.x && current.y === goalCell.y) {
+      const cells = [current];
+      let cursor = currentKey;
+      while (parents.has(cursor)) {
+        const previous = parents.get(cursor);
+        cells.push(previous);
+        cursor = keyOf(previous.x, previous.y);
+      }
+      cells.reverse();
+      const raw = cells.slice(1).map(cellPoint);
+      raw.push({ x: resolvedGoal.x, y: resolvedGoal.y });
+      const smoothed = [];
+      let anchor = { x: start.x, y: start.y };
+      let index = 0;
+      while (index < raw.length) {
+        let farthest = index;
+        for (let probe = raw.length - 1; probe >= index; probe -= 1) {
+          if (isWorldNavigationSegmentOpen(anchor, raw[probe])) {
+            farthest = probe;
+            break;
+          }
+        }
+        smoothed.push(raw[farthest]);
+        anchor = raw[farthest];
+        index = farthest + 1;
+      }
+      return smoothed;
+    }
+    closed.add(currentKey);
+    directions.forEach(([dx, dy, cost]) => {
+      const nx = current.x + dx;
+      const ny = current.y + dy;
+      if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) return;
+      const point = cellPoint({ x: nx, y: ny });
+      if (!isWorldNavigationPointOpen(point.x, point.y)) return;
+      if (dx && dy) {
+        const sideA = cellPoint({ x: current.x + dx, y: current.y });
+        const sideB = cellPoint({ x: current.x, y: current.y + dy });
+        if (!isWorldNavigationPointOpen(sideA.x, sideA.y) || !isWorldNavigationPointOpen(sideB.x, sideB.y)) return;
+      }
+      const nextKey = keyOf(nx, ny);
+      const nextScore = current.g + cost;
+      if (nextScore >= (scores.get(nextKey) ?? Infinity)) return;
+      scores.set(nextKey, nextScore);
+      parents.set(nextKey, { x: current.x, y: current.y });
+      const heuristic = Math.hypot(goalCell.x - nx, goalCell.y - ny);
+      open.push({ x: nx, y: ny, g: nextScore, f: nextScore + heuristic });
+    });
+  }
+  return [];
+}
+
+function getWorldTargetApproachPoint(target) {
+  const start = { x: state.player.x, y: state.player.y };
+  const interactionRadius = Math.max(34, (target.radius ?? target.baseRadius ?? 42) + getInteractionAssist(target.kind === "quiz" ? "zone" : target.kind ?? "zone") - 10);
+  if (Math.hypot(start.x - target.x, start.y - target.y) <= interactionRadius) {
+    return start;
+  }
+  const candidates = [];
+  for (let index = 0; index < 16; index += 1) {
+    const angle = (Math.PI * 2 * index) / 16;
+    const candidate = {
+      x: target.x + Math.cos(angle) * Math.max(28, interactionRadius - 8),
+      y: target.y + Math.sin(angle) * Math.max(28, interactionRadius - 8)
+    };
+    if (isWorldNavigationPointOpen(candidate.x, candidate.y)) {
+      candidates.push(candidate);
+    }
+  }
+  candidates.sort((a, b) => Math.hypot(a.x - start.x, a.y - start.y) - Math.hypot(b.x - start.x, b.y - start.y));
+  return candidates[0] ?? { x: target.x, y: target.y };
+}
+
+function setAutoNavigation(scope, waypoints, options = {}) {
+  if (!waypoints.length) {
+    showToast("그곳으로 갈 수 없어요", "조금 더 가까운 땅이나 다른 쪽을 눌러 보세요.");
+    return false;
+  }
+  state.autoNavigation = {
+    ...createAutoNavigationState(),
+    active: true,
+    scope,
+    waypoints: waypoints.map((point) => ({ x: point.x, y: point.y })),
+    destination: { ...waypoints[waypoints.length - 1] },
+    targetType: options.targetType ?? null,
+    targetId: options.targetId ?? null,
+    targetLabel: options.targetLabel ?? "목적지",
+    autoInteract: Boolean(options.autoInteract),
+    traversal: options.traversal ?? null
+  };
+  return true;
+}
+
+function resolveWorldTapTarget(id, type) {
+  if (type === "zone") return getAvailableZones().find((target) => target.id === id) ?? null;
+  return buildWorldPracticeTargets().find((target) => target.id === id) ?? null;
+}
+
+function findWorldTapTarget(point) {
+  const scaleAssist = Math.max(18, 34 * (canvas.width / Math.max(canvas.clientWidth, 1)));
+  const targets = [
+    ...getAvailableZones().map((target) => ({ ...target, tapType: "zone" })),
+    ...buildWorldPracticeTargets().map((target) => ({ ...target, tapType: "practice" }))
+  ];
+  return targets
+    .map((target) => ({ target, distance: Math.hypot(point.x - target.x, point.y - target.y) }))
+    .filter(({ target, distance }) => distance <= Math.max(target.radius ?? target.baseRadius ?? 40, scaleAssist))
+    .sort((a, b) => a.distance - b.distance)[0]?.target ?? null;
+}
+
+function beginWorldTapNavigation(point) {
+  const target = findWorldTapTarget(point);
+  const goal = target ? getWorldTargetApproachPoint(target) : point;
+  const path = findWorldNavigationPath({ x: state.player.x, y: state.player.y }, goal);
+  return setAutoNavigation("world", path, {
+    targetType: target?.tapType,
+    targetId: target?.id,
+    targetLabel: target?.label ?? "선택한 곳",
+    autoInteract: Boolean(target)
+  });
+}
+
+function findActivityTapTarget(game, point) {
+  return buildActivityTargets(game)
+    .map((target) => {
+      const inside = target.shape === "rect"
+        ? point.x >= target.x - 18 && point.x <= target.x + target.w + 18 && point.y >= target.y - 18 && point.y <= target.y + target.h + 18
+        : Math.hypot(point.x - target.x, point.y - target.y) <= Math.max(target.r ?? 22, 34);
+      return { target, inside, distance: Math.hypot(point.x - getActivityTargetAnchor(target).x, point.y - getActivityTargetAnchor(target).y) };
+    })
+    .filter((entry) => entry.inside)
+    .sort((a, b) => a.distance - b.distance)[0]?.target ?? null;
+}
+
+function beginActivityTapNavigation(point) {
+  const game = state.activeMiniGame;
+  if (!game) return false;
+  const target = findActivityTapTarget(game, point);
+  if (!target) {
+    return setAutoNavigation("activity", [{ x: clamp(point.x, 36, game.width - 36), y: clamp(point.y, 48, game.height - 36) }], {
+      targetLabel: "선택한 곳"
+    });
+  }
+  if (target.requiresAction === false) {
+    const centerY = target.y + target.h / 2;
+    const left = { x: target.x + 12, y: centerY };
+    const right = { x: target.x + target.w - 12, y: centerY };
+    const nearLeft = Math.hypot(game.player.x - left.x, game.player.y - left.y) <= Math.hypot(game.player.x - right.x, game.player.y - right.y);
+    const waypoints = nearLeft ? [left, right] : [right, left];
+    return setAutoNavigation("activity", waypoints, {
+      targetType: "activity",
+      targetId: target.id,
+      targetLabel: target.label,
+      traversal: { reversePasses: 0 }
+    });
+  }
+  const anchor = getActivityTargetAnchor(target);
+  return setAutoNavigation("activity", [{ x: clamp(anchor.x, 36, game.width - 36), y: clamp(anchor.y, 48, game.height - 36) }], {
+    targetType: "activity",
+    targetId: target.id,
+    targetLabel: target.label,
+    autoInteract: true
+  });
+}
+
+function getAutoNavigationMovement(scope, player, dt) {
+  const navigation = state.autoNavigation;
+  if (!navigation.active || navigation.scope !== scope) return { dx: 0, dy: 0, magnitude: 0 };
+  if (scope === "activity" && navigation.autoInteract && state.activeMiniGame) {
+    const movingTarget = buildActivityTargets(state.activeMiniGame).find((target) => target.id === navigation.targetId);
+    if (movingTarget) {
+      const anchor = getActivityTargetAnchor(movingTarget);
+      const lastIndex = navigation.waypoints.length - 1;
+      navigation.waypoints[lastIndex] = {
+        x: clamp(anchor.x, 36, state.activeMiniGame.width - 36),
+        y: clamp(anchor.y, 48, state.activeMiniGame.height - 36)
+      };
+      navigation.destination = { ...navigation.waypoints[lastIndex] };
+    }
+  }
+  const waypoint = navigation.waypoints[navigation.waypointIndex];
+  if (!waypoint) return { dx: 0, dy: 0, magnitude: 0 };
+  const dx = waypoint.x - player.x;
+  const dy = waypoint.y - player.y;
+  const distance = Math.hypot(dx, dy);
+  navigation.actionCooldown = Math.max(0, navigation.actionCooldown - dt);
+  if (distance <= 9) {
+    navigation.waypointIndex += 1;
+    navigation.lastDistance = Infinity;
+    if (navigation.waypointIndex < navigation.waypoints.length) {
+      return getAutoNavigationMovement(scope, player, dt);
+    }
+    finishAutoNavigation(scope);
+    return { dx: 0, dy: 0, magnitude: 0 };
+  }
+  if (distance >= navigation.lastDistance - 0.15) navigation.stuckTimer += dt;
+  else navigation.stuckTimer = Math.max(0, navigation.stuckTimer - dt * 0.5);
+  navigation.lastDistance = distance;
+  if (navigation.stuckTimer > 1.1) {
+    cancelAutoNavigation();
+    showToast("이동이 막혔어요", "다른 쪽 땅을 한 번 눌러 주세요.");
+    return { dx: 0, dy: 0, magnitude: 0 };
+  }
+  return { dx: dx / distance, dy: dy / distance, magnitude: 1 };
+}
+
+function finishAutoNavigation(scope) {
+  const navigation = state.autoNavigation;
+  if (!navigation.active || navigation.scope !== scope) return;
+  if (scope === "world" && navigation.autoInteract) {
+    const target = resolveWorldTapTarget(navigation.targetId, navigation.targetType);
+    cancelAutoNavigation();
+    if (!target) return;
+    if (navigation.targetType === "practice") {
+      state.hoveredPractice = target;
+      handleWorldPracticeAction();
+    } else {
+      state.hoveredZone = target;
+      interactWithZone(target);
+    }
+    return;
+  }
+  if (scope === "activity") {
+    const game = state.activeMiniGame;
+    const current = game ? buildActivityTargets(game).find((target) => target.id === navigation.targetId) : null;
+    if (navigation.traversal && current && navigation.traversal.reversePasses < 1) {
+      const reverse = [...navigation.waypoints].reverse();
+      navigation.waypoints = reverse;
+      navigation.waypointIndex = 0;
+      navigation.traversal.reversePasses += 1;
+      navigation.lastDistance = Infinity;
+      return;
+    }
+    if (navigation.autoInteract && current && navigation.actionAttempts < 3) {
+      navigation.actionAttempts += 1;
+      navigation.waypointIndex = Math.max(0, navigation.waypoints.length - 1);
+      navigation.lastDistance = Infinity;
+      handleActivityAction();
+      const remaining = buildActivityTargets(game).find((target) => target.id === navigation.targetId);
+      if (remaining) {
+        navigation.actionCooldown = 0.12;
+        return;
+      }
+    }
+  }
+  cancelAutoNavigation();
 }
 
 function syncMobileViewportMode() {
@@ -3003,6 +3464,7 @@ function serializeState() {
   return {
     started: state.started,
     voiceEnabled: state.voiceEnabled,
+    controlMode: state.controlMode,
     player: {
       x: state.player.x,
       y: state.player.y,
@@ -3181,6 +3643,8 @@ function applySavedGame(data) {
 
   state.started = Boolean(data.started);
   state.voiceEnabled = data.voiceEnabled ?? true;
+  state.controlMode = normalizeControlMode(data.controlMode ?? getStoredControlMode());
+  state.autoNavigation = createAutoNavigationState();
   state.player.x = data.player?.x ?? 245;
   state.player.y = data.player?.y ?? 1110;
   state.player.facing = data.player?.facing ?? "down";
@@ -3869,6 +4333,7 @@ function resetState(options = {}) {
   state.touchKeys.clear();
   resetTouchJoystick();
   state.interactQueued = false;
+  state.autoNavigation = createAutoNavigationState();
   state.player.x = 245;
   state.player.y = 1110;
   state.player.facing = "down";
@@ -3919,6 +4384,7 @@ function resetState(options = {}) {
   state.controlTutorial.pendingLaunch = null;
   state.controlTutorial.fallbackMessage = "";
   delete document.body.dataset.tutorialStep;
+  delete document.body.dataset.tutorialMode;
   ui.resetButton.textContent = "하루 다시 시작";
   ui.resetButton.classList.remove("is-confirming");
   state.saveMessage = "새 하루 준비 중";
@@ -3929,6 +4395,7 @@ function resetState(options = {}) {
   ui.promptBubble.classList.add("hidden");
   ui.endingCard.classList.add("hidden");
   ui.controlTutorial.classList.add("hidden");
+  ui.tapTutorialTarget.classList.add("hidden");
   ui.touchJoystick.classList.remove("is-tutorial-target");
   ui.touchAction.classList.remove("is-tutorial-target");
   unlockTutorialBackgroundFocus();
@@ -3943,10 +4410,15 @@ function resetState(options = {}) {
 function setPrompt(text) {
   const resolvedText = text
     ? state.device?.isTouch
-      ? text
-          .replace(/^E\s*-\s*/, "행동 버튼 · ")
-          .replace(/E로/g, "행동 버튼으로")
-          .replace(/E 키/g, "행동 버튼")
+      ? state.controlMode === "tap"
+        ? text
+            .replace(/^E\s*-\s*/, "대상 터치 · ")
+            .replace(/E로/g, "대상을 눌러")
+            .replace(/E 키/g, "대상 터치")
+        : text
+            .replace(/^E\s*-\s*/, "행동 버튼 · ")
+            .replace(/E로/g, "행동 버튼으로")
+            .replace(/E 키/g, "행동 버튼")
       : text
     : "";
   if (resolvedText === state.uiFrame.promptSignature) {
@@ -4276,8 +4748,16 @@ function getNearestWorldPracticeTargetLegacy() {
     });
     if (practice.carriedTool === "hoe") {
       practice.field.rows.forEach((row, rowIndex) => {
-        const cellTarget = getWorldPracticeRowCellTarget(row, player);
-        if (cellTarget && row.cells[cellTarget.index] < 1) {
+        const cellWidth = row.w / row.cells.length;
+        const cellTargets = state.controlMode === "tap"
+          ? row.cells.map((_, index) => ({
+              index,
+              x: row.x1 + index * cellWidth + cellWidth * 0.5,
+              y: row.y
+            }))
+          : [getWorldPracticeRowCellTarget(row, player)].filter(Boolean);
+        cellTargets.forEach((cellTarget) => {
+          if (row.cells[cellTarget.index] >= 1) return;
           addTarget({
             id: `field-row-${rowIndex}-${cellTarget.index}`,
             x: cellTarget.x,
@@ -4287,7 +4767,7 @@ function getNearestWorldPracticeTargetLegacy() {
             rowIndex,
             cellIndex: cellTarget.index
           });
-        }
+        });
       });
       practice.field.sidePatches.forEach((patch, index) => {
         if (patch.tilled < 1) {
@@ -4566,8 +5046,16 @@ function buildWorldPracticeTargetsLegacy() {
     });
     if (practice.carriedTool === "hoe") {
       practice.field.rows.forEach((row, rowIndex) => {
-        const cellTarget = getWorldPracticeRowCellTarget(row, player);
-        if (cellTarget && row.cells[cellTarget.index] < 1) {
+        const cellWidth = row.w / row.cells.length;
+        const cellTargets = state.controlMode === "tap"
+          ? row.cells.map((_, index) => ({
+              index,
+              x: row.x1 + index * cellWidth + cellWidth * 0.5,
+              y: row.y
+            }))
+          : [getWorldPracticeRowCellTarget(row, player)].filter(Boolean);
+        cellTargets.forEach((cellTarget) => {
+          if (row.cells[cellTarget.index] >= 1) return;
           addTarget({
             id: `field-row-${rowIndex}-${cellTarget.index}`,
             x: cellTarget.x,
@@ -4579,7 +5067,7 @@ function buildWorldPracticeTargetsLegacy() {
             rowIndex,
             cellIndex: cellTarget.index
           });
-        }
+        });
       });
     }
   }
@@ -4848,8 +5336,16 @@ function buildWorldPracticeTargets() {
     });
     if (practice.carriedTool === "hoe") {
       practice.field.rows.forEach((row, rowIndex) => {
-        const cellTarget = getWorldPracticeRowCellTarget(row, player);
-        if (cellTarget && row.cells[cellTarget.index] < 1) {
+        const cellWidth = row.w / row.cells.length;
+        const cellTargets = state.controlMode === "tap"
+          ? row.cells.map((_, index) => ({
+              index,
+              x: row.x1 + index * cellWidth + cellWidth * 0.5,
+              y: row.y
+            }))
+          : [getWorldPracticeRowCellTarget(row, player)].filter(Boolean);
+        cellTargets.forEach((cellTarget) => {
+          if (row.cells[cellTarget.index] >= 1) return;
           addTarget({
             id: `field-row-${rowIndex}-${cellTarget.index}`,
             x: cellTarget.x,
@@ -4861,7 +5357,7 @@ function buildWorldPracticeTargets() {
             rowIndex,
             cellIndex: cellTarget.index
           });
-        }
+        });
       });
       practice.field.sidePatches.forEach((patch, index) => {
         if (patch.tilled < 1) {
@@ -6006,7 +6502,13 @@ function collidesWithObstacle(x, y) {
 }
 
 function movePlayer(dt) {
-  const movement = getMovementIntent();
+  const manualMovement = getMovementIntent();
+  if (manualMovement.magnitude > 0 && state.autoNavigation.active) {
+    cancelAutoNavigation();
+  }
+  const movement = manualMovement.magnitude > 0
+    ? manualMovement
+    : getAutoNavigationMovement("world", state.player, dt);
   if (movement.magnitude === 0) {
     return;
   }
@@ -6020,7 +6522,7 @@ function movePlayer(dt) {
   state.player.step += dt * 8;
 
   let speed = state.player.speed * (state.device?.moveSpeedMultiplier ?? 1);
-  if (state.device?.isTouch) {
+  if (state.device?.isTouch && !(state.controlMode === "tap" && state.autoNavigation.active)) {
     speed *= 0.34 + movement.magnitude * 0.66;
   }
   if (isSlowZone(state.player.x, state.player.y)) {
@@ -6675,10 +7177,10 @@ function buildActivityTargets(game) {
   switch (game.kind) {
     case "gardenCare":
       if (game.player.carrying !== "shears") {
-        return [{ ...game.tool, label: "전지가위", prompt: "E 집기", requiresAction: true }];
+        return [{ ...game.tool, id: "garden-tool", label: "전지가위", prompt: "E 집기", requiresAction: true }];
       }
       return game.shrubs
-        .map((shrub, index) => ({ ...shrub, label: `덤불 ${index + 1}`, prompt: "E 다듬기", requiresAction: true }))
+        .map((shrub, index) => ({ ...shrub, id: `garden-shrub-${index}`, label: `덤불 ${index + 1}`, prompt: "E 다듬기", requiresAction: true }))
         .filter((shrub) => !shrub.trimmed);
     case "lawnTrim":
       if (!game.mower.attached) {
@@ -6689,6 +7191,7 @@ function buildActivityTargets(game) {
             w: game.mower.w,
             h: game.mower.h,
             shape: "rect",
+            id: "lawn-mower",
             label: "잔디깎는 기계",
             prompt: "E 붙잡기",
             requiresAction: true
@@ -6703,6 +7206,7 @@ function buildActivityTargets(game) {
           h: lane.h,
           progress: lane.cut,
           shape: "rect",
+          id: `lawn-lane-${index}`,
           label: `잔디 줄 ${index + 1}`,
           prompt: "밀어 지나가기",
           requiresAction: false
@@ -6710,24 +7214,24 @@ function buildActivityTargets(game) {
         .filter((lane) => !isActivityCoverageComplete(lane.progress));
     case "vegetablePlant":
       if (!game.tray.taken) {
-        return [{ ...game.tray, label: "모종 상자", prompt: "E 들기", requiresAction: true }];
+        return [{ ...game.tray, id: "plant-tray", label: "모종 상자", prompt: "E 들기", requiresAction: true }];
       }
       return game.plots
-        .map((plot, index) => ({ ...plot, label: `모종 자리 ${index + 1}`, prompt: "E 심기", requiresAction: true }))
+        .map((plot, index) => ({ ...plot, id: `plant-plot-${index}`, label: `모종 자리 ${index + 1}`, prompt: "E 심기", requiresAction: true }))
         .filter((plot) => !plot.planted);
     case "vegetableGrow":
       if (!game.bucket.taken) {
-        return [{ ...game.bucket, label: "양동이", prompt: "E 들기", requiresAction: true }];
+        return [{ ...game.bucket, id: "grow-bucket", label: "양동이", prompt: "E 들기", requiresAction: true }];
       }
       if (game.bucket.water <= 0) {
-        return [{ ...game.well, label: "우물", prompt: "E 물 채우기", requiresAction: true }];
+        return [{ ...game.well, id: "grow-well", label: "우물", prompt: "E 물 뜨기", requiresAction: true }];
       }
       return game.plants
-        .map((plant, index) => ({ ...plant, label: `채소 줄 ${index + 1}`, prompt: "E 물 주기", requiresAction: true }))
+        .map((plant, index) => ({ ...plant, id: `grow-plant-${index}`, label: `채소 줄 ${index + 1}`, prompt: "E 물 주기", requiresAction: true }))
         .filter((plant) => !plant.watered);
     case "farmWork":
       if (game.player.carrying !== "hoe") {
-        return [{ ...game.tool, label: "호미", prompt: "E 들기", requiresAction: true }];
+        return [{ ...game.tool, id: "farm-tool", label: "호미", prompt: "E 들기", requiresAction: true }];
       }
       return game.rows
         .map((row, index) => ({
@@ -6737,6 +7241,7 @@ function buildActivityTargets(game) {
           h: 20,
           progress: row.progress,
           shape: "rect",
+          id: `farm-row-${index}`,
           label: `고랑 ${index + 1}`,
           prompt: "고랑 위로 걷기",
           requiresAction: false
@@ -6744,7 +7249,7 @@ function buildActivityTargets(game) {
         .filter((row) => !isActivityCoverageComplete(row.progress));
     case "raiseLivestock":
       if (!game.feedBag.taken) {
-        return [{ ...game.feedBag, label: "사료 자루", prompt: "E 들기", requiresAction: true }];
+        return [{ ...game.feedBag, id: "livestock-feed", label: "사료 자루", prompt: "E 들기", requiresAction: true }];
       }
       return game.troughs
         .map((trough, index) => ({
@@ -6754,6 +7259,7 @@ function buildActivityTargets(game) {
           h: 24,
           filled: trough.filled,
           shape: "rect",
+          id: `livestock-trough-${index}`,
           label: `먹이통 ${index + 1}`,
           prompt: "E 사료 붓기",
           requiresAction: true
@@ -6761,13 +7267,13 @@ function buildActivityTargets(game) {
         .filter((trough) => !trough.filled);
     case "catchFish":
       if (!game.net.taken) {
-        return [{ ...game.net, label: "뜰채", prompt: "E 집기", requiresAction: true }];
+        return [{ ...game.net, id: "fish-net", label: "뜰채", prompt: "E 집기", requiresAction: true }];
       }
       if (game.player.carryingCatch) {
-        return [{ ...game.basket, label: "바구니", prompt: "E 담기", requiresAction: true }];
+        return [{ ...game.basket, id: "fish-basket", label: "바구니", prompt: "E 담기", requiresAction: true }];
       }
       return game.fish
-        .map((fish, index) => ({ ...fish, r: 18, label: `물고기 ${index + 1}`, prompt: "E 건지기", requiresAction: true }))
+        .map((fish, index) => ({ ...fish, id: `fish-${index}`, r: 18, label: `물고기 ${index + 1}`, prompt: "E 건지기", requiresAction: true }))
         .filter((fish) => !fish.caught);
     default:
       return [];
@@ -6915,7 +7421,7 @@ function getTouchActionLabel() {
       if (!game.bucket.taken) {
         return "집기";
       }
-      return target === game.well ? "채우기" : "물주기";
+      return target.id === "grow-well" ? "물 뜨기" : "물주기";
     case "farmWork":
       return game.player.carrying === "hoe" ? "고르기" : "집기";
     case "raiseLivestock":
@@ -6985,11 +7491,15 @@ function updateMiniGameUi(options = {}) {
   const target = isCompleting ? null : getNearestActivityTarget(game);
   const targetHint = target ? `${target.label} · ${target.prompt}` : "주변을 움직여 손에 닿는 대상 앞까지 가 보세요.";
   const resolvedTargetHint = state.device?.isTouch
-    ? target
-      ? target.requiresAction === false
-        ? `${target.label} · ${target.prompt}. 조이스틱으로 움직이세요.`
-        : `${target.label} 근처에서 행동 버튼`
-      : "가까운 대상으로 움직여 보세요."
+    ? state.controlMode === "tap"
+      ? target
+        ? `${target.label}을 누르면 자동으로 이동${target.requiresAction === false ? "합니다" : "하고 행동합니다"}.`
+        : "가고 싶은 땅을 눌러 이동하세요."
+      : target
+        ? target.requiresAction === false
+          ? `${target.label} · ${target.prompt}. 조이스틱으로 움직이세요.`
+          : `${target.label} 근처에서 행동 버튼`
+        : "가까운 대상으로 움직여 보세요."
     : targetHint;
   const goals = buildActivityObjectives(game);
   const guide = buildActivityGuide(game);
@@ -7050,6 +7560,7 @@ function updateMiniGameUi(options = {}) {
 }
 
 function startMiniGame(zone) {
+  cancelAutoNavigation();
   closeOptionalPanels();
   setPrompt("");
   const pausedSnapshot = state.pausedActivity?.zoneId === zone.id ? state.pausedActivity.snapshot : null;
@@ -7068,6 +7579,7 @@ function startMiniGame(zone) {
 }
 
 function closeMiniGame() {
+  cancelAutoNavigation();
   state.activeMiniGame = null;
   state.uiFrame.miniGameUiSignature = "";
   ui.miniGame.classList.add("hidden");
@@ -7093,6 +7605,7 @@ function pauseMiniGame() {
   if (game.completion?.active) {
     return;
   }
+  cancelAutoNavigation();
   state.pausedActivity = {
     zoneId: game.zone.id,
     snapshot: snapshotActivityState(game)
@@ -7451,7 +7964,13 @@ function moveActivityPlayer(dt) {
   player.prevX = player.x;
   player.prevY = player.y;
 
-  const movement = getMovementIntent();
+  const manualMovement = getMovementIntent();
+  if (manualMovement.magnitude > 0 && state.autoNavigation.active) {
+    cancelAutoNavigation();
+  }
+  const movement = manualMovement.magnitude > 0
+    ? manualMovement
+    : getAutoNavigationMovement("activity", player, dt);
   if (movement.magnitude === 0) {
     return;
   }
@@ -7465,7 +7984,7 @@ function moveActivityPlayer(dt) {
   }
 
   let speed = player.speed;
-  if (state.device?.isTouch) {
+  if (state.device?.isTouch && !(state.controlMode === "tap" && state.autoNavigation.active)) {
     speed *= 0.4 + movement.magnitude * 0.6;
   }
   if (game.kind === "lawnTrim" && game.mower.attached) {
@@ -7565,6 +8084,7 @@ function beginActivityCompletion(game) {
     return;
   }
   prepareActivityFinalScene(game);
+  cancelAutoNavigation();
   resetTouchJoystick();
   game.completion.active = true;
   game.completion.timer = game.completion.duration;
@@ -9426,6 +9946,7 @@ function renderActivityScene() {
   }
 
   drawActivityTargetHighlight(focusTarget);
+  drawAutoNavigationGuide(activityCtx, "activity");
   drawActivityParticles(game);
   drawActivityPlayer(game);
   drawActivityExpression(game, focusTarget);
@@ -9460,7 +9981,9 @@ function startGame() {
   showToast(
     "첫 부탁",
     state.device?.isTouch
-      ? "왼쪽 조이스틱으로 이모에게 가서 오른쪽 행동 버튼을 누르세요."
+      ? state.controlMode === "tap"
+        ? "화면의 이모를 누르면 가까이 걸어가서 자동으로 대화합니다."
+        : "왼쪽 조이스틱으로 이모에게 가서 오른쪽 행동 버튼을 누르세요."
       : "방향키로 이모에게 가서 E 키를 누르세요."
   );
   renderSidebar();
@@ -10012,7 +10535,10 @@ function update(dt) {
     state.hoveredZone = getNearestZone();
     state.hoveredPractice = getNearestWorldPracticeTarget();
     setPrompt(
-      state.worldPractice.feedback ||
+      (state.autoNavigation.active && state.autoNavigation.scope === "world"
+        ? `${state.autoNavigation.targetLabel}까지 이동 중 · 다른 곳을 누르면 경로가 바뀝니다`
+        : "") ||
+        state.worldPractice.feedback ||
         state.hoveredPractice?.prompt ||
         getWorldPracticeCarryPrompt() ||
         state.hoveredZone?.prompt ||
@@ -10035,6 +10561,39 @@ function update(dt) {
 
 function worldToScreen(x, y) {
   return { x: x - state.camera.x, y: y - state.camera.y };
+}
+
+function drawAutoNavigationGuide(targetContext, scope) {
+  const navigation = state.autoNavigation;
+  if (!navigation.active || navigation.scope !== scope || state.controlMode !== "tap") return;
+  const remaining = navigation.waypoints.slice(navigation.waypointIndex);
+  if (!remaining.length) return;
+  const player = scope === "world" ? state.player : state.activeMiniGame?.player;
+  if (!player) return;
+  const convert = (point) => scope === "world" ? worldToScreen(point.x, point.y) : point;
+  const start = convert(player);
+  const pulse = 0.5 + Math.sin(performance.now() / 180) * 0.5;
+  targetContext.save();
+  targetContext.strokeStyle = "rgba(255, 250, 226, 0.9)";
+  targetContext.lineWidth = scope === "world" ? 4 : 3;
+  targetContext.setLineDash([8, 8]);
+  targetContext.beginPath();
+  targetContext.moveTo(start.x, start.y);
+  remaining.forEach((point) => {
+    const screen = convert(point);
+    targetContext.lineTo(screen.x, screen.y);
+  });
+  targetContext.stroke();
+  targetContext.setLineDash([]);
+  const end = convert(remaining[remaining.length - 1]);
+  targetContext.fillStyle = `rgba(217, 127, 86, ${0.72 + pulse * 0.2})`;
+  targetContext.strokeStyle = "rgba(255, 252, 235, 0.95)";
+  targetContext.lineWidth = 3;
+  targetContext.beginPath();
+  targetContext.arc(end.x, end.y, 12 + pulse * 4, 0, Math.PI * 2);
+  targetContext.fill();
+  targetContext.stroke();
+  targetContext.restore();
 }
 
 function emitAmbientParticle(x, y, options = {}) {
@@ -14675,6 +15234,7 @@ function renderWorldScene() {
   drawZoneHints();
   drawTargetPointers();
   drawWorldPracticeHighlight();
+  drawAutoNavigationGuide(ctx, "world");
   drawWorldExpressionMoment();
   if (!ui.statsPanel.classList.contains("hidden") && shouldRefreshMiniMap()) {
     renderMiniMap();
@@ -14955,6 +15515,37 @@ function setupInput() {
   ui.touchAction.addEventListener("pointerleave", releaseAction);
   ui.touchAction.addEventListener("pointercancel", releaseAction);
 
+  const handleTapNavigation = (event, targetCanvas, scope) => {
+    if (event.button !== undefined && event.button !== 0) return;
+    if (!state.device?.isTouch || state.controlMode !== "tap" || state.portraitGate.open) return;
+    const point = getCanvasPointerPoint(event, targetCanvas);
+    if (!point) return;
+    event.preventDefault();
+    if (state.controlTutorial.open) {
+      if (scope === "world" && state.controlTutorial.step === 0) {
+        navigator.vibrate?.(8);
+        advanceControlTutorial();
+      }
+      return;
+    }
+    if (!state.started || state.activeDialogue || state.activeQuiz || state.endingShown) return;
+    if (scope === "world" && !state.activeMiniGame) {
+      navigator.vibrate?.(6);
+      beginWorldTapNavigation({ x: point.x + state.camera.x, y: point.y + state.camera.y });
+    } else if (scope === "activity" && state.activeMiniGame && !state.activeMiniGame.completion?.active) {
+      navigator.vibrate?.(6);
+      beginActivityTapNavigation(point);
+    }
+  };
+  canvas.addEventListener("pointerup", (event) => handleTapNavigation(event, canvas, "world"));
+  ui.activityCanvas.addEventListener("pointerup", (event) => handleTapNavigation(event, ui.activityCanvas, "activity"));
+  ui.tapTutorialTarget.addEventListener("click", () => {
+    if (state.controlTutorial.open && state.controlMode === "tap" && state.controlTutorial.step === 1) {
+      navigator.vibrate?.(10);
+      completeControlTutorial();
+    }
+  });
+
   ui.dialogueNext.addEventListener("click", nextDialogue);
   ui.dialogueClose.addEventListener("click", closeDialogue);
   ui.miniGameClose.addEventListener("click", pauseMiniGame);
@@ -15005,6 +15596,18 @@ function setupInput() {
     });
   });
   ui.fullscreenToggle.addEventListener("click", toggleGameFullscreen);
+  ui.controlModeSelector.addEventListener("change", (event) => {
+    const input = event.target.closest("input[name='controlMode']");
+    if (input) setControlMode(input.value, { savePreference: true, saveGame: false });
+  });
+  ui.controlModeToggle.addEventListener("click", () => {
+    const nextMode = state.controlMode === "tap" ? "joystick" : "tap";
+    closeOptionalPanels();
+    setControlMode(nextMode, { announce: true });
+    if (state.device?.isTouch && !hasSeenControlTutorial(nextMode)) {
+      showControlTutorial(null);
+    }
+  });
   ui.fullscreenButton.addEventListener("click", beginFullscreenLaunch);
   ui.portraitRetry.addEventListener("click", retryPortraitMode);
   ui.portraitCancel.addEventListener("click", cancelPortraitGate);
@@ -15088,13 +15691,16 @@ function setupInput() {
   });
 }
 
+const initialSavedGame = loadSavedGame();
+state.controlMode = normalizeControlMode(initialSavedGame?.controlMode ?? getStoredControlMode());
 resetState({ clearSave: false });
 applyDeviceCss(initialDeviceProfile);
 applyResponsiveCanvasProfile();
 setupInput();
+setControlMode(state.controlMode, { savePreference: false, saveGame: false });
 syncFullscreenUi();
 syncDeviceProfile({ force: true });
 renderSidebar();
 updateTouchActionLabel();
-updateSaveSummary(loadSavedGame());
+updateSaveSummary(initialSavedGame);
 requestAnimationFrame(loop);
