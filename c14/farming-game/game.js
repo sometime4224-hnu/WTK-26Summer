@@ -1635,21 +1635,34 @@ async function requestPortraitOrientationLock() {
       message: "자동 세로 전환을 지원하지 않는 브라우저예요. 휴대전화를 직접 세로로 돌려 주세요."
     };
   }
-  try {
-    await Promise.resolve(lock.call(window.screen.orientation, "portrait"));
-    const portrait = await waitForPortraitViewport();
-    return {
-      locked: portrait,
-      supported: true,
-      message: portrait ? "세로모드로 고정했어요." : "세로 전환을 기다리고 있어요. 휴대전화를 직접 세로로 돌려 주세요."
-    };
-  } catch (error) {
-    return {
-      locked: false,
-      supported: true,
-      message: "브라우저가 자동 세로 전환을 허용하지 않았어요. 휴대전화를 직접 세로로 돌려 주세요."
-    };
+  const portraitLockModes = ["portrait-primary", "portrait"];
+  for (const mode of portraitLockModes) {
+    try {
+      await Promise.resolve(lock.call(window.screen.orientation, mode));
+      const portrait = await waitForPortraitViewport();
+      if (portrait) {
+        return {
+          locked: true,
+          supported: true,
+          message: "세로모드로 고정했어요."
+        };
+      }
+      unlockPortraitOrientation();
+      return {
+        locked: false,
+        supported: true,
+        message: "브라우저의 화면 방향이 세로로 바뀌지 않아 자동 잠금을 풀었어요. 휴대전화를 직접 세로로 돌려 주세요."
+      };
+    } catch (error) {
+      // Some browsers accept only the generic portrait value, so try it once as a fallback.
+    }
   }
+  unlockPortraitOrientation();
+  return {
+    locked: false,
+    supported: true,
+    message: "브라우저가 자동 세로 전환을 허용하지 않았어요. 화면 방향 잠금을 풀고 휴대전화를 직접 세로로 돌려 주세요."
+  };
 }
 
 function unlockPortraitOrientation() {

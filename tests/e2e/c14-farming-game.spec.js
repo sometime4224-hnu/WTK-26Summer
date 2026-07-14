@@ -211,7 +211,7 @@ test.describe("c14 farming game mobile layout", () => {
     await page.locator("#fullscreenButton").click();
 
     await expect.poll(() => page.evaluate(() => window.__fullscreenRequestCount)).toBe(1);
-    await expect.poll(() => page.evaluate(() => window.__orientationLocks)).toEqual(["portrait"]);
+    await expect.poll(() => page.evaluate(() => window.__orientationLocks)).toEqual(["portrait-primary"]);
     await expect(page.locator("html")).toHaveAttribute("data-fullscreen", "on");
     await expect(page.locator("#controlTutorial")).toBeVisible();
     await expect(page.locator("body")).toHaveClass(/is-control-tutorial/);
@@ -272,6 +272,7 @@ test.describe("c14 farming game mobile layout", () => {
     await page.locator("#gameShell").evaluate((shell) => {
       window.__testFullscreenElement = null;
       window.__orientationLocks = [];
+      window.__orientationUnlocks = 0;
       Object.defineProperty(document, "fullscreenElement", {
         configurable: true,
         get: () => window.__testFullscreenElement
@@ -289,10 +290,17 @@ test.describe("c14 farming game mobile layout", () => {
           return Promise.reject(new DOMException("denied", "NotAllowedError"));
         }
       });
+      Object.defineProperty(screen.orientation, "unlock", {
+        configurable: true,
+        value: () => {
+          window.__orientationUnlocks += 1;
+        }
+      });
     });
 
     await page.locator("#fullscreenButton").click();
-    await expect.poll(() => page.evaluate(() => window.__orientationLocks)).toEqual(["portrait"]);
+    await expect.poll(() => page.evaluate(() => window.__orientationLocks)).toEqual(["portrait-primary", "portrait"]);
+    await expect.poll(() => page.evaluate(() => window.__orientationUnlocks)).toBeGreaterThan(0);
     await expect(page.locator("#portraitGate")).toBeVisible();
     await expect(page.locator("#controlTutorial")).toBeHidden();
     await expect(page.locator("#portraitGateStatus")).toContainText("직접 세로로");
@@ -311,6 +319,47 @@ test.describe("c14 farming game mobile layout", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(page.locator("#portraitGate")).toBeHidden();
     await expect(page.locator("body")).toHaveClass(/is-game-started/);
+  });
+
+  test("방향 잠금 성공 뒤에도 가로 화면이면 잠금을 풀고 세로 안내로 돌아간다", async ({ page }) => {
+    await clearFarmingSave(page);
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.goto("/c14/farming-game/");
+    await page.locator("#gameShell").evaluate((shell) => {
+      window.__testFullscreenElement = null;
+      window.__orientationLocks = [];
+      window.__orientationUnlocks = 0;
+      Object.defineProperty(document, "fullscreenElement", {
+        configurable: true,
+        get: () => window.__testFullscreenElement
+      });
+      shell.requestFullscreen = () => {
+        window.__testFullscreenElement = shell;
+        document.dispatchEvent(new Event("fullscreenchange"));
+        return Promise.resolve();
+      };
+      Object.defineProperty(screen.orientation, "lock", {
+        configurable: true,
+        value: (mode) => {
+          window.__orientationLocks.push(mode);
+          return Promise.resolve();
+        }
+      });
+      Object.defineProperty(screen.orientation, "unlock", {
+        configurable: true,
+        value: () => {
+          window.__orientationUnlocks += 1;
+        }
+      });
+    });
+
+    await page.locator("#fullscreenButton").click();
+
+    await expect.poll(() => page.evaluate(() => window.__orientationLocks)).toEqual(["portrait-primary"]);
+    await expect.poll(() => page.evaluate(() => window.__orientationUnlocks)).toBeGreaterThan(0);
+    await expect(page.locator("#portraitGate")).toBeVisible();
+    await expect(page.locator("#portraitGateStatus")).toContainText("자동 잠금을 풀었어요");
+    await expect(page.locator("#controlTutorial")).toBeHidden();
   });
 
   test("자동 세로 전환이 끝나기 전에는 게임을 시작하지 않는다", async ({ page }) => {
