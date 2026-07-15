@@ -20,7 +20,7 @@
 
   window.REVIEW4_DATA = {
     title: "복습 4",
-    order: ["confirm", "evaluate", "listening", "readingWriting"],
+    order: ["confirm", "evaluate", "readingWriting"],
     sections: {
       confirm: {
         id: "confirm",
@@ -224,7 +224,7 @@
       evaluate: {
         id: "evaluate",
         href: "evaluate.html",
-        nextHref: "listening.html",
+        nextHref: "reading-writing.html",
         title: "평가하기",
         hero: "짧고 빠르게 맞히는 선택형 점검",
         countLabel: "17문항",
@@ -369,18 +369,9 @@
       },
       listening: {
         id: "listening",
-        href: "listening.html",
-        transcriptHref: "listening-transcripts.html",
-        nextHref: "reading-writing.html",
         title: "듣기",
         hero: "재생 버튼으로 듣고 바로 고르는 흐름",
         countLabel: "16문항",
-        homework: {
-          enabled: true,
-          assignmentId: "review4-listening-v1",
-          assignmentTitle: "복습 4 듣기",
-          requireStudentName: true
-        },
         questions: [
           q(
             "l1",

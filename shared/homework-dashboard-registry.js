@@ -23,13 +23,6 @@
                 title: "복습 4",
                 assignments: [
                     {
-                        assignmentId: "review4-listening-v1",
-                        title: "복습 4 듣기",
-                        chapter: "review4",
-                        totalQuestions: 16,
-                        activityHref: "review/review4-html/listening.html"
-                    },
-                    {
                         assignmentId: "review4-reading-writing-v1",
                         title: "복습 4 읽기와 쓰기",
                         chapter: "review4",
