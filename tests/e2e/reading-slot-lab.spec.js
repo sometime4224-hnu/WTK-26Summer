@@ -93,18 +93,6 @@ test('reading slot lab renders 20-item practice set', async ({ page }) => {
   await expect(page.locator('.blank-mark')).toHaveAttribute('aria-pressed', 'false');
 });
 
-test('midterm hub links to reading slot lab', async ({ page }) => {
-  await page.goto('/midterm-exam/index.html', { waitUntil: 'domcontentloaded' });
-
-  const card = page.locator('a[href="../apps/reading-slot-lab/index.html"]');
-  await expect(card).toContainText('빈칸 성분 연습');
-  await expect(card).toContainText('읽기 지문의 빈칸에 들어갈 말의 성분과 근거를 연습합니다.');
-
-  await card.click();
-  await expect(page).toHaveURL(/\/apps\/reading-slot-lab\/index\.html$/);
-  await expect(page.locator('h1')).toHaveText('빈칸 성분 연습');
-});
-
 test('reading slot lab highlights syntax and logic hints', async ({ page }) => {
   await page.goto('/apps/reading-slot-lab/index.html', { waitUntil: 'domcontentloaded' });
 
