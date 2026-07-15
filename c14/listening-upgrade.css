@@ -1,0 +1,263 @@
+/* Chapter 14 listening-only layout and offline polish. */
+
+.c14-listening-page,
+.c14-cuttoon-page {
+    color: #1f2937;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    text-rendering: optimizeLegibility;
+}
+
+.c14-listening-page *,
+.c14-listening-page *::before,
+.c14-listening-page *::after,
+.c14-cuttoon-page *,
+.c14-cuttoon-page *::before,
+.c14-cuttoon-page *::after {
+    box-sizing: border-box;
+}
+
+.c14-listening-page button,
+.c14-listening-page input,
+.c14-listening-page select,
+.c14-listening-page textarea,
+.c14-cuttoon-page button,
+.c14-cuttoon-page input,
+.c14-cuttoon-page select,
+.c14-cuttoon-page textarea {
+    font: inherit;
+}
+
+.c14-listening-page .nav-glyph,
+.c14-cuttoon-page .nav-glyph {
+    display: inline-grid;
+    width: 1.15rem;
+    height: 1.15rem;
+    place-items: center;
+    border-radius: 0.35rem;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    font-size: 0.78rem;
+    line-height: 1;
+}
+
+.c14-listening-page .listening-mode-link,
+.c14-cuttoon-page .listening-mode-link {
+    margin-left: auto;
+    padding: 0.42rem 0.68rem;
+    border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.c14-listening-page :where(a, button, input, textarea, select):focus-visible,
+.c14-cuttoon-page :where(a, button, input, textarea, select):focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--lw-accent, var(--lc-accent, #4d7c0f)) 58%, white);
+    outline-offset: 3px;
+}
+
+.c14-listening-page .lw-quick-dock {
+    border-color: color-mix(in srgb, var(--lw-accent) 18%, rgba(148, 163, 184, 0.28));
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.16);
+}
+
+.c14-listening-page .lw-hero,
+.c14-listening-page .lw-lesson,
+.c14-listening-page .lw-section,
+.c14-listening-page .lw-lesson-visual {
+    border-color: color-mix(in srgb, var(--lw-accent) 12%, rgba(148, 163, 184, 0.18));
+}
+
+.c14-listening-page .lw-resource-link,
+.c14-listening-page .lw-quick-dock__button,
+.c14-listening-page .lw-button,
+.c14-cuttoon-page .lc-action,
+.c14-cuttoon-page .lc-thumb {
+    touch-action: manipulation;
+}
+
+@media (max-width: 640px) {
+    .c14-listening-page .injected-global-nav,
+    .c14-cuttoon-page .lc-nav {
+        min-width: 0;
+        gap: 6px !important;
+    }
+
+    .c14-listening-page .injected-global-nav .divider,
+    .c14-cuttoon-page .lc-nav__divider {
+        display: none;
+    }
+
+    .c14-listening-page .listening-mode-link,
+    .c14-cuttoon-page .listening-mode-link {
+        flex: 0 0 auto;
+        margin-left: auto;
+    }
+
+    .c14-listening-page .lw-shell,
+    .c14-listening-page.lw-compact-mode .lw-shell {
+        padding: 12px 8px 76px;
+    }
+
+    .c14-listening-page .lw-quick-dock {
+        top: 48px;
+    }
+
+    .c14-listening-page .lw-progress-target {
+        scroll-margin-top: 190px;
+    }
+
+    .c14-listening-page .lw-hero,
+    .c14-listening-page.lw-compact-mode .lw-hero {
+        padding: 15px;
+        border-radius: 21px;
+    }
+
+    .c14-listening-page .lw-hero h1 {
+        margin: 10px 0 8px;
+        font-size: clamp(1.9rem, 11vw, 2.45rem);
+    }
+
+    .c14-listening-page .lw-hero p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.58;
+    }
+
+    .c14-listening-page .lw-anchor-list {
+        display: none;
+    }
+
+    .c14-listening-page .lw-routine,
+    .c14-listening-page.lw-compact-mode .lw-routine {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+        max-width: 100%;
+        margin-top: 12px;
+        padding: 10px;
+        border-radius: 15px;
+    }
+
+    .c14-listening-page .lw-routine h2 {
+        grid-column: 1 / -1;
+        margin: 0;
+        font-size: 12px;
+    }
+
+    .c14-listening-page .lw-routine-step {
+        grid-template-columns: 26px minmax(0, 1fr);
+        gap: 6px;
+        align-items: start;
+        margin: 0;
+        padding: 7px;
+        border-radius: 11px;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .c14-listening-page .lw-routine-step span {
+        width: 26px;
+        height: 26px;
+        font-size: 11px;
+    }
+
+    .c14-listening-page .lw-routine-step strong {
+        font-size: 11px;
+    }
+
+    .c14-listening-page .lw-routine-step p {
+        font-size: 10px;
+        line-height: 1.45;
+    }
+
+    .c14-listening-page .lw-instruction-bar {
+        gap: 7px;
+        margin-top: 12px;
+        padding: 10px 11px;
+        border-radius: 15px;
+    }
+
+    .c14-listening-page .lw-instruction-help {
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
+    .c14-listening-page .lw-lesson,
+    .c14-listening-page.lw-compact-mode .lw-lesson {
+        margin-top: 12px;
+        padding: 14px;
+        border-radius: 21px;
+    }
+
+    .c14-listening-page .lw-lesson-header {
+        gap: 7px;
+    }
+
+    .c14-listening-page .lw-lesson h2 {
+        font-size: 1.55rem;
+        line-height: 1.15;
+    }
+
+    .c14-listening-page .lw-lesson-summary {
+        margin-top: 6px;
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+    .c14-listening-page .lw-count-badge {
+        padding: 7px 10px;
+    }
+
+    .c14-listening-page .lw-lesson-progress {
+        padding: 9px;
+    }
+
+    .c14-listening-page .lw-lesson-visual {
+        margin-bottom: 12px;
+        border-radius: 18px;
+    }
+
+    .c14-listening-page .lw-lesson-visual figcaption {
+        padding: 8px 10px;
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
+    .c14-listening-page .lw-quick-dock__summary span {
+        display: none;
+    }
+
+    .c14-listening-page .lw-quick-dock__button {
+        min-height: 34px;
+    }
+
+    .c14-listening-page .lw-pre-card--audio .lw-inline-actions,
+    .c14-listening-page .lw-pre-card--audio .lw-speed-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .c14-listening-page .lw-pre-card--audio :where(.lw-button, .lw-button-secondary, .lw-speed-button) {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .c14-listening-page .lw-vocab-card,
+    .c14-listening-page .lw-vocab-flip,
+    .c14-listening-page .lw-vocab-flip__inner {
+        min-height: 158px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .c14-listening-page *,
+    .c14-listening-page *::before,
+    .c14-listening-page *::after,
+    .c14-cuttoon-page *,
+    .c14-cuttoon-page *::before,
+    .c14-cuttoon-page *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

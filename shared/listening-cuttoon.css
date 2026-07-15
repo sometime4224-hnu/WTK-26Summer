@@ -51,6 +51,13 @@ body {
     font-size: 14px;
 }
 
+.lc-nav a:focus-visible,
+.lc-action:focus-visible,
+.lc-thumb:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--lc-accent) 58%, white);
+    outline-offset: 3px;
+}
+
 .lc-nav__divider,
 .lc-nav__title {
     color: var(--lc-muted);
@@ -59,12 +66,15 @@ body {
 
 .lc-shell {
     width: min(1100px, calc(100% - 24px));
+    min-width: 0;
     margin: 14px auto 28px;
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 14px;
 }
 
 .lc-stage {
+    min-width: 0;
     padding: 16px;
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.82);
@@ -97,6 +107,7 @@ body {
     border: 1px solid rgba(148, 163, 184, 0.2);
     font-weight: 900;
     font-size: 0.98rem;
+    margin: 0;
 }
 
 .lc-badge,
@@ -126,6 +137,8 @@ body {
 .lc-frame {
     position: relative;
     width: min(100%, 980px);
+    min-width: 0;
+    max-width: 100%;
     margin: 0 auto;
     aspect-ratio: var(--lc-frame-ratio, 16 / 9);
     border-radius: 22px;
@@ -151,10 +164,14 @@ body {
 
 .lc-thumbs {
     display: flex;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: 6px;
     overflow-x: auto;
-    padding-bottom: 2px;
+    padding: 6px 3px 8px;
+    scroll-padding-inline: 3px;
     scrollbar-width: thin;
 }
 
@@ -178,6 +195,8 @@ body {
 .lc-thumb.is-active {
     border-color: color-mix(in srgb, var(--lc-accent) 54%, white);
     box-shadow: 0 14px 28px color-mix(in srgb, var(--lc-accent) 18%, transparent);
+    outline: 2px solid color-mix(in srgb, var(--lc-accent) 34%, white);
+    outline-offset: -3px;
 }
 
 .lc-thumb__media {
@@ -192,6 +211,10 @@ body {
     object-fit: contain;
     display: block;
     transition: transform 0.26s ease, object-position 0.26s ease;
+}
+
+.lc-thumb__media img:not([src]) {
+    visibility: hidden;
 }
 
 .lc-thumb__media img.is-fallback {
@@ -218,6 +241,8 @@ body {
 
 .lc-audio {
     width: min(100%, 980px);
+    min-width: 0;
+    max-width: 100%;
     margin: 12px auto 0;
 }
 
@@ -225,7 +250,58 @@ body {
     width: 100%;
 }
 
+.lc-local-audio {
+    width: min(100%, 980px);
+    min-width: 0;
+    max-width: 100%;
+    margin: 10px auto 0;
+    padding: 12px 14px;
+    display: grid;
+    gap: 9px;
+    border: 1px solid color-mix(in srgb, var(--lc-accent) 18%, rgba(148, 163, 184, 0.26));
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--lc-accent) 4%, white);
+}
+
+.lc-local-audio__top,
+.lc-local-audio__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.lc-local-audio__title {
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: var(--lc-accent-dark);
+}
+
+.lc-local-audio__file {
+    min-width: 0;
+    max-width: 100%;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #475569;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.76rem;
+    overflow-wrap: anywhere;
+}
+
+.lc-local-audio__status {
+    margin: 0;
+    color: var(--lc-muted);
+    font-size: 0.8rem;
+    line-height: 1.55;
+}
+
+.lc-local-audio__status[data-tone="warn"] {
+    color: #9a3412;
+}
+
 .lc-transcript {
+    min-width: 0;
     padding: 14px;
     border-radius: 22px;
     border: 1px solid rgba(255, 255, 255, 0.82);
@@ -276,15 +352,15 @@ body {
     word-break: keep-all;
 }
 
-.lc-word {
+.lc-chunk {
     display: inline;
     padding: 0.06em 0.12em;
     border-radius: 0.45em;
     transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.lc-word.is-active {
-    background: color-mix(in srgb, var(--lc-accent) 78%, white);
+.lc-chunk.is-active {
+    background: var(--lc-accent-dark);
     color: #fff;
     box-shadow: 0 6px 16px color-mix(in srgb, var(--lc-accent) 28%, transparent);
 }
@@ -295,7 +371,7 @@ body {
     }
 
     .lc-shell {
-        width: min(100% - 16px, 1100px);
+        width: min(1100px, calc(100% - 16px));
         margin: 10px auto 22px;
     }
 
@@ -324,7 +400,47 @@ body {
         font-size: 0.95rem;
     }
 
+    .lc-local-audio__actions .lc-action {
+        flex: 1 1 180px;
+    }
+
     .lc-thumb {
         flex-basis: 124px;
+    }
+}
+
+@media (max-width: 520px) {
+    .lc-nav__title {
+        display: none;
+    }
+
+    .lc-stage,
+    .lc-transcript {
+        padding: 10px;
+        border-radius: 17px;
+    }
+
+    .lc-stage__top {
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .lc-frame {
+        border-radius: 15px;
+    }
+
+    .lc-thumb {
+        flex-basis: min(112px, 34vw);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }

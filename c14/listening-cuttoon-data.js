@@ -8,6 +8,9 @@ window.C14_LISTENING_CUTTOON = {
         },
         frameRatio: "1.85",
         audio: {
+            trackNumber: 52,
+            preferOriginal: true,
+            preload: "none",
             originalSrc: "../assets/c14/listening/audio/Seoul%20Univ_3B_Trk_52.mp3",
             generatedSrc: "../assets/c14/listening/audio/c14_track52_generated.mp3"
         },
@@ -77,10 +80,10 @@ window.C14_LISTENING_CUTTOON = {
             {
                 speaker: "여",
                 text: "고구마 좀 쪄 왔는데 드셔 보세요. 제가 직접 키운 거예요.",
-                start: 7.01,
+                start: 7.35,
                 end: 11.65,
                 chunks: [
-                    { start: 7.01, end: 9.67, text: "고구마 좀 쪄 왔는데 드셔 보세요." },
+                    { start: 7.35, end: 9.67, text: "고구마 좀 쪄 왔는데 드셔 보세요." },
                     { start: 10.41, end: 11.65, text: "제가 직접 키운 거예요." }
                 ],
                 generated: {
@@ -321,6 +324,9 @@ window.C14_LISTENING_CUTTOON = {
         },
         frameRatio: "1.22",
         audio: {
+            trackNumber: 53,
+            preferOriginal: true,
+            preload: "none",
             originalSrc: "../assets/c14/listening/audio/Seoul%20Univ_3B_Trk_53.mp3",
             generatedSrc: "../assets/c14/listening/audio/c14_track53_generated.mp3"
         },

@@ -3203,6 +3203,22 @@
         }).join(" ");
     }
 
+    function getAudioSeekTimeFromControl(control, lessonId) {
+        const fallbackTime = Number(control && control.dataset && control.dataset.seekTime);
+        const lineIndex = Number(control && control.dataset && control.dataset.lineIndex);
+        const chunkIndex = Number(control && control.dataset && control.dataset.chunkIndex);
+        const lesson = lessonMap.get(lessonId);
+        if (!lesson || !Number.isInteger(lineIndex) || !Number.isInteger(chunkIndex)) {
+            return fallbackTime;
+        }
+
+        const line = lesson.transcript && lesson.transcript[lineIndex];
+        const chunks = getLineChunks(line, getAudioTimingSourceType(lessonId), lesson, lineIndex);
+        const currentChunk = chunks && chunks[chunkIndex];
+        const currentStart = Number(currentChunk && currentChunk.start);
+        return Number.isFinite(currentStart) ? currentStart : fallbackTime;
+    }
+
     function getAudioActiveLineIndex(lessonId, currentTime) {
         const lesson = lessonMap.get(lessonId);
         if (!lesson) return null;
@@ -5061,11 +5077,15 @@
         lessonMap.forEach((lesson, lessonId) => {
             const audio = document.getElementById(`audio-${lessonId}`);
             if (!audio) return;
-            audio.addEventListener("error", () => {
+            const handleAudioSourceError = () => {
                 if (activateFallbackAudioSource(audio, lessonId)) return;
+                if (audio.dataset.fallbackApplied === "true" && !audio.error) return;
                 clearPlaybackState("audio", lessonId);
                 setStatus(`listen-status-${lessonId}`, getInstructionText().audioUnsupported, "warn");
-            });
+            };
+            audio.addEventListener("error", handleAudioSourceError);
+            const sourceNode = audio.querySelector("source");
+            if (sourceNode) sourceNode.addEventListener("error", handleAudioSourceError);
             audio.addEventListener("play", () => {
                 cancelSpeech();
                 setPlaybackState("audio", lessonId, { mode: "audio" });
@@ -5248,7 +5268,7 @@
         if (action === "check-prediction") return void checkPrediction(lessonId);
         if (action === "set-stage") return void setStage(lessonId, Number(button.dataset.stage));
         if (action === "set-speed") return void setSpeed(lessonId, Number(button.dataset.speed));
-        if (action === "seek-audio") return void seekAudioTo(lessonId, Number(button.dataset.seekTime));
+        if (action === "seek-audio") return void seekAudioTo(lessonId, getAudioSeekTimeFromControl(button, lessonId));
         if (action === "open-cuttoon-fullscreen") return void openCuttoonFullscreen(lessonId);
         if (action === "close-cuttoon-fullscreen") return void closeCuttoonFullscreen(lessonId);
         if (action === "toggle-cuttoon-fullscreen-audio") return void toggleCuttoonFullscreenAudio(lessonId);
