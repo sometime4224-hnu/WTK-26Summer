@@ -25,6 +25,15 @@ async function openFresh(page) {
   await page.reload({ waitUntil: 'domcontentloaded' });
 }
 
+test('14과 허브의 문법 3 카드에서 보조 활동을 연다', async ({ page }) => {
+  await page.goto('/c14/index.html', { waitUntil: 'domcontentloaded' });
+
+  await page.getByRole('link', { name: '내 느낌 · 다른 사람의 느낌' }).click();
+
+  await expect(page).toHaveURL(/\/c14\/grammar3-other-feelings\.html$/);
+  await expect(page.getByTestId('c14-g3-other-feelings')).toBeVisible();
+});
+
 test('정식 활동은 그림 위에서 두 형태를 동시에 보여 주고 16개 형용사를 정확히 바꾼다', async ({ page }) => {
   await openFresh(page);
 
