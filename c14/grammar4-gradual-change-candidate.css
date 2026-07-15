@@ -1,0 +1,293 @@
+:root {
+    color-scheme: light;
+}
+
+html {
+    scroll-padding-top: 76px;
+}
+
+body.candidate-page {
+    font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    overflow-x: clip;
+}
+
+.candidate-page .global-nav {
+    min-height: 48px;
+    padding-block: 10px;
+}
+
+.candidate-page .section {
+    overflow: visible;
+}
+
+.candidate-page .topbar {
+    position: sticky;
+    top: 49px;
+    z-index: 35;
+    margin: -22px -22px 18px;
+    padding: 14px 22px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 32px 32px 18px 18px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(16px);
+}
+
+.candidate-page .metric {
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    font-variant-numeric: tabular-nums;
+}
+
+.candidate-page .motion-card {
+    isolation: isolate;
+    scroll-margin-top: 136px;
+    transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.candidate-page .motion-card[data-visual-state="initial"] {
+    border-style: dashed;
+}
+
+.candidate-page .motion-card[data-visual-state="changing"] {
+    border-style: solid;
+    border-width: 2px;
+    box-shadow: 0 20px 42px rgba(15, 23, 42, 0.11);
+}
+
+.candidate-page .motion-card[data-visual-state="complete"] {
+    border-style: double;
+    border-width: 4px;
+    box-shadow: 0 22px 46px rgba(16, 185, 129, 0.16);
+}
+
+.candidate-page .media-frame {
+    background-color: #f8fafc;
+}
+
+.candidate-page .media-frame.is-asset-error {
+    outline: 3px dashed currentColor;
+    outline-offset: -10px;
+}
+
+.candidate-page .scene-base,
+.candidate-page .asset-sprite,
+.candidate-page .scene-patch img,
+.candidate-page .asset-feature img,
+.candidate-page .asset-patch img {
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.candidate-page img[hidden] {
+    display: none !important;
+}
+
+.candidate-page button,
+.candidate-page a {
+    -webkit-tap-highlight-color: rgba(37, 99, 235, 0.2);
+}
+
+.candidate-page button {
+    min-height: 44px !important;
+}
+
+.candidate-page button:focus-visible,
+.candidate-page a:focus-visible {
+    outline: 4px solid #facc15;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 7px rgba(15, 23, 42, 0.88);
+}
+
+.candidate-page button:disabled {
+    cursor: not-allowed;
+}
+
+.candidate-page .step-btn,
+.candidate-page .reset-btn,
+.candidate-page .btn {
+    touch-action: manipulation;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .candidate-page .motion-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 22px 44px rgba(15, 23, 42, 0.1);
+    }
+}
+
+@media (max-width: 720px) {
+    html {
+        scroll-padding-top: 56px;
+    }
+
+    .candidate-page .shell {
+        width: min(100%, calc(100% - 12px));
+        margin-top: 8px;
+    }
+
+    .candidate-page .section {
+        padding: 12px;
+        border-radius: 22px;
+    }
+
+    .candidate-page .topbar {
+        position: static;
+        margin: -12px -12px 12px;
+        padding: 12px;
+        border-radius: 22px 22px 14px 14px;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    .candidate-page .metrics,
+    .candidate-page .button-row {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .candidate-page .metric,
+    .candidate-page .btn {
+        width: 100%;
+        min-width: 0;
+        min-height: 44px;
+        padding: 10px 8px;
+        text-align: center;
+    }
+
+    .candidate-page .board {
+        grid-template-columns: none;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(266px, calc(100vw - 48px));
+        gap: 12px;
+        margin-top: 12px;
+        padding: 2px 4px 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-inline: contain;
+        scroll-snap-type: inline mandatory;
+        scrollbar-gutter: stable;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .candidate-page .motion-card {
+        padding: 14px;
+        border-radius: 22px;
+        scroll-margin-top: 58px;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+    }
+
+    .candidate-page .card-top {
+        margin-bottom: 10px;
+    }
+
+    .candidate-page .media-frame {
+        min-height: 232px;
+        border-radius: 18px;
+    }
+
+    .candidate-page .copy {
+        margin-top: 12px;
+    }
+
+    .candidate-page .pattern {
+        line-height: 1.72;
+    }
+
+    .candidate-page .card-actions {
+        grid-template-columns: minmax(0, 1fr) 76px;
+        gap: 8px;
+    }
+
+    .candidate-page .reset-btn {
+        width: auto;
+    }
+}
+
+@media (max-width: 360px) {
+    .candidate-page .global-nav {
+        gap: 7px;
+        padding-inline: 10px;
+    }
+
+    .candidate-page .global-nav a {
+        font-size: 0.82rem;
+    }
+
+    .candidate-page .nav-divider {
+        font-size: 0.72rem;
+    }
+
+    .candidate-page .shell {
+        width: min(100%, calc(100% - 8px));
+    }
+
+    .candidate-page .section {
+        padding: 9px;
+        border-radius: 18px;
+    }
+
+    .candidate-page .topbar {
+        margin: -9px -9px 9px;
+        padding: 9px;
+        border-radius: 18px 18px 12px 12px;
+    }
+
+    .candidate-page .metrics,
+    .candidate-page .button-row {
+        gap: 7px;
+    }
+
+    .candidate-page .metric,
+    .candidate-page .btn {
+        font-size: 0.78rem;
+    }
+
+    .candidate-page .motion-card {
+        padding: 11px;
+        border-radius: 18px;
+    }
+
+    .candidate-page .media-frame {
+        min-height: 196px;
+    }
+
+    .candidate-page .card-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .candidate-page .reset-btn {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto !important;
+    }
+
+    .candidate-page *,
+    .candidate-page *::before,
+    .candidate-page *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+
+@media (forced-colors: active) {
+    .candidate-page .motion-card,
+    .candidate-page .metric,
+    .candidate-page .btn,
+    .candidate-page .step-btn,
+    .candidate-page .reset-btn {
+        border: 2px solid CanvasText;
+    }
+
+    .candidate-page button:focus-visible,
+    .candidate-page a:focus-visible {
+        outline: 3px solid Highlight;
+        box-shadow: none;
+    }
+}
