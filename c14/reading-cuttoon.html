@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>읽기 컷툰 탐색 | 도낏자루 썩는 줄 모른다</title>
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <style>
+        :root {
+            --bg: #f4f6f3;
+            --paper: #ffffff;
+            --ink: #18251f;
+            --muted: #66756d;
+            --line: #d7e1da;
+            --line-strong: #9fb6a8;
+            --green: #25634a;
+            --green-dark: #174634;
+            --green-soft: #e1f2e8;
+            --amber: #b5671c;
+            --amber-soft: #fff0d8;
+            --blue: #315f89;
+            --blue-soft: #e8f1f8;
+            --violet: #6d4d8a;
+            --violet-soft: #f0eafa;
+            --shadow: 0 18px 48px rgba(30, 56, 43, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 6% 3%, rgba(37, 99, 74, 0.12), transparent 28rem),
+                radial-gradient(circle at 94% 92%, rgba(181, 103, 28, 0.1), transparent 32rem),
+                var(--bg);
+            font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+        }
+
+        button,
+        a {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :focus-visible {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid rgba(215, 225, 218, 0.95);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar__inner {
+            width: min(1440px, calc(100% - 28px));
+            min-height: 54px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar__home,
+        .topbar__nav a {
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            color: var(--green-dark);
+            font-size: 0.9rem;
+            font-weight: 850;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .topbar__home {
+            gap: 6px;
+            padding: 0 10px;
+            background: var(--green-soft);
+        }
+
+        .topbar__nav {
+            min-width: 0;
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .topbar__nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .topbar__nav a {
+            padding: 0 10px;
+        }
+
+        .topbar__nav a[aria-current="page"] {
+            color: #fff;
+            background: var(--green);
+        }
+
+        .shell {
+            width: min(1440px, calc(100% - 28px));
+            margin: 18px auto 42px;
+        }
+
+        .hero {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 14px;
+            padding: clamp(20px, 4vw, 34px);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            background:
+                linear-gradient(135deg, rgba(225, 242, 232, 0.96), rgba(255, 255, 255, 0.96) 54%, rgba(255, 240, 216, 0.84));
+            box-shadow: var(--shadow);
+        }
+
+        .hero__eyebrow {
+            display: inline-flex;
+            margin-bottom: 8px;
+            color: var(--green-dark);
+            font-size: 0.8rem;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            word-break: keep-all;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.75rem, 4vw, 3.2rem);
+            line-height: 1.08;
+        }
+
+        .hero__guide {
+            max-width: 52rem;
+            margin: 12px 0 0;
+            color: #3f5148;
+            font-size: clamp(0.98rem, 1.7vw, 1.12rem);
+            font-weight: 700;
+            line-height: 1.7;
+        }
+
+        .hero__count {
+            flex: 0 0 auto;
+            min-height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--line-strong);
+            border-radius: 999px;
+            padding: 0 16px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--green-dark);
+            font-size: 0.95rem;
+            font-weight: 900;
+        }
+
+        .reader-app {
+            display: grid;
+            grid-template-columns: minmax(360px, 500px) minmax(0, 1fr);
+            grid-template-areas: "visual text";
+            gap: 14px;
+            align-items: start;
+        }
+
+        .text-pane {
+            grid-area: text;
+            min-width: 0;
+            display: grid;
+            gap: 14px;
+        }
+
+        .reader-app > .visual-pane {
+            grid-area: visual;
+        }
+
+        .panel,
+        .visual-pane {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.97);
+            box-shadow: var(--shadow);
+        }
+
+        .panel {
+            padding: clamp(16px, 2.8vw, 24px);
+        }
+
+        .panel__head,
+        .visual-pane__head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .panel__head h2,
+        .visual-pane__head h2 {
+            margin: 0;
+            font-size: clamp(1.08rem, 2vw, 1.32rem);
+        }
+
+        .sentence-section + .sentence-section {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px dashed var(--line-strong);
+        }
+
+        .sentence-section h3 {
+            margin: 0 0 9px;
+            color: var(--green-dark);
+            font-size: 0.9rem;
+            font-weight: 900;
+        }
+
+        .sentence-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .sentence-choice {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 34px minmax(0, 1fr);
+            gap: 10px;
+            align-items: start;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            padding: 11px 12px;
+            color: var(--ink);
+            background: #fff;
+            text-align: left;
+            line-height: 1.62;
+            transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+        }
+
+        .sentence-choice:hover {
+            border-color: var(--line-strong);
+            transform: translateY(-1px);
+        }
+
+        .sentence-choice.is-active {
+            border: 3px solid var(--green-dark);
+            padding: 9px 10px;
+            background: var(--green-soft);
+            box-shadow: 0 0 0 4px rgba(37, 99, 74, 0.12);
+        }
+
+        .sentence-choice__number {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            color: var(--green-dark);
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .sentence-choice__text {
+            min-width: 0;
+        }
+
+        .cut-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .cut-group {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 9px;
+        }
+
+        .cut-choice {
+            min-width: 0;
+            min-height: 94px;
+            display: grid;
+            place-items: center;
+            gap: 6px;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            padding: 6px;
+            color: var(--ink);
+            background: #fff;
+            font-size: 0.78rem;
+            font-weight: 850;
+            box-sizing: border-box;
+            transition: border-color 160ms ease, transform 160ms ease, background 160ms ease;
+        }
+
+        .cut-choice__thumb {
+            position: relative;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 2 / 1;
+            display: block;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #e8efe9;
+        }
+
+        .cut-choice__visual,
+        .scene-image-surface {
+            position: absolute;
+            inset: 0;
+            background-image: var(--sprite-url);
+            background-repeat: no-repeat;
+            background-position: var(--sprite-x) var(--sprite-y);
+            background-size: 200% 300%;
+        }
+
+        .cut-choice__fallback,
+        .scene-code-fallback {
+            position: absolute;
+            inset: 0;
+            display: none;
+            place-items: center;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 74% 24%, rgba(232, 165, 84, 0.28), transparent 30%),
+                linear-gradient(145deg, #edf5ef, #d7e7dc);
+        }
+
+        .cut-choice__thumb[data-image-status="error"] .cut-choice__visual,
+        #scene-visual[data-image-status="error"] .scene-image-surface {
+            display: none;
+        }
+
+        .cut-choice__thumb[data-image-status="error"] .cut-choice__fallback,
+        #scene-visual[data-image-status="error"] .scene-code-fallback {
+            display: grid;
+        }
+
+        .fallback-symbol {
+            position: relative;
+            width: 44%;
+            aspect-ratio: 1;
+            border: 0.14em solid var(--green-dark);
+            color: var(--green-dark);
+            background: var(--green-soft);
+            box-shadow: 0.55em 0.55em 0 rgba(23, 70, 52, 0.13);
+        }
+
+        [data-fallback-kind="cave"] .fallback-symbol {
+            border-radius: 48% 48% 12% 12%;
+            background: radial-gradient(ellipse at 50% 76%, #163e31 0 38%, #7aa06f 40% 64%, #d8eadf 66%);
+        }
+
+        [data-fallback-kind="passage"] .fallback-symbol {
+            clip-path: polygon(0 42%, 100% 0, 100% 100%, 0 64%);
+            background: linear-gradient(90deg, #163e31, #f5dfb8 72%, #fff);
+        }
+
+        [data-fallback-kind="go"] .fallback-symbol {
+            border-radius: 8%;
+            background-color: #e8a554;
+            background-image:
+                repeating-linear-gradient(0deg, transparent 0 13%, #174634 14% 16%),
+                repeating-linear-gradient(90deg, transparent 0 13%, #174634 14% 16%);
+        }
+
+        [data-fallback-kind="time"] .fallback-symbol,
+        [data-fallback-kind="century"] .fallback-symbol {
+            border-radius: 50%;
+            background: conic-gradient(#f3c3ce 0 25%, #7aa06f 25% 50%, #d88c45 50% 75%, #b9d0df 75%);
+        }
+
+        [data-fallback-kind="time"] .fallback-symbol::before,
+        [data-fallback-kind="century"] .fallback-symbol::before {
+            content: "";
+            position: absolute;
+            inset: 20%;
+            border: 0.1em solid currentColor;
+            border-radius: 50%;
+            background: #fff8ed;
+        }
+
+        [data-fallback-kind="time"] .fallback-symbol::after,
+        [data-fallback-kind="century"] .fallback-symbol::after {
+            content: "";
+            position: absolute;
+            top: 31%;
+            left: 49%;
+            width: 9%;
+            height: 28%;
+            border-radius: 999px;
+            background: currentColor;
+            transform: rotate(38deg);
+            transform-origin: 50% 68%;
+        }
+
+        [data-fallback-kind="axe"] .fallback-symbol {
+            width: 50%;
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        [data-fallback-kind="axe"] .fallback-symbol::before {
+            content: "";
+            position: absolute;
+            inset: 24% 8% 34% 20%;
+            border: 0.15em solid currentColor;
+            border-radius: 52% 12% 12% 52%;
+            background: #789085;
+            transform: rotate(-20deg);
+        }
+
+        [data-fallback-kind="descent"] .fallback-symbol {
+            border: 0;
+            border-left: 0.15em solid currentColor;
+            border-bottom: 0.15em solid currentColor;
+            background: transparent;
+            box-shadow: none;
+            transform: skewY(-24deg);
+        }
+
+        [data-fallback-kind="village"] .fallback-symbol,
+        [data-fallback-kind="home-tree"] .fallback-symbol {
+            width: 50%;
+            border-radius: 6%;
+            background: linear-gradient(145deg, #f5dfb8 0 48%, #9f6c43 49% 63%, #d8eadf 64%);
+            clip-path: polygon(50% 0, 100% 35%, 88% 35%, 88% 100%, 12% 100%, 12% 35%, 0 35%);
+        }
+
+        [data-fallback-kind="home-tree"] .fallback-symbol::after {
+            content: "";
+            position: absolute;
+            right: -8%;
+            bottom: 24%;
+            width: 52%;
+            aspect-ratio: 1;
+            border: 0.1em solid currentColor;
+            border-radius: 50%;
+            background: #4f8b69;
+        }
+
+        [data-fallback-kind="dialogue"] .fallback-symbol {
+            width: 54%;
+            aspect-ratio: 4 / 3;
+            border-radius: 28% 28% 28% 6%;
+            background: #e8f1f8;
+        }
+
+        [data-fallback-kind="ancestry"] .fallback-symbol,
+        [data-fallback-kind="immortals"] .fallback-symbol {
+            width: 56%;
+            border: 0;
+            background:
+                radial-gradient(circle at 50% 24%, #f5dfb8 0 11%, #6d4d8a 12% 15%, transparent 16%),
+                radial-gradient(circle at 23% 76%, #f5dfb8 0 11%, #6d4d8a 12% 15%, transparent 16%),
+                radial-gradient(circle at 77% 76%, #f5dfb8 0 11%, #6d4d8a 12% 15%, transparent 16%),
+                linear-gradient(62deg, transparent 47%, #6d4d8a 48% 52%, transparent 53%) 0 0 / 50% 100%,
+                linear-gradient(-62deg, transparent 47%, #6d4d8a 48% 52%, transparent 53%) 100% 0 / 50% 100%;
+            background-repeat: no-repeat;
+            box-shadow: none;
+        }
+
+        [data-fallback-kind="immortals"] .fallback-symbol {
+            filter: drop-shadow(0 0 0.8em rgba(232, 165, 84, 0.75));
+        }
+
+        .cut-choice__label {
+            line-height: 1.2;
+        }
+
+        .cut-choice:hover {
+            border-color: var(--line-strong);
+            transform: translateY(-1px);
+        }
+
+        .cut-choice.is-active {
+            border: 3px solid var(--green-dark);
+            padding: 4px;
+            color: var(--green-dark);
+            background: var(--green-soft);
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 6px 16px rgba(37, 99, 74, 0.16);
+        }
+
+        .cut-choice.is-active .cut-choice__thumb {
+            border: 3px solid var(--green-dark);
+        }
+
+        .visual-pane {
+            position: sticky;
+            top: 70px;
+            overflow: hidden;
+        }
+
+        .visual-pane__head {
+            margin: 0;
+            padding: 15px 16px;
+            border-bottom: 1px solid var(--line);
+            background: linear-gradient(90deg, var(--green-soft), #fff);
+        }
+
+        .visual-pane__status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .layout-toggle {
+            min-height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 2px solid var(--line-strong);
+            border-radius: 999px;
+            padding: 0 11px;
+            color: var(--green-dark);
+            background: #fff;
+            font-size: 0.78rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .layout-toggle:hover,
+        .layout-toggle[aria-pressed="true"] {
+            background: var(--green-soft);
+        }
+
+        .layout-toggle[aria-pressed="true"] {
+            box-shadow: inset 0 0 0 1px var(--green-dark);
+        }
+
+        #cut-progress {
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid var(--line-strong);
+            border-radius: 999px;
+            padding: 0 10px;
+            background: #fff;
+            color: var(--green-dark);
+            font-size: 0.8rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .mobile-toggle {
+            display: none;
+            min-height: 34px;
+            border: 1px solid var(--line-strong);
+            border-radius: 999px;
+            padding: 0 10px;
+            color: var(--green-dark);
+            background: #fff;
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .scene-wrap {
+            padding: 14px 14px 0;
+        }
+
+        #scene-visual {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 2 / 1;
+            display: block;
+            overflow: hidden;
+            border: 4px solid var(--green-dark);
+            border-radius: 18px;
+            background: #eef5f0;
+            box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.84);
+            transition: border-color 180ms ease, background 180ms ease;
+        }
+
+        .scene-image-surface {
+            animation: scene-in 220ms ease both;
+        }
+
+        @keyframes scene-in {
+            from {
+                opacity: 0.18;
+                transform: translateX(18px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        .sequence-rail {
+            --active-index: 0;
+            position: relative;
+            height: 18px;
+            margin: 10px 14px 0;
+            border-radius: 999px;
+            background: #e1e8e3;
+            overflow: hidden;
+        }
+
+        .sequence-rail::before {
+            content: "";
+            position: absolute;
+            inset: 5px 8px;
+            border-top: 2px dashed #789085;
+        }
+
+        .sequence-rail::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: calc(9px + (100% - 18px) * var(--active-index) / 11);
+            width: 18px;
+            height: 18px;
+            border: 3px solid var(--green-dark);
+            border-radius: 50%;
+            background: #fff;
+            box-sizing: border-box;
+            transform: translateX(-50%);
+            transition: left 180ms ease;
+        }
+
+        .scene-footer {
+            padding: 14px 16px 4px;
+        }
+
+        .scene-footer h3 {
+            margin: 0 0 7px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        #current-sentence {
+            min-height: 4.8em;
+            margin: 0;
+            font-size: clamp(1rem, 2vw, 1.18rem);
+            font-weight: 800;
+            line-height: 1.65;
+        }
+
+        .visual-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 8px;
+            padding: 12px 16px 16px;
+        }
+
+        .visual-action,
+        .help-toggle {
+            min-height: 44px;
+            border: 1px solid var(--line-strong);
+            border-radius: 12px;
+            color: var(--green-dark);
+            background: #fff;
+            font-weight: 900;
+        }
+
+        .visual-action:hover,
+        .help-toggle:hover {
+            background: var(--green-soft);
+        }
+
+        .help-toggle {
+            width: auto;
+            min-width: 88px;
+            padding: 0 10px;
+            border-width: 2px;
+            border-radius: 12px;
+            font-size: 0.82rem;
+            white-space: nowrap;
+        }
+
+        .optional-help {
+            margin: 0 16px 14px;
+            border: 1px dashed var(--line-strong);
+            border-radius: 12px;
+            padding: 11px 12px;
+            color: #3f5148;
+            background: #f8fbf9;
+            font-size: 0.9rem;
+            font-weight: 700;
+            line-height: 1.6;
+        }
+
+        .live-feedback {
+            min-height: 1.5rem;
+            margin: 0;
+            padding: 0 16px 14px;
+            color: var(--green-dark);
+            font-size: 0.85rem;
+            font-weight: 850;
+        }
+
+        .reader-app[data-layout-mode="focus"] {
+            display: block;
+        }
+
+        .reader-app[data-layout-mode="focus"] .text-pane {
+            display: none;
+        }
+
+        .reader-app[data-layout-mode="focus"] .visual-pane {
+            position: static;
+            width: min(1080px, 100%);
+            margin: 0 auto;
+            overflow: visible;
+        }
+
+        .reader-app[data-layout-mode="focus"] .mobile-current-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .reader-app[data-layout-mode="focus"] .scene-footer {
+            order: 2;
+            margin: 0 20px;
+            padding: 18px 4px 14px;
+            text-align: center;
+        }
+
+        .reader-app[data-layout-mode="focus"] #current-sentence {
+            min-height: 0;
+            font-size: clamp(1.2rem, 2.5vw, 1.72rem);
+            line-height: 1.55;
+        }
+
+        .reader-app[data-layout-mode="focus"] .scene-wrap {
+            order: 3;
+            padding: 0 20px;
+        }
+
+        .reader-app[data-layout-mode="focus"] #scene-visual {
+            border-width: 5px;
+            border-radius: 22px;
+        }
+
+        .reader-app[data-layout-mode="focus"] .sequence-rail {
+            order: 4;
+            margin-top: 14px;
+        }
+
+        .reader-app[data-layout-mode="focus"] .visual-actions {
+            order: 1;
+            grid-template-columns: minmax(120px, 1fr) minmax(120px, 1fr) auto;
+            width: min(720px, calc(100% - 32px));
+            margin: 0 auto;
+        }
+
+        .reader-app[data-layout-mode="focus"] .optional-help {
+            order: 5;
+        }
+
+        .reader-app[data-layout-mode="focus"] .live-feedback {
+            order: 6;
+            text-align: center;
+        }
+
+        .sr-only {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        .sv-qa-hide-copy [data-copy-layer="PRIMARY"]:not([data-nontext-visual]),
+        .sv-qa-hide-copy [data-copy-layer="OPTIONAL_HELP"]:not([data-nontext-visual]) {
+            color: transparent !important;
+            text-shadow: none !important;
+        }
+
+        @media (max-width: 1040px) {
+            .reader-app {
+                grid-template-columns: minmax(330px, 420px) minmax(0, 1fr);
+            }
+        }
+
+        @media (max-width: 800px) {
+            .topbar__inner {
+                align-items: stretch;
+                flex-direction: column;
+                gap: 4px;
+                padding: 7px 0;
+            }
+
+            .topbar__home {
+                align-self: flex-start;
+                min-height: 32px;
+            }
+
+            .topbar__nav {
+                width: 100%;
+            }
+
+            .topbar__nav a {
+                min-height: 34px;
+            }
+
+            .shell {
+                margin-top: 12px;
+            }
+
+            .hero {
+                align-items: flex-start;
+                flex-direction: column;
+                border-radius: 18px;
+            }
+
+            .reader-app {
+                display: block;
+                padding-bottom: max(300px, 44vh);
+            }
+
+            .reader-app[data-layout-mode="focus"] {
+                padding-bottom: 0;
+            }
+
+            .visual-pane {
+                position: fixed;
+                z-index: 45;
+                top: auto;
+                right: 8px;
+                bottom: max(8px, env(safe-area-inset-bottom));
+                left: 8px;
+                max-height: 46vh;
+                overflow: auto;
+                border: 2px solid var(--green-dark);
+                border-radius: 17px;
+                box-shadow: 0 20px 54px rgba(12, 37, 27, 0.28);
+            }
+
+            .reader-app[data-layout-mode="focus"] .visual-pane {
+                position: static;
+                max-height: none;
+                border-width: 1px;
+                box-shadow: var(--shadow);
+            }
+
+            .reader-app[data-layout-mode="focus"] .mobile-toggle {
+                display: none;
+            }
+
+            .mobile-toggle {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .visual-pane.is-collapsed {
+                max-height: none;
+            }
+
+            .visual-pane.is-collapsed .mobile-current-panel {
+                display: none;
+            }
+
+            .visual-pane.is-collapsed .scene-wrap,
+            .visual-pane.is-collapsed .sequence-rail,
+            .visual-pane.is-collapsed .scene-footer,
+            .visual-pane.is-collapsed .visual-actions,
+            .visual-pane.is-collapsed .optional-help,
+            .visual-pane.is-collapsed .live-feedback {
+                display: none !important;
+            }
+
+            .visual-pane.is-collapsed .visual-pane__head {
+                border-bottom: 0;
+            }
+
+            #scene-visual {
+                max-height: none;
+            }
+
+            #current-sentence {
+                min-height: 0;
+                font-size: 0.94rem;
+            }
+
+            .scene-footer {
+                padding-top: 9px;
+            }
+
+            .visual-actions {
+                padding-top: 8px;
+                padding-bottom: 10px;
+            }
+
+            .reader-app[data-layout-mode="focus"] .scene-footer {
+                margin: 0 12px;
+                padding-top: 14px;
+            }
+
+            .reader-app[data-layout-mode="focus"] .scene-wrap {
+                padding: 0 10px;
+            }
+
+            .reader-app[data-layout-mode="focus"] .visual-actions {
+                grid-template-columns: 1fr 1fr;
+                width: 100%;
+            }
+
+            .reader-app[data-layout-mode="focus"] .help-toggle {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .shell,
+            .topbar__inner {
+                width: min(100% - 16px, 1440px);
+            }
+
+            .hero,
+            .panel {
+                padding: 15px;
+            }
+
+            .cut-group {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .sentence-choice {
+                grid-template-columns: 30px minmax(0, 1fr);
+                padding: 10px;
+            }
+
+            .sentence-choice.is-active {
+                padding: 8px;
+            }
+
+            .visual-pane__head {
+                align-items: flex-start;
+            }
+
+            .visual-pane__status {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 5px;
+            }
+
+            .scene-wrap {
+                padding: 9px 9px 0;
+            }
+
+            .visual-actions {
+                padding-right: 10px;
+                padding-left: 10px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+            }
+        }
+    </style>
+</head>
+<body data-page="c14-reading-cuttoon">
+    <header class="topbar">
+        <div class="topbar__inner">
+            <a class="topbar__home" href="index.html" data-copy-layer="PRIMARY"><span aria-hidden="true">←</span><span>14과 홈</span></a>
+            <nav class="topbar__nav" aria-label="읽기 컷툰 탐색">
+                <a href="reading.html" data-copy-layer="PRIMARY">본문 읽기</a>
+                <a href="mock-reading-exam.html" data-copy-layer="PRIMARY">읽기 문제</a>
+                <a href="reading-cuttoon.html" aria-current="page" data-copy-layer="PRIMARY">읽기 컷툰 탐색</a>
+                <a href="writing-cut.html" data-copy-layer="PRIMARY">컷 쓰기</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="shell" id="reader">
+        <section class="hero" aria-labelledby="page-title">
+            <div>
+                <span class="hero__eyebrow" data-copy-layer="PRIMARY">읽기 컷툰 탐색</span>
+                <h1 id="page-title" data-copy-layer="PRIMARY">도낏자루 썩는 줄 모른다</h1>
+                <p class="hero__guide" data-copy-layer="PRIMARY">그림에 맞는 문장을 먼저 찾아 보세요.</p>
+            </div>
+            <span class="hero__count" data-copy-layer="PRIMARY">12컷</span>
+        </section>
+
+        <div class="reader-app" id="reader-app" data-layout-mode="default">
+            <div class="text-pane">
+                <section class="panel" aria-labelledby="passage-heading">
+                    <div class="panel__head">
+                        <h2 id="passage-heading" data-copy-layer="PRIMARY">읽기 지문</h2>
+                    </div>
+                    <div id="sentence-list"></div>
+                </section>
+
+                <section class="panel" aria-labelledby="cut-list-heading">
+                    <div class="panel__head">
+                        <h2 id="cut-list-heading" data-copy-layer="PRIMARY">컷 목록</h2>
+                    </div>
+                    <div class="cut-list" id="cut-list"></div>
+                </section>
+            </div>
+
+            <aside class="visual-pane" id="visual-pane" aria-labelledby="current-cut-heading">
+                <div class="visual-pane__head">
+                    <h2 id="current-cut-heading" data-copy-layer="PRIMARY">현재 문장 컷툰</h2>
+                    <div class="visual-pane__status">
+                        <span id="cut-progress" data-copy-layer="PRIMARY">1번 컷</span>
+                        <button class="layout-toggle" id="layout-toggle" type="button" aria-pressed="false" aria-controls="reader-app" data-copy-layer="PRIMARY"><span aria-hidden="true">⛶</span><span id="layout-toggle-label">큰 그림 보기</span></button>
+                        <button class="mobile-toggle" id="mobile-toggle" type="button" aria-expanded="true" aria-controls="mobile-current-panel" data-copy-layer="PRIMARY">현재 컷툰 접기</button>
+                    </div>
+                </div>
+
+                <div class="mobile-current-panel" id="mobile-current-panel">
+                <div class="scene-wrap">
+                    <div
+                        id="scene-visual"
+                        role="img"
+                        data-semantic-visual
+                        data-sv-component="STEP_SEQUENCE"
+                        data-meaning-ref="M-STORY-SEQUENCE"
+                        data-interaction-ref="interaction.cuts-01-04"
+                        data-visual-state="cut01"
+                        data-cut-id="cut01"
+                        data-asset-ref="asset.ai-story-sprite-01"
+                        data-image-status="loading"
+                        data-fallback-kind="cave"
+                        data-state-change-channels="image crop outline visibility sequence"
+                        data-accessible-fallback-ref="scene-fallback"
+                        aria-labelledby="scene-fallback"
+                        data-copy-layer="PRIMARY"
+                        data-nontext-visual
+                    >
+                        <div class="scene-image-surface" aria-hidden="true" data-origin="AI_GENERATED"></div>
+                        <div class="scene-code-fallback" id="scene-code-fallback" aria-hidden="true" data-origin="CODE">
+                            <span class="fallback-symbol"></span>
+                        </div>
+                    </div>
+                    <span class="sr-only" id="scene-fallback" data-copy-layer="PRIMARY">깊은 산 동굴 앞에 선 나무꾼</span>
+                </div>
+
+                <div class="sequence-rail" id="sequence-rail" aria-hidden="true"></div>
+
+                <div class="scene-footer">
+                    <h3 data-copy-layer="PRIMARY">대표 문장</h3>
+                    <p id="current-sentence" data-copy-layer="PRIMARY">옛날에 어떤 나무꾼이 나무를 하러 산에 갔다가 동굴을 발견했다.</p>
+                </div>
+
+                <div class="visual-actions">
+                    <button class="visual-action" id="prev-cut" type="button" data-copy-layer="PRIMARY"><span aria-hidden="true">←</span> 이전 컷</button>
+                    <button class="visual-action" id="next-cut" type="button" data-copy-layer="PRIMARY">다음 컷 <span aria-hidden="true">→</span></button>
+                    <button class="help-toggle" id="optional-help-toggle" type="button" aria-expanded="false" aria-controls="optional-help" data-copy-layer="PRIMARY">이동 도움말</button>
+                </div>
+                <p class="optional-help" id="optional-help" hidden data-copy-layer="OPTIONAL_HELP">이전 컷과 다음 컷 버튼이나 좌우 방향키로 이동할 수 있어요.</p>
+                <p class="live-feedback" id="live-feedback" aria-live="polite" data-copy-layer="PRIMARY"></p>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script src="reading-cuttoon-data.js"></script>
+    <script>
+        (function () {
+            'use strict';
+
+            const data = window.C14_READING_CUTTOON_DATA;
+            if (!data) return;
+
+            const cuts = data.cuts;
+            const sentences = data.sentences;
+            const assets = data.assets || [];
+            const cutById = new Map(cuts.map((cut) => [cut.id, cut]));
+            const sentenceById = new Map(sentences.map((sentence) => [sentence.id, sentence]));
+            const assetById = new Map(assets.map((asset) => [asset.id, asset]));
+            const assetStatus = new Map(assets.map((asset) => [asset.id, 'loading']));
+            const mobileQuery = window.matchMedia('(max-width: 800px)');
+            const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+            const elements = {
+                sentenceList: document.getElementById('sentence-list'),
+                cutList: document.getElementById('cut-list'),
+                readerApp: document.getElementById('reader-app'),
+                visualPane: document.getElementById('visual-pane'),
+                sceneVisual: document.getElementById('scene-visual'),
+                sceneImageSurface: document.querySelector('#scene-visual .scene-image-surface'),
+                sceneFallback: document.getElementById('scene-fallback'),
+                currentSentence: document.getElementById('current-sentence'),
+                cutProgress: document.getElementById('cut-progress'),
+                sequenceRail: document.getElementById('sequence-rail'),
+                previous: document.getElementById('prev-cut'),
+                next: document.getElementById('next-cut'),
+                layoutToggle: document.getElementById('layout-toggle'),
+                layoutToggleLabel: document.getElementById('layout-toggle-label'),
+                mobileToggle: document.getElementById('mobile-toggle'),
+                helpToggle: document.getElementById('optional-help-toggle'),
+                optionalHelp: document.getElementById('optional-help'),
+                liveFeedback: document.getElementById('live-feedback')
+            };
+
+            let activeCutId = data.stateDefaults.activeCutId;
+            let mobileCollapsed = data.stateDefaults.mobileCollapsed;
+            let layoutMode = data.stateDefaults.layoutMode || 'default';
+            let forceAssetFailure = false;
+            let assetLoadGeneration = 0;
+
+            function spritePosition(value, max) {
+                if (max <= 1) return '0%';
+                return `${(value / (max - 1)) * 100}%`;
+            }
+
+            function applySpriteSurface(surface, cut) {
+                const asset = assetById.get(cut.visual.assetRef);
+                if (!surface || !asset) return;
+                surface.style.setProperty('--sprite-url', `url("${asset.src}")`);
+                surface.style.setProperty('--sprite-x', spritePosition(cut.visual.spriteCol, asset.grid.columns));
+                surface.style.setProperty('--sprite-y', spritePosition(cut.visual.spriteRow, asset.grid.rows));
+                surface.dataset.assetRef = asset.id;
+                surface.dataset.spriteCol = String(cut.visual.spriteCol);
+                surface.dataset.spriteRow = String(cut.visual.spriteRow);
+            }
+
+            function statusForAsset(assetRef) {
+                return forceAssetFailure ? 'error' : (assetStatus.get(assetRef) || 'error');
+            }
+
+            function refreshAssetStates() {
+                document.querySelectorAll('[data-asset-ref]').forEach((element) => {
+                    element.dataset.imageStatus = statusForAsset(element.dataset.assetRef);
+                });
+            }
+
+            function preloadAssets() {
+                const generation = ++assetLoadGeneration;
+                assets.forEach((asset) => {
+                    assetStatus.set(asset.id, 'loading');
+                    const image = new Image();
+                    image.decoding = 'async';
+                    image.onload = () => {
+                        if (generation !== assetLoadGeneration || forceAssetFailure) return;
+                        assetStatus.set(asset.id, 'loaded');
+                        refreshAssetStates();
+                    };
+                    image.onerror = () => {
+                        if (generation !== assetLoadGeneration || forceAssetFailure) return;
+                        assetStatus.set(asset.id, 'error');
+                        refreshAssetStates();
+                    };
+                    image.src = asset.src;
+                });
+                refreshAssetStates();
+            }
+
+            function readState() {
+                try {
+                    const raw = window.localStorage.getItem(data.storageKey);
+                    if (!raw) return { ...data.stateDefaults };
+                    const parsed = JSON.parse(raw);
+                    return {
+                        activeCutId: cutById.has(parsed.activeCutId) ? parsed.activeCutId : data.stateDefaults.activeCutId,
+                        mobileCollapsed: typeof parsed.mobileCollapsed === 'boolean' ? parsed.mobileCollapsed : data.stateDefaults.mobileCollapsed,
+                        layoutMode: parsed.layoutMode === 'focus' ? 'focus' : 'default'
+                    };
+                } catch (error) {
+                    return { ...data.stateDefaults };
+                }
+            }
+
+            function writeState() {
+                try {
+                    window.localStorage.setItem(data.storageKey, JSON.stringify({ activeCutId, mobileCollapsed, layoutMode }));
+                } catch (error) {
+                }
+            }
+
+            function sentenceText(sentence) {
+                return sentence.segments.map((segment) => segment.text).join('');
+            }
+
+            function renderSentenceList() {
+                const fragment = document.createDocumentFragment();
+                data.sections.forEach((section) => {
+                    const wrapper = document.createElement('section');
+                    wrapper.className = 'sentence-section';
+
+                    const heading = document.createElement('h3');
+                    heading.textContent = section.title;
+                    heading.dataset.copyLayer = 'PRIMARY';
+                    wrapper.appendChild(heading);
+
+                    const list = document.createElement('div');
+                    list.className = 'sentence-list';
+                    section.sentenceIds.forEach((sentenceId) => {
+                        const sentence = sentenceById.get(sentenceId);
+                        const cut = cutById.get(sentence.cutId);
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.className = 'sentence-choice';
+                        button.dataset.sentenceChoice = '';
+                        button.dataset.sentenceId = sentence.id;
+                        button.dataset.cutId = cut.id;
+                        button.dataset.copyLayer = 'PRIMARY';
+                        button.setAttribute('aria-pressed', 'false');
+
+                        const number = document.createElement('span');
+                        number.className = 'sentence-choice__number';
+                        number.setAttribute('aria-hidden', 'true');
+                        number.textContent = String(cut.visual.sequenceIndex);
+
+                        const text = document.createElement('span');
+                        text.className = 'sentence-choice__text';
+                        text.textContent = sentenceText(sentence);
+
+                        button.append(number, text);
+                        list.appendChild(button);
+                    });
+                    wrapper.appendChild(list);
+                    fragment.appendChild(wrapper);
+                });
+                elements.sentenceList.replaceChildren(fragment);
+            }
+
+            function renderCutList() {
+                const fragment = document.createDocumentFragment();
+                let currentGroup = null;
+                let currentGroupRef = '';
+                cuts.forEach((cut) => {
+                    if (cut.interactionRef !== currentGroupRef) {
+                        currentGroupRef = cut.interactionRef;
+                        currentGroup = document.createElement('div');
+                        currentGroup.className = 'cut-group';
+                        currentGroup.dataset.interactionRef = currentGroupRef;
+                        currentGroup.setAttribute('role', 'group');
+                        fragment.appendChild(currentGroup);
+                    }
+
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'cut-choice';
+                    button.dataset.cutChoice = '';
+                    button.dataset.cutId = cut.id;
+                    button.dataset.copyLayer = 'PRIMARY';
+                    button.setAttribute('aria-pressed', 'false');
+
+                    const thumbnail = document.createElement('span');
+                    thumbnail.setAttribute('aria-hidden', 'true');
+                    thumbnail.classList.add('cut-choice__thumb');
+                    thumbnail.dataset.nontextVisual = '';
+                    thumbnail.dataset.thumbnailCutId = cut.id;
+                    thumbnail.dataset.assetRef = cut.visual.assetRef;
+                    thumbnail.dataset.fallbackKind = cut.visual.fallbackKind;
+                    thumbnail.dataset.imageStatus = statusForAsset(cut.visual.assetRef);
+
+                    const thumbnailVisual = document.createElement('span');
+                    thumbnailVisual.className = 'cut-choice__visual';
+                    thumbnailVisual.setAttribute('aria-hidden', 'true');
+                    thumbnailVisual.dataset.origin = 'AI_GENERATED';
+                    applySpriteSurface(thumbnailVisual, cut);
+
+                    const thumbnailFallback = document.createElement('span');
+                    thumbnailFallback.className = 'cut-choice__fallback';
+                    thumbnailFallback.setAttribute('aria-hidden', 'true');
+                    thumbnailFallback.dataset.origin = 'CODE';
+                    const fallbackSymbol = document.createElement('span');
+                    fallbackSymbol.className = 'fallback-symbol';
+                    thumbnailFallback.appendChild(fallbackSymbol);
+                    thumbnail.append(thumbnailVisual, thumbnailFallback);
+
+                    const label = document.createElement('span');
+                    label.className = 'cut-choice__label';
+                    label.textContent = cut.label;
+                    button.setAttribute('aria-label', `${cut.label}: ${cut.alt}`);
+                    button.append(thumbnail, label);
+                    currentGroup.appendChild(button);
+                });
+                elements.cutList.replaceChildren(fragment);
+            }
+
+            function setOptionalHelp(open) {
+                elements.optionalHelp.hidden = !open;
+                elements.helpToggle.setAttribute('aria-expanded', String(open));
+            }
+
+            function announceSelection() {
+                elements.liveFeedback.textContent = '';
+                window.requestAnimationFrame(() => {
+                    elements.liveFeedback.textContent = '선택한 컷과 문장을 함께 보여 줍니다.';
+                });
+            }
+
+            function scrollChoiceIntoView(element) {
+                if (!element) return;
+                element.scrollIntoView({
+                    behavior: reducedMotionQuery.matches ? 'auto' : 'smooth',
+                    block: 'nearest',
+                    inline: 'nearest'
+                });
+            }
+
+            function selectCut(cutId, options) {
+                const config = { announce: true, persist: true, scroll: true, source: 'user', ...(options || {}) };
+                const cut = cutById.get(cutId);
+                if (!cut) return;
+                const previousCutId = activeCutId;
+                activeCutId = cut.id;
+                const index = cuts.findIndex((item) => item.id === cut.id);
+                const sentence = sentenceById.get(cut.sentenceIds[0]);
+
+                elements.sceneVisual.dataset.visualState = cut.visual.visualState;
+                elements.sceneVisual.dataset.cutId = cut.id;
+                elements.sceneVisual.dataset.assetRef = cut.visual.assetRef;
+                elements.sceneVisual.dataset.imageStatus = statusForAsset(cut.visual.assetRef);
+                elements.sceneVisual.dataset.fallbackKind = cut.visual.fallbackKind;
+                elements.sceneVisual.dataset.meaningRef = cut.visual.meaningRefs.includes('M-PROVERB-USE') ? 'M-PROVERB-USE' : 'M-STORY-SEQUENCE';
+                elements.sceneVisual.dataset.interactionRef = cut.interactionRef;
+                applySpriteSurface(elements.sceneImageSurface, cut);
+                elements.currentSentence.textContent = sentenceText(sentence);
+                elements.sceneFallback.textContent = cut.alt;
+                elements.cutProgress.textContent = cut.label;
+                elements.sequenceRail.style.setProperty('--active-index', String(index));
+
+                document.querySelectorAll('[data-cut-choice]').forEach((button) => {
+                    const selected = button.dataset.cutId === cut.id;
+                    button.classList.toggle('is-active', selected);
+                    button.dataset.active = String(selected);
+                    button.setAttribute('aria-pressed', String(selected));
+                    if (selected) button.setAttribute('aria-current', 'step');
+                    else button.removeAttribute('aria-current');
+                });
+
+                document.querySelectorAll('[data-sentence-choice]').forEach((button) => {
+                    const selected = button.dataset.sentenceId === sentence.id;
+                    button.classList.toggle('is-active', selected);
+                    button.dataset.active = String(selected);
+                    button.setAttribute('aria-pressed', String(selected));
+                    if (selected) button.setAttribute('aria-current', 'true');
+                    else button.removeAttribute('aria-current');
+                });
+
+                if (config.scroll) {
+                    scrollChoiceIntoView(document.querySelector(`[data-cut-choice][data-cut-id="${cut.id}"]`));
+                    scrollChoiceIntoView(document.querySelector(`[data-sentence-choice][data-sentence-id="${sentence.id}"]`));
+                }
+                if (config.persist) writeState();
+                if (config.announce) announceSelection();
+
+                elements.sceneVisual.dispatchEvent(new CustomEvent('cuttoonchange', {
+                    bubbles: true,
+                    detail: { before: previousCutId, after: cut.id, source: config.source }
+                }));
+            }
+
+            function moveBy(delta, source) {
+                const currentIndex = cuts.findIndex((cut) => cut.id === activeCutId);
+                const nextIndex = (currentIndex + delta + cuts.length) % cuts.length;
+                selectCut(cuts[nextIndex].id, { source: source || 'user' });
+            }
+
+            function applyCollapsedState(persist) {
+                elements.visualPane.classList.toggle('is-collapsed', mobileCollapsed);
+                elements.mobileToggle.setAttribute('aria-expanded', String(!mobileCollapsed));
+                elements.mobileToggle.textContent = mobileCollapsed ? '현재 컷툰 펼치기' : '현재 컷툰 접기';
+                if (persist) writeState();
+            }
+
+            function applyLayoutMode(persist) {
+                const focusMode = layoutMode === 'focus';
+                if (focusMode && mobileCollapsed) {
+                    mobileCollapsed = false;
+                    applyCollapsedState(false);
+                }
+                elements.readerApp.dataset.layoutMode = layoutMode;
+                elements.layoutToggle.setAttribute('aria-pressed', String(focusMode));
+                elements.layoutToggleLabel.textContent = focusMode ? '기본 보기' : '큰 그림 보기';
+                if (persist) writeState();
+            }
+
+            renderSentenceList();
+            renderCutList();
+
+            const restored = readState();
+            activeCutId = restored.activeCutId;
+            mobileCollapsed = restored.mobileCollapsed;
+            layoutMode = restored.layoutMode || 'default';
+            applyCollapsedState(false);
+            applyLayoutMode(false);
+            selectCut(activeCutId, { announce: false, persist: false, scroll: false, source: 'restore' });
+            setOptionalHelp(false);
+            preloadAssets();
+
+            elements.cutList.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-cut-choice]');
+                if (button) selectCut(button.dataset.cutId, { source: 'user' });
+            });
+
+            elements.sentenceList.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-sentence-choice]');
+                if (button) selectCut(button.dataset.cutId, { source: 'user' });
+            });
+
+            elements.previous.addEventListener('click', () => moveBy(-1, 'user'));
+            elements.next.addEventListener('click', () => moveBy(1, 'user'));
+
+            elements.layoutToggle.addEventListener('click', () => {
+                layoutMode = layoutMode === 'focus' ? 'default' : 'focus';
+                applyLayoutMode(true);
+            });
+
+            elements.mobileToggle.addEventListener('click', () => {
+                mobileCollapsed = !mobileCollapsed;
+                applyCollapsedState(true);
+            });
+
+            elements.helpToggle.addEventListener('click', () => {
+                setOptionalHelp(elements.helpToggle.getAttribute('aria-expanded') !== 'true');
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+                const activeElement = document.activeElement;
+                if (activeElement && activeElement !== document.body && !document.getElementById('reader').contains(activeElement)) return;
+                if (activeElement && activeElement.closest('a, input, textarea, select, [contenteditable="true"], #layout-toggle, #mobile-toggle, #optional-help-toggle')) return;
+                if (event.key === 'ArrowLeft') {
+                    event.preventDefault();
+                    moveBy(-1, 'keyboard');
+                } else if (event.key === 'ArrowRight') {
+                    event.preventDefault();
+                    moveBy(1, 'keyboard');
+                }
+            });
+
+            mobileQuery.addEventListener('change', () => {
+                applyCollapsedState(false);
+            });
+
+            window.C14ReadingCuttoonQA = {
+                setCopyHidden(hidden) {
+                    document.body.classList.toggle('sv-qa-hide-copy', Boolean(hidden));
+                },
+                forceImageFailure() {
+                    forceAssetFailure = true;
+                    assetLoadGeneration += 1;
+                    refreshAssetStates();
+                },
+                restoreImages() {
+                    forceAssetFailure = false;
+                    preloadAssets();
+                },
+                getImageState() {
+                    return {
+                        forced: forceAssetFailure,
+                        assets: Object.fromEntries(assets.map((asset) => [asset.id, statusForAsset(asset.id)])),
+                        activeCutId,
+                        activeAssetRef: elements.sceneVisual.dataset.assetRef,
+                        activeStatus: elements.sceneVisual.dataset.imageStatus
+                    };
+                },
+                getLayoutState() {
+                    return { layoutMode, activeCutId, mobileCollapsed };
+                },
+                resetState() {
+                    activeCutId = data.stateDefaults.activeCutId;
+                    mobileCollapsed = data.stateDefaults.mobileCollapsed;
+                    layoutMode = data.stateDefaults.layoutMode || 'default';
+                    setOptionalHelp(false);
+                    applyCollapsedState(true);
+                    applyLayoutMode(true);
+                    selectCut(activeCutId, { announce: false, persist: true, scroll: false, source: 'reset' });
+                }
+            };
+        })();
+    </script>
+</body>
+</html>
