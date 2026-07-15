@@ -94,15 +94,16 @@ button:disabled { cursor: not-allowed; }
 .section-kicker { margin: 0; color: var(--mint-strong); font-size: 0.78rem; font-weight: 900; letter-spacing: 0.1em; }
 .workspace h2 { margin: 0.35rem 0 0; font-size: clamp(1.35rem, 2.4vw, 1.8rem); line-height: 1.35; }
 .workspace-intro { margin: 0.6rem 0 0; color: var(--muted); line-height: 1.65; }
-.practice-layout { display: grid; grid-template-columns: minmax(16rem, 0.82fr) minmax(0, 1.18fr); gap: 1.1rem; margin-top: 1.2rem; }
+.practice-layout { display: grid; grid-template-columns: minmax(12rem, 0.62fr) minmax(0, 1.38fr); gap: 1.1rem; align-items: start; margin-top: 1.2rem; }
 .scene-card, .build-card, .speech-card, .summary-card { border: 1px solid var(--line); border-radius: 1.1rem; background: white; overflow: hidden; }
-.scene-card img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #e7efea; }
+.scene-card img { display: block; width: 100%; max-height: 14rem; aspect-ratio: 16 / 10; object-fit: cover; background: #e7efea; }
 .scene-copy { padding: 0.9rem 1rem 1rem; }
 .scene-badge { display: inline-block; padding: 0.26rem 0.55rem; border-radius: 99px; background: #fff1dd; color: #a35214; font-size: 0.74rem; font-weight: 900; }
 .scene-copy h3 { margin: 0.55rem 0 0; font-size: 1rem; }
 .scene-copy p { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.88rem; line-height: 1.55; }
 .build-card { padding: 1rem; }
 .sentence-frame { margin: 0.9rem 0; padding: 0.78rem 0.9rem; border: 1px dashed #b8cfc4; border-radius: 0.85rem; background: #f8fcf9; color: #315249; font-weight: 800; line-height: 1.55; }
+.token-guide { margin: 0.9rem 0 0; color: var(--muted); font-size: 0.84rem; font-weight: 750; line-height: 1.5; }
 .quick-tokens { margin: 1rem 0; }
 .token-btn { padding: 0.5rem 0.72rem; border: 1px solid #b8d5c6; border-radius: 0.75rem; background: #f2faf5; color: #1a6548; font-size: 0.88rem; font-weight: 800; transition: transform 0.15s ease, background 0.15s ease; }
 .token-btn:hover { background: #ddf2e5; transform: translateY(-1px); }
@@ -143,10 +144,30 @@ button:disabled { cursor: not-allowed; }
   .fusion-topbar { padding-inline: 1rem; }
   .fusion-topbar strong { display: none; }
   .hero, .practice-layout, .speech-layout { grid-template-columns: 1fr; }
+  .scene-card { display: grid; grid-template-columns: minmax(7.25rem, 0.6fr) minmax(0, 1fr); align-items: stretch; }
+  .scene-card img { width: 100%; height: 100%; max-height: 9rem; aspect-ratio: auto; }
+  .scene-copy { display: grid; align-content: center; padding: 0.75rem 0.85rem; }
+  .scene-copy h3 { margin-top: 0.42rem; font-size: 0.94rem; }
+  .scene-copy p { font-size: 0.8rem; line-height: 1.45; }
+  .token-guide { margin-top: 0.8rem; }
+  .quick-tokens { gap: 0.42rem; margin: 0.75rem 0; }
+  .token-btn { padding: 0.46rem 0.58rem; font-size: 0.82rem; }
+  .draft-input { min-height: 6.4rem; }
   .progress-card { grid-template-columns: 1fr; }
   .stage-tabs { grid-template-columns: repeat(3, 1fr); }
   .stage-tab { min-width: 0; font-size: 0.7rem; }
   .summary-grid { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 761px) and (max-width: 1100px) {
+  .practice-layout { grid-template-columns: minmax(11.5rem, 0.58fr) minmax(0, 1.42fr); }
+  .scene-card img { max-height: 11rem; }
+  .scene-copy { padding: 0.75rem 0.85rem 0.85rem; }
+}
+
+@media (max-width: 380px) {
+  .scene-card { grid-template-columns: 6.5rem minmax(0, 1fr); }
+  .scene-card img { max-height: 8.4rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

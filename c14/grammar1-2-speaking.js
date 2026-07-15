@@ -334,6 +334,22 @@
     return draft.trim() ? draft.trim() + " " + token : token;
   }
 
+  function mixedTokenOrder(tokens, kind) {
+    var mixed = tokens.slice();
+    var seed = (state.cycle + 1) * 997 + (kind === "grammar1" ? 137 : 389);
+    for (var index = mixed.length - 1; index > 0; index -= 1) {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      var swapIndex = seed % (index + 1);
+      var temporary = mixed[index];
+      mixed[index] = mixed[swapIndex];
+      mixed[swapIndex] = temporary;
+    }
+    if (mixed.every(function (token, index) { return token === tokens[index]; })) {
+      mixed.push(mixed.shift());
+    }
+    return mixed;
+  }
+
   function renderTop() {
     var complete = state.cycle >= CYCLES.length;
     var result = complete ? state.results[CYCLES.length - 1] : currentResult();
@@ -367,7 +383,8 @@
           '<p class="section-kicker">' + escapeHtml(data.label) + '</p>' +
           '<p class="sentence-frame">' + escapeHtml(data.frame) + '</p>' +
           '<div class="focus-chips">' + data.focus.map(function (item) { return '<span>' + escapeHtml(item) + '</span>'; }).join("") + '</div>' +
-          '<div class="quick-tokens" aria-label="추천 어휘">' + data.tokens.map(function (token) { return '<button class="token-btn" type="button" data-token="' + escapeHtml(token) + '">' + escapeHtml(token) + '</button>'; }).join("") + '</div>' +
+          '<p class="token-guide">섞인 어절을 눌러 문장의 순서를 직접 만들어 보세요.</p>' +
+          '<div class="quick-tokens" aria-label="섞인 추천 어휘">' + mixedTokenOrder(data.tokens, kind).map(function (token) { return '<button class="token-btn" type="button" data-token="' + escapeHtml(token) + '">' + escapeHtml(token) + '</button>'; }).join("") + '</div>' +
           '<label for="draftInput" class="section-kicker">나의 문장</label>' +
           '<textarea id="draftInput" class="draft-input" placeholder="그림을 보고 문장을 완성해 보세요." spellcheck="false">' + escapeHtml(resultData.draft) + '</textarea>' +
           '<div class="action-row">' +
