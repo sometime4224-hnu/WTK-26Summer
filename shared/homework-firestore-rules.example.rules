@@ -55,20 +55,15 @@ service cloud.firestore {
     }
 
     function isReview4Assignment(assignmentId) {
-      return assignmentId in [
-        "review4-listening-v1",
-        "review4-reading-writing-v1"
-      ];
+      return assignmentId == "review4-reading-writing-v1";
     }
 
     function review4SectionId(assignmentId) {
-      return assignmentId == "review4-listening-v1"
-        ? "listening"
-        : "readingWriting";
+      return "readingWriting";
     }
 
     function review4Total(assignmentId) {
-      return assignmentId == "review4-listening-v1" ? 16 : 15;
+      return 15;
     }
 
     function isReview4Submission(assignmentId) {

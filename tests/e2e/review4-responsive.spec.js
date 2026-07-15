@@ -12,8 +12,6 @@ const pages = [
   { name: 'hub', path: '/review/review4-html/index.html', quiz: false },
   { name: 'confirm', path: '/review/review4-html/confirm.html', quiz: true },
   { name: 'evaluate', path: '/review/review4-html/evaluate.html', quiz: true },
-  { name: 'listening', path: '/review/review4-html/listening.html', quiz: true },
-  { name: 'listening transcripts', path: '/review/review4-html/listening-transcripts.html', quiz: false },
   { name: 'reading writing', path: '/review/review4-html/reading-writing.html', quiz: true }
 ];
 
@@ -35,6 +33,19 @@ async function startQuizIfNeeded(page, target) {
 }
 
 test.describe('Review 4 responsive layout', () => {
+  test('does not expose the retired listening pages', async ({ page }) => {
+    for (const path of [
+      '/review/review4-html/listening.html',
+      '/review/review4-html/listening-transcripts.html'
+    ]) {
+      const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+      expect(response.status()).toBe(404);
+    }
+
+    await page.goto('/review/review4-html/index.html', { waitUntil: 'load' });
+    await expect(page.locator('a[href="listening.html"], a[href="listening-transcripts.html"]')).toHaveCount(0);
+  });
+
   test('fits hub and section quiz screens across viewport sizes', async ({ browser }) => {
     for (const viewport of viewports) {
       const context = await browser.newContext({

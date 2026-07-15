@@ -24,13 +24,6 @@ async function installSubmitterMock(page) {
 
 const homeworkTargets = [
   {
-    sectionId: 'listening',
-    path: '/review/review4-html/listening.html',
-    assignmentId: 'review4-listening-v1',
-    title: '복습 4 듣기',
-    total: 16
-  },
-  {
     sectionId: 'readingWriting',
     path: '/review/review4-html/reading-writing.html',
     assignmentId: 'review4-reading-writing-v1',
