@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="ko" data-device="pointer" data-control-mode="joystick">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#6f3d35" />
+    <meta
+      name="description"
+      content="집 안의 문제를 살펴보고 알맞은 도구와 표현을 연결하는 고려대 한국어 3B 15과 어휘 탐험 게임"
+    />
+    <title>우리 집 SOS · 15과 집 문제 어휘 탐험</title>
+    <link rel="stylesheet" href="./vocab-support-home-issues-game.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+  </head>
+  <body>
+    <nav class="top-nav" aria-label="학습 자료 이동">
+      <a href="../index.html" aria-label="전체 단원 메인으로">⌂ 메인</a>
+      <span aria-hidden="true">/</span>
+      <a href="./index.html">15과</a>
+      <span aria-hidden="true">/</span>
+      <a href="./vocabulary.html">어휘</a>
+      <span class="top-nav__title">집에서 생기는 문제</span>
+    </nav>
+
+    <div id="houseGame" class="house-game">
+      <header id="heroPanel" class="hero-panel">
+        <div class="hero-compact">
+          <div class="hero-heading">
+            <p class="eyebrow">15과 어휘 · 집 문제 해결 탐험</p>
+            <h1><span aria-hidden="true">🏠</span> 우리 집 SOS</h1>
+          </div>
+          <div class="hero-actions" aria-label="게임 설정">
+            <button
+              id="heroToggle"
+              class="mini-button"
+              type="button"
+              aria-expanded="false"
+              aria-controls="heroDetails"
+            >
+              안내 보기
+            </button>
+            <button id="fullscreenToggle" class="mini-button" type="button">전체화면</button>
+            <button id="resetButton" class="mini-button" type="button">처음부터</button>
+            <button id="soundToggle" class="mini-button" type="button" aria-pressed="true">소리 켜짐</button>
+          </div>
+        </div>
+        <div id="heroDetails" class="hero-details hidden">
+          <p>
+            네 방을 차례로 살피며 <strong>막히다, 새다, 나가다, 고장 나다</strong>를 장면과 연결해 보세요.
+            문제를 진단하고 수리 동작을 끝내면 집이 다시 안전해집니다.
+          </p>
+          <ul aria-label="학습 순서">
+            <li><span>1</span> 방을 탐색해 이상 징후 찾기</li>
+            <li><span>2</span> 문제 표현을 고르고 직접 수리하기</li>
+            <li><span>3</span> 기록장에서 완성 문장 확인하기</li>
+          </ul>
+        </div>
+      </header>
+
+      <main class="game-layout">
+        <section class="play-panel" aria-label="집 탐험 게임">
+          <div class="canvas-frame">
+            <canvas
+              id="houseCanvas"
+              width="960"
+              height="640"
+              tabindex="0"
+              aria-label="주방, 욕실, 거실, 침실을 탐색하며 집 안 문제를 해결하는 게임 화면"
+            ></canvas>
+
+            <div class="hud-overlay">
+              <div class="hud-topbar" aria-label="게임 정보">
+                <button
+                  id="storyToggle"
+                  class="hud-toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="storyPanel"
+                >
+                  <span>현재 임무</span>
+                  <strong id="storyToggleLabel">첫 이상 징후 찾기</strong>
+                </button>
+                <button
+                  id="statsToggle"
+                  class="hud-toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="statsPanel"
+                >
+                  <span>집 상태</span>
+                  <strong id="statsToggleLabel">안전 0 · 도구 0</strong>
+                </button>
+                <button
+                  id="journalToggle"
+                  class="hud-toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="journalDrawer"
+                >
+                  <span>수리 기록장</span>
+                  <strong id="journalToggleLabel">표현 0 / 8</strong>
+                </button>
+              </div>
+
+              <section id="storyPanel" class="hud-card story-panel hidden" aria-live="polite">
+                <p class="card-tag">오늘의 점검</p>
+                <h2 id="storyTitle">이상한 소리를 따라가세요</h2>
+                <p id="storyBody">집 안을 걸으며 반짝이는 물건 가까이에서 조사해 보세요.</p>
+                <div class="progress-row" aria-label="임무 진행률">
+                  <div class="progress-track" aria-hidden="true">
+                    <div id="storyProgressFill" class="progress-fill"></div>
+                  </div>
+                  <strong id="storyProgressLabel">0 / 4 방</strong>
+                </div>
+              </section>
+
+              <section id="statsPanel" class="hud-card stats-panel hidden" aria-label="집 점검 현황">
+                <div>
+                  <p class="card-tag">방 지도</p>
+                  <div id="roomMap" class="room-map" aria-label="방 바로 보기">
+                    <button class="room-button is-active" type="button" data-room="kitchen" aria-current="true">
+                      <span aria-hidden="true">🍳</span><strong>주방</strong>
+                    </button>
+                    <button class="room-button" type="button" data-room="bathroom">
+                      <span aria-hidden="true">🛁</span><strong>욕실</strong>
+                    </button>
+                    <button class="room-button" type="button" data-room="living">
+                      <span aria-hidden="true">🛋️</span><strong>거실</strong>
+                    </button>
+                    <button class="room-button" type="button" data-room="bedroom">
+                      <span aria-hidden="true">🛏️</span><strong>침실</strong>
+                    </button>
+                  </div>
+                </div>
+                <dl class="stat-list">
+                  <div><dt>집 안전도</dt><dd id="safetyValue">0%</dd></div>
+                  <div><dt>찾은 도구</dt><dd id="toolValue">0 / 4</dd></div>
+                  <div><dt>자동 저장</dt><dd id="saveValue">준비됨</dd></div>
+                </dl>
+              </section>
+            </div>
+
+            <section
+              id="startCard"
+              class="floating-card start-card"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="startTitle"
+              aria-describedby="startDescription"
+              tabindex="-1"
+            >
+              <div class="start-illustration" aria-hidden="true">
+                <span>💧</span><span>🔧</span><span>💡</span>
+              </div>
+              <p id="startEyebrow" class="card-tag">집주인의 긴급 메모</p>
+              <h2 id="startTitle">네 방의 문제를 찾아 주세요!</h2>
+              <p id="startDescription">
+                고장 난 곳을 직접 조사하고, 들은 소리와 보이는 장면으로 알맞은 집 문제 표현을 완성해요.
+              </p>
+
+              <fieldset id="controlModeSelector" class="control-mode-selector">
+                <legend>터치 조작 방식</legend>
+                <label class="control-mode-option">
+                  <input type="radio" name="controlMode" value="joystick" checked />
+                  <span class="control-option-copy">
+                    <strong>조이스틱 + 조사</strong>
+                    <small>직접 걸어가서 행동 버튼을 눌러요.</small>
+                  </span>
+                </label>
+                <label class="control-mode-option">
+                  <input type="radio" name="controlMode" value="tap" />
+                  <span class="control-option-copy">
+                    <strong>화면을 터치</strong>
+                    <small>가고 싶은 곳을 누르면 자동으로 이동해요.</small>
+                  </span>
+                </label>
+              </fieldset>
+
+              <p id="resumeHint" class="resume-hint hidden" role="status">
+                저장된 점검 기록이 있어요. 시작하면 마지막 방에서 이어집니다.
+              </p>
+              <div class="start-actions">
+                <button id="fullscreenButton" class="primary-button" type="button">전체화면으로 시작</button>
+                <button id="startButton" class="secondary-button" type="button">현재 화면으로 시작</button>
+              </div>
+            </section>
+
+            <div id="interactionPrompt" class="interaction-prompt hidden" role="status" aria-live="polite">
+              <kbd id="interactionPromptKey">E</kbd>
+              <span id="interactionPromptText">수상한 곳 조사하기</span>
+            </div>
+
+            <section
+              id="dialogueBox"
+              class="dialogue-box hidden"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="dialogueSpeaker"
+              aria-describedby="dialogueText"
+              tabindex="-1"
+            >
+              <div class="dialogue-head">
+                <p id="dialogueSpeaker">집주인</p>
+                <button id="dialogueClose" class="icon-button" type="button" aria-label="대화 닫기">×</button>
+              </div>
+              <p id="dialogueText">어디에서 이상한 소리가 나는지 잘 들어 보세요.</p>
+            </section>
+
+            <section
+              id="diagnosisPanel"
+              class="diagnosis-panel hidden"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="diagnosisQuestion"
+              tabindex="-1"
+            >
+              <p id="diagnosisScene" class="card-tag">욕실 · 물이 차오르는 변기</p>
+              <h2 id="diagnosisQuestion">지금 생긴 문제를 어떻게 말할까요?</h2>
+              <div id="diagnosisOptions" class="diagnosis-options" role="group" aria-label="문제 표현 선택"></div>
+              <p id="diagnosisFeedback" class="diagnosis-feedback" role="status" aria-live="polite"></p>
+            </section>
+
+            <section
+              id="endingPanel"
+              class="ending-panel hidden"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="endingSummary"
+              tabindex="-1"
+            >
+              <p class="card-tag">집 점검 완료</p>
+              <div class="ending-badge" aria-hidden="true">✓</div>
+              <h2 id="endingSummary">우리 집이 다시 편안해졌어요!</h2>
+              <div class="ending-review">
+                <div><span>익힌 표현</span><strong id="endingWords">8개</strong></div>
+                <div><span>기록장</span><strong id="endingJournal">4문장</strong></div>
+              </div>
+              <button id="endingRestart" class="primary-button" type="button">다시 점검하기</button>
+            </section>
+
+            <div id="toast" class="toast hidden" role="status" aria-live="polite">
+              <span class="toast-icon" aria-hidden="true">✓</span>
+              <div><strong id="toastTitle">기록 완료</strong><p id="toastBody">새 표현이 수리 기록장에 저장됐어요.</p></div>
+            </div>
+
+            <div id="touchControls" class="touch-controls" aria-label="터치 조작 패널">
+              <div id="touchJoystick" class="touch-joystick" role="group" aria-label="이동 조이스틱">
+                <span class="joystick-arrow joystick-arrow--up" aria-hidden="true">▲</span>
+                <span class="joystick-arrow joystick-arrow--right" aria-hidden="true">▶</span>
+                <span class="joystick-arrow joystick-arrow--down" aria-hidden="true">▼</span>
+                <span class="joystick-arrow joystick-arrow--left" aria-hidden="true">◀</span>
+                <div id="touchJoystickKnob" class="touch-joystick-knob"></div>
+                <span class="touch-control-caption" aria-hidden="true">이동</span>
+              </div>
+              <button id="touchAction" class="touch-action" type="button">
+                <span aria-hidden="true">🔎</span>
+                <strong id="touchActionLabel">조사</strong>
+              </button>
+              <p id="tapModeHint" class="tap-mode-hint" role="status">
+                <span aria-hidden="true">☝️</span> 반짝이는 곳을 터치하세요
+              </p>
+            </div>
+
+            <section
+              id="controlTutorial"
+              class="control-tutorial hidden"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="tutorialTitle"
+              aria-describedby="tutorialBody"
+              tabindex="-1"
+            >
+              <div class="tutorial-visual" aria-hidden="true"><span>☝️</span></div>
+              <p id="tutorialStepLabel" class="card-tag">조작 연습 1 / 2</p>
+              <h2 id="tutorialTitle">이동 패드를 살짝 밀어 보세요</h2>
+              <p id="tutorialBody">손가락을 패드에 댄 채 가고 싶은 방향으로 움직이면 집 안을 걸을 수 있어요.</p>
+              <p id="tutorialStatus" class="tutorial-status" role="status" aria-live="polite">연습을 기다리고 있어요.</p>
+              <div class="tutorial-actions">
+                <button id="tutorialSkip" class="text-button" type="button">건너뛰기</button>
+                <button id="tutorialNext" class="primary-button" type="button">다음</button>
+              </div>
+            </section>
+          </div>
+
+          <div class="keyboard-guide" aria-label="키보드 조작법">
+            <span><kbd>WASD</kbd> / <kbd>방향키</kbd> 이동</span>
+            <span><kbd>E</kbd> / <kbd>Space</kbd> 조사</span>
+            <span><kbd>Esc</kbd> 닫기</span>
+          </div>
+        </section>
+      </main>
+
+      <button id="journalBackdrop" class="drawer-backdrop hidden" type="button" aria-label="수리 기록장 닫기"></button>
+      <aside
+        id="journalDrawer"
+        class="journal-drawer hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="journalHeading"
+        tabindex="-1"
+      >
+        <header class="journal-head">
+          <div>
+            <p class="card-tag">나의 수리 노트</p>
+            <h2 id="journalHeading">집 문제 표현 기록장</h2>
+          </div>
+          <button id="journalClose" class="icon-button" type="button" aria-label="기록장 닫기">×</button>
+        </header>
+        <div class="journal-scroll">
+          <p id="journalSummary" class="journal-summary">아직 기록한 표현이 없어요. 집 안의 이상 징후를 찾아보세요.</p>
+          <ol id="journalList" class="journal-list" aria-label="발견한 집 문제 표현"></ol>
+          <section class="journal-tip">
+            <p class="card-tag">말하기 도움</p>
+            <p><strong>“무엇이 어떻게 됐어요?”</strong>를 먼저 말하고, 이어서 <strong>“그래서 ~해야 해요.”</strong>로 해결 방법을 말해 보세요.</p>
+          </section>
+        </div>
+      </aside>
+    </div>
+
+    <script src="./vocab-support-home-issues-game.js"></script>
+    <script src="../shared/learning-enhancements.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+  </body>
+</html>
