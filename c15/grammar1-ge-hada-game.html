@@ -9,7 +9,7 @@
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>15과 문법 1 보조 게임 | -게 하다</title>
     <style>
         :root {
@@ -22,15 +22,22 @@
             --blue-soft: #dbeafe;
             --green: #047857;
             --green-soft: #d1fae5;
-            --orange: #ea580c;
+            --orange: #c2410c;
             --orange-soft: #ffedd5;
+            --purple: #7c3aed;
+            --shadow: 0 12px 28px rgba(15, 23, 42, 0.09);
         }
 
         * {
             box-sizing: border-box;
         }
 
-        html, body {
+        [hidden] {
+            display: none !important;
+        }
+
+        html,
+        body {
             margin: 0;
             background: var(--bg);
             color: var(--text);
@@ -45,279 +52,460 @@
             font: inherit;
         }
 
+        button,
+        [tabindex] {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button:focus-visible,
+        a:focus-visible,
+        [tabindex]:focus-visible {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+        }
+
         .app {
-            width: min(100%, 720px);
+            width: min(100%, 760px);
             margin: 0 auto;
-            padding: 10px 8px calc(18px + env(safe-area-inset-bottom));
+            padding: 10px 10px calc(24px + env(safe-area-inset-bottom));
         }
 
         .topbar {
             position: sticky;
             top: 0;
-            z-index: 20;
+            z-index: 30;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            padding: 4px 2px 10px;
+            padding: 5px 2px 10px;
             background: linear-gradient(180deg, rgba(248, 250, 252, 0.98), rgba(248, 250, 252, 0.92));
             backdrop-filter: blur(8px);
         }
 
         .back-link {
             color: var(--blue);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .progress {
-            color: var(--muted);
             font-size: 14px;
             font-weight: 900;
+            text-decoration: none;
+        }
+
+        .scoreboard {
+            min-width: 0;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 900;
+            text-align: right;
+        }
+
+        .scoreboard span {
+            display: block;
+        }
+
+        #scoreText {
+            margin-top: 2px;
+            color: var(--blue);
         }
 
         .mission {
             padding: 6px 4px 10px;
         }
 
-        #missionText {
+        #pageTitle {
             margin: 0;
-            font-size: clamp(23px, 6vw, 33px);
-            line-height: 1.32;
+            color: var(--blue);
+            font-size: 16px;
             font-weight: 900;
-            letter-spacing: -0.02em;
+            line-height: 1.3;
+        }
+
+        #missionText {
+            margin: 4px 0 0;
+            font-size: clamp(22px, 5.8vw, 32px);
+            font-weight: 900;
+            line-height: 1.3;
+            letter-spacing: -0.025em;
+            word-break: keep-all;
+        }
+
+        #statusText {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.45;
+            word-break: keep-all;
+        }
+
+        .other-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 7px;
+            margin-bottom: 9px;
+        }
+
+        .other-tab {
+            min-height: 43px;
+            padding: 8px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--panel);
+            color: #334155;
+            font-weight: 900;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .other-tab[aria-pressed="true"] {
+            border-color: var(--purple);
+            background: #ede9fe;
+            color: #5b21b6;
+            box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.12);
+        }
+
+        .stage-shell {
+            position: relative;
         }
 
         .stage {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr);
+            align-items: stretch;
             gap: 8px;
-        }
-
-        .zone.is-hidden {
-            display: none;
         }
 
         .zone {
             position: relative;
+            display: flex;
+            min-width: 0;
+            min-height: 278px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4px;
             overflow: hidden;
-            padding: 0;
-            border: 0;
-            border-radius: 18px;
+            padding: 10px 8px 12px;
+            border: 2px solid transparent;
+            border-radius: 20px;
             background: var(--panel);
+            color: var(--text);
             cursor: pointer;
+            box-shadow: var(--shadow);
             touch-action: manipulation;
-            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
-            transform-origin: center bottom;
+            transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
         }
 
         .zone::after {
             content: "";
             position: absolute;
-            inset: 0;
-            border: 2px dashed rgba(148, 163, 184, 0.8);
-            border-radius: 18px;
+            inset: 5px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 15px;
             pointer-events: none;
-            transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
         }
 
-        .zone.is-hover::after,
-        .zone:active::after {
+        .zone.is-hover {
             border-color: var(--blue);
-            background: rgba(219, 234, 254, 0.18);
+            background: #eff6ff;
+            transform: translateY(-3px);
         }
 
-        .zone.is-correct::after {
-            border-color: var(--green);
-            background: rgba(209, 250, 229, 0.24);
+        .zone.is-pass::after {
+            border-color: #60a5fa;
         }
 
-        .zone.is-wrong::after {
-            border-color: var(--orange);
-            background: rgba(255, 237, 213, 0.26);
+        .zone.is-result {
+            border-color: #34d399;
+            background: #ecfdf5;
         }
 
-        .zone.is-celebrating {
-            animation: zoneCelebrateDance 0.95s ease-in-out both;
+        .zone.is-command {
+            border-color: #a78bfa;
+            background: #f5f3ff;
         }
 
-        .zone.is-shaking {
-            animation: zoneShake 0.58s ease both;
+        .zone.is-wrong {
+            border-color: #fb923c;
+            background: var(--orange-soft);
+            animation: zoneShake 0.46s ease;
+        }
+
+        .zone:disabled {
+            cursor: default;
+            opacity: 1;
+        }
+
+        .zone__role {
+            position: relative;
+            z-index: 2;
+            align-self: flex-start;
+            min-height: 26px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+
+        .zone.is-result .zone__role {
+            background: var(--green);
+            color: #ffffff;
+        }
+
+        .zone.is-command .zone__role {
+            background: var(--purple);
+            color: #ffffff;
+        }
+
+        .zone__image-wrap {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            min-height: 0;
+            flex: 1 1 auto;
+            align-items: center;
+            justify-content: center;
         }
 
         .zone img {
             display: block;
-            width: 100%;
+            width: min(100%, 205px);
             height: auto;
             pointer-events: none;
         }
 
-        .zone-name {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            z-index: 1;
-            display: inline-flex;
+        .zone__copy {
+            position: relative;
+            z-index: 2;
+            display: block;
+            min-height: 48px;
+            text-align: center;
+        }
+
+        .zone__name,
+        .zone__line {
+            display: block;
+        }
+
+        .zone__name {
+            font-size: 19px;
+            font-weight: 900;
+        }
+
+        .zone__line {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.25;
+            word-break: keep-all;
+        }
+
+        .route-rail {
+            position: relative;
+            display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 34px;
-            padding: 5px 9px;
+            min-height: 100%;
+        }
+
+        .route-rail::before {
+            content: "";
+            position: absolute;
+            left: 2px;
+            right: 2px;
+            top: 50%;
+            height: 5px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.92);
-            color: #334155;
-            font-size: 13px;
+            background: #dbe2ea;
+            transform: translateY(-50%);
+        }
+
+        .route-arrow {
+            position: relative;
+            z-index: 2;
+            display: inline-flex;
+            width: 38px;
+            height: 38px;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #cbd5e1;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #64748b;
+            font-size: 20px;
             font-weight: 900;
-            box-shadow: 0 4px 8px rgba(15, 23, 42, 0.08);
-            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        .route-rail.is-forward::before,
+        .route-rail.is-reverse::before {
+            background: linear-gradient(90deg, #7c3aed, #10b981);
+        }
+
+        .route-rail.is-forward .route-arrow,
+        .route-rail.is-reverse .route-arrow {
+            border-color: #7c3aed;
+            color: #6d28d9;
+        }
+
+        .result-popup {
+            margin-top: 9px;
+            padding: 13px 14px;
+            border: 2px solid #86efac;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #ecfdf5, #d1fae5);
+            text-align: center;
+            box-shadow: 0 10px 24px rgba(4, 120, 87, 0.1);
+        }
+
+        .result-popup.is-summary {
+            border-color: #93c5fd;
+            background: linear-gradient(180deg, #eff6ff, #dbeafe);
+        }
+
+        .result-popup__label {
+            margin: 0 0 4px;
+            color: var(--green);
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+        }
+
+        .result-popup.is-summary .result-popup__label {
+            color: #1d4ed8;
+        }
+
+        .result-popup__sentence {
+            margin: 0;
+            color: #065f46;
+            font-size: clamp(22px, 5vw, 30px);
+            font-weight: 900;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+            word-break: keep-all;
+        }
+
+        .result-popup.is-summary .result-popup__sentence {
+            color: #1d4ed8;
         }
 
         .feedback {
-            min-height: 56px;
-            margin-top: 8px;
+            min-height: 62px;
+            margin-top: 9px;
             padding: 12px 14px;
             border: 1px solid var(--line);
             border-radius: 16px;
             background: var(--panel);
             color: var(--muted);
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 800;
             line-height: 1.45;
         }
 
-        .feedback__label {
+        .feedback__label,
+        .feedback__answer,
+        .feedback__meta {
             display: block;
+        }
+
+        .feedback__label {
             margin-bottom: 4px;
             font-size: 12px;
             font-weight: 900;
             letter-spacing: 0.08em;
-            text-transform: uppercase;
         }
 
         .feedback__answer {
-            display: block;
-            font-size: 18px;
+            color: inherit;
+            font-size: 17px;
             font-weight: 900;
-            line-height: 1.3;
             word-break: keep-all;
         }
 
         .feedback__meta {
-            display: block;
-            margin-top: 8px;
-            font-size: 15px;
-            font-weight: 800;
-            line-height: 1.35;
+            margin-top: 6px;
+            font-size: 14px;
+            word-break: keep-all;
         }
 
         .feedback.is-correct {
-            border-color: #86efac;
-            border-width: 2px;
-            background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
-            color: var(--green);
-            text-align: center;
-            box-shadow: 0 12px 24px rgba(4, 120, 87, 0.12);
-        }
-
-        .feedback.is-correct .feedback__label {
-            margin-bottom: 6px;
-            font-size: 13px;
-            color: #047857;
-        }
-
-        .feedback.is-correct .feedback__answer {
-            font-size: clamp(25px, 6vw, 33px);
-            font-weight: 900;
-            line-height: 1.16;
-            letter-spacing: -0.03em;
+            border: 2px solid #86efac;
+            background: var(--green-soft);
             color: #065f46;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
         }
 
         .feedback.is-wrong {
-            border-color: #fdba74;
+            border: 2px solid #fdba74;
             background: var(--orange-soft);
-            color: var(--orange);
-        }
-
-        .feedback.is-wrong .feedback__answer {
-            font-size: 17px;
+            color: #9a3412;
         }
 
         .feedback.is-summary {
-            border-color: #93c5fd;
-            border-width: 2px;
-            background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
-            color: var(--blue);
-            text-align: center;
-            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.12);
-        }
-
-        .feedback.is-summary .feedback__label {
-            margin-bottom: 6px;
-            font-size: 13px;
-            color: #1d4ed8;
-        }
-
-        .feedback.is-summary .feedback__answer {
-            font-size: clamp(27px, 6vw, 35px);
-            line-height: 1.15;
-            color: #1d4ed8;
-            letter-spacing: -0.03em;
-        }
-
-        .feedback.is-summary .feedback__meta {
+            border: 2px solid #93c5fd;
+            background: var(--blue-soft);
             color: #1e40af;
         }
 
+        .game-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 9px;
+        }
+
         .composer {
-            position: sticky;
-            bottom: 0;
-            z-index: 30;
             margin-top: 10px;
-            padding: 8px;
+            padding: 9px;
             border: 1px solid var(--line);
             border-radius: 20px;
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 -4px 18px rgba(15, 23, 42, 0.06);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 -4px 18px rgba(15, 23, 42, 0.05);
         }
 
-        .preview {
+        .sentence-card {
             display: flex;
+            min-height: 60px;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            min-height: 58px;
-            margin-bottom: 8px;
+            gap: 9px;
+            margin-bottom: 9px;
             padding: 10px 12px;
-            border: 1px solid #93c5fd;
-            border-radius: 16px;
+            border: 2px solid #93c5fd;
+            border-radius: 15px;
             background: #eff6ff;
             color: var(--blue);
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 900;
             text-align: center;
-            user-select: none;
             cursor: grab;
-            touch-action: manipulation;
+            user-select: none;
+            touch-action: none;
         }
 
-        .preview:active {
+        .sentence-card.is-dragging {
+            border-color: var(--blue);
+            background: #dbeafe;
             cursor: grabbing;
         }
 
-        .preview__icon {
+        .sentence-card[aria-disabled="true"] {
+            cursor: default;
+            opacity: 0.58;
+        }
+
+        .sentence-card__icon {
             flex: 0 0 auto;
             font-size: 24px;
             line-height: 1;
         }
 
-        .preview__icon.is-hidden {
+        .sentence-card__icon.is-hidden {
             display: none;
         }
 
-        .preview__text {
+        .sentence-card__text {
             min-width: 0;
             line-height: 1.3;
             word-break: keep-all;
@@ -327,68 +515,84 @@
             display: flex;
             gap: 8px;
             overflow-x: auto;
-            padding-bottom: 2px;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .token-row::-webkit-scrollbar {
-            display: none;
+            padding: 2px 1px 9px;
+            scrollbar-color: #94a3b8 #e2e8f0;
+            scrollbar-width: thin;
         }
 
         .token-row + .token-row {
-            margin-top: 8px;
+            margin-top: 4px;
         }
 
-        .token-row.is-muted {
-            opacity: 0.45;
+        .token-row::-webkit-scrollbar {
+            height: 7px;
+        }
+
+        .token-row::-webkit-scrollbar-track {
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        .token-row::-webkit-scrollbar-thumb {
+            border-radius: 999px;
+            background: #94a3b8;
         }
 
         .token {
             flex: 0 0 auto;
-            appearance: none;
-            min-height: 44px;
-            padding: 10px 14px;
-            border: 1px solid var(--line);
-            border-radius: 999px;
-            background: #ffffff;
-            color: #334155;
-            font-size: 16px;
-            font-weight: 800;
-            white-space: nowrap;
-            touch-action: manipulation;
-        }
-
-        .token--noun,
-        .token--verb {
             display: flex;
+            min-width: 76px;
+            min-height: 72px;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            min-width: 78px;
-            min-height: 76px;
-            padding: 10px 12px;
-            border-radius: 18px;
-            white-space: normal;
-        }
-
-        .token__icon {
-            display: block;
-            font-size: 24px;
-            line-height: 1;
-        }
-
-        .token__text {
-            display: block;
+            padding: 9px 11px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #ffffff;
+            color: #334155;
             font-size: 14px;
-            line-height: 1.15;
+            font-weight: 900;
+            cursor: pointer;
+            touch-action: manipulation;
         }
 
         .token.is-selected {
             border-color: #60a5fa;
             background: var(--blue-soft);
-            color: var(--blue);
+            color: #1d4ed8;
+            box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.12);
+        }
+
+        .token:disabled {
+            cursor: default;
+            opacity: 0.38;
+        }
+
+        .token__icon {
+            font-size: 23px;
+            line-height: 1;
+        }
+
+        .token__text {
+            line-height: 1.15;
+            white-space: nowrap;
+        }
+
+        .route-help {
+            margin: 4px 2px 7px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        .route-controls {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
         }
 
         .controls {
@@ -399,15 +603,15 @@
 
         .control-btn {
             flex: 1 1 0;
-            appearance: none;
-            min-height: 44px;
-            padding: 10px 12px;
+            min-height: 45px;
+            padding: 9px 10px;
             border: 1px solid var(--line);
-            border-radius: 14px;
+            border-radius: 13px;
             background: #ffffff;
             color: #334155;
             font-size: 15px;
             font-weight: 900;
+            cursor: pointer;
             touch-action: manipulation;
         }
 
@@ -417,84 +621,200 @@
             color: #ffffff;
         }
 
-        .flying-icon {
+        .control-btn.route {
+            border-color: #a78bfa;
+            background: #f5f3ff;
+            color: #5b21b6;
+        }
+
+        .control-btn:disabled {
+            cursor: default;
+            opacity: 0.46;
+        }
+
+        .drag-ghost {
             position: fixed;
-            top: 0;
+            z-index: 120;
             left: 0;
-            z-index: 80;
+            top: 0;
             display: inline-flex;
+            max-width: min(80vw, 440px);
+            min-height: 54px;
             align-items: center;
             justify-content: center;
-            width: 88px;
-            height: 88px;
-            border: 2px solid rgba(147, 197, 253, 0.95);
+            gap: 8px;
+            padding: 9px 13px;
+            border: 2px solid rgba(37, 99, 235, 0.5);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--blue);
+            font-size: 17px;
+            font-weight: 900;
+            line-height: 1.25;
+            box-shadow: 0 18px 36px rgba(37, 99, 235, 0.2);
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        .command-beam {
+            position: fixed;
+            z-index: 110;
+            left: 0;
+            top: 0;
+            height: 7px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 18px 36px rgba(37, 99, 235, 0.22);
-            font-size: 56px;
+            background: linear-gradient(90deg, #7c3aed, #10b981);
+            box-shadow: 0 0 12px rgba(124, 58, 237, 0.35);
+            opacity: 0;
+            pointer-events: none;
+            transform-origin: left center;
+        }
+
+        .command-beam.is-visible {
+            opacity: 0.92;
+        }
+
+        .flying-icon {
+            position: fixed;
+            z-index: 130;
+            left: 0;
+            top: 0;
+            display: inline-flex;
+            width: 62px;
+            height: 62px;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #93c5fd;
+            border-radius: 999px;
+            background: #ffffff;
+            font-size: 38px;
             line-height: 1;
+            box-shadow: 0 14px 28px rgba(37, 99, 235, 0.2);
             pointer-events: none;
             will-change: transform, opacity;
         }
 
-        @keyframes zoneCelebrateDance {
-            0% { transform: translateY(0) rotate(0deg) scale(1); }
-            18% { transform: translateY(-8px) rotate(-3deg) scale(1.02); }
-            36% { transform: translateY(0) rotate(3deg) scale(1.03); }
-            54% { transform: translateY(-10px) rotate(-2deg) scale(1.04); }
-            72% { transform: translateY(0) rotate(2deg) scale(1.02); }
-            100% { transform: translateY(0) rotate(0deg) scale(1); }
-        }
-
         @keyframes zoneShake {
-            0% { transform: translateX(0) rotate(0deg); }
-            18% { transform: translateX(-10px) rotate(-2deg); }
-            36% { transform: translateX(9px) rotate(2deg); }
-            54% { transform: translateX(-8px) rotate(-1.5deg); }
-            72% { transform: translateX(6px) rotate(1deg); }
-            100% { transform: translateX(0) rotate(0deg); }
-        }
-
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
+            0%,
+            100% { transform: translateX(0); }
+            25% { transform: translateX(-7px); }
+            50% { transform: translateX(7px); }
+            75% { transform: translateX(-4px); }
         }
 
         @media (min-width: 721px) {
+            .composer {
+                position: sticky;
+                bottom: 8px;
+                z-index: 25;
+                backdrop-filter: blur(10px);
+            }
+        }
+
+        @media (max-width: 720px) {
             .app {
-                padding-inline: 14px;
+                padding-inline: 8px;
             }
 
-            .topbar {
-                padding-top: 10px;
+            .stage {
+                grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+                gap: 5px;
             }
 
-            .zone-name {
-                font-size: 14px;
+            .zone {
+                min-height: 200px;
+                padding: 7px 5px 9px;
+                border-radius: 16px;
+            }
+
+            .zone::after {
+                inset: 4px;
+                border-radius: 12px;
+            }
+
+            .zone img {
+                width: min(100%, 150px);
+            }
+
+            .zone__role {
+                min-height: 23px;
+                padding: 4px 7px;
+                font-size: 10px;
+            }
+
+            .zone__copy {
+                min-height: 42px;
+            }
+
+            .zone__name {
+                font-size: 16px;
+            }
+
+            .zone__line {
+                font-size: 10px;
+            }
+
+            .route-arrow {
+                width: 30px;
+                height: 30px;
+                font-size: 16px;
             }
 
             .composer {
-                padding: 10px;
+                position: static;
+                padding: 8px;
+                backdrop-filter: none;
+            }
+
+            .sentence-card {
+                min-height: 56px;
+                font-size: 17px;
             }
         }
 
         @media (max-width: 420px) {
-            .token--noun,
-            .token--verb {
-                min-width: 72px;
-                min-height: 72px;
-                padding-inline: 10px;
+            .stage {
+                grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
+                gap: 4px;
             }
 
-            .token__icon {
-                font-size: 22px;
+            .zone {
+                min-height: 178px;
+            }
+
+            .zone img {
+                width: min(100%, 128px);
+            }
+
+            .route-arrow {
+                width: 26px;
+                height: 26px;
+                font-size: 14px;
+            }
+
+            .token {
+                min-width: 70px;
+                min-height: 68px;
+            }
+
+            .route-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .scoreboard {
+                font-size: 12px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
             }
         }
     </style>
@@ -507,773 +827,137 @@
     <!-- End Google Tag Manager (noscript) -->
 
     <main class="app">
-        <div class="topbar">
+        <header class="topbar">
             <a class="back-link" href="grammar1.html">문법 1로</a>
-            <div class="progress" id="progressText">1단계 1 / 9</div>
+            <div class="scoreboard" aria-label="게임 진행">
+                <span id="progressText">1단계 1 / 9</span>
+                <span id="scoreText">첫 시도 0 / 18</span>
+            </div>
+        </header>
+
+        <section class="mission" aria-labelledby="pageTitle">
+            <h1 id="pageTitle">누가 하게 할까요?</h1>
+            <p id="missionText">친구가 케이크를 먹게 하세요.</p>
+            <p id="statusText" aria-live="polite">행동을 고른 뒤 카드를 인물 한 곳 또는 두 인물 순서로 옮겨 보세요.</p>
+        </section>
+
+        <div class="other-tabs" id="otherTabs" role="group" aria-label="타인 선택" hidden>
+            <button class="other-tab" type="button" data-other="friend" aria-pressed="true">친구</button>
+            <button class="other-tab" type="button" data-other="sibling" aria-pressed="false">동생</button>
+            <button class="other-tab" type="button" data-other="staff" aria-pressed="false">부하직원</button>
         </div>
 
-        <section class="mission">
-            <p id="missionText">친구가 케이크를 먹게 하세요.</p>
+        <section class="stage-shell" aria-label="행동 경로 무대">
+            <div class="stage" id="stageBoard">
+                <button class="zone zone--self" type="button" id="selfZone" data-zone="self" aria-label="나의 직접 행동 제출">
+                    <span class="zone__role" id="selfRole">직접 행동</span>
+                    <span class="zone__image-wrap">
+                        <img
+                            id="selfImage"
+                            src="../assets/c15/grammar/images/ge-hada-cast/self_main_01.webp"
+                            alt="나 캐릭터"
+                            width="1012"
+                            height="1012"
+                            loading="lazy"
+                            decoding="async" />
+                    </span>
+                    <span class="zone__copy">
+                        <span class="zone__name" id="selfName">나</span>
+                        <span class="zone__line" id="selfLine">누르면 내가 직접 해요</span>
+                    </span>
+                </button>
+
+                <div class="route-rail" id="routeRail" aria-hidden="true">
+                    <span class="route-arrow" id="routeArrow">•</span>
+                </div>
+
+                <button class="zone zone--other" type="button" id="otherZone" data-zone="other" aria-label="친구의 직접 행동 제출">
+                    <span class="zone__role" id="otherRole">직접 행동</span>
+                    <span class="zone__image-wrap">
+                        <img
+                            id="otherImage"
+                            src="../assets/c15/grammar/images/ge-hada-cast/friend_female_01.webp"
+                            alt="친구 캐릭터"
+                            width="1012"
+                            height="1012"
+                            loading="lazy"
+                            decoding="async" />
+                    </span>
+                    <span class="zone__copy">
+                        <span class="zone__name" id="otherName">친구</span>
+                        <span class="zone__line" id="otherLine">누르면 친구가 직접 해요</span>
+                    </span>
+                </button>
+            </div>
+
+            <section class="result-popup" id="resultPopup" aria-live="polite" hidden>
+                <p class="result-popup__label" id="resultLabel">완성 문장</p>
+                <p class="result-popup__sentence" id="resultSentence"></p>
+            </section>
         </section>
 
-        <section class="stage" id="stageBoard" aria-label="인물 선택">
-            <button class="zone" type="button" id="selfZone" aria-label="나에게 놓기">
-                <img
-                    id="selfImage"
-                    src="../assets/c15/grammar/images/ge-hada-cast/self_main_01.webp"
-                    alt="왼쪽 인물 캐릭터"
-                    width="1012"
-                    height="1012" loading="lazy" decoding="async" />
-                <span class="zone-name" id="selfName">나</span>
-            </button>
-
-            <button class="zone" type="button" id="friendZone" aria-label="친구에게 놓기">
-                <img
-                    id="friendImage"
-                    src="../assets/c15/grammar/images/ge-hada-cast/friend_female_01.webp"
-                    alt="친구 캐릭터"
-                    width="1012"
-                    height="1012" loading="lazy" decoding="async" />
-                <span class="zone-name" id="friendName">친구</span>
-            </button>
-
-            <button class="zone is-hidden" type="button" id="siblingZone" aria-label="동생에게 놓기">
-                <img
-                    id="siblingImage"
-                    src="../assets/c15/grammar/images/ge-hada-cast/boy_02.webp"
-                    alt="동생 캐릭터"
-                    width="1012"
-                    height="1012" loading="lazy" decoding="async" />
-                <span class="zone-name" id="siblingName">동생</span>
-            </button>
-
-            <button class="zone is-hidden" type="button" id="staffZone" aria-label="부하직원에게 놓기">
-                <img
-                    id="staffImage"
-                    src="../assets/c15/grammar/images/ge-hada-cast/office_man_glasses_01.webp"
-                    alt="부하직원 캐릭터"
-                    width="1012"
-                    height="1012" loading="lazy" decoding="async" />
-                <span class="zone-name" id="staffName">부하직원</span>
-            </button>
+        <section class="feedback" id="feedbackBox" role="status" aria-live="polite">
+            명사와 동사를 고른 뒤 행동 경로를 만들어 보세요.
         </section>
 
-        <section class="feedback" id="feedbackBox">행동을 고르고 인물을 탭하세요.</section>
+        <div class="game-actions">
+            <button class="control-btn primary" type="button" id="nextBtn" hidden>다음 문제</button>
+            <button class="control-btn primary" type="button" id="restartBtn" hidden>다시 하기</button>
+        </div>
 
         <section class="composer" id="composer" aria-label="행동 선택">
-            <div class="preview" id="actionPreview" draggable="true">
-                <span class="preview__icon" id="previewNounIcon" aria-hidden="true">🍰</span>
-                <span class="preview__text" id="actionPreviewText">케이크를 먹다</span>
-                <span class="preview__icon" id="previewVerbIcon" aria-hidden="true">🍽️</span>
+            <div
+                class="sentence-card"
+                id="sentenceCard"
+                role="button"
+                tabindex="0"
+                aria-label="드래그할 행동 카드"
+                aria-describedby="routeHelp">
+                <span class="sentence-card__icon" id="previewNounIcon" aria-hidden="true">🍰</span>
+                <span class="sentence-card__text" id="actionPreviewText">케이크를 먹다</span>
+                <span class="sentence-card__icon" id="previewVerbIcon" aria-hidden="true">🍽️</span>
             </div>
 
-            <div class="token-row" id="nounRow">
-                <button class="token token--noun is-selected" type="button" data-kind="noun" data-value="케이크" data-particle="를" data-icon="🍰"><span class="token__icon" aria-hidden="true">🍰</span><span class="token__text">케이크</span></button>
-                <button class="token token--noun" type="button" data-kind="noun" data-value="빵" data-particle="을" data-icon="🥖"><span class="token__icon" aria-hidden="true">🥖</span><span class="token__text">빵</span></button>
-                <button class="token token--noun" type="button" data-kind="noun" data-value="밥" data-particle="을" data-icon="🍚"><span class="token__icon" aria-hidden="true">🍚</span><span class="token__text">밥</span></button>
-                <button class="token token--noun" type="button" data-kind="noun" data-value="물" data-particle="을" data-icon="💧"><span class="token__icon" aria-hidden="true">💧</span><span class="token__text">물</span></button>
-                <button class="token token--noun" type="button" data-kind="noun" data-value="책" data-particle="을" data-icon="📘"><span class="token__icon" aria-hidden="true">📘</span><span class="token__text">책</span></button>
-                <button class="token token--noun" type="button" data-kind="noun" data-value="신문" data-particle="을" data-icon="📰"><span class="token__icon" aria-hidden="true">📰</span><span class="token__text">신문</span></button>
-                <button class="token token--noun" type="button" data-kind="noun" data-value="영화" data-particle="를" data-icon="🎬"><span class="token__icon" aria-hidden="true">🎬</span><span class="token__text">영화</span></button>
-                <button class="token token--noun" type="button" data-kind="noun" data-value="드라마" data-particle="를" data-icon="📺"><span class="token__icon" aria-hidden="true">📺</span><span class="token__text">드라마</span></button>
+            <div class="token-row" id="nounRow" aria-label="명사 선택">
+                <button class="token is-selected" type="button" data-kind="noun" data-value="케이크" data-particle="를" data-icon="🍰" aria-pressed="true"><span class="token__icon" aria-hidden="true">🍰</span><span class="token__text">케이크</span></button>
+                <button class="token" type="button" data-kind="noun" data-value="빵" data-particle="을" data-icon="🥖" aria-pressed="false"><span class="token__icon" aria-hidden="true">🥖</span><span class="token__text">빵</span></button>
+                <button class="token" type="button" data-kind="noun" data-value="밥" data-particle="을" data-icon="🍚" aria-pressed="false"><span class="token__icon" aria-hidden="true">🍚</span><span class="token__text">밥</span></button>
+                <button class="token" type="button" data-kind="noun" data-value="물" data-particle="을" data-icon="💧" aria-pressed="false"><span class="token__icon" aria-hidden="true">💧</span><span class="token__text">물</span></button>
+                <button class="token" type="button" data-kind="noun" data-value="책" data-particle="을" data-icon="📘" aria-pressed="false"><span class="token__icon" aria-hidden="true">📘</span><span class="token__text">책</span></button>
+                <button class="token" type="button" data-kind="noun" data-value="신문" data-particle="을" data-icon="📰" aria-pressed="false"><span class="token__icon" aria-hidden="true">📰</span><span class="token__text">신문</span></button>
+                <button class="token" type="button" data-kind="noun" data-value="영화" data-particle="를" data-icon="🎬" aria-pressed="false"><span class="token__icon" aria-hidden="true">🎬</span><span class="token__text">영화</span></button>
+                <button class="token" type="button" data-kind="noun" data-value="드라마" data-particle="를" data-icon="📺" aria-pressed="false"><span class="token__icon" aria-hidden="true">📺</span><span class="token__text">드라마</span></button>
             </div>
 
-            <div class="token-row" id="verbRow">
-                <button class="token token--verb is-selected" type="button" data-kind="verb" data-value="먹다" data-present="먹어요" data-ge="먹게" data-icon="🍽️"><span class="token__icon" aria-hidden="true">🍽️</span><span class="token__text">먹다</span></button>
-                <button class="token token--verb" type="button" data-kind="verb" data-value="마시다" data-present="마셔요" data-ge="마시게" data-icon="🥤"><span class="token__icon" aria-hidden="true">🥤</span><span class="token__text">마시다</span></button>
-                <button class="token token--verb" type="button" data-kind="verb" data-value="읽다" data-present="읽어요" data-ge="읽게" data-icon="📖"><span class="token__icon" aria-hidden="true">📖</span><span class="token__text">읽다</span></button>
-                <button class="token token--verb" type="button" data-kind="verb" data-value="보다" data-present="봐요" data-ge="보게" data-icon="👀"><span class="token__icon" aria-hidden="true">👀</span><span class="token__text">보다</span></button>
-                <button class="token token--verb" type="button" data-kind="verb" data-value="고르다" data-present="골라요" data-ge="고르게" data-icon="☝️"><span class="token__icon" aria-hidden="true">☝️</span><span class="token__text">고르다</span></button>
-                <button class="token token--verb" type="button" data-kind="verb" data-value="사다" data-present="사요" data-ge="사게" data-icon="🛍️"><span class="token__icon" aria-hidden="true">🛍️</span><span class="token__text">사다</span></button>
-                <button class="token token--verb" type="button" data-kind="verb" data-value="웃다" data-present="웃어요" data-ge="웃게" data-icon="😄"><span class="token__icon" aria-hidden="true">😄</span><span class="token__text">웃다</span></button>
-                <button class="token token--verb" type="button" data-kind="verb" data-value="울다" data-present="울어요" data-ge="울게" data-icon="😢"><span class="token__icon" aria-hidden="true">😢</span><span class="token__text">울다</span></button>
+            <div class="token-row" id="verbRow" aria-label="동사 선택">
+                <button class="token is-selected" type="button" data-kind="verb" data-value="먹다" data-present="먹어요" data-ge="먹게" data-icon="🍽️" aria-pressed="true"><span class="token__icon" aria-hidden="true">🍽️</span><span class="token__text">먹다</span></button>
+                <button class="token" type="button" data-kind="verb" data-value="마시다" data-present="마셔요" data-ge="마시게" data-icon="🥤" aria-pressed="false"><span class="token__icon" aria-hidden="true">🥤</span><span class="token__text">마시다</span></button>
+                <button class="token" type="button" data-kind="verb" data-value="읽다" data-present="읽어요" data-ge="읽게" data-icon="📖" aria-pressed="false"><span class="token__icon" aria-hidden="true">📖</span><span class="token__text">읽다</span></button>
+                <button class="token" type="button" data-kind="verb" data-value="보다" data-present="봐요" data-ge="보게" data-icon="👀" aria-pressed="false"><span class="token__icon" aria-hidden="true">👀</span><span class="token__text">보다</span></button>
+                <button class="token" type="button" data-kind="verb" data-value="고르다" data-present="골라요" data-ge="고르게" data-icon="☝️" aria-pressed="false"><span class="token__icon" aria-hidden="true">☝️</span><span class="token__text">고르다</span></button>
+                <button class="token" type="button" data-kind="verb" data-value="사다" data-present="사요" data-ge="사게" data-icon="🛍️" aria-pressed="false"><span class="token__icon" aria-hidden="true">🛍️</span><span class="token__text">사다</span></button>
+                <button class="token" type="button" data-kind="verb" data-value="웃다" data-present="웃어요" data-ge="웃게" data-icon="😄" aria-pressed="false"><span class="token__icon" aria-hidden="true">😄</span><span class="token__text">웃다</span></button>
+                <button class="token" type="button" data-kind="verb" data-value="울다" data-present="울어요" data-ge="울게" data-icon="😢" aria-pressed="false"><span class="token__icon" aria-hidden="true">😢</span><span class="token__text">울다</span></button>
+            </div>
+
+            <p class="route-help" id="routeHelp">
+                인물 한 곳에 놓으면 직접 행동, 두 인물을 순서대로 지나 놓으면 원인자 → 행위자예요.
+            </p>
+
+            <div class="route-controls" role="group" aria-label="사동 경로 선택">
+                <button class="control-btn route" type="button" data-route="self-to-other">나 → 타인</button>
+                <button class="control-btn route" type="button" data-route="other-to-self">타인 → 나</button>
             </div>
 
             <div class="controls">
-                <button class="control-btn" type="button" id="resetBtn">처음</button>
+                <button class="control-btn" type="button" id="resetBtn">처음부터</button>
             </div>
         </section>
     </main>
 
-    <script>
-        (function () {
-            const NO_OBJECT_VERBS = new Set(["웃다", "울다"]);
-            const AUTO_ADVANCE_DELAY = 1500;
-            const PHASE_BREAK_SECONDS = 5;
-            const FLIGHT_DURATION = 520;
+    <div class="command-beam" id="commandBeam" aria-hidden="true"></div>
 
-            const castAssets = {
-                self: {
-                    normal: "../assets/c15/grammar/images/ge-hada-cast/self_main_01.webp",
-                    bad: "../assets/c15/grammar/images/ge-hada-cast-bad/self_main_01_bad.webp",
-                    laugh: "../assets/c15/grammar/images/ge-hada-cast-laugh/self_main_01_laugh.webp",
-                    sad: "../assets/c15/grammar/images/ge-hada-cast-sad/self_main_01_sad.webp",
-                    alt: "나 캐릭터"
-                },
-                friend: {
-                    normal: "../assets/c15/grammar/images/ge-hada-cast/friend_female_01.webp",
-                    bad: "../assets/c15/grammar/images/ge-hada-cast-bad/friend_female_01_bad.webp",
-                    laugh: "../assets/c15/grammar/images/ge-hada-cast-laugh/friend_female_01_laugh.webp",
-                    sad: "../assets/c15/grammar/images/ge-hada-cast-sad/friend_female_01_sad.webp",
-                    alt: "친구 캐릭터"
-                },
-                sibling: {
-                    normal: "../assets/c15/grammar/images/ge-hada-cast/boy_02.webp",
-                    bad: "../assets/c15/grammar/images/ge-hada-cast-bad/boy_02_bad.webp",
-                    laugh: "../assets/c15/grammar/images/ge-hada-cast-laugh/boy_02_laugh.webp",
-                    sad: "../assets/c15/grammar/images/ge-hada-cast-sad/boy_02_sad.webp",
-                    alt: "동생 캐릭터"
-                },
-                staff: {
-                    normal: "../assets/c15/grammar/images/ge-hada-cast/office_man_glasses_01.webp",
-                    bad: "../assets/c15/grammar/images/ge-hada-cast-bad/office_man_glasses_01_bad.webp",
-                    laugh: "../assets/c15/grammar/images/ge-hada-cast-laugh/office_man_glasses_01_laugh.webp",
-                    sad: "../assets/c15/grammar/images/ge-hada-cast-sad/office_man_glasses_01_sad.webp",
-                    alt: "부하직원 캐릭터"
-                }
-            };
-
-            const characters = {
-                self: { label: "나", cast: "self" },
-                friend: { label: "친구", cast: "friend" },
-                sibling: { label: "동생", cast: "sibling" },
-                staff: { label: "부하직원", cast: "staff" }
-            };
-
-            const phases = [
-                {
-                    id: 1,
-                    board: "duo",
-                    missions: [
-                        { prompt: "친구가 케이크를 먹게 하세요.", target: "friend", pair: "friend", noun: "케이크", verb: "먹다" },
-                        { prompt: "물을 마시세요.", target: "self", pair: "friend", noun: "물", verb: "마시다" },
-                        { prompt: "동생이 책을 읽게 하세요.", target: "sibling", pair: "sibling", noun: "책", verb: "읽다" },
-                        { prompt: "동생을 울게 하세요.", target: "sibling", pair: "sibling", noun: null, verb: "울다" },
-                        { prompt: "영화를 보세요.", target: "self", pair: "friend", noun: "영화", verb: "보다" },
-                        { prompt: "책을 고르세요.", target: "self", pair: "friend", noun: "책", verb: "고르다" },
-                        { prompt: "친구가 케이크를 사게 하세요.", target: "friend", pair: "friend", noun: "케이크", verb: "사다" },
-                        { prompt: "부하직원이 신문을 읽게 하세요.", target: "staff", pair: "staff", noun: "신문", verb: "읽다" },
-                        { prompt: "친구가 드라마를 보게 하세요.", target: "friend", pair: "friend", noun: "드라마", verb: "보다" }
-                    ]
-                },
-                {
-                    id: 2,
-                    board: "quad",
-                    missions: [
-                        { prompt: "친구가 빵을 먹게 하세요.", target: "friend", noun: "빵", verb: "먹다" },
-                        { prompt: "동생이 드라마를 보게 하세요.", target: "sibling", noun: "드라마", verb: "보다" },
-                        { prompt: "부하직원이 물을 마시게 하세요.", target: "staff", noun: "물", verb: "마시다" },
-                        { prompt: "밥을 먹으세요.", target: "self", noun: "밥", verb: "먹다" },
-                        { prompt: "친구를 웃게 하세요.", target: "friend", noun: null, verb: "웃다" },
-                        { prompt: "부하직원을 울게 하세요.", target: "staff", noun: null, verb: "울다" },
-                        { prompt: "동생이 케이크를 사게 하세요.", target: "sibling", noun: "케이크", verb: "사다" },
-                        { prompt: "신문을 읽으세요.", target: "self", noun: "신문", verb: "읽다" },
-                        { prompt: "부하직원이 책을 고르게 하세요.", target: "staff", noun: "책", verb: "고르다" }
-                    ]
-                }
-            ];
-
-            const totalMissionCount = phases.reduce(function (sum, phase) {
-                return sum + phase.missions.length;
-            }, 0);
-
-            const missionText = document.getElementById("missionText");
-            const progressText = document.getElementById("progressText");
-            const stageBoard = document.getElementById("stageBoard");
-            const feedbackBox = document.getElementById("feedbackBox");
-            const composer = document.getElementById("composer");
-            const actionPreview = document.getElementById("actionPreview");
-            const previewNounIcon = document.getElementById("previewNounIcon");
-            const previewVerbIcon = document.getElementById("previewVerbIcon");
-            const actionPreviewText = document.getElementById("actionPreviewText");
-            const resetBtn = document.getElementById("resetBtn");
-            const nounRow = document.getElementById("nounRow");
-            const nounButtons = Array.from(document.querySelectorAll('[data-kind="noun"]'));
-            const verbButtons = Array.from(document.querySelectorAll('[data-kind="verb"]'));
-            const zoneRefs = {
-                self: {
-                    zone: document.getElementById("selfZone"),
-                    image: document.getElementById("selfImage"),
-                    name: document.getElementById("selfName")
-                },
-                friend: {
-                    zone: document.getElementById("friendZone"),
-                    image: document.getElementById("friendImage"),
-                    name: document.getElementById("friendName")
-                },
-                sibling: {
-                    zone: document.getElementById("siblingZone"),
-                    image: document.getElementById("siblingImage"),
-                    name: document.getElementById("siblingName")
-                },
-                staff: {
-                    zone: document.getElementById("staffZone"),
-                    image: document.getElementById("staffImage"),
-                    name: document.getElementById("staffName")
-                }
-            };
-            const zoneKeys = Object.keys(zoneRefs);
-
-            let currentPhaseIndex = 0;
-            let missionIndex = 0;
-            let selectedNoun = nounButtons[0];
-            let selectedVerb = verbButtons[0];
-            let moodOverride = {};
-            let autoAdvanceTimer = null;
-            let countdownInterval = null;
-            let countdownTimeout = null;
-            let isLocked = false;
-            let totalCorrect = 0;
-            let phaseScores = phases.map(function () {
-                return 0;
-            });
-
-            function getSubjectParticle(word) {
-                const text = String(word || "").trim();
-                if (!text) {
-                    return "가";
-                }
-
-                const lastChar = text.charCodeAt(text.length - 1);
-                const hangulBase = 0xac00;
-                const hangulLast = 0xd7a3;
-
-                if (lastChar < hangulBase || lastChar > hangulLast) {
-                    return "가";
-                }
-
-                return ((lastChar - hangulBase) % 28) === 0 ? "가" : "이";
-            }
-
-            function getObjectParticle(word) {
-                const text = String(word || "").trim();
-                if (!text) {
-                    return "를";
-                }
-
-                const lastChar = text.charCodeAt(text.length - 1);
-                const hangulBase = 0xac00;
-                const hangulLast = 0xd7a3;
-
-                if (lastChar < hangulBase || lastChar > hangulLast) {
-                    return "를";
-                }
-
-                return ((lastChar - hangulBase) % 28) === 0 ? "를" : "을";
-            }
-
-            function currentPhase() {
-                return phases[currentPhaseIndex];
-            }
-
-            function currentMission() {
-                return currentPhase().missions[missionIndex];
-            }
-
-            function isObjectlessVerb(verbValue) {
-                return NO_OBJECT_VERBS.has(verbValue);
-            }
-
-            function currentActionText() {
-                if (isObjectlessVerb(selectedVerb.dataset.value)) {
-                    return selectedVerb.dataset.value;
-                }
-                return selectedNoun.dataset.value + selectedNoun.dataset.particle + " " + selectedVerb.dataset.value;
-            }
-
-            function clearZoneState() {
-                zoneKeys.forEach(function (key) {
-                    zoneRefs[key].zone.classList.remove("is-hover", "is-correct", "is-wrong", "is-celebrating", "is-shaking");
-                });
-            }
-
-            function clearFeedback() {
-                clearZoneState();
-                feedbackBox.classList.remove("is-correct", "is-wrong", "is-summary");
-                feedbackBox.replaceChildren();
-                feedbackBox.textContent = "행동을 고르고 인물을 탭하세요.";
-            }
-
-            function setFeedbackMessage(label, message, meta) {
-                feedbackBox.replaceChildren();
-
-                const labelNode = document.createElement("span");
-                labelNode.className = "feedback__label";
-                labelNode.textContent = label;
-
-                const answerNode = document.createElement("span");
-                answerNode.className = "feedback__answer";
-                answerNode.textContent = message;
-
-                feedbackBox.append(labelNode, answerNode);
-
-                if (meta) {
-                    const metaNode = document.createElement("span");
-                    metaNode.className = "feedback__meta";
-                    metaNode.textContent = meta;
-                    feedbackBox.append(metaNode);
-                }
-            }
-
-            function clearAutoAdvance() {
-                if (!autoAdvanceTimer) {
-                    return;
-                }
-
-                window.clearTimeout(autoAdvanceTimer);
-                autoAdvanceTimer = null;
-            }
-
-            function clearBreakCountdown() {
-                if (countdownInterval) {
-                    window.clearInterval(countdownInterval);
-                    countdownInterval = null;
-                }
-
-                if (countdownTimeout) {
-                    window.clearTimeout(countdownTimeout);
-                    countdownTimeout = null;
-                }
-            }
-
-            function clearTimers() {
-                clearAutoAdvance();
-                clearBreakCountdown();
-            }
-
-            function clearFlyingIcons() {
-                document.querySelectorAll(".flying-icon").forEach(function (node) {
-                    node.remove();
-                });
-            }
-
-            function getNounButtonByValue(value) {
-                return nounButtons.find(function (button) {
-                    return button.dataset.value === value;
-                }) || null;
-            }
-
-            function getVerbButtonByValue(value) {
-                return verbButtons.find(function (button) {
-                    return button.dataset.value === value;
-                }) || null;
-            }
-
-            function getCurrentVisibleZoneKeys() {
-                const phase = currentPhase();
-                const mission = currentMission();
-
-                if (phase.board === "quad") {
-                    return zoneKeys;
-                }
-
-                return ["self", mission.pair || (mission.target === "self" ? "friend" : mission.target)];
-            }
-
-            function updateZoneVisibility() {
-                const visibleKeys = getCurrentVisibleZoneKeys();
-                stageBoard.classList.toggle("is-expanded", currentPhase().board === "quad");
-                zoneKeys.forEach(function (key) {
-                    zoneRefs[key].zone.classList.toggle("is-hidden", visibleKeys.indexOf(key) === -1);
-                });
-            }
-
-            function buildSelfResultMessage(nounValue, verbValue) {
-                const verbButton = getVerbButtonByValue(verbValue);
-                if (!verbButton) {
-                    return "제가 직접 했어요.";
-                }
-
-                if (isObjectlessVerb(verbValue) || nounValue == null) {
-                    return "제가 직접 " + verbButton.dataset.present;
-                }
-
-                const nounButton = getNounButtonByValue(nounValue);
-                const nounText = nounButton
-                    ? nounButton.dataset.value + nounButton.dataset.particle + " "
-                    : nounValue + " ";
-
-                return "제가 직접 " + nounText + verbButton.dataset.present;
-            }
-
-            function buildOtherResultMessage(targetKey, nounValue, verbValue, mode) {
-                const targetLabel = characters[targetKey].label;
-                const verbButton = getVerbButtonByValue(verbValue);
-                const tail = mode === "done" ? " 했어요." : " 해야 해요.";
-
-                if (!verbButton) {
-                    return targetLabel;
-                }
-
-                if (isObjectlessVerb(verbValue) || nounValue == null) {
-                    return targetLabel + getObjectParticle(targetLabel) + " " + verbButton.dataset.ge + tail;
-                }
-
-                const nounButton = getNounButtonByValue(nounValue);
-                const nounText = nounButton
-                    ? nounButton.dataset.value + nounButton.dataset.particle + " "
-                    : nounValue + " ";
-
-                return targetLabel + getSubjectParticle(targetLabel) + " " + nounText + verbButton.dataset.ge + tail;
-            }
-
-            function setSummaryMessage(label, scoreText, metaText) {
-                feedbackBox.classList.remove("is-correct", "is-wrong");
-                feedbackBox.classList.add("is-summary");
-                setFeedbackMessage(label, scoreText, metaText);
-            }
-
-            function schedulePostAnswerAdvance() {
-                clearAutoAdvance();
-                autoAdvanceTimer = window.setTimeout(function () {
-                    autoAdvanceTimer = null;
-                    handlePostAnswerAdvance();
-                }, AUTO_ADVANCE_DELAY);
-            }
-
-            function updatePreview() {
-                const nounIcon = isObjectlessVerb(selectedVerb.dataset.value) ? "" : (selectedNoun.dataset.icon || "");
-                previewNounIcon.textContent = nounIcon;
-                previewNounIcon.classList.toggle("is-hidden", !nounIcon);
-                previewVerbIcon.textContent = selectedVerb.dataset.icon || "";
-                actionPreviewText.textContent = currentActionText();
-            }
-
-            function updateNounRowState() {
-                nounRow.classList.toggle("is-muted", isObjectlessVerb(selectedVerb.dataset.value));
-            }
-
-            function setSelected(buttons, picked) {
-                buttons.forEach(function (button) {
-                    button.classList.toggle("is-selected", button === picked);
-                });
-            }
-
-            function updateCastMood() {
-                zoneKeys.forEach(function (key) {
-                    const character = characters[key];
-                    const cast = castAssets[character.cast];
-                    const mood = moodOverride[key] || "normal";
-
-                    zoneRefs[key].image.src = cast[mood] || cast.normal;
-                    zoneRefs[key].image.alt = cast.alt;
-                    zoneRefs[key].name.textContent = character.label;
-                    zoneRefs[key].zone.setAttribute("aria-label", character.label + "에게 놓기");
-                });
-            }
-
-            function getSuccessMoodOverride(targetKey, verbValue) {
-                const mood = verbValue === "울다" ? "sad" : "laugh";
-                return { [targetKey]: mood };
-            }
-
-            function getWrongMoodOverride(targetKey) {
-                return { [targetKey]: "bad" };
-            }
-
-            function loadMission() {
-                const phase = currentPhase();
-                const mission = currentMission();
-                clearTimers();
-                clearFlyingIcons();
-                moodOverride = {};
-                isLocked = false;
-                composer.hidden = false;
-                missionText.textContent = mission.prompt;
-                progressText.textContent = phase.id + "단계 " + (missionIndex + 1) + " / " + phase.missions.length;
-                updateZoneVisibility();
-                updateCastMood();
-                clearFeedback();
-            }
-
-            function openPhaseBreak() {
-                const currentScore = phaseScores[currentPhaseIndex];
-                const phase = currentPhase();
-                const nextPhase = phases[currentPhaseIndex + 1];
-                let secondsLeft = PHASE_BREAK_SECONDS;
-
-                clearTimers();
-                clearFlyingIcons();
-                clearZoneState();
-                moodOverride = {};
-                isLocked = true;
-                composer.hidden = true;
-                updateZoneVisibility();
-                updateCastMood();
-                progressText.textContent = phase.id + "단계 결과";
-                missionText.textContent = phase.id + "단계 9문제를 마쳤어요.";
-
-                function renderBreakMessage() {
-                    setSummaryMessage(
-                        phase.id + "단계 점수",
-                        currentScore + " / " + phase.missions.length,
-                        secondsLeft + "초 후 " + nextPhase.id + "단계가 시작돼요."
-                    );
-                }
-
-                renderBreakMessage();
-                countdownInterval = window.setInterval(function () {
-                    secondsLeft -= 1;
-                    if (secondsLeft > 0) {
-                        renderBreakMessage();
-                    }
-                }, 1000);
-
-                countdownTimeout = window.setTimeout(function () {
-                    clearBreakCountdown();
-                    currentPhaseIndex += 1;
-                    missionIndex = 0;
-                    loadMission();
-                }, PHASE_BREAK_SECONDS * 1000);
-            }
-
-            function openFinalSummary() {
-                clearTimers();
-                clearFlyingIcons();
-                clearZoneState();
-                moodOverride = {};
-                isLocked = true;
-                composer.hidden = true;
-                updateZoneVisibility();
-                updateCastMood();
-                progressText.textContent = "최종 점수";
-                missionText.textContent = "18문제를 모두 마쳤어요.";
-                setSummaryMessage("최종 점수", totalCorrect + " / " + totalMissionCount, "처음 버튼을 누르면 처음부터 다시 할 수 있어요.");
-            }
-
-            function handlePostAnswerAdvance() {
-                if (missionIndex >= currentPhase().missions.length - 1) {
-                    if (currentPhaseIndex < phases.length - 1) {
-                        openPhaseBreak();
-                    } else {
-                        openFinalSummary();
-                    }
-                    return;
-                }
-
-                missionIndex += 1;
-                loadMission();
-            }
-
-            function showCorrect(targetKey) {
-                const mission = currentMission();
-                const zone = zoneRefs[targetKey].zone;
-                const message = targetKey === "self"
-                    ? buildSelfResultMessage(mission.noun, mission.verb)
-                    : buildOtherResultMessage(targetKey, mission.noun, mission.verb, "done");
-
-                clearAutoAdvance();
-                isLocked = true;
-                moodOverride = getSuccessMoodOverride(targetKey, mission.verb);
-                updateCastMood();
-                clearZoneState();
-                zone.classList.add("is-correct", "is-celebrating");
-                feedbackBox.classList.remove("is-wrong", "is-summary");
-                feedbackBox.classList.add("is-correct");
-                setFeedbackMessage("정답", message);
-                schedulePostAnswerAdvance();
-            }
-
-            function showWrong(targetKey, reason) {
-                const zone = zoneRefs[targetKey].zone;
-
-                clearAutoAdvance();
-                isLocked = true;
-                moodOverride = getWrongMoodOverride(targetKey);
-                updateCastMood();
-                clearZoneState();
-                zone.classList.add("is-wrong", "is-shaking");
-                feedbackBox.classList.remove("is-correct", "is-summary");
-                feedbackBox.classList.add("is-wrong");
-                setFeedbackMessage("오답", reason);
-                schedulePostAnswerAdvance();
-            }
-
-            function animateNounFlight(zone) {
-                if (isObjectlessVerb(selectedVerb.dataset.value)) {
-                    return;
-                }
-
-                const icon = selectedNoun.dataset.icon || "";
-                if (!icon) {
-                    return;
-                }
-
-                const startRect = previewNounIcon.getBoundingClientRect();
-                const zoneRect = zone.getBoundingClientRect();
-
-                if (!startRect.width || !startRect.height || !zoneRect.width || !zoneRect.height) {
-                    return;
-                }
-
-                const flyer = document.createElement("span");
-                flyer.className = "flying-icon";
-                flyer.setAttribute("aria-hidden", "true");
-                flyer.textContent = icon;
-                document.body.appendChild(flyer);
-
-                const flyerRect = flyer.getBoundingClientRect();
-                const startX = startRect.left + (startRect.width / 2) - (flyerRect.width / 2);
-                const startY = startRect.top + (startRect.height / 2) - (flyerRect.height / 2);
-                const midX = startX + ((zoneRect.left + zoneRect.width * 0.5) - startRect.left) * 0.55;
-                const midY = startY - 54;
-                const endX = zoneRect.left + (zoneRect.width * 0.5) - (flyerRect.width / 2);
-                const endY = zoneRect.top + (zoneRect.height * 0.4) - (flyerRect.height / 2);
-
-                const cleanup = function () {
-                    flyer.remove();
-                };
-
-                if (typeof flyer.animate === "function") {
-                    const motion = flyer.animate([
-                        { transform: "translate(" + startX + "px, " + startY + "px) scale(0.92)", opacity: 1 },
-                        { transform: "translate(" + midX + "px, " + midY + "px) scale(1.18)", opacity: 1, offset: 0.5 },
-                        { transform: "translate(" + endX + "px, " + endY + "px) scale(0.72)", opacity: 0.15 }
-                    ], {
-                        duration: FLIGHT_DURATION,
-                        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-                        fill: "forwards"
-                    });
-                    motion.onfinish = cleanup;
-                    motion.oncancel = cleanup;
-                    return;
-                }
-
-                flyer.style.transform = "translate(" + endX + "px, " + endY + "px) scale(0.72)";
-                flyer.style.opacity = "0.15";
-                window.setTimeout(cleanup, FLIGHT_DURATION);
-            }
-
-            function submitToZone(targetKey) {
-                if (isLocked) {
-                    return;
-                }
-
-                const zone = zoneRefs[targetKey].zone;
-                zone.classList.remove("is-hover");
-                animateNounFlight(zone);
-                evaluate(targetKey);
-            }
-
-            function evaluate(targetKey) {
-                if (isLocked) {
-                    return;
-                }
-
-                const mission = currentMission();
-                const nounOk = mission.noun == null ? true : selectedNoun.dataset.value === mission.noun;
-                const verbOk = selectedVerb.dataset.value === mission.verb;
-                const targetOk = mission.target === targetKey;
-
-                if (nounOk && verbOk && targetOk) {
-                    totalCorrect += 1;
-                    phaseScores[currentPhaseIndex] += 1;
-                    showCorrect(targetKey);
-                    return;
-                }
-
-                if (!nounOk || !verbOk) {
-                    showWrong(targetKey, "행동이 맞지 않아요.");
-                    return;
-                }
-
-                if (mission.target === "self") {
-                    showWrong(targetKey, "이번에는 내가 직접 해야 해요.");
-                } else {
-                    showWrong(targetKey, "이번에는 " + buildOtherResultMessage(mission.target, mission.noun, mission.verb, "need"));
-                }
-            }
-
-            nounButtons.forEach(function (button) {
-                button.addEventListener("click", function () {
-                    if (isLocked) {
-                        return;
-                    }
-
-                    selectedNoun = button;
-                    setSelected(nounButtons, button);
-                    updatePreview();
-                    clearFeedback();
-                });
-            });
-
-            verbButtons.forEach(function (button) {
-                button.addEventListener("click", function () {
-                    if (isLocked) {
-                        return;
-                    }
-
-                    selectedVerb = button;
-                    setSelected(verbButtons, button);
-                    updatePreview();
-                    updateNounRowState();
-                    clearFeedback();
-                });
-            });
-
-            actionPreview.addEventListener("dragstart", function (event) {
-                if (isLocked) {
-                    event.preventDefault();
-                    return;
-                }
-
-                event.dataTransfer.setData("text/plain", currentActionText());
-            });
-
-            zoneKeys.forEach(function (key) {
-                const zone = zoneRefs[key].zone;
-
-                zone.addEventListener("dragover", function (event) {
-                    if (isLocked) {
-                        return;
-                    }
-
-                    event.preventDefault();
-                    zone.classList.add("is-hover");
-                });
-
-                zone.addEventListener("dragleave", function () {
-                    zone.classList.remove("is-hover");
-                });
-
-                zone.addEventListener("drop", function (event) {
-                    if (isLocked) {
-                        return;
-                    }
-
-                    event.preventDefault();
-                    submitToZone(key);
-                });
-
-                zone.addEventListener("click", function () {
-                    submitToZone(key);
-                });
-            });
-
-            function resetGame() {
-                clearTimers();
-                clearFlyingIcons();
-                clearZoneState();
-                currentPhaseIndex = 0;
-                missionIndex = 0;
-                totalCorrect = 0;
-                phaseScores = phases.map(function () {
-                    return 0;
-                });
-                selectedNoun = nounButtons[0];
-                selectedVerb = verbButtons[0];
-                setSelected(nounButtons, selectedNoun);
-                setSelected(verbButtons, selectedVerb);
-                updatePreview();
-                updateNounRowState();
-                loadMission();
-            }
-
-            resetBtn.addEventListener("click", resetGame);
-
-            resetGame();
-        })();
-    </script>
+    <script src="grammar1-ge-hada-game.js"></script>
     <script src="../shared/page-qr.js"></script>
 </body>
 </html>
