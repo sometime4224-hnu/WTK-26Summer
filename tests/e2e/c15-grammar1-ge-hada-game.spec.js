@@ -142,24 +142,27 @@ async function pointerDragOutside(page) {
   await page.mouse.up();
 }
 
-async function expectContinuousDragBeam(page) {
+async function expectCausativeDragBeam(page) {
   const source = page.locator("#sentenceCard");
-  const target = page.locator("#selfZone");
+  const causer = page.locator("#selfZone");
+  const actor = page.locator("#otherZone");
   await source.scrollIntoViewIfNeeded();
   const sourceBox = await source.boundingBox();
-  const targetBox = await target.boundingBox();
+  const causerBox = await causer.boundingBox();
+  const actorBox = await actor.boundingBox();
   expect(sourceBox).not.toBeNull();
-  expect(targetBox).not.toBeNull();
+  expect(causerBox).not.toBeNull();
+  expect(actorBox).not.toBeNull();
 
   const sourcePoint = { x: sourceBox.x + sourceBox.width / 2, y: sourceBox.y + sourceBox.height / 2 };
-  const targetPoint = { x: targetBox.x + targetBox.width / 2, y: targetBox.y + targetBox.height / 2 };
-  const halfway = { x: (sourcePoint.x + targetPoint.x) / 2, y: (sourcePoint.y + targetPoint.y) / 2 };
+  const causerPoint = { x: causerBox.x + causerBox.width / 2, y: causerBox.y + causerBox.height / 2 };
+  const actorPoint = { x: actorBox.x + actorBox.width / 2, y: actorBox.y + actorBox.height / 2 };
 
   await page.mouse.move(sourcePoint.x, sourcePoint.y);
   await page.mouse.down();
-  await page.mouse.move(halfway.x, halfway.y, { steps: 8 });
-  await expect(page.locator("#commandBeam")).toHaveClass(/is-visible/);
-  await page.mouse.move(targetPoint.x, targetPoint.y, { steps: 8 });
+  await page.mouse.move(causerPoint.x, causerPoint.y, { steps: 8 });
+  await expect(page.locator("#commandBeam")).not.toHaveClass(/is-visible/);
+  await page.mouse.move(actorPoint.x, actorPoint.y, { steps: 8 });
   await expect(page.locator("#commandBeam")).toHaveClass(/is-visible/);
   const beamWidth = await page.locator("#commandBeam").evaluate((beam) => Number.parseFloat(beam.style.width));
   expect(beamWidth).toBeGreaterThan(20);
@@ -246,11 +249,11 @@ test("pointer drag records self-to-other direction and direct action remains cli
   await expect(page.locator("#otherRole")).toHaveText("관찰자");
 });
 
-test("drag beam stays connected while entering an actor zone", async ({ page }) => {
+test("drag beam begins at the causer and stays visible at the actor", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await openGame(page);
 
-  await expectContinuousDragBeam(page);
+  await expectCausativeDragBeam(page);
   await expectCleanDragState(page);
 });
 
