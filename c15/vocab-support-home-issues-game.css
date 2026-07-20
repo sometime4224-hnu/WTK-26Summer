@@ -893,19 +893,32 @@ kbd {
 
 .dialogue-box {
   position: absolute;
-  right: clamp(10px, 2vw, 18px);
-  bottom: clamp(10px, 2vw, 18px);
-  left: clamp(10px, 2vw, 18px);
+  top: 50%;
+  left: 50%;
   z-index: 35;
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 14px 16px;
-  border: 1px solid rgba(255, 236, 207, 0.3);
-  border-radius: 18px;
-  background: rgba(56, 36, 34, 0.93);
+  width: min(560px, calc(100% - 38px));
+  padding: 18px 21px;
+  border: 2px solid rgba(255, 236, 207, 0.48);
+  border-radius: 24px;
+  background: rgba(56, 36, 34, 0.96);
   color: #fffaf1;
-  box-shadow: 0 18px 45px rgba(39, 20, 19, 0.36);
+  box-shadow: 0 22px 52px rgba(39, 20, 19, 0.42);
+  transform: translate(-50%, -50%);
   backdrop-filter: blur(15px);
+}
+
+.dialogue-box::after {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  border-right: 2px solid rgba(255, 236, 207, 0.48);
+  border-bottom: 2px solid rgba(255, 236, 207, 0.48);
+  background: rgba(56, 36, 34, 0.96);
+  box-shadow: 7px 7px 12px rgba(39, 20, 19, 0.14);
+  content: "";
+  transform: translateX(-50%) rotate(45deg);
 }
 
 .dialogue-head {
@@ -927,9 +940,72 @@ kbd {
 }
 
 .dialogue-box > p {
-  margin-bottom: 2px;
-  font-size: 0.88rem;
-  line-height: 1.55;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0;
+  font-size: 1rem;
+  font-weight: 750;
+  line-height: 1.62;
+}
+
+.dialogue-box[data-tone="opening"] {
+  width: min(680px, calc(100% - 34px));
+  padding: clamp(26px, 4vw, 38px) clamp(26px, 5vw, 46px);
+  border: 3px solid #e6ad58;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 50% -35%, rgba(255, 230, 160, 0.86), transparent 48%),
+    rgba(255, 252, 245, 0.98);
+  color: #4b2f2a;
+  box-shadow: 0 28px 70px rgba(39, 20, 19, 0.48);
+  text-align: center;
+}
+
+.dialogue-box[data-tone="opening"]::after {
+  border-right-color: #e6ad58;
+  border-bottom-color: #e6ad58;
+  background: #fffaf1;
+}
+
+.dialogue-box[data-tone="opening"] .dialogue-head {
+  justify-content: center;
+}
+
+.dialogue-box[data-tone="opening"] .dialogue-head p {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 12px;
+  color: #9b563b;
+  font-size: 1rem;
+}
+
+.dialogue-box[data-tone="opening"] .dialogue-head p::before {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 50%;
+  background: #f3c763;
+  color: #56352e;
+  content: "🏠";
+  font-size: 0.9rem;
+}
+
+.dialogue-box[data-tone="opening"] .icon-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border-color: rgba(110, 65, 48, 0.24);
+  background: rgba(110, 65, 48, 0.08);
+  color: #784331;
+}
+
+.dialogue-box[data-tone="opening"] > p {
+  font-size: clamp(1.28rem, 2.35vw, 1.7rem);
+  font-weight: 950;
+  line-height: 1.58;
+  letter-spacing: -0.025em;
 }
 
 .diagnosis-panel {
@@ -1851,6 +1927,28 @@ html[data-control-mode="joystick"] #houseCanvas {
     max-height: calc(100% - 18px);
     padding: 15px;
     border-radius: 18px;
+  }
+
+  .dialogue-box {
+    width: calc(100% - 28px);
+    padding: 15px 17px;
+    border-radius: 20px;
+  }
+
+  .dialogue-box > p {
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  .dialogue-box[data-tone="opening"] {
+    width: calc(100% - 22px);
+    padding: 26px 23px 29px;
+    border-radius: 25px;
+  }
+
+  .dialogue-box[data-tone="opening"] > p {
+    font-size: clamp(1.16rem, 5.2vw, 1.42rem);
+    line-height: 1.55;
   }
 
   .start-illustration {

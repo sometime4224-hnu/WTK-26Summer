@@ -1171,11 +1171,31 @@
     if (ui.tutorialNext) ui.tutorialNext.textContent = tutorialStep === 0 ? "다음" : "탐험 시작";
   }
 
+  function beginQueuedMission() {
+    const issue = activeIssue();
+    if (!issue || issueStatus(issue).phase !== "queued") return false;
+    const isOpeningMission = issue.id === MISSION_ORDER[0]
+      && state.discoveryOrder.length === 0
+      && state.repairedOrder.length === 0;
+    if (isOpeningMission) {
+      activateCurrentIssue({ announce: false });
+      showDialogue(
+        "집 지킴이",
+        "저와 함께 우리 집을 고쳐주세요! 집 안에서 달라진 모습을 눈으로 찾아봐요.",
+        "opening"
+      );
+      beep(430, 0.08, "sine");
+      haptic(16);
+      return true;
+    }
+    return activateCurrentIssue({ announce: true });
+  }
+
   function completeTutorial() {
     setOpen(ui.controlTutorial, false);
     try { localStorage.setItem(TUTORIAL_KEY, "done"); } catch { /* ignore */ }
     ui.canvas?.focus({ preventScroll: true });
-    if (activeIssue() && issueStatus(activeIssue()).phase === "queued") activateCurrentIssue({ announce: true });
+    if (activeIssue() && issueStatus(activeIssue()).phase === "queued") beginQueuedMission();
     else showToast("현재 임무", ui.missionInstruction?.textContent || "반짝이는 목표를 확인하세요.", "hint");
   }
 
@@ -1195,7 +1215,7 @@
     if (forceTutorial || !seenTutorial) showTutorial();
     else {
       ui.canvas?.focus({ preventScroll: true });
-      if (activeIssue() && issueStatus(activeIssue()).phase === "queued") activateCurrentIssue({ announce: true });
+      if (activeIssue() && issueStatus(activeIssue()).phase === "queued") beginQueuedMission();
       else showToast("점검 시작", "저장된 상황에서 이어갑니다.", "hint");
     }
   }
@@ -1234,8 +1254,7 @@
       if (ui.startEyebrow) ui.startEyebrow.textContent = "저장된 집 점검 기록";
       if (ui.startTitle) ui.startTitle.textContent = "마지막 방에서 이어서 점검할까요?";
       if (ui.startDescription) ui.startDescription.textContent = `${discoveredIssues().length}개 표현을 찾고 ${repairedIssues().length}곳을 해결했어요.`;
-      if (ui.startButton) ui.startButton.textContent = "현재 화면으로 이어하기";
-      if (ui.fullscreenButton) ui.fullscreenButton.textContent = "전체화면으로 이어하기";
+      if (ui.startButton) ui.startButton.textContent = "이어하기";
     }
   }
 

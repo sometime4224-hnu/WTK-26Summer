@@ -68,6 +68,7 @@ async function startNewAndSkipTutorial(page) {
   await expect(page.locator("#controlTutorial")).toBeVisible();
   await page.locator("#tutorialSkip").click();
   await expect(page.locator("#controlTutorial")).toBeHidden();
+  await closeDialogue(page);
   await expect.poll(async () => (await snapshot(page)).started).toBe(true);
 }
 
@@ -237,19 +238,50 @@ async function repairDiagnosedIssue(page, issue, { assertDialogueBlocks = false 
   throw new Error(`${issue.id} did not resolve within four repair actions`);
 }
 
-test("C15 hub keeps the original room-zoom activity and links separately to the upgraded game", async ({ page }) => {
+test("C15 hub shows only the upgraded house-problem game", async ({ page }) => {
   await page.goto("/c15/", { waitUntil: "domcontentloaded" });
   const originalLink = page.locator('a[href="vocab-support-home-issues-room-zoom.html"]');
   const upgradedLink = page.locator('a[href="vocab-support-home-issues-game.html"]');
 
-  await expect(originalLink).toHaveCount(1);
-  await expect(originalLink).toContainText("집 탐험 어휘 보조 활동");
+  await expect(originalLink).toHaveCount(0);
   await expect(upgradedLink).toHaveCount(1);
   await expect(upgradedLink).toContainText("우리 집 SOS");
 
   await upgradedLink.click();
   await expect(page).toHaveURL(/\/c15\/vocab-support-home-issues-game\.html$/);
   await expect(page.locator("#houseGame")).toBeVisible();
+});
+
+test("the opening uses a character briefing instead of a fullscreen prompt", async ({ page }) => {
+  await clearHouseRescueState(page);
+  await page.goto(PAGE_URL, { waitUntil: "domcontentloaded" });
+  await waitForTestHelper(page);
+
+  await expect(page.locator("#fullscreenButton")).toHaveCount(0);
+  await expect(page.locator("#startButton")).toHaveText("탐험 시작");
+  await callHouseHelper(page, "startNew");
+  await page.locator("#tutorialSkip").click();
+
+  await expect(page.locator("#dialogueBox")).toBeVisible();
+  await expect(page.locator("#dialogueBox")).toHaveAttribute("data-tone", "opening");
+  await expect(page.locator("#dialogueSpeaker")).toHaveText("집 지킴이");
+  await expect(page.locator("#dialogueText")).toContainText("저와 함께 우리 집을 고쳐주세요!");
+  const dialogueLayout = await page.locator("#dialogueBox").evaluate((dialogue) => {
+    const textStyle = getComputedStyle(dialogue.querySelector("#dialogueText"));
+    const dialogueRect = dialogue.getBoundingClientRect();
+    const frameRect = dialogue.closest(".canvas-frame").getBoundingClientRect();
+    return {
+      centerOffsetX: dialogueRect.left + dialogueRect.width / 2 - (frameRect.left + frameRect.width / 2),
+      centerOffsetY: dialogueRect.top + dialogueRect.height / 2 - (frameRect.top + frameRect.height / 2),
+      textSize: Number.parseFloat(textStyle.fontSize),
+    };
+  });
+  expect(Math.abs(dialogueLayout.centerOffsetX)).toBeLessThanOrEqual(1);
+  expect(Math.abs(dialogueLayout.centerOffsetY)).toBeLessThanOrEqual(1);
+  expect(dialogueLayout.textSize).toBeGreaterThanOrEqual(20);
+  expect((await snapshot(page)).blackout).toBe(true);
+
+  await closeDialogue(page);
 });
 
 test("original room-zoom activity remains available", async ({ page }) => {
