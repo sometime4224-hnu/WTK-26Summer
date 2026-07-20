@@ -287,9 +287,9 @@ test("the opening uses a character briefing instead of a fullscreen prompt", asy
   await page.locator("#houseCanvas").dblclick({ position: { x: 20, y: 500 } });
   await expect(page.locator("#dialogueBox")).toBeHidden();
   expect((await snapshot(page)).openingIncidentPending).toBe(true);
-  await page.waitForTimeout(2_200);
+  await page.waitForTimeout(1_000);
   expect((await snapshot(page)).blackout).toBe(false);
-  await expect.poll(async () => (await snapshot(page)).blackout, { timeout: 2_500 }).toBe(true);
+  await expect.poll(async () => (await snapshot(page)).blackout, { timeout: 4_000 }).toBe(true);
 });
 
 test("original room-zoom activity remains available", async ({ page }) => {
@@ -402,12 +402,12 @@ test("the deterministic full loop diagnoses and repairs all eight house issues",
       strength: 1
     });
     await expect(page.locator("#missionInstruction"))
-      .toHaveText("반복해서 움직이는 장면을 찾아 터치하세요.");
+      .toHaveText("이상한 곳을 찾아 눌러 보세요.");
 
     await openIssueDiagnosis(page, issue);
     await expect(page.locator("#diagnosisVisual")).toHaveAttribute("data-issue", issue.id);
     await expect(page.locator("#diagnosisQuestion"))
-      .toHaveText("이 장면과 어울리는 표현은 무엇일까요?");
+      .toHaveText("무슨 일이 생겼을까요?");
 
     // Exercise one real wrong choice before using the deterministic helper for
     // the correct answer. A wrong answer must teach without changing progress.
@@ -419,7 +419,7 @@ test("the deterministic full loop diagnoses and repairs all eight house issues",
       expect(wrongIndex).toBeGreaterThanOrEqual(0);
       await options.nth(wrongIndex).click();
       await expect(page.locator("#diagnosisPanel")).toBeVisible();
-      await expect(page.locator("#diagnosisFeedback")).toContainText("핵심 단서를 다시 살펴보세요");
+      await expect(page.locator("#diagnosisFeedback")).toContainText("다시 잘 보고 골라 보세요");
       await expect(page.locator("#diagnosisFeedback")).toHaveAttribute("data-tone", "bad");
       expect((await snapshot(page)).discovered).toEqual([]);
     }

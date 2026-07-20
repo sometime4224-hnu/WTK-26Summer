@@ -631,7 +631,7 @@
       beginSceneFx("incident", issue);
     }
     if (announce) {
-      showToast("집 안에 변화가 생겼어요", "빛·움직임·소리를 보고 움직이는 곳을 터치하세요.", "warning");
+      showToast("어? 무슨 일이에요?", "이상한 곳을 찾아 눌러 보세요.", "warning");
       beep(issue.id === "power-outage" ? 165 : 360, 0.12, issue.id === "power-outage" ? "square" : "triangle");
       haptic([18, 24, 18]);
     }
@@ -657,11 +657,11 @@
     const status = issueStatus(issue);
     if (issue.id !== state.activeIssueId || status.phase !== "incident") return false;
     activeDiagnosisId = issue.id;
-    if (ui.diagnosisScene) ui.diagnosisScene.textContent = `${ROOMS.find((room) => room.id === issue.room)?.icon || "🏠"} 장면 관찰`;
-    if (ui.diagnosisQuestion) ui.diagnosisQuestion.textContent = "이 장면과 어울리는 표현은 무엇일까요?";
+    if (ui.diagnosisScene) ui.diagnosisScene.textContent = `${ROOMS.find((room) => room.id === issue.room)?.icon || "🏠"} 무슨 일이에요?`;
+    if (ui.diagnosisQuestion) ui.diagnosisQuestion.textContent = "무슨 일이 생겼을까요?";
     updateDiagnosisVisual(issue);
     if (ui.diagnosisFeedback) {
-      ui.diagnosisFeedback.textContent = "그림의 움직임을 보고 골라 보세요.";
+      ui.diagnosisFeedback.textContent = "잘 보고 골라 보세요.";
       ui.diagnosisFeedback.dataset.tone = "normal";
     }
     if (ui.diagnosisOptions) {
@@ -689,7 +689,7 @@
     if (!issue) return false;
     if (answer !== issue.expression) {
       if (ui.diagnosisFeedback) {
-        ui.diagnosisFeedback.textContent = "장면의 핵심 단서를 다시 살펴보세요.";
+        ui.diagnosisFeedback.textContent = "다시 잘 보고 골라 보세요.";
         ui.diagnosisFeedback.dataset.tone = "bad";
       }
       beep(180, 0.12, "square");
@@ -703,7 +703,7 @@
     }
     closeDiagnosis();
     spawnParticles(issue.x + issue.w / 2, issue.y + issue.h / 2, issue.color, 16);
-    showToast("표현을 찾았어요", `${issue.expression} · 이제 ${responseTargetLabel(issue)}에서 ${issue.actionLabel || "해결"}하세요.`);
+    showToast("맞아요!", `“${issue.expression}”예요. ${withObjectParticle(responseTargetLabel(issue))} 눌러 보세요.`);
     beep(720, 0.11, "sine");
     haptic(24);
     updateAllUi();
@@ -723,23 +723,23 @@
     spawnParticles(issue.x + issue.w / 2, issue.y + issue.h / 2, issue.color, 9);
     if (status.repairStep < REPAIR_STEPS) {
       showDialogue(
-        `${actionLabel} ${status.repairStep}/${REPAIR_STEPS} · ${responseTargetLabel(issue)}`,
-        `${steps[status.repairStep - 1]} 창을 닫은 뒤 ${withObjectParticle(responseTargetLabel(issue))} 다시 터치해 다음 단계인 “${steps[status.repairStep]}”를 진행하세요.`
+        "집 지킴이",
+        `${steps[status.repairStep - 1]} 이제 ${withObjectParticle(responseTargetLabel(issue))} 다시 눌러 보세요.`
       );
       beep(460, 0.06, "triangle");
     } else {
       status.phase = "resolved";
       beginSceneFx("resolution", canonicalIssue);
       if (!state.repairedOrder.includes(issue.id)) state.repairedOrder.push(issue.id);
-      showToast(`${actionLabel} 완료`, "장면이 어떻게 정상으로 돌아오는지 눈으로 확인하세요.");
+      showToast("잘했어요!", "이제 괜찮아요.");
       spawnParticles(issue.x + issue.w / 2, issue.y + issue.h / 2, "#f3c763", 24);
       beep(860, 0.15, "sine");
       haptic([18, 28, 28]);
       const hasNextMission = queueNextMission();
       if (hasNextMission) {
         showDialogue(
-          `${actionLabel} 완료`,
-          `“${issue.example}” 장면의 변화를 확인한 뒤 창을 닫으면 다음 상황이 시작됩니다.`
+          "집 지킴이",
+          "잘했어요! 다른 곳도 살펴볼까요?"
         );
       } else {
         completeGame();
@@ -755,7 +755,7 @@
     if (openingIncidentIsPending()) return false;
     const object = nearestObject();
     if (!object) {
-      showToast("조사할 곳이 없어요", "반짝이는 물건에 조금 더 가까이 가 보세요.", "hint");
+      showToast("조금 더 가까이 가요", "반짝이는 물건을 눌러 보세요.", "hint");
       return false;
     }
     state.path = [];
@@ -776,7 +776,7 @@
       repairIssue(displayObjectForIssue(issue));
       return true;
     }
-    showDialogue(issue.label, `${issue.expression}. ${issue.example}`);
+    showDialogue("집 지킴이", `“${issue.expression}”라고 해요. ${issue.example}`);
     beep(560, 0.05, "sine");
     return true;
   }
@@ -897,7 +897,7 @@
     if (!state.path.length) {
       state.autoTargetId = null;
       autoNavigation.targetId = null;
-      showToast("길을 찾지 못했어요", "방 안쪽이나 문 근처를 다시 눌러 보세요.", "hint");
+      showToast("길이 막혔어요", "문 가까이나 방 안을 눌러 보세요.", "hint");
     }
   }
 
@@ -944,7 +944,7 @@
     if (object) {
       const approach = approachPoint(object);
       beginTapNavigation(approach.x, approach.y, object.id);
-      showToast("이동 중", `${object.label} 가까이로 갈게요.`, "hint");
+      showToast("이동할게요", `${object.label} 쪽으로 가요.`, "hint");
     } else {
       beginTapNavigation(point.x, point.y, null);
     }
@@ -1023,7 +1023,7 @@
       if (!state.path.length) {
         state.autoTargetId = null;
         autoNavigation.targetId = null;
-        showToast("이동 경로를 다시 확인해 주세요", "문이 보이는 통로나 방 안쪽을 터치해 보세요.", "hint");
+        showToast("길이 막혔어요", "문 가까이나 방 안을 눌러 보세요.", "hint");
       }
     }
     return true;
@@ -1055,7 +1055,7 @@
     const room = roomForPoint(centerX, centerY);
     if (room && room.id !== currentRoomId) {
       currentRoomId = room.id;
-      showToast(`${room.icon} ${room.name}`, roomMissionHint(room.id), "hint");
+      showToast(`${room.icon} ${room.name}에 왔어요`, roomMissionHint(room.id), "hint");
     }
     updateInteractionPrompt();
     updateRoomMap();
@@ -1065,8 +1065,8 @@
   function roomMissionHint(roomId) {
     const unresolved = ISSUES.filter((issue) => issue.room === roomId && !isResolved(issue)).length;
     const current = activeIssue();
-    if (current?.room === roomId) return "이 방에서 반복해서 움직이는 장면을 찾아보세요.";
-    return unresolved ? `이 방에는 앞으로 확인할 상황이 ${unresolved}개 있어요.` : "이 방의 점검을 마쳤어요.";
+    if (current?.room === roomId) return "이 방을 잘 살펴보세요.";
+    return unresolved ? "여기도 나중에 살펴봐요." : "이 방은 다 살펴봤어요.";
   }
 
   function updateInteractionPrompt() {
@@ -1079,7 +1079,7 @@
     let label = `${object.label} 조사`;
     const issue = ISSUE_BY_ID.get(object.id);
     const status = issueStatus(object);
-    if (status.phase === "incident") label = `${object.label} 상황 확인`;
+    if (status.phase === "incident") label = `${object.label} 눌러 보기`;
     if (status.phase === "diagnosed") label = `${object.label} ${issue?.actionLabel || "해결"} ${status.repairStep + 1}/${REPAIR_STEPS}`;
     if (status.phase === "resolved") label = `${object.label} 복습`;
     if (ui.interactionPromptText) ui.interactionPromptText.textContent = label;
@@ -1107,28 +1107,28 @@
     const issue = activeIssue();
     const status = issue ? issueStatus(issue) : null;
     const room = issue ? ROOMS.find((entry) => entry.id === issue.room) : null;
-    let phaseLabel = "점검 완료";
-    let title = "우리 집 점검 완료";
-    let body = "기록장을 열어 여덟 표현과 해결 문장을 다시 말해 보세요.";
-    let mission = "모든 상황을 해결했어요. 수리 기록장을 확인하세요.";
+    let phaseLabel = "다 했어요";
+    let title = "우리 집이 다시 편안해졌어요";
+    let body = "기록장에서 표현을 다시 말해 보세요.";
+    let mission = "기록장을 열어 표현을 다시 말해 보세요.";
     if (issue && status) {
       if (status.phase === "queued") {
-        phaseLabel = "다음 상황";
-        title = "다음 장면 준비";
-        body = "방금 바뀐 장면을 확인한 뒤 창을 닫아 주세요.";
-        mission = "정상으로 돌아온 모습을 확인하고 창을 닫으세요.";
+        phaseLabel = "집을 살펴봐요";
+        title = "집 안을 둘러봐요";
+        body = "아직은 조용해요. 집을 둘러보세요.";
+        mission = "집 안을 둘러보세요.";
       } else if (status.phase === "incident") {
-        phaseLabel = "👁 장면 관찰";
-        title = `${room?.icon || "🏠"} ${room?.name || "집 안"}의 변화를 찾아보세요`;
-        body = "빛·물·공기·사물의 반복되는 움직임을 살펴보세요.";
-        mission = "반복해서 움직이는 장면을 찾아 터치하세요.";
+        phaseLabel = "무슨 일이에요?";
+        title = `${room?.icon || "🏠"} ${room?.name || "집 안"}에서 무슨 일이 생겼을까요?`;
+        body = "이상한 곳을 찾아 눌러 보세요.";
+        mission = "이상한 곳을 찾아 눌러 보세요.";
       } else if (status.phase === "diagnosed") {
         const target = responseTargetLabel(issue);
         const action = issue.actionLabel || "해결";
         phaseLabel = `${action} ${status.repairStep + 1}/${REPAIR_STEPS}`;
-        title = `${target}에서 ${action}하기`;
-        body = `${issue.expression} 상황이에요. ${issue.repairSteps?.[status.repairStep] || "상태를 안전하게 확인하세요."}`;
-        mission = `${room?.name || "집 안"}의 ${withObjectParticle(target)} 터치: ${issue.repairSteps?.[status.repairStep] || "상태 확인"}`;
+        title = `${withObjectParticle(target)} 눌러 보세요`;
+        body = issue.repairSteps?.[status.repairStep] || "천천히 살펴보세요.";
+        mission = `${withObjectParticle(target)} 눌러 보세요.`;
       }
     }
     if (ui.storyTitle) ui.storyTitle.textContent = title;
@@ -1150,7 +1150,7 @@
     if (ui.journalSummary) {
       ui.journalSummary.textContent = discovered.length
         ? `${discovered.length}개 표현을 찾고 ${repairedIssues().length}곳을 수리했어요.`
-        : "아직 기록한 표현이 없어요. 집 안의 이상 징후를 찾아보세요.";
+        : "아직 기록한 표현이 없어요. 이상한 곳을 찾아보세요.";
     }
     if (!ui.journalList) return;
     ui.journalList.innerHTML = "";
@@ -1163,7 +1163,7 @@
       if (discoveredNow) {
         item.innerHTML = `<span class="journal-number">${index + 1}</span><div><strong>${issue.expression}</strong><p>${issue.example}</p><small>${resolvedNow ? `✓ ${issue.actionLabel || "해결"} 완료` : `${issue.actionLabel || "해결"} ${status.repairStep}/${REPAIR_STEPS}`}</small></div>`;
       } else {
-        item.innerHTML = `<span class="journal-number">${index + 1}</span><div><strong>아직 찾지 못한 표현</strong><p>${ROOMS.find((room) => room.id === issue.room)?.name || "집 안"}에서 단서를 찾아보세요.</p></div>`;
+        item.innerHTML = `<span class="journal-number">${index + 1}</span><div><strong>아직 찾지 못한 표현</strong><p>${ROOMS.find((room) => room.id === issue.room)?.name || "집 안"}에서 이상한 곳을 찾아보세요.</p></div>`;
       }
       ui.journalList.appendChild(item);
     });
@@ -1201,9 +1201,9 @@
       ? (!touchDevice ? "WASD 또는 방향키로 걸어 보세요" : tap ? "가고 싶은 곳을 터치하세요" : "이동 패드를 살짝 밀어 보세요")
       : (!touchDevice ? "E 또는 Space로 조사하세요" : tap ? "반짝이는 물건을 터치하세요" : "오른쪽 행동 버튼을 눌러 보세요");
     if (ui.tutorialBody) ui.tutorialBody.textContent = tutorialStep === 0
-      ? (!touchDevice ? "네 방향 키로 집 안을 움직이고 문을 지나 다른 방으로 갈 수 있어요." : tap ? "빈 바닥을 누르면 안전한 길을 찾아 자동으로 걸어갑니다." : "조이스틱을 원하는 방향으로 기울이면 집 안을 걸을 수 있어요.")
-      : (!touchDevice ? "물건 가까이에서 행동 키를 누르면 조사·수리·줍기가 상황에 맞게 실행됩니다." : tap ? "물건을 누르면 가까이 이동한 뒤 자동으로 조사합니다." : "물건 가까이에서 조사·수리·줍기 버튼이 상황에 맞게 바뀝니다.");
-    if (ui.tutorialStatus) ui.tutorialStatus.textContent = "설명을 확인한 뒤 다음을 눌러 탐험을 시작하세요.";
+      ? (!touchDevice ? "방향키로 걸어요. 문을 지나 다른 방에도 갈 수 있어요." : tap ? "바닥을 누르면 그곳으로 걸어가요." : "이동 패드를 움직이면 걸어요.")
+      : (!touchDevice ? "물건 가까이에서 E 또는 Space를 누르세요." : tap ? "물건을 누르면 가까이 가서 확인해요." : "물건 가까이에서 오른쪽 버튼을 누르세요.");
+    if (ui.tutorialStatus) ui.tutorialStatus.textContent = "준비가 되면 다음을 누르세요.";
     if (ui.tutorialNext) ui.tutorialNext.textContent = tutorialStep === 0 ? "다음" : "탐험 시작";
   }
 
@@ -1217,7 +1217,7 @@
       clearOpeningIncidentTimer();
       showDialogue(
         "집 지킴이",
-        "저와 함께 우리 집을 고쳐주세요! 집 안에서 달라진 모습을 눈으로 찾아봐요.",
+        "저와 함께 우리 집을 고쳐주세요! 집 안을 둘러봐요.",
         "opening"
       );
       beep(430, 0.08, "sine");
@@ -1232,7 +1232,7 @@
     try { localStorage.setItem(TUTORIAL_KEY, "done"); } catch { /* ignore */ }
     ui.canvas?.focus({ preventScroll: true });
     if (activeIssue() && issueStatus(activeIssue()).phase === "queued") beginQueuedMission();
-    else showToast("현재 임무", ui.missionInstruction?.textContent || "반짝이는 목표를 확인하세요.", "hint");
+    else showToast("할 일", ui.missionInstruction?.textContent || "반짝이는 곳을 찾아보세요.", "hint");
   }
 
   function enterGame({ forceTutorial = false } = {}) {
@@ -1252,7 +1252,7 @@
     else {
       ui.canvas?.focus({ preventScroll: true });
       if (activeIssue() && issueStatus(activeIssue()).phase === "queued") beginQueuedMission();
-      else showToast("점검 시작", "저장된 상황에서 이어갑니다.", "hint");
+      else showToast("다시 왔네요", "하던 곳부터 해 볼까요?", "hint");
     }
   }
 
@@ -1335,7 +1335,7 @@
     if (!resetArmed) {
       resetArmed = true;
       if (ui.resetButton) ui.resetButton.textContent = "한 번 더 누르기";
-      showToast("처음부터 시작할까요?", "진행 기록을 지우려면 버튼을 한 번 더 누르세요.", "warning");
+      showToast("처음부터 할까요?", "지금까지 한 일을 지우려면 한 번 더 누르세요.", "warning");
       clearTimeout(resetTimer);
       resetTimer = window.setTimeout(() => {
         resetArmed = false;
@@ -1498,7 +1498,7 @@
         setOpen(ui.statsPanel, false);
         ui.statsToggle?.setAttribute("aria-expanded", "false");
         beginTapNavigation(room.x + room.w / 2, room.y + room.h / 2, null);
-        showToast(`${room.icon} ${room.name}(으)로 이동`, "문을 지나 안전한 길로 걸어갑니다.", "hint");
+        showToast(`${room.icon} ${room.name}에 갈게요`, "문을 지나 그 방으로 걸어가요.", "hint");
       });
     });
 
