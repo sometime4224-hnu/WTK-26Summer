@@ -609,6 +609,7 @@
     function activateDrag() {
         if (!dragState || dragState.active) return;
         dragState.active = true;
+        dragState.beamStart = centerOf(refs.sentenceCard);
         dragState.ghost = makeGhost(dragState.x, dragState.y);
         refs.sentenceCard.classList.add("is-dragging");
         refs.statusText.textContent = "한 인물에 바로 놓거나 원인자를 지나 행위자에게 놓으세요.";
@@ -622,18 +623,13 @@
         if (!dragState.active && distance > 5) activateDrag();
         if (!dragState.active) return;
         moveGhost(dragState.ghost, event.clientX, event.clientY);
+        drawBeam(dragState.beamStart, { x: event.clientX, y: event.clientY });
         refs.selfZone.classList.remove("is-hover");
         refs.otherZone.classList.remove("is-hover");
         const zone = zoneAtPoint(event.clientX, event.clientY);
         if (zone) {
             zone.classList.add("is-hover");
             appendTrail(zone);
-        }
-        if (dragState.trail.length) {
-            const sourceKey = dragState.trail[dragState.trail.length - 1];
-            const source = sourceKey === "self" ? refs.selfZone : refs.otherZone;
-            if (zone !== source) drawBeam(centerOf(source), { x: event.clientX, y: event.clientY });
-            else hideBeam();
         }
         event.preventDefault();
     }
@@ -704,6 +700,7 @@
             x: event.clientX,
             y: event.clientY,
             active: false,
+            beamStart: null,
             ghost: null,
             trail: []
         };

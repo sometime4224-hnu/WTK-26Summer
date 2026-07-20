@@ -142,6 +142,30 @@ async function pointerDragOutside(page) {
   await page.mouse.up();
 }
 
+async function expectContinuousDragBeam(page) {
+  const source = page.locator("#sentenceCard");
+  const target = page.locator("#selfZone");
+  await source.scrollIntoViewIfNeeded();
+  const sourceBox = await source.boundingBox();
+  const targetBox = await target.boundingBox();
+  expect(sourceBox).not.toBeNull();
+  expect(targetBox).not.toBeNull();
+
+  const sourcePoint = { x: sourceBox.x + sourceBox.width / 2, y: sourceBox.y + sourceBox.height / 2 };
+  const targetPoint = { x: targetBox.x + targetBox.width / 2, y: targetBox.y + targetBox.height / 2 };
+  const halfway = { x: (sourcePoint.x + targetPoint.x) / 2, y: (sourcePoint.y + targetPoint.y) / 2 };
+
+  await page.mouse.move(sourcePoint.x, sourcePoint.y);
+  await page.mouse.down();
+  await page.mouse.move(halfway.x, halfway.y, { steps: 8 });
+  await expect(page.locator("#commandBeam")).toHaveClass(/is-visible/);
+  await page.mouse.move(targetPoint.x, targetPoint.y, { steps: 8 });
+  await expect(page.locator("#commandBeam")).toHaveClass(/is-visible/);
+  const beamWidth = await page.locator("#commandBeam").evaluate((beam) => Number.parseFloat(beam.style.width));
+  expect(beamWidth).toBeGreaterThan(20);
+  await page.mouse.up();
+}
+
 async function expectNoHorizontalOverflow(page) {
   const hasOverflow = await page.evaluate(() => (
     document.documentElement.scrollWidth > window.innerWidth + 1
@@ -220,6 +244,14 @@ test("pointer drag records self-to-other direction and direct action remains cli
   await expect(page.locator("#resultSentence")).toHaveText("제가 물을 마셔요.");
   await expect(page.locator("#selfRole")).toHaveText("직접 행동");
   await expect(page.locator("#otherRole")).toHaveText("관찰자");
+});
+
+test("drag beam stays connected while entering an actor zone", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await openGame(page);
+
+  await expectContinuousDragBeam(page);
+  await expectCleanDragState(page);
 });
 
 test("a wrong direction stays on the question and a retry earns no first-attempt point", async ({ page }) => {
