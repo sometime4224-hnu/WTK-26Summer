@@ -69,6 +69,7 @@ async function startNewAndSkipTutorial(page) {
   await page.locator("#tutorialSkip").click();
   await expect(page.locator("#controlTutorial")).toBeHidden();
   await closeDialogue(page);
+  await expect.poll(async () => (await snapshot(page)).blackout, { timeout: 4_500 }).toBe(true);
   await expect.poll(async () => (await snapshot(page)).started).toBe(true);
 }
 
@@ -279,9 +280,16 @@ test("the opening uses a character briefing instead of a fullscreen prompt", asy
   expect(Math.abs(dialogueLayout.centerOffsetX)).toBeLessThanOrEqual(1);
   expect(Math.abs(dialogueLayout.centerOffsetY)).toBeLessThanOrEqual(1);
   expect(dialogueLayout.textSize).toBeGreaterThanOrEqual(20);
-  expect((await snapshot(page)).blackout).toBe(true);
+  const beforeClosingBriefing = await snapshot(page);
+  expect(beforeClosingBriefing.issues["power-outage"]).toMatchObject({ phase: "queued" });
+  expect(beforeClosingBriefing.blackout).toBe(false);
 
-  await closeDialogue(page);
+  await page.locator("#houseCanvas").dblclick({ position: { x: 20, y: 500 } });
+  await expect(page.locator("#dialogueBox")).toBeHidden();
+  expect((await snapshot(page)).openingIncidentPending).toBe(true);
+  await page.waitForTimeout(2_200);
+  expect((await snapshot(page)).blackout).toBe(false);
+  await expect.poll(async () => (await snapshot(page)).blackout, { timeout: 2_500 }).toBe(true);
 });
 
 test("original room-zoom activity remains available", async ({ page }) => {

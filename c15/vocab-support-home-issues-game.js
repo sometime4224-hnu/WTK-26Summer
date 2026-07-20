@@ -7,6 +7,8 @@
   const SAVE_VERSION = 2;
   const WORLD = Object.freeze({ width: 960, height: 640 });
   const REPAIR_STEPS = 2;
+  const OPENING_INCIDENT_DELAY = 3000;
+  const DIALOGUE_DOUBLE_TAP_WINDOW = 480;
   const ISSUE_PHASES = Object.freeze(["queued", "incident", "diagnosed", "resolved"]);
 
   const byId = (id) => document.getElementById(id);
@@ -213,6 +215,10 @@
   let audioContext = null;
   let toastTimer = 0;
   let resetTimer = 0;
+  let openingIncidentTimer = null;
+  let dialogueTapAt = 0;
+  let dialogueTapPointerType = "";
+  let suppressDialogueSurfaceClick = false;
   let resetArmed = false;
   let lastFrame = performance.now();
   let accumulator = 0;
@@ -521,9 +527,38 @@
     ui.dialogueBox?.focus({ preventScroll: true });
   }
 
+  function clearOpeningIncidentTimer() {
+    if (openingIncidentTimer !== null) window.clearTimeout(openingIncidentTimer);
+    openingIncidentTimer = null;
+  }
+
+  function openingIncidentIsPending() {
+    return openingIncidentTimer !== null;
+  }
+
+  function scheduleOpeningIncident() {
+    clearOpeningIncidentTimer();
+    openingIncidentTimer = window.setTimeout(() => {
+      openingIncidentTimer = null;
+      const issue = activeIssue();
+      if (!playing || issue?.id !== "power-outage" || issueStatus(issue).phase !== "queued") return;
+      activateCurrentIssue({ announce: false });
+      beep(165, 0.12, "square");
+      haptic([18, 24, 18]);
+    }, OPENING_INCIDENT_DELAY);
+  }
+
   function closeDialogue() {
+    const tone = ui.dialogueBox?.dataset.tone;
     setOpen(ui.dialogueBox, false);
+    dialogueTapAt = 0;
+    dialogueTapPointerType = "";
     ui.canvas?.focus({ preventScroll: true });
+    const issue = activeIssue();
+    if (tone === "opening" && playing && issue?.id === "power-outage" && issueStatus(issue).phase === "queued") {
+      scheduleOpeningIncident();
+      return;
+    }
     if (playing && activeIssue() && issueStatus(activeIssue()).phase === "queued") {
       activateCurrentIssue({ announce: true });
     }
@@ -717,6 +752,7 @@
 
   function tryInteract() {
     if (!playing || hasBlockingOverlay()) return false;
+    if (openingIncidentIsPending()) return false;
     const object = nearestObject();
     if (!object) {
       showToast("조사할 곳이 없어요", "반짝이는 물건에 조금 더 가까이 가 보세요.", "hint");
@@ -1178,7 +1214,7 @@
       && state.discoveryOrder.length === 0
       && state.repairedOrder.length === 0;
     if (isOpeningMission) {
-      activateCurrentIssue({ announce: false });
+      clearOpeningIncidentTimer();
       showDialogue(
         "집 지킴이",
         "저와 함께 우리 집을 고쳐주세요! 집 안에서 달라진 모습을 눈으로 찾아봐요.",
@@ -1229,6 +1265,7 @@
     state.soundOn = soundOn;
     currentRoomId = "living";
     activeDiagnosisId = null;
+    clearOpeningIncidentTimer();
     particles = [];
     incidentFx = null;
     resolutionFx = null;
@@ -1362,12 +1399,39 @@
         joystickY: Math.round(controls.joystickY * 1000) / 1000,
         actionPressed: controls.actionPressed
       },
+      openingIncidentPending: openingIncidentIsPending(),
       activeDiagnosisId,
       room: currentRoomId
     };
   }
 
   function bindEvents() {
+    document.addEventListener("pointerup", (event) => {
+      if (!isOpen(ui.dialogueBox) || event.target === ui.dialogueClose || ui.dialogueClose?.contains(event.target)) return;
+      const now = performance.now();
+      const isSecondTap = dialogueTapAt > 0
+        && now - dialogueTapAt <= DIALOGUE_DOUBLE_TAP_WINDOW
+        && dialogueTapPointerType === event.pointerType;
+      dialogueTapAt = isSecondTap ? 0 : now;
+      dialogueTapPointerType = isSecondTap ? "" : event.pointerType;
+      if (!isSecondTap) return;
+      suppressDialogueSurfaceClick = true;
+      window.setTimeout(() => { suppressDialogueSurfaceClick = false; }, 0);
+      event.preventDefault();
+      event.stopPropagation();
+      closeDialogue();
+    }, { capture: true, passive: false });
+    document.addEventListener("click", (event) => {
+      if (suppressDialogueSurfaceClick) {
+        suppressDialogueSurfaceClick = false;
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      if (!isOpen(ui.dialogueBox) || event.target === ui.dialogueClose || ui.dialogueClose?.contains(event.target)) return;
+      event.preventDefault();
+      event.stopPropagation();
+    }, { capture: true });
     document.addEventListener("keydown", (event) => {
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(event.code)) event.preventDefault();
       keys[event.code] = true;
