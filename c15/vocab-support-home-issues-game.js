@@ -4,8 +4,10 @@
   const SAVE_KEY = "c15-house-rescue-save-v1";
   const CONTROL_MODE_KEY = "c15-house-rescue-control-mode-v1";
   const TUTORIAL_KEY = "c15-house-rescue-tutorial-v1";
+  const SAVE_VERSION = 2;
   const WORLD = Object.freeze({ width: 960, height: 640 });
   const REPAIR_STEPS = 2;
+  const ISSUE_PHASES = Object.freeze(["queued", "incident", "diagnosed", "resolved"]);
 
   const byId = (id) => document.getElementById(id);
   const ui = {
@@ -16,6 +18,7 @@
     resetButton: byId("resetButton"),
     soundToggle: byId("soundToggle"),
     canvas: byId("houseCanvas"),
+    canvasFrame: document.querySelector(".canvas-frame"),
     storyToggle: byId("storyToggle"),
     storyToggleLabel: byId("storyToggleLabel"),
     storyPanel: byId("storyPanel"),
@@ -23,6 +26,9 @@
     storyBody: byId("storyBody"),
     storyProgressFill: byId("storyProgressFill"),
     storyProgressLabel: byId("storyProgressLabel"),
+    missionGuide: byId("missionGuide"),
+    missionPhase: byId("missionPhase"),
+    missionInstruction: byId("missionInstruction"),
     statsToggle: byId("statsToggle"),
     statsToggleLabel: byId("statsToggleLabel"),
     statsPanel: byId("statsPanel"),
@@ -49,15 +55,20 @@
     dialogueClose: byId("dialogueClose"),
     diagnosisPanel: byId("diagnosisPanel"),
     diagnosisScene: byId("diagnosisScene"),
+    diagnosisVisual: byId("diagnosisVisual"),
+    diagnosisVisualPrimary: byId("diagnosisVisualPrimary"),
+    diagnosisVisualSecondary: byId("diagnosisVisualSecondary"),
     diagnosisQuestion: byId("diagnosisQuestion"),
     diagnosisOptions: byId("diagnosisOptions"),
     diagnosisFeedback: byId("diagnosisFeedback"),
+    diagnosisCancel: byId("diagnosisCancel"),
     endingPanel: byId("endingPanel"),
     endingSummary: byId("endingSummary"),
     endingWords: byId("endingWords"),
     endingJournal: byId("endingJournal"),
     endingRestart: byId("endingRestart"),
     toast: byId("toast"),
+    toastIcon: document.querySelector(".toast-icon"),
     toastTitle: byId("toastTitle"),
     toastBody: byId("toastBody"),
     journalBackdrop: byId("journalBackdrop"),
@@ -92,68 +103,112 @@
   ]);
 
   const DOORS = Object.freeze([
-    { x: 456, y: 118, w: 48, h: 92 },
-    { x: 156, y: 304, w: 112, h: 32 },
-    { x: 692, y: 304, w: 112, h: 32 },
-    { x: 456, y: 438, w: 48, h: 104 }
+    { x: 440, y: 118, w: 80, h: 92 },
+    { x: 156, y: 288, w: 112, h: 64 },
+    { x: 692, y: 288, w: 112, h: 64 },
+    { x: 440, y: 438, w: 80, h: 104 }
   ]);
 
   const ISSUES = Object.freeze([
     {
       id: "water-supply", room: "kitchen", label: "수도꼭지", icon: "🚰", x: 100, y: 76, w: 72, h: 58,
       expression: "수돗물이 안 나오다", clue: "손잡이를 돌려도 물 한 방울 나오지 않아요.",
-      example: "주방 수돗물이 안 나와서 관리실에 연락했어요.", repair: "수도 밸브를 확인해요.",
+      incident: "수도꼭지를 돌렸는데 물이 한 방울도 나오지 않아요.",
+      example: "주방 수돗물이 안 나와서 관리실에 연락했어요.",
+      repairTarget: { label: "급수 밸브", icon: "🔩", x: 112, y: 202, w: 62, h: 44 },
+      repairSteps: ["싱크대 아래 급수 밸브가 잠겼는지 확인했어요.", "급수 밸브를 천천히 열고 물이 나오는지 확인했어요."],
+      resolution: "수도꼭지에서 물이 다시 나와요.",
       distractors: ["물이 새다", "물이 안 내려가다"], color: "#4f9ec4"
     },
     {
-      id: "power-outage", room: "living", label: "두꺼비집", icon: "💡", x: 72, y: 378, w: 62, h: 68,
+      id: "power-outage", room: "living", label: "전등 스위치", icon: "💡", x: 386, y: 388, w: 44, h: 60,
       expression: "전기가 나가다", clue: "불도 텔레비전도 갑자기 모두 꺼졌어요.",
-      example: "어젯밤에 전기가 나가서 촛불을 켰어요.", repair: "차단기를 안전하게 올려요.",
+      incident: "딸깍! 거실 불과 텔레비전이 갑자기 모두 꺼졌어요.",
+      example: "어젯밤에 전기가 나가서 촛불을 켰어요.",
+      repairTarget: { label: "두꺼비집", icon: "⚡", x: 72, y: 378, w: 62, h: 68 },
+      repairSteps: ["젖은 손이 아닌지 확인하고 전기 제품의 전원을 껐어요.", "내려간 차단기를 안전하게 올렸어요."],
+      resolution: "거실 불과 텔레비전이 다시 켜졌어요.",
       distractors: ["난방이 안 되다", "소음이 심하다"], color: "#e7a52e"
     },
     {
       id: "toilet-clog", room: "bathroom", label: "변기", icon: "🚽", x: 560, y: 72, w: 82, h: 78,
       expression: "변기가 막히다", clue: "물을 내리자 물이 차오르고 변기가 꿀렁거려요.",
-      example: "변기가 막혀서 뚫어뻥을 사용했어요.", repair: "뚫어뻥으로 막힌 곳을 뚫어요.",
+      incident: "물을 내리자 변기 물이 올라오며 꿀렁거려요.",
+      example: "변기가 막혀서 뚫어뻥을 사용했어요.",
+      repairSteps: ["물이 넘치지 않도록 급수 밸브를 먼저 잠갔어요.", "뚫어뻥을 밀착해 막힌 곳을 뚫었어요."],
+      resolution: "변기 물이 정상적으로 내려가요.",
       distractors: ["수돗물이 안 나오다", "물이 새다"], color: "#6e8fc4"
     },
     {
       id: "leak", room: "bathroom", label: "수도관", icon: "💧", x: 842, y: 176, w: 56, h: 72,
       expression: "물이 새다", clue: "수도관 연결 부분에서 물방울이 계속 떨어져요.",
-      example: "욕실 수도관에서 물이 새서 바닥이 젖었어요.", repair: "연결 너트를 조여요.",
+      incident: "수도관 아래에 물방울이 떨어지고 바닥 웅덩이가 커져요.",
+      example: "욕실 수도관에서 물이 새서 바닥이 젖었어요.",
+      repairSteps: ["더 새지 않도록 급수 밸브를 잠갔어요.", "수도관 연결 너트를 렌치로 조였어요."],
+      resolution: "물방울이 멈추고 바닥을 닦았어요.",
       distractors: ["물이 안 내려가다", "수돗물이 안 나오다"], color: "#3f9bc0"
     },
     {
       id: "noise", room: "bedroom", label: "이웃집 벽", icon: "🔊", x: 888, y: 414, w: 34, h: 136,
       expression: "소음이 심하다", clue: "벽 너머에서 쿵쿵거리는 소리가 크게 들려요.",
-      example: "밤마다 이웃집 소음이 심해서 잠을 못 자요.", repair: "관리실에 조용히 요청해요.",
+      incident: "밤인데 이웃집 벽 너머에서 쿵쿵 소리가 크게 들려요.",
+      example: "밤마다 이웃집 소음이 심해서 잠을 못 자요.",
+      repairTarget: { label: "관리실 인터폰", icon: "☎️", x: 548, y: 394, w: 66, h: 54 },
+      repairSteps: ["소음이 난 시간과 상황을 조용히 기록했어요.", "관리실에 연락해 이웃에게 조용히 해 달라고 요청했어요."],
+      resolution: "벽 너머 소리가 잦아들어 다시 조용해졌어요.",
+      actionLabel: "대응",
       distractors: ["전기가 나가다", "이상한 냄새가 나다"], color: "#bd625e"
     },
     {
       id: "heating", room: "bedroom", label: "난방기", icon: "🌡️", x: 548, y: 520, w: 92, h: 54,
       expression: "난방이 안 되다", clue: "온도를 올려도 방바닥과 공기가 계속 차가워요.",
-      example: "난방이 안 돼서 방 안이 너무 추워요.", repair: "난방 밸브와 온도계를 확인해요.",
+      incident: "온도를 올렸는데도 방바닥이 차갑고 입김이 나요.",
+      example: "난방이 안 돼서 방 안이 너무 추워요.",
+      repairSteps: ["온도조절기의 설정 온도를 확인했어요.", "난방 밸브를 열고 관리실 점검을 요청했어요."],
+      resolution: "방바닥이 따뜻해지고 실내 온도가 올라갔어요.",
+      actionLabel: "점검",
       distractors: ["전기가 나가다", "소음이 심하다"], color: "#d47755"
     },
     {
       id: "smell", room: "kitchen", label: "냉장고", icon: "🧊", x: 352, y: 92, w: 72, h: 118,
       expression: "이상한 냄새가 나다", clue: "문을 여니 코를 찌르는 낯선 냄새가 퍼져요.",
-      example: "냉장고에서 이상한 냄새가 나서 안을 청소했어요.", repair: "상한 음식을 버리고 안을 닦아요.",
+      incident: "냉장고 문을 여니 코를 찌르는 냄새가 퍼져요.",
+      example: "냉장고에서 이상한 냄새가 나서 안을 청소했어요.",
+      repairSteps: ["유통기한을 살펴 상한 음식을 찾았어요.", "상한 음식을 버리고 냉장고 안을 닦았어요."],
+      resolution: "냉장고 안이 깨끗해지고 냄새가 사라졌어요.",
       distractors: ["소음이 심하다", "난방이 안 되다"], color: "#7f78a8"
     },
     {
       id: "drain", room: "kitchen", label: "싱크대 배수구", icon: "🕳️", x: 220, y: 78, w: 72, h: 58,
       expression: "물이 안 내려가다", clue: "싱크대에 고인 물이 빙글빙글 돌기만 해요.",
-      example: "싱크대 물이 안 내려가서 배수구를 청소했어요.", repair: "배수구의 이물질을 꺼내요.",
+      incident: "설거지 물이 싱크대에 고인 채 내려가지 않아요.",
+      example: "싱크대 물이 안 내려가서 배수구를 청소했어요.",
+      repairSteps: ["배수구 거름망을 조심히 꺼냈어요.", "거름망과 배수구의 이물질을 제거했어요."],
+      resolution: "고인 물이 소용돌이치며 시원하게 내려가요.",
       distractors: ["변기가 막히다", "수돗물이 안 나오다"], color: "#66798b"
     }
   ]);
 
   const ISSUE_BY_ID = new Map(ISSUES.map((issue) => [issue.id, issue]));
+  const MISSION_ORDER = Object.freeze([
+    "power-outage", "water-supply", "drain", "smell",
+    "toilet-clog", "leak", "heating", "noise"
+  ]);
+  const ISSUE_VISUALS = Object.freeze({
+    "power-outage": Object.freeze({ cue: "blackout-flicker", primary: "💡", secondary: "📺", effects: ["⚡", "✦", "⚡"] }),
+    "water-supply": Object.freeze({ cue: "dry-faucet", primary: "🚰", secondary: "🚫", effects: ["💧", "×", "💧"] }),
+    drain: Object.freeze({ cue: "standing-water", primary: "🚰", secondary: "🕳️", effects: ["↻", "•", "↻"] }),
+    smell: Object.freeze({ cue: "rising-odor", primary: "🧊", secondary: "🤢", effects: ["〰", "〰", "〰"] }),
+    "toilet-clog": Object.freeze({ cue: "rising-bowl-water", primary: "🚽", secondary: "🪠", effects: ["●", "○", "●"] }),
+    leak: Object.freeze({ cue: "falling-drops-puddle", primary: "🔧", secondary: "💧", effects: ["💧", "💧", "💧"] }),
+    heating: Object.freeze({ cue: "cold-room-snow", primary: "🌡️", secondary: "🥶", effects: ["❄", "❄", "❄"] }),
+    noise: Object.freeze({ cue: "wall-impact-waves", primary: "🧱", secondary: "🛏️", effects: ["💥", "◖", "💥"] })
+  });
   const TOOLKIT = Object.freeze({ id: "toolkit", room: "living", label: "수리 가방", icon: "🧰", x: 350, y: 536, w: 66, h: 56 });
 
   const keys = Object.create(null);
   const controls = { joystickActive: false, joystickX: 0, joystickY: 0, joystickPointerId: null, actionPressed: false };
+  const autoNavigation = { goalX: null, goalY: null, targetId: null, stallTime: 0, retries: 0 };
   const camera = { x: WORLD.width / 2, y: WORLD.height / 2, scale: 1 };
   let audioContext = null;
   let toastTimer = 0;
@@ -168,26 +223,29 @@
   let playing = false;
   let isTouchDevice = false;
   let particles = [];
+  let incidentFx = null;
+  let resolutionFx = null;
 
   function blankIssueState() {
-    return Object.fromEntries(ISSUES.map((issue) => [issue.id, { discovered: false, repaired: false, repairStep: 0 }]));
+    return Object.fromEntries(ISSUES.map((issue) => [issue.id, { phase: "queued", repairStep: 0 }]));
   }
 
   function getStoredMode() {
-    try { return localStorage.getItem(CONTROL_MODE_KEY) === "tap" ? "tap" : "joystick"; }
-    catch { return "joystick"; }
+    try { return localStorage.getItem(CONTROL_MODE_KEY) === "joystick" ? "joystick" : "tap"; }
+    catch { return "tap"; }
   }
 
   function createState() {
     return {
-      version: 1,
+      version: SAVE_VERSION,
       started: false,
       completed: false,
-      toolkit: false,
+      toolkit: true,
       soundOn: true,
       controlMode: getStoredMode(),
       player: { x: 250, y: 492, w: 28, h: 38, facing: "down", step: 0 },
       issues: blankIssueState(),
+      activeIssueId: MISSION_ORDER[0],
       discoveryOrder: [],
       repairedOrder: [],
       path: [],
@@ -219,8 +277,24 @@
     return touch;
   }
 
+  function syncCanvasResolution() {
+    if (!ui.canvas) return;
+    const portraitStage = playing && window.innerWidth <= 680 && window.innerHeight > window.innerWidth;
+    let nextWidth = WORLD.width;
+    let nextHeight = WORLD.height;
+    if (portraitStage && ui.canvasFrame) {
+      const frameWidth = Math.max(1, ui.canvasFrame.clientWidth);
+      const frameHeight = Math.max(1, ui.canvasFrame.clientHeight);
+      nextHeight = Math.max(900, Math.min(1600, Math.round(nextWidth * frameHeight / frameWidth)));
+    }
+    if (ui.canvas.width !== nextWidth || ui.canvas.height !== nextHeight) {
+      ui.canvas.width = nextWidth;
+      ui.canvas.height = nextHeight;
+    }
+  }
+
   function normalizeMode(mode) {
-    return mode === "tap" ? "tap" : "joystick";
+    return mode === "joystick" ? "joystick" : "tap";
   }
 
   function setControlMode(mode, { save = true } = {}) {
@@ -231,6 +305,11 @@
     });
     state.path = [];
     state.autoTargetId = null;
+    autoNavigation.goalX = null;
+    autoNavigation.goalY = null;
+    autoNavigation.targetId = null;
+    autoNavigation.stallTime = 0;
+    autoNavigation.retries = 0;
     releaseInputs();
     if (save) {
       try { localStorage.setItem(CONTROL_MODE_KEY, state.controlMode); } catch { /* storage can be unavailable */ }
@@ -245,7 +324,73 @@
 
   function issueStatus(issueOrId) {
     const id = typeof issueOrId === "string" ? issueOrId : issueOrId.id;
-    return state.issues[id] || { discovered: false, repaired: false, repairStep: 0 };
+    return state.issues[id] || { phase: "queued", repairStep: 0 };
+  }
+
+  function isDiscovered(issueOrId) {
+    return ["diagnosed", "resolved"].includes(issueStatus(issueOrId).phase);
+  }
+
+  function isResolved(issueOrId) {
+    return issueStatus(issueOrId).phase === "resolved";
+  }
+
+  function activeIssue() {
+    return state.activeIssueId ? ISSUE_BY_ID.get(state.activeIssueId) || null : null;
+  }
+
+  function displayObjectForIssue(issue) {
+    const status = issueStatus(issue);
+    if (status.phase === "diagnosed" && issue.repairTarget) {
+      return { ...issue, ...issue.repairTarget, id: issue.id, stage: "response" };
+    }
+    return { ...issue, stage: status.phase === "resolved" ? "resolved" : "symptom" };
+  }
+
+  function responseTargetLabel(issue) {
+    return issue.repairTarget?.label || issue.label;
+  }
+
+  function withObjectParticle(label) {
+    const lastCharacter = String(label || "").slice(-1);
+    const code = lastCharacter.charCodeAt(0);
+    const hasFinalConsonant = code >= 0xac00 && code <= 0xd7a3 && (code - 0xac00) % 28 !== 0;
+    return `${label}${hasFinalConsonant ? "을" : "를"}`;
+  }
+
+  function isBlackoutActive() {
+    return ["incident", "diagnosed"].includes(issueStatus("power-outage").phase);
+  }
+
+  function effectStrength(issueOrId) {
+    const id = typeof issueOrId === "string" ? issueOrId : issueOrId.id;
+    const status = issueStatus(id);
+    if (id !== state.activeIssueId || !["incident", "diagnosed"].includes(status.phase)) return 0;
+    return status.phase === "diagnosed" && status.repairStep > 0 ? 0.46 : 1;
+  }
+
+  function beginSceneFx(type, issue) {
+    const fx = { issueId: issue.id, startedAt: performance.now() };
+    if (type === "incident") incidentFx = fx;
+    else resolutionFx = fx;
+    const frame = ui.canvasFrame;
+    if (!frame) return;
+    const className = type === "incident" ? "is-incident-flash" : "is-resolution-flash";
+    frame.classList.remove(className);
+    requestAnimationFrame(() => frame.classList.add(className));
+    window.setTimeout(() => frame.classList.remove(className), type === "incident" ? 900 : 1300);
+  }
+
+  function updateDiagnosisVisual(issue) {
+    const visual = ISSUE_VISUALS[issue.id];
+    if (!visual || !ui.diagnosisVisual) return;
+    ui.diagnosisVisual.dataset.issue = issue.id;
+    ui.diagnosisVisual.setAttribute("aria-label", issue.clue);
+    if (ui.diagnosisVisualPrimary) ui.diagnosisVisualPrimary.textContent = visual.primary;
+    if (ui.diagnosisVisualSecondary) ui.diagnosisVisualSecondary.textContent = visual.secondary;
+    ui.diagnosisVisual.querySelectorAll(".diagnosis-visual__effect").forEach((element, index) => {
+      element.textContent = visual.effects[index] || "✦";
+    });
   }
 
   function discoveredIssues() {
@@ -258,7 +403,7 @@
 
   function serializeState() {
     return {
-      version: 1,
+      version: SAVE_VERSION,
       started: state.started,
       completed: state.completed,
       toolkit: state.toolkit,
@@ -266,6 +411,7 @@
       controlMode: state.controlMode,
       player: { x: state.player.x, y: state.player.y, facing: state.player.facing },
       issues: state.issues,
+      activeIssueId: state.activeIssueId,
       discoveryOrder: state.discoveryOrder,
       repairedOrder: state.repairedOrder,
       savedAt: Date.now()
@@ -289,13 +435,13 @@
     if (!raw) return false;
     try {
       const saved = JSON.parse(raw);
-      if (!saved || saved.version !== 1) return false;
+      if (!saved || ![1, SAVE_VERSION].includes(saved.version)) return false;
       const next = createState();
       next.started = Boolean(saved.started);
       next.completed = Boolean(saved.completed);
-      next.toolkit = Boolean(saved.toolkit);
+      next.toolkit = true;
       next.soundOn = saved.soundOn !== false;
-      next.controlMode = normalizeMode(saved.controlMode ?? getStoredMode());
+      next.controlMode = getStoredMode();
       if (saved.player && Number.isFinite(saved.player.x) && Number.isFinite(saved.player.y)) {
         next.player.x = Math.max(30, Math.min(WORLD.width - 50, saved.player.x));
         next.player.y = Math.max(30, Math.min(WORLD.height - 60, saved.player.y));
@@ -303,18 +449,27 @@
       }
       for (const issue of ISSUES) {
         const source = saved.issues?.[issue.id];
+        const migratedPhase = ISSUE_PHASES.includes(source?.phase)
+          ? source.phase
+          : source?.repaired
+            ? "resolved"
+            : source?.discovered
+              ? "diagnosed"
+              : "queued";
         next.issues[issue.id] = {
-          discovered: Boolean(source?.discovered),
-          repaired: Boolean(source?.repaired),
+          phase: migratedPhase,
           repairStep: Math.max(0, Math.min(REPAIR_STEPS, Number(source?.repairStep) || 0))
         };
       }
       next.discoveryOrder = Array.isArray(saved.discoveryOrder)
-        ? saved.discoveryOrder.filter((id, index, list) => ISSUE_BY_ID.has(id) && list.indexOf(id) === index && next.issues[id].discovered)
-        : ISSUES.filter((issue) => next.issues[issue.id].discovered).map((issue) => issue.id);
+        ? saved.discoveryOrder.filter((id, index, list) => ISSUE_BY_ID.has(id) && list.indexOf(id) === index && ["diagnosed", "resolved"].includes(next.issues[id].phase))
+        : MISSION_ORDER.filter((id) => ["diagnosed", "resolved"].includes(next.issues[id].phase));
       next.repairedOrder = Array.isArray(saved.repairedOrder)
-        ? saved.repairedOrder.filter((id, index, list) => ISSUE_BY_ID.has(id) && list.indexOf(id) === index && next.issues[id].repaired)
-        : ISSUES.filter((issue) => next.issues[issue.id].repaired).map((issue) => issue.id);
+        ? saved.repairedOrder.filter((id, index, list) => ISSUE_BY_ID.has(id) && list.indexOf(id) === index && next.issues[id].phase === "resolved")
+        : MISSION_ORDER.filter((id) => next.issues[id].phase === "resolved");
+      const firstUnresolved = MISSION_ORDER.find((id) => next.issues[id].phase !== "resolved") || null;
+      next.activeIssueId = firstUnresolved;
+      next.completed = !firstUnresolved;
       state = next;
       return next.started;
     } catch {
@@ -351,6 +506,7 @@
     if (!ui.toast) return;
     clearTimeout(toastTimer);
     ui.toast.dataset.tone = tone;
+    if (ui.toastIcon) ui.toastIcon.textContent = tone === "warning" ? "!" : tone === "hint" ? "→" : "✓";
     if (ui.toastTitle) ui.toastTitle.textContent = title;
     if (ui.toastBody) ui.toastBody.textContent = body;
     setOpen(ui.toast, true);
@@ -368,6 +524,9 @@
   function closeDialogue() {
     setOpen(ui.dialogueBox, false);
     ui.canvas?.focus({ preventScroll: true });
+    if (playing && activeIssue() && issueStatus(activeIssue()).phase === "queued") {
+      activateCurrentIssue({ announce: true });
+    }
   }
 
   function spawnParticles(x, y, color, count = 12) {
@@ -402,7 +561,9 @@
   }
 
   function visibleObjects() {
-    return state.toolkit ? ISSUES : [TOOLKIT, ...ISSUES];
+    const issue = activeIssue();
+    if (!issue || isResolved(issue)) return [];
+    return [displayObjectForIssue(issue)];
   }
 
   function nearestObject(reach = isTouchDevice ? 92 : 76) {
@@ -423,15 +584,49 @@
   }
 
   function hasBlockingOverlay() {
-    return isOpen(ui.diagnosisPanel) || isOpen(ui.endingPanel) || isOpen(ui.controlTutorial) || isOpen(ui.journalDrawer);
+    return isOpen(ui.dialogueBox) || isOpen(ui.diagnosisPanel) || isOpen(ui.endingPanel) || isOpen(ui.controlTutorial) || isOpen(ui.journalDrawer);
+  }
+
+  function activateCurrentIssue({ announce = true } = {}) {
+    const issue = activeIssue();
+    if (!issue) return false;
+    const status = issueStatus(issue);
+    if (status.phase === "queued") {
+      status.phase = "incident";
+      beginSceneFx("incident", issue);
+    }
+    if (announce) {
+      showToast("집 안에 변화가 생겼어요", "빛·움직임·소리를 보고 움직이는 곳을 터치하세요.", "warning");
+      beep(issue.id === "power-outage" ? 165 : 360, 0.12, issue.id === "power-outage" ? "square" : "triangle");
+      haptic([18, 24, 18]);
+    }
+    updateAllUi();
+    saveGame();
+    return true;
+  }
+
+  function closeDiagnosis() {
+    activeDiagnosisId = null;
+    setOpen(ui.diagnosisPanel, false);
+    ui.canvas?.focus({ preventScroll: true });
+  }
+
+  function queueNextMission() {
+    const currentIndex = MISSION_ORDER.indexOf(state.activeIssueId);
+    const nextId = MISSION_ORDER.slice(currentIndex + 1).find((id) => !isResolved(id)) || null;
+    state.activeIssueId = nextId;
+    return Boolean(nextId);
   }
 
   function openDiagnosis(issue) {
+    const status = issueStatus(issue);
+    if (issue.id !== state.activeIssueId || status.phase !== "incident") return false;
     activeDiagnosisId = issue.id;
-    if (ui.diagnosisScene) ui.diagnosisScene.textContent = `${ROOMS.find((room) => room.id === issue.room)?.name || "집 안"} · ${issue.label}`;
-    if (ui.diagnosisQuestion) ui.diagnosisQuestion.textContent = issue.clue;
+    if (ui.diagnosisScene) ui.diagnosisScene.textContent = `${ROOMS.find((room) => room.id === issue.room)?.icon || "🏠"} 장면 관찰`;
+    if (ui.diagnosisQuestion) ui.diagnosisQuestion.textContent = "이 장면과 어울리는 표현은 무엇일까요?";
+    updateDiagnosisVisual(issue);
     if (ui.diagnosisFeedback) {
-      ui.diagnosisFeedback.textContent = "장면에 맞는 표현을 골라 보세요.";
+      ui.diagnosisFeedback.textContent = "그림의 움직임을 보고 골라 보세요.";
       ui.diagnosisFeedback.dataset.tone = "normal";
     }
     if (ui.diagnosisOptions) {
@@ -451,6 +646,7 @@
     closeDialogue();
     setOpen(ui.diagnosisPanel, true);
     ui.diagnosisPanel?.focus({ preventScroll: true });
+    return true;
   }
 
   function answerDiagnosis(answer) {
@@ -466,14 +662,13 @@
       return false;
     }
     const status = issueStatus(issue);
-    if (!status.discovered) {
-      status.discovered = true;
+    if (status.phase === "incident") {
+      status.phase = "diagnosed";
       state.discoveryOrder.push(issue.id);
     }
-    activeDiagnosisId = null;
-    setOpen(ui.diagnosisPanel, false);
+    closeDiagnosis();
     spawnParticles(issue.x + issue.w / 2, issue.y + issue.h / 2, issue.color, 16);
-    showToast("표현을 찾았어요", `${issue.expression} · 이제 다시 조사해 수리하세요.`);
+    showToast("표현을 찾았어요", `${issue.expression} · 이제 ${responseTargetLabel(issue)}에서 ${issue.actionLabel || "해결"}하세요.`);
     beep(720, 0.11, "sine");
     haptic(24);
     updateAllUi();
@@ -483,23 +678,41 @@
 
   function repairIssue(issue) {
     const status = issueStatus(issue);
+    if (status.phase !== "diagnosed") return false;
+    const canonicalIssue = ISSUE_BY_ID.get(issue.id) || issue;
+    const steps = Array.isArray(issue.repairSteps) && issue.repairSteps.length
+      ? issue.repairSteps
+      : ["상태를 안전하게 확인했어요.", "문제가 해결됐는지 다시 확인했어요."];
+    const actionLabel = issue.actionLabel || "해결";
     status.repairStep = Math.min(REPAIR_STEPS, status.repairStep + 1);
     spawnParticles(issue.x + issue.w / 2, issue.y + issue.h / 2, issue.color, 9);
     if (status.repairStep < REPAIR_STEPS) {
-      showDialogue("수리 메모", `${issue.repair} (${status.repairStep}/${REPAIR_STEPS}) 한 번 더 행동해 보세요.`);
+      showDialogue(
+        `${actionLabel} ${status.repairStep}/${REPAIR_STEPS} · ${responseTargetLabel(issue)}`,
+        `${steps[status.repairStep - 1]} 창을 닫은 뒤 ${withObjectParticle(responseTargetLabel(issue))} 다시 터치해 다음 단계인 “${steps[status.repairStep]}”를 진행하세요.`
+      );
       beep(460, 0.06, "triangle");
     } else {
-      status.repaired = true;
+      status.phase = "resolved";
+      beginSceneFx("resolution", canonicalIssue);
       if (!state.repairedOrder.includes(issue.id)) state.repairedOrder.push(issue.id);
-      showDialogue("수리 완료", `${issue.expression} → 문제가 해결됐어요! ${issue.example}`);
-      showToast("안전도 상승", `${issue.label} 점검을 마쳤어요.`);
+      showToast(`${actionLabel} 완료`, "장면이 어떻게 정상으로 돌아오는지 눈으로 확인하세요.");
       spawnParticles(issue.x + issue.w / 2, issue.y + issue.h / 2, "#f3c763", 24);
       beep(860, 0.15, "sine");
       haptic([18, 28, 28]);
-      if (state.repairedOrder.length === ISSUES.length) completeGame();
+      const hasNextMission = queueNextMission();
+      if (hasNextMission) {
+        showDialogue(
+          `${actionLabel} 완료`,
+          `“${issue.example}” 장면의 변화를 확인한 뒤 창을 닫으면 다음 상황이 시작됩니다.`
+        );
+      } else {
+        completeGame();
+      }
     }
     updateAllUi();
     saveGame();
+    return true;
   }
 
   function tryInteract() {
@@ -511,40 +724,32 @@
     }
     state.path = [];
     state.autoTargetId = null;
-    if (object.id === TOOLKIT.id) {
-      if (!state.toolkit) {
-        state.toolkit = true;
-        spawnParticles(object.x + object.w / 2, object.y + object.h / 2, "#f2bc5b", 22);
-        showDialogue("집주인", "수리 가방을 챙겼어요. 이제 반짝이는 물건을 조사하고 문제를 정확히 말해 보세요.");
-        showToast("도구 준비 완료", "밸브·뚫어뻥·렌치·점검기가 들어 있어요.");
-        beep(650, 0.12, "triangle");
-        haptic(24);
-        updateAllUi();
-        saveGame();
-      }
+    autoNavigation.targetId = null;
+    const issue = ISSUE_BY_ID.get(object.id);
+    if (!issue || issue.id !== state.activeIssueId) return false;
+    const status = issueStatus(issue);
+    if (status.phase === "queued") {
+      activateCurrentIssue({ announce: true });
       return true;
     }
-    if (!state.toolkit) {
-      showDialogue("집주인", "거실에 있는 수리 가방을 먼저 챙겨 주세요.", "warning");
-      return false;
-    }
-    const status = issueStatus(object);
-    if (!status.discovered) {
-      openDiagnosis(object);
+    if (status.phase === "incident") {
+      openDiagnosis(issue);
       return true;
     }
-    if (!status.repaired) {
-      repairIssue(object);
+    if (status.phase === "diagnosed") {
+      repairIssue(displayObjectForIssue(issue));
       return true;
     }
-    showDialogue(object.label, `${object.expression}. ${object.example}`);
+    showDialogue(issue.label, `${issue.expression}. ${issue.example}`);
     beep(560, 0.05, "sine");
     return true;
   }
 
   function completeGame() {
     state.completed = true;
+    state.activeIssueId = null;
     state.path = [];
+    setOpen(ui.dialogueBox, false);
     if (ui.endingSummary) ui.endingSummary.textContent = "네 방의 문제를 모두 해결했어요!";
     if (ui.endingWords) ui.endingWords.textContent = `${state.discoveryOrder.length}개`;
     if (ui.endingJournal) ui.endingJournal.textContent = `${state.repairedOrder.length}문장`;
@@ -623,7 +828,9 @@
         if (cameFrom.has(nextKey)) continue;
         const x = column * cell + cell / 2;
         const y = row * cell + cell / 2;
-        if (!isWalkable(x, y)) continue;
+        const midpointX = (current.x + x) / 2;
+        const midpointY = (current.y + y) / 2;
+        if (!isWalkable(x, y) || !isWalkable(midpointX, midpointY)) continue;
         cameFrom.set(nextKey, current);
         queue.push({ column, row, x, y });
       }
@@ -646,7 +853,16 @@
     const py = state.player.y + state.player.h / 2;
     state.path = buildPath(px, py, worldX, worldY);
     state.autoTargetId = targetId;
-    if (!state.path.length) showToast("길을 찾지 못했어요", "방 안쪽이나 문 근처를 다시 눌러 보세요.", "hint");
+    autoNavigation.goalX = worldX;
+    autoNavigation.goalY = worldY;
+    autoNavigation.targetId = targetId;
+    autoNavigation.stallTime = 0;
+    autoNavigation.retries = 0;
+    if (!state.path.length) {
+      state.autoTargetId = null;
+      autoNavigation.targetId = null;
+      showToast("길을 찾지 못했어요", "방 안쪽이나 문 근처를 다시 눌러 보세요.", "hint");
+    }
   }
 
   function findTapObject(x, y) {
@@ -739,15 +955,41 @@
     const distance = Math.hypot(dx, dy);
     if (distance < 7) {
       state.path.shift();
-      if (!state.path.length && state.autoTargetId) {
+      if (!state.path.length) {
         const targetId = state.autoTargetId;
         state.autoTargetId = null;
-        const object = targetId === TOOLKIT.id ? TOOLKIT : ISSUE_BY_ID.get(targetId);
-        if (object && nearestObject(112)?.id === object.id) tryInteract();
+        autoNavigation.goalX = null;
+        autoNavigation.goalY = null;
+        autoNavigation.targetId = null;
+        autoNavigation.stallTime = 0;
+        if (targetId) {
+          const object = ISSUE_BY_ID.get(targetId);
+          if (object && nearestObject(112)?.id === object.id) tryInteract();
+        }
       }
       return true;
     }
+    const beforeX = state.player.x;
+    const beforeY = state.player.y;
     movePlayer(dx / distance, dy / distance, Math.min(distance, 210 * dt));
+    const moved = Math.hypot(state.player.x - beforeX, state.player.y - beforeY);
+    autoNavigation.stallTime = moved < 0.2 ? autoNavigation.stallTime + dt : 0;
+    if (autoNavigation.stallTime > 0.5) {
+      autoNavigation.retries += 1;
+      autoNavigation.stallTime = 0;
+      const goalX = autoNavigation.goalX;
+      const goalY = autoNavigation.goalY;
+      const playerX = state.player.x + state.player.w / 2;
+      const playerY = state.player.y + state.player.h / 2;
+      state.path = Number.isFinite(goalX) && Number.isFinite(goalY) && autoNavigation.retries <= 2
+        ? buildPath(playerX, playerY, goalX, goalY)
+        : [];
+      if (!state.path.length) {
+        state.autoTargetId = null;
+        autoNavigation.targetId = null;
+        showToast("이동 경로를 다시 확인해 주세요", "문이 보이는 통로나 방 안쪽을 터치해 보세요.", "hint");
+      }
+    }
     return true;
   }
 
@@ -785,9 +1027,10 @@
   }
 
   function roomMissionHint(roomId) {
-    const unresolved = ISSUES.filter((issue) => issue.room === roomId && !issueStatus(issue).repaired).length;
-    if (!state.toolkit) return roomId === "living" ? "수리 가방을 찾아보세요." : "거실에서 수리 가방을 먼저 챙기세요.";
-    return unresolved ? `이 방에 해결할 문제가 ${unresolved}개 있어요.` : "이 방의 점검을 마쳤어요.";
+    const unresolved = ISSUES.filter((issue) => issue.room === roomId && !isResolved(issue)).length;
+    const current = activeIssue();
+    if (current?.room === roomId) return "이 방에서 반복해서 움직이는 장면을 찾아보세요.";
+    return unresolved ? `이 방에는 앞으로 확인할 상황이 ${unresolved}개 있어요.` : "이 방의 점검을 마쳤어요.";
   }
 
   function updateInteractionPrompt() {
@@ -798,15 +1041,14 @@
       return;
     }
     let label = `${object.label} 조사`;
-    if (object.id === TOOLKIT.id) label = "수리 가방 챙기기";
-    else {
-      const status = issueStatus(object);
-      if (status.discovered && !status.repaired) label = `${object.label} 수리 ${status.repairStep}/${REPAIR_STEPS}`;
-      if (status.repaired) label = `${object.label} 복습`;
-    }
+    const issue = ISSUE_BY_ID.get(object.id);
+    const status = issueStatus(object);
+    if (status.phase === "incident") label = `${object.label} 상황 확인`;
+    if (status.phase === "diagnosed") label = `${object.label} ${issue?.actionLabel || "해결"} ${status.repairStep + 1}/${REPAIR_STEPS}`;
+    if (status.phase === "resolved") label = `${object.label} 복습`;
     if (ui.interactionPromptText) ui.interactionPromptText.textContent = label;
     if (ui.interactionPromptKey) ui.interactionPromptKey.textContent = isTouchDevice ? "행동" : "E";
-    if (ui.touchActionLabel) ui.touchActionLabel.textContent = label.includes("수리") ? "수리" : label.includes("챙기기") ? "줍기" : "조사";
+    if (ui.touchActionLabel) ui.touchActionLabel.textContent = status.phase === "diagnosed" ? (issue?.actionLabel || "해결") : "확인";
     setOpen(ui.interactionPrompt, true);
   }
 
@@ -817,31 +1059,51 @@
       if (active) button.setAttribute("aria-current", "true");
       else button.removeAttribute("aria-current");
       const roomIssues = ISSUES.filter((issue) => issue.room === button.dataset.room);
-      const repaired = roomIssues.filter((issue) => issueStatus(issue).repaired).length;
+      const repaired = roomIssues.filter((issue) => isResolved(issue)).length;
       button.dataset.progress = `${repaired}/${roomIssues.length}`;
+      button.classList.toggle("is-complete", roomIssues.length > 0 && repaired === roomIssues.length);
     });
   }
 
   function updateStory() {
     const discovered = discoveredIssues().length;
     const repaired = repairedIssues().length;
-    let title = "거실의 수리 가방 챙기기";
-    let body = "수리 가방 가까이에서 조사 버튼을 눌러 도구를 준비하세요.";
-    if (state.toolkit && repaired < ISSUES.length) {
-      const inProgress = ISSUES.find((issue) => issueStatus(issue).discovered && !issueStatus(issue).repaired);
-      const next = inProgress || ISSUES.find((issue) => !issueStatus(issue).discovered);
-      if (next) {
-        const room = ROOMS.find((entry) => entry.id === next.room);
-        title = inProgress ? `${next.label} 수리 마무리` : `${room?.name || "집 안"}의 이상 징후 찾기`;
-        body = inProgress ? `${next.expression} 장면으로 돌아가 두 번 행동해 문제를 해결하세요.` : `${room?.icon || "🏠"} ${room?.name || "집 안"}에서 반짝이는 ${next.label}을 조사하세요.`;
+    const issue = activeIssue();
+    const status = issue ? issueStatus(issue) : null;
+    const room = issue ? ROOMS.find((entry) => entry.id === issue.room) : null;
+    let phaseLabel = "점검 완료";
+    let title = "우리 집 점검 완료";
+    let body = "기록장을 열어 여덟 표현과 해결 문장을 다시 말해 보세요.";
+    let mission = "모든 상황을 해결했어요. 수리 기록장을 확인하세요.";
+    if (issue && status) {
+      if (status.phase === "queued") {
+        phaseLabel = "다음 상황";
+        title = "다음 장면 준비";
+        body = "방금 바뀐 장면을 확인한 뒤 창을 닫아 주세요.";
+        mission = "정상으로 돌아온 모습을 확인하고 창을 닫으세요.";
+      } else if (status.phase === "incident") {
+        phaseLabel = "👁 장면 관찰";
+        title = `${room?.icon || "🏠"} ${room?.name || "집 안"}의 변화를 찾아보세요`;
+        body = "빛·물·공기·사물의 반복되는 움직임을 살펴보세요.";
+        mission = "반복해서 움직이는 장면을 찾아 터치하세요.";
+      } else if (status.phase === "diagnosed") {
+        const target = responseTargetLabel(issue);
+        const action = issue.actionLabel || "해결";
+        phaseLabel = `${action} ${status.repairStep + 1}/${REPAIR_STEPS}`;
+        title = `${target}에서 ${action}하기`;
+        body = `${issue.expression} 상황이에요. ${issue.repairSteps?.[status.repairStep] || "상태를 안전하게 확인하세요."}`;
+        mission = `${room?.name || "집 안"}의 ${withObjectParticle(target)} 터치: ${issue.repairSteps?.[status.repairStep] || "상태 확인"}`;
       }
-    } else if (repaired === ISSUES.length) {
-      title = "우리 집 점검 완료";
-      body = "기록장을 열어 여덟 표현과 해결 문장을 다시 말해 보세요.";
     }
     if (ui.storyTitle) ui.storyTitle.textContent = title;
     if (ui.storyBody) ui.storyBody.textContent = body;
     if (ui.storyToggleLabel) ui.storyToggleLabel.textContent = title;
+    if (ui.missionPhase) ui.missionPhase.textContent = phaseLabel;
+    if (ui.missionInstruction) ui.missionInstruction.textContent = mission;
+    if (ui.missionGuide) {
+      ui.missionGuide.dataset.phase = status?.phase || "resolved";
+      ui.missionGuide.dataset.issue = issue?.id || "complete";
+    }
     if (ui.storyProgressFill) ui.storyProgressFill.style.width = `${repaired / ISSUES.length * 100}%`;
     if (ui.storyProgressLabel) ui.storyProgressLabel.textContent = `${repaired} / ${ISSUES.length} 해결 · 표현 ${discovered}`;
   }
@@ -856,12 +1118,14 @@
     }
     if (!ui.journalList) return;
     ui.journalList.innerHTML = "";
-    ISSUES.forEach((issue, index) => {
+    MISSION_ORDER.map((id) => ISSUE_BY_ID.get(id)).filter(Boolean).forEach((issue, index) => {
       const status = issueStatus(issue);
       const item = document.createElement("li");
-      item.className = `journal-item ${status.discovered ? "is-discovered" : "is-locked"} ${status.repaired ? "is-repaired" : ""}`;
-      if (status.discovered) {
-        item.innerHTML = `<span class="journal-number">${index + 1}</span><div><strong>${issue.expression}</strong><p>${issue.example}</p><small>${status.repaired ? "✓ 해결 완료" : `수리 ${status.repairStep}/${REPAIR_STEPS}`}</small></div>`;
+      const discoveredNow = isDiscovered(issue);
+      const resolvedNow = isResolved(issue);
+      item.className = `journal-item ${discoveredNow ? "is-discovered" : "is-locked"} ${resolvedNow ? "is-repaired" : ""}`;
+      if (discoveredNow) {
+        item.innerHTML = `<span class="journal-number">${index + 1}</span><div><strong>${issue.expression}</strong><p>${issue.example}</p><small>${resolvedNow ? `✓ ${issue.actionLabel || "해결"} 완료` : `${issue.actionLabel || "해결"} ${status.repairStep}/${REPAIR_STEPS}`}</small></div>`;
       } else {
         item.innerHTML = `<span class="journal-number">${index + 1}</span><div><strong>아직 찾지 못한 표현</strong><p>${ROOMS.find((room) => room.id === issue.room)?.name || "집 안"}에서 단서를 찾아보세요.</p></div>`;
       }
@@ -875,7 +1139,7 @@
     const safety = Math.round(repaired / ISSUES.length * 100);
     if (ui.statsToggleLabel) ui.statsToggleLabel.textContent = `안전 ${safety} · 표현 ${discovered}`;
     if (ui.safetyValue) ui.safetyValue.textContent = `${safety}%`;
-    if (ui.toolValue) ui.toolValue.textContent = state.toolkit ? "4종 세트" : "준비 전";
+    if (ui.toolValue) ui.toolValue.textContent = "기본 도구 준비";
     if (ui.soundToggle) {
       ui.soundToggle.textContent = state.soundOn ? "소리 켜짐" : "소리 꺼짐";
       ui.soundToggle.setAttribute("aria-pressed", String(state.soundOn));
@@ -903,7 +1167,7 @@
     if (ui.tutorialBody) ui.tutorialBody.textContent = tutorialStep === 0
       ? (!touchDevice ? "네 방향 키로 집 안을 움직이고 문을 지나 다른 방으로 갈 수 있어요." : tap ? "빈 바닥을 누르면 안전한 길을 찾아 자동으로 걸어갑니다." : "조이스틱을 원하는 방향으로 기울이면 집 안을 걸을 수 있어요.")
       : (!touchDevice ? "물건 가까이에서 행동 키를 누르면 조사·수리·줍기가 상황에 맞게 실행됩니다." : tap ? "물건을 누르면 가까이 이동한 뒤 자동으로 조사합니다." : "물건 가까이에서 조사·수리·줍기 버튼이 상황에 맞게 바뀝니다.");
-    if (ui.tutorialStatus) ui.tutorialStatus.textContent = "직접 해 보거나 다음을 눌러도 좋아요.";
+    if (ui.tutorialStatus) ui.tutorialStatus.textContent = "설명을 확인한 뒤 다음을 눌러 탐험을 시작하세요.";
     if (ui.tutorialNext) ui.tutorialNext.textContent = tutorialStep === 0 ? "다음" : "탐험 시작";
   }
 
@@ -911,7 +1175,8 @@
     setOpen(ui.controlTutorial, false);
     try { localStorage.setItem(TUTORIAL_KEY, "done"); } catch { /* ignore */ }
     ui.canvas?.focus({ preventScroll: true });
-    showToast("첫 임무", state.toolkit ? "다음 문제를 찾아보세요." : "거실의 수리 가방을 먼저 챙기세요.", "hint");
+    if (activeIssue() && issueStatus(activeIssue()).phase === "queued") activateCurrentIssue({ announce: true });
+    else showToast("현재 임무", ui.missionInstruction?.textContent || "반짝이는 목표를 확인하세요.", "hint");
   }
 
   function enterGame({ forceTutorial = false } = {}) {
@@ -920,6 +1185,7 @@
     ui.game.classList.add("is-game-started");
     document.body.classList.add("is-game-started");
     ui.startCard?.classList.add("hidden");
+    requestAnimationFrame(syncCanvasResolution);
     setOpen(ui.endingPanel, false);
     setControlMode(state.controlMode, { save: false });
     updateAllUi();
@@ -929,7 +1195,8 @@
     if (forceTutorial || !seenTutorial) showTutorial();
     else {
       ui.canvas?.focus({ preventScroll: true });
-      showToast("점검 시작", state.toolkit ? "저장된 방에서 이어갑니다." : "거실의 수리 가방을 찾아보세요.", "hint");
+      if (activeIssue() && issueStatus(activeIssue()).phase === "queued") activateCurrentIssue({ announce: true });
+      else showToast("점검 시작", "저장된 상황에서 이어갑니다.", "hint");
     }
   }
 
@@ -943,6 +1210,8 @@
     currentRoomId = "living";
     activeDiagnosisId = null;
     particles = [];
+    incidentFx = null;
+    resolutionFx = null;
     closeAllPanels();
     enterGame({ forceTutorial });
   }
@@ -1025,7 +1294,8 @@
   }
 
   function teleportTo(id) {
-    const object = id === TOOLKIT.id ? TOOLKIT : ISSUE_BY_ID.get(id);
+    const issue = ISSUE_BY_ID.get(id);
+    const object = id === TOOLKIT.id ? TOOLKIT : issue ? displayObjectForIssue(issue) : null;
     if (!object) throw new Error(`Unknown house object: ${id}`);
     closeDialogue();
     setOpen(ui.diagnosisPanel, false);
@@ -1041,12 +1311,30 @@
   }
 
   function snapshotForTests() {
+    const current = activeIssue();
+    const currentObject = current ? displayObjectForIssue(current) : null;
+    const powerPhase = issueStatus("power-outage").phase;
+    const currentVisual = current ? ISSUE_VISUALS[current.id] : null;
     return {
       started: state.started,
       completed: state.completed,
       toolkit: state.toolkit,
       discovered: discoveredIssues().map((issue) => issue.expression),
       repaired: repairedIssues().map((issue) => issue.expression),
+      activeIssueId: state.activeIssueId,
+      issues: Object.fromEntries(MISSION_ORDER.map((id) => [id, { ...issueStatus(id) }])),
+      blackout: ["incident", "diagnosed"].includes(powerPhase),
+      targetLabel: currentObject?.label || null,
+      visualCue: current && currentVisual ? {
+        kind: currentVisual.cue,
+        issueId: current.id,
+        phase: issueStatus(current).phase,
+        strength: effectStrength(current),
+        sourceBounds: { x: current.x, y: current.y, w: current.w, h: current.h },
+        targetBounds: currentObject ? { x: currentObject.x, y: currentObject.y, w: currentObject.w, h: currentObject.h } : null
+      } : null,
+      resolutionEffect: resolutionFx ? { issueId: resolutionFx.issueId, active: fxProgress(resolutionFx, performance.now(), 1350) < 1 } : null,
+      pathLength: state.path.length,
       player: { x: Math.round(state.player.x * 100) / 100, y: Math.round(state.player.y * 100) / 100 },
       controlMode: state.controlMode,
       controls: {
@@ -1066,7 +1354,7 @@
       keys[event.code] = true;
       if (!event.repeat && ["KeyE", "Space"].includes(event.code)) tryInteract();
       if (event.code === "Escape") {
-        if (isOpen(ui.diagnosisPanel)) { activeDiagnosisId = null; setOpen(ui.diagnosisPanel, false); }
+        if (isOpen(ui.diagnosisPanel)) closeDiagnosis();
         else if (isOpen(ui.journalDrawer)) openJournal(false);
         else if (isOpen(ui.dialogueBox)) closeDialogue();
         else if (isOpen(ui.storyPanel)) setOpen(ui.storyPanel, false);
@@ -1079,8 +1367,8 @@
       if (document.hidden) { releaseInputs(); saveGame(); }
     });
     window.addEventListener("beforeunload", saveGame);
-    window.addEventListener("resize", () => { detectDevice(); updateAllUi(); });
-    window.addEventListener("orientationchange", () => window.setTimeout(() => { detectDevice(); updateAllUi(); }, 80));
+    window.addEventListener("resize", () => { detectDevice(); syncCanvasResolution(); updateAllUi(); });
+    window.addEventListener("orientationchange", () => window.setTimeout(() => { detectDevice(); syncCanvasResolution(); updateAllUi(); }, 80));
 
     ui.heroToggle?.addEventListener("click", () => {
       const open = ui.heroDetails?.classList.contains("hidden") ?? true;
@@ -1094,6 +1382,7 @@
     ui.journalClose?.addEventListener("click", () => openJournal(false));
     ui.journalBackdrop?.addEventListener("click", () => openJournal(false));
     ui.dialogueClose?.addEventListener("click", closeDialogue);
+    ui.diagnosisCancel?.addEventListener("click", closeDiagnosis);
     ui.resetButton?.addEventListener("click", handleReset);
     ui.soundToggle?.addEventListener("click", () => {
       state.soundOn = !state.soundOn;
@@ -1123,12 +1412,10 @@
         if (!playing || hasBlockingOverlay()) return;
         const room = ROOMS.find((entry) => entry.id === button.dataset.room);
         if (!room) return;
-        state.player.x = room.x + room.w / 2 - state.player.w / 2;
-        state.player.y = room.y + room.h / 2 - state.player.h / 2;
-        currentRoomId = room.id;
-        state.path = [];
-        updateAllUi();
-        showToast(`${room.icon} ${room.name}`, roomMissionHint(room.id), "hint");
+        setOpen(ui.statsPanel, false);
+        ui.statsToggle?.setAttribute("aria-expanded", "false");
+        beginTapNavigation(room.x + room.w / 2, room.y + room.h / 2, null);
+        showToast(`${room.icon} ${room.name}(으)로 이동`, "문을 지나 안전한 길로 걸어갑니다.", "hint");
       });
     });
 
@@ -1202,9 +1489,25 @@
 
     for (const room of ROOMS) drawRoom(room);
     drawDoors();
-    drawFurniture();
-    ISSUES.forEach((issue) => drawIssue(issue, time));
-    if (!state.toolkit) drawToolkit(time);
+    drawFurniture(time);
+    drawRoomIncidentAtmosphere(time);
+    drawHouseIncidentLayer(time);
+    ISSUES.forEach((issue) => {
+      const status = issueStatus(issue);
+      if (status.phase === "diagnosed" && issue.repairTarget) {
+        drawIssue({ ...issue, stage: "symptom-context" }, time);
+      } else {
+        drawIssue(displayObjectForIssue(issue), time);
+      }
+    });
+    const issue = activeIssue();
+    if (issue) {
+      drawProblemEffect(issue, issueStatus(issue), time);
+      if (issueStatus(issue).phase === "diagnosed" && issue.repairTarget) {
+        drawIssue(displayObjectForIssue(issue), time);
+      }
+    }
+    drawResolutionEffect(time);
     drawPath();
     drawParticles();
     drawPlayer(time);
@@ -1261,7 +1564,7 @@
     });
   }
 
-  function drawFurniture() {
+  function drawFurniture(time) {
     // Kitchen counter and table
     drawFurnitureBox(54, 184, 270, 56, "#d6a06e", "#9a6747", "조리대");
     drawFurnitureBox(350, 238, 78, 42, "#f0cf95", "#a77c4e", "식탁");
@@ -1272,11 +1575,122 @@
     drawFurnitureBox(154, 382, 190, 60, "#87a976", "#5f7e50", "소파");
     ctx.fillStyle = "rgba(241, 203, 136, 0.6)";
     roundRect(142, 472, 174, 86, 26); ctx.fill();
-    drawPlant(412, 372);
+    drawPlant(418, 528);
+    drawPowerFixtures(time);
     // Bedroom bed, desk and wardrobe
-    drawFurnitureBox(680, 390, 174, 96, "#f3c8bd", "#b97b70", "침대");
+    const noiseStrength = effectStrength("noise");
+    const bedShake = noiseStrength ? Math.sin(time * 0.036) * 2.4 * noiseStrength : 0;
+    drawFurnitureBox(680 + bedShake, 390, 174, 96, "#f3c8bd", "#b97b70", "침대");
     drawFurnitureBox(650, 532, 142, 48, "#cf9c79", "#90634c", "책상");
     drawFurnitureBox(816, 530, 62, 66, "#b98d78", "#7d5d50", "옷장");
+  }
+
+  function drawPowerFixtures(time) {
+    const off = isBlackoutActive();
+    ctx.save();
+    roundRect(54, 490, 82, 54, 8);
+    const screenGlow = ctx.createLinearGradient(54, 490, 136, 544);
+    screenGlow.addColorStop(0, off ? "#121923" : "#dff7ff");
+    screenGlow.addColorStop(1, off ? "#05080d" : "#77bfd7");
+    ctx.fillStyle = screenGlow;
+    ctx.fill();
+    ctx.strokeStyle = off ? "#4b5563" : "#527b9a";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    if (off) {
+      ctx.strokeStyle = "rgba(180, 196, 213, 0.2)";
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(68, 501); ctx.lineTo(122, 532); ctx.stroke();
+    } else {
+      const scanY = 498 + ((time * 0.035) % 35);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.52)";
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(60, scanY); ctx.lineTo(130, scanY); ctx.stroke();
+      ctx.fillStyle = "rgba(42, 120, 157, 0.48)";
+      ctx.beginPath(); ctx.arc(76, 515, 8, 0, Math.PI * 2); ctx.arc(108, 515, 11, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.strokeStyle = "#6b4a3b";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(370, 474);
+    ctx.lineTo(370, 526);
+    ctx.stroke();
+    ctx.fillStyle = off ? "#4b5563" : "#ffe49b";
+    ctx.beginPath();
+    ctx.arc(370, 466, 19, 0, Math.PI * 2);
+    ctx.fill();
+    if (!off) {
+      const glow = ctx.createRadialGradient(370, 466, 4, 370, 466, 62);
+      glow.addColorStop(0, "rgba(255, 231, 151, 0.48)");
+      glow.addColorStop(1, "rgba(255, 231, 151, 0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(370, 466, 62, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function fxProgress(fx, time, duration) {
+    if (!fx) return 1;
+    return Math.max(0, Math.min(1, (time - fx.startedAt) / duration));
+  }
+
+  function drawRoomIncidentAtmosphere(time) {
+    const issue = activeIssue();
+    if (!issue) return;
+    const strength = effectStrength(issue);
+    if (!strength) return;
+    const room = ROOMS.find((entry) => entry.id === issue.room);
+    if (!room) return;
+    ctx.save();
+    roundRect(room.x + 4, room.y + 4, room.w - 8, room.h - 8, 15);
+    ctx.clip();
+    if (issue.id === "heating") {
+      ctx.fillStyle = `rgba(73, 145, 190, ${0.19 * strength})`;
+      ctx.fillRect(room.x, room.y, room.w, room.h);
+      const flakes = strength > 0.7 ? 7 : 3;
+      for (let index = 0; index < flakes; index += 1) {
+        const x = room.x + 42 + ((index * 67 + time * 0.018 * (1 + index % 2)) % (room.w - 84));
+        const y = room.y + ((index * 61 + time * 0.028 * (1 + (index % 3) * 0.18)) % room.h);
+        drawSnowflake(x, y, 6 + (index % 3) * 1.5, `rgba(242, 251, 255, ${0.68 * strength})`);
+      }
+    } else if (issue.id === "smell") {
+      const haze = ctx.createRadialGradient(issue.x + 15, issue.y + 40, 4, issue.x + 15, issue.y + 40, 170);
+      haze.addColorStop(0, `rgba(111, 91, 128, ${0.18 * strength})`);
+      haze.addColorStop(1, "rgba(111, 91, 128, 0)");
+      ctx.fillStyle = haze;
+      ctx.fillRect(room.x, room.y, room.w, room.h);
+    } else if (issue.id === "noise") {
+      ctx.fillStyle = `rgba(74, 61, 91, ${0.08 * strength})`;
+      ctx.fillRect(room.x, room.y, room.w, room.h);
+    }
+    ctx.restore();
+  }
+
+  function drawHouseIncidentLayer(time) {
+    const restoringPower = resolutionFx?.issueId === "power-outage";
+    if (!isBlackoutActive() && !restoringPower) return;
+    let opacity = 0.5;
+    if (isBlackoutActive()) {
+      const age = incidentFx?.issueId === "power-outage" ? time - incidentFx.startedAt : 1000;
+      if (age < 760) opacity = 0.28 + (Math.sin(age * 0.055) > 0.18 ? 0.25 : 0.04);
+      else opacity = 0.53 + Math.abs(Math.sin(time * 0.0027)) * 0.035;
+    } else {
+      const progress = fxProgress(resolutionFx, time, 1250);
+      opacity = 0.48 * (1 - progress);
+      if (progress >= 1) return;
+    }
+    ctx.save();
+    const playerX = state.player.x + state.player.w / 2;
+    const playerY = state.player.y + state.player.h / 2;
+    const shade = ctx.createRadialGradient(playerX, playerY, 28, playerX, playerY, 310);
+    shade.addColorStop(0, `rgba(10, 16, 29, ${opacity * 0.48})`);
+    shade.addColorStop(0.45, `rgba(10, 16, 29, ${opacity * 0.84})`);
+    shade.addColorStop(1, `rgba(10, 16, 29, ${opacity})`);
+    ctx.fillStyle = shade;
+    ctx.fillRect(0, 0, WORLD.width, WORLD.height);
+    ctx.restore();
   }
 
   function drawFurnitureBox(x, y, width, height, fill, stroke, label) {
@@ -1310,66 +1724,347 @@
 
   function drawIssue(issue, time) {
     const status = issueStatus(issue);
-    const nearby = nearestObject()?.id === issue.id;
-    const pulse = 0.5 + Math.sin(time * 0.004 + ISSUES.indexOf(issue)) * 0.5;
+    const contextOnly = issue.stage === "symptom-context";
+    const nearby = !contextOnly && nearestObject()?.id === issue.id;
+    const active = !contextOnly && issue.id === state.activeIssueId && status.phase !== "resolved";
+    const pulse = 0.5 + Math.sin(time * 0.004 + MISSION_ORDER.indexOf(issue.id)) * 0.5;
     const centerX = issue.x + issue.w / 2;
     const centerY = issue.y + issue.h / 2;
     ctx.save();
-    if (!status.repaired) {
-      ctx.globalAlpha = status.discovered ? 0.34 + pulse * 0.22 : 0.18 + pulse * 0.12;
-      ctx.fillStyle = status.discovered ? "#ef7a67" : "#f3c763";
+    if (contextOnly) ctx.globalAlpha = 0.7;
+    if (active) {
+      ctx.globalAlpha = status.phase === "diagnosed" ? 0.34 + pulse * 0.24 : 0.2 + pulse * 0.18;
+      ctx.fillStyle = status.phase === "diagnosed" ? "#ef7a67" : "#f3c763";
       ctx.beginPath(); ctx.arc(centerX, centerY, Math.max(issue.w, issue.h) * (0.65 + pulse * 0.12), 0, Math.PI * 2); ctx.fill();
       ctx.globalAlpha = 1;
     }
-    ctx.shadowColor = nearby ? "rgba(255, 246, 190, 0.95)" : "rgba(45, 30, 28, 0.2)";
-    ctx.shadowBlur = nearby ? 18 : 5;
+    ctx.shadowColor = nearby || active ? "rgba(255, 246, 190, 0.95)" : "rgba(45, 30, 28, 0.2)";
+    ctx.shadowBlur = nearby ? 20 : active ? 12 : 5;
     roundRect(issue.x, issue.y, issue.w, issue.h, 12);
-    ctx.fillStyle = status.repaired ? "#dcebd2" : "#fffaf0";
+    ctx.fillStyle = status.phase === "resolved" ? "#eaf3e3" : active ? "#fffaf0" : "#f4f0e9";
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = status.repaired ? "#78a268" : nearby ? "#f3c763" : issue.color;
-    ctx.lineWidth = nearby ? 5 : 3;
+    ctx.strokeStyle = status.phase === "resolved" ? "#78a268" : nearby || active ? "#f3c763" : "#aa9e94";
+    ctx.lineWidth = nearby ? 5 : active ? 4 : 2;
     ctx.stroke();
     ctx.font = `${Math.min(34, issue.h * 0.48)}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
     ctx.textAlign = "center";
-    ctx.fillText(status.repaired ? "✓" : issue.icon, centerX, centerY + 10);
+    ctx.globalAlpha = status.phase === "queued" && !active ? 0.58 : 1;
+    ctx.fillText(issue.icon, centerX, centerY + 10);
+    ctx.globalAlpha = 1;
     ctx.font = "800 11px system-ui, sans-serif";
     ctx.fillStyle = "#4d3934";
     ctx.fillText(issue.label, centerX, issue.y + issue.h + 16);
-    if (status.discovered && !status.repaired) {
-      ctx.fillStyle = "#a8453d";
-      ctx.font = "900 10px system-ui, sans-serif";
-      ctx.fillText(`${status.repairStep}/${REPAIR_STEPS}`, centerX, issue.y - 8);
+    if (active) {
+      const badgeY = issue.y - 17;
+      ctx.fillStyle = status.phase === "diagnosed" ? "#b64f43" : "#e2a83a";
+      ctx.beginPath(); ctx.arc(centerX, badgeY, 14 + pulse * 2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#fffaf1";
+      ctx.font = "18px \"Apple Color Emoji\", \"Segoe UI Emoji\", sans-serif";
+      const badge = status.phase === "diagnosed"
+        ? issue.actionLabel === "대응" ? "☎️" : issue.actionLabel === "점검" ? "🔎" : "🛠️"
+        : "👁️";
+      ctx.fillText(badge, centerX, badgeY + 6);
+      if (status.phase === "diagnosed") {
+        for (let index = 0; index < REPAIR_STEPS; index += 1) {
+          ctx.beginPath();
+          ctx.arc(centerX - 8 + index * 16, issue.y + issue.h + 29, 5, 0, Math.PI * 2);
+          ctx.fillStyle = index < status.repairStep ? "#4f8c63" : "#f0c3b8";
+          ctx.fill();
+          ctx.strokeStyle = "#753f36";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      }
+    }
+    if (status.phase === "resolved") {
+      ctx.fillStyle = "#4f8650";
+      ctx.beginPath();
+      ctx.arc(issue.x + issue.w - 4, issue.y + 4, 11, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#fff";
+      ctx.font = "900 13px system-ui, sans-serif";
+      ctx.fillText("✓", issue.x + issue.w - 4, issue.y + 9);
     }
     ctx.textAlign = "start";
-    drawProblemEffect(issue, status, time);
+    ctx.restore();
+  }
+
+  function drawDroplet(x, y, size, color = "#3e9fca", alpha = 1) {
+    ctx.save();
+    ctx.globalAlpha *= alpha;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x, y - size);
+    ctx.bezierCurveTo(x + size * 0.85, y - size * 0.18, x + size * 0.7, y + size * 0.78, x, y + size);
+    ctx.bezierCurveTo(x - size * 0.7, y + size * 0.78, x - size * 0.85, y - size * 0.18, x, y - size);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawCross(x, y, size, color = "#bd493f", alpha = 1) {
+    ctx.save();
+    ctx.globalAlpha *= alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(3, size * 0.22);
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(x - size, y - size); ctx.lineTo(x + size, y + size);
+    ctx.moveTo(x + size, y - size); ctx.lineTo(x - size, y + size);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawSparkle(x, y, size, color = "#fff1a8", alpha = 1) {
+    ctx.save();
+    ctx.globalAlpha *= alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(2, size * 0.22);
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(x - size, y); ctx.lineTo(x + size, y);
+    ctx.moveTo(x, y - size); ctx.lineTo(x, y + size);
+    ctx.moveTo(x - size * 0.58, y - size * 0.58); ctx.lineTo(x + size * 0.58, y + size * 0.58);
+    ctx.moveTo(x + size * 0.58, y - size * 0.58); ctx.lineTo(x - size * 0.58, y + size * 0.58);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawSnowflake(x, y, size, color = "rgba(242,251,255,0.85)") {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.8;
+    ctx.lineCap = "round";
+    for (let index = 0; index < 3; index += 1) {
+      ctx.rotate(Math.PI / 3);
+      ctx.beginPath(); ctx.moveTo(-size, 0); ctx.lineTo(size, 0); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawImpactBurst(x, y, radius, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.strokeStyle = `rgba(191, 62, 57, ${alpha})`;
+    ctx.fillStyle = `rgba(237, 113, 72, ${alpha * 0.34})`;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    for (let index = 0; index < 16; index += 1) {
+      const angle = index * Math.PI / 8;
+      const length = index % 2 ? radius * 0.52 : radius;
+      const px = Math.cos(angle) * length;
+      const py = Math.sin(angle) * length;
+      if (index === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath(); ctx.fill(); ctx.stroke();
     ctx.restore();
   }
 
   function drawProblemEffect(issue, status, time) {
-    if (status.repaired) return;
+    const severity = effectStrength(issue);
+    if (!severity) return;
     const x = issue.x + issue.w / 2;
     const y = issue.y + issue.h / 2;
-    const wave = Math.sin(time * 0.006);
+    const wave = Math.sin(time * 0.007);
+    const pulse = 0.5 + Math.sin(time * 0.009) * 0.5;
     ctx.save();
-    ctx.lineWidth = 3;
-    if (["leak", "toilet-clog", "drain"].includes(issue.id)) {
-      ctx.fillStyle = "rgba(49, 151, 199, 0.75)";
-      for (let i = 0; i < 3; i += 1) { ctx.beginPath(); ctx.arc(x - 15 + i * 15, y + issue.h / 2 + 7 + wave * 3, 5 + i, 0, Math.PI * 2); ctx.fill(); }
+    ctx.globalAlpha = severity;
+    ctx.lineWidth = 3.5;
+    if (issue.id === "leak") {
+      const puddleWidth = 38 + pulse * 17 * severity;
+      ctx.fillStyle = "rgba(39, 144, 193, 0.5)";
+      ctx.beginPath(); ctx.ellipse(x - 4, issue.y + issue.h + 30, puddleWidth, 12 + pulse * 2, 0, 0, Math.PI * 2); ctx.fill();
+      for (let index = 0; index < (severity > 0.7 ? 3 : 1); index += 1) {
+        const cycle = ((time * (0.00105 + index * 0.00017) + index * 0.34) % 1);
+        const dropY = issue.y + issue.h * 0.52 + cycle * 52;
+        drawDroplet(x - 7 + index * 8, dropY, 5 + index, "#309aca", 1 - Math.max(0, cycle - 0.82) / 0.18);
+        if (cycle > 0.78) {
+          ctx.strokeStyle = `rgba(143, 220, 239, ${(1 - cycle) * 4.5})`;
+          ctx.beginPath(); ctx.ellipse(x - 7 + index * 8, issue.y + issue.h + 27, (cycle - 0.78) * 45, (cycle - 0.78) * 12, 0, 0, Math.PI * 2); ctx.stroke();
+        }
+      }
+    } else if (issue.id === "toilet-clog") {
+      const waterY = issue.y + issue.h * 0.58 + wave * 3;
+      ctx.fillStyle = "rgba(48, 155, 199, 0.7)";
+      ctx.beginPath(); ctx.ellipse(x, waterY, issue.w * 0.34, 10 + pulse * 3, 0, 0, Math.PI * 2); ctx.fill();
+      const bubbles = severity > 0.7 ? 3 : 1;
+      for (let index = 0; index < bubbles; index += 1) {
+        const cycle = ((time * 0.0008 + index * 0.31) % 1);
+        ctx.globalAlpha = severity * (1 - cycle);
+        ctx.strokeStyle = "#9ee4f3";
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(x - 18 + index * 18, waterY - cycle * 26, 3 + cycle * 5, 0, Math.PI * 2); ctx.stroke();
+      }
+      ctx.globalAlpha = severity;
+      if (status.phase === "diagnosed" && status.repairStep > 0) {
+        const plungeY = waterY - 14 + Math.abs(wave) * 8;
+        ctx.fillStyle = "#b84d40";
+        ctx.beginPath(); ctx.ellipse(x, plungeY, 17, 8, 0, Math.PI, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#70493a"; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(x, plungeY - 2); ctx.lineTo(x, plungeY - 35); ctx.stroke();
+      }
+    } else if (issue.id === "drain") {
+      const waterY = issue.y + issue.h * 0.55;
+      ctx.fillStyle = "rgba(57, 153, 190, 0.5)";
+      ctx.beginPath(); ctx.ellipse(x, waterY, issue.w * 0.58, 19 + wave * 2, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = "rgba(201, 242, 249, 0.82)";
+      ctx.beginPath(); ctx.ellipse(x, waterY, issue.w * 0.45, 13, 0, 0, Math.PI * 2); ctx.stroke();
+      const debris = severity > 0.7 ? 4 : 2;
+      for (let index = 0; index < debris; index += 1) {
+        const angle = time * 0.0013 + index * Math.PI * 2 / debris;
+        ctx.fillStyle = index % 2 ? "#7d684f" : "#596b57";
+        ctx.beginPath();
+        ctx.arc(x + Math.cos(angle) * 27, waterY + Math.sin(angle) * 9, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
     } else if (issue.id === "water-supply") {
-      ctx.strokeStyle = "#4f9ec4"; ctx.beginPath(); ctx.moveTo(x - 8, y + 20); ctx.lineTo(x + 8, y + 36); ctx.moveTo(x + 8, y + 20); ctx.lineTo(x - 8, y + 36); ctx.stroke();
+      const dropY = issue.y + issue.h + 18 + pulse * 5;
+      drawDroplet(x, dropY, 10, "rgba(79, 158, 196, 0.3)");
+      drawCross(x, dropY, 12 + pulse * 2, "#bf4f45");
+      ctx.strokeStyle = "rgba(75, 132, 158, 0.8)";
+      ctx.beginPath(); ctx.arc(x, issue.y + 8, 24, -2.7 + wave * 0.08, -0.42 + wave * 0.08); ctx.stroke();
     } else if (issue.id === "power-outage") {
-      ctx.fillStyle = `rgba(47, 38, 55, ${0.22 + 0.12 * Math.abs(wave)})`; ctx.beginPath(); ctx.arc(x, y, 34, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = `rgba(255, 210, 92, ${0.55 + pulse * 0.42})`;
+      ctx.lineWidth = 4;
+      for (const offset of [-15, 17]) {
+        ctx.beginPath();
+        ctx.moveTo(x + offset, y - 38);
+        ctx.lineTo(x + offset * 0.45, y - 25);
+        ctx.lineTo(x + offset * 0.85, y - 15);
+        ctx.stroke();
+      }
+      drawCross(370, 466, 25, "rgba(219, 89, 70, 0.82)", 0.75 + pulse * 0.25);
     } else if (issue.id === "noise") {
-      ctx.strokeStyle = "rgba(190, 75, 70, 0.75)";
-      for (let i = 0; i < 3; i += 1) { ctx.beginPath(); ctx.arc(x, y, 35 + i * 12 + wave * 4, -0.9, 0.9); ctx.stroke(); }
+      const impactPhase = (time * 0.0032) % 2;
+      const impactY = impactPhase < 1 ? issue.y + 33 : issue.y + issue.h - 32;
+      drawImpactBurst(x - 5, impactY, 19 + pulse * 8, 0.62 + pulse * 0.3);
+      ctx.strokeStyle = "rgba(190, 64, 59, 0.78)";
+      ctx.lineWidth = 4;
+      for (let index = 0; index < 3; index += 1) {
+        ctx.globalAlpha = severity * (0.85 - index * 0.17);
+        ctx.beginPath();
+        ctx.arc(x - 6, impactY, 30 + index * 18 + pulse * 5, Math.PI * 0.62, Math.PI * 1.38);
+        ctx.stroke();
+      }
     } else if (issue.id === "heating") {
-      ctx.strokeStyle = "rgba(80, 146, 186, 0.8)";
-      for (let i = 0; i < 3; i += 1) { ctx.beginPath(); ctx.moveTo(x - 18 + i * 18, y - 35); ctx.lineTo(x - 12 + i * 18, y - 47); ctx.stroke(); }
+      const thermometerX = issue.x + 16;
+      const thermometerBottom = issue.y + issue.h - 9;
+      ctx.strokeStyle = "rgba(46, 116, 161, 0.9)";
+      ctx.lineWidth = 8;
+      ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(thermometerX, thermometerBottom); ctx.lineTo(thermometerX, thermometerBottom - 17); ctx.stroke();
+      drawSnowflake(x - 21, y - 42 + wave * 5, 8, "rgba(246, 253, 255, 0.95)");
+      drawSnowflake(x + 13, y - 55 - wave * 4, 6, "rgba(246, 253, 255, 0.85)");
+      if (roomForPoint(state.player.x, state.player.y)?.id === "bedroom") {
+        const breath = ((time * 0.0011) % 1);
+        ctx.globalAlpha = severity * (1 - breath);
+        ctx.fillStyle = "rgba(238, 250, 255, 0.7)";
+        ctx.beginPath();
+        ctx.ellipse(state.player.x + state.player.w / 2 + 16 + breath * 18, state.player.y + 12 - breath * 6, 8 + breath * 7, 4 + breath * 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
     } else if (issue.id === "smell") {
-      ctx.strokeStyle = "rgba(126, 103, 151, 0.7)";
-      for (let i = 0; i < 3; i += 1) { ctx.beginPath(); ctx.moveTo(x - 15 + i * 15, y - 32); ctx.bezierCurveTo(x - 25 + i * 15, y - 45, x + i * 15, y - 52, x - 8 + i * 15, y - 64); ctx.stroke(); }
+      ctx.fillStyle = "rgba(92, 78, 58, 0.86)";
+      ctx.beginPath(); ctx.ellipse(issue.x + 13, issue.y + issue.h * 0.62, 8, 6, 0.3, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "rgba(110, 132, 65, 0.85)";
+      ctx.beginPath(); ctx.arc(issue.x + 27, issue.y + issue.h * 0.72, 6, 0, Math.PI * 2); ctx.fill();
+      const trails = severity > 0.7 ? 3 : 1;
+      for (let index = 0; index < trails; index += 1) {
+        const offset = index * 17 - (trails - 1) * 8;
+        const rise = ((time * 0.00065 + index * 0.34) % 1);
+        ctx.globalAlpha = severity * (0.85 - rise * 0.55);
+        ctx.strokeStyle = index % 2 ? "#7b6d91" : "#7f8451";
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(x + offset, y + 2 - rise * 18);
+        ctx.bezierCurveTo(x - 15 + offset, y - 25 - rise * 28, x + 18 + offset, y - 45 - rise * 34, x + offset, y - 72 - rise * 40);
+        ctx.stroke();
+      }
     }
+    if (incidentFx?.issueId === issue.id) {
+      const arrival = fxProgress(incidentFx, time, 1150);
+      if (arrival < 1) {
+        ctx.globalAlpha = (1 - arrival) * 0.9;
+        ctx.strokeStyle = "#ffd06f";
+        ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.arc(x, y, Math.max(issue.w, issue.h) * 0.65 + arrival * 70, 0, Math.PI * 2); ctx.stroke();
+      } else incidentFx = null;
+    }
+    ctx.restore();
+  }
+
+  function drawResolutionEffect(time) {
+    if (!resolutionFx) return;
+    const issue = ISSUE_BY_ID.get(resolutionFx.issueId);
+    if (!issue) { resolutionFx = null; return; }
+    const progress = fxProgress(resolutionFx, time, 1350);
+    if (progress >= 1) { resolutionFx = null; return; }
+    const x = issue.x + issue.w / 2;
+    const y = issue.y + issue.h / 2;
+    const fade = 1 - progress;
+    ctx.save();
+    if (issue.id === "power-outage") {
+      drawSparkle(370, 466, 12 + progress * 8, "#ffe49b", fade);
+      drawSparkle(95, 513, 10 + progress * 7, "#b9edff", fade);
+    } else if (issue.id === "water-supply") {
+      ctx.strokeStyle = `rgba(45, 157, 204, ${fade})`;
+      ctx.lineWidth = 9 - progress * 5;
+      ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(x, issue.y + issue.h * 0.58); ctx.lineTo(x, issue.y + issue.h + 38 * fade); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(x, issue.y + issue.h + 36, 28 * progress, 8 * progress, 0, 0, Math.PI * 2); ctx.stroke();
+    } else if (issue.id === "drain") {
+      ctx.strokeStyle = `rgba(48, 153, 194, ${fade})`;
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      for (let angle = 0; angle < Math.PI * 4; angle += 0.12) {
+        const radius = (48 - angle * 3.1) * fade;
+        const px = x + Math.cos(angle + progress * 9) * radius;
+        const py = issue.y + issue.h * 0.55 + Math.sin(angle + progress * 9) * radius * 0.33;
+        if (angle === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    } else if (issue.id === "toilet-clog") {
+      ctx.fillStyle = `rgba(53, 157, 198, ${0.62 * fade})`;
+      ctx.beginPath();
+      ctx.ellipse(x, issue.y + issue.h * (0.58 + progress * 0.16), issue.w * 0.34 * fade, 12 * fade, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (issue.id === "leak") {
+      ctx.fillStyle = `rgba(45, 149, 193, ${0.48 * fade})`;
+      ctx.beginPath(); ctx.ellipse(x - 4 + progress * 34, issue.y + issue.h + 30, 48 * fade, 12 * fade, 0, 0, Math.PI * 2); ctx.fill();
+    } else if (issue.id === "smell") {
+      const sweepX = issue.x - 8 + progress * (issue.w + 16);
+      ctx.strokeStyle = `rgba(235, 252, 255, ${0.9 * fade})`;
+      ctx.lineWidth = 10;
+      ctx.beginPath(); ctx.moveTo(sweepX, issue.y + 8); ctx.lineTo(sweepX + 15, issue.y + issue.h - 8); ctx.stroke();
+    } else if (issue.id === "heating") {
+      const room = ROOMS.find((entry) => entry.id === "bedroom");
+      const warmth = ctx.createLinearGradient(0, room.y + room.h, 0, room.y);
+      warmth.addColorStop(0, `rgba(238, 143, 72, ${0.25 * fade})`);
+      warmth.addColorStop(1, "rgba(238, 143, 72, 0)");
+      ctx.fillStyle = warmth; ctx.fillRect(room.x, room.y, room.w, room.h);
+      for (let index = 0; index < 3; index += 1) {
+        ctx.strokeStyle = `rgba(213, 101, 60, ${fade * 0.7})`;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(x - 20 + index * 20, issue.y - 2);
+        ctx.bezierCurveTo(x - 32 + index * 20, issue.y - 18, x - 8 + index * 20, issue.y - 28, x - 18 + index * 20, issue.y - 45);
+        ctx.stroke();
+      }
+    } else if (issue.id === "noise") {
+      ctx.strokeStyle = `rgba(65, 147, 137, ${fade * 0.7})`;
+      ctx.lineWidth = 4;
+      for (let index = 0; index < 3; index += 1) {
+        const radius = (48 + index * 18) * fade;
+        ctx.beginPath(); ctx.arc(x, y, radius, Math.PI * 0.68, Math.PI * 1.32); ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = fade * 0.8;
+    ctx.strokeStyle = "#62a878";
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.arc(x, y, 24 + progress * 62, 0, Math.PI * 2); ctx.stroke();
+    drawSparkle(x - 30, y - 24, 8 + progress * 4, "#eaffc5", fade);
+    drawSparkle(x + 34, y + 12, 6 + progress * 5, "#fff4a7", fade);
     ctx.restore();
   }
 
@@ -1450,7 +2145,8 @@
 
   function render(time) {
     const room = ROOMS.find((entry) => entry.id === currentRoomId) || ROOMS[2];
-    const desiredScale = playing ? (isTouchDevice ? 1.32 : 1.24) : 1;
+    const portraitCanvas = ui.canvas.height > ui.canvas.width * 1.05;
+    const desiredScale = playing ? (portraitCanvas ? 2.18 : isTouchDevice ? 1.32 : 1.24) : 1;
     const halfViewWidth = ui.canvas.width / (2 * desiredScale);
     const halfViewHeight = ui.canvas.height / (2 * desiredScale);
     const roomCenterX = room.x + room.w / 2;

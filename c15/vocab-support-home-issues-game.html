@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" data-device="pointer" data-control-mode="joystick">
+<html lang="ko" data-device="pointer" data-control-mode="tap">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -78,7 +78,7 @@
                   aria-controls="storyPanel"
                 >
                   <span>현재 임무</span>
-                  <strong id="storyToggleLabel">첫 이상 징후 찾기</strong>
+                  <strong id="storyToggleLabel">거실 수리 가방 챙기기</strong>
                 </button>
                 <button
                   id="statsToggle"
@@ -88,7 +88,7 @@
                   aria-controls="statsPanel"
                 >
                   <span>집 상태</span>
-                  <strong id="statsToggleLabel">안전 0 · 도구 0</strong>
+                  <strong id="statsToggleLabel">안전 0 · 표현 0</strong>
                 </button>
                 <button
                   id="journalToggle"
@@ -102,22 +102,33 @@
                 </button>
               </div>
 
+              <div
+                id="missionGuide"
+                class="mission-guide"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                <span id="missionPhase" class="mission-phase">장면 관찰</span>
+                <strong id="missionInstruction">빛·움직임·소리의 변화를 찾아 터치하세요.</strong>
+              </div>
+
               <section id="storyPanel" class="hud-card story-panel hidden" aria-live="polite">
                 <p class="card-tag">오늘의 점검</p>
-                <h2 id="storyTitle">이상한 소리를 따라가세요</h2>
-                <p id="storyBody">집 안을 걸으며 반짝이는 물건 가까이에서 조사해 보세요.</p>
+                <h2 id="storyTitle">집 안의 변화를 눈으로 찾아보세요</h2>
+                <p id="storyBody">움직이는 장면 관찰 → 표현 선택 → 대응 행동 순서로 진행합니다.</p>
                 <div class="progress-row" aria-label="임무 진행률">
                   <div class="progress-track" aria-hidden="true">
                     <div id="storyProgressFill" class="progress-fill"></div>
                   </div>
-                  <strong id="storyProgressLabel">0 / 4 방</strong>
+                  <strong id="storyProgressLabel">0 / 8 해결 · 표현 0</strong>
                 </div>
               </section>
 
               <section id="statsPanel" class="hud-card stats-panel hidden" aria-label="집 점검 현황">
                 <div>
                   <p class="card-tag">방 지도</p>
-                  <div id="roomMap" class="room-map" aria-label="방 바로 보기">
+                  <div id="roomMap" class="room-map" aria-label="방으로 자동 이동">
                     <button class="room-button is-active" type="button" data-room="kitchen" aria-current="true">
                       <span aria-hidden="true">🍳</span><strong>주방</strong>
                     </button>
@@ -134,7 +145,7 @@
                 </div>
                 <dl class="stat-list">
                   <div><dt>집 안전도</dt><dd id="safetyValue">0%</dd></div>
-                  <div><dt>찾은 도구</dt><dd id="toolValue">0 / 4</dd></div>
+                  <div><dt>점검 도구</dt><dd id="toolValue">기본 도구 준비</dd></div>
                   <div><dt>자동 저장</dt><dd id="saveValue">준비됨</dd></div>
                 </dl>
               </section>
@@ -155,23 +166,23 @@
               <p id="startEyebrow" class="card-tag">집주인의 긴급 메모</p>
               <h2 id="startTitle">네 방의 문제를 찾아 주세요!</h2>
               <p id="startDescription">
-                고장 난 곳을 직접 조사하고, 들은 소리와 보이는 장면으로 알맞은 집 문제 표현을 완성해요.
+                먼저 발생한 상황을 보고 증상을 확인한 뒤, 알맞은 표현과 대응 행동을 순서대로 완성해요.
               </p>
 
               <fieldset id="controlModeSelector" class="control-mode-selector">
                 <legend>터치 조작 방식</legend>
-                <label class="control-mode-option">
-                  <input type="radio" name="controlMode" value="joystick" checked />
+                <label class="control-mode-option control-mode-option--primary">
+                  <input type="radio" name="controlMode" value="tap" checked />
                   <span class="control-option-copy">
-                    <strong>조이스틱 + 조사</strong>
-                    <small>직접 걸어가서 행동 버튼을 눌러요.</small>
+                    <strong>기본 · 화면 터치 이동</strong>
+                    <small>가고 싶은 바닥이나 물건을 바로 터치해요.</small>
                   </span>
                 </label>
-                <label class="control-mode-option">
-                  <input type="radio" name="controlMode" value="tap" />
+                <label class="control-mode-option control-mode-option--secondary">
+                  <input type="radio" name="controlMode" value="joystick" />
                   <span class="control-option-copy">
-                    <strong>화면을 터치</strong>
-                    <small>가고 싶은 곳을 누르면 자동으로 이동해요.</small>
+                    <strong>보조 · 조이스틱 + 행동 버튼</strong>
+                    <small>이동 패드로 걸어가서 행동 버튼을 눌러요.</small>
                   </span>
                 </label>
               </fieldset>
@@ -214,10 +225,18 @@
               aria-labelledby="diagnosisQuestion"
               tabindex="-1"
             >
-              <p id="diagnosisScene" class="card-tag">욕실 · 물이 차오르는 변기</p>
-              <h2 id="diagnosisQuestion">지금 생긴 문제를 어떻게 말할까요?</h2>
+              <p id="diagnosisScene" class="card-tag">장면 관찰</p>
+              <div id="diagnosisVisual" class="diagnosis-visual" role="img" aria-label="집 안에서 발견한 변화">
+                <span id="diagnosisVisualPrimary" class="diagnosis-visual__object diagnosis-visual__object--primary" aria-hidden="true">🏠</span>
+                <span id="diagnosisVisualSecondary" class="diagnosis-visual__object diagnosis-visual__object--secondary" aria-hidden="true">?</span>
+                <span class="diagnosis-visual__effect diagnosis-visual__effect--one" aria-hidden="true">✦</span>
+                <span class="diagnosis-visual__effect diagnosis-visual__effect--two" aria-hidden="true">✦</span>
+                <span class="diagnosis-visual__effect diagnosis-visual__effect--three" aria-hidden="true">✦</span>
+              </div>
+              <h2 id="diagnosisQuestion">이 장면과 어울리는 표현은 무엇일까요?</h2>
               <div id="diagnosisOptions" class="diagnosis-options" role="group" aria-label="문제 표현 선택"></div>
               <p id="diagnosisFeedback" class="diagnosis-feedback" role="status" aria-live="polite"></p>
+              <button id="diagnosisCancel" class="text-button diagnosis-cancel" type="button">현장으로 돌아가기</button>
             </section>
 
             <section

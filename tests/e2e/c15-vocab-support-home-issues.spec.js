@@ -8,14 +8,14 @@ const CONTROL_MODE_KEY = "c15-house-rescue-control-mode-v1";
 // C15 vocabulary set. In particular, older prototype-only TV/air-conditioner
 // expressions must never leak into progress, the journal, or persisted state.
 const ISSUE_SEQUENCE = [
-  { id: "water-supply", expression: "수돗물이 안 나오다" },
-  { id: "power-outage", expression: "전기가 나가다" },
-  { id: "toilet-clog", expression: "변기가 막히다" },
-  { id: "leak", expression: "물이 새다" },
-  { id: "noise", expression: "소음이 심하다" },
-  { id: "heating", expression: "난방이 안 되다" },
-  { id: "smell", expression: "이상한 냄새가 나다" },
-  { id: "drain", expression: "물이 안 내려가다" }
+  { id: "power-outage", expression: "전기가 나가다", cue: "blackout-flicker" },
+  { id: "water-supply", expression: "수돗물이 안 나오다", cue: "dry-faucet" },
+  { id: "drain", expression: "물이 안 내려가다", cue: "standing-water" },
+  { id: "smell", expression: "이상한 냄새가 나다", cue: "rising-odor" },
+  { id: "toilet-clog", expression: "변기가 막히다", cue: "rising-bowl-water" },
+  { id: "leak", expression: "물이 새다", cue: "falling-drops-puddle" },
+  { id: "heating", expression: "난방이 안 되다", cue: "cold-room-snow" },
+  { id: "noise", expression: "소음이 심하다", cue: "wall-impact-waves" }
 ];
 const OFFICIAL_VOCABULARY = ISSUE_SEQUENCE.map(({ expression }) => expression);
 
@@ -53,6 +53,13 @@ async function callHouseHelper(page, method, ...args) {
 
 async function snapshot(page) {
   return callHouseHelper(page, "snapshot");
+}
+
+async function issueState(page, issueId) {
+  const gameState = await snapshot(page);
+  const issue = gameState.issues?.[issueId];
+  if (!issue) throw new Error(`Missing snapshot issue state for ${issueId}`);
+  return issue;
 }
 
 async function startNewAndSkipTutorial(page) {
@@ -130,6 +137,56 @@ async function expectCanvasHasScene(page) {
   });
 }
 
+async function canvasVisualMetrics(page) {
+  // Read only bitmap pixels. DOM mission copy, toast text, and aria-live text
+  // cannot influence this result, so a passing comparison requires a real
+  // scene-level visual change rather than an explanatory sentence.
+  await page.waitForTimeout(900);
+  return page.locator("#houseCanvas").evaluate((canvas) => {
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    if (!context) throw new Error("Canvas 2D context is unavailable");
+
+    const columns = 10;
+    const rows = 7;
+    const tileWidth = canvas.width / columns;
+    const tileHeight = canvas.height / rows;
+    const tiles = [];
+    let luminanceTotal = 0;
+    let darkSamples = 0;
+    let sampleCount = 0;
+
+    for (let row = 0; row < rows; row += 1) {
+      for (let column = 0; column < columns; column += 1) {
+        const left = Math.floor(column * tileWidth + tileWidth * 0.15);
+        const right = Math.floor((column + 1) * tileWidth - tileWidth * 0.15);
+        const top = Math.floor(row * tileHeight + tileHeight * 0.15);
+        const bottom = Math.floor((row + 1) * tileHeight - tileHeight * 0.15);
+        let tileTotal = 0;
+        let tileSamples = 0;
+
+        for (let y = top; y < bottom; y += 7) {
+          for (let x = left; x < right; x += 7) {
+            const pixel = context.getImageData(x, y, 1, 1).data;
+            const luminance = 0.2126 * pixel[0] + 0.7152 * pixel[1] + 0.0722 * pixel[2];
+            tileTotal += luminance;
+            luminanceTotal += luminance;
+            darkSamples += luminance < 72 ? 1 : 0;
+            tileSamples += 1;
+            sampleCount += 1;
+          }
+        }
+        tiles.push(tileTotal / tileSamples);
+      }
+    }
+
+    return {
+      meanLuminance: luminanceTotal / sampleCount,
+      darkRatio: darkSamples / sampleCount,
+      tiles
+    };
+  });
+}
+
 async function openIssueDiagnosis(page, issue) {
   await callHouseHelper(page, "teleportTo", issue.id);
   await expect(page.locator("#interactionPrompt")).toBeVisible();
@@ -142,6 +199,42 @@ async function openIssueDiagnosis(page, issue) {
   for (let index = 0; index < await options.count(); index += 1) {
     await expectMinimumHitTarget(page, `#diagnosisOptions button:nth-of-type(${index + 1})`);
   }
+}
+
+async function closeDialogue(page) {
+  await expect(page.locator("#dialogueBox")).toBeVisible();
+  await page.locator("#dialogueClose").click();
+  await expect(page.locator("#dialogueBox")).toBeHidden();
+}
+
+async function repairDiagnosedIssue(page, issue, { assertDialogueBlocks = false } = {}) {
+  await callHouseHelper(page, "teleportTo", issue.id);
+  let previousStep = (await issueState(page, issue.id)).repairStep;
+
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    await callHouseHelper(page, "interact");
+    const afterAction = await issueState(page, issue.id);
+    expect(afterAction.repairStep).toBeGreaterThan(previousStep);
+
+    if (afterAction.phase === "resolved" && await page.locator("#endingPanel").isVisible()) {
+      return afterAction;
+    }
+
+    await expect(page.locator("#dialogueBox")).toBeVisible();
+
+    if (assertDialogueBlocks && afterAction.phase !== "resolved") {
+      await callHouseHelper(page, "interact");
+      await expect.poll(async () => (await issueState(page, issue.id)).repairStep)
+        .toBe(afterAction.repairStep);
+    }
+
+    if (afterAction.phase === "resolved") return afterAction;
+
+    await closeDialogue(page);
+    previousStep = afterAction.repairStep;
+  }
+
+  throw new Error(`${issue.id} did not resolve within four repair actions`);
 }
 
 test("C15 hub keeps the original room-zoom activity and links separately to the upgraded game", async ({ page }) => {
@@ -186,68 +279,95 @@ test("upgraded page draws a real scene without runtime errors or local HTTP fail
   expect(localHttpErrors).toEqual([]);
 });
 
-test("new rescue starts with the toolkit, then discovers exactly the official eight expressions", async ({ page }) => {
+test("the first incident must be observed and diagnosed before the breaker can restore power", async ({ page }) => {
   await clearHouseRescueState(page);
   await page.goto(PAGE_URL, { waitUntil: "domcontentloaded" });
   await waitForTestHelper(page);
 
   await expectMinimumHitTarget(page, "#startButton");
-  await callHouseHelper(page, "startNew");
-  await expect(page.locator("#controlTutorial")).toBeVisible();
-  await expectMinimumHitTarget(page, "#tutorialSkip");
-  await page.locator("#tutorialSkip").click();
+  await startNewAndSkipTutorial(page);
 
-  // Helper snapshot contract used below:
-  // - toolkit: boolean
-  // - discovered/repaired: official expression strings in discovery order
-  // - player: serializable { x, y }
-  // - controlMode and controls: stable input state for touch assertions
-  // These fields intentionally expose state, not implementation functions.
-  await callHouseHelper(page, "teleportTo", "toolkit");
-  await expect(page.locator("#interactionPrompt")).toBeVisible();
-  await page.keyboard.press("KeyE");
-  await expect.poll(async () => (await snapshot(page)).toolkit).toBe(true);
-  expect((await snapshot(page)).discovered).toEqual([]);
+  // The incident exists before the learner touches the repair target. The
+  // visible symptom is the light switch; the breaker becomes the target only
+  // after the learner identifies "전기가 나가다".
+  const incident = await snapshot(page);
+  expect(incident.activeIssueId).toBe("power-outage");
+  expect(incident.issues["power-outage"]).toMatchObject({ phase: "incident", repairStep: 0 });
+  expect(incident.blackout).toBe(true);
+  expect(incident.targetLabel).toContain("전등 스위치");
+  expect(incident.toolkit).toBe(true);
+  expect(incident.discovered).toEqual([]);
+  expect(incident.repaired).toEqual([]);
 
-  for (let index = 0; index < ISSUE_SEQUENCE.length; index += 1) {
-    const issue = ISSUE_SEQUENCE[index];
-    await openIssueDiagnosis(page, issue);
-    await callHouseHelper(page, "answerCorrect");
-    await expect(page.locator("#diagnosisPanel")).toBeHidden();
-    await expect.poll(async () => (await snapshot(page)).discovered)
-      .toEqual(OFFICIAL_VOCABULARY.slice(0, index + 1));
-  }
+  const outage = ISSUE_SEQUENCE[0];
+  await openIssueDiagnosis(page, outage);
+  await callHouseHelper(page, "answerCorrect");
+  await expect(page.locator("#diagnosisPanel")).toBeHidden();
 
-  const finalState = await snapshot(page);
-  expect(finalState.discovered).toEqual(OFFICIAL_VOCABULARY);
-  expect(new Set(finalState.discovered).size).toBe(8);
+  const diagnosed = await snapshot(page);
+  expect(diagnosed.issues[outage.id]).toMatchObject({ phase: "diagnosed", repairStep: 0 });
+  expect(diagnosed.blackout).toBe(true);
+  expect(diagnosed.targetLabel).toContain("두꺼비집");
+  expect(diagnosed.discovered).toEqual([outage.expression]);
 
-  await page.locator("#storyToggle").click();
-  await expect(page.locator("#storyPanel")).toBeVisible();
-  await page.locator("#statsToggle").click();
-  await expect(page.locator("#statsPanel")).toBeVisible();
-  await page.locator("#journalToggle").click();
-  await expect(page.locator("#journalDrawer")).toBeVisible();
-  const journalText = await page.locator("#journalDrawer").innerText();
-  for (const expression of OFFICIAL_VOCABULARY) expect(journalText).toContain(expression);
-  await expectMinimumHitTarget(page, "#journalClose");
-  await page.locator("#journalClose").click();
-  await expect(page.locator("#journalDrawer")).toBeHidden();
+  const resolved = await repairDiagnosedIssue(page, outage, { assertDialogueBlocks: true });
+  expect(resolved.phase).toBe("resolved");
+  expect((await snapshot(page)).blackout).toBe(false);
 });
 
-test("the deterministic full loop diagnoses and repairs all eight house issues", async ({ page }) => {
+test("the blackout is recognizable from a broad canvas effect without reading mission text", async ({ page }) => {
   await clearHouseRescueState(page);
   await page.goto(PAGE_URL, { waitUntil: "domcontentloaded" });
   await waitForTestHelper(page);
   await startNewAndSkipTutorial(page);
 
-  await callHouseHelper(page, "teleportTo", "toolkit");
-  await callHouseHelper(page, "interact");
-  await expect.poll(async () => (await snapshot(page)).toolkit).toBe(true);
+  const outage = ISSUE_SEQUENCE[0];
+  expect((await snapshot(page)).blackout).toBe(true);
+  const blackoutVisual = await canvasVisualMetrics(page);
+
+  await openIssueDiagnosis(page, outage);
+  await callHouseHelper(page, "answerCorrect");
+  await repairDiagnosedIssue(page, outage);
+  expect((await snapshot(page)).blackout).toBe(false);
+  const restoredVisual = await canvasVisualMetrics(page);
+
+  const broadlyBrightenedTiles = restoredVisual.tiles.filter((value, index) => (
+    value - blackoutVisual.tiles[index] > 18
+  )).length;
+
+  // Text occupies only a few tiles. Requiring most of the bitmap to brighten
+  // proves the incident is conveyed by scene lighting and powered fixtures,
+  // not merely by the warning sentence painted over the room.
+  expect(restoredVisual.meanLuminance - blackoutVisual.meanLuminance).toBeGreaterThan(25);
+  expect(blackoutVisual.darkRatio - restoredVisual.darkRatio).toBeGreaterThan(0.12);
+  expect(broadlyBrightenedTiles / restoredVisual.tiles.length).toBeGreaterThan(0.65);
+});
+
+test("the deterministic full loop diagnoses and repairs all eight house issues", async ({ page }) => {
+  test.setTimeout(65_000);
+  await clearHouseRescueState(page);
+  await page.goto(PAGE_URL, { waitUntil: "domcontentloaded" });
+  await waitForTestHelper(page);
+  await startNewAndSkipTutorial(page);
 
   for (let index = 0; index < ISSUE_SEQUENCE.length; index += 1) {
     const issue = ISSUE_SEQUENCE[index];
+    const beforeDiagnosis = await snapshot(page);
+    expect(beforeDiagnosis.activeIssueId).toBe(issue.id);
+    expect(beforeDiagnosis.issues[issue.id].phase).toBe("incident");
+    expect(beforeDiagnosis.visualCue).toMatchObject({
+      issueId: issue.id,
+      kind: issue.cue,
+      phase: "incident",
+      strength: 1
+    });
+    await expect(page.locator("#missionInstruction"))
+      .toHaveText("반복해서 움직이는 장면을 찾아 터치하세요.");
+
     await openIssueDiagnosis(page, issue);
+    await expect(page.locator("#diagnosisVisual")).toHaveAttribute("data-issue", issue.id);
+    await expect(page.locator("#diagnosisQuestion"))
+      .toHaveText("이 장면과 어울리는 표현은 무엇일까요?");
 
     // Exercise one real wrong choice before using the deterministic helper for
     // the correct answer. A wrong answer must teach without changing progress.
@@ -266,13 +386,22 @@ test("the deterministic full loop diagnoses and repairs all eight house issues",
 
     await callHouseHelper(page, "answerCorrect");
     await expect(page.locator("#diagnosisPanel")).toBeHidden();
+    expect((await issueState(page, issue.id)).phase).toBe("diagnosed");
 
-    // The learner performs two visible repair actions after diagnosing each
-    // issue; teleportTo has already put the player in deterministic reach.
-    await callHouseHelper(page, "interact");
-    await callHouseHelper(page, "interact");
+    // Every repair action opens a visible explanation. The learner must close
+    // it before the next action; production must not accept hidden rapid-fire
+    // interactions behind the dialogue.
+    const resolved = await repairDiagnosedIssue(page, issue);
+    expect(resolved.phase).toBe("resolved");
     await expect.poll(async () => (await snapshot(page)).repaired)
       .toEqual(OFFICIAL_VOCABULARY.slice(0, index + 1));
+
+    if (index < ISSUE_SEQUENCE.length - 1) {
+      await closeDialogue(page);
+      const next = await snapshot(page);
+      expect(next.activeIssueId).toBe(ISSUE_SEQUENCE[index + 1].id);
+      expect(next.issues[ISSUE_SEQUENCE[index + 1].id].phase).toBe("incident");
+    }
   }
 
   const completed = await snapshot(page);
@@ -283,7 +412,7 @@ test("the deterministic full loop diagnoses and repairs all eight house issues",
   await expect(page.locator("#safetyValue")).toHaveText("100%");
 
   const persisted = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), SAVE_KEY);
-  expect(persisted).toMatchObject({ started: true, completed: true, toolkit: true });
+  expect(persisted).toMatchObject({ started: true, completed: true });
   expect(persisted.discoveryOrder).toEqual(ISSUE_SEQUENCE.map(({ id }) => id));
   expect(persisted.repairedOrder).toEqual(ISSUE_SEQUENCE.map(({ id }) => id));
 
@@ -294,34 +423,66 @@ test("the deterministic full loop diagnoses and repairs all eight house issues",
   expect(restored.repaired).toEqual(OFFICIAL_VOCABULARY);
 });
 
-test("discovery progress and toolkit restore from the upgraded save key", async ({ page }) => {
+test("the active incident phase and repair target restore from the upgraded save key", async ({ page }) => {
   await clearHouseRescueState(page);
   await page.goto(PAGE_URL, { waitUntil: "domcontentloaded" });
   await waitForTestHelper(page);
   await startNewAndSkipTutorial(page);
 
-  await callHouseHelper(page, "teleportTo", "toolkit");
-  await callHouseHelper(page, "interact");
-  for (const issue of ISSUE_SEQUENCE.slice(0, 2)) {
-    await openIssueDiagnosis(page, issue);
-    await callHouseHelper(page, "answerCorrect");
-  }
+  const outage = ISSUE_SEQUENCE[0];
+  await openIssueDiagnosis(page, outage);
+  await callHouseHelper(page, "answerCorrect");
 
   await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), SAVE_KEY)).not.toBeNull();
   const beforeReload = await snapshot(page);
-  expect(beforeReload.toolkit).toBe(true);
-  expect(beforeReload.discovered).toEqual(OFFICIAL_VOCABULARY.slice(0, 2));
+  expect(beforeReload.activeIssueId).toBe(outage.id);
+  expect(beforeReload.issues[outage.id]).toMatchObject({ phase: "diagnosed", repairStep: 0 });
+  expect(beforeReload.blackout).toBe(true);
+  expect(beforeReload.targetLabel).toContain("두꺼비집");
 
   await page.reload({ waitUntil: "domcontentloaded" });
   await waitForTestHelper(page);
   const restored = await snapshot(page);
   expect(restored.started).toBe(true);
-  expect(restored.toolkit).toBe(true);
+  expect(restored.activeIssueId).toBe(outage.id);
+  expect(restored.issues[outage.id]).toEqual(beforeReload.issues[outage.id]);
+  expect(restored.blackout).toBe(true);
+  expect(restored.targetLabel).toContain("두꺼비집");
   expect(restored.discovered).toEqual(beforeReload.discovered);
   expect(restored.repaired).toEqual(beforeReload.repaired);
 });
 
-test.describe("390x844 joystick touch controls", () => {
+test("room map buttons navigate through every doorway instead of teleporting", async ({ page }) => {
+  await clearHouseRescueState(page);
+  await page.goto(PAGE_URL, { waitUntil: "domcontentloaded" });
+  await waitForTestHelper(page);
+  await startNewAndSkipTutorial(page);
+
+  expect((await snapshot(page)).room).toBe("living");
+
+  for (const roomId of ["kitchen", "bathroom", "bedroom", "living"]) {
+    const before = await snapshot(page);
+    await page.locator("#statsToggle").click();
+    await expect(page.locator("#statsPanel")).toBeVisible();
+    await page.locator(`#roomMap [data-room="${roomId}"]`).click();
+
+    // A teleport would synchronously produce pathLength 0. Keeping a real
+    // route here protects the shared door/collision geometry used by tap mode.
+    await expect.poll(async () => (await snapshot(page)).pathLength, { timeout: 2_000 })
+      .toBeGreaterThan(0);
+
+    await expect.poll(async () => {
+      const current = await snapshot(page);
+      return current.room === roomId && current.pathLength === 0;
+    }, { timeout: 10_000 }).toBe(true);
+
+    const after = await snapshot(page);
+    expect(Math.hypot(after.player.x - before.player.x, after.player.y - before.player.y))
+      .toBeGreaterThan(80);
+  }
+});
+
+test.describe("390x844 optional joystick controls", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
   test("controls stay tappable and pointercancel clears held input", async ({ page }) => {
@@ -372,22 +533,28 @@ test.describe("390x844 joystick touch controls", () => {
     await expect.poll(async () => (await snapshot(page)).controls.actionPressed).toBe(true);
     await action.dispatchEvent("pointercancel", { pointerId: 32, pointerType: "touch", isPrimary: true });
     await expect.poll(async () => (await snapshot(page)).controls.actionPressed).toBe(false);
+
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await waitForTestHelper(page);
+    await expect(page.locator("html")).toHaveAttribute("data-control-mode", "joystick");
   });
 });
 
-test.describe("390x844 canvas-tap mode", () => {
+test.describe("390x844 touch-first default", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
-  test("a canvas pointer moves the player and the selected mode persists", async ({ page }) => {
-    await clearHouseRescueState(page, "tap");
+  test("a fresh mobile visit defaults to canvas taps and moves the player", async ({ page }) => {
+    await clearHouseRescueState(page);
     await page.goto(PAGE_URL, { waitUntil: "domcontentloaded" });
     await waitForTestHelper(page);
     await startNewAndSkipTutorial(page);
 
     await expect(page.locator("html")).toHaveAttribute("data-control-mode", "tap");
+    await expect(page.locator('input[name="controlMode"][value="tap"]')).toBeChecked();
     await expect(page.locator("#touchJoystick")).toBeHidden();
     await expect(page.locator("#touchAction")).toBeHidden();
-    await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), CONTROL_MODE_KEY)).toBe("tap");
+    await expect(page.locator("#tapModeHint")).toBeVisible();
+    expect(await page.evaluate((key) => localStorage.getItem(key), CONTROL_MODE_KEY)).not.toBe("joystick");
 
     const before = (await snapshot(page)).player;
     const canvasBox = await page.locator("#houseCanvas").boundingBox();
@@ -413,17 +580,19 @@ for (const profile of [
   test.describe(profile.name, () => {
     test.use({ viewport: profile.viewport, isMobile: true, hasTouch: true });
 
-    test("keeps the canvas controls visible without horizontal overflow", async ({ page }) => {
-      await clearHouseRescueState(page, "joystick");
+    test("keeps the touch-first canvas and hint visible without horizontal overflow", async ({ page }) => {
+      await clearHouseRescueState(page);
       await page.goto(PAGE_URL, { waitUntil: "domcontentloaded" });
       await waitForTestHelper(page);
       await startNewAndSkipTutorial(page);
 
       await expect(page.locator("#houseGame")).toBeVisible();
       await expect(page.locator("#houseCanvas")).toBeVisible();
+      await expect(page.locator("html")).toHaveAttribute("data-control-mode", "tap");
       await expectInsideViewport(page, "#touchControls");
-      await expectInsideViewport(page, "#touchJoystick", 44);
-      await expectInsideViewport(page, "#touchAction", 44);
+      await expectInsideViewport(page, "#tapModeHint", 44);
+      await expect(page.locator("#touchJoystick")).toBeHidden();
+      await expect(page.locator("#touchAction")).toBeHidden();
       await expectNoHorizontalOverflow(page);
     });
   });
