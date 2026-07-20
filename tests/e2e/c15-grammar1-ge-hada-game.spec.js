@@ -163,6 +163,27 @@ test("c15 hub and grammar page keep links to the upgraded drag game", async ({ p
   await expect(page.locator("#sentenceCard")).toBeVisible();
 });
 
+test("c15 grammar 1 keeps selected supplemental activities collapsed in the requested order", async ({ page }) => {
+  await blockGoogleTagManager(page);
+  await page.goto("/c15/index.html", { waitUntil: "domcontentloaded" });
+
+  const extraActivities = page.locator("#grammar1-extra-activities");
+  await expect(extraActivities).not.toHaveAttribute("open", "");
+  await expect(extraActivities.getByText("추가 보조 활동", { exact: true })).toBeVisible();
+  await expect(extraActivities.locator('a[href="grammar1-ge-hada-cafe-game.html"]')).toBeHidden();
+  await extraActivities.locator("summary").click();
+  await expect(extraActivities).toHaveAttribute("open", "");
+
+  const activityOrder = await extraActivities.locator("a").evaluateAll((links) => (
+    links.map((link) => link.getAttribute("href"))
+  ));
+  expect(activityOrder).toEqual([
+    "grammar1-ge-hada-cafe-game.html",
+    "grammar1-speaking-pro.html",
+    "grammar1-ge-hada-emergency-game-teacher.html"
+  ]);
+});
+
 test("pointer drag records self-to-other direction and direct action remains clickable", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await openGame(page);
