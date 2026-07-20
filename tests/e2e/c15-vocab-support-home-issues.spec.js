@@ -283,10 +283,13 @@ test("the opening uses a character briefing instead of a fullscreen prompt", asy
   const beforeClosingBriefing = await snapshot(page);
   expect(beforeClosingBriefing.issues["power-outage"]).toMatchObject({ phase: "queued" });
   expect(beforeClosingBriefing.blackout).toBe(false);
+  expect(beforeClosingBriefing.targetLabel).toBeNull();
+  expect(beforeClosingBriefing.visualCue).toBeNull();
 
   await page.locator("#houseCanvas").dblclick({ position: { x: 20, y: 500 } });
   await expect(page.locator("#dialogueBox")).toBeHidden();
   expect((await snapshot(page)).openingIncidentPending).toBe(true);
+  await expect(page.locator("#interactionPrompt")).toBeHidden();
   await page.waitForTimeout(1_000);
   expect((await snapshot(page)).blackout).toBe(false);
   await expect.poll(async () => (await snapshot(page)).blackout, { timeout: 4_000 }).toBe(true);

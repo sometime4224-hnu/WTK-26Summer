@@ -597,7 +597,7 @@
 
   function visibleObjects() {
     const issue = activeIssue();
-    if (!issue || isResolved(issue)) return [];
+    if (!issue || !["incident", "diagnosed"].includes(issueStatus(issue).phase)) return [];
     return [displayObjectForIssue(issue)];
   }
 
@@ -1074,6 +1074,10 @@
     if (!object) {
       setOpen(ui.interactionPrompt, false);
       if (ui.touchActionLabel) ui.touchActionLabel.textContent = "조사";
+      if (ui.touchAction) {
+        ui.touchAction.disabled = true;
+        ui.touchAction.setAttribute("aria-disabled", "true");
+      }
       return;
     }
     let label = `${object.label} 조사`;
@@ -1085,6 +1089,10 @@
     if (ui.interactionPromptText) ui.interactionPromptText.textContent = label;
     if (ui.interactionPromptKey) ui.interactionPromptKey.textContent = isTouchDevice ? "행동" : "E";
     if (ui.touchActionLabel) ui.touchActionLabel.textContent = status.phase === "diagnosed" ? (issue?.actionLabel || "해결") : "확인";
+    if (ui.touchAction) {
+      ui.touchAction.disabled = false;
+      ui.touchAction.setAttribute("aria-disabled", "false");
+    }
     setOpen(ui.interactionPrompt, true);
   }
 
@@ -1368,9 +1376,10 @@
 
   function snapshotForTests() {
     const current = activeIssue();
-    const currentObject = current ? displayObjectForIssue(current) : null;
+    const currentIsInteractive = Boolean(current && ["incident", "diagnosed"].includes(issueStatus(current).phase));
+    const currentObject = currentIsInteractive ? displayObjectForIssue(current) : null;
     const powerPhase = issueStatus("power-outage").phase;
-    const currentVisual = current ? ISSUE_VISUALS[current.id] : null;
+    const currentVisual = currentIsInteractive ? ISSUE_VISUALS[current.id] : null;
     return {
       started: state.started,
       completed: state.completed,
@@ -1809,7 +1818,7 @@
     const status = issueStatus(issue);
     const contextOnly = issue.stage === "symptom-context";
     const nearby = !contextOnly && nearestObject()?.id === issue.id;
-    const active = !contextOnly && issue.id === state.activeIssueId && status.phase !== "resolved";
+    const active = !contextOnly && issue.id === state.activeIssueId && ["incident", "diagnosed"].includes(status.phase);
     const pulse = 0.5 + Math.sin(time * 0.004 + MISSION_ORDER.indexOf(issue.id)) * 0.5;
     const centerX = issue.x + issue.w / 2;
     const centerY = issue.y + issue.h / 2;
