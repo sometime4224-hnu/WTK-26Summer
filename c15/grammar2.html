@@ -11,282 +11,238 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>15과 문법 2 | A/V-(으)ㄹ걸(요)</title>
-    <script src="https://cdn.tailwindcss.com" defer></script>
 <style>
+        :root {
+            --ink: #172033;
+            --muted: #5b667a;
+            --line: #dfe6ef;
+            --blue: #2563c7;
+            --blue-soft: #eef5ff;
+            --green: #16856b;
+            --green-soft: #effaf6;
+            --orange: #ed741f;
+            --orange-soft: #fff5ea;
+            --violet: #6d4bd6;
+            --shadow: 0 12px 30px rgba(23, 32, 51, 0.07);
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
             margin: 0;
-            font-family: 'Noto Sans KR', sans-serif;
-            background:
-                radial-gradient(circle at top right, rgba(253, 186, 116, 0.28), transparent 26%),
-                radial-gradient(circle at top left, rgba(125, 211, 252, 0.16), transparent 22%),
-                linear-gradient(180deg, #fffbeb 0%, #fff7ed 42%, #f8fafc 100%);
+            color: var(--ink);
+            font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+            background: #f7fafc;
+            line-height: 1.55;
+        }
+        button, a { font: inherit; }
+        button { cursor: pointer; }
+        button:focus-visible, a:focus-visible, summary:focus-visible {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
         }
         .global-nav {
             position: sticky;
             top: 0;
             z-index: 1000;
-            height: 58px;
+            min-height: 48px;
             width: 100%;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             padding: 0 16px;
-            box-sizing: border-box;
-            background: rgba(255,255,255,0.92);
-            border-bottom: 1px solid #fed7aa;
+            background: rgba(255,255,255,0.96);
+            border-bottom: 1px solid #e7edf4;
             backdrop-filter: blur(8px);
         }
-        .global-nav a {
-            color: #c2410c;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 14px;
-        }
-        .nav-divider { color: #cbd5e1; font-weight: 700; }
-        .safe { word-break: keep-all; overflow-wrap: break-word; }
-        .tab-btn.active { background: #ffedd5; color: #c2410c; border-color: #fdba74; }
-        .vi-text { display: none; }
-        .vi-on .vi-text { display: block; }
-        .vi-switch { display: none; }
-        .vi-on .vi-switch { display: block; }
+        .global-nav a { color: #315f9d; text-decoration: none; font-size: 13px; font-weight: 800; }
+        .nav-divider { color: #b8c1ce; font-weight: 700; }
+        .safe { word-break: keep-all; overflow-wrap: anywhere; }
+        .hidden { display: none !important; }
+        .vi-text, .vi-switch { display: none; }
+        .vi-on .vi-text, .vi-on .vi-switch { display: block; }
         .vi-on .ko-switch { display: none; }
         .vi-switch-inline { display: none; }
         .vi-on .vi-switch-inline { display: inline; }
         .vi-on .ko-switch-inline { display: none; }
-        .formula-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 9999px;
-            border: 1px solid #fed7aa;
-            background: #fff7ed;
-            color: #c2410c;
-            font-size: 13px;
-            font-weight: 800;
-        }
-        .flow-card,
-        .compare-card,
-        .dialog-card,
-        .mistake-card,
-        .summary-card {
-            border-radius: 18px;
-            border: 1px solid rgba(148, 163, 184, 0.22);
-            background: rgba(255,255,255,0.95);
-            padding: 14px;
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
-        }
-        .signal-track {
-            margin-top: 14px;
-            padding: 16px;
-            border-radius: 20px;
-            border: 1px solid #fde68a;
-            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,247,237,0.94));
-        }
-        .signal-line {
-            position: relative;
-            height: 8px;
-            border-radius: 9999px;
-            background: linear-gradient(90deg, #dbeafe 0%, #fdba74 52%, #fca5a5 100%);
-        }
-        .signal-dot {
-            position: absolute;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 18px;
-            height: 18px;
-            border-radius: 9999px;
-            border: 4px solid #fff;
-            box-shadow: 0 0 0 2px rgba(194, 65, 12, 0.14);
-            background: #ea580c;
-        }
-        .legend-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            border-radius: 9999px;
-            padding: 7px 11px;
-            font-size: 12px;
-            font-weight: 800;
-            border: 1px solid transparent;
-        }
-        .legend-pill--sky {
-            background: #eff6ff;
-            border-color: #bfdbfe;
-            color: #1d4ed8;
-        }
-        .legend-pill--amber {
-            background: #fff7ed;
-            border-color: #fdba74;
-            color: #c2410c;
-        }
-        .legend-pill--violet {
-            background: #f5f3ff;
-            border-color: #c4b5fd;
-            color: #7c3aed;
-        }
-        .compare-card__head {
+        #page { width: min(100% - 24px, 1080px); margin: 0 auto; padding: 8px 0 36px; }
+        .hero {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
-            gap: 10px;
+            gap: 18px;
+            padding: 22px 24px 20px;
+            border: 1px solid #dbe7f5;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #ffffff 0%, #f2f7ff 65%, #fff8ee 100%);
+            box-shadow: var(--shadow);
         }
-        .compare-badge {
-            display: inline-flex;
-            align-items: center;
-            border-radius: 9999px;
-            padding: 4px 9px;
-            font-size: 11px;
-            font-weight: 800;
-        }
-        .compare-badge--basic { background: #e0f2fe; color: #0369a1; }
-        .compare-badge--guess { background: #ecfccb; color: #4d7c0f; }
-        .compare-badge--reply { background: #ffedd5; color: #c2410c; }
-        .compare-badge--follow { background: #f5f3ff; color: #7c3aed; }
-        .next-link,
-        .prev-link,
-        .ghost-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            border-radius: 9999px;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 700;
-            transition: background 0.2s, border-color 0.2s, transform 0.2s;
-        }
-        .next-link {
-            border: 1px solid #fdba74;
-            background: rgba(255,255,255,0.92);
-            color: #c2410c;
-            box-shadow: 0 4px 12px rgba(194, 65, 12, 0.08);
-        }
-        .next-link:hover { background: #fff7ed; border-color: #fb923c; transform: translateY(-1px); }
-        .prev-link {
-            border: 1px solid #cbd5e1;
-            background: rgba(255,255,255,0.92);
-            color: #475569;
-        }
-        .prev-link:hover { background: #f8fafc; transform: translateY(-1px); }
-        .ghost-link {
-            border: 1px dashed #cbd5e1;
-            background: rgba(255,255,255,0.72);
-            color: #94a3b8;
-            cursor: default;
-        }
-        .choice-btn {
-            min-height: 58px;
-            width: 100%;
-            border-radius: 16px;
-            border: 1px solid #cbd5e1;
-            background: #ffffff;
-            padding: 12px 14px;
-            text-align: left;
-            font-size: 14px;
-            font-weight: 700;
-            color: #1f2937;
-            transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
-        }
-        .choice-btn:hover { transform: translateY(-1px); border-color: #fdba74; }
-        .choice-btn:disabled:hover { transform: none; }
-        .choice-pending {
-            border-color: #c4b5fd;
-            background: #f5f3ff;
-            color: #6d28d9;
-        }
-        .choice-pending .choice-badge {
-            background: #8b5cf6;
-            color: #ffffff;
-        }
-        .choice-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
+        .eyebrow, .section-kicker { margin: 0; color: var(--blue); font-size: 12px; font-weight: 900; letter-spacing: .04em; }
+        h1, h2, h3, p { margin-top: 0; }
+        h1 { margin-bottom: 5px; font-size: clamp(27px, 5vw, 42px); line-height: 1.12; letter-spacing: -.04em; }
+        h2 { margin-bottom: 0; font-size: clamp(19px, 2.5vw, 25px); line-height: 1.25; letter-spacing: -.03em; }
+        h3 { margin-bottom: 0; font-size: 16px; line-height: 1.35; }
+        .hero-lead { max-width: 650px; margin: 0; color: var(--muted); font-size: 15px; }
+        .hero-key { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; color: #1d5c4d; font-weight: 900; }
+        .hero-key strong { padding: 7px 10px; border-radius: 10px; background: #d8f4eb; color: var(--green); }
+        .language-toggle { flex: 0 0 auto; border: 1px solid #c8d2df; border-radius: 10px; padding: 8px 10px; background: #fff; color: #475569; font-size: 12px; font-weight: 900; }
+        .lesson-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0 16px; }
+        .tab-btn { min-height: 44px; border: 1px solid #cfd9e5; border-radius: 12px; background: #fff; color: #526075; font-weight: 900; }
+        .tab-btn.active { border-color: #4c8de0; background: var(--blue); color: #fff; box-shadow: 0 5px 12px rgba(37,99,199,.16); }
+        .learning-stack { display: grid; gap: 14px; }
+        .section-card { padding: 21px 22px; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: 0 7px 20px rgba(23,32,51,.035); }
+        .section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+        .section-heading p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+        .concept-grid, .scene-grid, .compare-grid, .resource-grid { display: grid; gap: 10px; }
+        .concept-grid { grid-template-columns: repeat(3, 1fr); }
+        .concept-step, .scene-card, .compare-card, .dialog-card, .resource-card { padding: 15px; border: 1px solid #e1e7ef; border-radius: 16px; background: #fbfdff; }
+        .concept-step { position: relative; padding-top: 38px; }
+        .step-no { position: absolute; top: 13px; left: 15px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 12px; font-weight: 900; }
+        .concept-step p, .scene-card p, .compare-card p, .dialog-card p, .resource-card p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+        .concept-step strong, .scene-card strong { color: var(--ink); }
+        .rule-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 12px; }
+        .rule-box { padding: 16px; border-radius: 16px; background: var(--green-soft); border: 1px solid #b9e6d7; }
+        .rule-box h3 { color: var(--green); }
+        .formula-list { display: grid; gap: 8px; margin-top: 11px; }
+        .formula-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 11px; border-radius: 11px; background: #fff; border: 1px solid #d7e6e0; font-size: 14px; }
+        .formula-row strong { color: var(--green); font-size: 16px; }
+        .rule-note { margin: 11px 0 0; color: #4c665e; font-size: 12px; }
+        .pill-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+        .legend-pill, .compare-badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 5px 9px; font-size: 11px; font-weight: 900; }
+        .legend-pill--sky, .legend-pill--blue, .compare-badge--basic { background: #eaf3ff; color: #1d5ba9; }
+        .legend-pill--amber, .compare-badge--reply { background: #fff0dc; color: #b9570c; }
+        .legend-pill--violet, .compare-badge--follow { background: #f1edff; color: #6243bb; }
+        .legend-pill--green, .compare-badge--guess { background: #e8f7ef; color: #17724f; }
+        .scene-grid { grid-template-columns: repeat(3, 1fr); }
+        .scene-card { min-height: 150px; }
+        .scene-card--blue { background: var(--blue-soft); border-color: #cbdcf7; }
+        .scene-card--green { background: var(--green-soft); border-color: #c8e9dc; }
+        .scene-card--orange { background: var(--orange-soft); border-color: #f5d3af; }
+        .scene-label { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); font-size: 12px; font-weight: 900; }
+        .scene-card--green .scene-label { color: var(--green); }
+        .scene-card--orange .scene-label { color: var(--orange); }
+        .scene-quote { margin-top: 12px !important; color: var(--ink) !important; font-size: 16px !important; font-weight: 900; }
+        .scene-quote strong { color: var(--blue); }
+        .scene-card--green .scene-quote strong { color: var(--green); }
+        .scene-card--orange .scene-quote strong { color: var(--orange); }
+        .compare-grid { grid-template-columns: repeat(4, 1fr); }
+        .compare-card { min-height: 182px; }
+        .compare-card--target { border-color: #8acdbb; background: #f1fbf7; box-shadow: inset 0 3px 0 var(--green); }
+        .compare-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+        .compare-card__head p { margin: 0; color: var(--ink); font-size: 15px; font-weight: 900; }
+        .memory-line { margin: 13px 0 0; padding: 11px 13px; border-radius: 12px; background: #fff7e6; border: 1px solid #f2d08f; color: #83500e; font-size: 13px; }
+        .visual-notes, .extra-notes { border: 1px solid #dce4ed; border-radius: 16px; background: #f9fbfd; }
+        .visual-notes summary, .extra-notes summary { padding: 14px 16px; color: #2d5d94; font-size: 14px; font-weight: 900; cursor: pointer; }
+        .visual-notes[open], .extra-notes[open] { background: #fff; }
+        .visual-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 12px 14px; }
+        .visual-gallery figure { margin: 0; overflow: hidden; border: 1px solid #e4e8ee; border-radius: 12px; background: #fff; }
+        .visual-gallery img { display: block; width: 100%; height: auto; }
+        .visual-gallery figcaption { padding: 8px 10px; color: var(--muted); font-size: 12px; }
+        .extra-notes { padding-bottom: 0; }
+        .extra-notes > div { padding: 0 16px 15px; }
+        .extra-notes ul { margin: 0; padding-left: 20px; color: var(--muted); font-size: 13px; }
+        .practice-card { padding: 21px 22px; border: 1px solid #dfe6ef; border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
+        .practice-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 12px; font-weight: 800; }
+        .progress-track { height: 7px; margin-top: 8px; overflow: hidden; border-radius: 999px; background: #e8edf4; }
+        #progressBar { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), var(--green)); transition: width .2s ease; }
+        .practice-guide { margin: 13px 0; padding: 11px 13px; border: 1px solid #d9cff8; border-radius: 12px; background: #f7f4ff; color: #54408a; font-size: 12px; }
+        #qGrammar { margin: 15px 0 0; color: var(--orange); font-size: 12px; font-weight: 900; }
+        #qText { margin: 5px 0 0; font-size: 17px; font-weight: 900; }
+        #qHintKo, #qHintVi { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+        #qHintVi { color: #a35a1f; }
+        #choices { display: grid; gap: 8px; margin-top: 13px; }
+        .choice-btn { width: 100%; min-height: 52px; padding: 12px 13px; border: 1px solid #cfd8e4; border-radius: 13px; background: #fff; color: var(--ink); text-align: left; font-size: 14px; font-weight: 800; }
+        .choice-btn:hover { border-color: #7aa9e7; background: #f8fbff; }
+        .choice-btn:disabled { cursor: default; }
+        .choice-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .choice-text { flex: 1 1 auto; }
-        .choice-badge {
-            flex: 0 0 auto;
-            border-radius: 9999px;
-            padding: 4px 9px;
-            font-size: 11px;
-            font-weight: 800;
+        .choice-badge { flex: 0 0 auto; padding: 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 900; }
+        .choice-pending { border-color: #a992ee; background: #f2efff; color: #5937af; }
+        .choice-pending .choice-badge { background: var(--violet); color: #fff; }
+        .choice-target { border-color: #76c7aa; background: #ebfaf4; color: #096549; }
+        .choice-target .choice-badge { background: #0c9b6e; color: #fff; }
+        .choice-alternate { border-color: #f0b46f; background: #fff5e8; color: #a6530b; }
+        .choice-alternate .choice-badge { background: #e9891e; color: #fff; }
+        .choice-selected-wrong { border-color: #ef9aa7; background: #fff1f3; color: #b32443; }
+        .choice-selected-wrong .choice-badge { background: #db3e61; color: #fff; }
+        .choice-neutral { border-color: #e4e9ef; background: #f6f8fa; color: #8995a5; }
+        .action-btn { width: 100%; min-height: 50px; margin-top: 11px; border: 0; border-radius: 13px; color: #fff; font-weight: 900; }
+        .action-btn--check { background: var(--violet); }
+        .action-btn--next { background: var(--ink); }
+        .action-btn:disabled { opacity: .42; cursor: not-allowed; }
+        #feedbackBox { margin-top: 12px; padding: 13px; border-radius: 13px; font-size: 12px; }
+        #feedbackBox.feedback--perfect { border: 1px solid #9bd6bd; background: #ebfaf3; color: #155c43; }
+        #feedbackBox.feedback--partial { border: 1px solid #efc27d; background: #fff7e9; color: #80500d; }
+        #feedbackBox.feedback--review { border: 1px solid #efabb5; background: #fff2f4; color: #8f233b; }
+        .answer-pill { display: inline-flex; align-items: center; margin: 5px 5px 0 0; padding: 5px 8px; border-radius: 999px; font-size: 11px; font-weight: 900; }
+        .answer-pill--target { background: #e7f8f0; border: 1px solid #8ed6ba; color: #08664d; }
+        .answer-pill--alternate { background: #fff1dd; border: 1px solid #f0be7b; color: #a2520b; }
+        .answer-pill--selected { background: #f0edff; border: 1px solid #b9a8f0; color: #5937af; }
+        .answer-pill--wrong { background: #fff0f2; border: 1px solid #ef9eaa; color: #b32443; }
+        #resultPanel { margin-top: 12px; }
+        #resultPanel > div:first-child { padding: 16px; border: 1px solid #e9c98c; border-radius: 16px; background: #fff8ea; }
+        #resultPanel > div:first-child > p:first-child { margin-bottom: 0; color: #a86011; text-align: center; font-size: 12px; font-weight: 900; }
+        #resultPanel h3 { margin: 4px 0 0; text-align: center; }
+        #resultPanel > div:last-child { display: grid; gap: 8px; margin-top: 10px; }
+        #resultPanel > div:last-child > article { padding: 12px; border: 1px solid #dfe6ef; border-radius: 12px; background: #fff; }
+        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-top: 12px; }
+        .summary-card { padding: 12px; border-radius: 12px; border: 1px solid #dfe6ef; background: #fbfdff; }
+        .resource-section { margin-top: 14px; padding: 17px 18px; border: 1px solid #dfe6ef; border-radius: 18px; background: #fff; }
+        .resource-grid { grid-template-columns: repeat(4, 1fr); margin-top: 12px; }
+        .resource-card { display: flex; flex-direction: column; justify-content: space-between; min-height: 145px; }
+        .resource-card h3 { font-size: 15px; }
+        .resource-card a { align-self: flex-start; margin-top: 12px; padding: 7px 10px; border: 1px solid #c6d5e8; border-radius: 9px; color: #2d5d94; text-decoration: none; font-size: 12px; font-weight: 900; }
+        .quiet-resource { margin-top: 8px; text-align: right; }
+        .quiet-resource summary { display: inline-block; color: #9aa7b8; font-size: 11px; cursor: pointer; list-style: none; }
+        .quiet-resource summary::-webkit-details-marker { display: none; }
+        .quiet-resource summary::before { content: '· '; color: #cbd5e1; }
+        .quiet-resource[open] { padding: 10px 12px; border: 1px solid #e5eaf0; border-radius: 12px; background: #fbfdff; text-align: left; }
+        .quiet-resource__body { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .quiet-resource__body p { margin: 0; color: #7b8798; font-size: 12px; }
+        .quiet-resource__link { flex: none; color: #718096; font-size: 11px; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+        .page-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px; }
+        .next-link, .prev-link { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 900; }
+        .next-link { border: 1px solid #9fc1ec; background: #edf5ff; color: #285e9e; }
+        .prev-link { border: 1px solid #d1d9e3; background: #fff; color: #526075; }
+        .storage-note { margin: 10px 0 0; color: #64748b; font-size: 11px; }
+        @media (min-width: 760px) {
+            .resource-card:first-child { grid-column: span 2; }
+            .resource-card:first-child p { max-width: 520px; }
         }
-        .choice-target {
-            border-color: #86efac;
-            background: #ecfdf5;
-            color: #047857;
+        @media (max-width: 759px) {
+            .hero { padding: 19px 17px; }
+            .language-toggle { padding: 7px 8px; }
+            .section-card, .practice-card { padding: 18px 16px; }
+            .concept-grid, .rule-layout, .scene-grid, .compare-grid, .resource-grid { grid-template-columns: 1fr; }
+            .compare-card { min-height: 0; }
+            .visual-gallery { grid-template-columns: 1fr; }
+            .resource-card { min-height: 0; }
+            .summary-grid { grid-template-columns: 1fr 1fr 1fr; }
         }
-        .choice-target .choice-badge {
-            background: #10b981;
-            color: #ffffff;
+        @media (max-width: 380px) {
+            #page { width: min(100% - 16px, 1080px); }
+            .hero { gap: 10px; }
+            h1 { font-size: 26px; }
+            .hero-lead { font-size: 14px; }
+            .language-toggle { font-size: 11px; }
+            .section-heading { display: block; }
+            .page-nav { align-items: stretch; flex-direction: column; }
+            .prev-link, .next-link { justify-content: center; }
         }
-        .choice-alternate {
-            border-color: #fdba74;
-            background: #fff7ed;
-            color: #c2410c;
-        }
-        .choice-alternate .choice-badge {
-            background: #f59e0b;
-            color: #ffffff;
-        }
-        .choice-selected-wrong {
-            border-color: #fda4af;
-            background: #fff1f2;
-            color: #be123c;
-        }
-        .choice-selected-wrong .choice-badge {
-            background: #f43f5e;
-            color: #ffffff;
-        }
-        .choice-neutral {
-            border-color: #e2e8f0;
-            background: #f8fafc;
-            color: #94a3b8;
-        }
-        .answer-pill {
-            display: inline-flex;
-            align-items: center;
-            border-radius: 9999px;
-            padding: 6px 10px;
-            font-size: 12px;
-            font-weight: 800;
-            margin-right: 6px;
-            margin-top: 6px;
-        }
-        .answer-pill--target {
-            background: #ecfdf5;
-            border: 1px solid #86efac;
-            color: #047857;
-        }
-        .answer-pill--alternate {
-            background: #fff7ed;
-            border: 1px solid #fdba74;
-            color: #c2410c;
-        }
-        .answer-pill--selected {
-            background: #f5f3ff;
-            border: 1px solid #c4b5fd;
-            color: #6d28d9;
-        }
-        .answer-pill--wrong {
-            background: #fff1f2;
-            border: 1px solid #fda4af;
-            color: #be123c;
-        }
-        .summary-grid {
-            display: grid;
-            gap: 12px;
-            margin-top: 14px;
-        }
-        @media (min-width: 768px) {
-            .summary-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            #progressBar { transition: none; }
         }
     </style>
         <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+        <style>
+            @media (max-width: 380px) {
+                .multilang-scaffold { margin: 4px auto; padding: 6px; }
+                .multilang-scaffold__head > div:first-child { display: none; }
+                .multilang-scaffold__head { display: block; }
+                .multilang-bar { gap: 4px; padding: 0; }
+                .multilang-btn { min-height: 28px; padding: 0 8px; font-size: 10px; }
+            }
+        </style>
 </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
@@ -300,7 +256,68 @@
         <a href="index.html">15과 목록</a>
     </nav>
 
-    <main id="page" class="w-full max-w-5xl mx-auto space-y-4 px-3 sm:px-0 pb-8">
+<main id="page">
+        <section class="hero" aria-labelledby="pageTitle">
+            <div><p class="eyebrow">15과 · 문법 2</p><h1 id="pageTitle">A/V-(으)ㄹ걸(요)</h1><p class="hero-lead ko-switch safe">상황을 보고 “아마 그럴 거예요” 하고 가볍게 추측하거나, 상대의 말에 부드럽게 반응할 때 써요.</p><p class="hero-lead vi-switch safe">Dùng khi nhìn vào tình huống rồi đoán nhẹ “chắc là như vậy”, hoặc phản ứng mềm mại với lời người khác.</p><div class="hero-key"><strong>한 줄 핵심</strong><span class="ko-switch">근거를 보고, 내 생각을 가볍게 말해요.</span><span class="vi-switch">Nhìn vào căn cứ và nói nhẹ suy nghĩ của mình.</span></div></div>
+        </section>
+        <div class="lesson-tabs" role="tablist" aria-label="문법 학습 단계"><button id="tabLearn" class="tab-btn active" type="button" role="tab" aria-selected="true">학습 정리</button><button id="tabPractice" class="tab-btn" type="button" role="tab" aria-selected="false">짧게 확인하기</button></div>
+        <section id="learnPanel" class="learning-stack" role="tabpanel" aria-labelledby="tabLearn">
+            <article class="section-card">
+                <div class="section-heading"><div><p class="section-kicker">01 / 뜻</p><h2>확실한 사실보다 ‘내 생각에 그래 보여요’</h2></div><span class="legend-pill legend-pill--blue">대화에서 자주 써요</span></div>
+                <div class="concept-grid">
+                    <div class="concept-step"><span class="step-no">1</span><h3>상황을 봐요</h3><p class="ko-switch safe">하늘이 흐리거나, 시간·경험 같은 근거가 보여요.</p><p class="vi-switch safe">Có căn cứ như bầu trời nhiều mây, thời gian hoặc kinh nghiệm.</p></div>
+                    <div class="concept-step"><span class="step-no">2</span><h3>머릿속으로 짐작해요</h3><p class="ko-switch safe">확실하지는 않지만 “아마 그럴 것 같아”라고 생각해요.</p><p class="vi-switch safe">Chưa chắc hoàn toàn nhưng nghĩ rằng “có lẽ là như vậy”.</p></div>
+                    <div class="concept-step"><span class="step-no">3</span><h3>짧고 부드럽게 말해요</h3><p class="ko-switch safe"><strong>비가 올걸요.</strong> = 아마 비가 올 거예요.</p><p class="vi-switch safe"><strong>비가 올걸요.</strong> = Chắc là trời sẽ mưa.</p></div>
+                </div>
+            </article>
+            <article class="section-card">
+                <div class="section-heading"><div><p class="section-kicker">02 / 형태</p><h2>받침을 보고 바로 만들어요</h2></div></div>
+                <div class="rule-layout">
+                    <div class="rule-box"><h3>만드는 법</h3><div class="formula-list"><div class="formula-row"><span>받침 없음</span><strong>-ㄹ걸(요)</strong></div><div class="formula-row"><span>받침 있음</span><strong>-을걸(요)</strong></div><div class="formula-row"><span>과거 추측</span><strong>-았/었을걸(요)</strong></div></div><p class="rule-note ko-switch">동사와 형용사에 모두 쓸 수 있어요. <strong>요</strong>를 붙이면 더 부드러운 말투가 됩니다.</p><p class="rule-note vi-switch">Dùng được với động từ và tính từ. Thêm <strong>요</strong> thì giọng nói mềm mại hơn.</p></div>
+                    <div class="rule-box"><h3>예시</h3><div class="formula-list"><div class="formula-row"><span>가다 →</span><strong>갈걸요</strong></div><div class="formula-row"><span>오다 →</span><strong>올걸요</strong></div><div class="formula-row"><span>많다 →</span><strong>많을걸요</strong></div><div class="formula-row"><span>비싸다 →</span><strong>비쌀걸요</strong></div><div class="formula-row"><span>가다 →</span><strong>갔을걸요</strong></div></div></div>
+                </div>
+            </article>
+            <article class="section-card">
+                <div class="section-heading"><div><p class="section-kicker">03 / 쓰는 상황</p><h2>어떤 장면에서 자연스러울까요?</h2></div><span class="legend-pill legend-pill--green">가벼운 추측</span></div>
+                <div class="scene-grid">
+                    <div class="scene-card scene-card--blue"><span class="scene-label">☁ 근거가 보여요</span><p class="scene-quote">하늘이 흐리네요. <strong>비가 올걸요.</strong></p><p class="ko-switch">눈에 보이는 상황을 보고 결과를 짐작해요.</p><p class="vi-switch">Nhìn tình huống trước mắt rồi đoán kết quả.</p></div>
+                    <div class="scene-card scene-card--green"><span class="scene-label">◷ 경험으로 짐작해요</span><p class="scene-quote">지훈 씨는 벌써 <strong>출근했을걸요.</strong></p><p class="ko-switch">시간이나 경험을 근거로 다른 사람의 상태를 생각해요.</p><p class="vi-switch">Dựa vào thời gian hoặc kinh nghiệm để đoán trạng thái của người khác.</p></div>
+                    <div class="scene-card scene-card--orange"><span class="scene-label">↗ 질문에 반응해요</span><p class="scene-quote">온라인으로 내도 <strong>될걸요.</strong></p><p class="ko-switch">상대의 질문에 짧고 자연스럽게 대답해요.</p><p class="vi-switch">Trả lời ngắn gọn và tự nhiên cho câu hỏi của người nghe.</p></div>
+                </div>
+            </article>
+            <article class="section-card">
+                <div class="section-heading"><div><p class="section-kicker">04 / 비슷한 표현</p><h2>같은 추측이어도 말맛이 달라요</h2><p class="ko-switch">‘틀리다’보다 이 상황에서 더 자연스러운 표현을 찾아보세요.</p><p class="vi-switch">Không chỉ có đúng hay sai; hãy xem mẫu nào tự nhiên hơn trong tình huống này.</p></div></div>
+                <div class="compare-grid">
+                    <div class="compare-card compare-card--target"><div class="compare-card__head"><p>비가 올걸요.</p><span class="compare-badge compare-badge--reply">반응형</span></div><p class="safe">친구와 말하듯 가볍게 추측하거나 질문에 반응해요.</p></div>
+                    <div class="compare-card"><div class="compare-card__head"><p>비가 올 거예요.</p><span class="compare-badge compare-badge--basic">중립 예상</span></div><p class="safe">안내나 설명처럼 비교적 중립적으로 예측해요.</p></div>
+                    <div class="compare-card"><div class="compare-card__head"><p>비가 올 것 같아요.</p><span class="compare-badge compare-badge--guess">주관 추측</span></div><p class="safe">내 느낌이나 판단을 조심스럽게 말해요.</p></div>
+                    <div class="compare-card"><div class="compare-card__head"><p>비가 올 텐데요.</p><span class="compare-badge compare-badge--follow">뒷말 여지</span></div><p class="safe">걱정·제안처럼 뒤에 이어질 말이 느껴져요.</p></div>
+                </div>
+                <p class="memory-line ko-switch safe"><strong>기억하기:</strong> 실제 회화에서는 <strong>-거예요 / -것 같아요 / -걸요</strong>가 겹치는 장면도 많아요. 이번 문법의 중심은 <strong>짧고 반응적인 추측</strong>입니다.</p><p class="memory-line vi-switch safe"><strong>Ghi nhớ:</strong> Trong hội thoại thật, <strong>-거예요 / -것 같아요 / -걸요</strong> có thể chồng lấp. Trọng tâm của bài này là dự đoán ngắn mang tính phản ứng.</p>
+            </article>
+            <details class="visual-notes"><summary>시각 자료로 다시 보기 · 6장 인포그래픽</summary><div class="visual-gallery">
+                <figure><img src="../assets/c15/grammar/images/geolyo/geolyo-2.webp" alt="추측의 -(으)ㄹ걸의 뜻과 형태를 정리한 인포그래픽" loading="lazy" decoding="async"><figcaption>뜻과 형태: “아마 ~일 거야”라는 가벼운 추측</figcaption></figure>
+                <figure><img src="../assets/c15/grammar/images/geolyo/geolyo-3.webp" alt="추측의 -(으)ㄹ걸을 쓰는 상황과 느낌을 정리한 인포그래픽" loading="lazy" decoding="async"><figcaption>쓰는 상황: 근거를 보고 자연스럽게 짐작하기</figcaption></figure>
+                <figure><img src="../assets/c15/grammar/images/geolyo/geolyo-4.webp" alt="추측의 -(으)ㄹ걸과 비슷한 문법의 차이를 비교한 인포그래픽" loading="lazy" decoding="async"><figcaption>비슷한 문법: -거예요·-것 같아요·-텐데요와 비교</figcaption></figure>
+                <figure><img src="../assets/c15/grammar/images/geolyo/geolyo-1.webp" alt="추측과 후회의 -(으)ㄹ걸을 구별하는 방법을 정리한 인포그래픽" loading="lazy" decoding="async"><figcaption>헷갈리지 않기: 추측의 -걸과 후회의 -걸 구별</figcaption></figure>
+                <figure><img src="../assets/c15/grammar/images/geolyo/geolyo-5.webp" alt="추측의 근거가 내부 근거와 외부 근거로 나뉘는 것을 정리한 인포그래픽" loading="lazy" decoding="async"><figcaption>근거의 출처: 내 생각·경험과 눈에 보이는 상황을 구별하기</figcaption></figure>
+                <figure><img src="../assets/c15/grammar/images/geolyo/geolyo-6.webp" alt="문법별 내부 근거와 외부 근거의 차이를 비교한 인포그래픽" loading="lazy" decoding="async"><figcaption>근거성 한눈 비교: 상황에 따라 가장 자연스러운 표현 고르기</figcaption></figure>
+            </div></details>
+            <details class="extra-notes"><summary>자주 하는 실수와 마지막 정리</summary><div><ul class="ko-switch"><li>그냥 미래를 말한다고 모두 <strong>-걸요</strong>를 쓰지는 않아요. 안내나 설명이면 <strong>-거예요</strong>가 더 자연스러울 수 있어요.</li><li><strong>-텐데요</strong>는 걱정·제안·아쉬움처럼 뒤에 이어질 말이 있을 때 더 잘 어울려요.</li><li>과거의 일을 아쉬워하는 <strong>“그때 갈걸.”</strong>과 지금 상황을 추측하는 <strong>“갔을걸요.”</strong>을 구별하세요.</li></ul><ul class="vi-switch"><li>Không phải cứ nói về tương lai là dùng <strong>-걸요</strong>; lời hướng dẫn có thể hợp với <strong>-거예요</strong> hơn.</li><li><strong>-텐데요</strong> hợp hơn khi còn cảm giác lo lắng, đề nghị hoặc tiếc nuối phía sau.</li><li>Phân biệt <strong>“그때 갈걸.”</strong> (tiếc nuối) với <strong>“갔을걸요.”</strong> (đoán về việc đã qua).</li></ul></div></details>
+        </section>
+        <section id="practicePanel" class="hidden" role="tabpanel" aria-labelledby="tabPractice">
+            <article class="practice-card"><div class="practice-meta"><span id="progress"></span><span>상황에 맞는 말맛 고르기</span></div><div class="progress-track" aria-hidden="true"><div id="progressBar" style="width:0%"></div></div><div class="pill-row"><span class="legend-pill legend-pill--green">초록: 가장 자연스러운 답</span><span class="legend-pill legend-pill--amber">노랑: 가능한 답</span><span class="legend-pill legend-pill--violet">보라/빨강: 다시 볼 답</span></div><div class="practice-guide ko-switch">여러 표현이 가능할 수 있어요. 가능한 표현을 모두 고른 뒤 확인하세요.</div><div class="practice-guide vi-switch">Có thể có nhiều cách nói đều dùng được. Hãy chọn tất cả rồi kiểm tra.</div><p id="qGrammar"></p><p id="qText" class="safe"></p><p id="qHintKo" class="safe"></p><p id="qHintVi" class="vi-text safe"></p><div id="choices"></div><button id="checkBtn" class="action-btn action-btn--check" type="button" disabled>선택 확인</button><div id="feedbackBox" class="hidden"></div><button id="nextBtn" class="action-btn action-btn--next hidden" type="button">다음 문제</button><p id="storageStatus" class="storage-note" aria-live="polite">이 페이지의 연습 상태는 이 기기에 자동 저장됩니다.</p><button id="resetProgressBtn" class="prev-link" type="button">이 페이지 진도 초기화</button></article><article id="resultPanel" class="hidden"></article>
+        </section>
+        <section class="resource-section"><div class="section-heading"><div><p class="section-kicker">더 연습하기</p><h2>필요한 활동만 골라 보세요</h2></div></div><div class="resource-grid">
+            <article class="resource-card"><div><h3>추측 표현 비교 실험실</h3><p class="safe">-걸요·-것 같아요·-거예요·-텐데요의 위치를 한눈에 비교해요.</p></div></article>
+            <article class="resource-card"><div><h3>말풍선 분류</h3><p class="safe">문장 줄기를 알맞은 표현 칸에 놓아 보세요.</p></div><a href="grammar2-bubble-sort-game.html">분류 연습</a></article>
+            <article class="resource-card"><div><h3>스피드퀴즈</h3><p class="safe">상황을 보고 가장 자연스러운 표현을 빠르게 골라요.</p></div><a href="grammar2-speedquiz.html">퀴즈 시작</a></article>
+            <article class="resource-card"><div><h3>말하기 연습 PRO</h3><p class="safe">질문에 반응하면서 직접 말해 보세요.</p></div><a href="grammar2-speaking-pro.html">말하기 시작</a></article>
+        </div><details class="quiet-resource"><summary>추가 참고 자료</summary><div class="quiet-resource__body"><p>내부 근거와 외부 근거를 더 자세히 비교하는 보조 페이지입니다.</p><a class="quiet-resource__link" href="grammar2-guessing-evidence.html">학습 페이지 열기</a></div></details></section>
+        <div class="page-nav"><a href="grammar1.html" class="prev-link" aria-label="문법 1로 이동"><span aria-hidden="true">←</span><span>이전: 문법 1</span></a><a href="grammar3.html" class="next-link" aria-label="문법 3으로 이동"><span>다음: 문법 3</span><span aria-hidden="true">→</span></a></div>
+    </main>
+
+    <template id="legacyPage">
         <section class="bg-white border border-orange-100 rounded-2xl p-5 shadow-sm mt-4">
             <div class="flex items-start justify-between gap-3">
                 <div>
@@ -536,6 +553,10 @@
         <section class="bg-white border border-orange-100 rounded-2xl p-4 shadow-sm">
             <p class="text-xs font-bold text-orange-600">보조 게임</p>
             <div class="mt-3 grid gap-3 sm:grid-cols-3">
+                <article class="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
+                    <h2 class="text-base font-bold text-slate-800">추측 표현 비교 실험실</h2>
+                    <p class="text-sm text-slate-600 mt-2 safe">가능성 세로축에서 <strong>-걸요</strong>, <strong>-것 같아요</strong>, <strong>-거예요</strong>, <strong>-텐데요</strong>가 쓰이는 자리를 비교해 보세요.</p>
+                </article>
                 <article class="rounded-2xl border border-orange-100 bg-orange-50/60 p-4">
                     <h2 class="text-base font-bold text-slate-800">말풍선 분류 드래그</h2>
                     <p class="text-sm text-slate-600 mt-2 safe">문장 줄기를 보고 <strong>-걸요</strong>, <strong>-거예요</strong>, <strong>-것 같아요</strong>, <strong>-텐데요</strong> 칸으로 바로 분류해 보세요.</p>
@@ -564,11 +585,10 @@
             <a href="grammar1.html" class="prev-link" aria-label="문법 1로 이동"><span aria-hidden="true">←</span><span>이전: 문법 1</span></a>
             <a href="grammar3.html" class="next-link" aria-label="문법 3으로 이동"><span>다음: 문법 3</span><span aria-hidden="true">→</span></a>
         </div>
-    </main>
+    </template>
 
     <script>
         const page = document.getElementById('page');
-        const viToggle = document.getElementById('viToggle');
         const tabLearn = document.getElementById('tabLearn');
         const tabPractice = document.getElementById('tabPractice');
         const learnPanel = document.getElementById('learnPanel');
@@ -584,13 +604,8 @@
         const feedbackBox = document.getElementById('feedbackBox');
         const nextBtn = document.getElementById('nextBtn');
         const resultPanel = document.getElementById('resultPanel');
-
-        let viOn = false;
-        viToggle.addEventListener('click', function () {
-            viOn = !viOn;
-            page.classList.toggle('vi-on', viOn);
-            viToggle.textContent = viOn ? 'Tiếng Việt ON' : 'Tiếng Việt OFF';
-        });
+        const storageStatus = document.getElementById('storageStatus');
+        const resetProgressBtn = document.getElementById('resetProgressBtn');
 
         function showTab(name) {
             const learn = name === 'learn';
@@ -600,9 +615,12 @@
             tabPractice.classList.toggle('active', !learn);
             tabLearn.classList.toggle('text-slate-600', !learn);
             tabPractice.classList.toggle('text-slate-600', learn);
+            tabLearn.setAttribute('aria-selected', String(learn));
+            tabPractice.setAttribute('aria-selected', String(!learn));
             if (!learn && !state.started) {
                 state.started = true;
                 renderQuestion();
+                saveProgress();
             }
         }
 
@@ -740,8 +758,73 @@
             partialCount: 0,
             reviewCount: 0,
             selectedAnswers: [],
-            logs: []
+            logs: [],
+            currentResult: null
         };
+
+        const STORAGE_KEY = 'korean3bimprove:c15:grammar2:main:v2';
+
+        function setStorageStatus(message, tone) {
+            storageStatus.textContent = message;
+            storageStatus.style.color = tone === 'error' ? '#b4233f' : '';
+        }
+
+        function storageSnapshot() {
+            return {
+                version: 2,
+                idx: state.idx,
+                answered: state.answered,
+                started: state.started,
+                perfectCount: state.perfectCount,
+                partialCount: state.partialCount,
+                reviewCount: state.reviewCount,
+                selectedAnswers: state.selectedAnswers.slice(),
+                currentResult: state.currentResult,
+                logs: state.logs.slice()
+            };
+        }
+
+        function saveProgress() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(storageSnapshot()));
+                setStorageStatus('이 페이지의 연습 상태는 이 기기에 자동 저장됩니다.');
+            } catch (error) {
+                setStorageStatus('저장할 수 없어 현재 화면에서만 이어집니다. 브라우저 저장공간을 확인해 주세요.', 'error');
+            }
+        }
+
+        function restoreProgress() {
+            let raw;
+            try {
+                raw = localStorage.getItem(STORAGE_KEY);
+            } catch (error) {
+                setStorageStatus('브라우저 저장공간을 사용할 수 없어 현재 화면에서만 이어집니다.', 'error');
+                return;
+            }
+            if (!raw) return;
+            try {
+                const saved = JSON.parse(raw);
+                const valid = saved && saved.version === 2 && Number.isInteger(saved.idx)
+                    && saved.idx >= 0 && saved.idx <= quiz.length && Array.isArray(saved.selectedAnswers)
+                    && Array.isArray(saved.logs);
+                if (!valid) {
+                    setStorageStatus('저장된 기록을 읽지 못했어요. 기존 기록은 보존했습니다. 필요하면 아래 초기화 버튼을 사용하세요.', 'error');
+                    return;
+                }
+                state.idx = saved.idx;
+                state.answered = Boolean(saved.answered);
+                state.started = Boolean(saved.started);
+                state.perfectCount = Number(saved.perfectCount) || 0;
+                state.partialCount = Number(saved.partialCount) || 0;
+                state.reviewCount = Number(saved.reviewCount) || 0;
+                state.selectedAnswers = saved.selectedAnswers.slice();
+                state.currentResult = saved.currentResult || null;
+                state.logs = saved.logs.slice();
+                setStorageStatus('이 기기에 저장된 연습 상태를 이어서 사용할 수 있어요.');
+            } catch (error) {
+                setStorageStatus('저장된 기록을 읽지 못했어요. 기존 기록은 보존했습니다. 필요하면 아래 초기화 버튼을 사용하세요.', 'error');
+            }
+        }
 
         function esc(text) {
             return String(text == null ? '' : text)
@@ -947,6 +1030,7 @@
                 setChoiceState(button, 'default');
             }
             updateCheckButton();
+            saveProgress();
         }
 
         function submitQuestion() {
@@ -957,6 +1041,7 @@
             const question = quiz[state.idx];
             const result = classifySubmission(question, state.selectedAnswers);
             state.answered = true;
+            state.currentResult = result;
 
             if (result.status === 'perfect') {
                 state.perfectCount += 1;
@@ -979,17 +1064,12 @@
                 wrongGuideKo: question.wrongGuideKo
             });
 
-            feedbackBox.classList.remove('hidden');
-            feedbackBox.className = 'mt-3 rounded-xl border p-3 '
-                + (result.status === 'perfect'
-                    ? 'bg-emerald-50 border-emerald-200'
-                    : result.status === 'partial'
-                        ? 'bg-amber-50 border-amber-200'
-                        : 'bg-rose-50 border-rose-200');
+            feedbackBox.className = 'feedback-box feedback--' + result.status;
             feedbackBox.innerHTML = feedbackHtml(result, question);
             nextBtn.classList.remove('hidden');
             lockChoices(question, result);
             updateCheckButton();
+            saveProgress();
         }
 
         function renderQuestion() {
@@ -999,8 +1079,12 @@
             }
 
             const question = quiz[state.idx];
+            const restoredAnswers = state.selectedAnswers.slice();
+            const restoredAnswered = state.answered;
+            const restoredResult = state.currentResult;
             state.answered = false;
             state.selectedAnswers = [];
+            state.currentResult = null;
 
             progressEl.textContent = (state.idx + 1) + ' / ' + quiz.length;
             progressBar.style.width = (state.idx / quiz.length * 100) + '%';
@@ -1026,8 +1110,26 @@
                 choices.appendChild(button);
             });
 
+            restoredAnswers.forEach(function (answer) {
+                Array.from(choices.querySelectorAll('button')).forEach(function (button) {
+                    if (button.dataset.answer === answer) {
+                        state.selectedAnswers.push(answer);
+                        setChoiceState(button, 'pending');
+                    }
+                });
+            });
+
             resultPanel.classList.add('hidden');
-            updateCheckButton();
+            if (restoredAnswered && restoredResult) {
+                state.answered = true;
+                state.currentResult = restoredResult;
+                feedbackBox.className = 'feedback-box feedback--' + restoredResult.status;
+                feedbackBox.innerHTML = feedbackHtml(restoredResult, question);
+                nextBtn.classList.remove('hidden');
+                lockChoices(question, restoredResult);
+            } else {
+                updateCheckButton();
+            }
         }
 
         function buildRowExplain(log) {
@@ -1097,17 +1199,56 @@
                 state.reviewCount = 0;
                 state.selectedAnswers = [];
                 state.logs = [];
+                state.answered = false;
+                state.currentResult = null;
                 renderQuestion();
+                saveProgress();
             });
         }
+
+        restoreProgress();
+        if (state.started) {
+            showTab('practice');
+            renderQuestion();
+        }
+
+        resetProgressBtn.addEventListener('click', function () {
+            if (!window.confirm('이 페이지에 저장된 연습 기록만 초기화할까요?')) return;
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+            } catch (error) {
+                setStorageStatus('저장된 기록을 지우지 못했어요. 브라우저 저장공간을 확인해 주세요.', 'error');
+                return;
+            }
+            state.idx = 0;
+            state.answered = false;
+            state.started = false;
+            state.perfectCount = 0;
+            state.partialCount = 0;
+            state.reviewCount = 0;
+            state.selectedAnswers = [];
+            state.currentResult = null;
+            state.logs = [];
+            showTab('learn');
+            setStorageStatus('이 페이지의 연습 기록을 초기화했어요.');
+        });
 
         checkBtn.addEventListener('click', function () {
             submitQuestion();
         });
 
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'hidden') saveProgress();
+        });
+        window.addEventListener('pagehide', saveProgress);
+
         nextBtn.addEventListener('click', function () {
             state.idx += 1;
+            state.answered = false;
+            state.selectedAnswers = [];
+            state.currentResult = null;
             renderQuestion();
+            saveProgress();
         });
     </script>
     <script src="../shared/site-copyright.js"></script>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>-(으)ㄹ걸요 — 아마 아닐걸요?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/project-topbar-compact.css">
+<style>
+:root{
+  --paper:#FAF8F3;
+  --card:#FFFFFF;
+  --ink:#212B3F;
+  --muted:#77716A;
+  --indigo:#33518E;
+  --indigo-soft:#E9EEF7;
+  --rouge:#BE4A67;
+  --rouge-soft:#F9EBEF;
+  --gold:#B97F13;
+  --gold-soft:#F9EFDC;
+  --teal:#2E7D6E;
+  --teal-soft:#E5F1EE;
+  --line:#E6E1D6;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'IBM Plex Sans KR',sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.75;
+  font-size:16.5px;
+}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:'Gowun Batang',serif;line-height:1.35}
+section{padding:64px 0;border-top:1px solid var(--line)}
+section:first-of-type{border-top:none}
+.eyebrow{
+  display:inline-block;font-size:13px;font-weight:700;letter-spacing:.14em;
+  color:var(--indigo);background:var(--indigo-soft);
+  padding:5px 14px;border-radius:999px;margin-bottom:16px;
+}
+h2{font-size:clamp(24px,4vw,30px);margin-bottom:12px}
+.lead{color:var(--muted);margin-bottom:32px;max-width:640px}
+.mark{background:linear-gradient(transparent 62%, var(--gold-soft) 62%);padding:0 2px;font-weight:700}
+.k{color:var(--rouge);font-weight:700}
+
+/* ---------- hero ---------- */
+header{padding:72px 0 56px;text-align:center}
+header .tag{font-size:14px;letter-spacing:.2em;color:var(--muted);margin-bottom:14px}
+header h1{font-size:clamp(38px,8vw,64px);font-weight:700}
+header h1 .rise{color:var(--rouge);display:inline-block;transform:translateY(-4px)}
+header p.sub{margin-top:18px;color:var(--muted);font-size:17px}
+
+/* ---------- dialogue demo ---------- */
+.stage{
+  background:var(--card);border:1px solid var(--line);border-radius:20px;
+  padding:32px 24px;margin-top:40px;text-align:left;
+  box-shadow:0 1px 0 rgba(33,43,63,.03);
+}
+.bubble{max-width:78%;padding:14px 18px;border-radius:18px;position:relative;font-size:17px}
+.bubble .who{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+.b-q{background:var(--indigo-soft);color:var(--ink);border-bottom-left-radius:4px;margin-bottom:20px}
+.b-a{background:var(--rouge-soft);color:var(--ink);border-bottom-right-radius:4px;margin-left:auto;transition:background .3s}
+.b-a strong{color:var(--rouge)}
+.nuance{
+  margin:22px auto 0;max-width:560px;background:var(--paper);
+  border:1px dashed var(--line);border-radius:var(--radius);
+  padding:14px 18px;font-size:15px;color:var(--muted);text-align:center;
+}
+.nuance b{color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:22px}
+.chip{
+  font-family:inherit;font-size:14.5px;font-weight:500;cursor:pointer;
+  border:1.5px solid var(--line);background:var(--card);color:var(--ink);
+  padding:8px 16px;border-radius:999px;transition:all .18s;
+}
+.chip:hover{border-color:var(--indigo)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.hint{font-size:13px;color:var(--muted);text-align:center;margin-top:12px}
+
+/* ---------- 3-step principle ---------- */
+.steps{display:flex;flex-direction:column;gap:0;max-width:560px;margin:0 auto}
+.step{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 22px;display:flex;gap:16px;align-items:flex-start;
+}
+.step .no{
+  flex:none;width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:15px;
+}
+.step:nth-child(1) .no{background:var(--indigo-soft);color:var(--indigo)}
+.step:nth-child(3) .no{background:#F0EDE5;color:var(--muted)}
+.step:nth-child(5) .no{background:var(--rouge-soft);color:var(--rouge)}
+.step b{display:block;font-size:16.5px}
+.step span{font-size:15px;color:var(--muted)}
+.down{align-self:center;color:var(--muted);font-size:20px;padding:6px 0}
+.onelinr{
+  margin:32px auto 0;max-width:560px;text-align:center;
+  font-family:'Gowun Batang',serif;font-size:20px;
+  background:var(--gold-soft);border-radius:var(--radius);padding:18px 22px;
+}
+
+/* ---------- conjugation ---------- */
+.conj{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.conj .c{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 20px;
+}
+.conj .rule{font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--indigo);margin-bottom:6px}
+.conj .ex{font-size:17px}
+.conj .ex em{font-style:normal;color:var(--rouge);font-weight:700}
+
+/* ---------- decision map ---------- */
+.diag{display:flex;flex-direction:column;gap:12px;max-width:640px;margin:0 auto}
+.drow{
+  display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch;
+}
+.dq,.da{
+  border-radius:var(--radius);padding:14px 18px;font-size:15.5px;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.dq{background:var(--card);border:1px solid var(--line)}
+.dq b{font-size:16px}
+.dq span{font-size:13.5px;color:var(--muted)}
+.darr{align-self:center;color:var(--muted)}
+.da{background:#F3F1EA;border:1px solid var(--line)}
+.da b{font-size:16.5px}
+.da span{font-size:13.5px;color:var(--muted)}
+.drow.focus .da{background:var(--rouge-soft);border-color:var(--rouge)}
+.drow.focus .da b{color:var(--rouge)}
+.drow.tende .da{background:var(--teal-soft);border-color:#BBD8D1}
+.drow.tende .da b{color:var(--teal)}
+
+/* ---------- scene cards ---------- */
+.scene-q{
+  background:var(--indigo-soft);border-radius:var(--radius);
+  padding:16px 20px;font-size:17px;margin-bottom:20px;text-align:center;
+}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 20px;
+}
+.card.star{border:2px solid var(--rouge)}
+.card .badge{
+  display:inline-block;font-size:12px;font-weight:700;color:var(--rouge);
+  background:var(--rouge-soft);border-radius:999px;padding:3px 10px;margin-bottom:8px;
+}
+.card .ans{font-size:17.5px;font-weight:700;margin-bottom:6px}
+.card .mean{font-size:14.5px;margin-bottom:6px}
+.card .base{font-size:13px;color:var(--muted)}
+
+/* ---------- intonation ---------- */
+.tone{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.tone .t{
+  border-radius:var(--radius);padding:22px 22px 14px;text-align:center;
+}
+.tone .t.guess{background:var(--rouge-soft)}
+.tone .t.regret{background:#F0EDE5}
+.tone h3{font-size:19px;margin-bottom:4px}
+.tone .t.guess h3{color:var(--rouge)}
+.tone .cond{font-size:13.5px;color:var(--muted);margin-bottom:14px}
+.tone .say{font-family:'Gowun Batang',serif;font-size:22px;margin-bottom:6px}
+.tone svg{width:70%;max-width:220px;height:auto}
+
+/* ---------- map svg ---------- */
+.mapbox{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px 12px}
+.mapbox svg{width:100%;height:auto;display:block}
+.legend{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;font-size:13.5px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+/* ---------- tende ---------- */
+.vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:24px}
+.vs .v{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
+.vs h3{font-size:18px;margin-bottom:10px}
+.vs .v.a h3{color:var(--rouge)} .vs .v.b h3{color:var(--teal)}
+.vs ul{list-style:none}
+.vs li{font-size:15px;padding:6px 0;border-top:1px dashed var(--line)}
+.vs li:first-child{border-top:none}
+.vs li b{font-weight:700}
+
+/* ---------- quiz ---------- */
+.q{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px 22px;margin-bottom:16px;
+}
+.q .qt{font-size:16.5px;margin-bottom:12px}
+.q .qt .ctx{color:var(--muted);font-size:14.5px;display:block;margin-bottom:4px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{
+  font-family:inherit;font-size:14.5px;cursor:pointer;
+  border:1.5px solid var(--line);background:var(--paper);color:var(--ink);
+  padding:7px 14px;border-radius:999px;transition:all .15s;
+}
+.opt:hover{border-color:var(--indigo)}
+.opt.right{background:var(--teal-soft);border-color:var(--teal);color:var(--teal);font-weight:700}
+.opt.wrong{background:var(--rouge-soft);border-color:var(--rouge);color:var(--rouge)}
+.fb{font-size:14.5px;margin-top:12px;padding:10px 14px;border-radius:10px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--teal-soft);color:#1E5A4E}
+.fb.no{background:var(--rouge-soft);color:#8E3550}
+
+footer{padding:48px 0 64px;text-align:center;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+
+@media (prefers-reduced-motion: no-preference){
+  .fade{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+  .fade.in{opacity:1;transform:none}
+}
+@media (max-width:560px){
+  .drow{grid-template-columns:1fr}
+  .darr{transform:rotate(90deg);justify-self:center}
+  .bubble{max-width:92%}
+}
+:focus-visible{outline:2.5px solid var(--indigo);outline-offset:2px;border-radius:6px}
+.global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;min-height:44px;padding:8px max(12px,env(safe-area-inset-left)) 8px max(12px,env(safe-area-inset-right));background:rgba(250,248,243,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.global-nav a{color:var(--indigo);text-decoration:none;font-size:13px;font-weight:700}
+.nav-divider{color:#b8c1ce;font-weight:700}
+.progress-tools{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:9px;color:var(--muted);font-size:11px}
+.progress-tools button{border:0;background:transparent;color:#9a928a;cursor:pointer;font:inherit;text-decoration:underline;text-underline-offset:3px}
+</style>
+</head>
+<body>
+
+<nav class="global-nav" aria-label="상단 이동">
+  <a href="../index.html">메인</a><span class="nav-divider">|</span><a href="index.html">15과 목록</a><span class="nav-divider">|</span><a href="grammar2.html">문법 2로 돌아가기</a>
+</nav>
+
+<header class="wrap">
+  <p class="tag">한국어 문법 · 추측 표현</p>
+  <h1>아마 아닐<span class="rise">걸요?</span></h1>
+  <p class="sub">'-(으)ㄹ걸요'는 그냥 추측이 아니에요. <b>상대의 기대를 살짝 뒤집는</b> 추측이에요.</p>
+
+  <div class="stage" aria-label="대화 체험">
+    <div class="bubble b-q"><span class="who">친구</span>지금 식당 가면 자리 있겠지?</div>
+    <div class="bubble b-a"><span class="who">나</span><strong id="ans-text">자리 없을걸요 ↗</strong></div>
+    <div class="nuance" id="nuance" aria-live="polite">
+      속뜻 — <b>"네 생각과 달리, 아마 없을 거야."</b><br>근거: 내 경험 · 친구 사이의 편한 말
+    </div>
+    <div class="chips" role="group" aria-label="문법 고르기">
+      <button class="chip on" data-i="0">-(으)ㄹ걸요</button>
+      <button class="chip" data-i="1">-(으)ㄹ 거예요</button>
+      <button class="chip" data-i="2">-겠어요</button>
+      <button class="chip" data-i="3">-나 봐요</button>
+      <button class="chip" data-i="4">-는 것 같아요</button>
+      <button class="chip" data-i="5">-(으)ㄹ 텐데요</button>
+    </div>
+    <p class="hint">버튼을 눌러 보세요. 대답과 속뜻이 바뀌어요.</p>
+  </div>
+</header>
+
+<section class="wrap fade">
+  <span class="eyebrow">1 · 핵심 원리</span>
+  <h2>머릿속에서 일어나는 세 단계</h2>
+  <p class="lead">'-(으)ㄹ걸요'를 말하기 전, 화자의 머릿속에서는 이런 일이 일어나요.</p>
+  <div class="steps">
+    <div class="step"><span class="no">1</span><div><b>상대의 기대를 듣는다</b><span>"지금 가면 표 있겠죠?"</span></div></div>
+    <div class="down">↓</div>
+    <div class="step"><span class="no">2</span><div><b>내 경험과 비교한다</b><span>'내가 알기로는… 아닐 텐데?'</span></div></div>
+    <div class="down">↓</div>
+    <div class="step"><span class="no">3</span><div><b>반대 방향의 짐작을 말한다</b><span>"벌써 매진됐<span class="k">을걸요</span> ↗"</span></div></div>
+  </div>
+  <div class="onelinr">"그건 네 생각이고, <b>내가 알기로는</b> 아마 아닐 거야."</div>
+  <p class="lead" style="margin-top:28px">그래서 이 문법을 쓰려면 마음속에 <span class="mark">'내가 이건 좀 알아'</span>가 있어야 해요. 아무 근거 없이 로또 번호를 맞힐 때는 쓸 수 없어요. 그리고 "내가 더 잘 알아"라는 느낌이 있어서, <span class="mark">친구나 가까운 사람에게</span> 쓰는 것이 안전해요. 선생님이나 윗사람에게는 '-는 것 같아요'가 좋아요.</p>
+</section>
+
+<section class="wrap fade">
+  <span class="eyebrow">2 · 모양 만들기</span>
+  <h2>어떻게 붙여요?</h2>
+  <p class="lead">규칙은 아주 간단해요. 받침이 있으면 '-을걸요', 없으면 '-ㄹ걸요'.</p>
+  <div class="conj">
+    <div class="c"><div class="rule">받침 O → -을걸요</div><div class="ex">먹다 → 먹<em>을걸요</em><br>작다 → 작<em>을걸요</em></div></div>
+    <div class="c"><div class="rule">받침 X · ㄹ받침 → -ㄹ걸요</div><div class="ex">가다 → 갈<em>걸요</em> · 크다 → 클<em>걸요</em><br>살다 → 살<em>걸요</em></div></div>
+    <div class="c"><div class="rule">명사 → -일걸요</div><div class="ex">학생 → 학생<em>일걸요</em><br>휴일 → 휴일<em>일걸요</em></div></div>
+    <div class="c"><div class="rule">과거 → -았/었을걸요</div><div class="ex">가다 → 갔<em>을걸요</em><br>닫다 → 닫았<em>을걸요</em></div></div>
+  </div>
+</section>
+
+<section class="wrap fade">
+  <span class="eyebrow">3 · 문법 고르기</span>
+  <h2>근거가 뭐예요?</h2>
+  <p class="lead">추측 문법이 많아서 헷갈리죠? 외우지 말고, 스스로에게 <b>"내 추측의 근거가 뭐지?"</b> 하나만 물어보세요.</p>
+  <div class="diag">
+    <div class="drow"><div class="dq"><b>지금 눈앞에서 봤어요</b><span>검은 구름을 보면서</span></div><div class="darr">→</div><div class="da"><b>-겠어요</b><span>곧 비가 오겠어요</span></div></div>
+    <div class="drow"><div class="dq"><b>증거·흔적이 남아 있어요</b><span>젖은 땅을 보고</span></div><div class="darr">→</div><div class="da"><b>-나 봐요</b><span>밤에 비가 왔나 봐요</span></div></div>
+    <div class="drow focus"><div class="dq"><b>증거는 없지만, 내가 알아요</b><span>상대 생각과 반대로 짐작</span></div><div class="darr">→</div><div class="da"><b>-(으)ㄹ걸요</b><span>벌써 문 닫았을걸요</span></div></div>
+    <div class="drow tende"><div class="dq"><b>당연한 일이에요 + 걱정·조언</b><span>말한 뒤에 제안이 이어져요</span></div><div class="darr">→</div><div class="da"><b>-(으)ㄹ 텐데요</b><span>길 막힐 텐데요… 일찍 가요</span></div></div>
+    <div class="drow"><div class="dq"><b>조심스럽게 말하고 싶어요</b><span>가장 부드러운 만능형</span></div><div class="darr">→</div><div class="da"><b>-는 것 같아요</b><span>자리 없는 것 같아요</span></div></div>
+    <div class="drow"><div class="dq"><b>특별한 근거가 없어요</b><span>그냥 담백한 예상</span></div><div class="darr">→</div><div class="da"><b>-(으)ㄹ 거예요</b><span>내일 비가 올 거예요</span></div></div>
+  </div>
+</section>
+
+<section class="wrap fade">
+  <span class="eyebrow">4 · 한 장면, 여섯 대답</span>
+  <h2>모두 맞는 문장이에요. 태도가 달라요.</h2>
+  <div class="scene-q">친구: "지금 식당 가면 자리 있겠지?"</div>
+  <div class="cards">
+    <div class="card star"><span class="badge">오늘의 문법</span><div class="ans">자리 없을걸요 ↗</div><div class="mean">네 생각과 달리, 아마 없을 거야</div><div class="base">근거: 내 경험 · 친구 사이</div></div>
+    <div class="card"><div class="ans">자리 있을 거예요</div><div class="mean">그냥 제 예상이에요</div><div class="base">근거 없어도 OK · 중립적</div></div>
+    <div class="card"><div class="ans">자리 없겠어요</div><div class="mean">(창밖 줄을 보며) 지금 보니 없겠는데요</div><div class="base">근거: 눈앞의 단서</div></div>
+    <div class="card"><div class="ans">자리 없나 봐요</div><div class="mean">(줄 선 사진을 보고) 없는 모양이에요</div><div class="base">근거: 남아 있는 증거</div></div>
+    <div class="card"><div class="ans">자리 없을 것 같아요</div><div class="mean">조심스럽지만 제 느낌엔 없을 듯해요</div><div class="base">가장 부드럽고 안전한 표현</div></div>
+    <div class="card"><div class="ans">자리 없을 텐데요…</div><div class="mean">당연히 없을 거예요. (예약하고 가는 게 어때요?)</div><div class="base">걱정 + 조언이 뒤에 이어짐</div></div>
+  </div>
+</section>
+
+<section class="wrap fade">
+  <span class="eyebrow">5 · 조심하세요</span>
+  <h2>모양이 같은 문법: 후회의 '-(으)ㄹ걸'</h2>
+  <p class="lead">억양 하나로 완전히 다른 문법이 돼요. 끝을 <b>올리면 추측</b>, 끝을 <b>내리고 혼잣말</b>이면 후회예요.</p>
+  <div class="tone">
+    <div class="t guess">
+      <h3>추측 · 끝을 올려요</h3>
+      <p class="cond">상대에게 하는 말 · '요' 붙일 수 있음</p>
+      <p class="say">"자리 없을걸요"</p>
+      <svg viewBox="0 0 220 60" role="img" aria-label="올라가는 억양 곡선"><path d="M20 45 C80 45 140 40 195 18" fill="none" stroke="#BE4A67" stroke-width="3" stroke-linecap="round"/><path d="M186 14 L198 17 L191 27" fill="none" stroke="#BE4A67" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="t regret">
+      <h3>후회 · 끝을 내려요</h3>
+      <p class="cond">혼잣말 · '요' 없음 · 내가 안 한 일</p>
+      <p class="say">"미리 예약할걸…"</p>
+      <svg viewBox="0 0 220 60" role="img" aria-label="내려가는 억양 곡선"><path d="M20 18 C80 18 140 28 195 45" fill="none" stroke="#77716A" stroke-width="3" stroke-linecap="round"/><path d="M186 35 L198 44 L188 50" fill="none" stroke="#77716A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <p class="lead" style="margin-top:24px">쉬운 확인 방법: '-았/었-'이 붙은 <b>"갔을걸(요)"</b>는 언제나 <b>추측</b>이에요. 후회는 "갈걸…"처럼 어간에 바로 붙어요.</p>
+</section>
+
+<section class="wrap fade">
+  <span class="eyebrow">6 · 전체 지도</span>
+  <h2>추측 문법의 자리</h2>
+  <p class="lead">가로: 근거가 밖에 있어요(증거), 안에 있어요(내 지식). 세로: 얼마나 자신 있게 말해요.</p>
+  <div class="mapbox">
+    <svg viewBox="0 0 680 470" role="img" aria-label="추측 문법 지도: 근거의 성격과 확신 정도에 따라 일곱 개 문법을 배치한 그림">
+      <line x1="70" y1="410" x2="70" y2="40" stroke="#C9C3B6" stroke-width="1.5"/>
+      <path d="M65 48 L70 38 L75 48" fill="none" stroke="#C9C3B6" stroke-width="1.5"/>
+      <line x1="70" y1="410" x2="640" y2="410" stroke="#C9C3B6" stroke-width="1.5"/>
+      <path d="M632 405 L642 410 L632 415" fill="none" stroke="#C9C3B6" stroke-width="1.5"/>
+      <text x="82" y="34" font-size="12.5" fill="#77716A">확신 · 자신감 높음 ↑</text>
+      <text x="82" y="438" font-size="12.5" fill="#77716A">◀ 밖에 있는 증거</text>
+      <text x="638" y="438" font-size="12.5" fill="#77716A" text-anchor="end">내 지식 · 경험 ▶</text>
+
+      <rect x="450" y="52" width="160" height="34" rx="17" fill="#E5F1EE" stroke="#2E7D6E"/>
+      <text x="530" y="74" font-size="14" font-weight="700" fill="#2E7D6E" text-anchor="middle">-(으)ㄹ 텐데요</text>
+      <text x="530" y="106" font-size="12" fill="#77716A" text-anchor="middle">당연한 추론 · 걱정과 조언</text>
+
+      <rect x="430" y="128" width="150" height="34" rx="17" fill="#F9EBEF" stroke="#BE4A67" stroke-width="1.5"/>
+      <text x="505" y="150" font-size="14" font-weight="700" fill="#BE4A67" text-anchor="middle">-(으)ㄹ걸요</text>
+      <text x="505" y="182" font-size="12" fill="#77716A" text-anchor="middle">내 지식 · 상대 기대 뒤집기</text>
+
+      <rect x="105" y="105" width="110" height="34" rx="17" fill="#FFFFFF" stroke="#C9C3B6"/>
+      <text x="160" y="127" font-size="14" font-weight="700" fill="#212B3F" text-anchor="middle">-겠어요</text>
+      <text x="160" y="159" font-size="12" fill="#77716A" text-anchor="middle">눈앞의 단서</text>
+
+      <rect x="120" y="205" width="110" height="34" rx="17" fill="#FFFFFF" stroke="#C9C3B6"/>
+      <text x="175" y="227" font-size="14" font-weight="700" fill="#212B3F" text-anchor="middle">-나 봐요</text>
+      <text x="175" y="259" font-size="12" fill="#77716A" text-anchor="middle">남은 증거로 추론</text>
+
+      <rect x="440" y="225" width="150" height="34" rx="17" fill="#FFFFFF" stroke="#C9C3B6"/>
+      <text x="515" y="247" font-size="14" font-weight="700" fill="#212B3F" text-anchor="middle">-(으)ㄹ 거예요</text>
+      <text x="515" y="279" font-size="12" fill="#77716A" text-anchor="middle">담백한 예상</text>
+
+      <rect x="280" y="290" width="140" height="34" rx="17" fill="#FFFFFF" stroke="#C9C3B6"/>
+      <text x="350" y="312" font-size="14" font-weight="700" fill="#212B3F" text-anchor="middle">-는 것 같아요</text>
+      <text x="350" y="344" font-size="12" fill="#77716A" text-anchor="middle">부드러운 만능형</text>
+
+      <rect x="250" y="355" width="170" height="34" rx="17" fill="#FFFFFF" stroke="#C9C3B6"/>
+      <text x="335" y="377" font-size="14" font-weight="700" fill="#212B3F" text-anchor="middle">-(으)ㄹ지도 몰라요</text>
+    </svg>
+    <div class="legend">
+      <span><i style="background:#F9EBEF;border:1px solid #BE4A67"></i>오늘의 문법</span>
+      <span><i style="background:#E5F1EE;border:1px solid #2E7D6E"></i>확신이 더 높은 짝꿍</span>
+      <span><i style="background:#fff;border:1px solid #C9C3B6"></i>다른 추측 문법</span>
+    </div>
+  </div>
+
+  <div class="vs">
+    <div class="v a">
+      <h3>-(으)ㄹ걸요</h3>
+      <ul>
+        <li><b>확신:</b> 높음 — "내가 좀 알아"</li>
+        <li><b>방향:</b> 상대의 기대를 <b>뒤집고 닫아요</b></li>
+        <li><b>느낌:</b> 친구 사이 OK · 윗사람에게는 조심</li>
+        <li><b>예:</b> "길 막힐걸요." (끝)</li>
+      </ul>
+    </div>
+    <div class="v b">
+      <h3>-(으)ㄹ 텐데요</h3>
+      <ul>
+        <li><b>확신:</b> 더 높음 — "당연히 그럴 거예요"</li>
+        <li><b>방향:</b> 말끝을 <b>열어 두고</b> 걱정·조언으로 이어요</li>
+        <li><b>느낌:</b> 배려하는 마음 · 윗사람에게도 안전</li>
+        <li><b>예:</b> "길 막힐 텐데요… 일찍 가지 그래요?"</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="wrap fade">
+  <span class="eyebrow">7 · 연습</span>
+  <h2>어떤 문법이 자연스러워요?</h2>
+  <p class="lead">상황을 읽고 골라 보세요. 근거가 무엇인지 생각하면 쉬워요.</p>
+  <div id="quiz"></div>
+</section>
+
+<footer>
+  <p>한국어 추측 표현 학습 자료 · '-(으)ㄹ걸요'</p>
+  <div class="progress-tools"><span id="save-state" aria-live="polite">연습 선택은 이 기기에 자동 저장됩니다.</span><button id="reset-progress" type="button">이 보조 페이지 기록 초기화</button></div>
+</footer>
+
+<script>
+const STORAGE_KEY='korean3bimprove:c15:grammar2:guessing-evidence:v1';
+let pageState={version:1,chipIndex:0,answers:{}};
+function setSaveState(message){const el=document.getElementById('save-state');if(el)el.textContent=message;}
+function readPageState(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return;
+    const saved=JSON.parse(raw);
+    if(!saved||saved.version!==1||!Number.isInteger(saved.chipIndex)||saved.chipIndex<0||saved.chipIndex>5||!saved.answers||typeof saved.answers!=='object')throw new Error('invalid');
+    pageState={version:1,chipIndex:saved.chipIndex,answers:{...saved.answers}};
+    setSaveState('이 기기에 저장된 선택을 불러왔어요.');
+  }catch(error){setSaveState('저장 기록을 읽지 못했어요. 현재 선택은 화면에 유지됩니다.');}
+}
+function savePageState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(pageState));setSaveState('선택 내용을 이 기기에 저장했어요.');}
+  catch(error){setSaveState('저장할 수 없어 현재 선택만 유지합니다.');}
+}
+readPageState();
+const demo=[
+ {t:"자리 없을걸요 ↗",n:'속뜻 — <b>"네 생각과 달리, 아마 없을 거야."</b><br>근거: 내 경험 · 친구 사이의 편한 말'},
+ {t:"자리 있을 거예요",n:'속뜻 — <b>"그냥 제 예상이에요."</b><br>근거가 없어도 괜찮은 중립적인 추측'},
+ {t:"자리 없겠어요",n:'속뜻 — <b>"(창밖 줄을 보며) 지금 보니 없겠는데요."</b><br>근거: 눈앞에서 본 단서'},
+ {t:"자리 없나 봐요",n:'속뜻 — <b>"(줄 선 사진을 보고) 없는 모양이에요."</b><br>근거: 남아 있는 증거'},
+ {t:"자리 없을 것 같아요",n:'속뜻 — <b>"조심스럽지만 제 느낌엔 없을 듯해요."</b><br>가장 부드럽고 안전한 표현'},
+ {t:"자리 없을 텐데요…",n:'속뜻 — <b>"당연히 없을 거예요. 예약하고 가는 게 어때요?"</b><br>걱정과 조언이 뒤에 이어져요'}
+];
+const chips=document.querySelectorAll('.chip');
+function selectDemo(index,persist=true){
+  const c=chips[index];if(!c)return;
+  chips.forEach(x=>x.classList.remove('on'));c.classList.add('on');
+  pageState.chipIndex=index;
+  const d=demo[index];
+  document.getElementById('ans-text').textContent=d.t;
+  document.getElementById('nuance').innerHTML=d.n;
+  if(persist)savePageState();
+}
+chips.forEach(c=>c.addEventListener('click',()=>selectDemo(+c.dataset.i)));
+selectDemo(pageState.chipIndex,false);
+
+const qs=[
+ {ctx:"하늘의 검은 구름을 보면서",q:"곧 비가 ___.",o:["오겠어요","올걸요","왔나 봐요"],a:0,
+  ok:"맞아요! 눈앞의 단서를 보고 하는 즉석 추측은 '-겠어요'예요.",
+  no:"눈앞에서 구름을 직접 봤어요. 이럴 때는 '-겠어요'가 자연스러워요."},
+ {ctx:"친구: \"민수도 파티에 오겠지?\" — 나는 민수의 성격을 잘 알아요.",q:"글쎄, 안 ___.",o:["오나 봐요","올걸요","오겠어요"],a:1,
+  ok:"맞아요! 증거는 없지만 내 지식으로 친구의 기대를 뒤집는 추측 — '-(으)ㄹ걸요'예요.",
+  no:"증거는 없지만 '내가 민수를 알아요'. 친구의 기대와 반대로 짐작할 때는 '-(으)ㄹ걸요'예요."},
+ {ctx:"아침에 나와 보니 길이 젖어 있어요.",q:"밤에 비가 ___.",o:["오겠어요","올걸요","왔나 봐요"],a:2,
+  ok:"맞아요! 젖은 길이라는 증거를 보고 추론했으니 '-나 봐요'예요.",
+  no:"젖은 길이라는 '증거'가 남아 있어요. 증거를 보고 추론할 때는 '-나 봐요'예요."},
+ {ctx:"할머니께 길을 조심스럽게 알려 드려요.",q:"이 길이 더 빠른 ___.",o:["걸요","것 같아요","텐데요"],a:1,
+  ok:"맞아요! 윗사람에게 조심스럽게 말할 때는 '-는 것 같아요'가 가장 안전해요.",
+  no:"윗사람에게 '-(으)ㄹ걸요'는 자칫 무례하게 들려요. 부드러운 '-는 것 같아요'가 좋아요."},
+ {ctx:"친구가 퇴근 시간에 차로 출발한대요. 걱정이 돼서 조언하고 싶어요.",q:"길 많이 막힐 ___. 지하철 타는 게 어때요?",o:["걸요","텐데요","나 봐요"],a:1,
+  ok:"맞아요! 당연한 예상 + 걱정·조언이 이어질 때는 '-(으)ㄹ 텐데요'예요.",
+  no:"뒤에 조언이 이어지고 있어요. 말끝을 열어 두는 '-(으)ㄹ 텐데요'가 자연스러워요."}
+];
+const qbox=document.getElementById('quiz');
+qs.forEach((it,qi)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<div class="qt"><span class="ctx">'+ (qi+1) +'. '+it.ctx+'</span>'+it.q+'</div>'
+   +'<div class="opts">'+it.o.map((o,i)=>'<button class="opt" data-q="'+qi+'" data-i="'+i+'">'+o+'</button>').join('')+'</div>'
+   +'<div class="fb" id="fb'+qi+'"></div>';
+  qbox.appendChild(d);
+});
+function applyAnswer(qi,i,persist=true){
+  const it=qs[qi];if(!it||!Number.isInteger(i)||!it.o[i])return;
+  const fb=document.getElementById('fb'+qi);
+  const opts=qbox.querySelectorAll('.opt[data-q="'+qi+'"]');
+  opts.forEach(o=>o.classList.remove('right','wrong'));
+  if(i===it.a){opts[i].classList.add('right');fb.className='fb show ok';fb.textContent='⭕ '+it.ok;}
+  else{opts[i].classList.add('wrong');opts[it.a].classList.add('right');fb.className='fb show no';fb.textContent='❌ '+it.no;}
+  pageState.answers[qi]=i;
+  if(persist)savePageState();
+}
+qbox.addEventListener('click',e=>{
+  const b=e.target.closest('.opt');if(!b)return;
+  applyAnswer(+b.dataset.q,+b.dataset.i);
+});
+Object.entries(pageState.answers).forEach(([qi,i])=>applyAnswer(Number(qi),Number(i),false));
+document.getElementById('reset-progress').addEventListener('click',()=>{
+  if(!window.confirm('이 보조 페이지에 저장된 선택만 초기화할까요?'))return;
+  try{localStorage.removeItem(STORAGE_KEY);}catch(error){setSaveState('저장 기록을 지우지 못했어요.');return;}
+  pageState={version:1,chipIndex:0,answers:{}};
+  selectDemo(0,false);
+  qbox.querySelectorAll('.opt').forEach(o=>o.classList.remove('right','wrong'));
+  qbox.querySelectorAll('.fb').forEach(fb=>{fb.className='fb';fb.textContent='';});
+  setSaveState('이 보조 페이지 기록을 초기화했어요.');
+});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')savePageState();});
+window.addEventListener('pagehide',savePageState);
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+document.querySelectorAll('.fade').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
