@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>15과 문법 3 보조 활동 | 부정을 뒤집어 봐! 그림 스위치</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #516074;
+      --line: #d9e1ea;
+      --paper: #ffffff;
+      --ground: #f4f7fb;
+      --teal: #087f72;
+      --teal-dark: #056459;
+      --teal-pale: #e8f7f3;
+      --amber: #a85108;
+      --amber-pale: #fff5e8;
+      --red: #b5342d;
+      --red-pale: #fff0ef;
+      --blue: #2463a5;
+      --blue-pale: #edf5ff;
+      --radius: 20px;
+      font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { background: var(--ground); }
+
+    body {
+      margin: 0;
+      min-width: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #f8fbff 0, var(--ground) 280px);
+      line-height: 1.5;
+    }
+
+    button, a { font: inherit; }
+
+    button { cursor: pointer; }
+
+    button:focus-visible, a:focus-visible, summary:focus-visible {
+      outline: 3px solid #f3b34c;
+      outline-offset: 3px;
+    }
+
+    .global-nav {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 43px;
+      padding: 0 18px;
+      border-bottom: 1px solid rgba(134, 153, 174, 0.28);
+      background: rgba(255, 255, 255, 0.88);
+      font-size: 0.84rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .global-nav a { color: #35445b; text-decoration: none; }
+    .global-nav a:hover { color: var(--teal-dark); text-decoration: underline; }
+    .nav-divider { color: #9aa7b7; }
+
+    .shell {
+      width: min(100% - 28px, 1080px);
+      margin: 0 auto;
+      padding: 18px 0 36px;
+    }
+
+    .page-head { margin: 0 0 12px; }
+    .eyebrow {
+      margin: 0 0 3px;
+      color: var(--teal-dark);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+    h1 { margin: 0; font-size: clamp(1.38rem, 5vw, 1.95rem); line-height: 1.18; }
+    .instruction { margin: 6px 0 0; color: var(--muted); font-size: 0.94rem; }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: 0 10px 28px rgba(38, 59, 87, 0.07);
+    }
+
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(280px, 0.96fr);
+      overflow: hidden;
+    }
+
+    .visual-wrap {
+      position: relative;
+      min-height: 314px;
+      background: #e6eee9;
+    }
+
+    .visual-wrap img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 314px;
+      object-fit: cover;
+      transition: opacity 160ms ease;
+    }
+
+    .visual-wrap img.is-changing { opacity: 0.38; }
+
+    .visual-label {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      margin: 0;
+      padding: 6px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 999px;
+      color: #183242;
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 0.8rem;
+      font-weight: 850;
+      box-shadow: 0 4px 12px rgba(24, 50, 66, 0.14);
+    }
+
+    .visual-label[data-tone="negative"] { color: #7b3a10; background: #fff1da; }
+    .visual-label[data-tone="prohibited"] { color: #8c211b; background: #fff0ef; }
+    .visual-label[data-tone="required"] { color: #066255; background: #e6faf3; }
+
+    .workbench {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      padding: clamp(17px, 4vw, 30px);
+    }
+
+    .count-line {
+      margin: 0;
+      color: var(--teal-dark);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .sentence {
+      margin: 0;
+      overflow-wrap: anywhere;
+      font-size: clamp(1.24rem, 3.2vw, 1.76rem);
+      font-weight: 850;
+      letter-spacing: -0.025em;
+      line-height: 1.42;
+    }
+
+    .meaning {
+      margin: -5px 0 0;
+      min-height: 1.5em;
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .primary-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 9px;
+    }
+
+    .action-btn, .quiet-btn, .scene-btn, .copy-btn {
+      border: 1px solid transparent;
+      border-radius: 14px;
+      font-weight: 800;
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    .action-btn {
+      min-height: 48px;
+      padding: 10px 14px;
+      color: #fff;
+      background: var(--teal);
+      box-shadow: 0 7px 14px rgba(8, 127, 114, 0.21);
+    }
+
+    .action-btn:hover:not(:disabled) { background: var(--teal-dark); transform: translateY(-1px); }
+    .action-btn--condition { color: #7d3d08; background: #fff5e8; border-color: #f1c78d; box-shadow: none; }
+    .action-btn--condition:hover:not(:disabled) { color: #683000; background: #ffebcb; }
+    button:disabled { cursor: not-allowed; opacity: 0.52; transform: none; }
+
+    .secondary-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .quiet-btn, .copy-btn {
+      min-height: 38px;
+      padding: 7px 11px;
+      color: #405069;
+      background: #fff;
+      border-color: var(--line);
+      font-size: 0.86rem;
+    }
+    .quiet-btn:hover:not(:disabled), .copy-btn:hover { background: #f4f7fa; border-color: #b6c4d5; }
+    .quiet-btn--danger { color: #94322c; }
+
+    .storage-note {
+      margin: 0;
+      min-height: 1.4em;
+      color: #718096;
+      font-size: 0.78rem;
+    }
+    .storage-note.is-warning { color: #9b4a0b; }
+    .storage-note.is-error { color: #a12e29; }
+    .recovery-row[hidden] { display: none; }
+    .recovery-row { margin-top: -7px; }
+
+    .scene-panel { margin-top: 14px; padding: 16px; }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    h2 { margin: 0; font-size: 1rem; }
+    .section-head p { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .scene-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .scene-btn {
+      min-height: 54px;
+      padding: 8px 7px;
+      color: #42526a;
+      background: #f8fafc;
+      border-color: #e1e7ee;
+      font-size: 0.82rem;
+      line-height: 1.28;
+    }
+    .scene-btn:hover { border-color: #8ecfc6; background: #f0fbf8; }
+    .scene-btn[aria-pressed="true"] { color: #075e53; background: var(--teal-pale); border-color: #4bb6a7; box-shadow: inset 0 0 0 1px #4bb6a7; }
+
+    .guide { margin-top: 12px; padding: 0 2px; color: var(--muted); font-size: 0.84rem; }
+    .guide summary { cursor: pointer; color: #334860; font-weight: 750; }
+    .guide p { margin: 8px 0 0; }
+
+    .footer-links { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 18px 2px 0; font-size: 0.88rem; }
+    .footer-links a { color: #31516e; text-decoration: none; }
+    .footer-links a:hover { color: var(--teal-dark); text-decoration: underline; }
+
+    @media (max-width: 700px) {
+      .shell { width: min(100% - 20px, 650px); padding-top: 12px; }
+      .global-nav { min-height: 38px; padding: 0 10px; }
+      .page-head { margin-bottom: 10px; }
+      .instruction { font-size: 0.88rem; }
+      .stage { grid-template-columns: 1fr; }
+      .visual-wrap, .visual-wrap img { min-height: 206px; height: min(49vw, 250px); }
+      .workbench { gap: 11px; padding: 16px; }
+      .sentence { font-size: 1.34rem; }
+      .primary-actions { grid-template-columns: 1fr 1fr; }
+      .action-btn { min-height: 52px; padding-inline: 8px; font-size: 0.91rem; }
+      .scene-panel { padding: 13px; }
+      .scene-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 355px) {
+      .primary-actions { grid-template-columns: 1fr; }
+      .section-head { align-items: flex-start; flex-direction: column; gap: 2px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="global-nav" aria-label="상단 이동">
+    <a href="../index.html">메인</a><span class="nav-divider" aria-hidden="true">|</span>
+    <a href="index.html">15과 목록</a><span class="nav-divider" aria-hidden="true">|</span>
+    <a href="grammar3.html">문법 3</a>
+  </nav>
+
+  <main class="shell">
+    <header class="page-head">
+      <p class="eyebrow">15과 문법 3 보조 활동</p>
+      <h1>부정을 뒤집어 봐! 그림 스위치</h1>
+      <p class="instruction">문장에 <strong>-지 않다</strong>를 붙여 그림과 뜻이 어떻게 바뀌는지 보세요.</p>
+    </header>
+
+    <section class="stage panel" aria-label="문장 그림 실험실">
+      <div class="visual-wrap">
+        <img id="sceneImage" data-testid="negation-switch-image" src="../assets/c15/grammar/images/negation-switch/wash-hands-base.webp" alt="손을 씻는 그림" width="568" height="568" decoding="async" fetchpriority="high">
+        <p id="visualLabel" class="visual-label" data-testid="negation-switch-visual-label">기본 뜻</p>
+      </div>
+      <div class="workbench">
+        <p id="countLine" class="count-line">부정 0번</p>
+        <p id="sentence" class="sentence" data-testid="negation-switch-sentence">손을 씻어요.</p>
+        <p id="meaning" class="meaning" aria-live="polite">기본 행동이 그림에 나타나요.</p>
+        <div class="primary-actions" aria-label="문장 붙이기">
+          <button id="addNegationBtn" class="action-btn" data-testid="add-negation" type="button">-지 않다 붙이기</button>
+          <button id="addConditionBtn" class="action-btn action-btn--condition" data-testid="add-condition" type="button">-으면 안 되다 붙이기</button>
+        </div>
+        <div class="secondary-actions" aria-label="문장 되돌리기">
+          <button id="undoBtn" class="quiet-btn" data-testid="undo-step" type="button" disabled>한 단계 되돌리기</button>
+          <button id="resetSceneBtn" class="quiet-btn" type="button">처음 문장으로</button>
+        </div>
+        <p id="storageNote" class="storage-note" role="status">이 장면의 실험 상태를 이 기기에 저장합니다.</p>
+        <div id="recoveryRow" class="recovery-row" hidden>
+          <button id="copySentenceBtn" class="copy-btn" type="button">현재 문장 복사하기</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="scene-panel panel" aria-labelledby="sceneHeading">
+      <div class="section-head">
+        <h2 id="sceneHeading">다른 기본 문장 고르기</h2>
+        <p>각 장면의 상태는 그대로 남아요.</p>
+      </div>
+      <div id="sceneGrid" class="scene-grid" role="group" aria-label="기본 문장 선택"></div>
+      <details class="guide">
+        <summary>그림 읽는 법</summary>
+        <p>부정을 홀수 번 붙이면 ‘안 해요’ 뜻, 짝수 번 붙이면 기본 뜻으로 돌아와요. 마지막에 <strong>-으면 안 되다</strong>를 붙이면 금지 또는 꼭 해야 함으로 바뀝니다.</p>
+      </details>
+      <p class="secondary-actions" style="margin:14px 0 0">
+        <button id="clearAllBtn" class="quiet-btn quiet-btn--danger" type="button">저장한 실험 모두 지우기</button>
+      </p>
+    </section>
+
+    <p class="footer-links"><a href="grammar3.html">← 문법 3으로</a><a href="index.html">15과 목록</a></p>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const STORAGE_KEY = "korean3b-c15-grammar3-negation-switch-v1";
+      const VERSION = 1;
+      const MAX_NEGATIONS = 2048;
+      const ASSET_ROOT = "../assets/c15/grammar/images/negation-switch/";
+
+      const scenes = [
+        {
+          id: "pay-bill", label: "미납 요금", baseSentence: "밀린 요금을 빨리 내요.", negativeStem: "밀린 요금을 빨리 내", positiveConditional: "밀린 요금을 빨리 내면 안 돼요.",
+          images: {
+            base: ["pay-bill-base.webp", "밀린 요금을 빨리 내는 그림"],
+            negative: ["pay-bill-negative.webp", "밀린 요금을 내지 않고 미루는 그림"],
+            prohibited: ["pay-bill-prohibited.webp", "밀린 요금을 내면 안 되는 금지 그림"],
+            required: ["pay-bill-required.webp", "밀린 요금을 꼭 내야 하는 그림"]
+          }
+        },
+        {
+          id: "wear-suit", label: "면접 양복", baseSentence: "이 양복을 입어요.", negativeStem: "이 양복을 입", positiveConditional: "이 양복을 입으면 안 돼요.",
+          images: {
+            base: ["wear-suit-base.webp", "면접 양복을 입은 그림"],
+            negative: ["wear-suit-negative.webp", "면접 양복을 입지 않은 그림"],
+            prohibited: ["wear-suit-prohibited.webp", "면접 양복을 입으면 안 되는 금지 그림"],
+            required: ["wear-suit-required.webp", "면접 양복을 꼭 입어야 하는 그림"]
+          }
+        },
+        {
+          id: "wear-mask", label: "마스크", baseSentence: "마스크를 써요.", negativeStem: "마스크를 쓰", positiveConditional: "마스크를 쓰면 안 돼요.",
+          images: {
+            base: ["wear-mask-base.webp", "마스크를 쓰고 밖에 나가는 그림"],
+            negative: ["wear-mask-negative.webp", "마스크를 쓰지 않고 밖에 나가는 그림"],
+            prohibited: ["wear-mask-prohibited.webp", "마스크를 쓰면 안 되는 금지 그림"],
+            required: ["wear-mask-required.webp", "마스크를 꼭 써야 하는 그림"]
+          }
+        },
+        {
+          id: "wash-hands", label: "손 씻기", baseSentence: "손을 씻어요.", negativeStem: "손을 씻", positiveConditional: "손을 씻으면 안 돼요.",
+          images: {
+            base: ["wash-hands-base.webp", "손을 씻는 그림"],
+            negative: ["wash-hands-negative.webp", "손을 씻지 않고 지나가는 그림"],
+            prohibited: ["wash-hands-prohibited.webp", "손을 씻으면 안 되는 금지 그림"],
+            required: ["wash-hands-required.webp", "손을 꼭 씻어야 하는 그림"]
+          }
+        },
+        {
+          id: "save-electricity", label: "전기 절약", baseSentence: "전기를 아껴 써요.", negativeStem: "전기를 아껴 쓰", positiveConditional: "전기를 아껴 쓰면 안 돼요.",
+          images: {
+            base: ["save-electricity-base.webp", "전기를 아껴 쓰는 그림"],
+            negative: ["save-electricity-negative.webp", "전기를 아껴 쓰지 않는 그림"],
+            prohibited: ["save-electricity-prohibited.webp", "전기를 아껴 쓰면 안 되는 금지 그림"],
+            required: ["save-electricity-required.webp", "전기를 꼭 아껴 써야 하는 그림"]
+          }
+        },
+        {
+          id: "unplug", label: "플러그", baseSentence: "사용하지 않는 전기 플러그를 뽑아요.", negativeStem: "사용하지 않는 전기 플러그를 뽑", positiveConditional: "사용하지 않는 전기 플러그를 뽑으면 안 돼요.",
+          images: {
+            base: ["unplug-base.webp", "사용하지 않는 전기 플러그를 뽑는 그림"],
+            negative: ["unplug-negative.webp", "사용하지 않는 전기 플러그를 뽑지 않는 그림"],
+            prohibited: ["unplug-prohibited.webp", "전기 플러그를 뽑으면 안 되는 금지 그림"],
+            required: ["unplug-required.webp", "전기 플러그를 꼭 뽑아야 하는 그림"]
+          }
+        },
+        {
+          id: "turn-off-light", label: "불 끄기", baseSentence: "사람이 없는 방의 불을 꺼요.", negativeStem: "사람이 없는 방의 불을 끄", positiveConditional: "사람이 없는 방의 불을 끄면 안 돼요.",
+          images: {
+            base: ["turn-off-light-base.webp", "사람이 없는 방의 불을 끄는 그림"],
+            negative: ["turn-off-light-negative.webp", "사람이 없는 방의 불을 끄지 않는 그림"],
+            prohibited: ["turn-off-light-prohibited.webp", "사람이 없는 방의 불을 끄면 안 되는 금지 그림"],
+            required: ["turn-off-light-required.webp", "사람이 없는 방의 불을 꼭 꺼야 하는 그림"]
+          }
+        },
+        {
+          id: "save-water", label: "물 절약", baseSentence: "물을 아껴 써요.", negativeStem: "물을 아껴 쓰", positiveConditional: "물을 아껴 쓰면 안 돼요.",
+          images: {
+            base: ["save-water-base.webp", "물을 아껴 쓰는 그림"],
+            negative: ["save-water-negative.webp", "물을 아껴 쓰지 않는 그림"],
+            prohibited: ["save-water-prohibited.webp", "물을 아껴 쓰면 안 되는 금지 그림"],
+            required: ["save-water-required.webp", "물을 꼭 아껴 써야 하는 그림"]
+          }
+        }
+      ];
+
+      const sceneMap = new Map(scenes.map(scene => [scene.id, scene]));
+      const refs = {
+        image: document.getElementById("sceneImage"),
+        visualLabel: document.getElementById("visualLabel"),
+        countLine: document.getElementById("countLine"),
+        sentence: document.getElementById("sentence"),
+        meaning: document.getElementById("meaning"),
+        addNegation: document.getElementById("addNegationBtn"),
+        addCondition: document.getElementById("addConditionBtn"),
+        undo: document.getElementById("undoBtn"),
+        resetScene: document.getElementById("resetSceneBtn"),
+        clearAll: document.getElementById("clearAllBtn"),
+        sceneGrid: document.getElementById("sceneGrid"),
+        storageNote: document.getElementById("storageNote"),
+        recoveryRow: document.getElementById("recoveryRow"),
+        copySentence: document.getElementById("copySentenceBtn")
+      };
+
+      let persistence = { mode: "ready", message: "이 장면의 실험 상태를 이 기기에 저장합니다." };
+      let state = createDefaultState();
+
+      function createDefaultExperiment() {
+        return { negationCount: 0, conditionApplied: false };
+      }
+
+      function createDefaultState() {
+        const experiments = {};
+        scenes.forEach(scene => { experiments[scene.id] = createDefaultExperiment(); });
+        return { version: VERSION, activeSceneId: "wash-hands", experiments: experiments };
+      }
+
+      function normalizeExperiment(value) {
+        if (!value || !Number.isSafeInteger(value.negationCount) || value.negationCount < 0 || value.negationCount > MAX_NEGATIONS || typeof value.conditionApplied !== "boolean") {
+          return null;
+        }
+        return { negationCount: value.negationCount, conditionApplied: value.conditionApplied };
+      }
+
+      function normalizeSavedState(value) {
+        if (!value || value.version !== VERSION || !sceneMap.has(value.activeSceneId) || !value.experiments || typeof value.experiments !== "object") {
+          return null;
+        }
+        const experiments = {};
+        for (const scene of scenes) {
+          const experiment = normalizeExperiment(value.experiments[scene.id]);
+          if (!experiment) return null;
+          experiments[scene.id] = experiment;
+        }
+        return { version: VERSION, activeSceneId: value.activeSceneId, experiments: experiments };
+      }
+
+      function loadState() {
+        try {
+          const raw = window.localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const saved = normalizeSavedState(JSON.parse(raw));
+          if (!saved) {
+            persistence = {
+              mode: "locked",
+              message: "이전 저장 기록을 이 버전에서 열 수 없어요. 기록을 지우면 새로 저장할 수 있어요."
+            };
+            return;
+          }
+          state = saved;
+          persistence = { mode: "ready", message: "저장한 실험 상태를 불러왔어요." };
+        } catch (error) {
+          persistence = {
+            mode: "locked",
+            message: "저장 기록을 읽을 수 없어요. 기록을 지우면 새로 시작할 수 있어요."
+          };
+        }
+      }
+
+      function saveState() {
+        if (persistence.mode === "locked") return;
+        try {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          persistence = { mode: "ready", message: "이 장면의 실험 상태를 이 기기에 저장했습니다." };
+        } catch (error) {
+          persistence = {
+            mode: "error",
+            message: "지금은 저장할 수 없어요. 현재 문장을 복사해 둘 수 있습니다."
+          };
+        }
+      }
+
+      function activeScene() { return sceneMap.get(state.activeSceneId); }
+      function activeExperiment() { return state.experiments[state.activeSceneId]; }
+
+      function buildOpenSentence(scene, count) {
+        if (count === 0) return scene.baseSentence;
+        return scene.negativeStem + "지 않".repeat(count) + "아요.";
+      }
+
+      function buildFinishedSentence(scene, count) {
+        if (count === 0) return scene.positiveConditional;
+        return scene.negativeStem + "지 않".repeat(count - 1) + "지 않으면 안 돼요.";
+      }
+
+      function getDisplayState(experiment) {
+        const isOdd = experiment.negationCount % 2 === 1;
+        if (experiment.conditionApplied) {
+          return isOdd
+            ? { key: "required", label: "꼭 해야 함", meaning: "부정 뒤에 조건을 붙여서 ‘꼭 해야 함’ 뜻이 되었어요." }
+            : { key: "prohibited", label: "금지", meaning: "조건을 붙여서 ‘하면 안 됨’ 뜻이 되었어요." };
+        }
+        if (experiment.negationCount === 0) {
+          return { key: "base", label: "기본 뜻", meaning: "기본 행동이 그림에 나타나요." };
+        }
+        return isOdd
+          ? { key: "negative", label: "부정 뜻", meaning: "부정을 홀수 번 붙여서 ‘안 해요’ 뜻이에요." }
+          : { key: "base", label: "기본 뜻", meaning: "부정을 짝수 번 붙여서 기본 뜻으로 돌아왔어요." };
+      }
+
+      function renderImage(scene, display) {
+        const image = scene.images[display.key];
+        const nextSrc = ASSET_ROOT + image[0];
+        if (refs.image.getAttribute("src") !== nextSrc) {
+          refs.image.classList.add("is-changing");
+          refs.image.addEventListener("load", function onLoad() {
+            refs.image.classList.remove("is-changing");
+            refs.image.removeEventListener("load", onLoad);
+          });
+          refs.image.src = nextSrc;
+        }
+        refs.image.alt = image[1];
+        refs.visualLabel.textContent = display.label;
+        refs.visualLabel.dataset.tone = display.key;
+      }
+
+      function renderSceneButtons() {
+        refs.sceneGrid.textContent = "";
+        scenes.forEach(scene => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "scene-btn";
+          button.textContent = scene.label;
+          button.dataset.sceneId = scene.id;
+          button.setAttribute("aria-pressed", String(scene.id === state.activeSceneId));
+          button.setAttribute("aria-label", scene.baseSentence + " 장면");
+          button.addEventListener("click", function () {
+            state.activeSceneId = scene.id;
+            saveState();
+            render();
+          });
+          refs.sceneGrid.appendChild(button);
+        });
+      }
+
+      function renderStorageNote() {
+        refs.storageNote.textContent = persistence.message;
+        refs.storageNote.className = "storage-note" + (persistence.mode === "error" ? " is-error" : persistence.mode === "locked" ? " is-warning" : "");
+        refs.recoveryRow.hidden = persistence.mode === "ready";
+      }
+
+      function render() {
+        const scene = activeScene();
+        const experiment = activeExperiment();
+        const display = getDisplayState(experiment);
+        const sentence = experiment.conditionApplied
+          ? buildFinishedSentence(scene, experiment.negationCount)
+          : buildOpenSentence(scene, experiment.negationCount);
+
+        refs.countLine.textContent = "부정 " + experiment.negationCount + "번";
+        refs.sentence.textContent = sentence;
+        refs.meaning.textContent = display.meaning;
+        renderImage(scene, display);
+        refs.addNegation.disabled = experiment.conditionApplied || experiment.negationCount >= MAX_NEGATIONS;
+        refs.addCondition.disabled = experiment.conditionApplied;
+        refs.undo.disabled = !experiment.conditionApplied && experiment.negationCount === 0;
+        refs.resetScene.disabled = !experiment.conditionApplied && experiment.negationCount === 0;
+        refs.addNegation.title = experiment.conditionApplied ? "조건형을 되돌린 뒤에 다시 붙일 수 있어요." : "";
+        renderSceneButtons();
+        renderStorageNote();
+      }
+
+      function addNegation() {
+        const experiment = activeExperiment();
+        if (experiment.conditionApplied || experiment.negationCount >= MAX_NEGATIONS) return;
+        experiment.negationCount += 1;
+        saveState();
+        render();
+      }
+
+      function addCondition() {
+        const experiment = activeExperiment();
+        if (experiment.conditionApplied) return;
+        experiment.conditionApplied = true;
+        saveState();
+        render();
+      }
+
+      function undoStep() {
+        const experiment = activeExperiment();
+        if (experiment.conditionApplied) {
+          experiment.conditionApplied = false;
+        } else if (experiment.negationCount > 0) {
+          experiment.negationCount -= 1;
+        }
+        saveState();
+        render();
+      }
+
+      function resetCurrentScene() {
+        const experiment = activeExperiment();
+        if (!experiment.conditionApplied && experiment.negationCount === 0) return;
+        state.experiments[state.activeSceneId] = createDefaultExperiment();
+        saveState();
+        render();
+      }
+
+      function clearAll() {
+        if (!window.confirm("이 활동에 저장한 모든 장면의 실험을 지울까요?")) return;
+        state = createDefaultState();
+        try {
+          window.localStorage.removeItem(STORAGE_KEY);
+          persistence = { mode: "ready", message: "저장한 실험을 모두 지웠어요." };
+          saveState();
+        } catch (error) {
+          persistence = { mode: "error", message: "기록을 지우거나 저장할 수 없어요. 현재 문장을 복사해 둘 수 있습니다." };
+        }
+        render();
+      }
+
+      function copyCurrentSentence() {
+        const copy = refs.sentence.textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(copy).then(function () {
+            persistence = { mode: persistence.mode, message: "현재 문장을 복사했어요." };
+            renderStorageNote();
+          }).catch(function () { window.prompt("현재 문장을 복사하세요.", copy); });
+        } else {
+          window.prompt("현재 문장을 복사하세요.", copy);
+        }
+      }
+
+      refs.addNegation.addEventListener("click", addNegation);
+      refs.addCondition.addEventListener("click", addCondition);
+      refs.undo.addEventListener("click", undoStep);
+      refs.resetScene.addEventListener("click", resetCurrentScene);
+      refs.clearAll.addEventListener("click", clearAll);
+      refs.copySentence.addEventListener("click", copyCurrentSentence);
+      document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") saveState(); });
+      window.addEventListener("pagehide", saveState);
+
+      loadState();
+      render();
+    }());
+  </script>
+</body>
+</html>
