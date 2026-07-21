@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>15과 문법 2 보조 활동 | 것 같아요? 걸요? 비교 퀴즈</title>
+  <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #56657a;
+      --line: #d8e1ec;
+      --paper: #ffffff;
+      --blue: #2563eb;
+      --blue-soft: #eff6ff;
+      --orange: #c2410c;
+      --orange-soft: #fff4e9;
+      --green: #047857;
+      --green-soft: #ecfdf5;
+      --rose: #be123c;
+      --rose-soft: #fff1f2;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100dvh;
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+      background: #f7f9fc;
+    }
+    button, a { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, a:focus-visible {
+      outline: 3px solid #f59e0b;
+      outline-offset: 3px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      min-height: 42px;
+      gap: 8px;
+      padding: 7px max(12px, env(safe-area-inset-left));
+      background: rgba(255, 255, 255, .96);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar a { color: var(--blue); font-size: 12px; font-weight: 800; text-decoration: none; }
+    .topbar span { color: #94a3b8; }
+    .topbar .topbar-title {
+      min-width: 0;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .page { width: min(100% - 24px, 680px); margin: 0 auto; padding: 18px 0 36px; }
+    .eyebrow { margin: 0 0 5px; color: var(--orange); font-size: 12px; font-weight: 900; letter-spacing: .04em; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 6px; font-size: clamp(1.65rem, 7vw, 2.2rem); line-height: 1.2; letter-spacing: -.045em; }
+    .lead { margin-bottom: 14px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+
+    .comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+    .expression-card {
+      padding: 13px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--tone);
+      border-radius: 15px;
+    }
+    .expression-card h2 { margin-bottom: 6px; color: var(--tone); font-size: 1.05rem; letter-spacing: -.03em; }
+    .expression-card p { margin-bottom: 8px; color: #334155; font-size: 13px; line-height: 1.5; }
+    .expression-card p:last-child { margin-bottom: 0; }
+    .example { padding: 8px 9px; background: var(--soft); border-radius: 10px; font-size: 12px !important; }
+    .example strong { color: var(--tone); }
+    .contrast-emphasis {
+      color: #b91c1c;
+      font-size: 1.18em;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .memory-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .quiz {
+      margin-top: 16px;
+      padding: 16px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, .05);
+    }
+    .quiz-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .quiz-head h2 { margin-bottom: 0; font-size: 1.08rem; letter-spacing: -.025em; }
+    .progress { color: var(--blue); font-size: 12px; font-weight: 900; white-space: nowrap; }
+    .scene {
+      margin: 12px 0 9px;
+      padding: 11px 12px;
+      color: #334155;
+      background: var(--blue-soft);
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.58;
+    }
+    .sentence { margin: 0 0 10px; font-size: 1.04rem; font-weight: 900; line-height: 1.45; }
+    .choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .choice {
+      min-height: 54px;
+      padding: 10px 8px;
+      color: #243248;
+      background: #fff;
+      border: 1px solid #b9c7d8;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .choice:hover:not(:disabled) { border-color: var(--blue); background: #f8fbff; }
+    .choice:disabled { cursor: default; opacity: 1; }
+    .choice.is-correct { color: var(--green); background: var(--green-soft); border-color: #6ee7b7; }
+    .choice.is-wrong { color: var(--rose); background: var(--rose-soft); border-color: #fda4af; }
+    .feedback {
+      margin: 12px 0 0;
+      padding: 10px 11px;
+      color: #334155;
+      background: #f8fafc;
+      border-radius: 11px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+    .feedback.good { color: var(--green); background: var(--green-soft); }
+    .feedback.try { color: #9f1239; background: var(--rose-soft); }
+    .next-button, .retry-button {
+      width: 100%;
+      min-height: 52px;
+      margin-top: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      background: var(--blue);
+      border: 0;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .next-button:hover, .retry-button:hover { background: #1d4ed8; }
+    [hidden] { display: none !important; }
+
+    .result { text-align: center; }
+    .result h2 { margin-bottom: 7px; font-size: 1.35rem; }
+    .result p { margin-bottom: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .return-link {
+      display: block;
+      min-height: 48px;
+      margin-top: 9px;
+      padding: 13px;
+      color: #1e40af;
+      background: var(--blue-soft);
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .storage-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 14px 2px 0;
+      color: #64748b;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    .storage-row.is-unsaved { color: #a16207; }
+    .plain-button {
+      padding: 3px 0;
+      color: inherit;
+      background: transparent;
+      border: 0;
+      font-size: 11px;
+      font-weight: 800;
+      text-decoration: underline;
+    }
+    .storage-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    @media (max-width: 390px) {
+      .page { width: min(100% - 16px, 680px); padding-top: 13px; }
+      .comparison { gap: 7px; }
+      .expression-card { padding: 11px; }
+      .expression-card h2 { font-size: .98rem; }
+      .expression-card p { font-size: 12px; }
+      .quiz { margin-top: 13px; padding: 14px; }
+      .scene { margin-top: 10px; font-size: 13px; }
+    }
+    @media (max-width: 330px) {
+      .comparison { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="topbar" aria-label="상단 이동">
+    <a href="../index.html">메인</a><span aria-hidden="true">|</span>
+    <a href="index.html">15과 목록</a><span aria-hidden="true">|</span>
+    <a href="grammar2.html">문법 2</a>
+    <span class="topbar-title">것 같아요? 걸요? 비교 퀴즈</span>
+  </nav>
+
+  <main class="page">
+    <header>
+      <p class="eyebrow">15과 문법 2 · 보조 활동</p>
+      <h1>것 같아요? 걸요?</h1>
+      <p class="lead">대화를 읽고 더 자연스러운 말을 고르세요.</p>
+    </header>
+
+    <section class="comparison" aria-label="두 표현 비교">
+      <article class="expression-card" style="--tone: #2563eb; --soft: #eff6ff;">
+        <h2>-것 같아요</h2>
+        <p>상대에게 내 생각을 조심스럽게 말해요.</p>
+        <p class="example">A: 내일 비가 올까요?<br />B: 구름이 많아서 <strong>비가 올 것 같아요.</strong></p>
+        <p class="example">A: 지수 씨가 아직 안 왔네요.<br />B: 길이 막혀서 <strong>조금 늦을 것 같아요.</strong></p>
+      </article>
+      <article class="expression-card" style="--tone: #c2410c; --soft: #fff4e9;">
+        <h2>-걸요</h2>
+        <p>상대의 예상에 바로 반응해, <span class="contrast-emphasis">다른 생각</span>을 부드럽게 말해요.</p>
+        <p class="example">A: 이번 주말에는 날씨가 좋겠죠?<br />B: <strong>비가 올걸요.</strong></p>
+        <p class="example">A: 이 식당은 지금 사람이 많이 없겠죠?<br />B: <strong>사람이 많을걸요.</strong></p>
+      </article>
+    </section>
+    <p class="memory-note">두 표현 모두 추측이에요. 먼저 위 대화를 읽고, 아래에서 더 자연스러운 말을 골라요.</p>
+
+    <section id="quizSection" class="quiz" aria-labelledby="quizTitle">
+      <div class="quiz-head">
+        <h2 id="quizTitle">바로 골라 보기</h2>
+        <span id="progress" class="progress" aria-live="polite">1 / 15</span>
+      </div>
+      <p id="scene" class="scene"></p>
+      <p id="sentence" class="sentence"></p>
+      <div id="choices" class="choices" aria-label="표현 선택"></div>
+      <p id="feedback" class="feedback" role="status" aria-live="polite" hidden></p>
+      <button id="nextButton" class="next-button" type="button" hidden>다음 문제</button>
+    </section>
+
+    <section id="resultSection" class="quiz result" aria-labelledby="resultTitle" hidden>
+      <h2 id="resultTitle">퀴즈 완료</h2>
+      <p id="resultText"></p>
+      <button id="retryButton" class="retry-button" type="button">다시 풀기</button>
+      <a class="return-link" href="grammar2.html">문법 2로 돌아가기</a>
+    </section>
+
+    <div id="storageRow" class="storage-row">
+      <span id="storageStatus" role="status">이 기기에 자동 저장됩니다.</span>
+      <span class="storage-actions">
+        <button id="copyButton" class="plain-button" type="button" hidden>진행 내용 복사</button>
+        <button id="resetButton" class="plain-button" type="button">이 페이지 진도 초기화</button>
+      </span>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const STORAGE_KEY = "korean3bimprove:c15:grammar2:compare-quiz:v1";
+      const FORMS = {
+        geot: "-것 같아요",
+        geol: "-걸요"
+      };
+      const questions = [
+        {
+          scene: "A: 민지 씨가 아직 안 왔네요. 언제 도착할까요?",
+          sentence: "B: 길이 막혀서 조금 늦을 ___.",
+          answer: "geot",
+          choices: ["geot", "geol"],
+          fullSentence: "길이 막혀서 조금 늦을 것 같아요.",
+          explanation: "A의 질문에 B가 상황을 보고 조심스럽게 생각을 말해요."
+        },
+        {
+          scene: "A: 그 영화 재미있을까요?",
+          sentence: "B: 친구가 좋다고 해서 재미있을 ___.",
+          answer: "geot",
+          choices: ["geol", "geot"],
+          fullSentence: "친구가 좋다고 해서 재미있을 것 같아요.",
+          explanation: "A에게 내 판단을 조심스럽게 말해요."
+        },
+        {
+          scene: "A: 이번 시험 결과는 어떨까요?",
+          sentence: "B: 시험이 어려워서 점수가 잘 안 나올 ___.",
+          answer: "geot",
+          choices: ["geol", "geot"],
+          fullSentence: "시험이 어려워서 점수가 잘 안 나올 것 같아요.",
+          explanation: "A의 질문에 확실하지 않은 판단을 부드럽게 답해요."
+        },
+        {
+          scene: "A: 이 식당은 지금 사람이 많이 없겠죠?",
+          sentence: "B: 점심시간이라 사람이 많을 ___.",
+          answer: "geol",
+          choices: ["geol", "geot"],
+          fullSentence: "점심시간이라 사람이 많을걸요.",
+          explanation: "A의 예상과 다른 생각으로 바로 반응해요."
+        },
+        {
+          scene: "A: 민수 씨가 약속을 잊었겠죠?",
+          sentence: "B: 약속을 잘 지키니까 기억하고 있을 ___.",
+          answer: "geol",
+          choices: ["geot", "geol"],
+          fullSentence: "약속을 잘 지키니까 기억하고 있을걸요.",
+          explanation: "A의 예상에 다른 생각으로 바로 답해요."
+        },
+        {
+          scene: "A: 이번 주말에는 날씨가 좋겠죠?",
+          sentence: "B: 비 예보가 있어서 비가 올 ___.",
+          answer: "geol",
+          choices: ["geol", "geot"],
+          fullSentence: "비 예보가 있어서 비가 올걸요.",
+          explanation: "A의 예상에 바로 반응하며 다른 가능성을 말해요."
+        },
+        {
+          scene: "A: 유진 씨가 발표를 잘했겠죠?",
+          sentence: "B: 연습을 많이 해서 잘했을 ___.",
+          answer: "geot",
+          choices: ["geot", "geol"],
+          fullSentence: "연습을 많이 해서 잘했을 것 같아요.",
+          explanation: "A에게 B의 판단을 조심스럽게 답해요."
+        },
+        {
+          scene: "A: 버스는 곧 오겠죠?",
+          sentence: "B: 이 시간에는 차가 막혀서 조금 늦을 ___.",
+          answer: "geol",
+          choices: ["geot", "geol"],
+          fullSentence: "이 시간에는 차가 막혀서 조금 늦을걸요.",
+          explanation: "A의 예상과 다른 생각으로 바로 반응해요."
+        },
+        {
+          scene: "A: 이 가방은 비싸겠죠?",
+          sentence: "B: 세일 중이라 그렇게 비싸지 않을 ___.",
+          answer: "geot",
+          choices: ["geol", "geot"],
+          fullSentence: "세일 중이라 그렇게 비싸지 않을 것 같아요.",
+          explanation: "B의 판단을 조심스럽게 말해요."
+        },
+        {
+          scene: "A: 영화관에 자리가 많겠죠?",
+          sentence: "B: 주말이라 자리가 없을 ___.",
+          answer: "geol",
+          choices: ["geol", "geot"],
+          fullSentence: "주말이라 자리가 없을걸요.",
+          explanation: "A의 예상에 다른 생각으로 바로 답해요."
+        },
+        {
+          scene: "A: 내일 수업은 일찍 끝날까요?",
+          sentence: "B: 시험 준비 시간이 있어서 조금 늦게 끝날 ___.",
+          answer: "geot",
+          choices: ["geot", "geol"],
+          fullSentence: "시험 준비 시간이 있어서 조금 늦게 끝날 것 같아요.",
+          explanation: "A에게 확실하지 않은 판단을 부드럽게 답해요."
+        },
+        {
+          scene: "A: 수진 씨는 오늘 안 오겠죠?",
+          sentence: "B: 아침에 온다고 했으니까 올 ___.",
+          answer: "geol",
+          choices: ["geot", "geol"],
+          fullSentence: "아침에 온다고 했으니까 올걸요.",
+          explanation: "A의 예상과 다른 생각을 바로 말해요."
+        },
+        {
+          scene: "A: 이 음식은 맵겠죠?",
+          sentence: "B: 고추가 별로 없어서 안 매울 ___.",
+          answer: "geot",
+          choices: ["geol", "geot"],
+          fullSentence: "고추가 별로 없어서 안 매울 것 같아요.",
+          explanation: "B의 판단을 조심스럽게 말해요."
+        },
+        {
+          scene: "A: 가게가 아직 열었겠죠?",
+          sentence: "B: 지금 시간이 늦어서 문을 닫았을 ___.",
+          answer: "geol",
+          choices: ["geol", "geot"],
+          fullSentence: "지금 시간이 늦어서 문을 닫았을걸요.",
+          explanation: "A의 예상에 다른 가능성으로 바로 반응해요."
+        },
+        {
+          scene: "A: 회의가 길어질까요?",
+          sentence: "B: 안건이 많아서 길어질 ___.",
+          answer: "geot",
+          choices: ["geot", "geol"],
+          fullSentence: "안건이 많아서 길어질 것 같아요.",
+          explanation: "A에게 B의 판단을 조심스럽게 답해요."
+        }
+      ];
+      const defaultState = () => ({
+        schemaVersion: 2,
+        currentIndex: 0,
+        answers: Array(questions.length).fill(null),
+        completed: false
+      });
+      const els = {
+        quizSection: document.getElementById("quizSection"),
+        resultSection: document.getElementById("resultSection"),
+        progress: document.getElementById("progress"),
+        scene: document.getElementById("scene"),
+        sentence: document.getElementById("sentence"),
+        choices: document.getElementById("choices"),
+        feedback: document.getElementById("feedback"),
+        nextButton: document.getElementById("nextButton"),
+        resultText: document.getElementById("resultText"),
+        retryButton: document.getElementById("retryButton"),
+        storageRow: document.getElementById("storageRow"),
+        storageStatus: document.getElementById("storageStatus"),
+        copyButton: document.getElementById("copyButton"),
+        resetButton: document.getElementById("resetButton")
+      };
+      let state = defaultState();
+      let storageBlocked = false;
+      let storageFailed = false;
+      const LEGACY_QUESTION_COUNT = 6;
+
+      function hasValidAnswers(answers, count) {
+        return Array.isArray(answers)
+          && answers.length === count
+          && answers.every((answer) => answer === null || answer === "geot" || answer === "geol");
+      }
+
+      function hasValidStateFields(candidate, count) {
+        return candidate
+          && Number.isInteger(candidate.currentIndex)
+          && candidate.currentIndex >= 0
+          && candidate.currentIndex < count
+          && hasValidAnswers(candidate.answers, count)
+          && typeof candidate.completed === "boolean";
+      }
+
+      function isValidState(candidate) {
+        return candidate
+          && candidate.schemaVersion === 2
+          && hasValidStateFields(candidate, questions.length);
+      }
+
+      function isLegacyState(candidate) {
+        return candidate
+          && candidate.schemaVersion === 1
+          && hasValidStateFields(candidate, LEGACY_QUESTION_COUNT);
+      }
+
+      function migrateLegacyState(saved) {
+        return {
+          ...defaultState(),
+          currentIndex: saved.completed ? LEGACY_QUESTION_COUNT : saved.currentIndex,
+          answers: [...saved.answers, ...Array(questions.length - LEGACY_QUESTION_COUNT).fill(null)],
+          completed: false
+        };
+      }
+
+      function setStorageStatus(message, unsaved = false) {
+        els.storageStatus.textContent = message;
+        els.storageRow.classList.toggle("is-unsaved", unsaved);
+        els.copyButton.hidden = !unsaved;
+      }
+
+      function readState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const saved = JSON.parse(raw);
+          if (isLegacyState(saved)) {
+            state = migrateLegacyState(saved);
+            saveState();
+            if (!storageFailed) setStorageStatus("기존 6문항 진행을 이어서 저장했어요.");
+            return;
+          }
+          if (!isValidState(saved)) {
+            storageBlocked = true;
+            setStorageStatus("저장 기록을 읽지 못했어요. 복사하거나 초기화할 수 있어요.", true);
+            return;
+          }
+          state = saved;
+          setStorageStatus("이 기기에 저장됨");
+        } catch (error) {
+          storageFailed = true;
+          setStorageStatus("저장 기록을 읽지 못했어요. 진행 내용을 복사할 수 있어요.", true);
+        }
+      }
+
+      function saveState() {
+        if (storageBlocked) return;
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          storageFailed = false;
+          setStorageStatus("이 기기에 저장됨");
+        } catch (error) {
+          storageFailed = true;
+          setStorageStatus("저장할 수 없어요. 진행 내용을 복사해 보세요.", true);
+        }
+      }
+
+      function score() {
+        return state.answers.reduce((total, answer, index) => total + (answer === questions[index].answer ? 1 : 0), 0);
+      }
+
+      function renderQuiz() {
+        const question = questions[state.currentIndex];
+        const selected = state.answers[state.currentIndex];
+        const answered = selected !== null;
+        els.progress.textContent = `${state.currentIndex + 1} / ${questions.length}`;
+        els.scene.textContent = question.scene;
+        els.sentence.textContent = question.sentence;
+        els.choices.innerHTML = question.choices.map((form) => {
+          const classNames = ["choice"];
+          if (answered && form === question.answer) classNames.push("is-correct");
+          if (answered && form === selected && form !== question.answer) classNames.push("is-wrong");
+          return `<button class="${classNames.join(" ")}" type="button" data-form="${form}" ${answered ? "disabled" : ""}>${FORMS[form]}</button>`;
+        }).join("");
+
+        if (!answered) {
+          els.feedback.hidden = true;
+          els.nextButton.hidden = true;
+          return;
+        }
+
+        const correct = selected === question.answer;
+        els.feedback.hidden = false;
+        els.feedback.className = `feedback ${correct ? "good" : "try"}`;
+        els.feedback.textContent = correct
+          ? `맞아요. ${question.fullSentence} ${question.explanation}`
+          : `여기서는 “${question.fullSentence}”가 더 자연스러워요. ${question.explanation}`;
+        els.nextButton.hidden = false;
+        els.nextButton.textContent = state.currentIndex === questions.length - 1 ? "결과 보기" : "다음 문제";
+      }
+
+      function renderResult() {
+        const total = score();
+        const missed = questions.length - total;
+        els.resultText.textContent = missed === 0
+          ? `${questions.length}문항을 모두 맞혔어요.`
+          : `${questions.length}문항 중 ${total}문항을 맞혔어요. 틀린 ${missed}문항은 다시 풀어 보세요.`;
+      }
+
+      function render() {
+        els.quizSection.hidden = state.completed;
+        els.resultSection.hidden = !state.completed;
+        if (state.completed) renderResult();
+        else renderQuiz();
+      }
+
+      function selectAnswer(form) {
+        if (state.answers[state.currentIndex] !== null || !Object.hasOwn(FORMS, form)) return;
+        state.answers[state.currentIndex] = form;
+        saveState();
+        render();
+        els.nextButton.focus();
+      }
+
+      function moveNext() {
+        if (state.answers[state.currentIndex] === null) return;
+        if (state.currentIndex === questions.length - 1) state.completed = true;
+        else state.currentIndex += 1;
+        saveState();
+        render();
+        if (state.completed) els.retryButton.focus();
+        else els.choices.querySelector("button")?.focus();
+      }
+
+      function startAgain() {
+        state = defaultState();
+        storageBlocked = false;
+        saveState();
+        render();
+        els.choices.querySelector("button")?.focus();
+      }
+
+      async function copyProgress() {
+        const text = JSON.stringify({ page: "c15-grammar2-compare-quiz", ...state }, null, 2);
+        try {
+          await navigator.clipboard.writeText(text);
+          setStorageStatus("진행 내용을 복사했어요.", true);
+        } catch (error) {
+          window.prompt("아래 내용을 복사해 보세요.", text);
+        }
+      }
+
+      els.choices.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-form]");
+        if (button) selectAnswer(button.dataset.form);
+      });
+      els.nextButton.addEventListener("click", moveNext);
+      els.retryButton.addEventListener("click", startAgain);
+      els.copyButton.addEventListener("click", copyProgress);
+      els.resetButton.addEventListener("click", () => {
+        if (!window.confirm("이 페이지의 퀴즈 진행만 처음부터 다시 시작할까요?")) return;
+        try { localStorage.removeItem(STORAGE_KEY); } catch (error) { storageFailed = true; }
+        startAgain();
+        if (storageFailed) setStorageStatus("저장할 수 없어요. 현재 진행은 화면에 유지해요.", true);
+      });
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") saveState();
+      });
+      window.addEventListener("pagehide", saveState);
+
+      readState();
+      render();
+    })();
+  </script>
+</body>
+</html>
