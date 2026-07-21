@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>15과 문법 4 보조 활동 | 가는 길 생활 지도</title>
+  <link rel="stylesheet" href="grammar4-route-life-game.css" />
+  <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+</head>
+<body>
+  <nav class="top-nav" aria-label="상단 이동">
+    <a href="../index.html">메인</a>
+    <span aria-hidden="true">|</span>
+    <a href="index.html">15과 목록</a>
+    <span aria-hidden="true">|</span>
+    <a href="grammar4.html">문법 4</a>
+  </nav>
+
+  <main class="game-shell">
+    <header class="game-header">
+      <p class="eyebrow">15과 문법 4 · V-는 길에</p>
+      <h1>가는 길 생활 지도</h1>
+      <div class="speed-control">
+        <button id="speedButton" class="speed-button" type="button" aria-label="이동 속도 1배속, 눌러 2배속으로 변경"><span aria-hidden="true">⏩</span> <span id="speedLabel">1×</span></button>
+      </div>
+      <p id="sentenceOutput" class="sentence-output" role="status" aria-live="polite">어디에 가는 길에?</p>
+      <p id="mapHint" class="map-hint" role="status" aria-live="polite">목적지를 고르세요.</p>
+    </header>
+
+    <section class="map-section" aria-label="생활 지도">
+      <div id="mapCanvas" class="map-canvas" data-phase="choose">
+        <svg class="map-art" viewBox="0 0 100 80" aria-hidden="true" preserveAspectRatio="none">
+          <defs>
+            <pattern id="tinyGrid" width="10" height="10" patternUnits="userSpaceOnUse">
+              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(82, 119, 107, .11)" stroke-width="0.4" />
+            </pattern>
+          </defs>
+          <rect width="100" height="80" rx="5" fill="url(#tinyGrid)" />
+          <path class="road road-one" d="M 4 41 C 23 37, 35 53, 50 40 S 79 25, 96 38" />
+          <path class="road road-two" d="M 48 4 C 57 21, 38 35, 51 49 S 69 65, 52 77" />
+          <path class="river" d="M 4 64 C 22 55, 35 67, 49 59 S 78 58, 96 68" />
+          <path id="routeBase" class="route-base" d="" />
+          <path id="routePath" class="route-path" d="" />
+        </svg>
+
+        <div id="destinationLayer" class="destination-layer" aria-label="목적지 선택">
+          <button class="destination destination-home" type="button" data-destination="home" aria-label="집 선택">
+            <span aria-hidden="true">🏠</span><span>집</span>
+          </button>
+          <button class="destination destination-school" type="button" data-destination="school" aria-label="학교 선택">
+            <span aria-hidden="true">🏫</span><span>학교</span>
+          </button>
+          <button class="destination destination-station" type="button" data-destination="station" aria-label="대전역 선택">
+            <span aria-hidden="true">🚉</span><span>대전역</span>
+          </button>
+          <button class="destination destination-terminal" type="button" data-destination="terminal" aria-label="버스터미널 선택">
+            <span aria-hidden="true">🚌</span><span>버스터미널</span>
+          </button>
+          <button class="destination destination-mart" type="button" data-destination="mart" aria-label="마트 선택">
+            <span aria-hidden="true">🛒</span><span>마트</span>
+          </button>
+          <button class="destination destination-library" type="button" data-destination="library" aria-label="도서관 선택">
+            <span aria-hidden="true">📚</span><span>도서관</span>
+          </button>
+        </div>
+
+        <div id="objectLayer" class="object-layer" aria-live="off"></div>
+
+        <div id="traveler" class="traveler" aria-hidden="true">
+          <span class="traveler-icon">🚶</span>
+          <span class="traveler-shadow"></span>
+        </div>
+
+        <div id="resumePanel" class="resume-panel" hidden>
+          <p>이어 할 길이 있어요.</p>
+          <button id="resumeButton" class="primary-button" type="button">이어서 걷기</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultCard" class="result-card" hidden aria-labelledby="resultTitle">
+      <p class="result-kicker">도착</p>
+      <h2 id="resultTitle">문장이 완성됐어요.</h2>
+      <p id="resultFirstSentence" class="result-sentence result-sentence--previous" hidden></p>
+      <p id="resultSentence" class="result-sentence"></p>
+      <p id="resultDetail" class="result-detail"></p>
+      <button id="anotherRouteButton" class="primary-button" type="button">다른 길 가기</button>
+    </section>
+
+    <section class="utility-row" aria-label="게임 설정">
+      <p id="saveStatus" class="save-status" role="status" aria-live="polite">이 기기에 진행 상황을 저장합니다.</p>
+      <div class="utility-actions">
+        <button id="copyRecoveryButton" class="text-button" type="button" hidden>저장 내용 복사</button>
+        <button id="resetButton" class="text-button" type="button">처음부터</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="grammar4-route-life-game.js"></script>
+  <script src="../shared/site-copyright.js"></script>
+  <script src="../shared/page-qr.js"></script>
+</body>
+</html>
