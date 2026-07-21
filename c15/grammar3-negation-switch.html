@@ -126,6 +126,7 @@
 
     .visual-label[data-tone="negative"] { color: #7b3a10; background: #fff1da; }
     .visual-label[data-tone="prohibited"] { color: #8c211b; background: #fff0ef; }
+    .visual-label[data-tone="requiredWarning"] { color: #8c211b; background: #fff0ef; }
     .visual-label[data-tone="required"] { color: #066255; background: #e6faf3; }
 
     .workbench {
@@ -289,6 +290,7 @@
         <div class="primary-actions" aria-label="문장 붙이기">
           <button id="addNegationBtn" class="action-btn" data-testid="add-negation" type="button">-지 않다 붙이기</button>
           <button id="addConditionBtn" class="action-btn action-btn--condition" data-testid="add-condition" type="button">-으면 안 되다 붙이기</button>
+          <button id="showRequiredBtn" class="action-btn" data-testid="show-required-image" type="button" hidden>꼭! 그림 보기</button>
         </div>
         <div class="secondary-actions" aria-label="문장 되돌리기">
           <button id="undoBtn" class="quiet-btn" data-testid="undo-step" type="button" disabled>한 단계 되돌리기</button>
@@ -309,7 +311,7 @@
       <div id="sceneGrid" class="scene-grid" role="group" aria-label="기본 문장 선택"></div>
       <details class="guide">
         <summary>그림 읽는 법</summary>
-        <p>부정을 홀수 번 붙이면 ‘안 해요’ 뜻, 짝수 번 붙이면 기본 뜻으로 돌아와요. 마지막에 <strong>-으면 안 되다</strong>를 붙이면 금지 또는 꼭 해야 함으로 바뀝니다.</p>
+        <p>부정을 홀수 번 붙이면 ‘안 해요’ 뜻, 짝수 번 붙이면 기본 뜻으로 돌아와요. <strong>-지 않으면 안 되다</strong>에서는 먼저 ‘안 하는 것은 금지’ 그림을 보고, <strong>꼭!</strong>을 눌러 꼭 해야 하는 그림도 확인해요.</p>
       </details>
       <p class="secondary-actions" style="margin:14px 0 0">
         <button id="clearAllBtn" class="quiet-btn quiet-btn--danger" type="button">저장한 실험 모두 지우기</button>
@@ -335,6 +337,7 @@
             base: ["pay-bill-base.webp", "밀린 요금을 빨리 내는 그림"],
             negative: ["pay-bill-negative.webp", "밀린 요금을 내지 않고 미루는 그림"],
             prohibited: ["pay-bill-prohibited.webp", "밀린 요금을 내면 안 되는 금지 그림"],
+            requiredWarning: ["pay-bill-negative-prohibited.webp", "밀린 요금을 내지 않는 것은 금지라는 그림"],
             required: ["pay-bill-required.webp", "밀린 요금을 꼭 내야 하는 그림"]
           }
         },
@@ -344,6 +347,7 @@
             base: ["wear-suit-base.webp", "면접 양복을 입은 그림"],
             negative: ["wear-suit-negative.webp", "면접 양복을 입지 않은 그림"],
             prohibited: ["wear-suit-prohibited.webp", "면접 양복을 입으면 안 되는 금지 그림"],
+            requiredWarning: ["wear-suit-negative-prohibited.webp", "면접 양복을 입지 않는 것은 금지라는 그림"],
             required: ["wear-suit-required.webp", "면접 양복을 꼭 입어야 하는 그림"]
           }
         },
@@ -353,6 +357,7 @@
             base: ["wear-mask-base.webp", "마스크를 쓰고 밖에 나가는 그림"],
             negative: ["wear-mask-negative.webp", "마스크를 쓰지 않고 밖에 나가는 그림"],
             prohibited: ["wear-mask-prohibited.webp", "마스크를 쓰면 안 되는 금지 그림"],
+            requiredWarning: ["wear-mask-negative-prohibited.webp", "마스크를 쓰지 않는 것은 금지라는 그림"],
             required: ["wear-mask-required.webp", "마스크를 꼭 써야 하는 그림"]
           }
         },
@@ -362,6 +367,7 @@
             base: ["wash-hands-base.webp", "손을 씻는 그림"],
             negative: ["wash-hands-negative.webp", "손을 씻지 않고 지나가는 그림"],
             prohibited: ["wash-hands-prohibited.webp", "손을 씻으면 안 되는 금지 그림"],
+            requiredWarning: ["wash-hands-negative-prohibited.webp", "손을 씻지 않는 것은 금지라는 그림"],
             required: ["wash-hands-required.webp", "손을 꼭 씻어야 하는 그림"]
           }
         },
@@ -371,6 +377,7 @@
             base: ["save-electricity-base.webp", "전기를 아껴 쓰는 그림"],
             negative: ["save-electricity-negative.webp", "전기를 아껴 쓰지 않는 그림"],
             prohibited: ["save-electricity-prohibited.webp", "전기를 아껴 쓰면 안 되는 금지 그림"],
+            requiredWarning: ["save-electricity-negative-prohibited.webp", "전기를 아껴 쓰지 않는 것은 금지라는 그림"],
             required: ["save-electricity-required.webp", "전기를 꼭 아껴 써야 하는 그림"]
           }
         },
@@ -380,6 +387,7 @@
             base: ["unplug-base.webp", "사용하지 않는 전기 플러그를 뽑는 그림"],
             negative: ["unplug-negative.webp", "사용하지 않는 전기 플러그를 뽑지 않는 그림"],
             prohibited: ["unplug-prohibited.webp", "전기 플러그를 뽑으면 안 되는 금지 그림"],
+            requiredWarning: ["unplug-negative-prohibited.webp", "전기 플러그를 뽑지 않는 것은 금지라는 그림"],
             required: ["unplug-required.webp", "전기 플러그를 꼭 뽑아야 하는 그림"]
           }
         },
@@ -389,6 +397,7 @@
             base: ["turn-off-light-base.webp", "사람이 없는 방의 불을 끄는 그림"],
             negative: ["turn-off-light-negative.webp", "사람이 없는 방의 불을 끄지 않는 그림"],
             prohibited: ["turn-off-light-prohibited.webp", "사람이 없는 방의 불을 끄면 안 되는 금지 그림"],
+            requiredWarning: ["turn-off-light-negative-prohibited.webp", "사람이 없는 방의 불을 끄지 않는 것은 금지라는 그림"],
             required: ["turn-off-light-required.webp", "사람이 없는 방의 불을 꼭 꺼야 하는 그림"]
           }
         },
@@ -398,6 +407,7 @@
             base: ["save-water-base.webp", "물을 아껴 쓰는 그림"],
             negative: ["save-water-negative.webp", "물을 아껴 쓰지 않는 그림"],
             prohibited: ["save-water-prohibited.webp", "물을 아껴 쓰면 안 되는 금지 그림"],
+            requiredWarning: ["save-water-negative-prohibited.webp", "물을 아껴 쓰지 않는 것은 금지라는 그림"],
             required: ["save-water-required.webp", "물을 꼭 아껴 써야 하는 그림"]
           }
         }
@@ -412,6 +422,7 @@
         meaning: document.getElementById("meaning"),
         addNegation: document.getElementById("addNegationBtn"),
         addCondition: document.getElementById("addConditionBtn"),
+        showRequired: document.getElementById("showRequiredBtn"),
         undo: document.getElementById("undoBtn"),
         resetScene: document.getElementById("resetSceneBtn"),
         clearAll: document.getElementById("clearAllBtn"),
@@ -425,7 +436,7 @@
       let state = createDefaultState();
 
       function createDefaultExperiment() {
-        return { negationCount: 0, conditionApplied: false };
+        return { negationCount: 0, conditionApplied: false, requiredRevealed: false };
       }
 
       function createDefaultState() {
@@ -438,7 +449,12 @@
         if (!value || !Number.isSafeInteger(value.negationCount) || value.negationCount < 0 || value.negationCount > MAX_NEGATIONS || typeof value.conditionApplied !== "boolean") {
           return null;
         }
-        return { negationCount: value.negationCount, conditionApplied: value.conditionApplied };
+        const isRequiredState = value.conditionApplied && value.negationCount % 2 === 1;
+        return {
+          negationCount: value.negationCount,
+          conditionApplied: value.conditionApplied,
+          requiredRevealed: isRequiredState && value.requiredRevealed === true
+        };
       }
 
       function normalizeSavedState(value) {
@@ -505,9 +521,12 @@
       function getDisplayState(experiment) {
         const isOdd = experiment.negationCount % 2 === 1;
         if (experiment.conditionApplied) {
-          return isOdd
-            ? { key: "required", label: "꼭 해야 함", meaning: "부정 뒤에 조건을 붙여서 ‘꼭 해야 함’ 뜻이 되었어요." }
-            : { key: "prohibited", label: "금지", meaning: "조건을 붙여서 ‘하면 안 됨’ 뜻이 되었어요." };
+          if (isOdd) {
+            return experiment.requiredRevealed
+              ? { key: "required", label: "꼭 해야 함", meaning: "‘꼭!’ 그림이에요. 이 행동은 꼭 해야 해요." }
+              : { key: "requiredWarning", label: "안 하는 것은 금지", meaning: "‘-지 않으면 안 돼요’는 안 하는 것이 금지라는 뜻이에요. ‘꼭! 그림 보기’를 눌러 보세요." };
+          }
+          return { key: "prohibited", label: "금지", meaning: "조건을 붙여서 ‘하면 안 됨’ 뜻이 되었어요." };
         }
         if (experiment.negationCount === 0) {
           return { key: "base", label: "기본 뜻", meaning: "기본 행동이 그림에 나타나요." };
@@ -572,6 +591,7 @@
         renderImage(scene, display);
         refs.addNegation.disabled = experiment.conditionApplied || experiment.negationCount >= MAX_NEGATIONS;
         refs.addCondition.disabled = experiment.conditionApplied;
+        refs.showRequired.hidden = !(experiment.conditionApplied && experiment.negationCount % 2 === 1 && !experiment.requiredRevealed);
         refs.undo.disabled = !experiment.conditionApplied && experiment.negationCount === 0;
         refs.resetScene.disabled = !experiment.conditionApplied && experiment.negationCount === 0;
         refs.addNegation.title = experiment.conditionApplied ? "조건형을 되돌린 뒤에 다시 붙일 수 있어요." : "";
@@ -583,6 +603,7 @@
         const experiment = activeExperiment();
         if (experiment.conditionApplied || experiment.negationCount >= MAX_NEGATIONS) return;
         experiment.negationCount += 1;
+        experiment.requiredRevealed = false;
         saveState();
         render();
       }
@@ -591,6 +612,15 @@
         const experiment = activeExperiment();
         if (experiment.conditionApplied) return;
         experiment.conditionApplied = true;
+        experiment.requiredRevealed = false;
+        saveState();
+        render();
+      }
+
+      function showRequiredImage() {
+        const experiment = activeExperiment();
+        if (!experiment.conditionApplied || experiment.negationCount % 2 !== 1) return;
+        experiment.requiredRevealed = true;
         saveState();
         render();
       }
@@ -599,6 +629,7 @@
         const experiment = activeExperiment();
         if (experiment.conditionApplied) {
           experiment.conditionApplied = false;
+          experiment.requiredRevealed = false;
         } else if (experiment.negationCount > 0) {
           experiment.negationCount -= 1;
         }
@@ -641,6 +672,7 @@
 
       refs.addNegation.addEventListener("click", addNegation);
       refs.addCondition.addEventListener("click", addCondition);
+      refs.showRequired.addEventListener("click", showRequiredImage);
       refs.undo.addEventListener("click", undoStep);
       refs.resetScene.addEventListener("click", resetCurrentScene);
       refs.clearAll.addEventListener("click", clearAll);

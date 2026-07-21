@@ -44,6 +44,9 @@ test("c15 grammar3 negation switch changes whole sentence and illustration by po
   await firstAction.click();
   await page.getByTestId("add-condition").click();
   await expect(page.getByTestId("negation-switch-sentence")).toHaveText("손을 씻지 않으면 안 돼요.");
+  await expect(page.getByTestId("negation-switch-visual-label")).toHaveText("안 하는 것은 금지");
+  await expect(page.getByTestId("negation-switch-image")).toHaveAttribute("src", /wash-hands-negative-prohibited\.webp$/);
+  await page.getByTestId("show-required-image").click();
   await expect(page.getByTestId("negation-switch-visual-label")).toHaveText("꼭 해야 함");
   await expect(page.getByTestId("negation-switch-image")).toHaveAttribute("src", /wash-hands-required\.webp$/);
 
@@ -61,6 +64,9 @@ test("c15 grammar3 negation switch keeps an experiment for each scene and restor
   await page.getByTestId("add-negation").click();
   await page.getByTestId("add-condition").click();
   await expect(page.getByTestId("negation-switch-sentence")).toHaveText("마스크를 쓰지 않으면 안 돼요.");
+  await expect(page.getByTestId("negation-switch-image")).toHaveAttribute("src", /wear-mask-negative-prohibited\.webp$/);
+  await page.getByTestId("show-required-image").click();
+  await expect(page.getByTestId("negation-switch-image")).toHaveAttribute("src", /wear-mask-required\.webp$/);
 
   await page.getByRole("button", { name: "손을 씻어요. 장면" }).click();
   await expect(page.getByTestId("negation-switch-sentence")).toHaveText("손을 씻지 않아요.");
@@ -69,6 +75,7 @@ test("c15 grammar3 negation switch keeps an experiment for each scene and restor
 
   await page.getByRole("button", { name: "마스크를 써요. 장면" }).click();
   await expect(page.getByTestId("negation-switch-sentence")).toHaveText("마스크를 쓰지 않으면 안 돼요.");
+  await expect(page.getByTestId("negation-switch-image")).toHaveAttribute("src", /wear-mask-required\.webp$/);
 });
 
 test("c15 grammar3 negation switch does not overwrite unreadable saved state until confirmed reset", async ({ page }) => {
@@ -105,17 +112,27 @@ test("c15 grammar3 links expose the new picture-switch activity", async ({ page 
   await expect(grammarCard.locator('a[href="grammar3-negation-switch.html"]')).toContainText("부정을 뒤집어 봐");
 });
 
-test("c15 grammar3 negation switch remains reachable at narrow and zoomed layouts", async ({ page }) => {
+test("c15 grammar3 negation switch remains reachable at narrow and zoomed layouts", async ({ browser }) => {
   for (const viewport of [{ width: 320, height: 844 }, { width: 390, height: 844 }]) {
-    await page.setViewportSize(viewport);
-    await openFresh(page);
-    await expect(page.getByTestId("add-negation")).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBeFalsy();
+    const layoutContext = await browser.newContext({ viewport: viewport });
+    const layoutPage = await layoutContext.newPage();
+    await layoutPage.goto(pagePath, { waitUntil: "domcontentloaded" });
+    await expect(layoutPage.getByTestId("add-negation")).toBeVisible();
+    await layoutPage.getByTestId("add-negation").click();
+    await layoutPage.getByTestId("add-condition").click();
+    await expect(layoutPage.getByTestId("show-required-image")).toBeVisible();
+    expect(await layoutPage.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBeFalsy();
+    await layoutContext.close();
   }
 
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await openFresh(page);
-  await page.evaluate(() => { document.body.style.zoom = "2"; });
-  await expect(page.getByTestId("add-negation")).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBeFalsy();
+  const zoomContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const zoomPage = await zoomContext.newPage();
+  await zoomPage.goto(pagePath, { waitUntil: "domcontentloaded" });
+  await zoomPage.evaluate(() => { document.body.style.zoom = "2"; });
+  await expect(zoomPage.getByTestId("add-negation")).toBeVisible();
+  await zoomPage.getByTestId("add-negation").click();
+  await zoomPage.getByTestId("add-condition").click();
+  await expect(zoomPage.getByTestId("show-required-image")).toBeVisible();
+  expect(await zoomPage.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBeFalsy();
+  await zoomContext.close();
 });
