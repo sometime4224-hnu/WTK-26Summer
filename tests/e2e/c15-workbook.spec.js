@@ -5,6 +5,27 @@ const targets = [
   { path: '/c15/grammar2-workbook.html', title: 'A/V-(으)ㄹ걸(요)', firstLabel: '근거를 보고 대답하기 1번 답', storageKey: 'korean3bimprove:c15:grammar2:workbook:v1' }
 ];
 
+test('C15 hub places each workbook immediately after its grammar main page', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  await page.goto('/c15/index.html', { waitUntil: 'domcontentloaded' });
+
+  const grammar1Card = page.locator('article.path-card').filter({
+    has: page.getByRole('heading', { name: 'V-게 하다', exact: true })
+  });
+  const grammar2Card = page.locator('article.path-card').filter({
+    has: page.getByRole('heading', { name: 'A/V-(으)ㄹ걸(요)', exact: true })
+  });
+
+  const grammar1Links = await grammar1Card.locator('.lesson-list > a')
+    .evaluateAll((links) => links.slice(0, 2).map((link) => link.getAttribute('href')));
+  const grammar2Links = await grammar2Card.locator('.lesson-list > a')
+    .evaluateAll((links) => links.slice(0, 2).map((link) => link.getAttribute('href')));
+
+  expect(grammar1Links).toEqual(['grammar1.html', 'grammar1-workbook.html']);
+  expect(grammar2Links).toEqual(['grammar2.html', 'grammar2-workbook.html']);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+});
+
 test('C15 workbook pages keep the first response usable on narrow portrait screens', async ({ page }) => {
   for (const target of targets) {
     await page.setViewportSize({ width: 320, height: 844 });
