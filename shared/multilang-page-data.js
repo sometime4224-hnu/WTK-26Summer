@@ -533,20 +533,20 @@ window.MULTILANG_PAGE_DATA = {
         "translations": {
             "en": {
                 "title": "English scaffold",
-                "summary": "Use this ending to make a soft guess or to express regret about what should have been done.",
+                "summary": "Use this ending to make a light guess from a situation or reply gently to someone.",
                 "points": [
-                    "With present or future situations, it can sound like a cautious guess.",
-                    "In past reflection, it can mean I should have....",
-                    "Tone and context decide whether it is guessing or regret."
+                    "Use a clue such as the weather, time, or your experience.",
+                    "It sounds less certain than a firm statement.",
+                    "It is especially natural for a short, conversational response."
                 ]
             },
             "vi": {
                 "title": "Ho tro tieng Viet",
-                "summary": "Dung de doan nhe nhang hoac bay to tiec nuoi ve dieu le ra nen lam.",
+                "summary": "Dung khi nhin vao tinh huong de doan nhe 'chac la nhu vay', hoac de phan hoi mem mai.",
                 "points": [
-                    "Voi hien tai hoac tuong lai, co the la phong doan than trong.",
-                    "Khi nhin lai qua khu, co the nghia la le ra nen lam.",
-                    "Giong dieu va ngu canh quyet dinh la doan hay tiec."
+                    "Can cu co the la thoi tiet, thoi gian hoac kinh nghiem.",
+                    "Day la du doan, khong phai thong bao chac chan.",
+                    "Rat tu nhien khi tra loi ngan trong hoi thoai."
                 ]
             }
         }

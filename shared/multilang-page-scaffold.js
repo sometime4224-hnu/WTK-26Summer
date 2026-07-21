@@ -127,6 +127,12 @@
     }
 
     function insertPanel(panel) {
+        const anchor = document.querySelector("[data-multilang-anchor]");
+        if (anchor && anchor.parentNode) {
+            anchor.insertAdjacentElement("afterend", panel);
+            return;
+        }
+
         const header = document.querySelector("header");
         if (header && header.parentNode) {
             header.insertAdjacentElement("afterend", panel);

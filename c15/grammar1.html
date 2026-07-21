@@ -450,6 +450,7 @@
         }
     </style>
         <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+        <link rel="stylesheet" href="../shared/multilang-toggle.css" />
 </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
@@ -464,7 +465,7 @@
     </nav>
 
     <main id="page" class="w-full max-w-5xl mx-auto space-y-4 px-3 sm:px-0 pb-8">
-        <section class="bg-white border border-blue-100 rounded-2xl p-5 shadow-sm mt-4">
+        <section class="bg-white border border-blue-100 rounded-2xl p-5 shadow-sm mt-4" data-multilang-anchor>
             <div class="flex items-start justify-between gap-3">
                 <div>
                     <p class="text-xs font-bold text-blue-600">15과 문법 1</p>
@@ -472,7 +473,6 @@
                     <p class="text-sm text-slate-600 mt-1 safe">누가 다른 사람이나 어떤 대상이 어떤 행동을 하도록 만들 때 쓰는 표현이에요.</p>
                     <p class="vi-text text-xs text-blue-700 mt-1 safe">Mẫu này dùng khi ai đó khiến một người khác hay một đối tượng làm một hành động.</p>
                 </div>
-                <button id="viToggle" class="shrink-0 px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 whitespace-nowrap">Tiếng Việt OFF</button>
             </div>
             <div class="grid grid-cols-2 gap-2 mt-4">
                 <button id="tabLearn" class="tab-btn active border rounded-xl py-2.5 text-sm font-bold border-blue-200" type="button">학습</button>
@@ -763,8 +763,6 @@
     </main>
 
     <script>
-        const page = document.getElementById('page');
-        const viToggle = document.getElementById('viToggle');
         const tabLearn = document.getElementById('tabLearn');
         const tabPractice = document.getElementById('tabPractice');
         const learnPanel = document.getElementById('learnPanel');
@@ -782,13 +780,6 @@
         const feedbackBox = document.getElementById('feedbackBox');
         const nextBtn = document.getElementById('nextBtn');
         const resultPanel = document.getElementById('resultPanel');
-
-        let viOn = false;
-        viToggle.addEventListener('click', function () {
-            viOn = !viOn;
-            page.classList.toggle('vi-on', viOn);
-            viToggle.textContent = viOn ? 'Tiếng Việt ON' : 'Tiếng Việt OFF';
-        });
 
         function showTab(name) {
             const learn = name === 'learn';
