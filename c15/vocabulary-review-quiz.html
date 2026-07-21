@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>15과 어휘 복습 퀴즈 | 빈칸 채우기</title>
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <style>
+        :root {
+            --review-accent: #c2410c;
+            --review-accent-soft: #fff7ed;
+            --review-ink: #172033;
+            --review-muted: #64748b;
+            --review-line: #dbe4f0;
+            --review-panel: rgba(255, 255, 255, 0.95);
+            --review-correct: #15803d;
+            --review-correct-soft: #f0fdf4;
+            --review-warning: #b45309;
+            --review-warning-soft: #fffbeb;
+            --review-danger: #b91c1c;
+            --review-danger-soft: #fef2f2;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-width: 0;
+            color: var(--review-ink);
+            background:
+                radial-gradient(circle at 6% 7%, rgba(251, 146, 60, 0.15), transparent 26rem),
+                radial-gradient(circle at 95% 20%, rgba(59, 130, 246, 0.11), transparent 24rem),
+                linear-gradient(180deg, #fffaf5 0%, #f7fbff 58%, #fffdf7 100%);
+            font-family: "Noto Sans KR", "Noto Sans", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        button:focus-visible,
+        a:focus-visible {
+            outline: 3px solid #2563eb;
+            outline-offset: 3px;
+        }
+
+        [hidden] { display: none !important; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 48px;
+            padding: 8px 14px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+        }
+
+        .topbar a {
+            color: #1d4ed8;
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .topbar__divider {
+            color: #94a3b8;
+            font-weight: 800;
+        }
+
+        .shell {
+            width: min(920px, calc(100% - 32px));
+            margin: 18px auto 44px;
+        }
+
+        .quiz-header,
+        .quiz-card,
+        .completion,
+        .page-actions {
+            border: 1px solid var(--review-line);
+            border-radius: 18px;
+            background: var(--review-panel);
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+        }
+
+        .quiz-header {
+            padding: 20px clamp(16px, 4vw, 28px);
+        }
+
+        .eyebrow,
+        .card-eyebrow {
+            margin: 0 0 5px;
+            color: var(--review-accent);
+            font-size: 0.76rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        p {
+            margin-top: 0;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+            font-size: clamp(1.48rem, 4vw, 2rem);
+            line-height: 1.25;
+        }
+
+        .instruction {
+            max-width: 58ch;
+            margin-bottom: 0;
+            color: #475569;
+            font-size: 0.98rem;
+            line-height: 1.62;
+        }
+
+        .summary-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid #eef2f7;
+        }
+
+        .progress-label {
+            margin: 0;
+            color: #334155;
+            font-size: 0.92rem;
+            font-weight: 800;
+        }
+
+        .progress-label strong {
+            color: var(--review-accent);
+        }
+
+        .progress-bar {
+            width: min(42vw, 230px);
+            min-width: 96px;
+            height: 10px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        .progress-bar > span {
+            display: block;
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #fb923c, #ea580c);
+            transition: width 180ms ease;
+        }
+
+        .storage-status {
+            margin: 12px 0 0;
+            padding: 11px 12px;
+            border: 1px solid #fcd34d;
+            border-radius: 12px;
+            color: #854d0e;
+            background: var(--review-warning-soft);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .storage-status__copy {
+            margin: 8px 0 0;
+            min-height: 36px;
+            padding: 6px 10px;
+            border: 1px solid currentColor;
+            border-radius: 9px;
+            color: inherit;
+            background: #fff;
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .quiz-list {
+            display: grid;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .quiz-card {
+            padding: clamp(16px, 4vw, 24px);
+            scroll-margin-top: 72px;
+        }
+
+        .quiz-card.is-complete {
+            border-color: #86efac;
+            background: linear-gradient(140deg, #ffffff 0%, var(--review-correct-soft) 100%);
+        }
+
+        .quiz-card__head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .quiz-card__head h2 {
+            margin-bottom: 0;
+            font-size: clamp(1.12rem, 3.4vw, 1.36rem);
+            line-height: 1.35;
+        }
+
+        .quiz-count {
+            flex: 0 0 auto;
+            margin: 2px 0 0;
+            padding: 5px 9px;
+            border-radius: 999px;
+            color: #9a3412;
+            background: var(--review-accent-soft);
+            font-size: 0.78rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .quiz-card.is-complete .quiz-count {
+            color: var(--review-correct);
+            background: #dcfce7;
+        }
+
+        .dialogue {
+            display: grid;
+            gap: 10px;
+            margin: 0;
+            padding: 16px;
+            border: 1px solid #e7edf5;
+            border-radius: 14px;
+            background: #fbfdff;
+        }
+
+        .dialogue-line {
+            margin: 0;
+            color: #243146;
+            font-size: clamp(1rem, 2.9vw, 1.08rem);
+            line-height: 2;
+            word-break: keep-all;
+        }
+
+        .speaker {
+            margin-right: 6px;
+            color: #475569;
+            font-size: 0.9em;
+            font-weight: 900;
+        }
+
+        .blank {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 92px;
+            min-height: 34px;
+            margin: 0 2px;
+            padding: 1px 8px;
+            border: 1px dashed #94a3b8;
+            border-radius: 8px;
+            color: #475569;
+            background: #fff;
+            font-weight: 800;
+            line-height: 1.45;
+            vertical-align: baseline;
+        }
+
+        button.blank {
+            cursor: pointer;
+        }
+
+        button.blank:hover,
+        button.blank.is-selected {
+            border-color: var(--review-accent);
+            color: #9a3412;
+            background: var(--review-accent-soft);
+        }
+
+        .blank.is-filled {
+            border-style: solid;
+            border-color: #fdba74;
+            color: #9a3412;
+            background: #fff7ed;
+        }
+
+        .blank.is-locked {
+            border-style: solid;
+            border-color: #86efac;
+            color: var(--review-correct);
+            background: #f0fdf4;
+        }
+
+        .blank.is-drop-target {
+            border-color: #2563eb;
+            border-style: solid;
+            color: #1d4ed8;
+            background: #eff6ff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+        }
+
+        .word-bank-wrap {
+            margin-top: 16px;
+        }
+
+        .word-bank-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 0 0 8px;
+            color: #475569;
+            font-size: 0.86rem;
+            font-weight: 900;
+        }
+
+        .word-bank-label small {
+            color: #94a3b8;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .word-chip {
+            min-height: 42px;
+            padding: 7px 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            color: #334155;
+            background: #fff;
+            font-size: 0.92rem;
+            font-weight: 800;
+            line-height: 1.35;
+            cursor: pointer;
+            transition: border-color 140ms ease, background 140ms ease, transform 140ms ease;
+        }
+
+        .word-chip:hover:not(:disabled) {
+            border-color: var(--review-accent);
+            background: var(--review-accent-soft);
+            transform: translateY(-1px);
+        }
+
+        .word-chip[draggable="true"] {
+            cursor: grab;
+        }
+
+        .word-chip[draggable="true"]:active {
+            cursor: grabbing;
+        }
+
+        .word-chip.is-dragging {
+            border-color: #fb923c;
+            background: #fff7ed;
+            opacity: 0.58;
+        }
+
+        .word-chip:disabled {
+            border-color: #e2e8f0;
+            color: #94a3b8;
+            background: #f8fafc;
+            cursor: default;
+            opacity: 0.65;
+        }
+
+        .quiz-feedback {
+            min-height: 1.5em;
+            margin: 14px 0 0;
+            padding: 9px 11px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 750;
+            line-height: 1.45;
+        }
+
+        .quiz-feedback:empty {
+            display: none;
+        }
+
+        .quiz-feedback[data-tone="info"] {
+            color: #1d4ed8;
+            background: #eff6ff;
+        }
+
+        .quiz-feedback[data-tone="warning"] {
+            color: var(--review-warning);
+            background: var(--review-warning-soft);
+        }
+
+        .quiz-feedback[data-tone="correct"] {
+            color: var(--review-correct);
+            background: var(--review-correct-soft);
+        }
+
+        .quiz-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 14px;
+        }
+
+        .check-button,
+        .reset-button {
+            min-height: 44px;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .check-button {
+            min-width: 112px;
+            border: 1px solid #c2410c;
+            color: #fff;
+            background: #c2410c;
+        }
+
+        .check-button:hover {
+            background: #9a3412;
+        }
+
+        .check-button:disabled {
+            border-color: #86efac;
+            color: #166534;
+            background: #dcfce7;
+            cursor: default;
+        }
+
+        .completion {
+            margin-top: 16px;
+            padding: 20px;
+            border-color: #86efac;
+            color: #166534;
+            background: linear-gradient(140deg, #ffffff, #f0fdf4);
+        }
+
+        .completion h2 {
+            margin-bottom: 6px;
+            font-size: 1.2rem;
+        }
+
+        .completion p {
+            margin-bottom: 0;
+            line-height: 1.55;
+        }
+
+        .page-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 16px;
+            padding: 14px;
+        }
+
+        .reset-button {
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            background: #fff;
+        }
+
+        .reset-button:hover {
+            border-color: #94a3b8;
+            background: #f8fafc;
+        }
+
+        @media (max-width: 520px) {
+            .shell {
+                width: min(100% - 18px, 920px);
+                margin-top: 10px;
+            }
+
+            .quiz-header,
+            .quiz-card {
+                border-radius: 14px;
+            }
+
+            .summary-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .progress-bar {
+                width: 100%;
+            }
+
+            .quiz-card__head {
+                gap: 8px;
+            }
+
+            .dialogue {
+                padding: 13px;
+            }
+
+            .dialogue-line {
+                line-height: 1.9;
+            }
+
+            .blank {
+                min-width: 74px;
+                min-height: 33px;
+                padding-inline: 6px;
+            }
+
+            .word-chip {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            .check-button {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar" aria-label="빠른 이동">
+        <a href="../index.html">메인</a>
+        <span class="topbar__divider" aria-hidden="true">|</span>
+        <a href="index.html">15과</a>
+        <span class="topbar__divider" aria-hidden="true">|</span>
+        <a href="vocabulary.html">어휘 카드</a>
+    </nav>
+
+    <main class="shell">
+        <header class="quiz-header">
+            <p class="eyebrow">Vocabulary review</p>
+            <h1>어휘 복습 퀴즈</h1>
+            <p class="instruction">빈칸을 누른 뒤 어휘 바구니에서 표현을 고르거나, 표현을 빈칸으로 끌어 놓으세요. 한 지문을 모두 채운 뒤 확인합니다.</p>
+            <div class="summary-row">
+                <p id="progress-label" class="progress-label" aria-live="polite">완성 <strong>0 / 25</strong></p>
+                <div class="progress-bar" aria-hidden="true"><span id="progress-bar"></span></div>
+            </div>
+            <div id="storage-status" class="storage-status" role="status" hidden>
+                <span id="storage-status-text"></span>
+                <button id="copy-recovery" class="storage-status__copy" type="button" hidden>현재 답 복사</button>
+            </div>
+        </header>
+
+        <section id="quiz-list" class="quiz-list" aria-label="어휘 빈칸 퀴즈"></section>
+
+        <section id="completion" class="completion" aria-live="polite" hidden>
+            <h2>모든 대화를 완성했어요.</h2>
+            <p>25개 어휘를 문맥에 맞게 모두 골랐습니다.</p>
+        </section>
+
+        <div class="page-actions">
+            <button id="reset-button" class="reset-button" type="button">학습 기록 초기화</button>
+        </div>
+    </main>
+
+    <script>
+    (function () {
+        "use strict";
+
+        const STORAGE_KEY = "c15.vocabulary.reviewQuiz.v1";
+        const VERSION = 2;
+        const DRAG_DATA_TYPE = "application/x-c15-vocabulary-choice";
+
+        const VOCABULARY = {
+            "c15-vocab-01": "수돗물이 안 나오다",
+            "c15-vocab-02": "전기가 나가다",
+            "c15-vocab-03": "변기가 막히다",
+            "c15-vocab-04": "물이 새다",
+            "c15-vocab-05": "소음이 심하다",
+            "c15-vocab-06": "난방이 안 되다",
+            "c15-vocab-07": "이상한 냄새가 나다",
+            "c15-vocab-08": "물이 안 내려가다",
+            "c15-vocab-09": "계약서",
+            "c15-vocab-10": "보증금",
+            "c15-vocab-11": "포함되다",
+            "c15-vocab-12": "계약 기간",
+            "c15-vocab-13": "공과금",
+            "c15-vocab-14": "납부하다",
+            "c15-vocab-15": "계약하다",
+            "c15-vocab-16": "연체료",
+            "c15-vocab-17": "밀리다",
+            "c15-vocab-18": "지출",
+            "c15-vocab-19": "수입",
+            "c15-vocab-20": "늘다",
+            "c15-vocab-21": "줄다",
+            "c15-vocab-22": "아끼다",
+            "c15-vocab-23": "절약하다",
+            "c15-vocab-24": "낭비하다",
+            "c15-vocab-25": "저축하다"
+        };
+
+        function text(value) {
+            return { type: "text", value: value };
+        }
+
+        function blank(id, wordId, label) {
+            return { type: "blank", id: id, wordId: wordId, label: label };
+        }
+
+        function choice(wordId, label, choiceId) {
+            return { wordId: wordId, label: label, choiceId: choiceId || null };
+        }
+
+        const QUIZZES = [
+            {
+                id: "home-report",
+                title: "집 문제 긴급 신고",
+                lines: [
+                    {
+                        speaker: "세입자",
+                        parts: [
+                            text("어젯밤부터 "), blank("power", "c15-vocab-02", "전기가 나가서"),
+                            text(" 집 안이 너무 어두워요. 부엌 싱크대에는 "), blank("drain", "c15-vocab-08", "물이 안 내려가서"),
+                            text(" 설거지를 못 해요.")
+                        ]
+                    },
+                    {
+                        speaker: "세입자",
+                        parts: [
+                            text("화장실에서는 "), blank("toilet", "c15-vocab-03", "변기가 막혀서"),
+                            text(" 물이 넘칠까 봐 걱정이에요. 그리고 천장에서 "), blank("leak", "c15-vocab-04", "물이 새서"),
+                            text(" 바닥이 젖었어요.")
+                        ]
+                    }
+                ],
+                choices: [
+                    choice("c15-vocab-02", "전기가 나가서"),
+                    choice("c15-vocab-08", "물이 안 내려가서"),
+                    choice("c15-vocab-03", "변기가 막혀서"),
+                    choice("c15-vocab-04", "물이 새서"),
+                    choice("c15-vocab-01", "수돗물이 안 나와서"),
+                    choice("c15-vocab-06", "난방이 안 돼요"),
+                    choice("c15-vocab-05", "소음이 심해"),
+                    choice("c15-vocab-07", "이상한 냄새가 나서")
+                ]
+            },
+            {
+                id: "repair-call",
+                title: "수리 요청 전화",
+                lines: [
+                    {
+                        speaker: "세입자",
+                        parts: [
+                            text("아침부터 "), blank("tap-water", "c15-vocab-01", "수돗물이 안 나와서"),
+                            text(" 세수도 못 했어요. 방이 너무 추운데 "), blank("heating", "c15-vocab-06", "난방이 안 돼요"),
+                            text(".")
+                        ]
+                    },
+                    {
+                        speaker: "세입자",
+                        parts: [
+                            text("윗집에서 밤마다 쿵쿵거려서 "), blank("noise", "c15-vocab-05", "소음이 심해"),
+                            text(" 잠을 못 자요. 또 화장실 하수구 근처에서 "), blank("smell", "c15-vocab-07", "이상한 냄새가 나서"),
+                            text(" 창문을 열어 두었어요.")
+                        ]
+                    }
+                ],
+                choices: [
+                    choice("c15-vocab-01", "수돗물이 안 나와서"),
+                    choice("c15-vocab-06", "난방이 안 돼요"),
+                    choice("c15-vocab-05", "소음이 심해"),
+                    choice("c15-vocab-07", "이상한 냄새가 나서"),
+                    choice("c15-vocab-02", "전기가 나가서"),
+                    choice("c15-vocab-08", "물이 안 내려가서"),
+                    choice("c15-vocab-03", "변기가 막혀서"),
+                    choice("c15-vocab-04", "물이 새서")
+                ]
+            },
+            {
+                id: "contract-check",
+                title: "계약 전 확인",
+                lines: [
+                    {
+                        speaker: "세입자",
+                        parts: [
+                            text("이 방을 "), blank("contract", "c15-vocab-15", "계약하기"),
+                            text(" 전에 이 "), blank("contract-paper", "c15-vocab-09", "계약서"),
+                            text("를 자세히 읽어 보고 싶어요.")
+                        ]
+                    },
+                    {
+                        speaker: "임대인",
+                        parts: [
+                            text("네. 처음에 내는 "), blank("deposit", "c15-vocab-10", "보증금"),
+                            text("은 계약이 끝나면 돌려드려요. 월세에는 관리비가 "), blank("included", "c15-vocab-11", "포함되어"),
+                            text(" 있지만, 전기·가스 같은 "), blank("utilities", "c15-vocab-13", "공과금"),
+                            text("은 따로 내야 합니다.")
+                        ]
+                    }
+                ],
+                choices: [
+                    choice("c15-vocab-15", "계약하기"),
+                    choice("c15-vocab-09", "계약서"),
+                    choice("c15-vocab-10", "보증금"),
+                    choice("c15-vocab-11", "포함되어"),
+                    choice("c15-vocab-13", "공과금"),
+                    choice("c15-vocab-12", "계약 기간"),
+                    choice("c15-vocab-14", "납부해야"),
+                    choice("c15-vocab-16", "연체료"),
+                    choice("c15-vocab-17", "밀릴까 봐"),
+                    choice("c15-vocab-18", "지출")
+                ]
+            },
+            {
+                id: "utility-schedule",
+                title: "공과금 납부 일정",
+                lines: [
+                    {
+                        speaker: "세입자",
+                        parts: [
+                            blank("term", "c15-vocab-12", "계약 기간"),
+                            text("은 1년인가요?")
+                        ]
+                    },
+                    {
+                        speaker: "임대인",
+                        parts: [
+                            text("네. "), blank("utility-first", "c15-vocab-13", "공과금"),
+                            text("은 매달 25일까지 "), blank("pay", "c15-vocab-14", "납부해야"),
+                            text(" 합니다. 늦으면 "), blank("late-fee", "c15-vocab-16", "연체료"),
+                            text("가 붙어요.")
+                        ]
+                    },
+                    {
+                        speaker: "세입자",
+                        parts: [
+                            text("이번 달 "), blank("utility-second", "c15-vocab-13", "공과금"),
+                            text("이 "), blank("overdue", "c15-vocab-17", "밀릴까 봐"),
+                            text(" 걱정이에요.")
+                        ]
+                    }
+                ],
+                choices: [
+                    choice("c15-vocab-12", "계약 기간"),
+                    choice("c15-vocab-13", "공과금", "utility-bill-1"),
+                    choice("c15-vocab-14", "납부해야"),
+                    choice("c15-vocab-16", "연체료"),
+                    choice("c15-vocab-13", "공과금", "utility-bill-2"),
+                    choice("c15-vocab-17", "밀릴까 봐"),
+                    choice("c15-vocab-15", "계약하기"),
+                    choice("c15-vocab-09", "계약서"),
+                    choice("c15-vocab-10", "보증금"),
+                    choice("c15-vocab-11", "포함되어"),
+                    choice("c15-vocab-18", "지출"),
+                    choice("c15-vocab-19", "수입")
+                ]
+            },
+            {
+                id: "monthly-budget",
+                title: "월말 가계부",
+                lines: [
+                    {
+                        speaker: "민지",
+                        parts: [
+                            text("지난달보다 아르바이트 시간이 늘어서 이번 달 "), blank("income", "c15-vocab-19", "수입"),
+                            text("이 많아졌어요. 하지만 배달 음식을 자주 시켜서 식비가 "), blank("increase", "c15-vocab-20", "늘었어요"),
+                            text(".")
+                        ]
+                    },
+                    {
+                        speaker: "유진",
+                        parts: [
+                            text("그래서 이번 주에는 필요 없는 물건을 사지 않아 전체 "), blank("expenses", "c15-vocab-18", "지출"),
+                            text("을 줄였어요. 남은 돈은 여행을 위해 "), blank("saving", "c15-vocab-25", "저축하려고요"),
+                            text(".")
+                        ]
+                    }
+                ],
+                choices: [
+                    choice("c15-vocab-19", "수입"),
+                    choice("c15-vocab-20", "늘었어요"),
+                    choice("c15-vocab-18", "지출"),
+                    choice("c15-vocab-25", "저축하려고요"),
+                    choice("c15-vocab-24", "낭비하는"),
+                    choice("c15-vocab-23", "절약해요"),
+                    choice("c15-vocab-22", "아껴요"),
+                    choice("c15-vocab-21", "줄었어요")
+                ]
+            },
+            {
+                id: "saving-promise",
+                title: "절약 약속",
+                lines: [
+                    {
+                        speaker: "유진",
+                        parts: [
+                            text("필요 없는 옷을 사는 것은 돈을 "), blank("waste", "c15-vocab-24", "낭비하는"),
+                            text(" 일이에요. 그래서 우리 집은 사용하지 않는 불을 끄고 전기와 물을 "), blank("save-resources", "c15-vocab-23", "절약해요"),
+                            text(".")
+                        ]
+                    },
+                    {
+                        speaker: "민지",
+                        parts: [
+                            text("물건을 살 때 꼭 필요한지 생각해서 돈을 "), blank("save-money", "c15-vocab-22", "아껴요"),
+                            text(". 그렇게 하니 지난달보다 공과금이 "), blank("decrease", "c15-vocab-21", "줄었어요"),
+                            text(".")
+                        ]
+                    }
+                ],
+                choices: [
+                    choice("c15-vocab-24", "낭비하는"),
+                    choice("c15-vocab-23", "절약해요"),
+                    choice("c15-vocab-22", "아껴요"),
+                    choice("c15-vocab-21", "줄었어요"),
+                    choice("c15-vocab-19", "수입"),
+                    choice("c15-vocab-20", "늘었어요"),
+                    choice("c15-vocab-18", "지출"),
+                    choice("c15-vocab-25", "저축하려고요")
+                ]
+            }
+        ];
+
+        QUIZZES.forEach(function (quiz) {
+            const usedChoiceIds = new Set();
+            quiz.choices.forEach(function (item) {
+                const baseId = item.choiceId || item.wordId;
+                let choiceId = baseId;
+                let copyNumber = 2;
+                while (usedChoiceIds.has(choiceId)) {
+                    choiceId = baseId + "__" + copyNumber;
+                    copyNumber += 1;
+                }
+                item.choiceId = choiceId;
+                usedChoiceIds.add(choiceId);
+            });
+        });
+
+        const quizById = new Map(QUIZZES.map(function (quiz) {
+            return [quiz.id, quiz];
+        }));
+        const feedbackByQuiz = new Map();
+        const activeBlankByQuiz = new Map();
+        const els = {
+            quizList: document.getElementById("quiz-list"),
+            progressLabel: document.getElementById("progress-label"),
+            progressBar: document.getElementById("progress-bar"),
+            completion: document.getElementById("completion"),
+            resetButton: document.getElementById("reset-button"),
+            storageStatus: document.getElementById("storage-status"),
+            storageStatusText: document.getElementById("storage-status-text"),
+            copyRecovery: document.getElementById("copy-recovery")
+        };
+
+        let storageMode = "ready";
+        let storageNotice = "";
+        let state = loadState();
+
+        function blankList(quiz) {
+            return quiz.lines.reduce(function (items, line) {
+                return items.concat(line.parts.filter(function (part) {
+                    return part.type === "blank";
+                }));
+            }, []);
+        }
+
+        function shuffled(values) {
+            const next = values.slice();
+            for (let index = next.length - 1; index > 0; index -= 1) {
+                const target = Math.floor(Math.random() * (index + 1));
+                const current = next[index];
+                next[index] = next[target];
+                next[target] = current;
+            }
+            return next;
+        }
+
+        function newEntry(quiz) {
+            return {
+                answers: {},
+                locked: [],
+                completed: false,
+                attempts: 0,
+                bankOrder: shuffled(quiz.choices.map(function (item) { return item.choiceId; }))
+            };
+        }
+
+        function newState() {
+            const entries = {};
+            QUIZZES.forEach(function (quiz) {
+                entries[quiz.id] = newEntry(quiz);
+            });
+            return {
+                version: VERSION,
+                entries: entries
+            };
+        }
+
+        function isPlainObject(value) {
+            return value !== null && typeof value === "object" && !Array.isArray(value);
+        }
+
+        function normalizeStoredState(candidate) {
+            if (!isPlainObject(candidate) || candidate.version !== VERSION || !isPlainObject(candidate.entries)) {
+                return null;
+            }
+
+            const normalized = { version: VERSION, entries: {} };
+            for (let quizIndex = 0; quizIndex < QUIZZES.length; quizIndex += 1) {
+                const quiz = QUIZZES[quizIndex];
+                const entry = candidate.entries[quiz.id];
+                const blanks = blankList(quiz);
+                const blankById = new Map(blanks.map(function (item) { return [item.id, item]; }));
+                const choiceIds = new Set(quiz.choices.map(function (item) { return item.choiceId; }));
+
+                if (!isPlainObject(entry)
+                    || !isPlainObject(entry.answers)
+                    || !Array.isArray(entry.locked)
+                    || !Array.isArray(entry.bankOrder)
+                    || typeof entry.completed !== "boolean"
+                    || !Number.isInteger(entry.attempts)
+                    || entry.attempts < 0) {
+                    return null;
+                }
+
+                const bankSet = new Set(entry.bankOrder);
+                if (entry.bankOrder.length !== choiceIds.size || bankSet.size !== choiceIds.size
+                    || entry.bankOrder.some(function (wordId) { return !choiceIds.has(wordId); })) {
+                    return null;
+                }
+
+                const answers = {};
+                const assigned = new Set();
+                const answerKeys = Object.keys(entry.answers);
+                for (let keyIndex = 0; keyIndex < answerKeys.length; keyIndex += 1) {
+                    const blankId = answerKeys[keyIndex];
+                    const choiceId = entry.answers[blankId];
+                    if (!blankById.has(blankId) || !choiceIds.has(choiceId) || assigned.has(choiceId)) {
+                        return null;
+                    }
+                    answers[blankId] = choiceId;
+                    assigned.add(choiceId);
+                }
+
+                const locked = [];
+                const lockedSet = new Set();
+                for (let lockIndex = 0; lockIndex < entry.locked.length; lockIndex += 1) {
+                    const blankId = entry.locked[lockIndex];
+                    const blankItem = blankById.get(blankId);
+                    const selectedChoice = choiceFor(quiz, answers[blankId]);
+                    if (!blankItem || lockedSet.has(blankId) || !selectedChoice || selectedChoice.wordId !== blankItem.wordId) {
+                        return null;
+                    }
+                    locked.push(blankId);
+                    lockedSet.add(blankId);
+                }
+
+                if (entry.completed !== (locked.length === blanks.length)) {
+                    return null;
+                }
+
+                normalized.entries[quiz.id] = {
+                    answers: answers,
+                    locked: locked,
+                    completed: entry.completed,
+                    attempts: entry.attempts,
+                    bankOrder: entry.bankOrder.slice()
+                };
+            }
+            return normalized;
+        }
+
+        function normalizeLegacyState(candidate) {
+            if (!isPlainObject(candidate) || candidate.version !== 1 || !isPlainObject(candidate.entries)) {
+                return null;
+            }
+
+            const migrated = { version: VERSION, entries: {} };
+            for (let quizIndex = 0; quizIndex < QUIZZES.length; quizIndex += 1) {
+                const quiz = QUIZZES[quizIndex];
+                const oldEntry = candidate.entries[quiz.id];
+                const blanks = blankList(quiz);
+                const blankById = new Map(blanks.map(function (item) { return [item.id, item]; }));
+                if (!isPlainObject(oldEntry) || !isPlainObject(oldEntry.answers)
+                    || !Array.isArray(oldEntry.locked) || !Number.isInteger(oldEntry.attempts) || oldEntry.attempts < 0) {
+                    return null;
+                }
+
+                const entry = newEntry(quiz);
+                const assignedChoiceIds = new Set();
+                const answerKeys = Object.keys(oldEntry.answers);
+                for (let answerIndex = 0; answerIndex < answerKeys.length; answerIndex += 1) {
+                    const blankId = answerKeys[answerIndex];
+                    const legacyWordId = oldEntry.answers[blankId];
+                    const matchingChoice = quiz.choices.find(function (item) {
+                        return item.wordId === legacyWordId && !assignedChoiceIds.has(item.choiceId);
+                    });
+                    if (!blankById.has(blankId) || !matchingChoice) return null;
+                    entry.answers[blankId] = matchingChoice.choiceId;
+                    assignedChoiceIds.add(matchingChoice.choiceId);
+                }
+
+                const lockedSet = new Set();
+                for (let lockIndex = 0; lockIndex < oldEntry.locked.length; lockIndex += 1) {
+                    const blankId = oldEntry.locked[lockIndex];
+                    const blankItem = blankById.get(blankId);
+                    const selectedChoice = choiceFor(quiz, entry.answers[blankId]);
+                    if (!blankItem || lockedSet.has(blankId) || !selectedChoice || selectedChoice.wordId !== blankItem.wordId) {
+                        return null;
+                    }
+                    entry.locked.push(blankId);
+                    lockedSet.add(blankId);
+                }
+
+                entry.completed = entry.locked.length === blanks.length;
+                entry.attempts = oldEntry.attempts;
+                migrated.entries[quiz.id] = entry;
+            }
+            return migrated;
+        }
+
+        function loadState() {
+            let raw;
+            try {
+                raw = window.localStorage.getItem(STORAGE_KEY);
+            } catch (error) {
+                storageMode = "unavailable";
+                storageNotice = "브라우저 저장소를 사용할 수 없습니다. 현재 답은 이 화면에만 남습니다.";
+                return newState();
+            }
+
+            if (!raw) return newState();
+
+            try {
+                const parsed = JSON.parse(raw);
+                const normalized = normalizeStoredState(parsed) || normalizeLegacyState(parsed);
+                if (normalized) return normalized;
+            } catch (error) {
+                // Keep an unreadable record untouched until the learner explicitly resets it.
+            }
+
+            storageMode = "corrupt";
+            storageNotice = "저장된 기록을 읽을 수 없습니다. 기존 기록은 지우지 않았습니다. 새로 시작하려면 아래에서 학습 기록을 초기화하세요.";
+            return newState();
+        }
+
+        function saveState() {
+            if (storageMode === "corrupt" || storageMode === "unavailable") return;
+            try {
+                window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                storageMode = "ready";
+                storageNotice = "";
+            } catch (error) {
+                storageMode = "unsaved";
+                storageNotice = "현재 답을 저장하지 못했습니다. 페이지를 닫기 전에 아래 버튼으로 답을 복사하세요.";
+            }
+        }
+
+        function entryFor(quizId) {
+            return state.entries[quizId];
+        }
+
+        function choiceFor(quiz, choiceId) {
+            return quiz.choices.find(function (item) { return item.choiceId === choiceId; }) || null;
+        }
+
+        function isLocked(entry, blankId) {
+            return entry.locked.includes(blankId);
+        }
+
+        function setFeedback(quizId, message, tone) {
+            feedbackByQuiz.set(quizId, { message: message, tone: tone });
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, function (character) {
+                return {
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;"
+                }[character];
+            });
+        }
+
+        function renderBlank(quiz, entry, item, blankNumber) {
+            const selectedChoiceId = entry.answers[item.id];
+            const selectedChoice = selectedChoiceId ? choiceFor(quiz, selectedChoiceId) : null;
+            const locked = isLocked(entry, item.id);
+            const active = activeBlankByQuiz.get(quiz.id) === item.id;
+            const classes = [
+                "blank",
+                selectedChoice ? "is-filled" : "",
+                locked ? "is-locked" : "",
+                active ? "is-selected" : ""
+            ].filter(Boolean).join(" ");
+
+            if (locked) {
+                return '<span class="' + classes + '" data-blank-id="' + escapeHtml(item.id)
+                    + '" aria-label="' + escapeHtml(blankNumber + "번 빈칸 정답 확정") + '">'
+                    + escapeHtml(selectedChoice.label) + "</span>";
+            }
+
+            const visibleLabel = selectedChoice ? selectedChoice.label : "____";
+            const ariaLabel = selectedChoice
+                ? blankNumber + "번 빈칸, " + selectedChoice.label + ". 다시 고르려면 누르세요."
+                : blankNumber + "번 빈칸 선택";
+
+            return '<button class="' + classes + '" type="button" data-action="select-blank"'
+                + ' data-quiz-id="' + escapeHtml(quiz.id) + '" data-blank-id="' + escapeHtml(item.id)
+                + '" aria-pressed="' + String(active) + '" aria-label="' + escapeHtml(ariaLabel) + '">'
+                + escapeHtml(visibleLabel) + "</button>";
+        }
+
+        function renderDialogue(quiz, entry) {
+            let blankNumber = 0;
+            const lines = quiz.lines.map(function (line) {
+                const body = line.parts.map(function (part) {
+                    if (part.type === "text") return escapeHtml(part.value);
+                    blankNumber += 1;
+                    return renderBlank(quiz, entry, part, blankNumber);
+                }).join("");
+                return '<p class="dialogue-line"><span class="speaker">' + escapeHtml(line.speaker)
+                    + ":</span>" + body + "</p>";
+            }).join("");
+            return '<div class="dialogue">' + lines + "</div>";
+        }
+
+        function renderWordBank(quiz, entry) {
+            const usedChoiceIds = new Set(Object.keys(entry.answers).map(function (blankId) {
+                return entry.answers[blankId];
+            }));
+            const choices = entry.bankOrder.map(function (choiceId) {
+                return choiceFor(quiz, choiceId);
+            }).filter(Boolean).map(function (item) {
+                const used = usedChoiceIds.has(item.choiceId);
+                return '<button class="word-chip" type="button" data-action="choose-word"'
+                    + ' data-quiz-id="' + escapeHtml(quiz.id) + '" data-choice-id="' + escapeHtml(item.choiceId)
+                    + '" aria-label="' + escapeHtml(item.label + (used ? ", 이미 사용함" : ", 빈칸에 넣기"))
+                    + '" draggable="' + String(!used) + '"' + (used ? " disabled" : "") + ">" + escapeHtml(item.label) + "</button>";
+            }).join("");
+
+            return '<div class="word-bank-wrap">'
+                + '<p class="word-bank-label"><span>어휘 바구니</span><small>후보 ' + quiz.choices.length
+                + "개 · 빈칸 " + blankList(quiz).length + "개</small></p>"
+                + '<div class="word-bank" role="group" aria-label="' + escapeHtml(quiz.title + " 어휘 바구니") + '">'
+                + choices + "</div></div>";
+        }
+
+        function renderQuiz(quiz, index) {
+            const entry = entryFor(quiz.id);
+            const blanks = blankList(quiz);
+            const feedback = feedbackByQuiz.get(quiz.id);
+            const lockedCount = entry.locked.length;
+            const completeClass = entry.completed ? " is-complete" : "";
+            const statusText = entry.completed ? "완료" : lockedCount + " / " + blanks.length + " 정답";
+            const feedbackMarkup = feedback
+                ? '<p id="feedback-' + escapeHtml(quiz.id) + '" class="quiz-feedback" role="status" data-tone="'
+                    + escapeHtml(feedback.tone) + '">' + escapeHtml(feedback.message) + "</p>"
+                : '<p id="feedback-' + escapeHtml(quiz.id) + '" class="quiz-feedback" role="status"></p>';
+
+            return '<article id="quiz-' + escapeHtml(quiz.id) + '" class="quiz-card' + completeClass
+                + '" data-quiz-id="' + escapeHtml(quiz.id) + '">'
+                + '<div class="quiz-card__head"><div><p class="card-eyebrow">대화 ' + (index + 1)
+                + '</p><h2>' + escapeHtml(quiz.title) + "</h2></div>"
+                + '<span class="quiz-count">' + escapeHtml(statusText) + "</span></div>"
+                + renderDialogue(quiz, entry)
+                + renderWordBank(quiz, entry)
+                + feedbackMarkup
+                + '<div class="quiz-actions"><button class="check-button" type="button" data-action="check-quiz"'
+                + ' data-quiz-id="' + escapeHtml(quiz.id) + '"' + (entry.completed ? " disabled" : "")
+                + ">" + (entry.completed ? "완성" : "확인") + "</button></div></article>";
+        }
+
+        function updateStorageNotice() {
+            const shouldShow = storageMode !== "ready";
+            els.storageStatus.hidden = !shouldShow;
+            if (!shouldShow) return;
+
+            els.storageStatusText.textContent = storageNotice;
+            els.copyRecovery.hidden = storageMode === "corrupt";
+        }
+
+        function totalLocked() {
+            return QUIZZES.reduce(function (total, quiz) {
+                return total + entryFor(quiz.id).locked.length;
+            }, 0);
+        }
+
+        function totalBlanks() {
+            return QUIZZES.reduce(function (total, quiz) {
+                return total + blankList(quiz).length;
+            }, 0);
+        }
+
+        function allCompleted() {
+            return QUIZZES.every(function (quiz) {
+                return entryFor(quiz.id).completed;
+            });
+        }
+
+        function renderAll() {
+            els.quizList.innerHTML = QUIZZES.map(renderQuiz).join("");
+            const completed = totalLocked();
+            const total = totalBlanks();
+            els.progressLabel.innerHTML = "완성 <strong>" + completed + " / " + total + "</strong>";
+            els.progressBar.style.width = (completed / total * 100) + "%";
+            els.completion.hidden = !allCompleted();
+            updateStorageNotice();
+        }
+
+        function focusAfterRender(selector) {
+            window.requestAnimationFrame(function () {
+                const target = document.querySelector(selector);
+                if (target) target.focus();
+            });
+        }
+
+        function firstUnfilledBlank(quiz, entry) {
+            return blankList(quiz).find(function (item) {
+                return !entry.answers[item.id] && !isLocked(entry, item.id);
+            }) || null;
+        }
+
+        function selectBlank(quiz, blankId) {
+            const entry = entryFor(quiz.id);
+            if (isLocked(entry, blankId)) return;
+
+            if (entry.answers[blankId]) {
+                delete entry.answers[blankId];
+                setFeedback(quiz.id, "선택한 빈칸을 비웠어요. 다른 표현을 골라 넣으세요.", "info");
+                saveState();
+            }
+
+            activeBlankByQuiz.set(quiz.id, blankId);
+            renderAll();
+            focusAfterRender('[data-action="select-blank"][data-quiz-id="' + quiz.id + '"][data-blank-id="' + blankId + '"]');
+        }
+
+        function isChoiceUsed(entry, choiceId) {
+            return Object.keys(entry.answers).some(function (blankId) {
+                return entry.answers[blankId] === choiceId;
+            });
+        }
+
+        function placeChoice(quiz, blankId, choiceId, feedbackMessage) {
+            const entry = entryFor(quiz.id);
+            const blankItem = blankList(quiz).find(function (item) { return item.id === blankId; });
+            const selectedChoice = choiceFor(quiz, choiceId);
+            if (!blankItem || !selectedChoice || isLocked(entry, blankId) || isChoiceUsed(entry, choiceId)) {
+                return null;
+            }
+
+            entry.answers[blankId] = choiceId;
+            const nextBlank = firstUnfilledBlank(quiz, entry);
+            if (nextBlank) {
+                activeBlankByQuiz.set(quiz.id, nextBlank.id);
+            } else {
+                activeBlankByQuiz.delete(quiz.id);
+            }
+            setFeedback(quiz.id, feedbackMessage, "info");
+            saveState();
+            renderAll();
+            return { nextBlank: nextBlank };
+        }
+
+        function chooseWord(quiz, choiceId) {
+            const activeBlankId = activeBlankByQuiz.get(quiz.id);
+            if (!activeBlankId) {
+                setFeedback(quiz.id, "먼저 빈칸을 선택하세요.", "warning");
+                renderAll();
+                focusAfterRender('[data-action="choose-word"][data-quiz-id="' + quiz.id + '"][data-choice-id="' + choiceId + '"]');
+                return;
+            }
+
+            const result = placeChoice(quiz, activeBlankId, choiceId, "표현을 넣었어요. 모든 빈칸을 채운 뒤 확인하세요.");
+            if (!result) return;
+
+            if (result.nextBlank) {
+                focusAfterRender('[data-action="select-blank"][data-quiz-id="' + quiz.id + '"][data-blank-id="' + result.nextBlank.id + '"]');
+            } else {
+                focusAfterRender('[data-action="check-quiz"][data-quiz-id="' + quiz.id + '"]');
+            }
+        }
+
+        function checkQuiz(quiz) {
+            const entry = entryFor(quiz.id);
+            const blanks = blankList(quiz);
+            const missing = blanks.filter(function (item) {
+                return !entry.answers[item.id];
+            });
+
+            if (missing.length) {
+                activeBlankByQuiz.set(quiz.id, missing[0].id);
+                setFeedback(quiz.id, "빈칸 " + missing.length + "개를 더 채운 뒤 확인하세요.", "warning");
+                renderAll();
+                focusAfterRender('[data-action="select-blank"][data-quiz-id="' + quiz.id + '"][data-blank-id="' + missing[0].id + '"]');
+                return;
+            }
+
+            entry.attempts += 1;
+            const wrong = blanks.filter(function (item) {
+                const selectedChoice = choiceFor(quiz, entry.answers[item.id]);
+                return !selectedChoice || selectedChoice.wordId !== item.wordId;
+            });
+
+            blanks.forEach(function (item) {
+                const selectedChoice = choiceFor(quiz, entry.answers[item.id]);
+                if (selectedChoice && selectedChoice.wordId === item.wordId && !isLocked(entry, item.id)) {
+                    entry.locked.push(item.id);
+                }
+            });
+
+            if (wrong.length) {
+                wrong.forEach(function (item) {
+                    delete entry.answers[item.id];
+                });
+                activeBlankByQuiz.set(quiz.id, wrong[0].id);
+                setFeedback(quiz.id, (blanks.length - wrong.length) + "개를 맞았어요. 틀린 빈칸만 다시 고르세요.", "warning");
+            } else {
+                entry.completed = true;
+                activeBlankByQuiz.delete(quiz.id);
+                setFeedback(quiz.id, "대화를 완성했어요.", "correct");
+            }
+
+            saveState();
+            renderAll();
+
+            if (wrong.length) {
+                focusAfterRender('[data-action="select-blank"][data-quiz-id="' + quiz.id + '"][data-blank-id="' + wrong[0].id + '"]');
+            } else {
+                const nextQuiz = QUIZZES[QUIZZES.findIndex(function (item) { return item.id === quiz.id; }) + 1];
+                if (nextQuiz && !entryFor(nextQuiz.id).completed) {
+                    const nextBlank = firstUnfilledBlank(nextQuiz, entryFor(nextQuiz.id));
+                    if (nextBlank) {
+                        focusAfterRender('[data-action="select-blank"][data-quiz-id="' + nextQuiz.id + '"][data-blank-id="' + nextBlank.id + '"]');
+                    }
+                }
+            }
+        }
+
+        function clearDropTargets() {
+            document.querySelectorAll(".blank.is-drop-target").forEach(function (item) {
+                item.classList.remove("is-drop-target");
+            });
+        }
+
+        function draggedChoiceData(event) {
+            const dataTransfer = event.dataTransfer;
+            if (!dataTransfer) return null;
+            const raw = dataTransfer.getData(DRAG_DATA_TYPE);
+            if (!raw) return null;
+            try {
+                const parsed = JSON.parse(raw);
+                if (!parsed || typeof parsed.quizId !== "string" || typeof parsed.choiceId !== "string") return null;
+                return parsed;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function recoveryText() {
+            const lines = ["15과 어휘 복습 퀴즈 현재 답"];
+            QUIZZES.forEach(function (quiz) {
+                const entry = entryFor(quiz.id);
+                const answers = blankList(quiz).map(function (item) {
+                    const selected = choiceFor(quiz, entry.answers[item.id]);
+                    return selected ? selected.label : "____";
+                });
+                lines.push(quiz.title + ": " + answers.join(" / "));
+            });
+            return lines.join("\n");
+        }
+
+        function copyRecovery() {
+            const content = recoveryText();
+            const finish = function (message) {
+                storageNotice = message;
+                updateStorageNotice();
+            };
+
+            if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+                navigator.clipboard.writeText(content).then(function () {
+                    finish("현재 답을 클립보드에 복사했어요.");
+                }).catch(function () {
+                    finish("답을 복사하지 못했습니다. 화면의 답을 확인해 주세요.");
+                });
+                return;
+            }
+
+            const textarea = document.createElement("textarea");
+            textarea.value = content;
+            textarea.setAttribute("readonly", "");
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.select();
+            const copied = document.execCommand("copy");
+            textarea.remove();
+            finish(copied ? "현재 답을 클립보드에 복사했어요." : "답을 복사하지 못했습니다. 화면의 답을 확인해 주세요.");
+        }
+
+        function resetProgress() {
+            if (!window.confirm("이 페이지의 어휘 복습 기록을 처음부터 지울까요?")) return;
+
+            try {
+                window.localStorage.removeItem(STORAGE_KEY);
+                storageMode = "ready";
+                storageNotice = "";
+            } catch (error) {
+                storageMode = "unavailable";
+                storageNotice = "브라우저 저장소를 사용할 수 없습니다. 현재 답은 이 화면에만 남습니다.";
+            }
+
+            state = newState();
+            feedbackByQuiz.clear();
+            activeBlankByQuiz.clear();
+            renderAll();
+            const firstQuiz = QUIZZES[0];
+            const firstBlank = firstUnfilledBlank(firstQuiz, entryFor(firstQuiz.id));
+            if (firstBlank) {
+                focusAfterRender('[data-action="select-blank"][data-quiz-id="' + firstQuiz.id + '"][data-blank-id="' + firstBlank.id + '"]');
+            }
+        }
+
+        els.quizList.addEventListener("click", function (event) {
+            const button = event.target.closest("[data-action]");
+            if (!button) return;
+            const quiz = quizById.get(button.dataset.quizId);
+            if (!quiz) return;
+
+            if (button.dataset.action === "select-blank") {
+                selectBlank(quiz, button.dataset.blankId);
+            } else if (button.dataset.action === "choose-word") {
+                chooseWord(quiz, button.dataset.choiceId);
+            } else if (button.dataset.action === "check-quiz") {
+                checkQuiz(quiz);
+            }
+        });
+
+        els.quizList.addEventListener("dragstart", function (event) {
+            const chip = event.target.closest('[data-action="choose-word"]');
+            if (!chip || chip.disabled || !event.dataTransfer) return;
+
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData(DRAG_DATA_TYPE, JSON.stringify({
+                quizId: chip.dataset.quizId,
+                choiceId: chip.dataset.choiceId
+            }));
+            chip.classList.add("is-dragging");
+        });
+
+        els.quizList.addEventListener("dragend", function (event) {
+            const chip = event.target.closest('[data-action="choose-word"]');
+            if (chip) chip.classList.remove("is-dragging");
+            clearDropTargets();
+        });
+
+        els.quizList.addEventListener("dragover", function (event) {
+            const target = event.target.closest('[data-action="select-blank"]');
+            if (!target) return;
+            const quiz = quizById.get(target.dataset.quizId);
+            if (!quiz || isLocked(entryFor(quiz.id), target.dataset.blankId)) return;
+
+            event.preventDefault();
+            clearDropTargets();
+            target.classList.add("is-drop-target");
+            if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+        });
+
+        els.quizList.addEventListener("dragleave", function (event) {
+            const target = event.target.closest('[data-action="select-blank"]');
+            if (!target || target.contains(event.relatedTarget)) return;
+            target.classList.remove("is-drop-target");
+        });
+
+        els.quizList.addEventListener("drop", function (event) {
+            const target = event.target.closest('[data-action="select-blank"]');
+            if (!target) return;
+            event.preventDefault();
+            clearDropTargets();
+
+            const quiz = quizById.get(target.dataset.quizId);
+            const dragged = draggedChoiceData(event);
+            if (!quiz || !dragged || dragged.quizId !== quiz.id) return;
+
+            placeChoice(quiz, target.dataset.blankId, dragged.choiceId, "표현을 빈칸에 넣었어요. 모든 빈칸을 채운 뒤 확인하세요.");
+        });
+
+        els.resetButton.addEventListener("click", resetProgress);
+        els.copyRecovery.addEventListener("click", copyRecovery);
+        window.addEventListener("pagehide", saveState);
+
+        window.__c15VocabularyReviewQuiz = {
+            getSpec: function () {
+                return QUIZZES.map(function (quiz) {
+                    return {
+                        id: quiz.id,
+                        title: quiz.title,
+                        blanks: blankList(quiz).map(function (item) {
+                            return { id: item.id, wordId: item.wordId, label: item.label };
+                        }),
+                        choices: quiz.choices.map(function (item) {
+                            return { id: item.choiceId, wordId: item.wordId, label: item.label };
+                        })
+                    };
+                });
+            },
+            snapshot: function () {
+                return JSON.parse(JSON.stringify({
+                    storageMode: storageMode,
+                    state: state,
+                    totalLocked: totalLocked(),
+                    totalBlanks: totalBlanks(),
+                    completed: allCompleted()
+                }));
+            }
+        };
+
+        renderAll();
+    }());
+    </script>
+</body>
+</html>
