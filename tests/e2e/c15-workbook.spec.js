@@ -34,7 +34,9 @@ test('C15 grammar 1 workbook grades, restores, and page-scoped resets answers', 
   await page.evaluate((key) => localStorage.removeItem(key), storageKey);
   await page.reload({ waitUntil: 'domcontentloaded' });
 
+  await expect(page.locator('[data-item="g1-ex1-0"] .wb-verb-hint')).toHaveText(/지내다/);
   await expect(page.locator('[data-item="g1-ex2-0"] .wb-verb-hint')).toHaveText(/자다/);
+  await expect(page.locator('[data-item="g1-ex3-3"] .wb-verb-hint')).toHaveText(/소개해 주다/);
 
   const answer = page.getByLabel('부탁하기 1번 답');
   await answer.fill('지내');
@@ -55,7 +57,9 @@ test('C15 grammar 2 workbook checks a source-based response', async ({ page }) =
   await page.evaluate((key) => localStorage.removeItem(key), storageKey);
   await page.reload({ waitUntil: 'domcontentloaded' });
 
+  await expect(page.locator('[data-item="g2-ex1-1"] .wb-verb-hint')).toHaveText(/어렵다/);
   await expect(page.locator('[data-item="g2-ex2-0"] .wb-verb-hint')).toHaveText(/고쳐 주다/);
+  await expect(page.locator('[data-item="g2-ex3-0"] .wb-verb-hint')).toHaveText(/바쁘다/);
 
   await page.getByLabel('근거를 보고 대답하기 1번 답').fill('인터넷으로 낼 수 있을걸요');
   await page.getByRole('button', { name: '근거를 보고 대답하기 답 확인' }).click();
