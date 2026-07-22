@@ -613,12 +613,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung de so sanh kich thuoc, luong hoac muc do voi mot danh tu.",
+                "title": "Hỗ trợ tiếng Việt",
+                "summary": "Dùng N만 하다 để so sánh kích thước hoặc mức độ của một vật với một vật quen thuộc mà không cần nêu con số chính xác.",
                 "points": [
-                    "Thuong nghia la bang khoang danh tu do.",
-                    "Danh tu truoc mau nay la tieu chuan so sanh.",
-                    "Can xem ngu canh de biet dang so kich thuoc, so luong hay muc do."
+                    "Đặt vật cần miêu tả trước; danh từ đứng trước 만 là chuẩn so sánh.",
+                    "Mẫu thường dùng cho kích thước, chiều dài, chiều cao hoặc diện tích.",
+                    "Mẫu có nghĩa gần với ‘cỡ N’ hoặc ‘bằng khoảng N’, không nhất thiết hoàn toàn giống 100%."
                 ]
             }
         }
@@ -637,12 +637,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung de noi nguoi noi ngay ca y nghi lam dieu do cung khong co.",
+                "title": "Hỗ trợ tiếng Việt",
+                "summary": "Dùng V-(으)ㄹ 생각도 못 하다 khi vì thời gian, tiền bạc, sức khỏe hoặc hoàn cảnh mà người nói không có điều kiện để bắt đầu một việc.",
                 "points": [
-                    "Nghia gan voi: toi chua tung nghi den chuyen do.",
-                    "Thuong dung cho tinh huong bat ngo, khong the hoac ngoai du doan.",
-                    "Nhan manh y nghi do con khong xuat hien."
+                    "Không chỉ là ‘không làm’; mẫu nhấn mạnh người nói thậm chí không dám nghĩ đến việc đó.",
+                    "Đổi động từ sang dạng -(으)ㄹ rồi thêm 생각도 못 하다: 가다 → 갈, 먹다 → 먹을.",
+                    "Thường nêu lý do trước; khác với V-(으)ㄹ 만하다, mẫu dùng để giới thiệu hoặc gợi ý."
                 ]
             }
         }
@@ -661,12 +661,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung de noi mot viec dang lam, chap nhan duoc hoac co the chiu duoc o muc du.",
+                "title": "Hỗ trợ tiếng Việt",
+                "summary": "Dùng V-(으)ㄹ 만하다 để giới thiệu hoặc khuyên thử một địa điểm, món ăn hay hoạt động đáng trải nghiệm.",
                 "points": [
-                    "Co the nghia la dang lam.",
-                    "Cung co the nghia la chiu duoc hoac hop ly o muc nao do.",
-                    "Xem danh tu hoac tinh huong de hieu sac thai chinh xac."
+                    "Gắn -(으)ㄹ 만하다 vào động từ; khi nói về trải nghiệm, mẫu thường đi với -아/어 보다, như 가 볼 만하다.",
+                    "Nêu thêm lý do như cảnh đẹp, món ngon, cơ sở vật chất hoặc không khí để lời gợi ý tự nhiên hơn.",
+                    "Có thể có một chút bất tiện, nhưng trải nghiệm vẫn đủ giá trị để thử."
                 ]
             }
         }
@@ -685,12 +685,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung de noi mot nguoi, noi hoac su vat noi tieng vi dieu gi.",
+                "title": "Hỗ trợ tiếng Việt",
+                "summary": "Dùng hai mẫu này để giới thiệu một địa điểm, người hoặc vật nổi tiếng vì điều gì.",
                 "points": [
-                    "Dung mot dang voi y tinh tu hoac dong tu.",
-                    "Dung mot dang khac voi danh tu.",
-                    "Diem noi tieng co the la pham chat, hanh dong, dia diem, mon an, nguoi hoac su kien."
+                    "Dùng A/V-기로 유명하다 khi lý do là đặc điểm, đánh giá hoặc hành động.",
+                    "Dùng N(으)로 유명하다 khi lý do là danh từ; danh từ có 받침 dùng 으로, không có 받침 hoặc 받침 là ㄹ thì dùng 로.",
+                    "Trong phần giới thiệu, nêu đối tượng trước rồi chọn mẫu theo loại lý do."
                 ]
             }
         }

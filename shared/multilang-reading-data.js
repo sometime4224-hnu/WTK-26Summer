@@ -366,6 +366,7 @@
             }
         },
         "c16/reading.html": {
+            ariaLabel: "다국어 읽기 도움말",
             title: "다국어 읽기 도움말",
             subtitle: "본문 전체 번역이 아니라 읽기 목표와 활동 지시만 짧게 확인하세요.",
             translations: {
@@ -379,12 +380,12 @@
                     ]
                 },
                 vi: {
-                    title: "Ho tro doc tieng Viet",
-                    summary: "Hay doc thong tin du lich/cong vien bang cach tim dia diem, hoat dong va ly do nen den.",
+                    title: "Hỗ trợ đọc tiếng Việt",
+                    summary: "Hãy đọc thông tin về công viên bằng cách tìm địa điểm, hoạt động và lý do mỗi nơi đáng đến.",
                     points: [
-                        "Nhom thong tin theo dia diem hoac hoat dong.",
-                        "Tim dieu dac biet cua moi dia diem.",
-                        "Dung tieu de va hinh anh de du doan noi dung truoc khi doc chi tiet."
+                        "Nhóm thông tin theo từng địa điểm hoặc hoạt động.",
+                        "Tìm điểm đặc biệt của mỗi địa điểm.",
+                        "Dùng tiêu đề và hình ảnh để dự đoán nội dung trước khi đọc chi tiết."
                     ]
                 },
                 ar: {
@@ -426,6 +427,7 @@
             }
         },
         "c16/reading-cuttoon.html": {
+            ariaLabel: "다국어 읽기 도움말",
             title: "다국어 읽기 도움말",
             subtitle: "본문 전체 번역이 아니라 읽기 목표와 활동 지시만 짧게 확인하세요.",
             translations: {
@@ -439,12 +441,12 @@
                     ]
                 },
                 vi: {
-                    title: "Ho tro doc tieng Viet",
-                    summary: "Hay doc cuttoon bang cach noi tung tranh voi hoat dong hoac dia diem trong cau tieng Han.",
+                    title: "Hỗ trợ đọc tiếng Việt",
+                    summary: "Hãy đọc truyện tranh bằng cách nối từng hình với hoạt động hoặc địa điểm được giới thiệu trong câu tiếng Hàn.",
                     points: [
-                        "Dung thu tu canh de hieu tuyen duong hoac trai nghiem.",
-                        "Tim ten hoat dong va tinh tu mieu ta.",
-                        "Hay de hinh anh ho tro hieu bai truoc khi xem chi tiet."
+                        "Dùng thứ tự các cảnh để hiểu tuyến đường hoặc trải nghiệm.",
+                        "Tìm tên hoạt động và các tính từ miêu tả.",
+                        "Hãy để hình ảnh hỗ trợ việc hiểu bài trước khi đọc chi tiết."
                     ]
                 },
                 ar: {

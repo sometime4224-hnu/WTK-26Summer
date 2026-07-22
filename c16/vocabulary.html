@@ -833,8 +833,8 @@
         languages: [
                 "en",
                 "vi",
-                "mn",
                 "ar",
+                "mn",
                 "kk",
                 "th"
         ],
@@ -1323,7 +1323,7 @@
         ]
 };
     window.MULTILANG_CONFIG = {
-        langs: window.VOCABULARY_CONFIG.languages || ["en", "vi", "mn", "ar", "kk", "th"],
+        langs: window.VOCABULARY_CONFIG.languages || ["en", "vi", "ar", "mn", "kk", "th"],
         defaultLang: window.VOCABULARY_CONFIG.defaultLang || "none"
     };
     </script>
@@ -1341,8 +1341,8 @@
             none: { label: "한국어 뜻", answerLabel: "한국어 뜻", speech: "ko-KR" },
             en: { label: "영어", answerLabel: "English", speech: "en-US" },
             vi: { label: "베트남어", answerLabel: "Tiếng Việt", speech: "vi-VN" },
-            mn: { label: "몽골어", answerLabel: "Монгол", speech: "mn-MN" },
             ar: { label: "아랍어", answerLabel: "العربية", speech: "ar", dir: "rtl" },
+            mn: { label: "몽골어", answerLabel: "Монгол", speech: "mn-MN" },
             kk: { label: "카자흐어", answerLabel: "Қазақша", speech: "kk-KZ" },
             th: { label: "태국어", answerLabel: "ไทย", speech: "th-TH" }
         };
@@ -1372,7 +1372,7 @@
         let currentView = "cards";
         let activeLang = readStored("preferred-lang", cfg.defaultLang || "none");
         if (!LANGS[activeLang] || (activeLang !== "none" && !cfg.languages?.includes(activeLang))) activeLang = "none";
-        const standardLangs = ["en", "vi", "mn", "ar", "kk", "th"];
+        const standardLangs = ["en", "vi", "ar", "mn", "kk", "th"];
         const translationLangs = (Array.isArray(cfg.languages) && cfg.languages.length ? cfg.languages : standardLangs)
             .filter((lang) => LANGS[lang]);
         let currentCategory = "all";
@@ -1463,6 +1463,10 @@
         function answerFor(word, lang = activeLang) {
             if (lang === "none") return word.meaning || word.example || word.ko;
             return word[lang] || word.meaning || word.example || word.ko;
+        }
+
+        function answerLangFor(word, lang = activeLang) {
+            return lang !== "none" && String(word[lang] || "").trim() ? lang : "ko";
         }
 
         function answerLabel() {
@@ -1644,7 +1648,7 @@
                         <span class="word-card__face word-card__back">
                             <button class="card-action card-action--speak" type="button" data-speak="${escapeHtml(word.ko)}" data-lang-code="ko-KR" aria-label="${escapeHtml(word.ko)} 듣기"><i class="fa-solid fa-volume-high"></i></button>
                             <span class="word-card__back-main">${escapeHtml(word.ko)}</span>
-                            <span class="word-card__translation" dir="${escapeHtml(langDir(activeLang))}">
+                            <span class="word-card__translation" lang="${escapeHtml(answerLangFor(word))}" dir="${escapeHtml(langDir(answerLangFor(word)))}">
                                 <span class="word-card__lang">${escapeHtml(answerLabel())}</span>
                                 <span class="word-card__translation-text">${escapeHtml(answerFor(word))}</span>
                             </span>
@@ -1697,7 +1701,7 @@
                         ${word.example ? `<div><strong>예문</strong> ${escapeHtml(word.example)}</div>` : ""}
                         <div class="translation-grid">
                             ${translationLangs.filter((lang) => word[lang]).map((lang) => `
-                                <div class="translation-cell" dir="${escapeHtml(langDir(lang))}"><strong>${escapeHtml(LANGS[lang].label)}</strong>${escapeHtml(word[lang])}</div>
+                                <div class="translation-cell" lang="${escapeHtml(lang)}" dir="${escapeHtml(langDir(lang))}"><strong lang="ko">${escapeHtml(LANGS[lang].label)}</strong>${escapeHtml(word[lang])}</div>
                             `).join("")}
                         </div>
                     </div>
@@ -1753,13 +1757,16 @@
             const wrong = pool.sort(() => Math.random() - 0.5).slice(0, 3);
             const choices = [current, ...wrong].sort(() => Math.random() - 0.5);
             const correctAnswer = quizAnswerFor(current);
-            els.quizFeedback.dir = quizMode === "meaning" ? langDir(activeLang) : "ltr";
+            els.quizFeedback.lang = "ko";
+            els.quizFeedback.dir = "ltr";
             choices.forEach((choice) => {
                 const option = document.createElement("button");
                 option.className = "quiz-option";
                 option.type = "button";
                 option.textContent = quizAnswerFor(choice);
-                option.dir = quizMode === "meaning" ? langDir(activeLang) : "ltr";
+                const optionLang = quizMode === "meaning" ? answerLangFor(choice) : "ko";
+                option.lang = optionLang;
+                option.dir = langDir(optionLang);
                 option.dataset.correct = String(choice === current);
                 option.addEventListener("click", () => {
                     const ok = choice === current;
@@ -1768,7 +1775,12 @@
                         if (button === option) button.classList.add(ok ? "correct" : "wrong");
                         if (!ok && button.dataset.correct === "true") button.classList.add("correct");
                     });
-                    els.quizFeedback.textContent = ok ? "정답!" : `오답 - 정답: ${correctAnswer}`;
+                    if (ok) {
+                        els.quizFeedback.textContent = "정답!";
+                    } else {
+                        const correctLang = quizMode === "meaning" ? answerLangFor(current) : "ko";
+                        els.quizFeedback.innerHTML = `오답 - 정답: <span lang="${escapeHtml(correctLang)}" dir="${escapeHtml(langDir(correctLang))}">${escapeHtml(correctAnswer)}</span>`;
+                    }
                     els.nextQuestionBtn.hidden = false;
                 });
                 els.quizOptions.appendChild(option);

@@ -131,65 +131,6 @@
             font-weight: 800;
         }
 
-        .translation-toggle {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            min-height: 38px;
-            border: 1px solid #93c5fd;
-            border-radius: 999px;
-            padding: 0 13px;
-            background: #ffffff;
-            color: #1d4ed8;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 900;
-        }
-
-        .translation-toggle[aria-pressed="true"] {
-            background: #dbeafe;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
-        }
-
-        .vi-panel {
-            margin-top: 14px;
-            border: 1px solid #bfdbfe;
-            border-radius: 20px;
-            padding: 14px;
-            background: #eff6ff;
-            color: #1e3a8a;
-        }
-
-        .vi-panel[hidden] {
-            display: none;
-        }
-
-        .vi-panel p {
-            margin: 0;
-            font-size: 13px;
-            font-weight: 700;
-            line-height: 1.7;
-        }
-
-        .vi-panel ul,
-        .vi-panel ol {
-            margin: 8px 0 0;
-            padding-left: 20px;
-            color: #1e3a8a;
-            font-size: 13px;
-            font-weight: 700;
-            line-height: 1.7;
-        }
-
-        .vi-panel code {
-            border-radius: 8px;
-            padding: 1px 6px;
-            background: #ffffff;
-            color: #1d4ed8;
-            font-family: inherit;
-            font-weight: 900;
-        }
-
         .section-card {
             padding: 18px;
         }
@@ -508,7 +449,7 @@
     </nav>
 
     <main class="shell">
-        <section class="glass-card hero-card">
+        <section class="glass-card hero-card" data-multilang-anchor>
             <span class="pill pill-blue"><i class="fa-solid fa-ruler-combined"></i> Grammar 1</span>
             <h1 class="mt-4 mb-3 text-3xl sm:text-4xl font-black leading-tight">N만 하다</h1>
             <p class="m-0 text-[15px] leading-7 text-slate-700 max-w-3xl">
@@ -518,17 +459,6 @@
             <div class="mt-5 flex flex-wrap gap-2">
                 <span class="formula-chip"><i class="fa-solid fa-arrow-right-arrow-left"></i> N1이/가 N2만 하다</span>
                 <span class="pill pill-soft"><i class="fa-solid fa-quote-left"></i> 가야금이 사람 키만 해요.</span>
-                <button class="translation-toggle" type="button" data-vi-toggle aria-pressed="false">
-                    <i class="fa-solid fa-language"></i> Tiếng Việt
-                </button>
-            </div>
-            <div class="vi-panel" data-vi-panel hidden>
-                <p><strong>Giải thích ngắn:</strong> Dùng <code>N만 하다</code> khi muốn nói kích thước hoặc mức độ của một vật bằng một vật quen thuộc. Không cần nói số chính xác.</p>
-                <ul>
-                    <li>Nói vật cần miêu tả trước.</li>
-                    <li>Sau đó nói vật dùng để so sánh, ví dụ <code>사람 키</code>, <code>손바닥</code>, <code>둥근 탁자</code>.</li>
-                    <li>Khi luyện nói, giữ mẫu và ví dụ bằng tiếng Hàn. Không dịch <code>N만 하다</code> thành câu tiếng Việt.</li>
-                </ul>
             </div>
         </section>
 
@@ -593,9 +523,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="vi-panel" data-vi-panel hidden>
-                        <p><strong>Cách làm:</strong> Chọn vật cần nói, chọn một vật quen thuộc để so sánh, rồi dùng mẫu tiếng Hàn <code>N만 하다</code>. Ví dụ <code>가야금이 사람 키만 해요.</code></p>
-                    </div>
                 </article>
 
                 <article class="tone-panel tone-panel--amber">
@@ -611,9 +538,6 @@
                         <li>주로 크기, 길이, 높이, 넓이처럼 감각적으로 비교할 때 잘 어울립니다.</li>
                         <li><code>N만 하다</code>는 “정확히 같다”보다 “그 정도로 느껴진다”에 가깝습니다.</li>
                     </ul>
-                    <div class="vi-panel" data-vi-panel hidden>
-                        <p><strong>Lưu ý:</strong> Mẫu này thường nói cảm giác “khoảng bằng như vậy”. Nó không nhất thiết là hoàn toàn giống 100%.</p>
-                    </div>
                 </article>
             </div>
         </section>
@@ -691,9 +615,6 @@
                         <li>비교 기준: 사람 키만, 둥근 탁자만, 손바닥만</li>
                         <li>마무리: 해요 / 커요 / 길어요</li>
                     </ol>
-                    <div class="vi-panel" data-vi-panel hidden>
-                        <p><strong>Mẹo nói:</strong> Đừng bắt đầu bằng tiếng Việt. Hãy nhìn vật, chọn chuẩn so sánh, rồi nói câu tiếng Hàn với <code>N만 하다</code>.</p>
-                    </div>
                 </article>
             </div>
 
@@ -859,20 +780,6 @@
                 state.index = 0;
                 state.score = 0;
                 renderQuestion();
-            });
-
-            const translationToggle = document.querySelector('[data-vi-toggle]');
-            const translationPanels = Array.from(document.querySelectorAll('[data-vi-panel]'));
-
-            function setTranslationVisible(isVisible) {
-                translationToggle.setAttribute('aria-pressed', String(isVisible));
-                translationPanels.forEach(function (panel) {
-                    panel.hidden = !isVisible;
-                });
-            }
-
-            translationToggle.addEventListener('click', function () {
-                setTranslationVisible(translationToggle.getAttribute('aria-pressed') !== 'true');
             });
 
             renderQuestion();
