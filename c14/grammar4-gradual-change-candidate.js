@@ -2,7 +2,7 @@
     "use strict";
 
     const OBJECT_BASE = "../assets/c14/grammar/images/g4-hires-objects";
-    const SINGLE_BASE = "../assets/c14/vocabulary/images/split-variants/single";
+    const CARD_BASE = "../assets/c14/vocabulary/images/cards";
     const STORAGE_KEY = "c14-grammar4-gradual-change-candidate-v1";
     const STORAGE_VERSION = 1;
     const MAX_STORED_STAGE = 120;
@@ -17,7 +17,7 @@
             direction: "grow",
             sceneLabel: "꽃",
             effectCopy: "꽃이 점점 많아져요.",
-            baseImage: `${SINGLE_BASE}/s05_tl_n17.webp`,
+            baseImage: `${CARD_BASE}/c14-17.webp`,
             baseAlt: "가꾸다 장면 배경",
             spawn: { x: [12, 90], y: [58, 86], w: [9, 15], rotate: [-7, 7], scale: [0.78, 1.04] },
             patches: [
@@ -37,7 +37,7 @@
             direction: "grow",
             sceneLabel: "싹",
             effectCopy: "싹이 점점 많아져요.",
-            baseImage: `${SINGLE_BASE}/s04_tr_n14.webp`,
+            baseImage: `${CARD_BASE}/c14-14.webp`,
             baseAlt: "심다 장면 배경",
             spawn: { x: [12, 88], y: [58, 88], w: [7, 10], rotate: [-6, 6], scale: [0.76, 1.02] },
             patches: [
@@ -57,7 +57,7 @@
             direction: "grow",
             sceneLabel: "소",
             effectCopy: "소가 점점 많아져요.",
-            baseImage: `${SINGLE_BASE}/s04_bl_n15.webp`,
+            baseImage: `${CARD_BASE}/c14-15.webp`,
             baseAlt: "가축 장면 배경",
             spawn: { x: [14, 88], y: [55, 78], w: [10, 18], rotate: [-5, 5], scale: [0.72, 1] },
             patches: [
@@ -77,7 +77,7 @@
             direction: "grow",
             sceneLabel: "물고기",
             effectCopy: "물고기가 점점 많아져요.",
-            baseImage: `${SINGLE_BASE}/s04_br_n16.webp`,
+            baseImage: `${CARD_BASE}/c14-16.webp`,
             baseAlt: "물고기 장면 배경",
             spawn: { x: [12, 90], y: [54, 82], w: [11, 18], rotate: [-7, 7], scale: [0.74, 1] },
             patches: [
@@ -97,7 +97,7 @@
             direction: "grow",
             sceneLabel: "당근",
             effectCopy: "당근이 점점 많아져요.",
-            baseImage: `${SINGLE_BASE}/s04_tl_n13.webp`,
+            baseImage: `${CARD_BASE}/c14-13.webp`,
             baseAlt: "채소 장면 배경",
             spawn: { x: [14, 88], y: [62, 88], w: [9, 14], rotate: [-7, 7], scale: [0.76, 1] },
             patches: [
