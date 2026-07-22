@@ -147,11 +147,16 @@
         return (accepted || []).some(function (answer) { return normal === normalize(answer); });
     }
 
-    function checkOpenResponse(value, requiredPattern) {
+    function checkOpenResponse(value, requiredPattern, requiredPatterns) {
         var normal = normalize(value);
+        var patterns = Array.isArray(requiredPatterns) && requiredPatterns.length
+            ? requiredPatterns
+            : (requiredPattern ? [requiredPattern] : []);
         if (!normal) return { kind: "empty", message: "먼저 답을 적어 보세요." };
-        if (requiredPattern && normal.indexOf(normalize(requiredPattern)) === -1) {
-            return { kind: "needs-work", message: "문장은 여러 가지가 될 수 있어요. <strong>" + escapeHtml(requiredPattern) + "</strong> 표현을 넣어 다시 확인해 보세요." };
+        if (patterns.length && !patterns.some(function (pattern) {
+            return normal.indexOf(normalize(pattern)) !== -1;
+        })) {
+            return { kind: "needs-work", message: "문장은 여러 가지가 될 수 있어요. <strong>" + escapeHtml(requiredPattern || patterns[0]) + "</strong> 표현을 넣어 다시 확인해 보세요." };
         }
         return { kind: "correct", message: "좋아요. 목표 표현을 넣어 답을 만들었어요." };
     }
@@ -169,7 +174,7 @@
             var value = field.value.trim();
             var outcome;
             if (item.open) {
-                outcome = checkOpenResponse(value, item.requiredPattern);
+                outcome = checkOpenResponse(value, item.requiredPattern, item.requiredPatterns);
             } else if (!value) {
                 outcome = { kind: "empty", message: "먼저 답을 적어 보세요." };
             } else if (checkExact(value, item.answers)) {

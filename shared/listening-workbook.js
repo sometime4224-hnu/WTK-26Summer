@@ -930,6 +930,10 @@
         return (config && config.translationScaffold) || {};
     }
 
+    function hasAllSubtitleStagesUnlocked(config = pageConfig) {
+        return Boolean(config && config.subtitleAccess && config.subtitleAccess.allStagesUnlocked);
+    }
+
     function shouldHideTranslationContent(config = pageConfig) {
         const scaffold = getTranslationScaffoldConfig(config);
         return Boolean(scaffold.hideTranslations || scaffold.disableTranslations || (config && config.hideTranslations));
@@ -994,6 +998,12 @@
     }
 
     function getSubtitleHelpText() {
+        if (hasAllSubtitleStagesUnlocked()) {
+            return chooseLocalizedText(
+                "청취 횟수와 관계없이 핵심어와 전체 대본을 모두 선택할 수 있습니다.",
+                "Có thể chọn từ khóa hoặc toàn bộ lời thoại ngay, không phụ thuộc vào số lần nghe."
+            );
+        }
         if (shouldHideTranslationContent()) {
             return "자막은 1회 청취 후 핵심어, 2회 후 전체 대본이 열립니다.";
         }
@@ -1007,6 +1017,12 @@
     }
 
     function getCurrentStageText(label, unlocked) {
+        if (hasAllSubtitleStagesUnlocked()) {
+            return chooseLocalizedText(
+                `현재 단계: ${label} · 모든 자막 단계를 선택할 수 있습니다.`,
+                `Mức hiện tại: ${label} · có thể chọn tất cả các mức phụ đề.`
+            );
+        }
         if (!usesMinimalTranslationScaffold()) {
             return getInstructionText().currentStage(label, unlocked);
         }
@@ -5457,6 +5473,7 @@
 
     function getLessonUnlockedStage(lesson, listens) {
         const maxStage = Math.max(getLessonStages(lesson).length - 1, 0);
+        if (hasAllSubtitleStagesUnlocked()) return maxStage;
         if (listens >= 3) return Math.min(3, maxStage);
         if (listens >= 2) return Math.min(2, maxStage);
         if (listens >= 1) return Math.min(1, maxStage);

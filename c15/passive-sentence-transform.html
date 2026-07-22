@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>15과 보조 학습 | 피동 문장 변환 애니메이션</title>
+    <link rel="stylesheet" href="passive-sentence-transform.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+</head>
+<body>
+    <nav class="global-nav" aria-label="상단 이동">
+        <a href="../index.html">메인</a>
+        <span class="nav-divider" aria-hidden="true">|</span>
+        <a href="index.html">15과 목록</a>
+    </nav>
+
+    <main id="page" class="page-shell">
+        <p id="restoreNotice" class="notice" role="alert" hidden></p>
+
+        <section id="transformPanel" class="transform-panel" aria-labelledby="pageTitle">
+            <div class="section-heading section-heading--stage">
+                <div>
+                    <p id="scenarioCount" class="eyebrow">행위자 명시형 1 / 5</p>
+                    <h1 id="pageTitle">피동 문장 바꾸기</h1>
+                    <p class="transform-intro">동사 → 주어 → 목적어를 차례로 아래 피동문으로 옮겨 보세요.</p>
+                </div>
+                <p id="saveStatus" class="save-status" aria-live="polite">저장 준비됨</p>
+            </div>
+
+            <div id="scenarioTabs" class="scenario-tabs" role="tablist" aria-label="행위자 명시형 예문 선택"></div>
+
+            <article class="stage-card" aria-live="polite">
+                <p id="stepLabel" class="step-label">먼저 능동문을 살펴보세요.</p>
+                <p id="stepDescription" class="stage-description">누가 누구에게 어떤 행동을 하는지 확인합니다.</p>
+
+                <div id="sentenceBoard" class="sentence-board" role="tabpanel" aria-labelledby="scenario-catch" data-phase="0" data-next-part="verb">
+                    <div class="sentence-lane sentence-lane--active">
+                        <p class="lane-title">능동문</p>
+                        <div id="activeSentence" class="sentence-line" aria-label="선택한 능동문"></div>
+                    </div>
+                    <div class="transform-arrow" aria-hidden="true">↓</div>
+                    <div class="sentence-lane sentence-lane--passive">
+                        <p class="lane-title">피동문</p>
+                        <div id="passiveSentence" class="sentence-line sentence-line--passive" aria-live="polite" aria-label="아직 비어 있는 피동문"></div>
+                    </div>
+                </div>
+
+                <div class="stage-actions">
+                    <button id="stageNextBtn" class="button button--primary" type="button">다음 변화</button>
+                </div>
+
+                <details id="sceneViewer" class="scene-viewer">
+                    <summary>그림으로 함께 보기</summary>
+                    <div class="scene-viewer__body">
+                        <p class="scene-viewer__guide">왼쪽은 능동문 장면, 오른쪽은 피동문 장면이에요.</p>
+                        <div class="scene-pair">
+                            <figure class="scene-figure">
+                                <div class="scene-image-crop">
+                                    <img id="activeSceneImage" src="" alt="" loading="lazy" decoding="async" />
+                                </div>
+                                <figcaption>
+                                    <span class="scene-figure__label">능동 장면</span>
+                                    <span id="activeSceneCaption"></span>
+                                </figcaption>
+                            </figure>
+                            <figure class="scene-figure">
+                                <div class="scene-image-crop scene-image-crop--passive">
+                                    <img id="passiveSceneImage" src="" alt="" loading="lazy" decoding="async" />
+                                </div>
+                                <figcaption>
+                                    <span class="scene-figure__label">피동 장면</span>
+                                    <span id="passiveSceneCaption"></span>
+                                </figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </details>
+            </article>
+
+        </section>
+
+        <section id="omissionPanel" class="omission-panel" aria-labelledby="omissionTitle" hidden>
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">행위자 생략</p>
+                    <h2 id="omissionTitle">누가 했는지, 꼭 말해야 할까요?</h2>
+                </div>
+            </div>
+            <p class="section-intro">피동문에서는 행위자를 모를 때도, 말할 필요가 없을 때도 행위자를 생략할 수 있어요.</p>
+
+            <div class="omission-grid">
+                <article class="omission-group">
+                    <h3>행위자를 몰라요</h3>
+                    <p>누가 했는지 알 수 없으면 대상과 결과만 말해요.</p>
+                    <div id="unknownOmissionChoices" class="omission-choices"></div>
+                </article>
+                <article class="omission-group">
+                    <h3>행위자를 말할 필요가 없어요</h3>
+                    <p>지금 중요한 정보가 결과나 상태라면 행위자를 빼도 자연스러워요.</p>
+                    <div id="unneededOmissionChoices" class="omission-choices"></div>
+                </article>
+            </div>
+            <p id="omissionExplanation" class="omission-explanation" aria-live="polite">예문을 누르면 능동문과 생략 이유를 확인할 수 있어요.</p>
+
+            <details class="form-guide">
+                <summary>피동형 만드는 법 보기</summary>
+                <div class="form-guide__body">
+                    <p>동사에 따라 피동형이 달라집니다. 문장을 바꿀 때는 조사 변화와 함께 동사 형태도 확인하세요.</p>
+                    <ul class="form-list">
+                        <li><strong>-이:</strong> 쓰다 → 쓰이다</li>
+                        <li><strong>-히:</strong> 잡다 → 잡히다</li>
+                        <li><strong>-리:</strong> 열다 → 열리다</li>
+                        <li><strong>-기:</strong> 안다 → 안기다</li>
+                        <li><strong>-아/어지다:</strong> 고치다 → 고쳐지다</li>
+                        <li><strong>-되다:</strong> 포함하다 → 포함되다</li>
+                    </ul>
+                </div>
+            </details>
+        </section>
+
+        <section class="progress-tools" aria-label="학습 저장 관리">
+            <p id="progressSummary" class="progress-summary" aria-live="polite"></p>
+            <div class="progress-tools__actions">
+                <button id="resetProgressBtn" class="text-button" type="button">이 페이지 학습 기록 초기화</button>
+                <button id="copyRecoveryBtn" class="text-button" type="button" hidden>현재 학습 기록 복사</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="animationLayer" aria-hidden="true"></div>
+
+    <script src="passive-sentence-transform.js"></script>
+    <script src="../shared/learning-enhancements.js"></script>
+    <script src="../shared/site-copyright.js"></script>
+    <script src="../shared/page-qr.js"></script>
+</body>
+</html>
