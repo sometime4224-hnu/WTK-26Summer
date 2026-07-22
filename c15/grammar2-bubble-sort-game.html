@@ -99,6 +99,15 @@
             font-weight: 800;
         }
 
+        .save-status {
+            max-width: 170px;
+            color: var(--rose);
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.35;
+            text-align: right;
+        }
+
         .hero,
         .panel {
             border-radius: 24px;
@@ -298,12 +307,43 @@
             word-break: keep-all;
         }
 
-        .scene-subtext {
+        .scene-translation,
+        .i18n-inline {
+            display: block;
             margin: 8px 0 0;
             color: var(--muted);
             font-size: 14px;
             line-height: 1.55;
             word-break: keep-all;
+        }
+
+        .i18n-inline[hidden] {
+            display: none;
+        }
+
+        .i18n-compact {
+            display: inline;
+            margin-inline-start: 6px;
+            color: rgba(255, 255, 255, 0.88);
+            font-size: 0.86em;
+            font-weight: 800;
+        }
+
+        .game-language-bar {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(253, 186, 116, 0.58);
+        }
+
+        .game-language-label {
+            margin: 0;
+            color: var(--orange);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .game-language-bar .multilang-bar {
+            padding-bottom: 0;
         }
 
         .mobile-step-nav,
@@ -594,7 +634,7 @@
         }
 
         .zone__drop:empty::before {
-            content: "여기에 놓기";
+            content: attr(data-drop-label);
             color: var(--muted);
             font-size: 13px;
             font-weight: 800;
@@ -660,7 +700,7 @@
         }
 
         .feedback__ko,
-        .feedback__vi,
+        .feedback__translation,
         .feedback__hint {
             margin: 8px 0 0;
             font-size: 14px;
@@ -668,7 +708,7 @@
             word-break: keep-all;
         }
 
-        .feedback__vi,
+        .feedback__translation,
         .feedback__hint {
             color: var(--muted);
         }
@@ -783,14 +823,14 @@
         }
 
         .option-card__ko,
-        .option-card__vi {
+        .option-card__translation {
             margin: 8px 0 0;
             font-size: 13px;
             line-height: 1.55;
             word-break: keep-all;
         }
 
-        .option-card__vi {
+        .option-card__translation {
             color: var(--muted);
         }
 
@@ -922,7 +962,7 @@
             word-break: keep-all;
         }
 
-        .review-card__vi {
+        .review-card__translation {
             margin: 8px 0 0;
             color: var(--muted);
             font-size: 13px;
@@ -1038,10 +1078,10 @@
                 font-size: 21px;
             }
 
-            .scene-subtext,
+            .scene-translation,
             .move-guide__mode,
             .feedback__ko,
-            .feedback__vi,
+            .feedback__translation,
             .feedback__hint {
                 font-size: 13px;
             }
@@ -1123,6 +1163,7 @@
         }
     </style>
         <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+        <link rel="stylesheet" href="../shared/multilang-toggle.css" />
 </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
@@ -1132,88 +1173,93 @@
 
     <main class="app">
         <div class="topbar">
-            <a class="back-link" href="grammar2.html">← 문법 2</a>
+            <a class="back-link" href="grammar2.html" data-i18n-key="back" data-i18n-mode="append">← 문법 2</a>
             <div class="topbar__meta">
                 <span id="progressText">연습 1 / 3</span>
                 <span id="scoreText">비교 연습</span>
             </div>
+            <span id="saveStatus" class="save-status" hidden>진행 내용이 이 기기에 저장되지 않았어요.</span>
         </div>
 
         <section class="hero">
-            <p class="eyebrow">15과 문법 2 보조 게임</p>
-            <h1>말풍선을 알맞은 칸에 놓아 보세요.</h1>
-            <p>연습 스테이지에서는 맞고 틀림을 보지 않습니다. 같은 문장 줄기를 네 추측 표현에 바꿔 넣으면서 느낌 차이를 비교합니다. 문제 스테이지부터 최적 정답, 부분 정답, 오답을 구분합니다.</p>
+            <p class="eyebrow" data-i18n-key="eyebrow" data-i18n-mode="below">15과 문법 2 보조 게임</p>
+            <h1 data-i18n-key="title" data-i18n-mode="below">말풍선을 알맞은 칸에 놓아 보세요.</h1>
+            <p data-i18n-key="lead" data-i18n-mode="below">연습 스테이지에서는 맞고 틀림을 보지 않습니다. 같은 문장 줄기를 네 추측 표현에 바꿔 넣으면서 느낌 차이를 비교합니다. 문제 스테이지부터 최적 정답, 부분 정답, 오답을 구분합니다.</p>
+            <div class="game-language-bar" aria-label="다국어 도움">
+                <p class="game-language-label" data-i18n-key="languageHelp" data-i18n-mode="append">다국어 도움</p>
+                <div data-multilang-bar></div>
+            </div>
         </section>
 
         <section id="playScreen" class="panel">
             <span id="stageChip" class="stage-chip">연습 스테이지</span>
             <div id="mobileStepNav" class="mobile-step-nav" hidden>
-                <button id="mobileExplainBtn" class="mobile-step-btn is-active" type="button" aria-pressed="true">1. 설명</button>
-                <button id="mobileActBtn" class="mobile-step-btn" type="button" aria-pressed="false">2. 수행</button>
+                <button id="mobileExplainBtn" class="mobile-step-btn is-active" type="button" aria-pressed="true" data-i18n-key="explainStep" data-i18n-mode="append">1. 설명</button>
+                <button id="mobileActBtn" class="mobile-step-btn" type="button" aria-pressed="false" data-i18n-key="actStep" data-i18n-mode="append">2. 수행</button>
             </div>
 
             <div id="explainStage" class="mobile-step-panel">
                 <div id="practiceGuide" class="practice-guide" hidden>
-                    <p class="practice-guide__title">말맛 지도</p>
+                    <p class="practice-guide__title" data-i18n-key="guideTitle" data-i18n-mode="append">말맛 지도</p>
                     <div class="practice-guide__grid">
                         <article class="practice-guide__card" data-form="geolyo">
                             <div class="practice-guide__flow">
-                                <span class="practice-guide__box">상대 말</span>
+                                <span class="practice-guide__box" data-i18n-key="otherWords" data-i18n-mode="append">상대 말</span>
                                 <span class="practice-guide__arrow" aria-hidden="true"></span>
-                                <span class="practice-guide__box">내 답</span>
+                                <span class="practice-guide__box" data-i18n-key="myAnswer" data-i18n-mode="append">내 답</span>
                             </div>
                             <strong>-걸요</strong>
-                            <p>누가 말했을 때 바로 부드럽게 답해요.</p>
+                            <p data-i18n-key="guideGeolyo" data-i18n-mode="below">누가 말했을 때 바로 부드럽게 답해요.</p>
                         </article>
                         <article class="practice-guide__card" data-form="geoyeyo">
                             <div class="practice-guide__flow">
-                                <span class="practice-guide__box practice-guide__box--blue">안내</span>
+                                <span class="practice-guide__box practice-guide__box--blue" data-i18n-key="notice" data-i18n-mode="append">안내</span>
                                 <span class="practice-guide__arrow" aria-hidden="true"></span>
-                                <span class="practice-guide__box practice-guide__box--blue">설명</span>
+                                <span class="practice-guide__box practice-guide__box--blue" data-i18n-key="explanation" data-i18n-mode="append">설명</span>
                             </div>
                             <strong>-거예요</strong>
-                            <p>차분히 알려 주거나 설명할 때 잘 보여요.</p>
+                            <p data-i18n-key="guideGeoyeyo" data-i18n-mode="below">차분히 알려 주거나 설명할 때 잘 보여요.</p>
                         </article>
                         <article class="practice-guide__card" data-form="geotgathayo">
                             <div class="practice-guide__flow practice-guide__flow--single">
-                                <span class="practice-guide__box practice-guide__box--violet">내 생각</span>
+                                <span class="practice-guide__box practice-guide__box--violet" data-i18n-key="myThought" data-i18n-mode="append">내 생각</span>
                             </div>
                             <strong>-것 같아요</strong>
-                            <p>내 생각이나 내 판단을 조심스럽게 말해요.</p>
+                            <p data-i18n-key="guideGeotgathayo" data-i18n-mode="below">내 생각이나 내 판단을 조심스럽게 말해요.</p>
                         </article>
                         <article class="practice-guide__card" data-form="tendeyo">
                             <div class="practice-guide__flow">
-                                <span class="practice-guide__box practice-guide__box--green">예상</span>
+                                <span class="practice-guide__box practice-guide__box--green" data-i18n-key="prediction" data-i18n-mode="append">예상</span>
                                 <span class="practice-guide__arrow" aria-hidden="true"></span>
-                                <span class="practice-guide__box practice-guide__box--green">뒤에 말</span>
+                                <span class="practice-guide__box practice-guide__box--green" data-i18n-key="moreTalk" data-i18n-mode="append">뒤에 말</span>
                             </div>
                             <strong>-텐데요</strong>
-                            <p>걱정이나 덧붙이는 말이 뒤에 더 올 것 같아요.</p>
+                            <p data-i18n-key="guideTendeyo" data-i18n-mode="below">걱정이나 덧붙이는 말이 뒤에 더 올 것 같아요.</p>
                         </article>
                     </div>
-                    <p class="practice-guide__hint">연습에서는 카드를 이 칸 저 칸 옮겨 보세요. 선택한 칸과 위의 말맛 지도가 같이 강조됩니다.</p>
+                    <p class="practice-guide__hint" data-i18n-key="guideHint" data-i18n-mode="below">연습에서는 카드를 이 칸 저 칸 옮겨 보세요. 선택한 칸과 위의 말맛 지도가 같이 강조됩니다.</p>
                 </div>
 
-                <p class="scene-label">상황</p>
+                <p class="scene-label" data-i18n-key="sceneLabel" data-i18n-mode="append">상황</p>
                 <p id="sceneText" class="scene-text"></p>
-                <p id="sceneViText" class="scene-subtext"></p>
+                <p id="sceneTranslationText" class="scene-translation" hidden></p>
 
                 <div class="move-guide">
-                    <p class="move-guide__title">움직이는 방법</p>
+                    <p class="move-guide__title" data-i18n-key="moveTitle" data-i18n-mode="append">움직이는 방법</p>
                     <div class="move-guide__row">
                         <article class="move-guide__step">
-                            <strong>1. 위 말풍선</strong>
-                            <p>이 말풍선이 옮길 대상이에요.</p>
+                            <strong data-i18n-key="moveOne" data-i18n-mode="append">1. 위 말풍선</strong>
+                            <p data-i18n-key="moveOneText" data-i18n-mode="below">이 말풍선이 옮길 대상이에요.</p>
                         </article>
                         <span class="move-guide__arrow" aria-hidden="true"></span>
                         <article class="move-guide__step">
-                            <strong>2. 아래 칸</strong>
-                            <p>아래 네 칸 중 한 칸으로 내려요.</p>
+                            <strong data-i18n-key="moveTwo" data-i18n-mode="append">2. 아래 칸</strong>
+                            <p data-i18n-key="moveTwoText" data-i18n-mode="below">아래 네 칸 중 한 칸으로 내려요.</p>
                         </article>
                         <span class="move-guide__arrow" aria-hidden="true"></span>
                         <article class="move-guide__step">
-                            <strong>3. 놓기 또는 누르기</strong>
-                            <p>끌어다 놓거나 칸을 눌러도 돼요.</p>
+                            <strong data-i18n-key="moveThree" data-i18n-mode="append">3. 놓기 또는 누르기</strong>
+                            <p data-i18n-key="moveThreeText" data-i18n-mode="below">끌어다 놓거나 칸을 눌러도 돼요.</p>
                         </article>
                     </div>
                     <p id="moveGuideMode" class="move-guide__mode">연습에서는 여러 칸에 다시 놓으며 느낌 차이를 비교할 수 있어요.</p>
@@ -1234,7 +1280,7 @@
                 <div class="drop-direction" aria-hidden="true">
                     <span class="drop-direction__line"></span>
                     <span class="drop-direction__arrow">↓</span>
-                    <span>아래 칸으로 옮기세요</span>
+                    <span data-i18n-key="dropDirection" data-i18n-mode="append">아래 칸으로 옮기세요</span>
                     <span class="drop-direction__line"></span>
                 </div>
 
@@ -1242,28 +1288,28 @@
                     <div class="zone" data-form="geolyo" role="button" tabindex="0" aria-label="-걸요 칸">
                         <div class="zone__head">
                             <strong>-걸요</strong>
-                            <span>바로 반응</span>
+                            <span data-i18n-key="zoneGeolyo" data-i18n-mode="append">바로 반응</span>
                         </div>
                         <div class="zone__drop"></div>
                     </div>
                     <div class="zone" data-form="geoyeyo" role="button" tabindex="0" aria-label="-거예요 칸">
                         <div class="zone__head">
                             <strong>-거예요</strong>
-                            <span>차분한 설명</span>
+                            <span data-i18n-key="zoneGeoyeyo" data-i18n-mode="append">차분한 설명</span>
                         </div>
                         <div class="zone__drop"></div>
                     </div>
                     <div class="zone" data-form="geotgathayo" role="button" tabindex="0" aria-label="-것 같아요 칸">
                         <div class="zone__head">
                             <strong>-것 같아요</strong>
-                            <span>내 생각</span>
+                            <span data-i18n-key="zoneGeotgathayo" data-i18n-mode="append">내 생각</span>
                         </div>
                         <div class="zone__drop"></div>
                     </div>
                     <div class="zone" data-form="tendeyo" role="button" tabindex="0" aria-label="-텐데요 칸">
                         <div class="zone__head">
                             <strong>-텐데요</strong>
-                            <span>뒤에 말 더 있음</span>
+                            <span data-i18n-key="zoneTendeyo" data-i18n-mode="append">뒤에 말 더 있음</span>
                         </div>
                         <div class="zone__drop"></div>
                     </div>
@@ -1272,7 +1318,7 @@
                 <div id="feedbackBox" class="feedback" hidden></div>
 
                 <div id="optionReview" class="option-review" hidden>
-                    <p class="option-review__title">네 표현 모두 보기</p>
+                    <p class="option-review__title" data-i18n-key="reviewTitle" data-i18n-mode="append">네 표현 모두 보기</p>
                     <div id="optionReviewGrid" class="option-review__grid"></div>
                 </div>
 
@@ -1283,14 +1329,24 @@
         <section id="resultScreen" class="panel" hidden></section>
 
         <div class="footer-links">
-            <a class="footer-link" href="grammar2.html">문법 2로 돌아가기</a>
-            <a class="footer-link" href="index.html">15과 목록</a>
+            <a class="footer-link" href="grammar2.html" data-i18n-key="backToGrammar" data-i18n-mode="append">문법 2로 돌아가기</a>
+            <a class="footer-link" href="index.html" data-i18n-key="chapterList" data-i18n-mode="append">15과 목록</a>
         </div>
     </main>
 
     <script>
+        window.MULTILANG_CONFIG = {
+            langs: ["en", "vi", "ar", "mn", "kk", "th"],
+            defaultLang: "none"
+        };
+    </script>
+    <script src="../shared/multilang-toggle.js"></script>
+    <script src="grammar2-bubble-sort-game-i18n.js"></script>
+    <script>
         (function () {
             const formOrder = ["geolyo", "geoyeyo", "geotgathayo", "tendeyo"];
+            const i18n = window.C15_GRAMMAR2_BUBBLE_SORT_I18N;
+            const storageKey = "korean3bimprove:c15:grammar2-bubble-sort-game:v1";
 
             const forms = {
                 geolyo: { label: "-걸요" },
@@ -1302,82 +1358,67 @@
             const practiceRounds = [
                 {
                     sceneKo: "같은 줄기예요. 끝말만 바꿔 보세요.",
-                    sceneVi: "Đây là cùng một thân câu. Hãy đổi phần cuối câu.",
                     cardText: "계좌이체로 내도 될 ...",
                     options: {
                         geolyo: {
                             text: "계좌이체로 내도 될걸요.",
                             ko: "이 말은 질문에 바로 답할 때 잘 어울려요. 상대에게 부드럽게 반응하는 느낌이 있어요.",
-                            vi: "Câu này hợp khi trả lời ngay câu hỏi. Nó có cảm giác đáp lại nhẹ nhàng."
                         },
                         geoyeyo: {
                             text: "계좌이체로 내도 될 거예요.",
                             ko: "이 말은 차분히 알려 주는 느낌이에요. 설명처럼 들려요.",
-                            vi: "Câu này có cảm giác nói để giải thích. Nghe bình tĩnh và rõ ràng."
                         },
                         geotgathayo: {
                             text: "계좌이체로 내도 될 것 같아요.",
                             ko: "이 말은 내 생각을 말하는 느낌이에요. 확실히 말하기보다 조심스럽게 말해요.",
-                            vi: "Câu này có cảm giác nói suy nghĩ của mình. Nó nói nhẹ nhàng hơn là khẳng định."
                         },
                         tendeyo: {
                             text: "계좌이체로 내도 될 텐데요.",
                             ko: "이 말은 뒤에 다른 말이 더 올 것 같아요. 예를 들면 걱정이나 설명이 이어질 수 있어요.",
-                            vi: "Câu này làm người nghe thấy phía sau còn có lời tiếp theo. Ví dụ có thể nối sang lo lắng hay giải thích."
                         }
                     }
                 },
                 {
                     sceneKo: "같은 줄기예요. 네 느낌을 비교해 보세요.",
-                    sceneVi: "Đây là cùng một thân câu. Hãy so sánh bốn cảm giác.",
                     cardText: "이번 달 전기 요금이 많이 나올 ...",
                     options: {
                         geolyo: {
                             text: "이번 달 전기 요금이 많이 나올걸요.",
                             ko: "이 말은 누군가의 말에 바로 반응하는 느낌이 커요. 혼잣말보다 대화에서 더 잘 보여요.",
-                            vi: "Câu này có cảm giác đáp lại lời ai đó. Nó hợp trong hội thoại hơn là tự nói một mình."
                         },
                         geoyeyo: {
                             text: "이번 달 전기 요금이 많이 나올 거예요.",
                             ko: "이 말은 설명하거나 알려 주는 느낌이에요. 말하는 사람이 조금 더 단정해 보여요.",
-                            vi: "Câu này có cảm giác giải thích hoặc báo cho người khác biết. Người nói nghe có vẻ chắc hơn một chút."
                         },
                         geotgathayo: {
                             text: "이번 달 전기 요금이 많이 나올 것 같아요.",
                             ko: "이 말은 내 생각을 꺼내는 느낌이에요. 혼자 생각하거나 조심스럽게 말할 때 잘 어울려요.",
-                            vi: "Câu này có cảm giác nói ra suy nghĩ của mình. Nó hợp khi tự nghĩ hoặc nói một cách nhẹ nhàng."
                         },
                         tendeyo: {
                             text: "이번 달 전기 요금이 많이 나올 텐데요.",
                             ko: "이 말은 뒤에 걱정이나 해결 말이 더 이어질 것 같아요. 예를 들면 \"그래서 아껴야 해요\" 같은 말이 따라오기 쉬워요.",
-                            vi: "Câu này làm người nghe thấy phía sau sẽ còn có lo lắng hay cách giải quyết. Ví dụ dễ nối sang câu như \"vì vậy phải tiết kiệm\"."
                         }
                     }
                 },
                 {
                     sceneKo: "같은 줄기예요. 끝말을 바꾸면 말맛이 달라져요.",
-                    sceneVi: "Đây là cùng một thân câu. Đổi phần cuối là đổi sắc thái câu nói.",
                     cardText: "밤에는 조금 시끄러울 ...",
                     options: {
                         geolyo: {
                             text: "밤에는 조금 시끄러울걸요.",
                             ko: "이 말은 상대 말에 바로 답하며 다른 생각을 말하는 느낌이 있어요. 대화에서 많이 보여요.",
-                            vi: "Câu này có cảm giác đáp lại ngay lời người khác và nói một ý khác. Nó hay xuất hiện trong hội thoại."
                         },
                         geoyeyo: {
                             text: "밤에는 조금 시끄러울 거예요.",
                             ko: "이 말은 정보를 알려 주는 느낌이 있어요. 차분히 설명하는 말처럼 들려요.",
-                            vi: "Câu này có cảm giác cho biết thông tin. Nó nghe như một lời giải thích bình tĩnh."
                         },
                         geotgathayo: {
                             text: "밤에는 조금 시끄러울 것 같아요.",
                             ko: "이 말은 내가 그렇게 생각한다는 느낌이 있어요. 내 판단을 부드럽게 말해요.",
-                            vi: "Câu này có cảm giác 'mình nghĩ như vậy'. Nó nói phán đoán của mình một cách nhẹ nhàng."
                         },
                         tendeyo: {
                             text: "밤에는 조금 시끄러울 텐데요.",
                             ko: "이 말은 뒤에 걱정이나 덧붙이는 말이 이어질 것 같아요. 예를 들면 \"괜찮으세요?\" 같은 말이 붙기 쉬워요.",
-                            vi: "Câu này làm người nghe thấy phía sau còn có lo lắng hay lời nói thêm. Ví dụ dễ nối sang câu như \"anh/chị có ổn không?\"."
                         }
                     }
                 }
@@ -1386,187 +1427,157 @@
             const quizRounds = [
                 {
                     sceneKo: "친구가 물어요. \"계좌이체로 내도 돼요?\"",
-                    sceneVi: "Bạn hỏi: \"Em trả bằng chuyển khoản được không?\"",
                     cardText: "계좌이체로 내도 될 ...",
                     options: {
                         geolyo: {
                             text: "계좌이체로 내도 될걸요.",
                             status: "best",
                             ko: "질문에 바로 답하는 말이라 제일 좋아요.",
-                            vi: "Đây là câu đáp lại ngay, nên tốt nhất."
                         },
                         geoyeyo: {
                             text: "계좌이체로 내도 될 거예요.",
                             status: "partial",
                             ko: "이 말도 들을 수 있어요. 하지만 설명처럼 들려요.",
-                            vi: "Câu này cũng có thể dùng. Nhưng nghe giống giải thích hơn."
                         },
                         geotgathayo: {
                             text: "계좌이체로 내도 될 것 같아요.",
                             status: "partial",
                             ko: "이 말도 될 수 있어요. 하지만 내 생각처럼 더 들려요.",
-                            vi: "Câu này cũng có thể dùng. Nhưng nghe giống ý nghĩ của mình hơn."
                         },
                         tendeyo: {
                             text: "계좌이체로 내도 될 텐데요.",
                             status: "wrong",
                             ko: "이 말은 뒤에 다른 말이 더 올 때 더 잘 맞아요.",
-                            vi: "Mẫu này hợp hơn khi phía sau còn có nói thêm."
                         }
                     }
                 },
                 {
                     sceneKo: "직원이 차분히 알려 줘요. \"다음 달부터 자동이체가 ...\"",
-                    sceneVi: "Nhân viên nói để giải thích: \"Từ tháng sau sẽ ...\"",
                     cardText: "다음 달부터 자동이체가 될 ...",
                     options: {
                         geolyo: {
                             text: "다음 달부터 자동이체가 될걸요.",
                             status: "wrong",
                             ko: "이 말은 바로 반응하는 느낌이 커서 여기와 조금 멀어요.",
-                            vi: "Mẫu này có cảm giác đáp lại ngay, nên hơi xa với câu này."
                         },
                         geoyeyo: {
                             text: "다음 달부터 자동이체가 될 거예요.",
                             status: "best",
                             ko: "차분히 알려 주는 말이라 제일 좋아요.",
-                            vi: "Đây là câu giải thích nhẹ nhàng, nên tốt nhất."
                         },
                         geotgathayo: {
                             text: "다음 달부터 자동이체가 될 것 같아요.",
                             status: "partial",
                             ko: "이 말도 가능해요. 하지만 확실한 안내 느낌은 조금 약해요.",
-                            vi: "Câu này cũng được. Nhưng cảm giác hướng dẫn chắc chắn yếu hơn."
                         },
                         tendeyo: {
                             text: "다음 달부터 자동이체가 될 텐데요.",
                             status: "wrong",
                             ko: "이 말은 뒤에 걱정이나 다른 말이 이어질 때 더 잘 맞아요.",
-                            vi: "Mẫu này hợp hơn khi sau đó còn có lo lắng hay nói thêm."
                         }
                     }
                 },
                 {
                     sceneKo: "혼자 생각해요. \"이번 달 전기 요금이 많이 ...\"",
-                    sceneVi: "Mình tự nghĩ: \"Tiền điện tháng này sẽ ...\"",
                     cardText: "이번 달 전기 요금이 많이 나올 ...",
                     options: {
                         geolyo: {
                             text: "이번 달 전기 요금이 많이 나올걸요.",
                             status: "partial",
                             ko: "이 말도 들을 수 있어요. 하지만 누군가에게 답하는 느낌이 더 커요.",
-                            vi: "Câu này cũng có thể nghe được. Nhưng có cảm giác đáp lại người khác hơn."
                         },
                         geoyeyo: {
                             text: "이번 달 전기 요금이 많이 나올 거예요.",
                             status: "partial",
                             ko: "이 말도 가능해요. 하지만 설명하는 느낌이 더 나요.",
-                            vi: "Câu này cũng được. Nhưng nghe giống giải thích hơn."
                         },
                         geotgathayo: {
                             text: "이번 달 전기 요금이 많이 나올 것 같아요.",
                             status: "best",
                             ko: "내 생각을 말하는 자리라 제일 좋아요.",
-                            vi: "Đây là lúc nói ý nghĩ của mình, nên tốt nhất."
                         },
                         tendeyo: {
                             text: "이번 달 전기 요금이 많이 나올 텐데요.",
                             status: "wrong",
                             ko: "이 말은 뒤에 다른 말이 이어질 때 더 잘 맞아요.",
-                            vi: "Mẫu này hợp hơn khi phía sau còn có nói tiếp."
                         }
                     }
                 },
                 {
                     sceneKo: "가스비를 걱정하며 뒤에 말을 더 하려고 해요.",
-                    sceneVi: "Mình lo tiền gas và còn muốn nói tiếp.",
                     cardText: "가스비가 많이 나올 ...",
                     options: {
                         geolyo: {
                             text: "가스비가 많이 나올걸요.",
                             status: "partial",
                             ko: "이 말도 될 수 있어요. 하지만 걱정이 이어지는 힘은 약해요.",
-                            vi: "Câu này cũng có thể dùng. Nhưng cảm giác lo lắng nối tiếp yếu hơn."
                         },
                         geoyeyo: {
                             text: "가스비가 많이 나올 거예요.",
                             status: "wrong",
                             ko: "이 말은 설명처럼 들려서 걱정 느낌이 약해요.",
-                            vi: "Câu này nghe giống giải thích, nên cảm giác lo yếu hơn."
                         },
                         geotgathayo: {
                             text: "가스비가 많이 나올 것 같아요.",
                             status: "partial",
                             ko: "이 말도 가능해요. 하지만 뒤에 말이 이어질 느낌은 덜해요.",
-                            vi: "Câu này cũng được. Nhưng cảm giác còn nói tiếp ít hơn."
                         },
                         tendeyo: {
                             text: "가스비가 많이 나올 텐데요.",
                             status: "best",
                             ko: "뒤에 걱정이나 다른 말을 더 하기 쉬워서 제일 좋아요.",
-                            vi: "Mẫu này dễ nối sang lo lắng hay nói tiếp, nên tốt nhất."
                         }
                     }
                 },
                 {
                     sceneKo: "친구가 \"밤에는 조용해요\"라고 말해요. 나는 다른 생각이 있어요.",
-                    sceneVi: "Bạn nói: \"Ban đêm yên lắm.\" Nhưng mình nghĩ hơi khác.",
                     cardText: "밤에는 조금 시끄러울 ...",
                     options: {
                         geolyo: {
                             text: "밤에는 조금 시끄러울걸요.",
                             status: "best",
                             ko: "상대 말에 바로 반응하며 다른 생각을 말해서 제일 좋아요.",
-                            vi: "Đây là câu đáp lại ngay và nói ý khác, nên tốt nhất."
                         },
                         geoyeyo: {
                             text: "밤에는 조금 시끄러울 거예요.",
                             status: "partial",
                             ko: "이 말도 가능해요. 하지만 설명처럼 더 들려요.",
-                            vi: "Câu này cũng được. Nhưng nghe giống giải thích hơn."
                         },
                         geotgathayo: {
                             text: "밤에는 조금 시끄러울 것 같아요.",
                             status: "partial",
                             ko: "이 말도 가능해요. 하지만 혼자 생각하는 느낌이 더 커요.",
-                            vi: "Câu này cũng được. Nhưng nghe giống ý nghĩ của mình hơn."
                         },
                         tendeyo: {
                             text: "밤에는 조금 시끄러울 텐데요.",
                             status: "wrong",
                             ko: "이 말은 뒤에 걱정이나 다른 말이 더 올 때 더 잘 맞아요.",
-                            vi: "Mẫu này hợp hơn khi sau đó còn có lo lắng hay nói thêm."
                         }
                     }
                 },
                 {
                     sceneKo: "짧게 바로 반응해요. \"그럴 ...\"",
-                    sceneVi: "Mình đáp lại ngắn gọn: \"Chắc là vậy ...\"",
                     cardText: "그럴 ...",
                     options: {
                         geolyo: {
                             text: "그럴걸요.",
                             status: "best",
                             ko: "짧고 바로 반응하는 말이라 제일 좋아요.",
-                            vi: "Đây là câu đáp ngắn và ngay, nên tốt nhất."
                         },
                         geoyeyo: {
                             text: "그럴 거예요.",
                             status: "partial",
                             ko: "이 말도 가능해요. 하지만 설명하는 느낌이 더 나요.",
-                            vi: "Câu này cũng được. Nhưng nghe giống giải thích hơn."
                         },
                         geotgathayo: {
                             text: "그럴 것 같아요.",
                             status: "partial",
                             ko: "이 말도 가능해요. 하지만 내 생각처럼 더 들려요.",
-                            vi: "Câu này cũng được. Nhưng nghe giống ý nghĩ của mình hơn."
                         },
                         tendeyo: {
                             text: "그럴 텐데요.",
                             status: "wrong",
                             ko: "이 말은 뒤에 다른 말이 더 이어질 때 더 잘 맞아요.",
-                            vi: "Mẫu này hợp hơn khi phía sau còn có nói tiếp."
                         }
                     }
                 }
@@ -1577,6 +1588,7 @@
                 practiceIndex: 0,
                 practicePicked: null,
                 quizIndex: 0,
+                quizPicked: null,
                 bestCount: 0,
                 partialCount: 0,
                 wrongCount: 0,
@@ -1596,11 +1608,12 @@
             const mobileContinueBtn = document.getElementById("mobileContinueBtn");
             const mobileActionSummary = document.getElementById("mobileActionSummary");
             const sceneText = document.getElementById("sceneText");
-            const sceneViText = document.getElementById("sceneViText");
+            const sceneTranslationText = document.getElementById("sceneTranslationText");
             const sourceArea = document.getElementById("sourceArea");
             const bubbleCard = document.getElementById("bubbleCard");
             const bubbleText = document.getElementById("bubbleText");
             const feedbackBox = document.getElementById("feedbackBox");
+            const saveStatus = document.getElementById("saveStatus");
             const optionReview = document.getElementById("optionReview");
             const optionReviewGrid = document.getElementById("optionReviewGrid");
             const moveGuideMode = document.getElementById("moveGuideMode");
@@ -1611,6 +1624,90 @@
             const resultScreen = document.getElementById("resultScreen");
             const zones = Array.from(document.querySelectorAll(".zone"));
             const mobileMedia = window.matchMedia("(max-width: 640px)");
+
+            function getLang() {
+                const candidate = window.MultilangToggle && typeof window.MultilangToggle.getLang === "function"
+                    ? window.MultilangToggle.getLang()
+                    : document.body.dataset.activeLang;
+                return i18n.languages.includes(candidate) ? candidate : "none";
+            }
+
+            function getCopy(key) {
+                const lang = getLang();
+                return lang === "none" ? "" : ((i18n.ui[lang] && i18n.ui[lang][key]) || "");
+            }
+
+            function interpolate(value, vars) {
+                return String(value || "").replace(/\{(\w+)\}/g, function (match, key) {
+                    return vars && Object.prototype.hasOwnProperty.call(vars, key) ? vars[key] : match;
+                });
+            }
+
+            function translationAttrs() {
+                const lang = getLang();
+                return lang === "ar" ? ' lang="ar" dir="rtl"' : (lang === "none" ? "" : ' lang="' + lang + '"');
+            }
+
+            function roundCopy(stage, index, formId) {
+                const list = stage === "practice" ? i18n.practice : i18n.quiz;
+                const round = list[index];
+                if (!round) return { scene: "", option: "" };
+                return {
+                    scene: round.scene[getLang()] || "",
+                    option: formId && round.options[formId] ? (round.options[formId][getLang()] || "") : ""
+                };
+            }
+
+            function translationParagraph(text, className) {
+                if (!text || getLang() === "none") return "";
+                return '<p class="' + className + '"' + translationAttrs() + '>' + esc(text) + '</p>';
+            }
+
+            function bilingualText(korean, key, vars) {
+                const translated = interpolate(getCopy(key), vars);
+                return translated ? korean + " · " + translated : korean;
+            }
+
+            function applyStaticTranslations() {
+                document.querySelectorAll("[data-i18n-key]").forEach(function (element) {
+                    const key = element.dataset.i18nKey;
+                    const korean = element.dataset.i18nKo || element.textContent.trim();
+                    element.dataset.i18nKo = korean;
+                    const translated = getCopy(key);
+
+                    if (element.dataset.i18nMode === "append") {
+                        element.textContent = translated ? korean + " · " + translated : korean;
+                        return;
+                    }
+
+                    let translation = element._i18nTranslationNode;
+                    if (!translation) {
+                        translation = document.createElement("span");
+                        translation.className = "i18n-inline";
+                        element.insertAdjacentElement("afterend", translation);
+                        element._i18nTranslationNode = translation;
+                    }
+                    translation.textContent = translated;
+                    translation.hidden = !translated;
+                    if (getLang() !== "none") {
+                        translation.lang = getLang();
+                        translation.dir = getLang() === "ar" ? "rtl" : "ltr";
+                    }
+                });
+            }
+
+            function setDynamicParagraph(element, korean, key) {
+                element.textContent = korean;
+                const translated = getCopy(key);
+                if (translated) {
+                    const translation = document.createElement("span");
+                    translation.className = "i18n-inline";
+                    translation.textContent = translated;
+                    translation.lang = getLang();
+                    translation.dir = getLang() === "ar" ? "rtl" : "ltr";
+                    element.appendChild(translation);
+                }
+            }
 
             function esc(text) {
                 return String(text == null ? "" : text)
@@ -1624,7 +1721,12 @@
             function resetZones() {
                 zones.forEach(function (zone) {
                     zone.classList.remove("is-over", "is-active", "is-best", "is-partial", "is-wrong");
-                    zone.querySelector(".zone__drop").textContent = "";
+                    const drop = zone.querySelector(".zone__drop");
+                    drop.textContent = "";
+                    drop.dataset.dropLabel = bilingualText("여기에 놓기", "dropHere");
+                    const formLabel = forms[zone.dataset.form].label + " 칸";
+                    const aria = getCopy("ariaZone");
+                    zone.setAttribute("aria-label", aria ? interpolate(aria, { form: forms[zone.dataset.form].label }) : formLabel);
                 });
             }
 
@@ -1670,6 +1772,12 @@
                 return "오답";
             }
 
+            function getStatusCopyKey(status) {
+                if (status === "best") return "best";
+                if (status === "partial") return "partial";
+                return "wrong";
+            }
+
             function isMobileLayout() {
                 return mobileMedia.matches;
             }
@@ -1678,12 +1786,17 @@
                 const guideText = state.stage === "practice"
                     ? "이 화면에서는 말풍선을 한 칸에 놓고 느낌 차이를 비교해 보세요."
                     : "이 화면에서는 가장 알맞은 표현을 골라 보고 바로 설명을 확인해 보세요.";
+                const guideKey = state.stage === "practice" ? "practiceAction" : "quizAction";
+                const translatedScene = roundCopy(state.stage, state.stage === "practice" ? state.practiceIndex : state.quizIndex).scene;
+                const translatedGuide = getCopy(guideKey);
 
                 mobileActionSummary.innerHTML =
-                    '<strong>수행 화면 요약</strong>'
-                    + '<p><strong>상황</strong> ' + esc(sceneKo) + '</p>'
-                    + '<p><strong>말풍선</strong> ' + esc(cardText) + '</p>'
-                    + '<p>' + esc(guideText) + '</p>';
+                    '<strong>' + bilingualText("수행 화면 요약", "mobileSummary") + '</strong>'
+                    + '<p><strong>' + esc(bilingualText("상황", "situation")) + '</strong> ' + esc(sceneKo) + '</p>'
+                    + '<p><strong>' + esc(bilingualText("말풍선", "bubble")) + '</strong> ' + esc(cardText) + '</p>'
+                    + '<p>' + esc(guideText) + '</p>'
+                    + (translatedScene ? '<p class="i18n-inline"' + translationAttrs() + '>' + esc(translatedScene) + '</p>' : '')
+                    + (translatedGuide ? '<p class="i18n-inline"' + translationAttrs() + '>' + esc(translatedGuide) + '</p>' : '');
             }
 
             function syncMobileStep() {
@@ -1717,17 +1830,28 @@
             function setMobileStep(step) {
                 state.mobileStep = step === "act" ? "act" : "explain";
                 syncMobileStep();
+                saveState();
             }
 
             function updateMeta() {
                 if (state.stage === "practice") {
-                    progressText.textContent = "연습 " + (state.practiceIndex + 1) + " / " + practiceRounds.length;
-                    scoreText.textContent = "비교 연습";
+                    progressText.textContent = bilingualText("연습 " + (state.practiceIndex + 1) + " / " + practiceRounds.length, "progressPractice", {
+                        current: state.practiceIndex + 1,
+                        total: practiceRounds.length
+                    });
+                    scoreText.textContent = bilingualText("비교 연습", "scorePractice");
                     return;
                 }
 
-                progressText.textContent = "문제 " + (state.quizIndex + 1) + " / " + quizRounds.length;
-                scoreText.textContent = "최적 " + state.bestCount + " · 부분 " + state.partialCount + " · 오답 " + state.wrongCount;
+                progressText.textContent = bilingualText("문제 " + (state.quizIndex + 1) + " / " + quizRounds.length, "progressQuiz", {
+                    current: state.quizIndex + 1,
+                    total: quizRounds.length
+                });
+                scoreText.textContent = bilingualText(
+                    "최적 " + state.bestCount + " · 부분 " + state.partialCount + " · 오답 " + state.wrongCount,
+                    "score",
+                    { best: state.bestCount, partial: state.partialCount, wrong: state.wrongCount }
+                );
             }
 
             function renderPracticeComparison(round, pickedFormId) {
@@ -1737,11 +1861,11 @@
                     return '<article class="option-card' + (isPicked ? ' is-picked' : '') + '" data-mode="practice" data-form="' + formId + '">'
                         + '<div class="option-card__head">'
                         + '<strong>' + esc(forms[formId].label) + '</strong>'
-                        + '<span class="status-badge practice">' + (isPicked ? '지금 느낌' : '비교') + '</span>'
+                        + '<span class="status-badge practice">' + esc(bilingualText(isPicked ? '지금 느낌' : '비교', isPicked ? 'practicePicked' : 'compare')) + '</span>'
                         + '</div>'
                         + '<p class="option-card__text">' + esc(option.text) + '</p>'
                         + '<p class="option-card__ko">' + esc(option.ko) + '</p>'
-                        + '<p class="option-card__vi">' + esc(option.vi) + '</p>'
+                        + translationParagraph(roundCopy("practice", state.practiceIndex, formId).option, "option-card__translation")
                         + '</article>';
                 }).join("");
 
@@ -1755,28 +1879,91 @@
                     return '<article class="option-card' + (isPicked ? ' is-picked' : '') + '" data-form="' + formId + '" data-status="' + option.status + '">'
                         + '<div class="option-card__head">'
                         + '<strong>' + esc(forms[formId].label) + '</strong>'
-                        + '<span class="status-badge ' + option.status + '">' + esc(getStatusLabel(option.status)) + '</span>'
+                        + '<span class="status-badge ' + option.status + '">' + esc(bilingualText(getStatusLabel(option.status), getStatusCopyKey(option.status))) + '</span>'
                         + '</div>'
-                        + (isPicked ? '<div class="option-card__head" style="margin-top:8px;"><span class="status-badge picked">내가 고름</span></div>' : '')
+                        + (isPicked ? '<div class="option-card__head" style="margin-top:8px;"><span class="status-badge picked">' + esc(bilingualText("내가 고름", "quizPicked")) + '</span></div>' : '')
                         + '<p class="option-card__text">' + esc(option.text) + '</p>'
                         + '<p class="option-card__ko">' + esc(option.ko) + '</p>'
-                        + '<p class="option-card__vi">' + esc(option.vi) + '</p>'
+                        + translationParagraph(roundCopy("quiz", state.quizIndex, formId).option, "option-card__translation")
                         + '</article>';
                 }).join("");
 
                 optionReview.hidden = false;
             }
 
+            function updateSceneTranslation(stage, index) {
+                const translated = roundCopy(stage, index).scene;
+                sceneTranslationText.textContent = translated;
+                sceneTranslationText.hidden = !translated;
+                if (translated) {
+                    sceneTranslationText.lang = getLang();
+                    sceneTranslationText.dir = getLang() === "ar" ? "rtl" : "ltr";
+                }
+            }
+
+            function renderPracticeFeedback(round, formId, hintKey) {
+                const option = round.options[formId];
+                feedbackBox.hidden = false;
+                feedbackBox.className = "feedback is-practice";
+                feedbackBox.innerHTML =
+                    '<p class="feedback__label is-practice">' + esc(bilingualText("지금 놓은 말의 느낌", "practicePicked")) + '</p>'
+                    + '<p class="feedback__answer">' + esc(option.text) + '</p>'
+                    + '<p class="feedback__ko">' + esc(option.ko) + '</p>'
+                    + translationParagraph(roundCopy("practice", state.practiceIndex, formId).option, "feedback__translation")
+                    + '<p class="feedback__hint">' + esc(hintKey === "feedbackPracticeHintAfter"
+                        ? "다른 칸에 다시 놓아도 됩니다. 같은 줄기인데도 느낌이 달라지는지 비교해 보세요."
+                        : "같은 줄기라도 끝말이 바뀌면 말하는 느낌이 달라져요. 아래 네 표현을 같이 비교해 보세요.") + '</p>'
+                    + translationParagraph(getCopy(hintKey), "feedback__translation");
+            }
+
+            function renderQuizFeedback(round, formId) {
+                const option = round.options[formId];
+                const pickedZone = zones.find(function (zone) {
+                    return zone.dataset.form === formId;
+                });
+                const bestZone = zones.find(function (zone) {
+                    return zone.dataset.form === formOrder.find(function (id) {
+                        return round.options[id].status === "best";
+                    });
+                });
+
+                resetZones();
+                moveBubbleToZone(formId);
+                bubbleCard.draggable = false;
+                bubbleText.textContent = option.text;
+
+                if (pickedZone) {
+                    pickedZone.classList.add("is-" + option.status);
+                }
+                if (option.status !== "best" && bestZone) {
+                    bestZone.classList.add("is-best");
+                }
+
+                feedbackBox.hidden = false;
+                feedbackBox.className = "feedback is-" + option.status;
+                feedbackBox.innerHTML =
+                    '<p class="feedback__label is-' + option.status + '">' + esc(bilingualText(getStatusLabel(option.status), getStatusCopyKey(option.status))) + '</p>'
+                    + '<p class="feedback__answer">' + esc(option.text) + '</p>'
+                    + '<p class="feedback__ko">' + esc(option.ko) + '</p>'
+                    + translationParagraph(roundCopy("quiz", state.quizIndex, formId).option, "feedback__translation");
+                renderQuizComparison(round, formId);
+                nextBtn.hidden = false;
+                nextBtn.textContent = bilingualText(
+                    state.quizIndex === quizRounds.length - 1 ? "결과 보기" : "다음",
+                    state.quizIndex === quizRounds.length - 1 ? "showResult" : "next"
+                );
+            }
+
             function renderPracticeRound() {
                 const round = getPracticeRound();
-                stageChip.textContent = "연습 스테이지";
+                stageChip.textContent = bilingualText("연습 스테이지", "practiceStage");
                 practiceGuide.hidden = false;
-                moveGuideMode.textContent = "연습에서는 여러 칸에 다시 놓으며 느낌 차이를 비교할 수 있어요.";
+                setDynamicParagraph(moveGuideMode, "연습에서는 여러 칸에 다시 놓으며 느낌 차이를 비교할 수 있어요.", "practiceMode");
                 updateMeta();
                 sceneText.textContent = round.sceneKo;
-                sceneViText.textContent = round.sceneVi;
+                updateSceneTranslation("practice", state.practiceIndex);
                 bubbleText.textContent = round.cardText;
-                mobileContinueBtn.textContent = "이제 느낌 비교하기";
+                mobileContinueBtn.textContent = bilingualText("이제 느낌 비교하기", "continuePractice");
                 updateActionSummary(round.sceneKo, round.cardText);
                 resetZones();
                 if (state.practicePicked) {
@@ -1798,18 +1985,13 @@
                 syncMobileStep();
 
                 if (state.practicePicked) {
-                    const pickedOption = round.options[state.practicePicked];
-                    feedbackBox.hidden = false;
-                    feedbackBox.className = "feedback is-practice";
-                    feedbackBox.innerHTML =
-                        '<p class="feedback__label is-practice">지금 놓은 말의 느낌</p>'
-                        + '<p class="feedback__answer">' + esc(pickedOption.text) + '</p>'
-                        + '<p class="feedback__ko">' + esc(pickedOption.ko) + '</p>'
-                        + '<p class="feedback__vi">' + esc(pickedOption.vi) + '</p>'
-                        + '<p class="feedback__hint">같은 줄기라도 끝말이 바뀌면 말하는 느낌이 달라져요. 아래 네 표현을 같이 비교해 보세요.</p>';
+                    renderPracticeFeedback(round, state.practicePicked, "feedbackPracticeHint");
                     renderPracticeComparison(round, state.practicePicked);
                     nextBtn.hidden = false;
-                    nextBtn.textContent = state.practiceIndex === practiceRounds.length - 1 ? "문제 시작" : "다음 예문";
+                    nextBtn.textContent = bilingualText(
+                        state.practiceIndex === practiceRounds.length - 1 ? "문제 시작" : "다음 예문",
+                        state.practiceIndex === practiceRounds.length - 1 ? "startQuiz" : "nextExample"
+                    );
                 } else {
                     feedbackBox.hidden = true;
                     feedbackBox.className = "feedback";
@@ -1822,15 +2004,15 @@
 
             function renderQuizRound() {
                 const round = getQuizRound();
-                stageChip.textContent = "문제 스테이지";
+                stageChip.textContent = bilingualText("문제 스테이지", "quizStage");
                 practiceGuide.hidden = true;
                 setPracticeGuideActive(null);
-                moveGuideMode.textContent = "문제에서는 한 칸을 고르면 바로 판정이 나와요.";
+                setDynamicParagraph(moveGuideMode, "문제에서는 한 칸을 고르면 바로 판정이 나와요.", "quizMode");
                 updateMeta();
                 sceneText.textContent = round.sceneKo;
-                sceneViText.textContent = round.sceneVi;
+                updateSceneTranslation("quiz", state.quizIndex);
                 bubbleText.textContent = round.cardText;
-                mobileContinueBtn.textContent = "이제 문제 풀기";
+                mobileContinueBtn.textContent = bilingualText("이제 문제 풀기", "continueQuiz");
                 updateActionSummary(round.sceneKo, round.cardText);
                 resetZones();
                 moveBubbleToSource();
@@ -1844,6 +2026,9 @@
                 playScreen.hidden = false;
                 resultScreen.hidden = true;
                 syncMobileStep();
+                if (state.locked && state.quizPicked) {
+                    renderQuizFeedback(round, state.quizPicked);
+                }
             }
 
             function renderCurrent() {
@@ -1851,6 +2036,9 @@
                     if (state.practiceIndex >= practiceRounds.length) {
                         state.stage = "quiz";
                         state.quizIndex = 0;
+                        state.quizPicked = null;
+                        state.locked = false;
+                        saveState();
                         renderCurrent();
                         return;
                     }
@@ -1883,18 +2071,15 @@
                 }
 
                 const pickedOption = round.options[formId];
-                feedbackBox.hidden = false;
-                feedbackBox.className = "feedback is-practice";
-                feedbackBox.innerHTML =
-                    '<p class="feedback__label is-practice">지금 놓은 말의 느낌</p>'
-                    + '<p class="feedback__answer">' + esc(pickedOption.text) + '</p>'
-                    + '<p class="feedback__ko">' + esc(pickedOption.ko) + '</p>'
-                    + '<p class="feedback__vi">' + esc(pickedOption.vi) + '</p>'
-                    + '<p class="feedback__hint">다른 칸에 다시 놓아도 됩니다. 같은 줄기인데도 느낌이 달라지는지 비교해 보세요.</p>';
+                renderPracticeFeedback(round, formId, "feedbackPracticeHintAfter");
 
                 renderPracticeComparison(round, formId);
                 nextBtn.hidden = false;
-                nextBtn.textContent = state.practiceIndex === practiceRounds.length - 1 ? "문제 시작" : "다음 예문";
+                nextBtn.textContent = bilingualText(
+                    state.practiceIndex === practiceRounds.length - 1 ? "문제 시작" : "다음 예문",
+                    state.practiceIndex === practiceRounds.length - 1 ? "startQuiz" : "nextExample"
+                );
+                saveState();
             }
 
             function submitQuiz(formId) {
@@ -1904,28 +2089,9 @@
 
                 const round = getQuizRound();
                 const option = round.options[formId];
-                const pickedZone = zones.find(function (zone) {
-                    return zone.dataset.form === formId;
-                });
-                const bestZone = zones.find(function (zone) {
-                    return zone.dataset.form === formOrder.find(function (id) {
-                        return round.options[id].status === "best";
-                    });
-                });
-
                 state.locked = true;
-                bubbleCard.draggable = false;
-                bubbleText.textContent = option.text;
-                resetZones();
-                moveBubbleToZone(formId);
+                state.quizPicked = formId;
                 setMobileStep("act");
-
-                if (pickedZone) {
-                    pickedZone.classList.add("is-" + option.status);
-                }
-                if (option.status !== "best" && bestZone) {
-                    bestZone.classList.add("is-best");
-                }
 
                 if (option.status === "best") {
                     state.bestCount += 1;
@@ -1936,8 +2102,8 @@
                 }
 
                 state.logs.push({
+                    roundIndex: state.quizIndex,
                     sceneKo: round.sceneKo,
-                    sceneVi: round.sceneVi,
                     pickedText: option.text,
                     pickedStatus: option.status,
                     bestText: round.options[formOrder.find(function (id) {
@@ -1946,16 +2112,8 @@
                 });
 
                 updateMeta();
-                feedbackBox.hidden = false;
-                feedbackBox.className = "feedback is-" + option.status;
-                feedbackBox.innerHTML =
-                    '<p class="feedback__label is-' + option.status + '">' + esc(getStatusLabel(option.status)) + '</p>'
-                    + '<p class="feedback__answer">' + esc(option.text) + '</p>'
-                    + '<p class="feedback__ko">' + esc(option.ko) + '</p>'
-                    + '<p class="feedback__vi">' + esc(option.vi) + '</p>';
-                renderQuizComparison(round, formId);
-                nextBtn.hidden = false;
-                nextBtn.textContent = state.quizIndex === quizRounds.length - 1 ? "결과 보기" : "다음";
+                renderQuizFeedback(round, formId);
+                saveState();
             }
 
             function submit(formId) {
@@ -1973,15 +2131,18 @@
                         return log.pickedStatus !== "best";
                     })
                     .map(function (log) {
+                        const sceneTranslation = Number.isInteger(log.roundIndex)
+                            ? roundCopy("quiz", log.roundIndex).scene
+                            : "";
                         return '<article class="review-card">'
                             + '<div class="review-card__head">'
-                            + '<strong>' + esc(getStatusLabel(log.pickedStatus)) + '</strong>'
-                            + '<span class="status-badge ' + log.pickedStatus + '">' + esc(log.pickedStatus === "partial" ? "부분" : "오답") + '</span>'
+                            + '<strong>' + esc(bilingualText(getStatusLabel(log.pickedStatus), getStatusCopyKey(log.pickedStatus))) + '</strong>'
+                            + '<span class="status-badge ' + log.pickedStatus + '">' + esc(bilingualText(log.pickedStatus === "partial" ? "부분" : "오답", log.pickedStatus === "partial" ? "partialShort" : "wrongShort")) + '</span>'
                             + '</div>'
                             + '<p class="review-card__scene">' + esc(log.sceneKo) + '</p>'
-                            + '<p class="review-card__vi">' + esc(log.sceneVi) + '</p>'
-                            + '<p class="review-card__picked"><strong>내가 고른 말:</strong> ' + esc(log.pickedText) + '</p>'
-                            + '<p class="review-card__best"><strong>최적 정답:</strong> ' + esc(log.bestText) + '</p>'
+                            + translationParagraph(sceneTranslation, "review-card__translation")
+                            + '<p class="review-card__picked"><strong>' + esc(bilingualText("내가 고른 말:", "selected")) + '</strong> ' + esc(log.pickedText) + '</p>'
+                            + '<p class="review-card__best"><strong>' + esc(bilingualText("최적 정답:", "bestAnswer")) + '</strong> ' + esc(log.bestText) + '</p>'
                             + '</article>';
                     }).join("");
 
@@ -1989,23 +2150,32 @@
                 resultScreen.hidden = false;
                 resultScreen.innerHTML =
                     '<div class="result-card">'
-                    + '<p class="result-card__eyebrow">완료</p>'
+                    + '<p class="result-card__eyebrow">' + esc(bilingualText("완료", "resultDone")) + '</p>'
                     + '<p class="result-card__score">' + weighted + '%</p>'
-                    + '<p class="result-card__desc">최적 정답은 1점, 부분 정답은 0.5점으로 계산했어요.</p>'
+                    + '<p class="result-card__desc">' + esc(bilingualText("최적 정답은 1점, 부분 정답은 0.5점으로 계산했어요.", "resultDesc")) + '</p>'
                     + '</div>'
                     + '<div class="result-grid">'
-                    + '<div class="result-box best"><p class="result-box__label">최적 정답</p><p class="result-box__value">' + state.bestCount + '</p></div>'
-                    + '<div class="result-box partial"><p class="result-box__label">부분 정답</p><p class="result-box__value">' + state.partialCount + '</p></div>'
-                    + '<div class="result-box wrong"><p class="result-box__label">오답</p><p class="result-box__value">' + state.wrongCount + '</p></div>'
+                    + '<div class="result-box best"><p class="result-box__label">' + esc(bilingualText("최적 정답", "best")) + '</p><p class="result-box__value">' + state.bestCount + '</p></div>'
+                    + '<div class="result-box partial"><p class="result-box__label">' + esc(bilingualText("부분 정답", "partial")) + '</p><p class="result-box__value">' + state.partialCount + '</p></div>'
+                    + '<div class="result-box wrong"><p class="result-box__label">' + esc(bilingualText("오답", "wrong")) + '</p><p class="result-box__value">' + state.wrongCount + '</p></div>'
                     + '</div>'
-                    + '<button id="restartBtn" class="restart-btn" type="button">다시 하기</button>'
+                    + '<button id="restartBtn" class="restart-btn" type="button">' + esc(bilingualText("다시 하기", "restart")) + '</button>'
                     + (reviewHtml ? '<div class="review-list">' + reviewHtml + '</div>' : '');
 
                 document.getElementById("restartBtn").addEventListener("click", function () {
+                    if (!window.confirm("이 페이지의 저장된 진행 내용을 지우고 다시 시작할까요?")) {
+                        return;
+                    }
+                    try {
+                        localStorage.removeItem(storageKey);
+                    } catch {
+                        // Keep the in-memory reset available when storage is unavailable.
+                    }
                     state.stage = "practice";
                     state.practiceIndex = 0;
                     state.practicePicked = null;
                     state.quizIndex = 0;
+                    state.quizPicked = null;
                     state.bestCount = 0;
                     state.partialCount = 0;
                     state.wrongCount = 0;
@@ -2014,6 +2184,74 @@
                     state.logs = [];
                     renderCurrent();
                 });
+            }
+
+            function setSaveFailure() {
+                document.body.dataset.progressSave = "unsaved";
+                if (saveStatus) {
+                    saveStatus.hidden = false;
+                    saveStatus.textContent = "진행 내용이 이 기기에 저장되지 않았어요.";
+                }
+            }
+
+            function saveState() {
+                const payload = {
+                    schemaVersion: 1,
+                    stage: state.stage,
+                    practiceIndex: state.practiceIndex,
+                    practicePicked: state.practicePicked,
+                    quizIndex: state.quizIndex,
+                    quizPicked: state.quizPicked,
+                    bestCount: state.bestCount,
+                    partialCount: state.partialCount,
+                    wrongCount: state.wrongCount,
+                    mobileStep: state.mobileStep,
+                    locked: state.locked,
+                    logs: state.logs
+                };
+
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(payload));
+                    document.body.dataset.progressSave = "saved";
+                    if (saveStatus) saveStatus.hidden = true;
+                } catch {
+                    setSaveFailure();
+                }
+            }
+
+            function restoreState() {
+                let saved;
+                try {
+                    const raw = localStorage.getItem(storageKey);
+                    if (!raw) return;
+                    saved = JSON.parse(raw);
+                } catch {
+                    return;
+                }
+
+                if (!saved || saved.schemaVersion !== 1
+                    || !["practice", "quiz"].includes(saved.stage)
+                    || !Number.isInteger(saved.practiceIndex)
+                    || !Number.isInteger(saved.quizIndex)
+                    || saved.practiceIndex < 0
+                    || saved.practiceIndex > practiceRounds.length
+                    || saved.quizIndex < 0
+                    || saved.quizIndex > quizRounds.length
+                    || !Array.isArray(saved.logs)) {
+                    return;
+                }
+
+                state.stage = saved.stage;
+                state.practiceIndex = saved.practiceIndex;
+                state.practicePicked = formOrder.includes(saved.practicePicked) ? saved.practicePicked : null;
+                state.quizIndex = saved.quizIndex;
+                state.quizPicked = formOrder.includes(saved.quizPicked) ? saved.quizPicked : null;
+                state.bestCount = Number.isFinite(saved.bestCount) ? saved.bestCount : 0;
+                state.partialCount = Number.isFinite(saved.partialCount) ? saved.partialCount : 0;
+                state.wrongCount = Number.isFinite(saved.wrongCount) ? saved.wrongCount : 0;
+                state.mobileStep = saved.mobileStep === "act" ? "act" : "explain";
+                state.locked = Boolean(saved.locked && state.quizPicked);
+                state.logs = saved.logs;
             }
 
             bubbleCard.addEventListener("dragstart", function (event) {
@@ -2076,9 +2314,11 @@
                     state.practicePicked = null;
                 } else {
                     state.quizIndex += 1;
+                    state.quizPicked = null;
                     state.locked = false;
                 }
                 state.mobileStep = "explain";
+                saveState();
                 renderCurrent();
             });
 
@@ -2094,12 +2334,31 @@
                 setMobileStep("act");
             });
 
+            document.addEventListener("click", function (event) {
+                if (!event.target.closest("[data-multilang-btn]")) return;
+                window.setTimeout(function () {
+                    applyStaticTranslations();
+                    renderCurrent();
+                }, 0);
+            });
+
+            document.addEventListener("visibilitychange", function () {
+                if (document.visibilityState === "hidden") saveState();
+            });
+            window.addEventListener("pagehide", saveState);
+
             if (typeof mobileMedia.addEventListener === "function") {
                 mobileMedia.addEventListener("change", syncMobileStep);
             }
             window.addEventListener("resize", syncMobileStep);
 
+            restoreState();
+            applyStaticTranslations();
             renderCurrent();
+            document.addEventListener("DOMContentLoaded", function () {
+                applyStaticTranslations();
+                renderCurrent();
+            });
         })();
     </script>
     <script src="../shared/site-copyright.js"></script>

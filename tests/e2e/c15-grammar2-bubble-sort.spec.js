@@ -1,6 +1,7 @@
 const { test, expect } = require("@playwright/test");
 
 test("c15 grammar2 bubble sort game compares nuance in practice and grades quiz", async ({ page }) => {
+    page.on("dialog", (dialog) => dialog.accept());
     await page.goto("/c15/grammar2-bubble-sort-game.html");
 
     await expect(page.locator("h1")).toContainText("말풍선을 알맞은 칸에 놓아 보세요.");
@@ -74,7 +75,11 @@ test("c15 grammar2 bubble sort game compares nuance in practice and grades quiz"
     await expect(page.locator("#resultScreen")).toContainText("최적 정답");
     await expect(page.locator("#resultScreen")).toContainText("부분 정답");
     await expect(page.locator("#resultScreen")).toContainText("오답");
+    await page.locator('[data-multilang-btn="en"]').click();
+    await expect(page.locator("#resultScreen")).toContainText("Complete");
+    await expect(page.locator("#resultScreen")).toContainText("Best answer");
 
+    await page.locator('[data-multilang-btn="none"]').click();
     await page.locator("#restartBtn").click();
     await expect(page.locator("#progressText")).toHaveText("연습 1 / 3");
     await expect(page.locator("#scoreText")).toHaveText("비교 연습");
@@ -142,4 +147,97 @@ test("c15 grammar2 bubble sort game splits explanation and action on smartphone"
     const nextBox = await page.locator("#nextBtn").boundingBox();
     expect(nextBox).not.toBeNull();
     expect(nextBox.height).toBeGreaterThanOrEqual(56);
+});
+
+test("c15 grammar2 bubble sort game replaces legacy Vietnamese output with shared multilingual help", async ({ page }) => {
+    const pageErrors = [];
+    page.on("pageerror", (error) => pageErrors.push(error.message));
+    await page.addInitScript(() => {
+        localStorage.removeItem("preferred-lang");
+        localStorage.removeItem("korean3bimprove:c15:grammar2-bubble-sort-game:v1");
+    });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/c15/grammar2-bubble-sort-game.html");
+
+    await expect(page.locator("[data-multilang-btn]")).toHaveCount(7);
+    await expect(page.locator("#sceneViText")).toHaveCount(0);
+    await expect(page.locator(".option-card__vi, .feedback__vi, .review-card__vi")).toHaveCount(0);
+    await expect(page.locator("#sceneTranslationText")).toBeHidden();
+
+    await page.locator('[data-multilang-btn="en"]').click();
+    await expect(page.locator("body")).toHaveAttribute("data-active-lang", "en");
+    await expect(page.locator(".i18n-inline").first()).toContainText("Chapter 15");
+    await expect(page.locator("#sceneTranslationText")).toContainText("same sentence stem");
+    await page.locator("#mobileContinueBtn").click();
+    await page.locator('.zone[data-form="geolyo"]').click();
+    await expect(page.locator(".feedback__translation").first()).toContainText("soft");
+
+    await page.locator('[data-multilang-btn="vi"]').click();
+    await expect(page.locator("body")).toHaveAttribute("data-active-lang", "vi");
+    await expect(page.locator(".feedback__translation").first()).toContainText("Câu này");
+    await expect(page.locator(".feedback__translation").first()).not.toContainText("This sounds");
+
+    await page.locator('[data-multilang-btn="ar"]').click();
+    await expect(page.locator("body")).toHaveAttribute("data-active-lang", "ar");
+    await expect(page.locator(".feedback__translation").first()).toHaveAttribute("dir", "rtl");
+
+    for (const code of ["mn", "kk", "th"]) {
+        await page.locator(`[data-multilang-btn="${code}"]`).click();
+        await expect(page.locator("body")).toHaveAttribute("data-active-lang", code);
+        await expect(page.locator(".feedback__translation").first()).toHaveAttribute("lang", code);
+    }
+
+    await page.locator('[data-multilang-btn="none"]').click();
+    await expect(page.locator("body")).toHaveAttribute("data-active-lang", "none");
+    await expect(page.locator("#sceneTranslationText")).toBeHidden();
+    await expect(page.locator(".feedback__translation")).toHaveCount(0);
+
+    const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
+    expect(hasOverflow).toBe(false);
+    expect(pageErrors).toEqual([]);
+});
+
+test("c15 grammar2 bubble sort game restores a selected practice response after reload", async ({ page }) => {
+    await page.goto("/c15/grammar2-bubble-sort-game.html");
+    await page.evaluate(() => {
+        localStorage.removeItem("preferred-lang");
+        localStorage.removeItem("korean3bimprove:c15:grammar2-bubble-sort-game:v1");
+    });
+    await page.reload();
+
+    await page.locator('.zone[data-form="geolyo"]').click();
+    await expect(page.locator("#feedbackBox")).toContainText("지금 놓은 말의 느낌");
+    await page.reload();
+
+    await expect(page.locator("#progressText")).toHaveText("연습 1 / 3");
+    await expect(page.locator("#feedbackBox")).toContainText("지금 놓은 말의 느낌");
+    await expect(page.locator('.zone[data-form="geolyo"] .zone__drop .bubble')).toBeVisible();
+});
+
+test("c15 grammar2 bubble sort game stays reachable at narrow and enlarged layouts", async ({ page }) => {
+    await page.addInitScript(() => {
+        localStorage.removeItem("preferred-lang");
+        localStorage.removeItem("korean3bimprove:c15:grammar2-bubble-sort-game:v1");
+    });
+
+    for (const viewport of [{ width: 320, height: 844 }, { width: 1440, height: 900 }]) {
+        await page.setViewportSize(viewport);
+        await page.goto("/c15/grammar2-bubble-sort-game.html");
+        if (viewport.width === 1440) {
+            await page.evaluate(() => {
+                document.documentElement.style.zoom = "2";
+            });
+        } else {
+            await page.locator("#mobileContinueBtn").click();
+        }
+
+        const layout = await page.evaluate(() => ({
+            overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+            headingVisible: Boolean(document.querySelector("h1")?.getBoundingClientRect().width),
+            firstZoneReachable: Boolean(document.querySelector(".zone")?.getBoundingClientRect().width)
+        }));
+        expect(layout.overflow).toBe(false);
+        expect(layout.headingVisible).toBe(true);
+        expect(layout.firstZoneReachable).toBe(true);
+    }
 });
