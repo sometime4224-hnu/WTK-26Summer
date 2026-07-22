@@ -11,6 +11,11 @@
     const scoreLogKey = `${storageBase}.scoreLogs`;
     const recommendedMinutes = Number(config.recommendedMinutes || 25);
     const fixedSeed = new URLSearchParams(window.location.search).get("seed");
+    const storageVersion = 1;
+    const titleSuffix = Object.prototype.hasOwnProperty.call(config, "titleSuffix")
+        ? String(config.titleSuffix || "")
+        : " IBT";
+    const questionIds = new Set((config.questions || []).map(function (question) { return question.id; }));
 
     let scoreLogs = [];
     let timerId = null;
@@ -22,7 +27,10 @@
         startedAt: Date.now(),
         result: null,
         reviewFilter: "wrong",
-        notice: ""
+        notice: "",
+        storageIssues: {},
+        storageNotice: "",
+        recoveryText: ""
     };
 
     function escapeHtml(value) {
@@ -45,39 +53,130 @@
             .replace(/\s+/g, "");
     }
 
-    function readJson(key, fallback) {
+    function storageIssue(key, status, raw, message) {
+        state.storageIssues[key] = {
+            status: status,
+            raw: typeof raw === "string" ? raw : "",
+            message: message
+        };
+    }
+
+    function clearStorageIssue(key) {
+        delete state.storageIssues[key];
+    }
+
+    function readRawStorage(key) {
         try {
             const raw = window.localStorage.getItem(key);
-            return raw ? JSON.parse(raw) : fallback;
+            return { ok: true, raw: raw };
         } catch (error) {
-            return fallback;
+            storageIssue(key, "unavailable", "", "이 브라우저에서 저장소를 읽을 수 없습니다.");
+            return { ok: false, raw: null };
         }
     }
 
-    function writeJson(key, value) {
+    function parseStoredJson(key) {
+        const stored = readRawStorage(key);
+        if (!stored.ok || stored.raw == null) {
+            return { status: stored.ok ? "empty" : "unavailable", value: null, raw: stored.raw };
+        }
+        try {
+            return { status: "parsed", value: JSON.parse(stored.raw), raw: stored.raw };
+        } catch (error) {
+            storageIssue(key, "corrupt", stored.raw, "저장 데이터가 손상되어 자동 저장을 멈췄습니다.");
+            return { status: "corrupt", value: null, raw: stored.raw };
+        }
+    }
+
+    function writeStorageRecord(key, value) {
+        const issue = state.storageIssues[key];
+        if (issue && (issue.status === "corrupt" || issue.status === "unsupported")) {
+            state.storageNotice = "기존 저장 데이터를 보호하기 위해 자동 저장을 멈췄습니다.";
+            return false;
+        }
         try {
             window.localStorage.setItem(key, JSON.stringify(value));
+            clearStorageIssue(key);
+            state.storageNotice = "";
+            return true;
         } catch (error) {
-            // The quiz still works without localStorage.
+            storageIssue(key, "write-failed", "", "답은 메모리에 유지되지만 이 기기에 저장되지 않았습니다.");
+            state.storageNotice = "저장하지 못했습니다. 현재 답은 이 화면에만 유지됩니다.";
+            return false;
         }
     }
 
     function removeStorage(key) {
         try {
             window.localStorage.removeItem(key);
+            clearStorageIssue(key);
+            return true;
         } catch (error) {
-            // Ignore storage failures.
+            storageIssue(key, "unavailable", "", "저장 데이터를 지울 수 없습니다.");
+            return false;
         }
     }
 
+    function isFiniteNumber(value) {
+        return typeof value === "number" && Number.isFinite(value);
+    }
+
+    function isPlainObject(value) {
+        return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+    }
+
+    function isValidScoreLog(log) {
+        return isPlainObject(log)
+            && (typeof log.seed === "string" || typeof log.seed === "number")
+            && Number.isInteger(log.score)
+            && Number.isInteger(log.total)
+            && log.total === config.questions.length
+            && log.score >= 0
+            && log.score <= log.total
+            && Number.isInteger(log.percent)
+            && log.percent >= 0
+            && log.percent <= 100
+            && isFiniteNumber(log.completedAt)
+            && typeof log.signature === "string";
+    }
+
     function readScoreLogs() {
-        const logs = readJson(scoreLogKey, []);
-        return Array.isArray(logs) ? logs : [];
+        const stored = parseStoredJson(scoreLogKey);
+        if (stored.status === "empty" || stored.status === "unavailable" || stored.status === "corrupt") return [];
+
+        let logs = null;
+        if (Array.isArray(stored.value)) {
+            logs = stored.value;
+        } else if (isPlainObject(stored.value) && stored.value.version === storageVersion) {
+            if (stored.value.quizId !== storageBase || !Array.isArray(stored.value.entries)) {
+                storageIssue(scoreLogKey, "corrupt", stored.raw, "응시 기록 형식이 올바르지 않아 자동 저장을 멈췄습니다.");
+                return [];
+            }
+            logs = stored.value.entries;
+        } else if (isPlainObject(stored.value) && Object.prototype.hasOwnProperty.call(stored.value, "version")) {
+            storageIssue(scoreLogKey, "unsupported", stored.raw, "지원하지 않는 버전의 응시 기록이 있어 자동 저장을 멈췄습니다.");
+            return [];
+        }
+
+        if (!logs || !logs.every(isValidScoreLog)) {
+            storageIssue(scoreLogKey, "corrupt", stored.raw, "응시 기록 형식이 올바르지 않아 자동 저장을 멈췄습니다.");
+            return [];
+        }
+        clearStorageIssue(scoreLogKey);
+        return logs.slice(-30);
     }
 
     function writeScoreLogs(logs) {
-        scoreLogs = logs.slice(-30);
-        writeJson(scoreLogKey, scoreLogs);
+        const nextLogs = logs.slice(-30);
+        if (writeStorageRecord(scoreLogKey, {
+            version: storageVersion,
+            quizId: storageBase,
+            entries: nextLogs
+        })) {
+            scoreLogs = nextLogs;
+        } else {
+            scoreLogs = nextLogs;
+        }
     }
 
     function hashSeed(seed) {
@@ -243,6 +342,82 @@
         return `${state.attempt.seed}:${JSON.stringify(normalizedAnswers)}`;
     }
 
+    function validateAnswers(answers, attempt) {
+        if (!isPlainObject(answers)) return false;
+        const attemptById = new Map(attempt.questions.map(function (question) {
+            return [question.id, question];
+        }));
+        return Object.keys(answers).every(function (id) {
+            if (!questionIds.has(id) || !attemptById.has(id) || typeof answers[id] !== "string") return false;
+            const question = attemptById.get(id);
+            if (question.type !== "mcq" || answers[id] === "") return true;
+            return [question.answer].concat(question.distractors || []).includes(answers[id]);
+        });
+    }
+
+    function validateResult(result, attempt) {
+        if (!isPlainObject(result)) return false;
+        if (String(result.seed) !== String(attempt.seed)) return false;
+        if (!Number.isInteger(result.score) || result.score < 0 || result.score > attempt.questions.length) return false;
+        if (result.total !== attempt.questions.length) return false;
+        if (!Number.isInteger(result.percent) || result.percent < 0 || result.percent > 100) return false;
+        if (!validateAnswers(result.answers, attempt)) return false;
+        if (!isFiniteNumber(result.completedAt) || !isFiniteNumber(result.elapsedMs)) return false;
+        if (!Array.isArray(result.items) || result.items.length !== attempt.questions.length) return false;
+        if (typeof result.signature !== "string") return false;
+        return result.items.every(function (item, index) {
+            return isPlainObject(item)
+                && item.id === attempt.questions[index].id
+                && item.number === index + 1
+                && typeof item.ok === "boolean";
+        });
+    }
+
+    function validateProgress(progress) {
+        if (!isPlainObject(progress)) return null;
+        if (typeof progress.seed !== "string" && typeof progress.seed !== "number") return null;
+        const attempt = buildAttempt(progress.seed);
+        if (progress.total !== attempt.questions.length) return null;
+        if (!Number.isInteger(progress.currentIndex) || progress.currentIndex < 0 || progress.currentIndex >= progress.total) return null;
+        if (!isFiniteNumber(progress.startedAt) || progress.startedAt <= 0) return null;
+        if (progress.updatedAt != null && (!isFiniteNumber(progress.updatedAt) || progress.updatedAt <= 0)) return null;
+        if (!validateAnswers(progress.answers, attempt)) return null;
+        const computedAnswered = attempt.questions.reduce(function (total, question) {
+            return total + (isAnswered(question, progress.answers[question.id]) ? 1 : 0);
+        }, 0);
+        if (!Number.isInteger(progress.answered) || progress.answered !== computedAnswered) return null;
+        if (progress.completed != null && typeof progress.completed !== "boolean") return null;
+        if (progress.lastResult != null && !validateResult(progress.lastResult, attempt)) return null;
+        return progress;
+    }
+
+    function decodeProgress() {
+        const stored = parseStoredJson(progressKey);
+        if (stored.status === "empty" || stored.status === "unavailable" || stored.status === "corrupt") return null;
+
+        let progress = null;
+        if (isPlainObject(stored.value) && stored.value.version === storageVersion) {
+            if (stored.value.quizId !== storageBase || !isPlainObject(stored.value.data)) {
+                storageIssue(progressKey, "corrupt", stored.raw, "저장된 진행 형식이 올바르지 않아 자동 저장을 멈췄습니다.");
+                return null;
+            }
+            progress = stored.value.data;
+        } else if (isPlainObject(stored.value) && Object.prototype.hasOwnProperty.call(stored.value, "version")) {
+            storageIssue(progressKey, "unsupported", stored.raw, "지원하지 않는 버전의 진행 데이터가 있어 자동 저장을 멈췄습니다.");
+            return null;
+        } else {
+            progress = stored.value;
+        }
+
+        const valid = validateProgress(progress);
+        if (!valid) {
+            storageIssue(progressKey, "corrupt", stored.raw, "저장된 진행 형식이 올바르지 않아 자동 저장을 멈췄습니다.");
+            return null;
+        }
+        clearStorageIssue(progressKey);
+        return valid;
+    }
+
     function saveProgress(extra) {
         const payload = Object.assign({
             seed: state.attempt.seed,
@@ -253,12 +428,16 @@
             answered: answerCount(),
             total: state.attempt.questions.length
         }, extra || {});
-        writeJson(progressKey, payload);
+        writeStorageRecord(progressKey, {
+            version: storageVersion,
+            quizId: storageBase,
+            data: payload
+        });
     }
 
     function readProgress() {
-        const progress = readJson(progressKey, null);
-        if (!progress || typeof progress !== "object") return null;
+        const progress = decodeProgress();
+        if (!progress) return null;
         if (String(progress.seed) !== String(state.attempt.seed)) return null;
         return progress;
     }
@@ -303,25 +482,88 @@
     }
 
     function renderTopActions() {
+        const links = Array.isArray(config.links) && config.links.length
+            ? config.links
+            : [
+                { href: "index.html", label: `${config.chapter || "11"}과 목록` },
+                { href: "review-quiz.html", label: "전체보기" }
+            ];
         return `
             <div class="ibt-top-actions">
-                <a class="ibt-link-button" href="index.html">11과 목록</a>
-                <a class="ibt-link-button" href="review-quiz.html">전체보기</a>
+                ${links.map(function (link) {
+                    return `<a class="ibt-link-button" href="${escapeAttr(link.href)}">${escapeHtml(link.label)}</a>`;
+                }).join("")}
+                <button class="ibt-button" type="button" data-action="reset-storage">저장 초기화</button>
             </div>
         `;
     }
 
     function renderStats() {
         const counts = getQuestionCounts();
+        const typeStats = [
+            ["mcq", "객관식"],
+            ["short", "단답"],
+            ["scaffold", "쓰기"]
+        ].filter(function (item) { return counts[item[0]] > 0; });
         return `
             <div class="ibt-stats" aria-label="문항 구성">
                 <span><strong>${counts.total}</strong>문항</span>
-                <span>객관식 <strong>${counts.mcq}</strong></span>
-                <span>단답 <strong>${counts.short}</strong></span>
-                <span>쓰기 <strong>${counts.scaffold}</strong></span>
+                ${typeStats.map(function (item) {
+                    return `<span>${item[1]} <strong>${counts[item[0]]}</strong></span>`;
+                }).join("")}
                 <span>권장 <strong>${recommendedMinutes}분</strong></span>
             </div>
         `;
+    }
+
+    function storageRecoveryPayload() {
+        const records = {};
+        [progressKey, scoreLogKey].forEach(function (key) {
+            const issue = state.storageIssues[key];
+            if (issue && issue.raw) {
+                records[key] = issue.raw;
+                return;
+            }
+            const stored = readRawStorage(key);
+            records[key] = stored.raw;
+        });
+        return JSON.stringify({ quizId: storageBase, records: records }, null, 2);
+    }
+
+    function renderStorageStatus() {
+        const issues = Object.keys(state.storageIssues).map(function (key) {
+            return state.storageIssues[key];
+        });
+        if (!issues.length && !state.storageNotice && !state.recoveryText) return "";
+        const messages = Array.from(new Set(issues.map(function (issue) { return issue.message; }).filter(Boolean)));
+        if (state.storageNotice && !messages.includes(state.storageNotice)) messages.push(state.storageNotice);
+        return `
+            <section class="ibt-storage-status" role="alert">
+                <div>
+                    <h2>저장 상태 확인</h2>
+                    ${messages.map(function (message) { return `<p>${escapeHtml(message)}</p>`; }).join("")}
+                </div>
+                <div class="ibt-action-row">
+                    <button class="ibt-button" type="button" data-action="copy-storage">저장 데이터 복사</button>
+                    <button class="ibt-button" type="button" data-action="reset-storage">저장된 진행 초기화</button>
+                </div>
+                ${state.recoveryText ? `
+                    <label class="ibt-recovery-label">
+                        복사할 저장 데이터
+                        <textarea class="ibt-recovery-text" readonly>${escapeHtml(state.recoveryText)}</textarea>
+                    </label>
+                ` : ""}
+            </section>
+        `;
+    }
+
+    function renderInlineStorageNotice() {
+        const issueKey = Object.keys(state.storageIssues)[0];
+        const issue = issueKey ? state.storageIssues[issueKey] : null;
+        const message = state.storageNotice || (issue && issue.message);
+        return message
+            ? `<p class="ibt-storage-inline" role="status">${escapeHtml(message)} 처음 화면에서 복사하거나 초기화할 수 있습니다.</p>`
+            : "";
     }
 
     function renderScoreLogs() {
@@ -347,14 +589,16 @@
     function renderStart() {
         stopTimer();
         const progress = readProgress();
-        const canResume = progress && progress.answered > 0 && progress.answered < progress.total;
+        const canResume = progress && progress.answered > 0 && !progress.completed;
         const answered = progress ? progress.answered : 0;
+        const hasImage = isPlainObject(config.image) && Boolean(config.image.src);
+        const eyebrow = config.eyebrow || `TOPIK IBT Review · Lesson ${config.chapter}`;
 
         root.innerHTML = `
-            <section class="ibt-hero">
+            <section class="ibt-hero ${hasImage ? "" : "ibt-hero--compact"}">
                 <div class="ibt-hero-copy">
-                    <p class="ibt-eyebrow">TOPIK IBT Review · Lesson ${escapeHtml(config.chapter)}</p>
-                    <h1>${escapeHtml(config.title)} IBT</h1>
+                    <p class="ibt-eyebrow">${escapeHtml(eyebrow)}</p>
+                    <h1>${escapeHtml(config.title)}${escapeHtml(titleSuffix)}</h1>
                     <p>${escapeHtml(config.subtitle)}</p>
                     <div class="ibt-tags">
                         ${(config.tags || []).map(function (tag) {
@@ -362,9 +606,9 @@
                         }).join("")}
                     </div>
                 </div>
-                <figure class="ibt-hero-media">
+                ${hasImage ? `<figure class="ibt-hero-media">
                     <img src="${escapeAttr(config.image.src)}" alt="${escapeAttr(config.image.alt)}" width="${config.image.width || 640}" height="${config.image.height || 420}">
-                </figure>
+                </figure>` : ""}
             </section>
 
             ${renderStats()}
@@ -390,6 +634,7 @@
                 ${renderScoreLogs()}
             </section>
 
+            ${renderStorageStatus()}
             <p class="ibt-rights-note">${escapeHtml(config.rightsNote || "")}</p>
         `;
     }
@@ -507,6 +752,7 @@
         const question = currentQuestion();
         root.innerHTML = `
             ${renderProgress()}
+            ${renderInlineStorageNotice()}
             ${state.notice ? `<p class="ibt-notice" role="status">${escapeHtml(state.notice)}</p>` : ""}
 
             <section class="ibt-quiz-layout">
@@ -562,6 +808,14 @@
             };
         });
         const total = state.attempt.questions.length;
+        const areaScores = Array.from(items.reduce(function (areas, item) {
+            const key = item.area || "전체";
+            const current = areas.get(key) || { area: key, score: 0, total: 0 };
+            current.total += 1;
+            if (item.ok) current.score += 1;
+            areas.set(key, current);
+            return areas;
+        }, new Map()).values());
         return {
             seed: state.attempt.seed,
             score: score,
@@ -571,6 +825,7 @@
             completedAt: Date.now(),
             elapsedMs: Date.now() - state.startedAt,
             items: items,
+            areaScores: areaScores,
             signature: answerSignature(answers)
         };
     }
@@ -593,6 +848,16 @@
 
     function renderResultSummary(result) {
         const wrong = result.total - result.score;
+        const areaScores = Array.isArray(result.areaScores) && result.areaScores.length
+            ? result.areaScores
+            : Array.from(result.items.reduce(function (areas, item) {
+                const key = item.area || "전체";
+                const current = areas.get(key) || { area: key, score: 0, total: 0 };
+                current.total += 1;
+                if (item.ok) current.score += 1;
+                areas.set(key, current);
+                return areas;
+            }, new Map()).values());
         return `
             <section class="ibt-result-hero">
                 <p class="ibt-eyebrow">Result</p>
@@ -602,6 +867,11 @@
                     <div>
                         <p>정답 ${result.score}문항 · 오답 ${wrong}문항</p>
                         <p>소요 시간 ${formatElapsed(result.elapsedMs)} · ${formatDateTime(result.completedAt)}</p>
+                        <div class="ibt-area-scores" aria-label="영역별 점수">
+                            ${areaScores.map(function (area) {
+                                return `<span>${escapeHtml(area.area)} <strong>${area.score}/${area.total}</strong></span>`;
+                            }).join("")}
+                        </div>
                     </div>
                 </div>
                 <div class="ibt-action-row">
@@ -656,6 +926,7 @@
 
         root.innerHTML = `
             ${renderResultSummary(result)}
+            ${renderInlineStorageNotice()}
             <section class="ibt-review-panel">
                 <div class="ibt-panel-head">
                     <div>
@@ -772,6 +1043,45 @@
         }
     }
 
+    function resetPageStorage(askForConfirmation) {
+        if (askForConfirmation && !window.confirm("이 시험의 저장된 진행과 응시 기록을 초기화할까요?")) return false;
+        const progressRemoved = removeStorage(progressKey);
+        const logsRemoved = removeStorage(scoreLogKey);
+        if (!progressRemoved || !logsRemoved) {
+            state.storageNotice = "저장 데이터를 모두 초기화하지 못했습니다.";
+            if (state.screen === "start") renderStart();
+            return false;
+        }
+        scoreLogs = [];
+        state.answers = {};
+        state.currentIndex = 0;
+        state.startedAt = Date.now();
+        state.attempt = buildAttempt(fixedSeed || Date.now());
+        state.result = null;
+        state.reviewFilter = "wrong";
+        state.notice = "";
+        state.storageNotice = "이 시험의 저장 데이터를 초기화했습니다.";
+        state.recoveryText = "";
+        state.screen = "start";
+        renderStart();
+        return true;
+    }
+
+    function copyStorageRecovery() {
+        const payload = storageRecoveryPayload();
+        state.recoveryText = payload;
+        state.storageNotice = "아래 저장 데이터를 선택해 복사할 수 있습니다.";
+        renderStart();
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+            navigator.clipboard.writeText(payload).then(function () {
+                state.storageNotice = "저장 데이터를 클립보드에 복사했습니다.";
+                if (state.screen === "start") renderStart();
+            }).catch(function () {
+                // The visible recovery textarea remains available as a fallback.
+            });
+        }
+    }
+
     function handleClick(event) {
         const control = event.target.closest("[data-action]");
         if (!control) return;
@@ -794,6 +1104,14 @@
         }
         if (action === "show-results") {
             showLatestResult();
+            return;
+        }
+        if (action === "copy-storage") {
+            copyStorageRecovery();
+            return;
+        }
+        if (action === "reset-storage") {
+            resetPageStorage(true);
             return;
         }
         if (action === "goto") {
@@ -856,19 +1174,17 @@
 
     function init() {
         scoreLogs = readScoreLogs();
-        const stored = readJson(progressKey, null);
+        const stored = decodeProgress();
         const seed = fixedSeed || (stored && stored.seed) || Date.now();
         state.attempt = buildAttempt(seed);
         state.startedAt = Date.now();
 
-        const progress = readProgress();
+        const progress = stored && String(stored.seed) === String(state.attempt.seed) ? stored : null;
         if (progress) {
             state.answers = progress.answers || {};
             state.currentIndex = Math.min(Number(progress.currentIndex) || 0, state.attempt.questions.length - 1);
             state.startedAt = Number(progress.startedAt) || Date.now();
             state.result = progress.lastResult || null;
-        } else {
-            saveProgress({ completed: false, lastResult: null });
         }
 
         window.__reviewQuizIbt = {
@@ -879,18 +1195,19 @@
             getQuestionCounts: getQuestionCounts,
             currentAttempt: function () { return state.attempt; },
             collectAnswers: collectAnswers,
-            readProgress: function () { return readJson(progressKey, null); },
+            readProgress: function () { return decodeProgress(); },
             readScoreLogs: function () { return readScoreLogs(); },
+            getStorageState: function () {
+                return {
+                    issues: Object.assign({}, state.storageIssues),
+                    notice: state.storageNotice
+                };
+            },
             getStorageKeys: function () {
                 return { progressKey: progressKey, scoreLogKey: scoreLogKey };
             },
             clearStorage: function () {
-                removeStorage(progressKey);
-                removeStorage(scoreLogKey);
-                scoreLogs = [];
-                startNewAttempt(fixedSeed || Date.now());
-                state.screen = "start";
-                renderStart();
+                return resetPageStorage(false);
             },
             setAnswers: function (answers) {
                 state.answers = Object.assign({}, answers || {});

@@ -100,6 +100,23 @@ button {
     border-top: 5px solid var(--ibt-accent);
 }
 
+.ibt-hero--compact {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px 16px;
+}
+
+.ibt-hero--compact .ibt-hero-copy {
+    align-content: start;
+}
+
+.ibt-hero--compact h1 {
+    font-size: clamp(26px, 7vw, 42px);
+}
+
+.ibt-hero--compact .ibt-tags {
+    margin-top: 8px;
+}
+
 .ibt-hero-copy {
     display: grid;
     align-content: center;
@@ -265,6 +282,17 @@ button {
     transform: translateY(-1px);
 }
 
+.ibt-button:focus-visible,
+.ibt-link-button:focus-visible,
+.ibt-segments button:focus-visible,
+.ibt-dot-button:focus-visible,
+.ibt-choice:has(input:focus-visible),
+.ibt-text-answer:focus-visible,
+.ibt-scaffold-answer:focus-visible {
+    outline: 3px solid #f59e0b;
+    outline-offset: 3px;
+}
+
 .ibt-button:disabled {
     cursor: not-allowed;
     opacity: 0.55;
@@ -326,8 +354,7 @@ button {
 }
 
 .ibt-progress-panel {
-    position: sticky;
-    top: 52px;
+    position: static;
     z-index: 20;
     display: grid;
     gap: 12px;
@@ -399,6 +426,62 @@ button {
     font-weight: 900;
 }
 
+.ibt-storage-inline,
+.ibt-storage-status {
+    margin: 12px 0 0;
+    border: 1px solid #f59e0b;
+    border-radius: var(--ibt-radius);
+    background: #fffbeb;
+    color: #78350f;
+}
+
+.ibt-storage-inline {
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 850;
+    line-height: 1.55;
+}
+
+.ibt-storage-status {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+}
+
+.ibt-storage-status h2,
+.ibt-storage-status p {
+    margin: 0;
+}
+
+.ibt-storage-status h2 {
+    font-size: 18px;
+}
+
+.ibt-storage-status p {
+    margin-top: 5px;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.55;
+}
+
+.ibt-recovery-label {
+    display: grid;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.ibt-recovery-text {
+    width: 100%;
+    min-height: 120px;
+    resize: vertical;
+    border: 1px solid #d97706;
+    border-radius: var(--ibt-radius);
+    background: #fff;
+    color: #334155;
+    font: 12px/1.5 Consolas, monospace;
+}
+
 .ibt-quiz-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 280px;
@@ -426,6 +509,7 @@ button {
     font-size: clamp(20px, 3vw, 30px);
     font-weight: 950;
     line-height: 1.45;
+    overflow-wrap: anywhere;
 }
 
 .ibt-question-support {
@@ -434,6 +518,7 @@ button {
     font-size: 14px;
     font-weight: 800;
     line-height: 1.55;
+    overflow-wrap: anywhere;
 }
 
 .ibt-choice-grid {
@@ -458,6 +543,11 @@ button {
     line-height: 1.45;
     cursor: pointer;
     box-shadow: 0 8px 18px rgba(23, 33, 38, 0.04);
+}
+
+.ibt-choice > span:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .ibt-choice input {
@@ -588,8 +678,7 @@ button {
 }
 
 .ibt-nav-bar {
-    position: sticky;
-    bottom: 0;
+    position: static;
     z-index: 20;
     display: grid;
     grid-template-columns: minmax(110px, 1fr) minmax(160px, 1.2fr) minmax(110px, 1fr);
@@ -608,6 +697,31 @@ button {
     gap: 16px;
     align-items: center;
     margin: 16px 0;
+}
+
+.ibt-area-scores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.ibt-area-scores span {
+    display: inline-flex;
+    gap: 5px;
+    align-items: center;
+    min-height: 32px;
+    padding: 5px 9px;
+    border: 1px solid var(--ibt-line);
+    border-radius: var(--ibt-radius);
+    background: var(--ibt-panel-soft);
+    color: var(--ibt-muted);
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.ibt-area-scores strong {
+    color: var(--ibt-accent-strong);
 }
 
 .ibt-score-ring {
@@ -789,11 +903,6 @@ button {
         width: 100%;
     }
 
-    .ibt-progress-panel,
-    .ibt-nav-bar {
-        position: static;
-    }
-
     .ibt-progress-meta,
     .ibt-panel-head,
     .ibt-review-head {
@@ -843,5 +952,16 @@ button {
     .ibt-review-item {
         box-shadow: none;
         break-inside: avoid;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
     }
 }
