@@ -69,7 +69,6 @@
     }
 
     .topbar a,
-    .mode-btn,
     .sound-btn,
     .mic-btn {
       min-height: 34px;
@@ -88,7 +87,6 @@
       cursor: pointer;
     }
 
-    .mode-btn.is-on,
     .sound-btn.is-on,
     .mic-btn.is-on {
       background: #1f7a54;
@@ -105,13 +103,12 @@
 
     .verb-pill {
       justify-self: center;
-      min-width: min(280px, 44vw);
+      min-width: 76px;
       height: 36px;
-      display: grid;
-      grid-template-columns: 1fr auto;
+      display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 0 8px 0 16px;
+      justify-content: center;
+      padding: 0 8px;
       border-radius: 999px;
       background: #201a17;
       color: #fff8ec;
@@ -128,15 +125,6 @@
       opacity: 1;
       visibility: visible;
       transform: translateY(0) scale(1);
-    }
-
-    .verb-pill__instrument {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 0.82rem;
-      font-weight: 800;
-      color: rgba(255, 248, 236, 0.82);
     }
 
     .verb-pill__verb {
@@ -219,49 +207,38 @@
       transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease;
     }
 
-    .instrument-btn[aria-selected="true"] {
+    .instrument-btn[aria-pressed="true"] {
       transform: translateY(-2px);
       background: #fff8ec;
       color: var(--ink);
       border-color: #fff8ec;
     }
 
-    .gesture-strip {
+    .play-btn {
       position: absolute;
-      z-index: 2;
-      left: 50%;
-      top: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transform: translateX(-50%);
-      pointer-events: none;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.16s ease, visibility 0.16s ease;
-    }
-
-    .gesture-strip.is-visible {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .gesture-chip {
-      min-width: 66px;
-      padding: 6px 10px;
-      border: 1px solid rgba(255, 248, 236, 0.16);
-      border-radius: 999px;
-      background: rgba(32, 26, 23, 0.58);
-      color: rgba(255, 248, 236, 0.78);
-      text-align: center;
-      font-size: 0.72rem;
-      font-weight: 900;
-      backdrop-filter: blur(8px);
-    }
-
-    .gesture-chip.is-active {
-      background: var(--paper);
+      z-index: 4;
+      right: 12px;
+      bottom: calc(var(--controls-height) + var(--safe-bottom) + 12px);
+      width: 52px;
+      min-height: 52px;
+      border: 1px solid rgba(255, 248, 236, 0.38);
+      border-radius: 8px;
+      background: #fff8ec;
       color: var(--ink);
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .instrument-btn:focus-visible,
+    .play-btn:focus-visible,
+    .topbar a:focus-visible,
+    .sound-btn:focus-visible,
+    .mic-btn:focus-visible {
+      outline: 3px solid #fff1a8;
+      outline-offset: 3px;
     }
 
     .toast {
@@ -289,6 +266,18 @@
       transform: translate(-50%, 0);
     }
 
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     @media (max-width: 720px) {
       :root {
         --nav-height: 44px;
@@ -302,7 +291,6 @@
       }
 
       .topbar a,
-      .mode-btn,
       .sound-btn,
       .mic-btn {
         min-height: 32px;
@@ -315,15 +303,7 @@
       }
 
       .verb-pill {
-        min-width: 0;
-        width: 100%;
         height: 32px;
-        padding-left: 10px;
-        gap: 5px;
-      }
-
-      .verb-pill__instrument {
-        font-size: 0.72rem;
       }
 
       .verb-pill__verb {
@@ -343,15 +323,11 @@
         font-size: 0.84rem;
       }
 
-      .gesture-strip {
-        top: 8px;
-        gap: 5px;
-      }
-
-      .gesture-chip {
-        min-width: 52px;
-        padding: 5px 8px;
-        font-size: 0.66rem;
+      .play-btn {
+        right: 8px;
+        bottom: calc(var(--controls-height) + var(--safe-bottom) + 8px);
+        width: 50px;
+        min-height: 50px;
       }
     }
   </style>
@@ -365,28 +341,29 @@
       <a href="../index.html">메인</a>
       <a href="index.html">16과</a>
     </div>
-    <div id="verbPill" class="verb-pill" aria-live="polite">
-      <span id="instrumentLabel" class="verb-pill__instrument">피아노</span>
-      <strong id="verbLabel" class="verb-pill__verb">치다</strong>
+    <div id="verbPill" class="verb-pill" data-feedback aria-hidden="true">
+      <strong id="verbLabel" class="verb-pill__verb"></strong>
     </div>
+    <span id="verbAnnouncer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></span>
     <div class="topbar__links">
-      <button id="modeBtn" class="mode-btn" type="button" aria-pressed="false">동사</button>
-      <button id="soundBtn" class="sound-btn" type="button" aria-pressed="false">소리</button>
+      <button id="soundBtn" class="sound-btn is-on" type="button" aria-pressed="true">소리</button>
       <button id="micBtn" class="mic-btn" type="button" aria-pressed="false">마이크</button>
     </div>
   </nav>
 
-  <main class="stage">
-    <canvas id="instrumentCanvas" aria-label="악기 연주 캔버스"></canvas>
-    <div id="gestureStrip" class="gesture-strip" aria-hidden="true"></div>
+  <main class="stage" aria-describedby="instrumentAssist">
+    <h1 class="sr-only">16과 악기 연주 어휘</h1>
+    <p id="instrumentAssist" class="sr-only">악기를 선택한 뒤 화면을 터치하거나 연주 버튼을 누르세요. 연주하면 동사가 들립니다.</p>
+    <canvas id="instrumentCanvas" aria-hidden="true"></canvas>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
-    <div class="instrument-rail" role="tablist" aria-label="악기 선택">
-      <button class="instrument-btn" type="button" role="tab" aria-selected="true" data-instrument="piano">피아노</button>
-      <button class="instrument-btn" type="button" role="tab" aria-selected="false" data-instrument="violin">바이올린</button>
-      <button class="instrument-btn" type="button" role="tab" aria-selected="false" data-instrument="trumpet">트럼펫</button>
-      <button class="instrument-btn" type="button" role="tab" aria-selected="false" data-instrument="guitar">기타</button>
-      <button class="instrument-btn" type="button" role="tab" aria-selected="false" data-instrument="drums">드럼</button>
+    <div class="instrument-rail" role="group" aria-label="악기 선택">
+      <button class="instrument-btn" type="button" aria-pressed="true" data-instrument="piano">피아노</button>
+      <button class="instrument-btn" type="button" aria-pressed="false" data-instrument="violin">바이올린</button>
+      <button class="instrument-btn" type="button" aria-pressed="false" data-instrument="trumpet">트럼펫</button>
+      <button class="instrument-btn" type="button" aria-pressed="false" data-instrument="guitar">기타</button>
+      <button class="instrument-btn" type="button" aria-pressed="false" data-instrument="drums">드럼</button>
     </div>
+    <button id="playCurrentBtn" class="play-btn" type="button" data-action="play-current" aria-label="피아노 연주하기">▶</button>
   </main>
 
   <script>
@@ -396,12 +373,11 @@
       const body = document.body;
       const verbPill = document.getElementById('verbPill');
       const verbLabel = document.getElementById('verbLabel');
-      const instrumentLabel = document.getElementById('instrumentLabel');
-      const modeBtn = document.getElementById('modeBtn');
+      const verbAnnouncer = document.getElementById('verbAnnouncer');
       const soundBtn = document.getElementById('soundBtn');
       const micBtn = document.getElementById('micBtn');
       const toast = document.getElementById('toast');
-      const gestureStrip = document.getElementById('gestureStrip');
+      const playCurrentBtn = document.getElementById('playCurrentBtn');
       const instrumentButtons = Array.from(document.querySelectorAll('.instrument-btn'));
 
       const instruments = {
@@ -472,22 +448,24 @@
 
       const state = {
         activeInstrument: 'piano',
-        textMode: 'verb',
         width: 0,
         height: 0,
         dpr: 1,
         lastTime: performance.now(),
+        frameId: null,
+        isPaused: false,
+        showPlayCue: true,
         effects: [],
         pointers: new Map(),
         layout: {},
         hideVerbTimer: null,
-        hideGestureTimer: null,
         lastWordAt: 0,
         heldPiano: new Map(),
         pianoPress: new Map(),
         drumHits: new Map(),
         funObjectHits: new Map(),
         funObjectMotion: new Map(),
+        funObjectPulls: new Map(),
         stringImpulse: new Map(),
         guitarGrabs: new Map(),
         violinBow: null,
@@ -497,25 +475,6 @@
         trumpetHead: null,
         trumpetLastBreathAt: 0,
         sparkleSeed: 1
-      };
-
-      const actionSentences = {
-        piano: {
-          '치다': '피아노를 치다',
-          '누르다': '건반을 누르다'
-        },
-        violin: {
-          '켜다': '바이올린을 켜다'
-        },
-        trumpet: {
-          '불다': '트럼펫을 불다'
-        },
-        guitar: {
-          '튕기다': '기타를 튕기다'
-        },
-        drums: {
-          '치다': '드럼을 치다'
-        }
       };
 
       const audio = {
@@ -536,6 +495,7 @@
 
       const pointerColors = ['#fff1a8', '#8de7dd', '#ffb0a8', '#b9a7ff', '#a7e5b9'];
       const supportsPointer = 'PointerEvent' in window;
+      const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
       function clamp(value, min, max) {
         return Math.min(max, Math.max(min, value));
@@ -567,6 +527,49 @@
         ctx.shadowBlur = r * 0.32;
         ctx.beginPath();
         ctx.arc(x, y, r * (1 + pulse * 0.08), 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawPlayCue(now) {
+        if (!state.showPlayCue) return;
+        let target = null;
+        if (state.activeInstrument === 'piano') {
+          const key = state.layout.piano?.whiteKeys?.[3];
+          if (key) target = { x: key.x + key.w / 2, y: key.y + key.h * 0.38, r: key.w * 0.48, color: '#fff1a8' };
+        }
+        if (state.activeInstrument === 'violin') {
+          const bow = getViolinBowTool();
+          if (bow) target = { x: bow.x, y: bow.y, r: bow.thickness * 3.1, color: '#fff4c7' };
+        }
+        if (state.activeInstrument === 'trumpet') {
+          const head = getTrumpetHead();
+          if (head) target = { x: head.x, y: head.y, r: head.r * 1.12, color: '#dff8ff' };
+        }
+        if (state.activeInstrument === 'guitar') {
+          const string = state.layout.guitar?.strings?.[2];
+          if (string) target = { x: state.width * 0.48, y: string.y, r: state.layout.guitar.stringGap * 1.3, color: '#8de7dd' };
+        }
+        if (state.activeInstrument === 'drums') {
+          const drum = state.layout.drums?.find((item) => item.id === 'snare') || state.layout.drums?.[0];
+          if (drum) target = { x: drum.x, y: drum.y, r: drum.r * 0.92, color: '#fff1a8' };
+        }
+        if (!target) return;
+
+        const cueRadius = Math.max(18, target.r);
+        drawTouchableGlow(target.x, target.y, cueRadius, target.color, reducedMotion ? 0 : now, reducedMotion ? 0.38 : 0.56);
+        ctx.save();
+        ctx.translate(target.x, target.y - cueRadius * 1.36);
+        ctx.globalAlpha = reducedMotion ? 0.74 : 0.58 + Math.sin(now * 0.006) * 0.22;
+        ctx.strokeStyle = target.color;
+        ctx.lineWidth = Math.max(2.5, cueRadius * 0.09);
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(0, cueRadius * 0.62);
+        ctx.lineTo(0, -cueRadius * 0.2);
+        ctx.quadraticCurveTo(0, -cueRadius * 0.54, cueRadius * 0.22, -cueRadius * 0.54);
+        ctx.quadraticCurveTo(cueRadius * 0.44, -cueRadius * 0.54, cueRadius * 0.44, -cueRadius * 0.24);
+        ctx.lineTo(cueRadius * 0.44, cueRadius * 0.12);
         ctx.stroke();
         ctx.restore();
       }
@@ -695,42 +698,9 @@
         return state.sparkleSeed / 4294967296;
       }
 
-      function objectPhrase(noun) {
-        const last = noun.charCodeAt(noun.length - 1);
-        const hasBatchim = last >= 0xac00 && last <= 0xd7a3 && (last - 0xac00) % 28 !== 0;
-        return `${noun}${hasBatchim ? '을' : '를'}`;
-      }
-
-      function sentenceForAction(verb, instrumentName, requestedText) {
-        if (requestedText && requestedText !== verb) return requestedText;
-        const instrumentKey = state.activeInstrument;
-        return actionSentences[instrumentKey]?.[verb]
-          || `${objectPhrase(instrumentName || instruments[instrumentKey].name)} ${verb}`;
-      }
-
-      function outputTextForAction(verb, instrumentName, requestedText) {
-        return state.textMode === 'sentence'
-          ? sentenceForAction(verb, instrumentName, requestedText)
-          : verb;
-      }
-
-      function setTextMode(mode) {
-        state.textMode = mode === 'sentence' ? 'sentence' : 'verb';
-        const isSentence = state.textMode === 'sentence';
-        modeBtn.textContent = isSentence ? '문장' : '동사';
-        modeBtn.classList.toggle('is-on', isSentence);
-        modeBtn.setAttribute('aria-pressed', String(isSentence));
-      }
-
-      function updateVerb(verb, instrumentName, color, outputText = null) {
-        if (state.textMode === 'sentence' && outputText?.includes(' ')) {
-          const parts = outputText.split(' ');
-          instrumentLabel.textContent = parts.slice(0, -1).join(' ');
-          verbLabel.textContent = parts[parts.length - 1];
-        } else {
-          verbLabel.textContent = verb;
-          instrumentLabel.textContent = instrumentName || instruments[state.activeInstrument].name;
-        }
+      function updateVerb(verb, color) {
+        verbLabel.textContent = verb;
+        verbAnnouncer.textContent = verb;
         verbLabel.style.background = color || instruments[state.activeInstrument].color;
         verbPill.classList.add('is-active');
         verbPill.classList.remove('pulse');
@@ -754,10 +724,11 @@
           || state.trumpetHead?.blowing;
       }
 
-      function flashVerb(verb, x, y, instrumentName, color, force = false, displayText = null, options = {}) {
+      function flashVerb(verb, x, y, instrumentName, color, force = false, options = {}) {
         const now = performance.now();
-        const outputText = outputTextForAction(verb, instrumentName, displayText);
-        updateVerb(verb, instrumentName, color, outputText);
+        const outputText = verb;
+        state.showPlayCue = false;
+        updateVerb(verb, color);
         if (!force && now - state.lastWordAt < 230) return;
         state.lastWordAt = now;
         const baseTextSize = outputText.length > 4
@@ -771,12 +742,7 @@
         addEffect({
           type: 'word',
           text: outputText,
-          phrase: outputText.includes(' ')
-            ? {
-                prefix: outputText.split(' ').slice(0, -1).join(' '),
-                verb: outputText.split(' ').slice(-1)[0]
-              }
-            : null,
+          phrase: null,
           x: safeX,
           y: clamp(y, state.height * 0.15, state.height * 0.76),
           duration: options.duration || 680,
@@ -786,34 +752,7 @@
       }
 
       function setGestureActive(label, reveal = true) {
-        Array.from(gestureStrip.children).forEach((node) => {
-          node.classList.toggle('is-active', node.textContent === label);
-        });
-        if (!reveal) {
-          gestureStrip.classList.remove('is-visible');
-          return;
-        }
-        gestureStrip.classList.add('is-visible');
-        scheduleGestureHide(900);
-      }
-
-      function scheduleGestureHide(delay = 700) {
-        clearTimeout(state.hideGestureTimer);
-        state.hideGestureTimer = setTimeout(() => {
-          if (!hasActivePlaying()) {
-            gestureStrip.classList.remove('is-visible');
-          }
-        }, delay);
-      }
-
-      function renderGestureStrip() {
-        gestureStrip.innerHTML = '';
-        instruments[state.activeInstrument].gestures.forEach((gesture) => {
-          const chip = document.createElement('span');
-          chip.className = 'gesture-chip';
-          chip.textContent = gesture;
-          gestureStrip.appendChild(chip);
-        });
+        // Gesture text is intentionally omitted; the active instrument itself provides the visual cue.
       }
 
       function showToast(message, duration = 1500) {
@@ -825,7 +764,7 @@
 
       function resizeCanvas() {
         const rect = canvas.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
         state.width = Math.max(320, rect.width);
         state.height = Math.max(260, rect.height);
         state.dpr = dpr;
@@ -840,11 +779,12 @@
         state.activeInstrument = key;
         body.dataset.instrument = key;
         instrumentButtons.forEach((btn) => {
-          btn.setAttribute('aria-selected', String(btn.dataset.instrument === key));
+          btn.setAttribute('aria-pressed', String(btn.dataset.instrument === key));
         });
         state.pointers.clear();
         state.effects = [];
         state.guitarGrabs.clear();
+        state.funObjectPulls.clear();
         state.layout.funObjects = [];
         state.funObjectMotion.clear();
         if (key === 'trumpet' || key === 'guitar' || key === 'drums') {
@@ -858,13 +798,11 @@
           resetTrumpetHead();
         }
         clearTimeout(state.hideVerbTimer);
-        clearTimeout(state.hideGestureTimer);
-        instrumentLabel.textContent = instruments[key].name;
-        verbLabel.textContent = instruments[key].verb;
+        verbLabel.textContent = '';
         verbLabel.style.background = instruments[key].color;
         verbPill.classList.remove('is-active', 'pulse');
-        renderGestureStrip();
-        setGestureActive(instruments[key].gestures[0], false);
+        state.showPlayCue = true;
+        playCurrentBtn.setAttribute('aria-label', `${instruments[key].name} 연주하기`);
       }
 
       function ensureAudio() {
@@ -901,8 +839,8 @@
         if (audio.master) {
           audio.master.gain.setTargetAtTime(nextMuted ? 0 : 0.72, audio.ctx.currentTime, 0.02);
         }
-        soundBtn.classList.toggle('is-on', !nextMuted && audio.enabled);
-        soundBtn.setAttribute('aria-pressed', String(!nextMuted && audio.enabled));
+        soundBtn.classList.toggle('is-on', !nextMuted);
+        soundBtn.setAttribute('aria-pressed', String(!nextMuted));
       }
 
       function noiseBuffer(seconds = 0.5) {
@@ -1184,6 +1122,10 @@
         } else if (object.kind === 'ball') {
           playDrum('tom', 0.36);
           playFunTone(285, { endFreq: 168, type: 'sine', duration: 0.18, volume: 0.07, delay: 0.015 });
+        } else if (object.kind === 'clap') {
+          playFunNoise({ duration: 0.055, volume: 0.065, filterType: 'bandpass', frequency: 1450 });
+          playFunNoise({ duration: 0.05, volume: 0.04, filterType: 'bandpass', frequency: 1900, delay: 0.045 });
+          playFunTone(340, { endFreq: 235, type: 'triangle', duration: 0.12, volume: 0.04, delay: 0.02 });
         } else if (object.kind === 'button') {
           playFunNoise({ duration: 0.05, volume: 0.04, filterType: 'highpass', frequency: 2800 });
           playFunTone(520, { endFreq: 360, type: 'square', duration: 0.08, volume: 0.035 });
@@ -1191,41 +1133,97 @@
         }
       }
 
-      function startViolin(freq, volume = 0.12) {
+      function startViolin(freq, volume = 0.12, bowPressure = 0.58) {
         const ctx = ensureAudio();
         if (!ctx) return;
         const now = ctx.currentTime;
+        const pressure = clamp(bowPressure, 0.2, 1);
         if (!audio.violinVoice) {
           const osc = ctx.createOscillator();
           const osc2 = ctx.createOscillator();
+          const brillianceOsc = ctx.createOscillator();
+          const coreGain = ctx.createGain();
+          const bodyGain = ctx.createGain();
+          const brillianceGain = ctx.createGain();
+          const toneMix = ctx.createGain();
           const gain = ctx.createGain();
           const filter = ctx.createBiquadFilter();
+          const resonance = ctx.createBiquadFilter();
           const vibrato = ctx.createOscillator();
           const vibratoGain = ctx.createGain();
+          const bowNoise = ctx.createBufferSource();
+          const noiseFilter = ctx.createBiquadFilter();
+          const noiseGain = ctx.createGain();
           osc.type = 'sawtooth';
           osc2.type = 'triangle';
+          brillianceOsc.type = 'sine';
+          coreGain.gain.value = 0.48;
+          bodyGain.gain.value = 0.26;
+          brillianceGain.gain.value = 0.09;
           filter.type = 'lowpass';
-          filter.frequency.value = 2600;
-          filter.Q.value = 1.1;
+          filter.frequency.value = 3400;
+          filter.Q.value = 0.82;
+          resonance.type = 'peaking';
+          resonance.frequency.value = 1850;
+          resonance.Q.value = 0.95;
+          resonance.gain.value = 5.5;
           vibrato.type = 'sine';
-          vibrato.frequency.value = 5.4;
-          vibratoGain.gain.value = 4;
+          vibrato.frequency.value = 5.15;
+          vibratoGain.gain.value = 2.8;
+          bowNoise.buffer = noiseBuffer(1.2);
+          bowNoise.loop = true;
+          noiseFilter.type = 'bandpass';
+          noiseFilter.frequency.value = 1780;
+          noiseFilter.Q.value = 0.64;
+          noiseGain.gain.value = 0.008;
           vibrato.connect(vibratoGain);
           vibratoGain.connect(osc.frequency);
+          vibratoGain.connect(osc2.frequency);
+          vibratoGain.connect(brillianceOsc.frequency);
           gain.gain.setValueAtTime(0.0001, now);
-          gain.gain.setTargetAtTime(volume, now, 0.06);
-          osc.connect(filter);
-          osc2.connect(filter);
-          filter.connect(gain);
+          gain.gain.setTargetAtTime(volume, now, 0.045);
+          osc.connect(coreGain);
+          osc2.connect(bodyGain);
+          brillianceOsc.connect(brillianceGain);
+          coreGain.connect(toneMix);
+          bodyGain.connect(toneMix);
+          brillianceGain.connect(toneMix);
+          toneMix.connect(filter);
+          bowNoise.connect(noiseFilter);
+          noiseFilter.connect(noiseGain);
+          noiseGain.connect(filter);
+          filter.connect(resonance);
+          resonance.connect(gain);
           gain.connect(audio.master);
           osc.start(now);
           osc2.start(now);
+          brillianceOsc.start(now);
+          bowNoise.start(now);
           vibrato.start(now);
-          audio.violinVoice = { osc, bodyOsc: osc2, gain, filter, vibrato, vibratoGain };
+          audio.violinVoice = {
+            osc,
+            bodyOsc: osc2,
+            brillianceOsc,
+            bowNoise,
+            gain,
+            filter,
+            resonance,
+            noiseFilter,
+            noiseGain,
+            vibrato,
+            vibratoGain
+          };
         }
-        audio.violinVoice.osc.frequency.setTargetAtTime(freq, now, 0.025);
-        audio.violinVoice.bodyOsc.frequency.setTargetAtTime(freq * 2.002, now, 0.025);
-        audio.violinVoice.gain.gain.setTargetAtTime(volume, now, 0.035);
+        const voice = audio.violinVoice;
+        voice.osc.frequency.setTargetAtTime(freq, now, 0.022);
+        voice.bodyOsc.frequency.setTargetAtTime(freq * 2.002, now, 0.022);
+        voice.brillianceOsc.frequency.setTargetAtTime(freq * 3.004, now, 0.022);
+        voice.filter.frequency.setTargetAtTime(1950 + pressure * 3700, now, 0.04);
+        voice.resonance.frequency.setTargetAtTime(1450 + pressure * 780, now, 0.05);
+        voice.noiseFilter.frequency.setTargetAtTime(1120 + pressure * 1850, now, 0.04);
+        voice.noiseGain.gain.setTargetAtTime(0.003 + pressure * 0.019, now, 0.035);
+        voice.vibratoGain.gain.setTargetAtTime(1.4 + pressure * 3.1, now, 0.08);
+        voice.gain.gain.setTargetAtTime(volume, now, 0.03);
       }
 
       function stopViolin() {
@@ -1236,6 +1234,8 @@
         try {
           voice.osc.stop(now + 0.42);
           voice.bodyOsc.stop(now + 0.42);
+          voice.brillianceOsc.stop(now + 0.42);
+          voice.bowNoise.stop(now + 0.42);
           voice.vibrato.stop(now + 0.42);
         } catch (error) {
           // Already stopped.
@@ -1486,7 +1486,7 @@
         const head = getTrumpetHead();
         const wind = trumpetWindEmojiPoint(head);
         playWindBurst(0.78, 0.72);
-        flashVerb('불다', wind.x + wind.r * 1.45, wind.y - wind.r * 1.25, '바람', '#8de7dd', forceVerb, '바람을 불다', {
+        flashVerb('불다', wind.x + wind.r * 1.45, wind.y - wind.r * 1.25, '바람', '#8de7dd', forceVerb, {
           sizeScale: 0.5,
           duration: 560
         });
@@ -1514,7 +1514,6 @@
         } else {
           stopTrumpet();
           scheduleVerbHide(220);
-          scheduleGestureHide(220);
         }
       }
 
@@ -1594,13 +1593,12 @@
         dispatchInstrumentUp(pointer);
         state.pointers.delete(pointer.id);
         scheduleVerbHide(260);
-        scheduleGestureHide(260);
       }
 
       function funObjectSpecs(instrument) {
         const w = state.width;
         const h = state.height;
-        const r = clamp(Math.min(w, h) * 0.052, 22, 40);
+        const r = clamp(Math.min(w, h) * 0.065, 26, 44);
         const keepTop = Math.max(r + 22, h * 0.14);
         const keepBottom = Math.min(h - r - 26, h * 0.82);
         const keepLeft = r + 24;
@@ -1622,8 +1620,9 @@
         if (instrument === 'drums') {
           return [
             { id: 'bell', kind: 'bell', name: '종', verb: '치다', color: '#d9b548', x: keepLeft + r * 1.55, y: keepTop + r * 1.1, r },
-            { id: 'ball', kind: 'ball', name: '공', verb: '치다', color: '#6fc08d', x: keepRight - r * 1.55, y: keepTop + r * 1.05, r: r * 0.92 },
-            { id: 'button', kind: 'button', name: '버튼', verb: '치다', color: '#4fb8d1', x: keepRight - r * 1.85, y: keepBottom - r * 0.9, r: r * 0.88 }
+            { id: 'ball', kind: 'ball', name: '야구공', verb: '치다', color: '#6fc08d', emoji: '⚾', x: keepRight - r * 1.55, y: keepTop + r * 1.05, r: r * 0.92 },
+            { id: 'clap', kind: 'clap', name: '박수', verb: '치다', color: '#f19a72', emoji: '👏', x: keepLeft + r * 1.55, y: keepBottom - r * 0.7, r: r * 0.96 },
+            { id: 'button', kind: 'button', name: '버튼', verb: '치다', color: '#4fb8d1', emoji: '🔘', x: keepRight - r * 1.85, y: keepBottom - r * 0.9, r: r * 0.88 }
           ];
         }
         return [];
@@ -1655,6 +1654,7 @@
           spring: 880,
           bell: 980,
           ball: 720,
+          clap: 520,
           button: 430
         };
         state.funObjectMotion.set(object.id, {
@@ -1665,12 +1665,66 @@
         });
       }
 
+      function isPullableFunObject(object) {
+        return object?.kind === 'rubberband' || object?.kind === 'spring';
+      }
+
+      function startFunObjectPull(pointer, object) {
+        const pull = {
+          pointerId: pointer.id,
+          objectId: object.id,
+          kind: object.kind,
+          anchorX: object.x,
+          anchorY: object.y,
+          currentX: object.x,
+          currentY: object.y,
+          strength: 0
+        };
+        pointer.funObject = object;
+        pointer.funObjectPull = pull;
+        state.funObjectPulls.set(pointer.id, pull);
+        state.showPlayCue = false;
+        setGestureActive('길게');
+      }
+
+      function moveFunObjectPull(pointer) {
+        const pull = pointer.funObjectPull;
+        const object = pointer.funObject;
+        if (!pull || !object) return;
+        const maxPull = object.r * 2.35;
+        const dx = pointer.x - pull.anchorX;
+        const dy = pointer.y - pull.anchorY;
+        const distanceFromAnchor = Math.hypot(dx, dy);
+        const ratio = distanceFromAnchor > maxPull ? maxPull / distanceFromAnchor : 1;
+        pull.currentX = pull.anchorX + dx * ratio;
+        pull.currentY = pull.anchorY + dy * ratio;
+        pull.strength = clamp(distanceFromAnchor / maxPull, 0, 1);
+        setGestureActive(pull.strength > 0.12 ? '드래그' : '길게');
+      }
+
+      function releaseFunObjectPull(pointer) {
+        const pull = pointer.funObjectPull;
+        const object = pointer.funObject;
+        if (!pull || !object) return;
+        state.funObjectPulls.delete(pointer.id);
+        pointer.funObjectPull = null;
+        pointer.funObject = null;
+        state.funObjectHits.set(object.id, 1);
+        triggerFunObjectMotion(object);
+        flashVerb(object.verb, pull.currentX, pull.currentY - object.r * 1.15, object.name, object.color, true, {
+          sizeScale: 0.46,
+          duration: 520
+        });
+        addFunObjectEffect(object);
+        playFunObjectSound(object);
+        setGestureActive(pull.strength > 0.12 ? '드래그' : '짧게');
+      }
+
       function interactFunObject(pointer, object) {
         pointer.funObject = object;
         state.funObjectHits.set(object.id, 1);
         triggerFunObjectMotion(object);
-        const phrase = `${objectPhrase(object.name)} ${object.verb}`;
-        flashVerb(object.verb, object.x, object.y - object.r * 1.25, object.name, object.color, true, phrase, {
+        flashVerb(object.verb, object.x, object.y - object.r * 1.25, object.name, object.color, true, {
           sizeScale: 0.46,
           duration: 520
         });
@@ -1704,6 +1758,9 @@
         } else if (object.kind === 'bell') {
           addEffect({ type: 'funChime', x: object.x, y: object.y, duration: 650, color: object.color, radius: object.r });
           addEffect({ type: 'ring', x: object.x, y: object.y, radius: object.r * 0.42, duration: 480, color: object.color });
+        } else if (object.kind === 'clap') {
+          addEffect({ type: 'burst', x: object.x, y: object.y - object.r * 0.12, duration: 360, color: '#fff1a8' });
+          addEffect({ type: 'ring', x: object.x, y: object.y, radius: object.r * 0.48, duration: 420, color: object.color });
         } else if (object.kind === 'button') {
           addEffect({ type: 'funButton', x: object.x, y: object.y, duration: 460, color: object.color, radius: object.r });
         }
@@ -1712,6 +1769,10 @@
       function dispatchInstrumentDown(pointer) {
         const funObject = hitFunObject(pointer.x, pointer.y);
         if (funObject) {
+          if (isPullableFunObject(funObject)) {
+            startFunObjectPull(pointer, funObject);
+            return;
+          }
           interactFunObject(pointer, funObject);
           return;
         }
@@ -1724,15 +1785,21 @@
 
       function dispatchInstrumentMove(pointer) {
         if (pointer.instrument !== state.activeInstrument) return;
+        if (pointer.funObjectPull) return moveFunObjectPull(pointer);
         if (pointer.funObject) return;
         if (state.activeInstrument === 'piano') return pianoMove(pointer);
         if (state.activeInstrument === 'violin') return violinMove(pointer);
         if (state.activeInstrument === 'trumpet') return trumpetMove(pointer);
         if (state.activeInstrument === 'guitar') return guitarMove(pointer);
+        if (state.activeInstrument === 'drums') return drumsMove(pointer);
       }
 
       function dispatchInstrumentUp(pointer) {
         if (pointer.instrument !== state.activeInstrument) return;
+        if (pointer.funObjectPull) {
+          releaseFunObjectPull(pointer);
+          return;
+        }
         if (pointer.funObject) {
           pointer.funObject = null;
           return;
@@ -1790,7 +1857,7 @@
         pointer.pianoMoved = true;
         startPianoVoice(pointer.id, key);
         state.pianoPress.set(key.id, { amount: 1, label: key.name, color: key.black ? '#201a17' : '#d7483f' });
-        flashVerb('치다', key.x + key.w / 2, key.y - 18, '피아노', instruments.piano.color, false, '피아노를 치다');
+        flashVerb('치다', key.x + key.w / 2, key.y - 18, '피아노', instruments.piano.color, false);
         setGestureActive('드래그');
         addEffect({ type: 'spark', x: key.x + key.w / 2, y: key.y + key.h * 0.26, duration: 380, color: '#fff1a8' });
       }
@@ -1800,7 +1867,7 @@
         const held = performance.now() - (pointer.pianoDownAt || pointer.startTime);
         const key = findPianoKeyById(pointer.lastKeyId);
         if (key && !pointer.pianoLongFired && held < 430) {
-          flashVerb('치다', key.x + key.w / 2, key.y - 18, '피아노', instruments.piano.color, true, '피아노를 치다');
+          flashVerb('치다', key.x + key.w / 2, key.y - 18, '피아노', instruments.piano.color, true);
           setGestureActive('짧게');
         }
         if (pointer.lastKeyId) {
@@ -1836,8 +1903,79 @@
         hitDrumZone(drum, pointer, 1);
       }
 
+      function drumsMove(pointer) {
+        const drum = hitDrum(pointer.x, pointer.y);
+        if (!drum || drum.id === pointer.drumId) return;
+        const travel = distance(pointer.x, pointer.y, pointer.lastX, pointer.lastY);
+        const velocity = clamp(travel / 18, 0.45, 1);
+        pointer.drumId = drum.id;
+        pointer.drumKind = drum.kind;
+        pointer.rollAt = performance.now();
+        hitDrumZone(drum, pointer, velocity);
+      }
+
       function drumsUp(pointer) {
         pointer.drumId = null;
+        pointer.drumKind = null;
+      }
+
+      function playCurrentInstrument() {
+        ensureAudio();
+        requestAnimationFrame(() => {
+          const center = { x: state.width / 2, y: state.height * 0.52 };
+          if (state.activeInstrument === 'piano') {
+            const key = state.layout.piano?.whiteKeys?.[3];
+            if (!key) {
+              flashVerb('치다', center.x, center.y, '피아노', instruments.piano.color, true);
+              return;
+            }
+            startPianoVoice('keyboard-play', key);
+            state.pianoPress.set(key.id, { amount: 1, label: key.name, color: '#d7483f' });
+            flashVerb('치다', key.x + key.w / 2, key.y - 18, '피아노', instruments.piano.color, true);
+            addEffect({ type: 'burst', x: key.x + key.w / 2, y: key.y + key.h * 0.35, duration: 460, color: '#ffd36a' });
+            setTimeout(() => releasePianoVoice('keyboard-play'), 220);
+            return;
+          }
+          if (state.activeInstrument === 'violin') {
+            const string = state.layout.violin?.strings?.[1];
+            if (!string) {
+              flashVerb('켜다', center.x, center.y, '바이올린', instruments.violin.color, true);
+              return;
+            }
+            startViolin(string.freq, 0.16);
+            state.stringImpulse.set(`v${string.index}`, 0.9);
+            flashVerb('켜다', string.x, state.height * 0.42, '바이올린', instruments.violin.color, true);
+            addEffect({ type: 'rosin', x: string.x, y: state.height * 0.45, duration: 460, color: '#fff4c7' });
+            setTimeout(stopViolin, 240);
+            return;
+          }
+          if (state.activeInstrument === 'trumpet') {
+            const bell = state.layout.trumpet?.bell;
+            startTrumpet(0.22);
+            state.trumpetAir = 1;
+            flashVerb('불다', bell?.x || center.x, (bell?.y || center.y) - (bell?.r || 0), '트럼펫', instruments.trumpet.color, true);
+            if (bell) addEffect({ type: 'air', x: bell.x + bell.r * 0.45, y: bell.y, vx: 4.2, vy: 0, duration: 560, color: '#fff1a8' });
+            setTimeout(() => {
+              if (!audio.micEnabled) stopTrumpet();
+            }, 240);
+            return;
+          }
+          if (state.activeInstrument === 'guitar') {
+            const string = state.layout.guitar?.strings?.[2];
+            if (!string) {
+              flashVerb('튕기다', center.x, center.y, '기타', instruments.guitar.color, true);
+              return;
+            }
+            pluckString(string, state.width * 0.48, 0.92);
+            return;
+          }
+          const drum = state.layout.drums?.find((item) => item.id === 'snare') || state.layout.drums?.[0];
+          if (drum) {
+            hitDrumZone(drum, { x: drum.x, y: drum.y }, 1);
+          } else {
+            flashVerb('치다', center.x, center.y, '드럼', instruments.drums.color, true);
+          }
+        });
       }
 
       function hitGuitarString(x, y) {
@@ -1863,6 +2001,14 @@
         state.stringImpulse.set(`g${string.index}`, Math.min(1.6, velocity * 1.3));
         flashVerb('튕기다', x, string.y - 28, '기타', instruments.guitar.color, velocity > 0.75);
         addEffect({ type: 'pluck', x, y: string.y, duration: 540, color: '#8de7dd' });
+      }
+
+      function strumString(string, x, velocity = 0.84) {
+        if (!string) return;
+        playPluck(string.freq, velocity);
+        state.stringImpulse.set(`g${string.index}`, Math.min(1.2, velocity));
+        flashVerb('치다', x, string.y - 28, '기타', instruments.guitar.color, velocity > 0.75);
+        addEffect({ type: 'pluck', x, y: string.y, duration: 420, color: '#fff1a8' });
       }
 
       function guitarDown(pointer) {
@@ -1913,7 +2059,7 @@
           const ordered = candidates.sort((a, b) => direction * (a.y - b.y));
           ordered.forEach((string) => {
             if (string.index !== pointer.lastStringIndex || moved > 12) {
-              pluckString(string, pointer.x, clamp(moved / 18, 0.55, 1));
+              strumString(string, pointer.x, clamp(moved / 18, 0.55, 1));
             }
           });
           pointer.lastStringIndex = ordered[ordered.length - 1].index;
@@ -2040,7 +2186,7 @@
         const string = nearestViolinString(contact.x, contact.y);
         if (string) {
           bow.active = true;
-          startViolin(string.freq, 0.05 + clamp(speed / 28, 0, 1) * 0.16);
+          startViolin(string.freq, 0.05 + clamp(speed / 28, 0, 1) * 0.16, bow.pressure);
           state.stringImpulse.set(`v${string.index}`, Math.min(1.2, 0.45 + speed / 16));
           flashVerb('켜다', contact.x, contact.y - 58, '바이올린', instruments.violin.color);
           setGestureActive(speed > 8 ? '드래그' : '길게');
@@ -2196,7 +2342,7 @@
             if (!pointer.pianoLongFired) {
               const key = findPianoKeyById(pointer.lastKeyId);
               if (key) {
-                flashVerb('누르다', key.x + key.w / 2, key.y - 18, '피아노', instruments.piano.color, true, '건반을 누르다');
+                flashVerb('누르다', key.x + key.w / 2, key.y - 18, '피아노', instruments.piano.color, true);
               }
               pointer.pianoLongFired = true;
             }
@@ -2323,6 +2469,11 @@
           transform.rotation = out * Math.PI * 1.15;
           transform.scaleX = 1 + squash;
           transform.scaleY = 1 - squash * 0.5;
+        } else if (object.kind === 'clap') {
+          const clap = Math.sin(t * Math.PI) * fade;
+          transform.rotation = Math.sin(t * Math.PI * 4) * 0.07 * fade;
+          transform.scaleX = 1 - clap * 0.16;
+          transform.scaleY = 1 + clap * 0.1;
         } else if (object.kind === 'button') {
           const press = Math.max(0, 1 - t * 3.2);
           transform.dy = press * object.r * 0.16;
@@ -2332,80 +2483,175 @@
         return transform;
       }
 
+      function funObjectPullFor(object) {
+        for (const pull of state.funObjectPulls.values()) {
+          if (pull.objectId === object.id) return pull;
+        }
+        return null;
+      }
+
       function drawFunObjects(now) {
         const objects = state.layout.funObjects || [];
         objects.forEach((object) => {
           const hit = state.funObjectHits.get(object.id) || 0;
           const motion = funObjectTransform(object);
+          const pull = funObjectPullFor(object);
+          const pullX = pull ? pull.currentX - object.x : 0;
+          const pullY = pull ? pull.currentY - object.y : 0;
+          const pullStrength = pull?.strength || 0;
+          const pullAngle = pullStrength > 0.01 ? Math.atan2(pullY, pullX) : 0;
+          const pullRotation = !pullStrength
+            ? 0
+            : object.kind === 'spring'
+              ? pullAngle - Math.PI / 2
+              : pullAngle;
+          const pullScaleX = object.kind === 'rubberband'
+            ? 1 + pullStrength * 1.1
+            : 1 - pullStrength * 0.16;
+          const pullScaleY = object.kind === 'spring'
+            ? 1 + pullStrength * 1.25
+            : 1 - pullStrength * 0.22;
           const wobble = Math.sin(now * 0.006 + object.x * 0.02) * object.r * 0.04;
           const scale = 1 + hit * 0.12;
           drawTouchableGlow(object.x, object.y, object.hitR * 0.72, object.color, now, 0.09 + hit * 0.14);
 
+          if (pull) {
+            ctx.save();
+            ctx.strokeStyle = object.color;
+            ctx.lineWidth = Math.max(2, object.r * 0.07);
+            ctx.setLineDash([Math.max(4, object.r * 0.18), Math.max(3, object.r * 0.12)]);
+            ctx.globalAlpha = 0.68;
+            ctx.beginPath();
+            ctx.moveTo(object.x, object.y);
+            ctx.lineTo(pull.currentX, pull.currentY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#fff8ec';
+            ctx.beginPath();
+            ctx.arc(object.x, object.y, Math.max(4, object.r * 0.13), 0, Math.PI * 2);
+            ctx.fill();
+            drawTouchableGlow(pull.currentX, pull.currentY, object.r * 0.42, '#fff1a8', now, 0.48);
+            ctx.restore();
+          }
+
           ctx.save();
-          ctx.translate(object.x + motion.dx, object.y + motion.dy + wobble - hit * object.r * 0.12);
-          ctx.rotate(motion.rotation);
-          ctx.scale(scale * motion.scaleX, scale * motion.scaleY);
+          ctx.translate(object.x + motion.dx + pullX * 0.5, object.y + motion.dy + wobble + pullY * 0.5 - hit * object.r * 0.12);
+          ctx.rotate(motion.rotation + pullRotation);
+          ctx.scale(scale * motion.scaleX * pullScaleX, scale * motion.scaleY * pullScaleY);
           ctx.shadowColor = 'rgba(0, 0, 0, 0.34)';
           ctx.shadowBlur = object.r * 0.5;
           ctx.shadowOffsetY = object.r * 0.18;
 
-          if (object.kind === 'pinwheel') {
-            ctx.strokeStyle = 'rgba(255, 248, 236, 0.62)';
-            ctx.lineWidth = Math.max(2, object.r * 0.08);
+          if (object.emoji) {
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+            ctx.beginPath();
+            ctx.arc(0, 0, object.r * 0.78, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = `${Math.round(Math.max(34, object.r * 1.68))}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(object.emoji, 0, -object.r * 0.03);
+          } else if (object.kind === 'pinwheel') {
+            ctx.strokeStyle = '#9b642e';
+            ctx.lineWidth = Math.max(3, object.r * 0.1);
             ctx.beginPath();
             ctx.moveTo(0, object.r * 0.1);
             ctx.lineTo(0, object.r * 1.45);
+            ctx.stroke();
+            ctx.strokeStyle = 'rgba(255, 248, 236, 0.74)';
+            ctx.lineWidth = Math.max(1.5, object.r * 0.036);
+            ctx.beginPath();
+            ctx.moveTo(-object.r * 0.1, object.r * 0.18);
+            ctx.lineTo(-object.r * 0.1, object.r * 1.38);
             ctx.stroke();
             ctx.rotate(now * 0.004 + hit * 1.3 + motion.extraSpin);
             ['#e75d4f', '#f4c64b', '#55bfa3', '#7b91e8'].forEach((color, index) => {
               ctx.rotate(Math.PI / 2);
               ctx.fillStyle = color;
+              ctx.strokeStyle = '#54261e';
+              ctx.lineWidth = Math.max(1.5, object.r * 0.04);
               ctx.beginPath();
               ctx.moveTo(0, 0);
               ctx.quadraticCurveTo(object.r * 0.46, -object.r * 0.14, object.r * 0.86, -object.r * 0.58);
               ctx.quadraticCurveTo(object.r * 0.42, -object.r * 0.3, object.r * 0.1, 0);
               ctx.fill();
+              ctx.stroke();
             });
             ctx.fillStyle = '#fff8ec';
             ctx.beginPath();
-            ctx.arc(0, 0, object.r * 0.16, 0, Math.PI * 2);
+            ctx.arc(0, 0, object.r * 0.2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#d7483f';
+            ctx.beginPath();
+            ctx.arc(0, 0, object.r * 0.09, 0, Math.PI * 2);
             ctx.fill();
           } else if (object.kind === 'bubbles') {
             ctx.shadowBlur = 0;
-            for (let i = 0; i < 4; i += 1) {
-              const angle = i * 1.7 + now * 0.0015;
-              const bx = Math.cos(angle) * object.r * (0.16 + i * 0.12);
-              const by = Math.sin(angle) * object.r * (0.2 + i * 0.1) - hit * object.r * 0.28;
-              const br = object.r * (0.22 + (i % 2) * 0.08);
-              ctx.strokeStyle = 'rgba(223, 248, 255, 0.78)';
-              ctx.lineWidth = 2;
-              ctx.beginPath();
-              ctx.arc(bx, by, br, 0, Math.PI * 2);
-              ctx.stroke();
-              ctx.fillStyle = 'rgba(141, 231, 221, 0.12)';
-              ctx.fill();
-            }
-          } else if (object.kind === 'feather') {
-            ctx.rotate(-0.42 + hit * 0.35);
-            ctx.strokeStyle = '#fff8ec';
-            ctx.lineWidth = 2;
+            ctx.save();
+            ctx.rotate(-0.5);
+            ctx.strokeStyle = '#f0b8d1';
+            ctx.lineWidth = Math.max(3, object.r * 0.11);
             ctx.beginPath();
-            ctx.moveTo(-object.r * 0.65, object.r * 0.58);
-            ctx.quadraticCurveTo(0, -object.r * 0.05, object.r * 0.72, -object.r * 0.66);
+            ctx.moveTo(-object.r * 0.72, object.r * 0.64);
+            ctx.lineTo(-object.r * 0.22, object.r * 0.1);
             ctx.stroke();
-            const feather = ctx.createLinearGradient(-object.r, object.r, object.r, -object.r);
-            feather.addColorStop(0, '#9edee6');
+            ctx.strokeStyle = '#fff8ec';
+            ctx.lineWidth = Math.max(2, object.r * 0.065);
+            ctx.beginPath();
+            ctx.arc(-object.r * 0.05, -object.r * 0.08, object.r * 0.27, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+            const bubbles = [
+              { x: object.r * 0.12, y: -object.r * 0.54, r: object.r * 0.27 },
+              { x: object.r * 0.58, y: -object.r * 0.18, r: object.r * 0.19 },
+              { x: object.r * 0.42, y: -object.r * 0.8, r: object.r * 0.14 }
+            ];
+            bubbles.forEach((bubble, index) => {
+              const bob = Math.sin(now * 0.003 + index) * object.r * 0.05 - hit * object.r * 0.18;
+              const sheen = ctx.createRadialGradient(bubble.x - bubble.r * 0.35, bubble.y + bob - bubble.r * 0.4, 1, bubble.x, bubble.y + bob, bubble.r);
+              sheen.addColorStop(0, 'rgba(255,255,255,0.82)');
+              sheen.addColorStop(0.38, 'rgba(184,241,255,0.24)');
+              sheen.addColorStop(1, 'rgba(115,184,245,0.08)');
+              ctx.fillStyle = sheen;
+              ctx.strokeStyle = '#bdefff';
+              ctx.lineWidth = Math.max(1.5, object.r * 0.05);
+              ctx.beginPath();
+              ctx.arc(bubble.x, bubble.y + bob, bubble.r, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.stroke();
+            });
+          } else if (object.kind === 'feather') {
+            ctx.rotate(-0.48 + hit * 0.35);
+            const feather = ctx.createLinearGradient(-object.r * 0.6, object.r * 0.7, object.r * 0.6, -object.r * 0.8);
+            feather.addColorStop(0, '#708ccf');
+            feather.addColorStop(0.5, '#d7efff');
             feather.addColorStop(1, '#fff8ec');
             ctx.fillStyle = feather;
+            ctx.strokeStyle = '#37527d';
+            ctx.lineWidth = Math.max(1.5, object.r * 0.05);
             ctx.beginPath();
-            ctx.ellipse(0, -object.r * 0.08, object.r * 0.28, object.r * 0.82, -0.82, 0, Math.PI * 2);
+            ctx.moveTo(-object.r * 0.56, object.r * 0.72);
+            ctx.bezierCurveTo(-object.r * 0.82, object.r * 0.12, -object.r * 0.4, -object.r * 0.84, object.r * 0.42, -object.r * 0.76);
+            ctx.bezierCurveTo(object.r * 0.9, -object.r * 0.26, object.r * 0.3, object.r * 0.58, -object.r * 0.56, object.r * 0.72);
+            ctx.closePath();
             ctx.fill();
-            ctx.strokeStyle = 'rgba(45, 72, 80, 0.42)';
-            ctx.lineWidth = 1;
-            for (let i = -3; i <= 3; i += 1) {
+            ctx.stroke();
+            ctx.strokeStyle = '#6c4a2f';
+            ctx.lineWidth = Math.max(2, object.r * 0.06);
+            ctx.beginPath();
+            ctx.moveTo(-object.r * 0.6, object.r * 0.74);
+            ctx.quadraticCurveTo(-object.r * 0.04, object.r * 0.02, object.r * 0.48, -object.r * 0.7);
+            ctx.stroke();
+            ctx.strokeStyle = 'rgba(55, 82, 125, 0.58)';
+            ctx.lineWidth = 1.4;
+            for (let i = -2; i <= 3; i += 1) {
               ctx.beginPath();
-              ctx.moveTo(i * object.r * 0.05, -object.r * 0.08);
-              ctx.lineTo(i * object.r * 0.18, -object.r * 0.46 + Math.abs(i) * object.r * 0.08);
+              const t = (i + 3) / 6;
+              const x = -object.r * 0.3 + t * object.r * 0.62;
+              const y = object.r * 0.36 - t * object.r * 0.94;
+              ctx.moveTo(x, y);
+              ctx.lineTo(x - object.r * (i < 1 ? 0.27 : -0.22), y - object.r * 0.12);
               ctx.stroke();
             }
           } else if (object.kind === 'basketball') {
@@ -2429,32 +2675,44 @@
             ctx.ellipse(object.r * 0.28, 0, object.r * 0.28, object.r * 0.72, 0, 0, Math.PI * 2);
             ctx.stroke();
           } else if (object.kind === 'rubberband') {
-            ctx.rotate(-0.15 + hit * 0.25);
-            ctx.strokeStyle = '#75d0c8';
-            ctx.lineWidth = Math.max(5, object.r * 0.14);
-            ctx.beginPath();
-            ctx.ellipse(0, 0, object.r * 0.92 + hit * object.r * 0.16, object.r * 0.38 - hit * object.r * 0.04, 0, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.strokeStyle = 'rgba(255, 248, 236, 0.58)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            [
+              { color: '#ef7972', x: -0.12, y: -0.08, angle: -0.28 },
+              { color: '#f1c655', x: 0.1, y: 0.06, angle: 0.18 },
+              { color: '#65cbb9', x: 0, y: 0.2, angle: -0.06 }
+            ].forEach((band) => {
+              ctx.save();
+              ctx.translate(object.r * band.x, object.r * band.y);
+              ctx.rotate(band.angle + hit * 0.12);
+              ctx.strokeStyle = '#44362c';
+              ctx.lineWidth = Math.max(5, object.r * 0.16);
+              ctx.beginPath();
+              ctx.ellipse(0, 0, object.r * (0.65 + hit * 0.12), object.r * 0.25, 0, 0, Math.PI * 2);
+              ctx.stroke();
+              ctx.strokeStyle = band.color;
+              ctx.lineWidth = Math.max(3, object.r * 0.095);
+              ctx.stroke();
+              ctx.restore();
+            });
           } else if (object.kind === 'spring') {
-            ctx.strokeStyle = '#d9ccff';
-            ctx.lineWidth = Math.max(3, object.r * 0.09);
+            ctx.strokeStyle = '#4f5d6c';
+            ctx.lineWidth = Math.max(5, object.r * 0.15);
             ctx.lineCap = 'round';
             ctx.beginPath();
             for (let i = 0; i <= 28; i += 1) {
               const t = i / 28;
-              const x = lerp(-object.r * 0.8, object.r * 0.8, t);
-              const y = Math.sin(t * Math.PI * 9 + hit * 1.6) * object.r * 0.28;
+              const x = Math.sin(t * Math.PI * 9 + hit * 1.6) * object.r * 0.27;
+              const y = lerp(-object.r * 0.78, object.r * 0.78, t);
               if (i === 0) ctx.moveTo(x, y);
               else ctx.lineTo(x, y);
             }
             ctx.stroke();
-            ctx.fillStyle = '#b9a7ff';
+            ctx.strokeStyle = '#e7eff7';
+            ctx.lineWidth = Math.max(2, object.r * 0.055);
+            ctx.stroke();
+            ctx.fillStyle = '#9daec0';
             ctx.beginPath();
-            ctx.arc(-object.r * 0.92, 0, object.r * 0.12, 0, Math.PI * 2);
-            ctx.arc(object.r * 0.92, 0, object.r * 0.12, 0, Math.PI * 2);
+            ctx.arc(0, -object.r * 0.94, object.r * 0.16, 0, Math.PI * 2);
+            ctx.arc(0, object.r * 0.94, object.r * 0.16, 0, Math.PI * 2);
             ctx.fill();
           } else if (object.kind === 'bell') {
             const bell = ctx.createRadialGradient(-object.r * 0.18, -object.r * 0.28, 2, 0, 0, object.r);
@@ -2468,29 +2726,105 @@
             ctx.quadraticCurveTo(object.r * 0.34, -object.r * 0.52, object.r * 0.5, object.r * 0.34);
             ctx.closePath();
             ctx.fill();
-            ctx.strokeStyle = 'rgba(255, 248, 236, 0.58)';
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#6f3f09';
+            ctx.lineWidth = Math.max(2, object.r * 0.07);
             ctx.stroke();
+            ctx.strokeStyle = '#d9b548';
+            ctx.lineWidth = Math.max(3, object.r * 0.1);
+            ctx.beginPath();
+            ctx.arc(0, -object.r * 0.56, object.r * 0.24, Math.PI * 1.05, Math.PI * 1.95);
+            ctx.stroke();
+            ctx.fillStyle = '#f8e089';
+            ctx.beginPath();
+            ctx.ellipse(0, object.r * 0.36, object.r * 0.48, object.r * 0.12, 0, 0, Math.PI * 2);
+            ctx.fill();
             ctx.fillStyle = '#6d3a08';
             ctx.beginPath();
             ctx.arc(0, object.r * 0.44 + hit * object.r * 0.08, object.r * 0.14, 0, Math.PI * 2);
             ctx.fill();
           } else if (object.kind === 'ball') {
             const ball = ctx.createRadialGradient(-object.r * 0.28, -object.r * 0.32, 2, 0, 0, object.r);
-            ball.addColorStop(0, '#fff8ec');
-            ball.addColorStop(0.45, '#6fc08d');
-            ball.addColorStop(1, '#1d6f4c');
+            ball.addColorStop(0, '#ffffff');
+            ball.addColorStop(0.65, '#dce8e2');
+            ball.addColorStop(1, '#839a91');
             ctx.fillStyle = ball;
             ctx.beginPath();
-            ctx.arc(0, 0, object.r * 0.68, 0, Math.PI * 2);
+            ctx.arc(0, 0, object.r * 0.74, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = 'rgba(255, 248, 236, 0.66)';
-            ctx.lineWidth = Math.max(2, object.r * 0.06);
+            ctx.strokeStyle = '#33453f';
+            ctx.lineWidth = Math.max(1.8, object.r * 0.055);
             ctx.beginPath();
-            ctx.arc(0, 0, object.r * 0.68, 0, Math.PI * 2);
-            ctx.moveTo(-object.r * 0.58, -object.r * 0.2);
-            ctx.quadraticCurveTo(0, object.r * 0.18, object.r * 0.58, -object.r * 0.2);
+            ctx.arc(0, 0, object.r * 0.74, 0, Math.PI * 2);
             ctx.stroke();
+            ctx.fillStyle = '#33453f';
+            ctx.beginPath();
+            for (let i = 0; i < 5; i += 1) {
+              const angle = -Math.PI / 2 + i * (Math.PI * 2 / 5);
+              const x = Math.cos(angle) * object.r * 0.18;
+              const y = Math.sin(angle) * object.r * 0.18;
+              if (i === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#52645d';
+            ctx.lineWidth = Math.max(1.2, object.r * 0.035);
+            for (let i = 0; i < 5; i += 1) {
+              const angle = -Math.PI / 2 + i * (Math.PI * 2 / 5);
+              ctx.beginPath();
+              ctx.moveTo(Math.cos(angle) * object.r * 0.22, Math.sin(angle) * object.r * 0.22);
+              ctx.lineTo(Math.cos(angle) * object.r * 0.62, Math.sin(angle) * object.r * 0.62);
+              ctx.stroke();
+            }
+          } else if (object.kind === 'clap') {
+            const r = object.r;
+            ctx.shadowBlur = r * 0.28;
+            [-1, 1].forEach((side) => {
+              ctx.save();
+              ctx.translate(side * r * 0.3, 0);
+              ctx.rotate(side * 0.58);
+
+              ctx.fillStyle = side < 0 ? '#6c8fe4' : '#e56e61';
+              ctx.strokeStyle = '#3d3030';
+              ctx.lineWidth = Math.max(1.6, r * 0.045);
+              roundedRect(ctx, -r * 0.18, r * 0.12, r * 0.36, r * 0.64, r * 0.12);
+              ctx.fill();
+              ctx.stroke();
+
+              const palm = ctx.createRadialGradient(-r * 0.12, -r * 0.28, 1, 0, -r * 0.08, r * 0.48);
+              palm.addColorStop(0, '#ffe1bd');
+              palm.addColorStop(0.65, '#f5ad81');
+              palm.addColorStop(1, '#bd654c');
+              ctx.fillStyle = palm;
+              ctx.beginPath();
+              ctx.ellipse(0, -r * 0.08, r * 0.27, r * 0.43, 0, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.strokeStyle = '#713a31';
+              ctx.lineWidth = Math.max(1.3, r * 0.038);
+              ctx.stroke();
+
+              ctx.lineCap = 'round';
+              ctx.strokeStyle = '#8d4a3c';
+              ctx.lineWidth = Math.max(1.2, r * 0.032);
+              [-0.12, 0, 0.12].forEach((offset) => {
+                ctx.beginPath();
+                ctx.moveTo(offset * r, -r * 0.3);
+                ctx.lineTo(offset * r * 1.05, -r * 0.56);
+                ctx.stroke();
+              });
+              ctx.restore();
+            });
+
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = '#fff1a8';
+            ctx.lineWidth = Math.max(1.5, r * 0.05);
+            ctx.lineCap = 'round';
+            [-0.28, 0, 0.28].forEach((offset) => {
+              ctx.beginPath();
+              ctx.moveTo(offset * r, -r * 0.15);
+              ctx.lineTo(offset * r * 1.55, -r * 0.72);
+              ctx.stroke();
+            });
           } else if (object.kind === 'button') {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
             ctx.beginPath();
@@ -2502,11 +2836,19 @@
             button.addColorStop(1, '#176177');
             ctx.fillStyle = button;
             ctx.beginPath();
-            ctx.arc(0, -hit * object.r * 0.16, object.r * 0.58, 0, Math.PI * 2);
+            ctx.arc(0, -hit * object.r * 0.16, object.r * 0.64, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = 'rgba(255, 248, 236, 0.64)';
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#17475a';
+            ctx.lineWidth = Math.max(2, object.r * 0.06);
             ctx.stroke();
+            ctx.fillStyle = '#113d4d';
+            [-1, 1].forEach((xSign) => {
+              [-1, 1].forEach((ySign) => {
+                ctx.beginPath();
+                ctx.arc(xSign * object.r * 0.2, -hit * object.r * 0.16 + ySign * object.r * 0.2, object.r * 0.075, 0, Math.PI * 2);
+                ctx.fill();
+              });
+            });
           }
 
           ctx.restore();
@@ -3236,6 +3578,17 @@
           ctx.ellipse(centerX + side * bodyW * 0.32, pegY - bodyH * 0.015, bodyW * 0.065, bodyW * 0.035, 0.15 * side, 0, Math.PI * 2);
           ctx.fill();
         }
+        const scrollY = topY - bodyH * 0.49;
+        ctx.fillStyle = '#35170f';
+        ctx.beginPath();
+        ctx.ellipse(centerX, scrollY, bodyW * 0.15, bodyW * 0.12, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 205, 133, 0.46)';
+        ctx.lineWidth = Math.max(1.4, bodyW * 0.015);
+        ctx.beginPath();
+        ctx.arc(centerX, scrollY, bodyW * 0.082, -Math.PI * 0.15, Math.PI * 1.72);
+        ctx.arc(centerX, scrollY, bodyW * 0.042, Math.PI * 1.72, -Math.PI * 0.2, true);
+        ctx.stroke();
         ctx.restore();
 
         ctx.save();
@@ -3281,6 +3634,29 @@
         ctx.stroke();
         ctx.restore();
 
+        ctx.save();
+        const fingerboardTop = topY - bodyH * 0.32;
+        const fingerboardBottom = centerY + bodyH * 0.14;
+        const fingerboardGradient = ctx.createLinearGradient(centerX - bodyW * 0.08, fingerboardTop, centerX + bodyW * 0.1, fingerboardBottom);
+        fingerboardGradient.addColorStop(0, '#2f201d');
+        fingerboardGradient.addColorStop(0.42, '#100b0a');
+        fingerboardGradient.addColorStop(1, '#050404');
+        ctx.fillStyle = fingerboardGradient;
+        ctx.beginPath();
+        ctx.moveTo(centerX - bodyW * 0.072, fingerboardTop);
+        ctx.lineTo(centerX + bodyW * 0.072, fingerboardTop);
+        ctx.lineTo(centerX + bodyW * 0.145, fingerboardBottom);
+        ctx.quadraticCurveTo(centerX, fingerboardBottom + bodyH * 0.035, centerX - bodyW * 0.145, fingerboardBottom);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 241, 202, 0.16)';
+        ctx.lineWidth = Math.max(1, bodyW * 0.012);
+        ctx.stroke();
+        ctx.fillStyle = '#d8b46a';
+        roundedRect(ctx, centerX - bodyW * 0.09, fingerboardTop - bodyH * 0.014, bodyW * 0.18, bodyH * 0.025, bodyW * 0.015);
+        ctx.fill();
+        ctx.restore();
+
         function drawFHole(side) {
           ctx.save();
           ctx.translate(centerX + side * bodyW * 0.25, centerY + bodyH * 0.01);
@@ -3323,6 +3699,19 @@
         ctx.ellipse(centerX - bridgeW * 0.16, bridgeY + bridgeH * 0.12, bridgeW * 0.07, bridgeH * 0.15, 0, 0, Math.PI * 2);
         ctx.ellipse(centerX + bridgeW * 0.16, bridgeY + bridgeH * 0.12, bridgeW * 0.07, bridgeH * 0.15, 0, 0, Math.PI * 2);
         ctx.fill();
+        ctx.strokeStyle = 'rgba(82, 37, 19, 0.58)';
+        ctx.lineWidth = Math.max(1, bodyW * 0.01);
+        [-0.28, 0, 0.28].forEach((offset) => {
+          ctx.beginPath();
+          ctx.moveTo(centerX + bridgeW * offset, bridgeY - bridgeH * 0.28);
+          ctx.lineTo(centerX + bridgeW * offset * 0.86, bridgeY + bridgeH * 0.42);
+          ctx.stroke();
+        });
+        ctx.fillStyle = '#9a572e';
+        [-1, 1].forEach((side) => {
+          roundedRect(ctx, centerX + side * bridgeW * 0.31 - bridgeW * 0.055, bridgeY + bridgeH * 0.36, bridgeW * 0.11, bridgeH * 0.13, bridgeH * 0.04);
+          ctx.fill();
+        });
         ctx.restore();
 
         ctx.save();
@@ -3344,6 +3733,26 @@
           ctx.arc(centerX + (i - 1.5) * stringGap, tailY + bodyH * 0.045, Math.max(2, stringGap * 0.13), 0, Math.PI * 2);
           ctx.fill();
         }
+        ctx.restore();
+
+        ctx.save();
+        const chinX = centerX + bodyW * 0.18;
+        const chinY = bottomY - bodyH * 0.17;
+        const chinGradient = ctx.createRadialGradient(chinX - bodyW * 0.04, chinY - bodyH * 0.035, 2, chinX, chinY, bodyW * 0.22);
+        chinGradient.addColorStop(0, '#4a3936');
+        chinGradient.addColorStop(0.48, '#1b1010');
+        chinGradient.addColorStop(1, '#060404');
+        ctx.fillStyle = chinGradient;
+        ctx.strokeStyle = 'rgba(226, 195, 154, 0.28)';
+        ctx.lineWidth = Math.max(1, bodyW * 0.012);
+        ctx.beginPath();
+        ctx.ellipse(chinX, chinY, bodyW * 0.18, bodyH * 0.085, -0.18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(255, 248, 236, 0.16)';
+        ctx.beginPath();
+        ctx.ellipse(chinX - bodyW * 0.045, chinY - bodyH * 0.025, bodyW * 0.06, bodyH * 0.02, -0.24, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
 
         strings.forEach((string, index) => {
@@ -3922,38 +4331,67 @@
         if (state.activeInstrument === 'trumpet') drawTrumpet(now);
         if (state.activeInstrument === 'guitar') drawGuitar(now);
         if (state.activeInstrument === 'drums') drawDrums(now);
+        drawPlayCue(now);
         drawEffects(dt);
-        requestAnimationFrame(drawFrame);
+        if (!state.isPaused) state.frameId = requestAnimationFrame(drawFrame);
+      }
+
+      function scheduleFrame() {
+        if (state.frameId === null && !state.isPaused) {
+          state.lastTime = performance.now();
+          state.frameId = requestAnimationFrame((now) => {
+            state.frameId = null;
+            drawFrame(now);
+          });
+        }
+      }
+
+      function pauseStage() {
+        state.isPaused = true;
+        if (state.frameId !== null) {
+          cancelAnimationFrame(state.frameId);
+          state.frameId = null;
+        }
+        stopSustainedVoices();
+      }
+
+      function resumeStage() {
+        state.isPaused = false;
+        scheduleFrame();
       }
 
       instrumentButtons.forEach((button) => {
         button.addEventListener('click', () => setInstrument(button.dataset.instrument));
       });
 
-      modeBtn.addEventListener('click', () => {
-        setTextMode(state.textMode === 'sentence' ? 'verb' : 'sentence');
-      });
-
       soundBtn.addEventListener('click', () => {
-        if (!audio.ctx || audio.muted) {
+        if (audio.muted) {
           audio.muted = false;
           ensureAudio();
           setAudioMuted(false);
         } else {
-          setAudioMuted(!audio.muted);
+          setAudioMuted(true);
         }
       });
 
       micBtn.addEventListener('click', enableMic);
+      playCurrentBtn.addEventListener('click', playCurrentInstrument);
 
       canvas.addEventListener('pointerdown', handlePointerDown);
       canvas.addEventListener('pointermove', handlePointerMove);
       canvas.addEventListener('pointerup', handlePointerUp);
       canvas.addEventListener('pointercancel', handlePointerUp);
+      const resizeObserver = window.ResizeObserver ? new ResizeObserver(resizeCanvas) : null;
+      resizeObserver?.observe(canvas);
       window.addEventListener('resize', resizeCanvas);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) pauseStage();
+        else resumeStage();
+      });
       window.addEventListener('pagehide', () => {
-        stopSustainedVoices();
+        pauseStage();
         stopMic();
+        resizeObserver?.disconnect();
       });
 
       if (!supportsPointer) {
@@ -3969,12 +4407,11 @@
       }
 
       resizeCanvas();
-      setTextMode('verb');
       setInstrument('piano');
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.isSecureContext) {
         micBtn.textContent = '터치';
       }
-      requestAnimationFrame(drawFrame);
+      scheduleFrame();
     })();
   </script>
   <script src="../shared/site-copyright.js"></script>
