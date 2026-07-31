@@ -9,7 +9,7 @@
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>16과 문법 3 보조자료 3 | 기준 충족 애니메이션</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <style>
@@ -757,6 +757,7 @@
         }
     </style>
     <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="../shared/c16-grammar-learning.css" />
 </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
@@ -883,6 +884,7 @@
                 </div>
 
                 <div class="scenario-grid" id="scenarioGrid" aria-label="상황 선택"></div>
+                <div data-c16-state-tools></div>
             </aside>
         </section>
 
@@ -893,6 +895,7 @@
         </nav>
     </main>
 
+    <script src="../shared/c16-grammar-state.js"></script>
     <script>
         const scenarios = [
             {
@@ -925,7 +928,7 @@
                 burden: 70,
                 value: 48,
                 obstacle: '입장료가 비싸고',
-                valueReason: '전시가 짧아서',
+                valueReason: '자료가 알차지만',
                 judgement: '전시를 볼 만하지 않아요',
                 failJudgement: '전시를 볼 만하지 않아요',
                 passSentence: '입장 줄이 길어도 자료가 알차서 전시를 볼 만해요.',
@@ -946,10 +949,11 @@
         ];
 
         const threshold = 58;
-        const state = {
-            index: 0,
-            autoTimer: null
-        };
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const initialState = { index: 0 };
+        let state = { ...initialState };
+        const runtime = { autoTimer: null };
+        let store = null;
 
         const root = document.documentElement;
         const thresholdStage = document.getElementById('thresholdStage');
@@ -1025,7 +1029,7 @@
 
         function renderScenarioButtons() {
             scenarioGrid.innerHTML = scenarios.map((item, index) => `
-                <button class="scenario-button ${index === state.index ? 'is-active' : ''}" type="button" data-index="${index}" aria-label="${item.title}">
+                <button class="scenario-button ${index === state.index ? 'is-active' : ''}" type="button" data-index="${index}" aria-pressed="${index === state.index}" aria-label="${item.title}">
                     <span class="scenario-icon">${iconMarkup(item.icon)}</span>
                     <span>
                         <strong>${item.title}</strong>
@@ -1038,12 +1042,16 @@
                 button.addEventListener('click', () => {
                     stopAuto();
                     state.index = Number(button.dataset.index);
+                    saveProgress();
                     render();
                 });
             });
         }
 
         function replayMotion() {
+            if (prefersReducedMotion) {
+                return;
+            }
             thresholdStage.classList.remove('is-animating');
             formulaFlow.classList.remove('is-animating');
             void thresholdStage.offsetWidth;
@@ -1071,9 +1079,9 @@
             sentenceBadge.className = `status-badge ${status.type === 'fail' ? 'is-fail' : ''} ${status.type === 'near' ? 'is-near' : ''}`;
             sentenceBadge.innerHTML = `${iconMarkup(status.icon)}<span>${status.choice}</span>`;
 
-            scoreText.textContent = String(Math.round(score));
-            burdenValue.textContent = String(item.burden);
-            valueValue.textContent = String(item.value);
+            scoreText.textContent = status.type === 'fail' ? '미달' : '충족';
+            burdenValue.textContent = item.burden >= 65 ? '큼' : '있음';
+            valueValue.textContent = item.value >= 70 ? '충분함' : '부족함';
             sentenceText.textContent = sentence;
             reasonText.textContent = status.reason;
             compareText.textContent = status.compare;
@@ -1088,20 +1096,21 @@
 
         function go(delta) {
             state.index = (state.index + delta + scenarios.length) % scenarios.length;
+            saveProgress();
             render();
         }
 
         function stopAuto() {
-            if (state.autoTimer) {
-                clearInterval(state.autoTimer);
-                state.autoTimer = null;
+            if (runtime.autoTimer) {
+                clearInterval(runtime.autoTimer);
+                runtime.autoTimer = null;
                 playBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
                 playBtn.setAttribute('aria-label', '애니메이션 재생');
             }
         }
 
         function toggleAuto() {
-            if (state.autoTimer) {
+            if (runtime.autoTimer) {
                 stopAuto();
                 return;
             }
@@ -1109,7 +1118,7 @@
             playBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
             playBtn.setAttribute('aria-label', '자동 재생 정지');
             replayMotion();
-            state.autoTimer = setInterval(() => go(1), 2400);
+            runtime.autoTimer = setInterval(() => go(1), 2400);
         }
 
         prevBtn.addEventListener('click', () => {
@@ -1124,9 +1133,27 @@
 
         playBtn.addEventListener('click', toggleAuto);
 
+        function saveProgress() {
+            if (store) store.save(state);
+        }
+
+        store = window.C16GrammarState.create('grammar3-threshold-animation', initialState, {
+            validate(saved) {
+                return Boolean(saved && Number.isInteger(saved.index)
+                    && saved.index >= 0 && saved.index < scenarios.length);
+            },
+            onReset(fresh) {
+                state = fresh;
+                stopAuto();
+                render();
+            }
+        });
+        state = store.get();
         render();
+        store.mount(document.querySelector('[data-c16-state-tools]'), () => state);
+        store.track(() => state);
     </script>
     <script src="../shared/site-copyright.js"></script>
-    <script src="../shared/page-qr.js"></script>
+    <script src="../shared/c16-support-a11y.js"></script>
 </body>
 </html>

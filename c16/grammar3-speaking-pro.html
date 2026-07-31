@@ -9,7 +9,7 @@
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>16과 문법 3 보조자료 | 말하기 연습 PRO</title>
     <script src="https://cdn.tailwindcss.com" defer></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -27,10 +27,18 @@
             --sp-secondary-soft: #e0f2fe;
             --sp-secondary-border: #7dd3fc;
         }
+        .sp-c16-skip { position: fixed; top: -56px; left: 12px; z-index: 200; padding: 10px 13px; border-radius: 10px; background: #10233f; color: #fff; font-weight: 900; text-decoration: none; }
+        .sp-c16-skip:focus { top: 10px; outline: 3px solid #fbbf24; outline-offset: 3px; }
+        .sp-c16-heading { margin-bottom: 12px; padding: 12px 14px; border: 1px solid var(--sp-accent-border); border-radius: 18px; background: rgba(255,255,255,.82); }
+        .sp-c16-heading p, .sp-c16-heading h1 { margin: 0; }
+        .sp-c16-heading h1 { margin-top: 4px; font-size: 1.15rem; line-height: 1.3; font-weight: 950; }
+        .sp-c16-heading__formula { margin-top: 3px !important; color: var(--sp-accent-strong); font-size: .86rem; font-weight: 900; }
+        .sp-c16-heading__action { margin-top: 6px !important; color: #334155; font-size: .85rem; font-weight: 800; line-height: 1.45; }
     </style>
     <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
-<body class="speaking-pro-page">
+<body class="speaking-pro-page c16-speaking-pro">
+    <a class="sp-c16-skip" href="#main-content">본문으로 건너뛰기</a>
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -39,8 +47,12 @@
     <script>
         window.C15SpeakingProConfig = {
             storageKey: 'c16-grammar3-manhada-pro-v1',
+            c16Enhanced: true,
+            typedFallback: true,
+            requireAttempt: true,
+            persistSession: true,
             eyebrow: '16과 문법 3 보조자료',
-            title: '말하기 연습 PRO',
+            title: 'V-(으)ㄹ 만하다 말하기',
             subtitle: '장소, 활동, 음식, 체험을 V-(으)ㄹ 만하다로 자연스럽게 추천해 보세요.',
             formula: 'V-(으)ㄹ 만하다',
             emoji: '👍',
@@ -163,7 +175,13 @@
         <button id="historyButton" class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors">학습 기록</button>
     </nav>
 
-    <main class="max-w-md mx-auto px-4 pt-4 pb-12">
+    <main id="main-content" class="max-w-md mx-auto px-4 pt-4 pb-12">
+        <header class="sp-c16-heading">
+            <p id="pageEyebrow" class="text-xs font-black text-emerald-700">16과 문법 3</p>
+            <h1 id="pageTitle">V-(으)ㄹ 만하다 말하기</h1>
+            <p id="pageFormula" class="sp-c16-heading__formula">V-(으)ㄹ 만하다</p>
+            <p id="pageSubtitle" class="sp-c16-heading__action">첫 행동: 모범 문장을 듣고 말하거나 직접 입력하세요.</p>
+        </header>
         <div id="mainArea"></div>
 
         <section id="sessionResult" class="hidden sp-card p-6 text-center">
@@ -195,11 +213,11 @@
         </section>
     </main>
 
-    <div id="historyModal" class="sp-modal-overlay hidden">
+    <div id="historyModal" class="sp-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="historyTitle" tabindex="-1">
         <div class="sp-modal">
             <div class="flex items-center justify-between gap-3 mb-4">
                 <div>
-                    <h2 class="text-lg font-black text-slate-800 m-0">학습 기록</h2>
+                    <h2 id="historyTitle" class="text-lg font-black text-slate-800 m-0">학습 기록</h2>
                     <p class="text-xs text-slate-500 mt-1 mb-0">문장별 최고 점수와 최근 인식 결과를 볼 수 있어요.</p>
                 </div>
                 <button id="closeHistoryBtn" class="sp-inline-btn" type="button">닫기</button>
@@ -212,7 +230,7 @@
         </div>
     </div>
 
+    <script src="../shared/c16-grammar-state.js"></script>
     <script src="../shared/c15-speaking-pro.js"></script>
-    <script src="../shared/page-qr.js"></script>
 </body>
 </html>

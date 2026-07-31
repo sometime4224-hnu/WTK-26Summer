@@ -9,7 +9,7 @@
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>16과 문법 2 보조자료 | 카드 문장 빌더 PRO</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <style>
@@ -47,6 +47,54 @@
                 linear-gradient(180deg, var(--bg) 0%, #f8fafc 64%, #ffffff 100%);
         }
 
+        .skip-link {
+            position: fixed;
+            top: 8px;
+            left: 8px;
+            z-index: 100;
+            transform: translateY(-150%);
+            border-radius: 8px;
+            padding: 9px 12px;
+            background: #0f172a;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .skip-link:focus {
+            transform: translateY(0);
+        }
+
+        .page-intro {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            margin: 0 0 10px;
+            padding: 0 3px;
+        }
+
+        .page-intro h1 {
+            margin: 0;
+            color: #0f172a;
+            font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+            line-height: 1.3;
+        }
+
+        .page-intro p {
+            margin: 0;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        :focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px;
+        }
+
         button,
         input {
             font: inherit;
@@ -55,6 +103,18 @@
         .safe {
             word-break: keep-all;
             overflow-wrap: break-word;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
         .topbar {
@@ -228,7 +288,7 @@
 
         .panel-pick {
             position: relative;
-            padding-top: 44px;
+            padding-top: 54px;
         }
 
         .panel-pick::before {
@@ -273,6 +333,17 @@
             gap: 8px;
         }
 
+        .panel-title {
+            position: absolute;
+            top: 15px;
+            left: 106px;
+            margin: 0;
+            color: #7c2d12;
+            font-size: 14px;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+
         .card-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -281,8 +352,11 @@
 
         .pick-card {
             position: relative;
-            display: block;
-            min-height: 0;
+            display: grid;
+            grid-template-rows: auto auto auto;
+            align-content: start;
+            gap: 5px;
+            min-height: 126px;
             overflow: hidden;
             border: 1px solid var(--line-soft);
             border-radius: 8px;
@@ -290,7 +364,7 @@
             background: #ffffff;
             color: #334155;
             cursor: pointer;
-            text-align: center;
+            text-align: left;
             transition: border-color 0.16s, background 0.16s, transform 0.16s, box-shadow 0.16s;
         }
 
@@ -309,14 +383,12 @@
             animation: selectedGlow 1.6s ease-in-out infinite;
         }
 
-        .pick-card.has-image {
-            min-height: 0;
-        }
+        .pick-card.has-image { min-height: 126px; }
 
         .pick-image {
             display: block;
             width: 100%;
-            aspect-ratio: 1 / 1;
+            aspect-ratio: 16 / 9;
             object-fit: cover;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
@@ -363,9 +435,20 @@
             color: var(--accent);
         }
 
-        .pick-card strong,
-        .pick-card span:not(.pick-check):not(.pick-icon) {
-            display: none;
+        .pick-card__label {
+            display: block;
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+
+        .pick-card__hint {
+            display: block;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.35;
         }
 
         .custom-row {
@@ -373,6 +456,29 @@
             grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
             gap: 8px;
             margin-top: 12px;
+        }
+
+        .custom-guide,
+        .custom-feedback,
+        .practice-gate {
+            margin: 8px 0 0;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .custom-feedback[data-tone="bad"] {
+            color: #be123c;
+        }
+
+        .practice-gate {
+            margin: 0;
+            padding: 11px;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            background: #fff7ed;
+            color: #9a3412;
         }
 
         .custom-input {
@@ -460,6 +566,23 @@
         .feedback-card:focus-visible {
             outline: 3px solid rgba(37, 99, 235, 0.26);
             outline-offset: 2px;
+        }
+
+        [data-c16-state-tools] {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
         }
 
         .feedback-card[data-ready="true"] {
@@ -1120,6 +1243,56 @@
                 margin-top: 8px;
             }
         }
+
+        /* 1440×900 at 200% behaves like a 720×450 viewport. Keep the goal
+           and the first reason card in one view; the sentence preview expands
+           again as soon as there is enough height. */
+        @media (min-width: 600px) and (max-height: 520px) {
+            .topbar {
+                min-height: 34px;
+            }
+
+            .topbar a {
+                width: 27px;
+                height: 27px;
+            }
+
+            .shell {
+                padding-top: 4px;
+            }
+
+            .page-intro {
+                gap: 2px 8px;
+                margin-bottom: 4px;
+            }
+
+            .page-intro p {
+                font-size: 12px;
+                line-height: 1.3;
+            }
+
+            .sentence-strip {
+                gap: 0;
+                padding: 6px 8px;
+            }
+
+            .sentence,
+            .chip-row {
+                display: none;
+            }
+
+            .sentence-tools {
+                justify-content: flex-start;
+            }
+
+            .mode-button {
+                min-height: 28px;
+            }
+
+            .panel-pick {
+                padding-top: 31px;
+            }
+        }
     </style>
     <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
@@ -1129,15 +1302,22 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
+    <a class="skip-link" href="#cardBuilderActivity">카드 문장 빌더로 건너뛰기</a>
+
     <nav class="topbar" aria-label="페이지 이동">
         <a href="../index.html" aria-label="메인" title="메인"><i class="fa-solid fa-house"></i></a>
         <a href="index.html" aria-label="16과 목록" title="16과 목록"><i class="fa-solid fa-list"></i></a>
     </nav>
 
-    <main class="shell">
-        <section class="layout" aria-label="카드 문장 빌더">
+    <main id="main-content" class="shell">
+        <header class="page-intro">
+            <h1>카드 문장 빌더</h1>
+            <p>이유와 행동을 고르면 말할 문장이 완성됩니다.</p>
+        </header>
+
+        <section id="cardBuilderActivity" class="layout" tabindex="-1" aria-label="카드 문장 빌더">
             <div class="workspace">
-                <section class="sentence-strip" aria-live="polite">
+                <section class="sentence-strip" aria-live="polite" aria-atomic="true">
                     <div class="sentence-tools">
                         <div class="mode-toggle" role="group" aria-label="시제 선택">
                             <button class="mode-button is-active" type="button" data-tense="present" aria-pressed="true">
@@ -1152,19 +1332,23 @@
                     <div class="chip-row" id="sentenceChips"></div>
                 </section>
 
-                <section class="panel panel-pick" data-step="1" aria-label="이유 카드">
+                <section class="panel panel-pick" data-step="1" aria-labelledby="reasonTitle">
+                    <h2 id="reasonTitle" class="panel-title">이유 고르기</h2>
                     <div class="panel-tools">
                         <button class="btn ghost icon-only" type="button" id="randomBtn" aria-label="랜덤 조합" title="랜덤 조합"><i class="fa-solid fa-shuffle"></i></button>
                     </div>
                     <div class="card-grid" id="reasonGrid"></div>
                     <div class="custom-row">
-                        <input class="custom-input" id="customReasonInput" type="text" aria-label="내 이유" placeholder="이유" />
-                        <input class="custom-input" id="customActionInput" type="text" aria-label="내 행동" placeholder="행동" />
+                        <input class="custom-input" id="customReasonInput" type="text" aria-label="내 이유" placeholder="이유: 시간이 없어서" />
+                        <input class="custom-input" id="customActionInput" type="text" aria-label="내 행동 (-ㄹ 또는 -을 형태)" aria-describedby="customGuide customFeedback" placeholder="행동: 여행 갈" />
                         <button class="btn icon-only" type="button" id="customApplyBtn" aria-label="직접 입력 적용" title="적용"><i class="fa-solid fa-plus"></i></button>
                     </div>
+                    <p id="customGuide" class="custom-guide">행동은 <strong>여행 갈</strong>, <strong>운동할</strong>처럼 문장에 바로 붙는 <strong>-ㄹ/을</strong> 형태로 입력하세요.</p>
+                    <p id="customFeedback" class="custom-feedback" role="status" aria-live="polite"></p>
                 </section>
 
-                <section class="panel panel-pick" data-step="2" aria-label="행동 카드">
+                <section class="panel panel-pick" data-step="2" aria-labelledby="actionTitle">
+                    <h2 id="actionTitle" class="panel-title">행동 고르기</h2>
                     <div class="panel-tools">
                         <button class="btn ghost icon-only" type="button" id="copyBtn" aria-label="문장 복사" title="문장 복사"><i class="fa-solid fa-copy"></i></button>
                     </div>
@@ -1172,10 +1356,14 @@
                 </section>
             </div>
 
-            <aside class="practice-panel" aria-label="말하기 PRO">
+            <aside class="practice-panel" aria-labelledby="practiceTitle">
+                <h2 id="practiceTitle" class="sr-only">말하기 연습</h2>
                 <div class="pro-target">
                     <p id="proTargetText"></p>
                 </div>
+
+                <p id="practiceGate" class="practice-gate" role="status">이유와 행동 카드를 하나씩 고르면 듣기와 말하기가 열려요.</p>
+                <div id="practiceActions" hidden>
 
                 <div class="btn-row practice-listen-row">
                     <button class="btn blue icon-only" type="button" id="listenBtn" aria-label="듣기" title="듣기"><i class="fa-solid fa-volume-high"></i></button>
@@ -1209,6 +1397,7 @@
                     <button class="btn ghost icon-only" type="button" id="resetSpeechBtn" aria-label="초기화" title="초기화"><i class="fa-solid fa-rotate-right"></i></button>
                     <button class="btn primary icon-only" type="button" id="saveBtn" aria-label="저장" title="저장"><i class="fa-solid fa-bookmark"></i></button>
                 </div>
+                </div>
             </aside>
         </section>
 
@@ -1217,8 +1406,10 @@
             <a class="btn icon-only" href="grammar2-umdu-gauge.html" aria-label="엄두 게이지" title="엄두 게이지"><i class="fa-solid fa-gauge-high"></i></a>
             <a class="btn primary icon-only" href="grammar2-speaking-pro.html" aria-label="말하기 PRO 전체 연습" title="말하기 PRO 전체 연습"><i class="fa-solid fa-microphone-lines"></i></a>
         </nav>
+        <div data-c16-state-tools></div>
     </main>
 
+    <script src="../shared/c16-grammar-state.js"></script>
     <script>
         const reasons = [
             { id: 'busy', icon: 'fa-briefcase', image: '../assets/c16/grammar2/card-builder/reason-busy-work.webp', label: '일이 너무 많아서', hint: '업무와 과제 때문에' },
@@ -1242,15 +1433,58 @@
             { id: 'piano', icon: 'fa-music', image: '../assets/c16/grammar2/card-builder/action-place-piano.webp', label: '피아노를 놓다', phrase: '피아노를 놓을' }
         ];
 
-        const storageKey = 'c16-grammar2-card-builder-pro-v1';
+        const savedSentenceKey = 'c16-grammar2-card-builder-pro-saved-v1';
         const RecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-        const state = {
-            reasonId: 'busy',
-            actionId: 'travel',
+        const defaultProgress = {
+            reasonId: null,
+            actionId: null,
             tense: 'present',
             customReason: '',
             customActionPhrase: '',
+            customReasonDraft: '',
+            customActionDraft: ''
+        };
+        const progressStore = window.C16GrammarState && typeof window.C16GrammarState.create === 'function'
+            ? window.C16GrammarState.create('grammar2-card-builder-pro', defaultProgress, {
+                validate(value) {
+                    const validReason = value.reasonId === null || reasons.some((item) => item.id === value.reasonId);
+                    const validAction = value.actionId === null || actions.some((item) => item.id === value.actionId);
+                    return Boolean(value)
+                        && validReason
+                        && validAction
+                        && (value.tense === 'present' || value.tense === 'past')
+                        && typeof value.customReason === 'string'
+                        && typeof value.customActionPhrase === 'string'
+                        && typeof value.customReasonDraft === 'string'
+                        && typeof value.customActionDraft === 'string';
+                },
+                onReset(freshState) {
+                    state.reasonId = null;
+                    state.actionId = null;
+                    state.tense = freshState.tense === 'past' ? 'past' : 'present';
+                    state.customReason = '';
+                    state.customActionPhrase = '';
+                    state.customReasonDraft = '';
+                    state.customActionDraft = '';
+                    refs.customReasonInput.value = '';
+                    refs.customActionInput.value = '';
+                    setCustomFeedback('', '');
+                    resetSpeech();
+                    render();
+                }
+            })
+            : null;
+        const restoredProgress = (progressStore ? progressStore.get() : null) || defaultProgress;
+
+        const state = {
+            reasonId: reasons.some((item) => item.id === restoredProgress.reasonId) ? restoredProgress.reasonId : null,
+            actionId: actions.some((item) => item.id === restoredProgress.actionId) ? restoredProgress.actionId : null,
+            tense: restoredProgress.tense === 'past' ? 'past' : 'present',
+            customReason: typeof restoredProgress.customReason === 'string' ? restoredProgress.customReason : '',
+            customActionPhrase: typeof restoredProgress.customActionPhrase === 'string' ? restoredProgress.customActionPhrase : '',
+            customReasonDraft: typeof restoredProgress.customReasonDraft === 'string' ? restoredProgress.customReasonDraft : '',
+            customActionDraft: typeof restoredProgress.customActionDraft === 'string' ? restoredProgress.customActionDraft : '',
             isRecording: false,
             recognition: null,
             transcript: '',
@@ -1283,14 +1517,23 @@
             customApplyBtn: document.getElementById('customApplyBtn'),
             customReasonInput: document.getElementById('customReasonInput'),
             customActionInput: document.getElementById('customActionInput'),
+            customFeedback: document.getElementById('customFeedback'),
+            practiceGate: document.getElementById('practiceGate'),
+            practiceActions: document.getElementById('practiceActions'),
             tenseButtons: document.querySelectorAll('[data-tense]')
         };
 
         init();
+        if (progressStore) {
+            progressStore.mount(document.querySelector('[data-c16-state-tools]'), progressSnapshot);
+            progressStore.track(progressSnapshot);
+        }
 
         function init() {
             renderCards();
             bindEvents();
+            refs.customReasonInput.value = state.customReasonDraft;
+            refs.customActionInput.value = state.customActionDraft;
             render();
             if (!RecognitionClass) {
                 refs.statusText.textContent = '음성 인식 불가';
@@ -1298,28 +1541,59 @@
             }
         }
 
+        function progressSnapshot() {
+            return {
+                reasonId: state.reasonId,
+                actionId: state.actionId,
+                tense: state.tense,
+                customReason: state.customReason,
+                customActionPhrase: state.customActionPhrase,
+                customReasonDraft: state.customReasonDraft,
+                customActionDraft: state.customActionDraft
+            };
+        }
+
+        function saveProgress() {
+            if (progressStore) {
+                progressStore.save(progressSnapshot());
+            }
+        }
+
+        function hasSentenceParts() {
+            return Boolean(getReasonText() && getActionPhrase());
+        }
+
+        function setCustomFeedback(message, tone) {
+            refs.customFeedback.textContent = message;
+            if (tone) {
+                refs.customFeedback.dataset.tone = tone;
+            } else {
+                delete refs.customFeedback.dataset.tone;
+            }
+        }
+
         function iconMarkup(icon) {
             return `<i class="fa-solid ${icon}" aria-hidden="true"></i>`;
         }
 
-        function visualMarkup(item) {
-            if (item.image) {
-                return `<img class="pick-image" src="${escapeHtml(item.image)}" alt="" loading="lazy" decoding="async" />`;
-            }
-            return `<span class="pick-icon">${iconMarkup(item.icon)}</span>`;
+        function visualMarkup(item, detail) {
+            const visual = item.image
+                ? `<img class="pick-image" src="${escapeHtml(item.image)}" alt="" loading="lazy" decoding="async" />`
+                : `<span class="pick-icon" aria-hidden="true">${iconMarkup(item.icon)}</span>`;
+            return `${visual}<span class="pick-card__label">${escapeHtml(item.label)}</span><span class="pick-card__hint">${escapeHtml(detail)}</span>`;
         }
 
         function renderCards() {
             refs.reasonGrid.innerHTML = reasons.map((item) => `
-                <button class="pick-card ${item.image ? 'has-image' : ''}" type="button" data-reason="${item.id}" aria-label="${escapeHtml(item.label)}" title="${escapeHtml(item.label)}">
-                    ${visualMarkup(item)}
+                <button class="pick-card ${item.image ? 'has-image' : ''}" type="button" data-reason="${item.id}" aria-label="${escapeHtml(item.label)}" aria-pressed="false" title="${escapeHtml(item.label)}">
+                    ${visualMarkup(item, item.hint)}
                     <span class="pick-check">${iconMarkup('fa-check')}</span>
                 </button>
             `).join('');
 
             refs.actionGrid.innerHTML = actions.map((item) => `
-                <button class="pick-card ${item.image ? 'has-image' : ''}" type="button" data-action="${item.id}" aria-label="${escapeHtml(item.label)}" title="${escapeHtml(item.label)}">
-                    ${visualMarkup(item)}
+                <button class="pick-card ${item.image ? 'has-image' : ''}" type="button" data-action="${item.id}" aria-label="${escapeHtml(item.label)}" aria-pressed="false" title="${escapeHtml(item.label)}">
+                    ${visualMarkup(item, `${item.phrase} 생각도 못 해요`)}
                     <span class="pick-check">${iconMarkup('fa-check')}</span>
                 </button>
             `).join('');
@@ -1332,8 +1606,11 @@
                 state.reasonId = card.dataset.reason;
                 state.customReason = '';
                 refs.customReasonInput.value = '';
+                state.customReasonDraft = '';
+                setCustomFeedback('', '');
                 resetSpeech();
                 render();
+                saveProgress();
             });
 
             refs.actionGrid.addEventListener('click', (event) => {
@@ -1342,8 +1619,11 @@
                 state.actionId = card.dataset.action;
                 state.customActionPhrase = '';
                 refs.customActionInput.value = '';
+                state.customActionDraft = '';
+                setCustomFeedback('', '');
                 resetSpeech();
                 render();
+                saveProgress();
             });
 
             refs.tenseButtons.forEach((button) => {
@@ -1351,10 +1631,15 @@
                     state.tense = button.dataset.tense;
                     resetSpeech();
                     render();
+                    saveProgress();
                 });
             });
 
             refs.customApplyBtn.addEventListener('click', applyCustom);
+            refs.customReasonInput.addEventListener('input', saveCustomDraft);
+            refs.customActionInput.addEventListener('input', saveCustomDraft);
+            refs.customReasonInput.addEventListener('keydown', handleCustomEnter);
+            refs.customActionInput.addEventListener('keydown', handleCustomEnter);
             refs.randomBtn.addEventListener('click', randomize);
             refs.copyBtn.addEventListener('click', copySentence);
             refs.listenBtn.addEventListener('click', () => speak(getSentence(), 0.94));
@@ -1370,23 +1655,44 @@
             });
         }
 
+        function saveCustomDraft() {
+            state.customReasonDraft = refs.customReasonInput.value;
+            state.customActionDraft = refs.customActionInput.value;
+            saveProgress();
+        }
+
+        function handleCustomEnter(event) {
+            if (event.key !== 'Enter') return;
+            event.preventDefault();
+            applyCustom();
+        }
+
         function render() {
-            const sentence = getSentence();
+            const ready = hasSentenceParts();
+            const sentence = ready ? getSentence() : '이유와 행동을 고르세요.';
             const reason = getReasonText();
             const action = getActionPhrase();
             refs.sentenceText.textContent = sentence;
-            refs.proTargetText.textContent = sentence;
-            refs.sentenceChips.innerHTML = [
-                reason,
-                action,
-                state.tense === 'past' ? '생각도 못 했어요' : '생각도 못 해요'
-            ].map((chip) => `<span class="chip">${escapeHtml(chip)}</span>`).join('');
+            refs.proTargetText.textContent = ready ? sentence : '문장이 완성되면 여기에서 듣고 말할 수 있어요.';
+            refs.sentenceChips.innerHTML = ready
+                ? [
+                    reason,
+                    action,
+                    state.tense === 'past' ? '생각도 못 했어요' : '생각도 못 해요'
+                ].map((chip) => `<span class="chip">${escapeHtml(chip)}</span>`).join('')
+                : '';
+            refs.practiceActions.hidden = !ready;
+            refs.practiceGate.hidden = ready;
 
             document.querySelectorAll('[data-reason]').forEach((button) => {
-                button.classList.toggle('is-selected', !state.customReason && button.dataset.reason === state.reasonId);
+                const selected = !state.customReason && button.dataset.reason === state.reasonId;
+                button.classList.toggle('is-selected', selected);
+                button.setAttribute('aria-pressed', String(selected));
             });
             document.querySelectorAll('[data-action]').forEach((button) => {
-                button.classList.toggle('is-selected', !state.customActionPhrase && button.dataset.action === state.actionId);
+                const selected = !state.customActionPhrase && button.dataset.action === state.actionId;
+                button.classList.toggle('is-selected', selected);
+                button.setAttribute('aria-pressed', String(selected));
             });
             refs.tenseButtons.forEach((button) => {
                 const active = button.dataset.tense === state.tense;
@@ -1397,15 +1703,18 @@
 
         function getReasonText() {
             if (state.customReason) return state.customReason;
-            return reasons.find((item) => item.id === state.reasonId).label;
+            const item = reasons.find((candidate) => candidate.id === state.reasonId);
+            return item ? item.label : '';
         }
 
         function getActionPhrase() {
             if (state.customActionPhrase) return state.customActionPhrase;
-            return actions.find((item) => item.id === state.actionId).phrase;
+            const item = actions.find((candidate) => candidate.id === state.actionId);
+            return item ? item.phrase : '';
         }
 
         function getSentence() {
+            if (!hasSentenceParts()) return '';
             const ending = state.tense === 'past' ? '생각도 못 했어요.' : '생각도 못 해요.';
             return `${getReasonText()} ${getActionPhrase()} ${ending}`;
         }
@@ -1413,14 +1722,34 @@
         function applyCustom() {
             const reason = refs.customReasonInput.value.trim();
             const action = refs.customActionInput.value.trim();
+            state.customReasonDraft = refs.customReasonInput.value;
+            state.customActionDraft = refs.customActionInput.value;
+
+            if (action && /다[\s.!?]*$/u.test(action)) {
+                setCustomFeedback('행동은 사전형 -다가 아니에요. “운동할”, “여행 갈”처럼 -ㄹ/을 형태로 고쳐 보세요.', 'bad');
+                saveProgress();
+                refs.customActionInput.focus();
+                return;
+            }
+
             if (reason) {
                 state.customReason = reason;
+                state.reasonId = null;
             }
             if (action) {
                 state.customActionPhrase = action;
+                state.actionId = null;
             }
+            if (!hasSentenceParts()) {
+                setCustomFeedback('이유와 행동을 모두 고르면 문장이 완성돼요.', '');
+                render();
+                saveProgress();
+                return;
+            }
+            setCustomFeedback('내 문장을 만들었어요. 이제 듣거나 말해 보세요.', '');
             resetSpeech();
             render();
+            saveProgress();
         }
 
         function randomize() {
@@ -1430,14 +1759,22 @@
             state.actionId = action.id;
             state.customReason = '';
             state.customActionPhrase = '';
+            state.customReasonDraft = '';
+            state.customActionDraft = '';
             refs.customReasonInput.value = '';
             refs.customActionInput.value = '';
+            setCustomFeedback('', '');
             resetSpeech();
             render();
+            saveProgress();
         }
 
         async function copySentence() {
             const sentence = getSentence();
+            if (!sentence) {
+                setCustomFeedback('먼저 이유와 행동을 골라 문장을 완성하세요.', 'bad');
+                return;
+            }
             try {
                 await navigator.clipboard.writeText(sentence);
                 refs.statusText.textContent = '복사됨';
@@ -1447,6 +1784,10 @@
         }
 
         function speak(text, rate) {
+            if (!text) {
+                setCustomFeedback('먼저 이유와 행동을 골라 문장을 완성하세요.', 'bad');
+                return;
+            }
             if (!window.speechSynthesis) {
                 refs.statusText.textContent = '듣기 불가';
                 return;
@@ -1461,6 +1802,10 @@
         }
 
         function toggleRecord() {
+            if (!hasSentenceParts()) {
+                setCustomFeedback('먼저 이유와 행동을 골라 문장을 완성하세요.', 'bad');
+                return;
+            }
             if (state.isRecording) {
                 stopRecord();
             } else {
@@ -1469,7 +1814,7 @@
         }
 
         function startRecord() {
-            if (!RecognitionClass) return;
+            if (!RecognitionClass || !hasSentenceParts()) return;
             stopRecord();
             state.transcript = '';
             state.recognition = new RecognitionClass();
@@ -1658,17 +2003,19 @@
 
         function saveSentence() {
             const sentence = getSentence();
+            if (!sentence) return;
             if (!state.saved.includes(sentence)) {
                 state.saved.unshift(sentence);
                 state.saved = state.saved.slice(0, 12);
-                localStorage.setItem(storageKey, JSON.stringify(state.saved));
+                localStorage.setItem(savedSentenceKey, JSON.stringify(state.saved));
             }
             refs.statusText.textContent = '저장됨';
+            saveProgress();
         }
 
         function loadSaved() {
             try {
-                return JSON.parse(localStorage.getItem(storageKey) || '[]');
+                return JSON.parse(localStorage.getItem(savedSentenceKey) || '[]');
             } catch (error) {
                 return [];
             }
@@ -1718,6 +2065,5 @@
         }
     </script>
     <script src="../shared/site-copyright.js"></script>
-    <script src="../shared/page-qr.js"></script>
 </body>
 </html>

@@ -13,6 +13,20 @@
     );
     const recognitionOnlyMode = hasRecognition;
     const storageKey = config.storageKey || 'c15-speaking-pro-v1';
+    // C16 pages opt in to the stricter learner flow below.  Keeping it opt-in
+    // preserves the established behaviour of the older speaking pages.
+    const isC16Enhanced = config.c16Enhanced === true;
+    const allowTypedFallback = isC16Enhanced && config.typedFallback !== false;
+    const requiresAttempt = isC16Enhanced && config.requireAttempt !== false;
+    const shouldPersistSession = isC16Enhanced && config.persistSession !== false;
+    const c16SessionPageId = isC16Enhanced
+        ? (config.c16StatePageId || (location.pathname.split('/').pop() || 'speaking-pro').replace(/\.html$/i, ''))
+        : '';
+    const legacySessionStorageKey = storageKey + '-session';
+    const sessionStorageKey = isC16Enhanced
+        ? 'korean3b.c16.grammar.' + c16SessionPageId
+        : legacySessionStorageKey;
+    const recordingStoreName = 'korean3b-c16-speaking-recordings';
     const originalItems = Array.isArray(config.items) ? config.items.slice() : [];
     const speakerChoices = (config.speakerSelect && Array.isArray(config.speakerSelect.choices))
         ? config.speakerSelect.choices
@@ -65,7 +79,19 @@
         selectedSpeaker: '',
         selectedSpeakerLabel: '',
         sessionScores: [],
-        sessionLog: []
+        sessionLog: [],
+        itemResponded: false,
+        skippedItemIds: [],
+        savedRecordingItemId: '',
+        savedRecordingItemIds: [],
+        summaryAudioUrls: [],
+        sessionStorageBlocked: false,
+        sessionRecoveryIssue: '',
+        sessionRawRecord: '',
+        sessionRecordKey: '',
+        historyStorageBlocked: false,
+        lastFocusedElement: null,
+        hasRenderedItem: false
     };
 
     init();
@@ -74,11 +100,17 @@
         renderHero();
         bindStaticEvents();
         renderWarnings();
+        restoreSession();
         if (hasSpeakerSelect()) {
-            renderSpeakerSelect();
+            if (state.selectedSpeaker && config.items.length) {
+                render();
+            } else {
+                renderSpeakerSelect();
+            }
         } else {
             render();
         }
+        renderSessionRecovery();
         window.addEventListener('beforeunload', cleanupAll);
     }
 
@@ -90,7 +122,9 @@
             refs.pageTitle.textContent = config.title || '';
         }
         if (refs.pageSubtitle) {
-            refs.pageSubtitle.textContent = config.subtitle || '';
+            refs.pageSubtitle.textContent = isC16Enhanced
+                ? (config.actionLabel || '첫 행동: 모범 문장을 듣고 말하거나 직접 입력하세요.')
+                : (config.subtitle || '');
         }
         if (refs.pageFormula) {
             refs.pageFormula.textContent = config.formula || '';
@@ -133,10 +167,18 @@
                     closeHistoryModal();
                 }
             });
+            refs.historyModal.setAttribute('role', 'dialog');
+            refs.historyModal.setAttribute('aria-modal', 'true');
+            refs.historyModal.setAttribute('tabindex', '-1');
+            refs.historyModal.querySelectorAll('[onclick]').forEach(function (button) {
+                button.removeAttribute('onclick');
+                button.addEventListener('click', closeHistoryModal);
+            });
         }
         if (refs.restartSessionBtn) {
             refs.restartSessionBtn.addEventListener('click', restartSession);
         }
+        document.addEventListener('keydown', handleModalKeydown);
     }
 
     function renderWarnings() {
@@ -160,6 +202,12 @@
         state.selectedSpeakerLabel = '';
         state.sessionScores = [];
         state.sessionLog = [];
+        state.itemResponded = false;
+        state.skippedItemIds = [];
+        state.savedRecordingItemId = '';
+        state.savedRecordingItemIds = [];
+        state.hasRenderedItem = false;
+        saveSession();
 
         refs.completeBadge.classList.add('hidden');
         refs.sessionResult.classList.add('hidden');
@@ -232,7 +280,13 @@
         state.selectedSpeakerLabel = choice.label || speakerId;
         state.sessionScores = [];
         state.sessionLog = [];
+        state.itemResponded = false;
+        state.skippedItemIds = [];
+        state.savedRecordingItemId = '';
+        state.savedRecordingItemIds = [];
+        state.hasRenderedItem = false;
         config.items = selectedItems;
+        saveSession();
         render();
     }
 
@@ -255,10 +309,14 @@
 
     function render() {
         cleanupTransientState();
+        clearSessionSummaryRecordings();
         const total = config.items.length;
         const isDone = state.idx >= total;
+        const isCompleted = isDone && (!isC16Enhanced || (
+            state.skippedItemIds.length === 0 && state.sessionLog.length > 0
+        ));
 
-        refs.completeBadge.classList.toggle('hidden', !isDone);
+        refs.completeBadge.classList.toggle('hidden', !isCompleted);
         refs.sessionResult.classList.toggle('hidden', !isDone);
         updateProgress(isDone);
 
@@ -273,14 +331,26 @@
         }
 
         refs.sessionResult.classList.add('hidden');
+        const isInitialItemRender = !state.hasRenderedItem;
         state.hasHeardModel = false;
+        state.itemResponded = wasCurrentItemAnswered();
         const item = config.items[state.idx];
         refs.mainArea.innerHTML = buildSpeakerContextMarkup() + buildCompactItemMarkup(item, state.idx === total - 1);
         bindItemEvents();
-        updateStatus('말하기 버튼을 눌러 문장을 끝까지 따라 말해 보세요.', false);
+        restoreRecordingForCurrentItem();
+        updateNextAvailability();
+        updateStatus(state.itemResponded
+            ? '응답을 저장했어요. 다시 시도하거나 다음 문장으로 갈 수 있어요.'
+            : (isC16Enhanced
+                ? '말하기 버튼을 누르거나, 마이크가 어렵다면 문장을 직접 입력해 보세요.'
+                : '말하기 버튼을 눌러 문장을 끝까지 따라 말해 보세요.'), false);
+        saveSession();
         window.setTimeout(function () {
-            focusGuideStage('listen');
+            focusGuideStage('listen', {
+                skipAutoScroll: isC16Enhanced && isInitialItemRender
+            });
         }, 60);
+        state.hasRenderedItem = true;
     }
 
     function buildItemMarkup(item, isLast) {
@@ -393,7 +463,7 @@
             '    <div id="recordArea" class="sp-record-area">',
             '      <div id="statusBox" class="sp-status-box">',
             '        <p class="sp-bubble-label">말하기 상태</p>',
-            '        <p id="statusText" class="sp-status-text safe m-0">말하기 버튼을 눌러 문장을 끝까지 따라 말해 보세요.</p>',
+            '        <p id="statusText" class="sp-status-text safe m-0" role="status" aria-live="polite">말하기 버튼을 눌러 문장을 끝까지 따라 말해 보세요.</p>',
             '      </div>',
             '      <div class="sp-record-main flex items-center gap-3">',
             '        <button id="recordBtn" class="sp-btn sp-record-button" type="button" aria-label="말하기 시작">',
@@ -404,15 +474,25 @@
             '          <div id="transcriptBox" class="sp-transcript safe">아직 인식된 문장이 없습니다.</div>',
             '        </div>',
             '      </div>',
+            allowTypedFallback ? [
+                '      <div class="sp-typed-fallback">',
+                '        <label for="typedResponseInput" class="sp-typed-fallback__label">마이크가 어렵다면 문장으로 답하기</label>',
+                '        <div class="sp-typed-fallback__row">',
+                '          <input id="typedResponseInput" class="sp-typed-fallback__input" type="text" autocomplete="off" placeholder="말한 문장을 입력하세요" />',
+                '          <button id="typedSubmitBtn" class="sp-inline-btn" type="button">입력 확인</button>',
+                '        </div>',
+                '      </div>'
+            ].join('') : '',
             '      <div id="audioWrap" class="hidden mt-3">',
             '        <p class="sp-bubble-label">녹음 다시 듣기</p>',
             '        <audio id="audioPlayer" class="w-full" controls></audio>',
             '      </div>',
             '    </div>',
             '    <div id="resultWrap" class="hidden sp-result-box"></div>',
-            '    <div id="actionRow" class="grid grid-cols-2 gap-2">',
+            '    <div id="actionRow" class="grid ' + (isC16Enhanced ? 'grid-cols-3' : 'grid-cols-2') + ' gap-2">',
             '      <button id="retryBtn" class="sp-btn sp-btn-ghost" type="button">다시 시도</button>',
-            '      <button id="nextBtn" class="sp-btn sp-btn-primary" type="button">' + (isLast ? '결과 보기' : '다음 문장') + '</button>',
+            isC16Enhanced ? '      <button id="skipBtn" class="sp-btn sp-btn-ghost" type="button">건너뛰기</button>' : '',
+            '      <button id="nextBtn" class="sp-btn sp-btn-primary" type="button"' + (requiresAttempt ? ' disabled aria-disabled="true"' : '') + '>' + (isLast ? '결과 보기' : '다음 문장') + '</button>',
             '    </div>',
             '    <details class="sp-tip-details mt-1">',
             '      <summary class="sp-tip-summary">말하기 포인트</summary>',
@@ -432,6 +512,9 @@
         const recordBtn = document.getElementById('recordBtn');
         const retryBtn = document.getElementById('retryBtn');
         const nextBtn = document.getElementById('nextBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const typedResponseInput = document.getElementById('typedResponseInput');
+        const typedSubmitBtn = document.getElementById('typedSubmitBtn');
         const toggleModelBtn = document.getElementById('toggleModelBtn');
         const changeSpeakerBtn = document.getElementById('changeSpeakerBtn');
 
@@ -444,10 +527,39 @@
         recordBtn.addEventListener('click', toggleRecording);
         retryBtn.addEventListener('click', resetAttemptUi);
         nextBtn.addEventListener('click', nextItem);
+        if (skipBtn) {
+            skipBtn.addEventListener('click', skipCurrentItem);
+        }
+        if (typedSubmitBtn && typedResponseInput) {
+            typedSubmitBtn.addEventListener('click', submitTypedResponse);
+            typedResponseInput.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    submitTypedResponse();
+                }
+            });
+        }
         toggleModelBtn.addEventListener('click', toggleModelAnswer);
         if (changeSpeakerBtn) {
             changeSpeakerBtn.addEventListener('click', renderSpeakerSelect);
         }
+    }
+
+    function submitTypedResponse() {
+        const input = document.getElementById('typedResponseInput');
+        const spokenText = input ? input.value.trim() : '';
+        if (!spokenText) {
+            updateStatus('문장을 입력한 뒤 입력 확인을 눌러 주세요.', false);
+            if (input) {
+                input.focus();
+            }
+            return;
+        }
+        if (state.isRecording) {
+            stopRecording();
+        }
+        updateTranscript(spokenText);
+        finishAttempt(spokenText);
     }
 
     function updateProgress(isDone) {
@@ -780,9 +892,12 @@
 
         state.sessionScores.push(best.score);
         state.sessionLog.push(entry);
+        state.itemResponded = true;
         persistHistory(entry);
+        saveSession();
         renderAttemptResult(entry);
         updateStatus(best.feedback, false);
+        updateNextAvailability();
     }
 
     function renderAttemptResult(entry) {
@@ -840,22 +955,40 @@
     }
 
     function renderSessionSummary() {
+        clearSessionSummaryRecordings();
         const attempts = state.sessionScores.length;
         const best = attempts ? Math.max.apply(null, state.sessionScores) : 0;
         const avg = attempts ? Math.round(state.sessionScores.reduce(function (sum, score) {
             return sum + score;
         }, 0) / attempts) : 0;
+        const skipped = state.skippedItemIds.length;
 
         refs.resAttempts.textContent = String(attempts);
         refs.resBest.textContent = attempts ? best + '점' : '-';
         refs.resAvg.textContent = attempts ? avg + '점' : '-';
 
+        if (isC16Enhanced) {
+            const resultHeading = refs.sessionResult && refs.sessionResult.querySelector('h2');
+            const resultDescription = refs.sessionResult && refs.sessionResult.querySelector('p');
+            if (resultHeading) {
+                resultHeading.textContent = skipped ? '연습 결과' : '말하기 연습 완료';
+            }
+            if (resultDescription) {
+                resultDescription.textContent = skipped
+                    ? `응답 ${attempts}회 · 건너뜀 ${skipped}문장입니다. 건너뛴 문장은 다시 연습해 보세요.`
+                    : '응답한 문장을 저장했어요. 필요하면 다시 연습할 수 있어요.';
+            }
+        }
+
         if (!state.sessionLog.length) {
-            refs.logArea.innerHTML = '<div class="sp-log-item"><p class="text-sm text-slate-500 m-0 safe">이번 세션에서는 아직 저장된 말하기 기록이 없습니다. 듣기와 따라 말하기만 해도 괜찮아요.</p></div>';
+            refs.logArea.innerHTML = isC16Enhanced
+                ? '<div class="sp-log-item"><p class="text-sm text-slate-500 m-0 safe">이번 세션에는 응답이 없습니다. 건너뜀은 학습 완료로 기록되지 않아요.</p></div>'
+                : '<div class="sp-log-item"><p class="text-sm text-slate-500 m-0 safe">이번 세션에서는 아직 저장된 말하기 기록이 없습니다. 듣기와 따라 말하기만 해도 괜찮아요.</p></div>';
             return;
         }
 
         refs.logArea.innerHTML = state.sessionLog.map(function (entry, index) {
+            const hasRecording = isC16Enhanced && state.savedRecordingItemIds.includes(entry.id);
             return [
                 '<div class="sp-log-item mt-3">',
                 '  <div class="flex items-start justify-between gap-3">',
@@ -866,16 +999,82 @@
                 '    </div>',
                 '    <span class="sp-score-pill">' + entry.score + '점</span>',
                 '  </div>',
+                hasRecording
+                    ? '  <div class="sp-session-audio" data-session-recording-id="' + escapeHtml(entry.id) + '"><p class="sp-note m-0">녹음 불러오는 중…</p></div>'
+                    : '',
                 '</div>'
             ].join('');
-        }).join('');
+        }).join('') + (isC16Enhanced && skipped
+            ? '<div class="sp-log-item mt-3"><p class="text-sm text-slate-600 m-0 safe"><b>건너뜀:</b> ' + skipped + '문장 · 다음 학습 때 다시 응답해 보세요.</p></div>'
+            : '');
+        if (isC16Enhanced) {
+            restoreSessionSummaryRecordings();
+        }
+    }
+
+    function restoreSessionSummaryRecordings() {
+        if (!shouldPersistSession || !refs.logArea) {
+            return;
+        }
+        refs.logArea.querySelectorAll('[data-session-recording-id]').forEach(function (container) {
+            const itemId = container.dataset.sessionRecordingId;
+            loadRecordingBlob(itemId).then(function (blob) {
+                if (!blob || !container.isConnected) {
+                    if (container.isConnected) {
+                        container.innerHTML = '<p class="sp-note m-0">저장된 녹음을 찾지 못했어요.</p>';
+                    }
+                    return;
+                }
+                const url = URL.createObjectURL(blob);
+                state.summaryAudioUrls.push(url);
+                container.innerHTML = [
+                    '<p class="sp-bubble-label">내 녹음 다시 듣기</p>',
+                    '<audio class="sp-session-audio__player" controls src="' + url + '"></audio>'
+                ].join('');
+            }).catch(function () {
+                if (container.isConnected) {
+                    container.innerHTML = '<p class="sp-note m-0">저장된 녹음을 불러오지 못했어요.</p>';
+                }
+            });
+        });
     }
 
     function nextItem() {
         if (state.isRecording) {
             stopRecording();
         }
+        if (requiresAttempt && !state.itemResponded) {
+            updateStatus('말하거나 문장을 입력한 뒤 다음으로 갈 수 있어요. 필요하면 건너뛰기를 선택하세요.', false);
+            const typedInput = document.getElementById('typedResponseInput');
+            (typedInput || document.getElementById('recordBtn'))?.focus();
+            return;
+        }
         state.idx += 1;
+        state.itemResponded = false;
+        saveSession();
+        render();
+    }
+
+    function skipCurrentItem() {
+        if (!isC16Enhanced) {
+            return;
+        }
+        // A real response should advance as a response, never be counted as
+        // both a response and a skip.
+        if (state.itemResponded) {
+            nextItem();
+            return;
+        }
+        const item = getCurrentItem();
+        if (!item) {
+            return;
+        }
+        if (!state.skippedItemIds.includes(item.id)) {
+            state.skippedItemIds.push(item.id);
+        }
+        state.idx += 1;
+        state.itemResponded = false;
+        saveSession();
         render();
     }
 
@@ -907,7 +1106,38 @@
         state.idx = 0;
         state.sessionScores = [];
         state.sessionLog = [];
+        state.itemResponded = false;
+        state.skippedItemIds = [];
+        state.savedRecordingItemId = '';
+        state.savedRecordingItemIds = [];
+        state.hasRenderedItem = false;
+        saveSession();
         render();
+    }
+
+    function wasCurrentItemAnswered() {
+        const item = getCurrentItem();
+        if (!item) {
+            return false;
+        }
+        return state.sessionLog.some(function (entry) {
+            return entry.id === item.id;
+        });
+    }
+
+    function updateNextAvailability() {
+        const nextBtn = document.getElementById('nextBtn');
+        if (!nextBtn) {
+            return;
+        }
+        const enabled = !requiresAttempt || state.itemResponded;
+        nextBtn.disabled = !enabled;
+        nextBtn.setAttribute('aria-disabled', String(!enabled));
+        const skipBtn = document.getElementById('skipBtn');
+        if (isC16Enhanced && skipBtn) {
+            skipBtn.hidden = state.itemResponded;
+            skipBtn.disabled = state.itemResponded;
+        }
     }
 
     function updateStatus(message, recording) {
@@ -954,6 +1184,14 @@
 
         clearAudioPlayer();
         state.audioUrl = URL.createObjectURL(blob);
+        if (shouldPersistSession) {
+            state.savedRecordingItemId = currentItem.id;
+            if (!state.savedRecordingItemIds.includes(currentItem.id)) {
+                state.savedRecordingItemIds.push(currentItem.id);
+            }
+            saveSession();
+            saveRecordingBlob(currentItem.id, blob);
+        }
 
         const audioWrap = document.getElementById('audioWrap');
         const audioPlayer = document.getElementById('audioPlayer');
@@ -963,6 +1201,31 @@
 
         audioPlayer.src = state.audioUrl;
         audioWrap.classList.remove('hidden');
+    }
+
+    function restoreRecordingForCurrentItem() {
+        if (!shouldPersistSession || !state.savedRecordingItemIds.length) {
+            return;
+        }
+        const item = getCurrentItem();
+        if (!item || !state.savedRecordingItemIds.includes(item.id)) {
+            return;
+        }
+        loadRecordingBlob(item.id).then(function (blob) {
+            if (!blob || !getCurrentItem() || getCurrentItem().id !== item.id) {
+                return;
+            }
+            clearAudioPlayer();
+            state.audioUrl = URL.createObjectURL(blob);
+            const audioWrap = document.getElementById('audioWrap');
+            const audioPlayer = document.getElementById('audioPlayer');
+            if (audioWrap && audioPlayer) {
+                audioPlayer.src = state.audioUrl;
+                audioWrap.classList.remove('hidden');
+            }
+        }).catch(function () {
+            // Audio recovery is optional.  The text response remains saved.
+        });
     }
 
     function clearAudioPlayer() {
@@ -980,6 +1243,13 @@
             URL.revokeObjectURL(state.audioUrl);
             state.audioUrl = '';
         }
+    }
+
+    function clearSessionSummaryRecordings() {
+        state.summaryAudioUrls.forEach(function (url) {
+            URL.revokeObjectURL(url);
+        });
+        state.summaryAudioUrls = [];
     }
 
     function cleanupMediaStream() {
@@ -1013,6 +1283,7 @@
     function cleanupAll() {
         cleanupTransientState();
         cleanupMediaStream();
+        clearSessionSummaryRecordings();
         state.speechRequestId += 1;
         window.speechSynthesis?.cancel();
     }
@@ -1053,7 +1324,9 @@
             markGuideTarget(highlight.id, highlight.mode);
         });
 
-        autoScrollToTarget(stage.scrollTarget, stage.fitIds || []);
+        if (!options || !options.skipAutoScroll) {
+            autoScrollToTarget(stage.scrollTarget, stage.fitIds || []);
+        }
     }
 
     function buildGuideStage(stageKey, options) {
@@ -1198,6 +1471,290 @@
         return !!(resultWrap && !resultWrap.classList.contains('hidden') && resultWrap.innerHTML.trim());
     }
 
+    function restoreSession() {
+        if (!shouldPersistSession) {
+            return;
+        }
+        const saved = loadSession();
+        if (!saved) {
+            return;
+        }
+        state.idx = saved.idx;
+        state.selectedSpeaker = saved.selectedSpeaker;
+        state.selectedSpeakerLabel = saved.selectedSpeakerLabel;
+        state.sessionScores = saved.sessionScores;
+        state.sessionLog = saved.sessionLog;
+        state.skippedItemIds = saved.skippedItemIds;
+        state.savedRecordingItemId = saved.savedRecordingItemId;
+        state.savedRecordingItemIds = saved.savedRecordingItemIds;
+
+        if (hasSpeakerSelect() && state.selectedSpeaker) {
+            const choice = speakerChoices.find(function (candidate) {
+                return candidate.id === state.selectedSpeaker;
+            });
+            const selectedItems = originalItems.filter(function (item) {
+                return item.speaker === state.selectedSpeaker;
+            });
+            if (!choice || !selectedItems.length) {
+                state.selectedSpeaker = '';
+                state.selectedSpeakerLabel = '';
+                state.idx = 0;
+            } else {
+                state.selectedSpeakerLabel = choice.label || state.selectedSpeaker;
+                config.items = selectedItems;
+                state.idx = Math.min(state.idx, selectedItems.length);
+            }
+        } else {
+            state.idx = Math.min(state.idx, originalItems.length);
+        }
+    }
+
+    function loadSession() {
+        let record;
+        try {
+            const primaryRaw = localStorage.getItem(sessionStorageKey);
+            if (primaryRaw !== null) {
+                record = { key: sessionStorageKey, raw: primaryRaw };
+            } else if (isC16Enhanced && legacySessionStorageKey !== sessionStorageKey) {
+                const legacyRaw = localStorage.getItem(legacySessionStorageKey);
+                if (legacyRaw !== null) {
+                    record = { key: legacySessionStorageKey, raw: legacyRaw };
+                }
+            }
+            if (!record) {
+                return null;
+            }
+            const parsed = JSON.parse(record.raw);
+            if (!parsed || parsed.version !== 1 || !Number.isInteger(parsed.idx)
+                || !Array.isArray(parsed.sessionScores) || !Array.isArray(parsed.sessionLog)
+                || !Array.isArray(parsed.skippedItemIds)) {
+                markSessionStorageBlocked('corrupt', record);
+                return null;
+            }
+            return {
+                idx: Math.max(0, parsed.idx),
+                selectedSpeaker: typeof parsed.selectedSpeaker === 'string' ? parsed.selectedSpeaker : '',
+                selectedSpeakerLabel: typeof parsed.selectedSpeakerLabel === 'string' ? parsed.selectedSpeakerLabel : '',
+                sessionScores: parsed.sessionScores.filter(function (score) { return Number.isFinite(score); }),
+                sessionLog: parsed.sessionLog.filter(function (entry) { return entry && typeof entry.id === 'string' && typeof entry.spoken === 'string'; }),
+                skippedItemIds: parsed.skippedItemIds.filter(function (id) { return typeof id === 'string'; }),
+                savedRecordingItemId: typeof parsed.savedRecordingItemId === 'string' ? parsed.savedRecordingItemId : '',
+                savedRecordingItemIds: Array.isArray(parsed.savedRecordingItemIds)
+                    ? parsed.savedRecordingItemIds.filter(function (id) { return typeof id === 'string'; })
+                    : (typeof parsed.savedRecordingItemId === 'string' && parsed.savedRecordingItemId
+                        ? [parsed.savedRecordingItemId]
+                        : [])
+            };
+        } catch (error) {
+            markSessionStorageBlocked(record ? 'corrupt' : 'unavailable', record || { key: sessionStorageKey, raw: '' });
+            return null;
+        }
+    }
+
+    function saveSession() {
+        if (!shouldPersistSession || state.sessionStorageBlocked) {
+            return;
+        }
+        try {
+            localStorage.setItem(sessionStorageKey, JSON.stringify(getSessionSnapshot()));
+        } catch (error) {
+            let raw = '';
+            try {
+                raw = localStorage.getItem(sessionStorageKey) || '';
+            } catch (readError) {
+                // The recovery panel still offers a copy of the in-memory session.
+            }
+            markSessionStorageBlocked('write', { key: sessionStorageKey, raw: raw });
+            updateStatus('현재 세션을 저장하지 못했어요. 이 페이지를 열어 둔 채 계속할 수 있어요.', false);
+            renderSessionRecovery();
+        }
+    }
+
+    function getSessionSnapshot() {
+        return {
+            version: 1,
+            idx: state.idx,
+            selectedSpeaker: state.selectedSpeaker,
+            selectedSpeakerLabel: state.selectedSpeakerLabel,
+            sessionScores: state.sessionScores,
+            sessionLog: state.sessionLog,
+            skippedItemIds: state.skippedItemIds,
+            savedRecordingItemId: state.savedRecordingItemId,
+            savedRecordingItemIds: state.savedRecordingItemIds,
+            updatedAt: new Date().toISOString()
+        };
+    }
+
+    function markSessionStorageBlocked(issue, record) {
+        state.sessionStorageBlocked = true;
+        state.sessionRecoveryIssue = issue || 'write';
+        state.sessionRecordKey = record && record.key ? record.key : sessionStorageKey;
+        state.sessionRawRecord = record && typeof record.raw === 'string' ? record.raw : '';
+    }
+
+    function renderSessionRecovery() {
+        const existing = document.getElementById('sessionRecovery');
+        if (existing) {
+            existing.remove();
+        }
+        if (!isC16Enhanced || !state.sessionStorageBlocked || !refs.mainArea) {
+            return;
+        }
+
+        const issueText = state.sessionRecoveryIssue === 'corrupt'
+            ? '이전 세션 기록을 읽을 수 없어요. 원본은 그대로 보관하고 있어요.'
+            : (state.sessionRecoveryIssue === 'unavailable'
+                ? '이 기기에서는 현재 세션을 저장할 수 없어요. 이 페이지를 열어 둔 채 계속 연습할 수 있어요.'
+                : '현재 세션을 저장하지 못했어요. 원본을 덮어쓰지 않고, 이 페이지에서 계속 연습할 수 있어요.');
+        const recovery = document.createElement('section');
+        recovery.id = 'sessionRecovery';
+        recovery.className = 'sp-session-recovery';
+        recovery.setAttribute('role', 'alert');
+        recovery.innerHTML = [
+            '<p class="sp-session-recovery__title">저장 기록을 복구할 수 있어요</p>',
+            '<p class="sp-session-recovery__copy">' + escapeHtml(issueText) + '</p>',
+            '<div class="sp-session-recovery__actions">',
+            '  <button class="sp-inline-btn" type="button" data-session-recovery-copy>기록 복사</button>',
+            '  <button class="sp-inline-btn" type="button" data-session-recovery-download>기록 내려받기</button>',
+            '  <button class="sp-inline-btn sp-session-recovery__reset" type="button" data-session-recovery-reset>이 페이지 세션 초기화</button>',
+            '</div>',
+            '<p class="sp-session-recovery__status" data-session-recovery-status aria-live="polite"></p>'
+        ].join('');
+        refs.mainArea.parentNode.insertBefore(recovery, refs.mainArea);
+        recovery.querySelector('[data-session-recovery-copy]').addEventListener('click', function () {
+            copySessionRecovery(recovery);
+        });
+        recovery.querySelector('[data-session-recovery-download]').addEventListener('click', function () {
+            downloadSessionRecovery(recovery);
+        });
+        recovery.querySelector('[data-session-recovery-reset]').addEventListener('click', resetSessionRecovery);
+    }
+
+    function buildSessionRecoveryExport() {
+        return JSON.stringify({
+            page: c16SessionPageId,
+            storageKey: state.sessionRecordKey || sessionStorageKey,
+            issue: state.sessionRecoveryIssue || 'write',
+            preservedRecord: state.sessionRawRecord,
+            currentSession: getSessionSnapshot()
+        }, null, 2);
+    }
+
+    function setSessionRecoveryStatus(recovery, message) {
+        const status = recovery && recovery.querySelector('[data-session-recovery-status]');
+        if (status) {
+            status.textContent = message;
+        }
+    }
+
+    function copySessionRecovery(recovery) {
+        const payload = buildSessionRecoveryExport();
+        const copied = function () {
+            setSessionRecoveryStatus(recovery, '복사했어요. 필요하면 메모장에 붙여 넣어 보관하세요.');
+        };
+        const fallback = function () {
+            const textarea = document.createElement('textarea');
+            textarea.value = payload;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                copied();
+            } catch (error) {
+                setSessionRecoveryStatus(recovery, '복사하지 못했어요. 기록 내려받기를 사용하세요.');
+            }
+            textarea.remove();
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(payload).then(copied).catch(fallback);
+        } else {
+            fallback();
+        }
+    }
+
+    function downloadSessionRecovery(recovery) {
+        const blob = new Blob([buildSessionRecoveryExport()], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = (c16SessionPageId || 'c16-speaking-session') + '-recovery.json';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+        setSessionRecoveryStatus(recovery, '복구 기록을 내려받기 시작했어요.');
+    }
+
+    function resetSessionRecovery() {
+        if (!window.confirm('이 페이지의 저장 세션만 초기화할까요? 복사하거나 내려받지 않은 손상 기록은 복구할 수 없습니다.')) {
+            return;
+        }
+        try {
+            localStorage.removeItem(state.sessionRecordKey || sessionStorageKey);
+        } catch (error) {
+            const recovery = document.getElementById('sessionRecovery');
+            setSessionRecoveryStatus(recovery, '초기화하지 못했어요. 기록 복사 또는 내려받기를 사용하세요.');
+            return;
+        }
+        state.sessionStorageBlocked = false;
+        state.sessionRecoveryIssue = '';
+        state.sessionRawRecord = '';
+        state.sessionRecordKey = '';
+        renderSessionRecovery();
+        saveSession();
+        updateStatus('이 페이지의 저장 세션을 초기화했어요. 지금부터 새로 저장합니다.', false);
+    }
+
+    function openRecordingDb() {
+        return new Promise(function (resolve, reject) {
+            if (!window.indexedDB) {
+                reject(new Error('IndexedDB is not available.'));
+                return;
+            }
+            const request = window.indexedDB.open(recordingStoreName, 1);
+            request.onupgradeneeded = function () {
+                const db = request.result;
+                if (!db.objectStoreNames.contains('recordings')) {
+                    db.createObjectStore('recordings');
+                }
+            };
+            request.onsuccess = function () { resolve(request.result); };
+            request.onerror = function () { reject(request.error || new Error('Unable to open IndexedDB.')); };
+        });
+    }
+
+    function recordingKey(itemId) {
+        return storageKey + ':' + itemId;
+    }
+
+    function saveRecordingBlob(itemId, blob) {
+        return openRecordingDb().then(function (db) {
+            return new Promise(function (resolve, reject) {
+                const transaction = db.transaction('recordings', 'readwrite');
+                transaction.objectStore('recordings').put(blob, recordingKey(itemId));
+                transaction.oncomplete = function () { db.close(); resolve(); };
+                transaction.onerror = function () { db.close(); reject(transaction.error || new Error('Unable to save recording.')); };
+            });
+        }).catch(function () {
+            // A recording is helpful but should never block the learning flow.
+        });
+    }
+
+    function loadRecordingBlob(itemId) {
+        return openRecordingDb().then(function (db) {
+            return new Promise(function (resolve, reject) {
+                const transaction = db.transaction('recordings', 'readonly');
+                const request = transaction.objectStore('recordings').get(recordingKey(itemId));
+                request.onsuccess = function () { resolve(request.result || null); };
+                request.onerror = function () { reject(request.error || new Error('Unable to load recording.')); };
+                transaction.oncomplete = function () { db.close(); };
+            });
+        });
+    }
+
     function persistHistory(entry) {
         const data = loadHistory();
         const prev = data[entry.id] || {};
@@ -1214,6 +1771,7 @@
     }
 
     function showHistoryModal() {
+        state.lastFocusedElement = document.activeElement;
         const data = loadHistory();
         const items = config.items.map(function (item) {
             return {
@@ -1247,34 +1805,91 @@
         }).join('');
 
         refs.historyModal.classList.remove('hidden');
+        window.setTimeout(function () {
+            (refs.closeHistoryBtn || refs.clearHistoryBtn || refs.historyModal).focus();
+        }, 0);
     }
 
     function closeHistoryModal() {
         refs.historyModal.classList.add('hidden');
+        if (state.lastFocusedElement && typeof state.lastFocusedElement.focus === 'function') {
+            state.lastFocusedElement.focus();
+        }
+        state.lastFocusedElement = null;
+    }
+
+    function handleModalKeydown(event) {
+        if (!refs.historyModal || refs.historyModal.classList.contains('hidden')) {
+            return;
+        }
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            closeHistoryModal();
+            return;
+        }
+        if (event.key !== 'Tab') {
+            return;
+        }
+        const focusable = Array.from(refs.historyModal.querySelectorAll(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )).filter(function (element) {
+            return !element.closest('.hidden');
+        });
+        if (!focusable.length) {
+            event.preventDefault();
+            refs.historyModal.focus();
+            return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
     }
 
     function clearHistory() {
-        if (!window.confirm('저장된 학습 기록을 모두 지울까요?')) {
+        const prompt = state.historyStorageBlocked
+            ? '손상되어 읽을 수 없는 기록을 초기화할까요?'
+            : '저장된 학습 기록을 모두 지울까요?';
+        if (!window.confirm(prompt)) {
             return;
         }
         localStorage.removeItem(storageKey);
+        state.historyStorageBlocked = false;
         showHistoryModal();
     }
 
     function loadHistory() {
         try {
-            return JSON.parse(localStorage.getItem(storageKey)) || {};
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) {
+                return {};
+            }
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                state.historyStorageBlocked = true;
+                return {};
+            }
+            return parsed;
         } catch (error) {
-            console.error(error);
+            state.historyStorageBlocked = true;
             return {};
         }
     }
 
     function saveHistory(data) {
+        if (state.historyStorageBlocked) {
+            return;
+        }
         try {
             localStorage.setItem(storageKey, JSON.stringify(data));
         } catch (error) {
-            console.error(error);
+            state.historyStorageBlocked = true;
+            updateStatus('기록을 저장하지 못했어요. 현재 페이지에서는 계속 연습할 수 있어요.', false);
         }
     }
 

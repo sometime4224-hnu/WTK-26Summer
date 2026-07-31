@@ -27,6 +27,14 @@
     box-sizing: border-box;
 }
 
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+summary:focus-visible {
+    outline: 3px solid #0f766e;
+    outline-offset: 3px;
+}
+
 html {
     -webkit-text-size-adjust: 100%;
 }
@@ -647,6 +655,23 @@ body.speaking-pro-page {
     }
 }
 
+.sp-modal-overlay.hidden,
+.sp-result-box.hidden,
+#audioWrap.hidden {
+    display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
 .sp-status-box {
     padding: 10px 12px;
     background: #f8fafc;
@@ -654,6 +679,328 @@ body.speaking-pro-page {
 
 .sp-record-area .sp-status-box {
     margin-bottom: 10px;
+}
+
+.sp-typed-fallback {
+    display: grid;
+    gap: 7px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.sp-typed-fallback__label {
+    color: #475569;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.sp-typed-fallback__row {
+    display: flex;
+    gap: 8px;
+}
+
+.sp-typed-fallback__input {
+    min-width: 0;
+    flex: 1;
+    min-height: 40px;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    border-radius: 12px;
+    padding: 0 10px;
+    background: #ffffff;
+    color: #0f172a;
+    font: inherit;
+    font-size: 13px;
+}
+
+.sp-typed-fallback__input::placeholder {
+    color: #94a3b8;
+}
+
+/* C16 uses the shared speaking engine, but keeps a self-contained layout so
+   the first response control remains usable if the optional utility CSS is
+   still loading. These rules are intentionally scoped to the four C16 pages. */
+body.c16-speaking-pro main {
+    width: 100%;
+    max-width: 28rem;
+    margin-right: auto;
+    margin-left: auto;
+    padding: 1rem 1rem 3rem;
+}
+
+/* The pages still work while optional utility CSS is unavailable. */
+body.c16-speaking-pro .hidden {
+    display: none !important;
+}
+
+body.c16-speaking-pro [hidden] {
+    display: none !important;
+}
+
+body.c16-speaking-pro .sp-session-recovery {
+    margin: 0 0 0.75rem;
+    padding: 0.85rem;
+    border: 1px solid #f59e0b;
+    border-radius: 14px;
+    background: #fffbeb;
+    color: #78350f;
+}
+
+body.c16-speaking-pro .sp-session-recovery__title,
+body.c16-speaking-pro .sp-session-recovery__copy,
+body.c16-speaking-pro .sp-session-recovery__status {
+    margin: 0;
+}
+
+body.c16-speaking-pro .sp-session-recovery__title {
+    font-size: 0.86rem;
+    font-weight: 900;
+}
+
+body.c16-speaking-pro .sp-session-recovery__copy,
+body.c16-speaking-pro .sp-session-recovery__status {
+    margin-top: 0.3rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+body.c16-speaking-pro .sp-session-recovery__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.65rem;
+}
+
+body.c16-speaking-pro .sp-session-recovery__actions .sp-inline-btn {
+    min-height: 34px;
+}
+
+body.c16-speaking-pro .sp-session-recovery__reset {
+    border-color: #dc2626;
+    color: #991b1b;
+}
+
+body.c16-speaking-pro .sp-session-audio {
+    margin-top: 0.65rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.28);
+}
+
+body.c16-speaking-pro .sp-session-audio__player {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+}
+
+body.c16-speaking-pro .sp-item-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+body.c16-speaking-pro .sp-scene-head,
+body.c16-speaking-pro .sp-scene-head > div:first-child,
+body.c16-speaking-pro .sp-answer-box > div,
+body.c16-speaking-pro .sp-record-main {
+    display: flex;
+}
+
+body.c16-speaking-pro .sp-scene-head,
+body.c16-speaking-pro .sp-answer-box > div {
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+body.c16-speaking-pro .sp-scene-head > div:first-child {
+    min-width: 0;
+    flex: 1;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+body.c16-speaking-pro .sp-scene-head .flex-1,
+body.c16-speaking-pro .sp-record-main .flex-1 {
+    min-width: 0;
+    flex: 1;
+}
+
+body.c16-speaking-pro .sp-prompt-grid,
+body.c16-speaking-pro .sp-activity-grid {
+    display: grid;
+    gap: 0.625rem;
+    margin-top: 0.75rem;
+}
+
+body.c16-speaking-pro #listenActionArea,
+body.c16-speaking-pro #actionRow {
+    display: grid;
+    gap: 0.5rem;
+}
+
+body.c16-speaking-pro #listenActionArea {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.c16-speaking-pro #actionRow {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (min-width: 600px) and (max-height: 520px) {
+    body.c16-speaking-pro .sp-nav {
+        min-height: 34px !important;
+        padding-top: 4px !important;
+        padding-bottom: 4px !important;
+    }
+
+    body.c16-speaking-pro main {
+        padding-top: 6px;
+        padding-bottom: 1rem;
+    }
+
+    body.c16-speaking-pro .sp-c16-heading,
+    body.c16-speaking-pro .sp-page-intro {
+        margin-bottom: 6px;
+        padding: 6px 8px;
+    }
+
+    body.c16-speaking-pro .sp-c16-heading h1,
+    body.c16-speaking-pro .sp-page-intro h1 {
+        margin-top: 1px;
+        font-size: 1rem;
+        line-height: 1.2;
+    }
+
+    body.c16-speaking-pro .sp-c16-heading__formula,
+    body.c16-speaking-pro .sp-page-formula,
+    body.c16-speaking-pro .sp-c16-heading__action,
+    body.c16-speaking-pro .sp-page-action {
+        margin-top: 2px !important;
+        font-size: 0.76rem;
+        line-height: 1.3;
+    }
+
+    body.c16-speaking-pro .sp-item-card {
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+
+    body.c16-speaking-pro .sp-scene-head {
+        margin-bottom: 0;
+        gap: 8px;
+    }
+
+    body.c16-speaking-pro .sp-scene-title {
+        margin-top: 2px !important;
+        font-size: 1rem !important;
+        line-height: 1.2 !important;
+    }
+
+    body.c16-speaking-pro .sp-scene-icon {
+        font-size: 1.45rem !important;
+    }
+
+    body.c16-speaking-pro .sp-mini-badge {
+        padding: 3px 7px;
+        font-size: 10px;
+    }
+
+    body.c16-speaking-pro .sp-prompt-grid,
+    body.c16-speaking-pro .sp-activity-grid {
+        gap: 6px !important;
+        margin-top: 6px !important;
+    }
+
+    body.c16-speaking-pro .sp-question-box,
+    body.c16-speaking-pro .sp-answer-box {
+        border-radius: 12px;
+        padding: 7px 9px;
+    }
+
+    body.c16-speaking-pro .sp-question-text,
+    body.c16-speaking-pro .sp-answer-text {
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    body.c16-speaking-pro .sp-bubble-label {
+        margin-bottom: 3px;
+        font-size: 10px;
+    }
+
+    body.c16-speaking-pro .sp-activity-grid {
+        display: flex;
+        flex-direction: column;
+    }
+
+    body.c16-speaking-pro #recordArea {
+        order: -1;
+        display: flex;
+        flex-direction: column;
+        padding: 8px;
+    }
+
+    body.c16-speaking-pro #recordArea .sp-record-main {
+        order: -1;
+        gap: 8px;
+    }
+
+    body.c16-speaking-pro #statusBox {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    body.c16-speaking-pro .sp-record-area .sp-status-box {
+        margin: 0;
+    }
+
+    body.c16-speaking-pro .sp-record-button {
+        width: 52px;
+        min-height: 52px;
+        height: 52px;
+    }
+
+    body.c16-speaking-pro .sp-transcript {
+        min-height: 42px;
+        padding: 6px;
+        border-radius: 12px;
+        font-size: 11px;
+        line-height: 1.3;
+    }
+
+    body.c16-speaking-pro .sp-btn {
+        min-height: 34px;
+        padding: 0 8px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 420px) {
+    body.c16-speaking-pro main {
+        padding-top: 10px;
+    }
+
+    body.c16-speaking-pro .sp-c16-heading {
+        margin-bottom: 8px;
+        padding: 9px 10px;
+    }
+
+    body.c16-speaking-pro .sp-item-card {
+        padding: 12px;
+    }
+
+    body.c16-speaking-pro .sp-prompt-grid,
+    body.c16-speaking-pro .sp-activity-grid {
+        margin-top: 8px;
+    }
+
+    .sp-typed-fallback__row {
+        flex-direction: column;
+    }
 }
 
 .sp-status-text {

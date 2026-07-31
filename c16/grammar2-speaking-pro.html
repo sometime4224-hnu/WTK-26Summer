@@ -9,7 +9,7 @@
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>16과 문법 2 보조자료 | 말하기 연습 PRO</title>
     <script src="https://cdn.tailwindcss.com" defer></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -27,10 +27,64 @@
             --sp-secondary-soft: #ecfdf5;
             --sp-secondary-border: #86efac;
         }
+
+        .skip-link {
+            position: fixed;
+            top: 8px;
+            left: 8px;
+            z-index: 100;
+            transform: translateY(-150%);
+            border-radius: 8px;
+            padding: 9px 12px;
+            background: #0f172a;
+            color: #ffffff;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .skip-link:focus {
+            transform: translateY(0);
+        }
+
+        .sp-page-intro {
+            margin-bottom: 10px;
+            padding: 0 2px;
+        }
+
+        .sp-page-intro h1 {
+            margin: 0;
+            color: #0f172a;
+            font-size: 1.15rem;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+
+        .sp-page-formula,
+        .sp-page-action {
+            margin: 3px 0 0;
+            color: #475569;
+            font-size: .84rem;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .sp-page-formula {
+            color: #c2410c;
+            font-weight: 900;
+        }
+
+        .sp-modal-overlay.hidden {
+            display: none !important;
+        }
+
+        :focus-visible {
+            outline: 3px solid #ea580c;
+            outline-offset: 3px;
+        }
     </style>
     <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
 </head>
-<body class="speaking-pro-page">
+<body class="speaking-pro-page c16-speaking-pro">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -39,8 +93,12 @@
     <script>
         window.C15SpeakingProConfig = {
             storageKey: 'c16-grammar2-thinking-pro-v1',
+            c16Enhanced: true,
+            typedFallback: true,
+            requireAttempt: true,
+            persistSession: true,
             eyebrow: '16과 문법 2 보조자료',
-            title: '말하기 연습 PRO',
+            title: 'V-(으)ㄹ 생각도 못 하다 말하기',
             subtitle: '시간, 돈, 체력, 상황 때문에 엄두도 못 내는 장면을 V-(으)ㄹ 생각도 못 하다로 말해 보세요.',
             formula: 'V-(으)ㄹ 생각도 못 하다',
             emoji: '🚫',
@@ -153,7 +211,9 @@
         };
     </script>
 
-    <nav class="sp-nav">
+    <a class="skip-link" href="#speakingActivity">말하기 활동으로 건너뛰기</a>
+
+    <nav class="sp-nav" aria-label="페이지 이동">
         <a href="../index.html"><i class="fa-solid fa-house mr-1"></i>메인</a>
         <span class="sp-nav-divider">|</span>
         <a href="index.html">16과 목록</a>
@@ -164,7 +224,15 @@
     </nav>
 
     <main class="max-w-md mx-auto px-4 pt-4 pb-12">
-        <div id="mainArea"></div>
+        <header class="sp-page-intro" aria-labelledby="pageTitle">
+            <h1 id="pageTitle">문법 2 말하기 연습</h1>
+            <p id="pageFormula" class="sp-page-formula">V-(으)ㄹ 생각도 못 하다</p>
+            <p id="pageSubtitle" class="sp-page-action">모범 답안을 듣고, 같은 문장을 말하거나 입력해 보세요.</p>
+        </header>
+
+        <div id="speakingActivity" tabindex="-1">
+            <div id="mainArea"></div>
+        </div>
 
         <section id="sessionResult" class="hidden sp-card p-6 text-center">
             <div class="text-5xl mb-3">🚫</div>
@@ -195,11 +263,11 @@
         </section>
     </main>
 
-    <div id="historyModal" class="sp-modal-overlay hidden">
+    <div id="historyModal" class="sp-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="historyTitle" tabindex="-1">
         <div class="sp-modal">
             <div class="flex items-center justify-between gap-3 mb-4">
                 <div>
-                    <h2 class="text-lg font-black text-slate-800 m-0">학습 기록</h2>
+                    <h2 id="historyTitle" class="text-lg font-black text-slate-800 m-0">학습 기록</h2>
                     <p class="text-xs text-slate-500 mt-1 mb-0">문장별 최고 점수와 최근 인식 결과를 볼 수 있어요.</p>
                 </div>
                 <button id="closeHistoryBtn" class="sp-inline-btn" type="button">닫기</button>
@@ -212,7 +280,7 @@
         </div>
     </div>
 
+    <script src="../shared/c16-grammar-state.js"></script>
     <script src="../shared/c15-speaking-pro.js"></script>
-    <script src="../shared/page-qr.js"></script>
 </body>
 </html>

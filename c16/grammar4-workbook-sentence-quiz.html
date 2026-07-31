@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>16과 문법 4 | 워크북 문장 완성</title>
+    <link rel="stylesheet" href="../shared/c16-grammar-learning.css" />
+    <style>
+        :root {
+            --ink: #10233f;
+            --muted: #52657a;
+            --line: #cbd8e6;
+            --blue: #2563eb;
+            --blue-soft: #eaf2ff;
+            --green: #087f5b;
+            --green-soft: #e8f8f1;
+            --rose: #be123c;
+            --rose-soft: #fff1f3;
+            --amber: #a45709;
+            --amber-soft: #fff7e8;
+            --surface: #ffffff;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { -webkit-text-size-adjust: 100%; }
+
+        body {
+            margin: 0;
+            min-width: 0;
+            color: var(--ink);
+            font-family: "Noto Sans KR", system-ui, sans-serif;
+            background: linear-gradient(180deg, #f5f9ff 0%, #ffffff 58%);
+        }
+
+        button, input { font: inherit; }
+
+        a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+            outline: 3px solid #0f766e;
+            outline-offset: 3px;
+        }
+
+        .skip-link {
+            position: fixed;
+            top: -60px;
+            left: 12px;
+            z-index: 100;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #10233f;
+            color: #fff;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .skip-link:focus { top: 10px; }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-height: 46px;
+            padding: 0 14px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, .94);
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .topbar a { color: var(--blue); text-decoration: none; }
+
+        .topbar span { color: #a8b6c6; }
+
+        .shell { width: min(720px, calc(100% - 28px)); margin: 0 auto; padding: 18px 0 42px; }
+
+        .eyebrow {
+            display: inline-flex;
+            margin: 0 0 7px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: var(--blue-soft);
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        h1 { margin: 0; font-size: clamp(1.55rem, 5.5vw, 2.2rem); line-height: 1.18; font-weight: 950; }
+
+        .lead { margin: 9px 0 0; color: #334155; font-size: 1rem; font-weight: 750; line-height: 1.6; }
+
+        .card {
+            margin-top: 16px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: clamp(15px, 4vw, 24px);
+            background: var(--surface);
+            box-shadow: 0 14px 34px rgba(15, 35, 63, .07);
+        }
+
+        .progress-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 13px; font-weight: 900; }
+
+        .progress-track { height: 8px; overflow: hidden; margin-top: 8px; border-radius: 99px; background: #e5edf5; }
+
+        .progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), #0f766e); transition: width .2s ease; }
+
+        .context { margin: 22px 0 0; color: #334155; font-size: 1.05rem; font-weight: 800; line-height: 1.6; }
+
+        .question { margin: 6px 0 0; color: var(--ink); font-size: clamp(1.25rem, 4vw, 1.55rem); font-weight: 950; line-height: 1.35; }
+
+        .step { margin: 23px 0 8px; color: #334155; font-size: 13px; font-weight: 950; }
+
+        .type-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+
+        .type-choice, .action-button, .next-button {
+            min-height: 46px;
+            border: 1px solid #9ebce9;
+            border-radius: 12px;
+            padding: 9px 12px;
+            background: #fff;
+            color: #1e3a5f;
+            cursor: pointer;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+
+        .type-choice[aria-pressed="true"] { border-color: var(--blue); background: var(--blue); color: #fff; }
+
+        .type-choice.is-wrong-type { border-color: #fb7185; background: var(--rose-soft); color: var(--rose); }
+
+        .answer-area { margin-top: 16px; padding: 14px; border: 1px solid #d6e2ee; border-radius: 14px; background: #f8fbff; }
+
+        .answer-area[hidden] { display: none; }
+
+        .sentence-frame { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; margin: 0; color: var(--ink); font-size: clamp(1.13rem, 4vw, 1.36rem); font-weight: 900; line-height: 1.65; }
+
+        .answer-input {
+            width: min(100%, 300px);
+            min-height: 43px;
+            border: 2px solid #9ebce9;
+            border-radius: 10px;
+            padding: 7px 10px;
+            background: #fff;
+            color: var(--ink);
+            font-weight: 850;
+        }
+
+        .answer-input:disabled { border-color: #9bdcc5; background: #f5fffa; }
+
+        .input-note { margin: 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; line-height: 1.5; }
+
+        .button-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+
+        .action-button.primary, .next-button { border-color: var(--blue); background: var(--blue); color: #fff; }
+
+        .action-button.warm { border-color: #f2b76a; background: var(--amber-soft); color: #8b4a08; }
+
+        .next-button:disabled { border-color: #d4dee9; background: #e8eef5; color: #8090a1; cursor: not-allowed; }
+
+        .feedback {
+            min-height: 25px;
+            margin: 14px 0 0;
+            padding: 10px 12px;
+            border-radius: 10px;
+            color: #334155;
+            background: #f1f5f9;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.55;
+        }
+
+        .feedback.good { color: #075c43; background: var(--green-soft); }
+        .feedback.bad { color: #9f1239; background: var(--rose-soft); }
+        .feedback.hint { color: #85460a; background: var(--amber-soft); }
+
+        details { margin-top: 13px; border: 1px solid #d6e2ee; border-radius: 11px; background: #fff; }
+        summary { padding: 10px 12px; color: #334155; cursor: pointer; font-size: 13px; font-weight: 900; }
+        .hint-copy { margin: 0; padding: 0 12px 12px; color: #52657a; font-size: 13px; font-weight: 700; line-height: 1.55; }
+
+        .summary-card[hidden] { display: none; }
+        .summary-card h2 { margin: 0; font-size: 1.35rem; }
+        .summary-card p { color: #334155; font-weight: 750; line-height: 1.6; }
+
+        .optional { margin-top: 16px; }
+        .optional summary { font-size: 15px; }
+        .optional-links { display: grid; gap: 8px; padding: 0 12px 12px; }
+        .optional-links a { color: #1d4ed8; font-weight: 850; line-height: 1.45; }
+
+        @media (max-width: 430px) {
+            .shell { width: min(100% - 18px, 720px); padding-top: 12px; }
+            .card { border-radius: 14px; padding: 14px; }
+            .type-grid { grid-template-columns: 1fr; }
+            .answer-input { width: 100%; }
+            .button-row > * { flex: 1 1 auto; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">본문으로 건너뛰기</a>
+    <nav class="topbar" aria-label="문법 4 이동">
+        <a href="index.html">16과 목록</a><span>›</span><a href="grammar4.html">문법 4</a><span>›</span><strong>핵심 연습</strong>
+    </nav>
+
+    <main class="shell" id="main-content">
+        <p class="eyebrow">문법 4 · 핵심 5문항</p>
+        <h1>A/V-기로 유명하다 · N(으)로 유명하다</h1>
+        <p class="lead">첫 행동: 문장에 맞는 유형을 고르고, 빈칸을 완성하세요.</p>
+
+        <section class="card" id="quizCard" aria-labelledby="quizHeading">
+            <div class="progress-row"><span id="progressLabel">1 / 5</span><span id="savedLabel">자동 저장됨</span></div>
+            <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+            <div id="quizContent"></div>
+            <div data-c16-state-tools></div>
+        </section>
+
+        <section class="card summary-card" id="summaryCard" hidden aria-labelledby="summaryHeading">
+            <h2 id="summaryHeading">핵심 문장 5개를 완성했어요</h2>
+            <p id="summaryText"></p>
+            <div class="button-row"><a class="next-button" href="grammar4-speaking-pro.html">이 표현으로 말하기</a><button class="action-button" id="restartBtn" type="button">다시 풀기</button></div>
+        </section>
+
+        <details class="optional">
+            <summary>한국 문화 탐색 (선택)</summary>
+            <div class="optional-links">
+                <a href="grammar4-korea-map-match.html">한국 지역·대표 명사 탐색</a>
+                <a href="grammar4-korea-then-now-map.html">한국 문화의 과거와 현재 탐색</a>
+            </div>
+        </details>
+        <details class="optional">
+            <summary>다른 문화와 비교 (선택)</summary>
+            <div class="optional-links">
+                <a href="grammar4-vietnam-map-match.html">베트남 문화 자료와 비교하기</a>
+                <a href="grammar4-vietnam-then-now-map.html">베트남의 과거와 현재 비교하기</a>
+            </div>
+        </details>
+    </main>
+
+    <script src="../shared/c16-grammar-state.js"></script>
+    <script>
+        (() => {
+            const questions = [
+                {
+                    id: 'dongdaemun', type: 'feature', place: '동대문시장은', context: '동대문시장은 쇼핑이 편리해요.',
+                    question: '어떤 특징으로 유명해요?', answer: '쇼핑이 편리하기로', hint: ['무엇이 편리한지 넣어 보세요.', '형용사 + 기로를 씁니다.', '쇼핑이 편리하기로']
+                },
+                {
+                    id: 'east-sea', type: 'feature', place: '동해는', context: '동해는 바다가 깨끗해요.',
+                    question: '어떤 특징으로 유명해요?', answer: '바다가 깨끗하기로', hint: ['무엇이 깨끗한지 넣어 보세요.', '형용사 + 기로를 씁니다.', '바다가 깨끗하기로']
+                },
+                {
+                    id: 'korea', type: 'feature', place: '한국은', context: '한국은 인터넷 속도가 빨라요.',
+                    question: '어떤 특징으로 유명해요?', answer: '인터넷 속도가 빠르기로', hint: ['무엇의 속도가 빠른지 넣어 보세요.', '빠르다 → 빠르기로를 씁니다.', '인터넷 속도가 빠르기로']
+                },
+                {
+                    id: 'ulleungdo', type: 'noun', place: '울릉도는', context: '울릉도의 대표 명사는 오징어예요.',
+                    question: '무엇으로 유명해요?', answer: '오징어', hint: ['대표 명사 하나를 넣어 보세요.', '명사 뒤에는 로/으로가 자동으로 붙습니다.', '오징어']
+                },
+                {
+                    id: 'jeonju', type: 'noun', place: '전주는', context: '전주의 대표 명사는 전주비빔밥이에요.',
+                    question: '무엇으로 유명해요?', answer: '전주비빔밥', hint: ['대표 음식 이름을 넣어 보세요.', '받침이 있으면 으로가 붙습니다.', '전주비빔밥']
+                }
+            ];
+
+            const labels = { feature: '특징·평가', noun: '대표 명사' };
+            const initialState = { index: 0, records: {}, completed: false };
+            let state = { ...initialState };
+            let store;
+            let lastFocusedChoice = null;
+
+            const quizContent = document.getElementById('quizContent');
+            const quizCard = document.getElementById('quizCard');
+            const summaryCard = document.getElementById('summaryCard');
+            const summaryText = document.getElementById('summaryText');
+            const progressLabel = document.getElementById('progressLabel');
+            const progressFill = document.getElementById('progressFill');
+
+            function recordFor(question) {
+                const existing = state.records[question.id] || {};
+                return {
+                    selectedType: typeof existing.selectedType === 'string' ? existing.selectedType : '',
+                    value: typeof existing.value === 'string' ? existing.value : '',
+                    attempts: Number.isInteger(existing.attempts) ? existing.attempts : 0,
+                    hintLevel: Number.isInteger(existing.hintLevel) ? existing.hintLevel : 0,
+                    correct: existing.correct === true,
+                    revealed: existing.revealed === true
+                };
+            }
+
+            function save() { store.save(state); }
+
+            function normalize(text) {
+                return String(text || '').toLowerCase().replace(/\s+/g, '').replace(/[.,!?~·:;()[\]{}'"“”‘’]/g, '');
+            }
+
+            function hasBatchim(text) {
+                const char = String(text || '').trim().slice(-1);
+                const code = char.charCodeAt(0);
+                return code >= 0xac00 && code <= 0xd7a3 && (code - 0xac00) % 28 !== 0;
+            }
+
+            function roParticle(text) {
+                const char = String(text || '').trim().slice(-1);
+                const code = char.charCodeAt(0);
+                const final = code >= 0xac00 && code <= 0xd7a3 ? (code - 0xac00) % 28 : 0;
+                return final !== 0 && final !== 8 ? '으로' : '로';
+            }
+
+            function normalizeNounEntry(value) {
+                const text = String(value || '').trim();
+                if (text.endsWith('으로')) return text.slice(0, -2).trim();
+                if (text.endsWith('로')) return text.slice(0, -1).trim();
+                return text;
+            }
+
+            function expectedFrame(question) {
+                if (question.type === 'noun') return `${question.place} ${question.answer}${roParticle(question.answer)} 유명해요.`;
+                return `${question.place} ${question.answer} 유명해요.`;
+            }
+
+            function isAnswerCorrect(question, value) {
+                const answer = normalize(question.answer);
+                const entered = normalize(question.type === 'noun' ? normalizeNounEntry(value) : value);
+                if (question.type === 'noun') {
+                    return entered === answer;
+                }
+                return entered === answer;
+            }
+
+            function render() {
+                const done = state.completed || state.index >= questions.length;
+                quizCard.hidden = done;
+                summaryCard.hidden = !done;
+                if (done) {
+                    const correctCount = questions.filter((question) => recordFor(question).correct).length;
+                    const revealCount = questions.filter((question) => recordFor(question).revealed && !recordFor(question).correct).length;
+                    summaryText.textContent = `직접 완성 ${correctCount}문항${revealCount ? ` · 정답 확인 ${revealCount}문항` : ''}입니다. 한국 문화의 특징과 대표 명사를 말해 보세요.`;
+                    return;
+                }
+                const question = questions[state.index];
+                const record = recordFor(question);
+                const typeIsCorrect = record.selectedType === question.type;
+                const finished = record.correct || record.revealed;
+                const particle = question.type === 'noun' ? roParticle(question.answer) : '';
+                progressLabel.textContent = `${state.index + 1} / ${questions.length}`;
+                progressFill.style.width = `${(state.index / questions.length) * 100}%`;
+                quizContent.innerHTML = `
+                    <p class="context">${question.context}</p>
+                    <h2 class="question" id="quizHeading" tabindex="-1">${question.question}</h2>
+                    <p class="step">1. 유형을 고르세요</p>
+                    <div class="type-grid" role="group" aria-label="표현 유형 선택">
+                        ${Object.entries(labels).map(([type, label]) => `<button class="type-choice ${record.selectedType === type && type !== question.type ? 'is-wrong-type' : ''}" type="button" data-type="${type}" aria-pressed="${record.selectedType === type}">${label}</button>`).join('')}
+                    </div>
+                    <section class="answer-area" id="answerArea" ${typeIsCorrect ? '' : 'hidden'} aria-labelledby="answerLabel">
+                        <p class="step" id="answerLabel">2. 빈칸을 완성하세요</p>
+                        <p class="sentence-frame"><span>${question.place}</span><input class="answer-input" id="answerInput" type="text" autocomplete="off" value="${escapeHtml(record.value)}" ${finished ? 'disabled' : ''} aria-describedby="inputNote" /><span>${particle} 유명해요.</span></p>
+                        <p class="input-note" id="inputNote">${question.type === 'noun' ? '명사만 입력하면 로/으로는 자동으로 붙습니다.' : '문장 속 특징·평가 표현을 입력하세요.'}</p>
+                        <div class="button-row">
+                            <button class="action-button primary" id="checkBtn" type="button" ${finished ? 'disabled' : ''}>입력 확인</button>
+                            <button class="action-button warm" id="revealBtn" type="button" ${finished ? 'disabled' : ''}>정답 확인</button>
+                        </div>
+                    </section>
+                    <p class="feedback ${feedbackTone(question, record)}" id="feedback" role="status" aria-live="polite">${feedbackText(question, record)}</p>
+                    <details><summary>힌트 ${record.hintLevel ? `${record.hintLevel}/3` : '열기'}</summary><p class="hint-copy" id="hintCopy">${hintText(question, record)}</p><div class="button-row"><button class="action-button" id="hintBtn" type="button" ${record.hintLevel >= 3 ? 'disabled' : ''}>다음 힌트</button></div></details>
+                    <div class="button-row"><button class="next-button" id="nextBtn" type="button" ${finished ? '' : 'disabled'}>${state.index === questions.length - 1 ? '결과 보기' : '다음 문항'}</button></div>
+                `;
+                bind(question, record);
+                if (lastFocusedChoice) {
+                    const target = document.querySelector(lastFocusedChoice);
+                    if (target) target.focus();
+                    lastFocusedChoice = null;
+                }
+            }
+
+            function feedbackText(question, record) {
+                if (!record.selectedType) return '유형을 먼저 고르세요.';
+                if (record.selectedType !== question.type) return `다시 선택해 보세요. 이 문장은 ${labels[question.type]}을 말해요.`;
+                if (record.correct) return `맞아요. ${expectedFrame(question)}`;
+                if (record.revealed) return `정답: ${expectedFrame(question)} 다음 문항으로 갈 수 있어요.`;
+                if (record.attempts) return '조금 달라요. 힌트를 보거나 다시 입력해 보세요.';
+                return '빈칸에 표현을 입력한 뒤 확인하세요.';
+            }
+
+            function feedbackTone(question, record) {
+                if (record.correct || record.revealed) return 'good';
+                if (record.selectedType && record.selectedType !== question.type) return 'bad';
+                if (record.attempts) return 'bad';
+                return '';
+            }
+
+            function hintText(question, record) {
+                if (!record.hintLevel) return '필요할 때만 한 단계씩 여세요.';
+                return question.hint.slice(0, record.hintLevel).map((hint, index) => `${index + 1}. ${hint}`).join(' ');
+            }
+
+            function bind(question, record) {
+                document.querySelectorAll('[data-type]').forEach((button) => {
+                    button.addEventListener('click', () => {
+                        const next = recordFor(question);
+                        next.selectedType = button.dataset.type;
+                        state.records[question.id] = next;
+                        save();
+                        lastFocusedChoice = `[data-type="${next.selectedType}"]`;
+                        render();
+                    });
+                });
+                const input = document.getElementById('answerInput');
+                const check = document.getElementById('checkBtn');
+                const reveal = document.getElementById('revealBtn');
+                const next = document.getElementById('nextBtn');
+                const hint = document.getElementById('hintBtn');
+                const checkAnswer = () => {
+                    const nextRecord = recordFor(question);
+                    nextRecord.value = question.type === 'noun' ? normalizeNounEntry(input.value) : input.value;
+                    nextRecord.attempts += 1;
+                    nextRecord.correct = isAnswerCorrect(question, nextRecord.value);
+                    state.records[question.id] = nextRecord;
+                    save();
+                    render();
+                    if (!nextRecord.correct) document.getElementById('answerInput')?.focus();
+                };
+                if (check) check.addEventListener('click', checkAnswer);
+                if (input) input.addEventListener('keydown', (event) => { if (event.key === 'Enter') { event.preventDefault(); checkAnswer(); } });
+                if (reveal) reveal.addEventListener('click', () => {
+                    const nextRecord = recordFor(question);
+                    nextRecord.value = question.answer;
+                    nextRecord.revealed = true;
+                    state.records[question.id] = nextRecord;
+                    save();
+                    render();
+                    document.getElementById('nextBtn')?.focus();
+                });
+                if (hint) hint.addEventListener('click', () => {
+                    const nextRecord = recordFor(question);
+                    nextRecord.hintLevel = Math.min(3, nextRecord.hintLevel + 1);
+                    state.records[question.id] = nextRecord;
+                    save();
+                    render();
+                    document.querySelector('summary')?.focus();
+                });
+                if (next) next.addEventListener('click', () => {
+                    if (!(recordFor(question).correct || recordFor(question).revealed)) return;
+                    if (state.index >= questions.length - 1) state.completed = true;
+                    else state.index += 1;
+                    save();
+                    render();
+                    document.getElementById('quizHeading')?.focus();
+                });
+            }
+
+            function escapeHtml(value) {
+                return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            }
+
+            store = window.C16GrammarState.create('grammar4-workbook-sentence-quiz', initialState, {
+                validate(saved) {
+                    return Boolean(saved && Number.isInteger(saved.index) && saved.index >= 0 && saved.index < questions.length
+                        && saved.records && typeof saved.records === 'object' && typeof saved.completed === 'boolean');
+                },
+                onReset(fresh) { state = fresh; render(); }
+            });
+            state = store.get();
+            store.mount(document.querySelector('[data-c16-state-tools]'), () => state);
+            store.track(() => state);
+            document.getElementById('restartBtn').addEventListener('click', () => {
+                state = JSON.parse(JSON.stringify(initialState));
+                save();
+                render();
+                document.getElementById('quizHeading')?.focus();
+            });
+            render();
+        })();
+    </script>
+    <script src="../shared/site-copyright.js"></script>
+</body>
+</html>

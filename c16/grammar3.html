@@ -9,7 +9,7 @@
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>16과 문법 3 | V-(으)ㄹ 만하다</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <style>
@@ -372,14 +372,17 @@
         }
     </style>
     <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="../shared/c16-grammar-learning.css" />
 </head>
-<body>
+<body class="c16-grammar-main">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    <nav class="topbar">
+    <a class="c16-skip-link" href="#learning-task">문법 확인으로 건너뛰기</a>
+
+    <nav class="topbar" aria-label="16과 이동">
         <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
         <span>|</span>
         <a href="index.html">16과 목록</a>
@@ -388,10 +391,10 @@
     </nav>
 
     <main class="shell">
-        <section class="hero" data-multilang-anchor>
+        <section class="hero" data-multilang-anchor data-c16-hero>
             <p class="eyebrow">Grammar 3</p>
             <h1>V-(으)ㄹ 만하다</h1>
-            <p class="lead">직접 해 보거나 가 볼 가치가 있을 때 쓰는 추천 표현입니다. 여행지, 활동, 음식, 체험을 소개할 때 이유를 함께 말하면 훨씬 자연스럽습니다.</p>
+            <p class="lead">목표: 해 보거나 가 볼 가치가 있는 일을 이유와 함께 추천해요.</p>
             <div class="chips">
                 <span class="chip"><i class="fa-solid fa-thumbs-up"></i> 가 볼 만해요</span>
                 <span class="chip"><i class="fa-solid fa-person-swimming"></i> 타 볼 만해요</span>
@@ -399,7 +402,7 @@
             </div>
         </section>
 
-        <section class="section grid">
+        <section class="section grid" data-c16-explanation>
             <article class="card">
                 <p class="eyebrow">Meaning</p>
                 <h2>추천할 가치</h2>
@@ -420,7 +423,7 @@
             </article>
         </section>
 
-        <section class="section card">
+        <section class="section card" data-c16-explanation>
             <p class="eyebrow">Examples</p>
             <h2>장소와 활동을 함께 말해요</h2>
             <div class="examples">
@@ -443,21 +446,24 @@
             </div>
         </section>
 
-        <section class="section quiz" aria-labelledby="quizTitle">
+        <section id="learning-task" class="section quiz" aria-labelledby="quizTitle">
             <div class="quiz-head">
                 <div>
                     <p class="eyebrow">Quick Check</p>
                     <h2 id="quizTitle">추천 문장 고르기</h2>
+                    <p class="c16-action-line">권할 만한 상황에 가장 자연스러운 문장을 고르세요.</p>
                 </div>
                 <span id="count" class="count">1 / 4</span>
             </div>
             <p id="prompt"></p>
             <div id="choices" class="choices"></div>
-            <div id="feedback" class="feedback"></div>
-            <div class="actions">
+            <div id="feedback" class="feedback" role="status" aria-live="polite"></div>
+            <div class="actions c16-quiz-actions">
                 <button id="nextBtn" class="btn primary" type="button" disabled>다음</button>
+                <button id="revealBtn" class="btn" type="button" hidden>정답 보기</button>
                 <button id="resetBtn" class="btn" type="button">처음부터</button>
             </div>
+            <div data-c16-state-tools></div>
         </section>
 
         <section class="section card">
@@ -479,99 +485,44 @@
         </nav>
     </main>
 
+    <script src="../shared/c16-grammar-state.js"></script>
+    <script src="../shared/c16-grammar-main-ux.js"></script>
     <script>
-        const quiz = [
-            {
-                prompt: '친구에게 진해 벚꽃 길을 추천하고 싶어요.',
-                choices: ['진해 벚꽃 길은 정말 가 볼 만해요.', '진해 벚꽃 길은 길이 길어요.', '진해 벚꽃 길은 봄이에요.'],
-                answer: 0,
-                feedback: '추천할 가치가 있다는 뜻이므로 “가 볼 만해요”가 자연스럽습니다.'
+        window.C16GrammarMainUX.initQuiz({
+            pageId: 'grammar3',
+            quiz: [
+                {
+                    prompt: '친구에게 진해 벚꽃 길을 추천하고 싶어요.',
+                    choices: ['진해 벚꽃 길은 길이 길어요.', '진해 벚꽃 길은 봄이에요.', '진해 벚꽃 길은 정말 가 볼 만해요.'],
+                    answer: 2,
+                    feedback: '추천할 가치가 있다는 뜻이므로 “가 볼 만해요”가 자연스럽습니다.'
+                },
+                {
+                    prompt: '청평에서 수상 스키를 경험해 보라고 권하고 싶어요.',
+                    choices: ['청평에서 수상 스키를 타 볼 만해요.', '청평에서 수상 스키가 빨라요.', '청평에서 수상 스키를 봐요.'],
+                    answer: 0,
+                    feedback: '활동을 권할 때는 “타 볼 만해요”처럼 말합니다.'
+                },
+                {
+                    prompt: '음식이 조금 맵지만 한 번 먹어 볼 가치가 있어요.',
+                    choices: ['이 음식은 매워도 맛이 있어요.', '이 음식은 매워도 먹어 볼 만해요.', '이 음식은 매워도 음식이에요.'],
+                    answer: 1,
+                    feedback: '부담이 있어도 추천할 수 있으면 “먹어 볼 만해요”가 맞습니다.'
+                },
+                {
+                    prompt: '안동에서 한옥 체험을 추천하고 싶어요.',
+                    choices: ['안동에서는 한옥 체험도 있어요.', '안동에서는 한옥 체험도 재미있어요.', '안동에서는 한옥 체험도 해 볼 만해요.'],
+                    answer: 2,
+                    feedback: '체험을 권하는 문장이므로 “해 볼 만해요”가 자연스럽습니다.'
+                }
+            ],
+            elements: {
+                prompt: '#prompt', choices: '#choices', feedback: '#feedback', count: '#count',
+                next: '#nextBtn', restart: '#resetBtn', reveal: '#revealBtn'
             },
-            {
-                prompt: '청평에서 수상 스키를 경험해 보라고 권하고 싶어요.',
-                choices: ['청평에서 수상 스키를 타 볼 만해요.', '청평에서 수상 스키가 빨라요.', '청평에서 수상 스키를 봐요.'],
-                answer: 0,
-                feedback: '활동을 권할 때는 “타 볼 만해요”처럼 말합니다.'
-            },
-            {
-                prompt: '음식이 조금 맵지만 한 번 먹어 볼 가치가 있어요.',
-                choices: ['이 음식은 매워도 먹어 볼 만해요.', '이 음식은 매워도 맛이 있어요.', '이 음식은 매워도 음식이에요.'],
-                answer: 0,
-                feedback: '부담이 있어도 추천할 수 있으면 “먹어 볼 만해요”가 맞습니다.'
-            },
-            {
-                prompt: '안동에서 한옥 체험을 추천하고 싶어요.',
-                choices: ['안동에서는 한옥 체험도 해 볼 만해요.', '안동에서는 한옥 체험도 있어요.', '안동에서는 한옥 체험도 재미있어요.'],
-                answer: 0,
-                feedback: '체험을 권하는 문장이므로 “해 볼 만해요”가 자연스럽습니다.'
-            }
-        ];
-
-        const promptEl = document.getElementById('prompt');
-        const choicesEl = document.getElementById('choices');
-        const feedbackEl = document.getElementById('feedback');
-        const countEl = document.getElementById('count');
-        const nextBtn = document.getElementById('nextBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const state = { index: 0, score: 0, answered: false };
-
-        function render() {
-            const item = quiz[state.index];
-            state.answered = false;
-            promptEl.textContent = item.prompt;
-            countEl.textContent = (state.index + 1) + ' / ' + quiz.length;
-            feedbackEl.className = 'feedback';
-            feedbackEl.textContent = '';
-            nextBtn.disabled = true;
-            nextBtn.textContent = state.index === quiz.length - 1 ? '결과' : '다음';
-            choicesEl.innerHTML = '';
-            item.choices.forEach(function (choice, idx) {
-                const btn = document.createElement('button');
-                btn.className = 'choice';
-                btn.type = 'button';
-                btn.textContent = choice;
-                btn.addEventListener('click', function () {
-                    if (state.answered) return;
-                    state.answered = true;
-                    Array.from(choicesEl.children).forEach(function (child, childIdx) {
-                        child.disabled = true;
-                        if (childIdx === item.answer) child.classList.add('correct');
-                        if (childIdx === idx && idx !== item.answer) child.classList.add('wrong');
-                    });
-                    if (idx === item.answer) state.score += 1;
-                    feedbackEl.className = 'feedback show ' + (idx === item.answer ? 'ok' : 'bad');
-                    feedbackEl.textContent = (idx === item.answer ? '정답! ' : '다시 확인! ') + item.feedback;
-                    nextBtn.disabled = false;
-                });
-                choicesEl.appendChild(btn);
-            });
-        }
-
-        function summary() {
-            promptEl.textContent = '완료: ' + state.score + ' / ' + quiz.length;
-            choicesEl.innerHTML = '<div class="sentence">추천하고 싶을 때는 활동 뒤에 “-아/어 볼 만해요”를 붙이면 말이 빠르게 만들어집니다.</div>';
-            feedbackEl.className = 'feedback';
-            feedbackEl.textContent = '';
-            countEl.textContent = '완료';
-            nextBtn.disabled = true;
-        }
-
-        nextBtn.addEventListener('click', function () {
-            if (state.index === quiz.length - 1) {
-                summary();
-                return;
-            }
-            state.index += 1;
-            render();
+            choiceClass: 'choice',
+            summaryText: '추천하고 싶을 때는 활동 뒤에 “-아/어 볼 만해요”를 붙여 보세요.'
         });
-
-        resetBtn.addEventListener('click', function () {
-            state.index = 0;
-            state.score = 0;
-            render();
-        });
-
-        render();
     </script>
     <script src="../shared/site-copyright.js"></script>
     <script src="../shared/multilang-page-data.js"></script>
@@ -581,6 +532,5 @@
     <script src="../shared/multilang-page-data-th.js"></script>
     <script src="../shared/multilang-page-scaffold.js"></script>
     <script src="../shared/multilang-toggle.js"></script>
-    <script src="../shared/page-qr.js"></script>
 </body>
 </html>

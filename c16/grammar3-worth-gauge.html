@@ -9,7 +9,7 @@
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>16과 문법 3 보조자료 | 해 볼 만 기준선</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <style>
@@ -46,6 +46,12 @@
 
         button {
             font: inherit;
+        }
+
+        button:focus-visible,
+        a:focus-visible {
+            outline: 3px solid #0f766e;
+            outline-offset: 3px;
         }
 
         .topbar {
@@ -223,6 +229,30 @@
 
         .panel {
             padding: 12px;
+        }
+
+        .task-heading {
+            margin: 0 0 10px;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 950;
+        }
+
+        .decision-feedback {
+            min-height: 24px;
+            margin: 10px 0 0;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+
+        .decision-feedback.is-correct {
+            color: var(--accent-dark);
+        }
+
+        .decision-feedback.is-wrong {
+            color: #be123c;
         }
 
         .activity-grid {
@@ -470,10 +500,21 @@
                 height: 34px;
             }
         }
+
+        @media (min-width: 600px) and (max-height: 520px) {
+            .topbar {
+                min-height: 36px;
+            }
+
+            .shell {
+                padding-top: 6px;
+            }
+        }
     </style>
     <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="../shared/c16-grammar-learning.css" />
 </head>
-<body>
+<body class="c16-grammar-support">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -488,46 +529,40 @@
     </nav>
 
     <main class="shell">
-        <section class="layout" aria-label="해 볼 만 기준선">
+        <section class="layout" aria-label="해 볼 만하다 판단 연습">
             <div class="workspace">
                 <section class="sentence-panel" aria-live="polite">
-                    <div class="sentence-meta" id="sentenceMeta"></div>
-                    <p class="sentence" id="sentenceText"></p>
+                    <div class="sentence-meta"><span class="badge good">한 과제</span></div>
+                    <p class="sentence" id="sentenceText">걸림돌이 있어도 해 볼 가치가 충분한지 판단하세요.</p>
                     <div class="chip-row" id="chipRow"></div>
                 </section>
 
-                <section class="contrast-panel" aria-label="해 볼 만하다 기준선 판단">
-                    <article class="contrast-card is-blocked" id="blockedCard">
-                        <strong><i class="fa-solid fa-circle-minus"></i> 기준 미달</strong>
-                        <p id="blockedText"></p>
-                    </article>
-                    <article class="contrast-card is-active" id="worthCard">
-                        <strong><i class="fa-solid fa-circle-check"></i> 기준 통과</strong>
-                        <p id="worthText"></p>
-                    </article>
-                </section>
-
-                <section class="panel">
+                <section class="panel" aria-labelledby="activityHeading">
+                    <h2 class="task-heading" id="activityHeading">1. 상황 선택</h2>
                     <div class="activity-grid" id="activityGrid"></div>
                 </section>
             </div>
 
             <aside class="side">
-                <section class="panel">
-                    <div class="level-grid" id="levelGrid"></div>
-                </section>
-
-                <section class="panel">
+                <section class="panel" aria-labelledby="reasonHeading">
+                    <h2 class="task-heading" id="reasonHeading">2. 근거 읽기</h2>
                     <div class="reason-pair">
                         <div class="reason-card">
                             <p>걸림돌</p>
                             <strong id="obstacleText"></strong>
                         </div>
                         <div class="reason-card">
-                            <p>가치 근거</p>
+                            <p id="reasonLabel">가치 근거</p>
                             <strong id="valueText"></strong>
                         </div>
                     </div>
+                </section>
+
+                <section class="panel" aria-labelledby="decisionHeading">
+                    <h2 class="task-heading" id="decisionHeading">3. 판단</h2>
+                    <div class="level-grid" id="levelGrid"></div>
+                    <p class="decision-feedback" id="feedback" role="status" aria-live="polite">판단을 고르면 바로 확인할 수 있어요.</p>
+                    <div data-c16-state-tools></div>
                 </section>
             </aside>
         </section>
@@ -539,6 +574,7 @@
         </nav>
     </main>
 
+    <script src="../shared/c16-grammar-state.js"></script>
     <script>
         const activities = [
             {
@@ -548,7 +584,8 @@
                 action: '진해에 가 볼',
                 obstacle: '사람이 많아도',
                 value: '벚꽃 길이 아름다워서',
-                blocked: '사람이 너무 많고 꽃이 많이 져서 지금은 진해에 가 볼 만하지 않아요.'
+                blocked: '사람이 너무 많고 꽃이 많이 져서 지금은 진해에 가 볼 만하지 않아요.',
+                isWorth: true
             },
             {
                 id: 'ski',
@@ -557,7 +594,8 @@
                 action: '수상 스키를 타 볼',
                 obstacle: '가격이 조금 비싸도',
                 value: '처음 해 보는 경험이라서',
-                blocked: '가격이 비싸고 시간이 짧아서 수상 스키를 타 볼 만하지 않아요.'
+                blocked: '가격이 비싸고 시간이 짧아서 수상 스키를 타 볼 만하지 않아요.',
+                isWorth: true
             },
             {
                 id: 'food',
@@ -566,7 +604,8 @@
                 action: '떡볶이를 먹어 볼',
                 obstacle: '좀 매워도',
                 value: '맛이 좋아서',
-                blocked: '너무 맵고 줄이 길어서 떡볶이를 먹어 볼 만하지 않아요.'
+                blocked: '너무 맵고 줄이 길어서 떡볶이를 먹어 볼 만하지 않아요.',
+                isWorth: true
             },
             {
                 id: 'hanok',
@@ -575,7 +614,8 @@
                 action: '한옥 체험을 해 볼',
                 obstacle: '시간이 조금 걸려도',
                 value: '전통 문화를 느낄 수 있어서',
-                blocked: '시간이 오래 걸리고 프로그램이 짧아서 한옥 체험을 해 볼 만하지 않아요.'
+                blocked: '시간이 오래 걸리고 프로그램이 짧아서 한옥 체험을 해 볼 만하지 않아요.',
+                isWorth: true
             },
             {
                 id: 'bike',
@@ -584,16 +624,18 @@
                 action: '자전거를 타 볼',
                 obstacle: '조금 힘들어도',
                 value: '강바람이 시원해서',
-                blocked: '길이 복잡하고 자전거 상태가 안 좋아서 자전거를 타 볼 만하지 않아요.'
+                blocked: '길이 복잡하고 자전거 상태가 안 좋아서 자전거를 타 볼 만하지 않아요.',
+                isWorth: true
             },
             {
                 id: 'museum',
                 icon: 'fa-landmark',
                 title: '박물관 전시',
                 action: '전시를 볼',
-                obstacle: '입장 줄이 길어도',
-                value: '자료가 알차서',
-                blocked: '입장료가 비싸고 전시가 짧아서 전시를 볼 만하지 않아요.'
+                obstacle: '입장료가 비싸고',
+                value: '전시 시간이 너무 짧아서',
+                blocked: '입장료가 비싸고 전시가 짧아서 전시를 볼 만하지 않아요.',
+                isWorth: false
             },
             {
                 id: 'walk',
@@ -602,7 +644,8 @@
                 action: '산책길을 걸어 볼',
                 obstacle: '날씨가 조금 흐려도',
                 value: '길이 조용해서',
-                blocked: '비가 오고 길이 미끄러워서 산책길을 걸어 볼 만하지 않아요.'
+                blocked: '비가 오고 길이 미끄러워서 산책길을 걸어 볼 만하지 않아요.',
+                isWorth: true
             },
             {
                 id: 'bibimbap',
@@ -611,63 +654,55 @@
                 action: '비빔밥을 먹어 볼',
                 obstacle: '가격이 조금 비싸도',
                 value: '재료가 신선해서',
-                blocked: '가격이 너무 비싸고 양이 적어서 비빔밥을 먹어 볼 만하지 않아요.'
+                blocked: '가격이 너무 비싸고 양이 적어서 비빔밥을 먹어 볼 만하지 않아요.',
+                isWorth: true
             }
         ];
 
-        const levels = [
+        const decisions = [
             {
-                id: 0,
-                label: '기준 미달',
-                mode: '해 볼 만하지 않아요',
+                id: 'not-worth',
+                label: '해 볼 만하지 않아요',
+                mode: '가치가 부족해요',
                 icon: 'fa-circle-minus',
                 badge: 'bad'
             },
             {
-                id: 1,
-                label: '기준 통과',
-                mode: '해 볼 만해요',
+                id: 'worth',
+                label: '해 볼 만해요',
+                mode: '가치가 충분해요',
                 icon: 'fa-circle-check',
                 badge: 'good'
-            },
-            {
-                id: 2,
-                label: '충분히 가치 있음',
-                mode: '정말 해 볼 만해요',
-                icon: 'fa-star',
-                badge: 'mid'
             }
         ];
 
-        const state = {
+        const initialState = {
             activityIndex: 0,
-            level: 1
+            decision: ''
         };
+        let state = { ...initialState };
+        let store = null;
 
         const activityGrid = document.getElementById('activityGrid');
         const levelGrid = document.getElementById('levelGrid');
-        const sentenceMeta = document.getElementById('sentenceMeta');
         const sentenceText = document.getElementById('sentenceText');
         const chipRow = document.getElementById('chipRow');
-        const blockedText = document.getElementById('blockedText');
-        const worthText = document.getElementById('worthText');
-        const blockedCard = document.getElementById('blockedCard');
-        const worthCard = document.getElementById('worthCard');
         const obstacleText = document.getElementById('obstacleText');
+        const reasonLabel = document.getElementById('reasonLabel');
         const valueText = document.getElementById('valueText');
+        const feedback = document.getElementById('feedback');
 
         function iconMarkup(name) {
             return `<i class="fa-solid ${name}" aria-hidden="true"></i>`;
         }
 
-        function worthSentence(activity, strong) {
-            const adverb = strong ? '정말 ' : '';
-            return `${activity.obstacle} ${activity.value} ${adverb}${activity.action} 만해요.`;
+        function worthSentence(activity) {
+            return `${activity.obstacle} ${activity.value} ${activity.action} 만해요.`;
         }
 
         function renderActivities() {
             activityGrid.innerHTML = activities.map((activity, index) => `
-                <button class="activity-card ${index === state.activityIndex ? 'is-selected' : ''}" type="button" data-activity="${index}" aria-label="${activity.title}">
+                <button class="activity-card ${index === state.activityIndex ? 'is-selected' : ''}" type="button" data-activity="${index}" aria-pressed="${index === state.activityIndex}" aria-label="${activity.title}">
                     <span class="activity-icon">${iconMarkup(activity.icon)}</span>
                     <strong>${activity.title}</strong>
                     <span>${activity.obstacle}<br />${activity.value}</span>
@@ -677,47 +712,60 @@
             activityGrid.querySelectorAll('[data-activity]').forEach((button) => {
                 button.addEventListener('click', () => {
                     state.activityIndex = Number(button.dataset.activity);
+                    state.decision = '';
+                    saveProgress();
                     render();
                 });
             });
         }
 
         function renderLevels() {
-            levelGrid.innerHTML = levels.map((level) => `
-                <button class="level-button ${level.id === state.level ? 'is-active' : ''}" type="button" data-level="${level.id}">
-                    <span class="level-number">${level.id}</span>
+            levelGrid.innerHTML = decisions.map((decision) => `
+                <button class="level-button ${decision.id === state.decision ? 'is-active' : ''}" type="button" data-decision="${decision.id}" aria-pressed="${decision.id === state.decision}">
+                    <span class="level-number">${iconMarkup(decision.icon)}</span>
                     <span class="level-copy">
-                        <strong>${iconMarkup(level.icon)} ${level.label}</strong>
-                        <span>${level.mode}</span>
+                        <strong>${decision.label}</strong>
+                        <span>${decision.mode}</span>
                     </span>
                 </button>
             `).join('');
 
-            levelGrid.querySelectorAll('[data-level]').forEach((button) => {
+            levelGrid.querySelectorAll('[data-decision]').forEach((button) => {
                 button.addEventListener('click', () => {
-                    state.level = Number(button.dataset.level);
+                    state.decision = button.dataset.decision;
+                    saveProgress();
                     render();
+                    window.setTimeout(() => {
+                        const selected = levelGrid.querySelector(`[data-decision="${state.decision}"]`);
+                        if (selected) selected.focus();
+                    }, 0);
                 });
             });
         }
 
         function renderOutput() {
             const activity = activities[state.activityIndex];
-            const level = levels[state.level];
-            const sentence = state.level === 0 ? activity.blocked : worthSentence(activity, state.level === 2);
+            const correctDecision = activity.isWorth === false ? 'not-worth' : 'worth';
+            const isAnswered = Boolean(state.decision);
+            const isCorrect = isAnswered && state.decision === correctDecision;
+            const model = activity.isWorth === false ? activity.blocked : worthSentence(activity);
 
-            sentenceMeta.innerHTML = `<span class="badge ${level.badge}">${iconMarkup(level.icon)} ${level.label} · ${level.mode}</span>`;
-            sentenceText.textContent = sentence;
-            chipRow.innerHTML = state.level === 0
-                ? ['걸림돌이 가치보다 큼', '기준 미달', '만하지 않아요'].map((chip) => `<span class="chip">${chip}</span>`).join('')
-                : [activity.obstacle, activity.value, `${activity.action} 만해요`].map((chip) => `<span class="chip">${chip}</span>`).join('');
-
-            blockedText.textContent = activity.blocked;
-            worthText.textContent = worthSentence(activity, true);
-            blockedCard.classList.toggle('is-active', state.level === 0);
-            worthCard.classList.toggle('is-active', state.level !== 0);
+            sentenceText.textContent = isAnswered ? model : `${activity.title}: 해 볼 만할까요?`;
+            chipRow.innerHTML = [activity.obstacle, activity.value, isAnswered ? model.slice(-12) : '판단 고르기']
+                .map((chip) => `<span class="chip">${chip}</span>`).join('');
             obstacleText.textContent = activity.obstacle;
+            reasonLabel.textContent = activity.isWorth === false ? '부정 근거' : '가치 근거';
             valueText.textContent = activity.value;
+            feedback.className = `decision-feedback ${isAnswered ? (isCorrect ? 'is-correct' : 'is-wrong') : ''}`;
+            feedback.textContent = !isAnswered
+                ? '걸림돌과 가치 근거를 읽고 판단을 고르세요.'
+                : isCorrect
+                    ? `맞아요. ${model}`
+                    : `다시 생각해 보세요. ${activity.isWorth === false ? '가치가 충분하지 않아요.' : '가치 근거가 걸림돌보다 충분해요.'}`;
+        }
+
+        function saveProgress() {
+            if (store) store.save(state);
         }
 
         function render() {
@@ -726,9 +774,23 @@
             renderOutput();
         }
 
+        store = window.C16GrammarState.create('grammar3-worth-gauge', initialState, {
+            validate(saved) {
+                return Boolean(saved && Number.isInteger(saved.activityIndex)
+                    && saved.activityIndex >= 0 && saved.activityIndex < activities.length
+                    && (saved.decision === '' || decisions.some((item) => item.id === saved.decision)));
+            },
+            onReset(fresh) {
+                state = fresh;
+                render();
+            }
+        });
+        state = store.get();
         render();
+        store.mount(document.querySelector('[data-c16-state-tools]'), () => state);
+        store.track(() => state);
     </script>
     <script src="../shared/site-copyright.js"></script>
-    <script src="../shared/page-qr.js"></script>
+    <script src="../shared/c16-support-a11y.js"></script>
 </body>
 </html>

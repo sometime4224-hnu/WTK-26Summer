@@ -9,7 +9,7 @@
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>16과 문법 4 보조자료 | 베트남 과거와 현재 지도 비교</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <style>
@@ -686,6 +686,10 @@
                 <a class="photo-link output-photo-link" id="photoAction" target="_blank" rel="noopener noreferrer" aria-label="현재 사진 보기" title="현재 사진 보기" hidden><i class="fa-solid fa-image"></i></a>
                 <span class="chip is-form">과거와 현재 비교</span>
             </div>
+            <div class="chip-row">
+                <button class="btn primary" type="button" id="checkSentenceBtn">문장 확인</button>
+                <span id="mapFeedback" role="status" aria-live="polite">도시를 고른 뒤 문장 확인을 누르세요.</span>
+            </div>
         </section>
 
         <nav class="region-bar" id="regionBar" aria-label="베트남 지역 필터"></nav>
@@ -744,8 +748,10 @@
             <a class="btn" href="grammar4-vietnam-map-match.html"><i class="fa-solid fa-map"></i> 명소 태그 지도</a>
             <a class="btn primary" href="grammar4-speaking-pro.html"><i class="fa-solid fa-microphone-lines"></i> 말하기 PRO</a>
         </nav>
+        <div data-c16-state-tools></div>
     </main>
 
+    <script src="../shared/c16-grammar-state.js"></script>
     <script>
         const regions = [
             { id: 'all', label: '전체', icon: 'fa-globe-asia' },
@@ -1555,9 +1561,30 @@
         const state = {
             region: 'north',
             targetId: 'hanoi',
-            tagId: 'oldQuarter',
-            zoomIndex: 0
+            zoomIndex: 0,
+            confirmed: false,
+            pendingFocus: ''
         };
+        const stateStore = window.C16GrammarState && window.C16GrammarState.create('grammar4-vietnam-then-now-map', storedState(), {
+            validate: function (candidate) {
+                const target = candidate && targets.find(function (item) { return item.id === candidate.targetId; });
+                return !!(candidate
+                    && regions.some(function (region) { return region.id === candidate.region; })
+                    && target
+                    && (candidate.region === 'all' || target.region === candidate.region)
+                    && Number.isInteger(candidate.zoomIndex)
+                    && candidate.zoomIndex >= 0
+                    && candidate.zoomIndex <= 4
+                    && typeof candidate.confirmed === 'boolean');
+            },
+            onReset: function (initial) {
+                Object.assign(state, initial, { pendingFocus: '[data-region="north"]' });
+                render();
+            }
+        });
+        if (stateStore) {
+            Object.assign(state, stateStore.get());
+        }
 
         const regionBar = document.getElementById('regionBar');
         const mapCanvas = document.getElementById('mapCanvas');
@@ -1581,7 +1608,22 @@
         const zoomInBtn = document.getElementById('zoomInBtn');
         const zoomResetBtn = document.getElementById('zoomResetBtn');
         const zoomLevel = document.getElementById('zoomLevel');
+        const checkSentenceBtn = document.getElementById('checkSentenceBtn');
+        const mapFeedback = document.getElementById('mapFeedback');
         const zoomSteps = [1, 1.35, 1.7, 2.15, 2.6];
+
+        function storedState() {
+            return {
+                region: state.region,
+                targetId: state.targetId,
+                zoomIndex: state.zoomIndex,
+                confirmed: state.confirmed
+            };
+        }
+
+        function saveProgress() {
+            if (stateStore) stateStore.save(storedState());
+        }
 
         function hasBatchim(text) {
             const code = text.charCodeAt(text.length - 1);
@@ -1647,6 +1689,7 @@
         }
 
         function eraPhotoLink(target, era) {
+            if (!state.confirmed) return '';
             const href = eraPhotoUrl(target, era);
             const label = era === 'past' ? '과거 사진 보기' : '현재 사진 보기';
             const iconName = era === 'past' ? 'fa-clock-rotate-left' : 'fa-image';
@@ -1682,12 +1725,13 @@
 
         function setZoomIndex(index) {
             state.zoomIndex = clamp(index, 0, zoomSteps.length - 1);
+            saveProgress();
             updateMapTransform();
         }
 
         function renderRegions() {
             regionBar.innerHTML = regions.map((region) => `
-                <button class="region-button ${region.id === state.region ? 'is-active' : ''}" type="button" data-region="${region.id}">
+                <button class="region-button ${region.id === state.region ? 'is-active' : ''}" type="button" data-region="${region.id}" aria-pressed="${region.id === state.region}">
                     ${icon(region.icon)} ${region.label}
                 </button>
             `).join('');
@@ -1699,6 +1743,9 @@
                     if (!list.some((target) => target.id === state.targetId)) {
                         state.targetId = list[0].id;
                     }
+                    state.confirmed = false;
+                    state.pendingFocus = `[data-region="${state.region}"]`;
+                    saveProgress();
                     render();
                 });
             });
@@ -1706,11 +1753,10 @@
 
         function renderPins() {
             const visible = filteredTargets();
-            pinLayer.innerHTML = targets.map((target) => {
-                const isVisible = state.region === 'all' || target.region === state.region;
+            pinLayer.innerHTML = visible.map((target) => {
                 const isActive = target.id === state.targetId;
                 return `
-                    <button class="pin ${isActive ? 'is-active' : ''} ${isVisible ? '' : 'is-muted'}" type="button" data-target="${target.id}" style="--x:${target.x}%; --y:${target.y}%;" aria-label="${target.name}">
+                    <button class="pin ${isActive ? 'is-active' : ''}" type="button" data-target="${target.id}" style="--x:${target.x}%; --y:${target.y}%;" aria-pressed="${isActive}" aria-label="${target.name}">
                         ${icon(target.icon)}
                     </button>
                     <span class="pin-label" style="--x:${target.x}%; --y:${target.y}%;">${target.name}</span>
@@ -1722,6 +1768,9 @@
                     const target = targets.find((item) => item.id === button.dataset.target);
                     state.targetId = target.id;
                     state.region = target.region;
+                    state.confirmed = false;
+                    state.pendingFocus = `[data-target="${target.id}"]`;
+                    saveProgress();
                     render();
                 });
             });
@@ -1732,22 +1781,26 @@
         function renderTags() {
             const target = getTarget();
             const comparison = comparisonFor(target);
+            const pastPhotoLink = state.confirmed ? eraPhotoLink(target, 'past') : '';
+            const nowPhotoLink = state.confirmed ? eraPhotoLink(target, 'now') : '';
+            const pastNote = state.confirmed ? '과거 사진 검색' : '문장 확인 뒤 과거 사진 검색';
+            const nowNote = state.confirmed ? '현재 사진 검색' : '문장 확인 뒤 현재 사진 검색';
             tagGrid.innerHTML = `
                 <article class="era-card is-past">
                     <div class="era-title">
                         <span><i class="fa-solid fa-clock-rotate-left"></i> 20~30년 전</span>
-                        ${eraPhotoLink(target, 'past')}
+                        ${pastPhotoLink}
                     </div>
                     <p>${comparison.past}</p>
-                    <span class="era-note"><i class="fa-solid fa-magnifying-glass"></i> 과거 사진 검색</span>
+                    <span class="era-note"><i class="fa-solid fa-magnifying-glass"></i> ${pastNote}</span>
                 </article>
                 <article class="era-card is-now">
                     <div class="era-title">
                         <span><i class="fa-solid fa-camera"></i> 지금</span>
-                        ${eraPhotoLink(target, 'now')}
+                        ${nowPhotoLink}
                     </div>
                     <p>${comparison.now}</p>
-                    <span class="era-note"><i class="fa-solid fa-magnifying-glass"></i> 현재 사진 검색</span>
+                    <span class="era-note"><i class="fa-solid fa-magnifying-glass"></i> ${nowNote}</span>
                 </article>
             `;
 
@@ -1772,6 +1825,9 @@
                     const next = targets.find((item) => item.id === button.dataset.near);
                     state.targetId = next.id;
                     state.region = next.region;
+                    state.confirmed = false;
+                    state.pendingFocus = `[data-target="${next.id}"]`;
+                    saveProgress();
                     render();
                 });
             });
@@ -1786,15 +1842,23 @@
             regionBadge.textContent = regionLabel(target.region);
             placeChip.innerHTML = `${icon(target.icon)} ${target.name}`;
             tagChip.textContent = comparison.focus;
-            mapAction.hidden = false;
-            mapAction.href = eraPhotoUrl(target, 'past');
-            mapAction.setAttribute('aria-label', `${target.name} 과거 사진 보기`);
-            photoAction.hidden = false;
-            photoAction.href = eraPhotoUrl(target, 'now');
-            photoAction.setAttribute('aria-label', `${target.name} 현재 사진 보기`);
+            mapAction.hidden = !state.confirmed;
+            photoAction.hidden = !state.confirmed;
+            if (state.confirmed) {
+                mapAction.href = eraPhotoUrl(target, 'past');
+                mapAction.setAttribute('aria-label', `${target.name} 과거 사진 보기`);
+                photoAction.href = eraPhotoUrl(target, 'now');
+                photoAction.setAttribute('aria-label', `${target.name} 현재 사진 보기`);
+            } else {
+                mapAction.removeAttribute('href');
+                photoAction.removeAttribute('href');
+            }
             placeIcon.innerHTML = icon(target.icon);
             placeName.textContent = target.name;
             placeMeta.textContent = `${target.vi} · ${target.hint} · ${comparison.focus}`;
+            mapFeedback.textContent = state.confirmed
+                ? `확인했어요. ${buildSentence(target)}`
+                : '도시를 고른 뒤 문장 확인을 누르세요.';
         }
 
         function render() {
@@ -1804,16 +1868,33 @@
             renderTags();
             renderNearPlaces();
             updateMapTransform();
+            if (state.pendingFocus) {
+                const selector = state.pendingFocus;
+                state.pendingFocus = '';
+                window.setTimeout(() => document.querySelector(selector)?.focus(), 0);
+            }
         }
 
         zoomOutBtn.addEventListener('click', () => setZoomIndex(state.zoomIndex - 1));
         zoomInBtn.addEventListener('click', () => setZoomIndex(state.zoomIndex + 1));
         zoomResetBtn.addEventListener('click', () => setZoomIndex(0));
+        checkSentenceBtn.addEventListener('click', () => {
+            state.confirmed = true;
+            saveProgress();
+            render();
+            mapFeedback.setAttribute('tabindex', '-1');
+            mapFeedback.focus();
+        });
         window.addEventListener('resize', updateMapTransform);
+
+        if (stateStore) {
+            stateStore.mount(document.querySelector('[data-c16-state-tools]'), storedState);
+            stateStore.track(storedState);
+        }
 
         render();
     </script>
     <script src="../shared/site-copyright.js"></script>
-    <script src="../shared/page-qr.js"></script>
+    <script src="../shared/c16-support-a11y.js"></script>
 </body>
 </html>

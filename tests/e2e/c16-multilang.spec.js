@@ -77,11 +77,23 @@ for (const target of SCAFFOLD_PAGES) {
     await expect(page.locator('body')).toHaveAttribute('data-active-lang', 'none');
     await expect(scaffold.locator('.lang-box.lang-visible')).toHaveCount(0);
 
-    const isImmediatelyAfterAnchor = await scaffold.evaluate((panel, anchorSelector) => {
-      const anchor = document.querySelector(anchorSelector);
-      return Boolean(anchor && anchor.parentElement === panel.parentElement && anchor.nextElementSibling === panel);
-    }, target.anchor);
-    expect(isImmediatelyAfterAnchor).toBe(true);
+    if (target.grammar) {
+      const translationHelp = scaffold.locator('xpath=ancestor::details[contains(@class, "c16-translation-help")]');
+      await expect(translationHelp).toHaveCount(1);
+      await expect(translationHelp).not.toHaveAttribute('open', '');
+      const followsQuickCheck = await translationHelp.evaluate((details) => {
+        const quickCheck = document.getElementById('learning-task');
+        return Boolean(quickCheck && quickCheck.nextElementSibling === details);
+      });
+      expect(followsQuickCheck).toBe(true);
+      await translationHelp.locator('summary').click();
+    } else {
+      const isImmediatelyAfterAnchor = await scaffold.evaluate((panel, anchorSelector) => {
+        const anchor = document.querySelector(anchorSelector);
+        return Boolean(anchor && anchor.parentElement === panel.parentElement && anchor.nextElementSibling === panel);
+      }, target.anchor);
+      expect(isImmediatelyAfterAnchor).toBe(true);
+    }
 
     for (const code of LANGUAGE_CODES) {
       await page.locator(`[data-multilang-btn="${code}"]`).click();
@@ -122,6 +134,7 @@ test('C16 언어 선택은 페이지 사이에서 유지되고 잘못된 저장�
   await page.goto('/c16/grammar1.html', { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => localStorage.clear());
   await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.locator('.c16-translation-help summary').click();
   await page.locator('[data-multilang-btn="kk"]').click();
   await expect(page.locator('body')).toHaveAttribute('data-active-lang', 'kk');
   expect(await page.evaluate(() => localStorage.getItem('preferred-lang'))).toBe('kk');
@@ -198,7 +211,7 @@ test('C16 문법 퀴즈, 읽기 이동, 듣기 자막은 키보드와 포인터�
   await page.setViewportSize({ width: 390, height: 844 });
 
   await page.goto('/c16/grammar1.html', { waitUntil: 'domcontentloaded' });
-  const correctGrammarChoice = page.locator('#quizChoices button').first();
+  const correctGrammarChoice = page.getByRole('button', { name: '가야금이 사람 키만 해요.' });
   await correctGrammarChoice.focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('#quizFeedback')).toContainText('정답!');

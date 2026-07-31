@@ -9,7 +9,7 @@
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>16과 문법 1 | N만 하다</title>
     <script src="https://cdn.tailwindcss.com" defer></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -433,14 +433,17 @@
         }
     </style>
     <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="../shared/c16-grammar-learning.css" />
 </head>
-<body>
+<body class="c16-grammar-main">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    <nav class="topbar">
+    <a class="c16-skip-link" href="#learning-task">문법 확인으로 건너뛰기</a>
+
+    <nav class="topbar" aria-label="16과 이동">
         <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
         <span>|</span>
         <a href="index.html">16과 목록</a>
@@ -449,24 +452,22 @@
     </nav>
 
     <main class="shell">
-        <section class="glass-card hero-card" data-multilang-anchor>
+        <section class="glass-card hero-card" data-multilang-anchor data-c16-hero>
             <span class="pill pill-blue"><i class="fa-solid fa-ruler-combined"></i> Grammar 1</span>
             <h1 class="mt-4 mb-3 text-3xl sm:text-4xl font-black leading-tight">N만 하다</h1>
-            <p class="m-0 text-[15px] leading-7 text-slate-700 max-w-3xl">
-                사물의 크기나 정도를 익숙한 기준에 비유해서 말할 때 쓰는 표현입니다.
-                사람 키, 손바닥, 둥근 탁자처럼 눈에 바로 보이는 기준을 붙이면 뜻이 더 선명해집니다.
-            </p>
+            <p class="m-0 text-[15px] leading-7 text-slate-700 max-w-3xl">목표: 익숙한 기준 명사로 사물의 크기나 정도를 비교해 말해요.</p>
             <div class="mt-5 flex flex-wrap gap-2">
                 <span class="formula-chip"><i class="fa-solid fa-arrow-right-arrow-left"></i> N1이/가 N2만 하다</span>
                 <span class="pill pill-soft"><i class="fa-solid fa-quote-left"></i> 가야금이 사람 키만 해요.</span>
             </div>
         </section>
 
-        <section class="glass-card section-card mt-4">
+        <section id="learning-task" class="glass-card section-card mt-4" aria-labelledby="quickCheckTitle">
             <div class="section-head">
                 <div>
                     <p class="eyebrow">Quick Start</p>
-                    <h2 class="section-title">맞는 비교 문장을 골라 보세요</h2>
+                    <h2 id="quickCheckTitle" class="section-title">맞는 비교 문장을 골라 보세요</h2>
+                    <p class="c16-action-line">장면에 가장 자연스러운 문장을 하나 고르세요.</p>
                 </div>
                 <span id="quizLabel" class="pill pill-soft"><i class="fa-solid fa-pen"></i> 1 / 5</span>
             </div>
@@ -481,17 +482,19 @@
                     <h3 id="quizPrompt" class="mt-0 text-xl font-black text-slate-800 leading-8"></h3>
                     <p id="quizHint" class="mt-3 mb-0 text-sm leading-6 text-slate-600"></p>
                     <div id="quizChoices" class="grid gap-3 mt-5"></div>
-                    <div id="quizFeedback" class="hidden mt-4 rounded-[20px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold leading-6 text-slate-700"></div>
+                    <div id="quizFeedback" class="c16-quiz-feedback" hidden role="status" aria-live="polite"></div>
                 </div>
 
-                <div class="flex flex-wrap gap-2 justify-between">
+                <div class="flex flex-wrap gap-2 justify-between c16-quiz-actions">
                     <button id="restartQuizBtn" class="action-btn action-btn-muted" type="button"><i class="fa-solid fa-rotate-right"></i> 다시 풀기</button>
+                    <button id="revealQuizBtn" class="action-btn action-btn-muted" type="button" hidden>정답 보기</button>
                     <button id="nextQuizBtn" class="action-btn action-btn-primary" type="button" disabled><i class="fa-solid fa-arrow-right"></i> 다음 문제</button>
                 </div>
+                <div data-c16-state-tools></div>
             </div>
         </section>
 
-        <section class="glass-card section-card mt-4">
+        <section class="glass-card section-card mt-4" data-c16-explanation>
             <div class="section-head">
                 <div>
                     <p class="eyebrow">Pattern Map</p>
@@ -542,7 +545,7 @@
             </div>
         </section>
 
-        <section class="glass-card section-card mt-4">
+        <section class="glass-card section-card mt-4" data-c16-explanation>
             <div class="section-head">
                 <div>
                     <p class="eyebrow">Examples</p>
@@ -613,7 +616,7 @@
                     <ol class="mt-3 mb-0 pl-5 text-sm leading-7 text-slate-700">
                         <li>대상 먼저: 가야금이, 장구가, 눈사람이</li>
                         <li>비교 기준: 사람 키만, 둥근 탁자만, 손바닥만</li>
-                        <li>마무리: 해요 / 커요 / 길어요</li>
+                        <li>마무리: 기준 뒤에 <strong>만 해요</strong></li>
                     </ol>
                 </article>
             </div>
@@ -625,164 +628,63 @@
         </section>
     </main>
 
+    <script src="../shared/c16-grammar-state.js"></script>
+    <script src="../shared/c16-grammar-main-ux.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const quiz = [
+        window.C16GrammarMainUX.initQuiz({
+            pageId: 'grammar1',
+            quiz: [
                 {
                     prompt: '가야금의 크기를 사람 키에 비유해서 말해 보세요.',
-                    hint: '크기를 비교하는 기준 명사 뒤에 `만`을 붙여요.',
-                    choices: [
-                        '가야금이 사람 키만 해요.',
-                        '가야금이 사람 키가 커요.',
-                        '가야금이 사람 키를 해요.'
-                    ],
-                    answer: 0,
-                    explanation: '사람 키처럼 익숙한 기준을 붙여 크기를 비교할 때는 `N만 하다`를 씁니다.'
+                    hint: '비교 기준 명사 뒤에 `만`을 붙여요.',
+                    choices: ['가야금이 사람 키가 커요.', '가야금이 사람 키만 해요.', '가야금이 사람 키를 해요.'],
+                    answer: 1,
+                    feedback: '사람 키처럼 익숙한 기준을 붙여 크기를 비교할 때는 `N만 하다`를 씁니다.'
                 },
                 {
                     prompt: '장구의 크기를 둥근 탁자에 비유해서 말해 보세요.',
                     hint: '비교 기준 명사 뒤에 `만`을 붙여요.',
-                    choices: [
-                        '장구는 둥근 탁자만 해요.',
-                        '장구는 둥근 탁자가 커요.',
-                        '장구는 둥근 탁자를 해요.'
-                    ],
-                    answer: 0,
-                    explanation: '사물의 크기를 익숙한 기준에 빗댈 때는 `N만 하다`를 씁니다.'
+                    choices: ['장구는 둥근 탁자가 커요.', '장구는 둥근 탁자를 해요.', '장구는 둥근 탁자만 해요.'],
+                    answer: 2,
+                    feedback: '사물의 크기를 익숙한 기준에 빗댈 때는 `N만 하다`를 씁니다.'
                 },
                 {
                     prompt: '친구가 만든 눈사람이 정말 커서 사람과 비슷해 보여요.',
                     hint: '숫자 대신 눈으로 바로 보이는 기준을 써 보세요.',
-                    choices: [
-                        '눈사람이 사람만 해요.',
-                        '눈사람이 사람이 커요.',
-                        '눈사람이 사람을 해요.'
-                    ],
+                    choices: ['눈사람이 사람만 해요.', '눈사람이 사람이 커요.', '눈사람이 사람을 해요.'],
                     answer: 0,
-                    explanation: '사람처럼 커 보인다는 뜻을 비유로 말할 때 `사람만 해요`라고 할 수 있습니다.'
+                    feedback: '사람처럼 커 보인다는 뜻을 비유로 말할 때 `사람만 해요`라고 할 수 있습니다.'
                 },
                 {
                     prompt: '학생증이 손바닥 정도 크기라고 말하고 싶어요.',
                     hint: '작은 물건은 가까운 기준 명사와 잘 어울립니다.',
-                    choices: [
-                        '학생증이 손바닥만 해요.',
-                        '학생증이 손바닥이 작아요.',
-                        '학생증이 손바닥을 해요.'
-                    ],
-                    answer: 0,
-                    explanation: '`손바닥만 해요`처럼 기준 명사 뒤에 `만 해요`를 붙이면 크기 비교가 됩니다.'
+                    choices: ['학생증이 손바닥이 작아요.', '학생증이 손바닥을 해요.', '학생증이 손바닥만 해요.'],
+                    answer: 2,
+                    feedback: '`손바닥만 해요`처럼 기준 명사 뒤에 `만 해요`를 붙이면 크기 비교가 됩니다.'
                 },
                 {
                     prompt: '길에서 본 고구마가 얼굴처럼 커 보여서 놀랐어요.',
                     hint: '비교 기준이 되는 명사를 넣어 문장을 완성해 보세요.',
-                    choices: [
-                        '고구마가 얼굴만 해요.',
-                        '고구마가 얼굴이 커요.',
-                        '고구마가 얼굴을 해요.'
-                    ],
-                    answer: 0,
-                    explanation: '익숙한 명사로 크기를 비유하는 구조이므로 `얼굴만 해요`가 맞습니다.'
+                    choices: ['고구마가 얼굴이 커요.', '고구마가 얼굴만 해요.', '고구마가 얼굴을 해요.'],
+                    answer: 1,
+                    feedback: '익숙한 명사로 크기를 비유하는 구조이므로 `얼굴만 해요`가 맞습니다.'
                 }
-            ];
-
-            const promptEl = document.getElementById('quizPrompt');
-            const hintEl = document.getElementById('quizHint');
-            const choicesEl = document.getElementById('quizChoices');
-            const feedbackEl = document.getElementById('quizFeedback');
-            const labelEl = document.getElementById('quizLabel');
-            const progressBarEl = document.getElementById('quizProgressBar');
-            const nextBtn = document.getElementById('nextQuizBtn');
-            const restartBtn = document.getElementById('restartQuizBtn');
-
-            const state = {
-                index: 0,
-                score: 0,
-                answered: false
-            };
-
-            function renderQuestion() {
-                const item = quiz[state.index];
-                state.answered = false;
-                promptEl.textContent = item.prompt;
-                hintEl.textContent = item.hint;
-                labelEl.innerHTML = '<i class="fa-solid fa-pen"></i> ' + (state.index + 1) + ' / ' + quiz.length;
-                progressBarEl.style.width = ((state.index / quiz.length) * 100) + '%';
-                feedbackEl.className = 'hidden mt-4 rounded-[20px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold leading-6 text-slate-700';
-                feedbackEl.textContent = '';
-                nextBtn.disabled = true;
-                nextBtn.textContent = state.index === quiz.length - 1 ? '결과 보기' : '다음 문제';
-
-                choicesEl.innerHTML = '';
-                item.choices.forEach(function (choice, choiceIndex) {
-                    const button = document.createElement('button');
-                    button.type = 'button';
-                    button.className = 'quiz-choice';
-                    button.textContent = choice;
-                    button.addEventListener('click', function () {
-                        if (state.answered) return;
-                        state.answered = true;
-                        const buttons = Array.from(choicesEl.querySelectorAll('button'));
-                        buttons.forEach(function (btn, idx) {
-                            btn.disabled = true;
-                            if (idx === item.answer) {
-                                btn.classList.add('correct');
-                            } else if (idx === choiceIndex) {
-                                btn.classList.add('wrong');
-                            } else {
-                                btn.classList.add('dimmed');
-                            }
-                        });
-
-                        if (choiceIndex === item.answer) {
-                            state.score += 1;
-                            feedbackEl.classList.remove('hidden');
-                            feedbackEl.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-800');
-                            feedbackEl.innerHTML = '<strong>정답!</strong> ' + item.explanation;
-                        } else {
-                            feedbackEl.classList.remove('hidden');
-                            feedbackEl.classList.add('border-rose-200', 'bg-rose-50', 'text-rose-800');
-                            feedbackEl.innerHTML = '<strong>다시 확인!</strong> ' + item.explanation;
-                        }
-
-                        nextBtn.disabled = false;
-                        progressBarEl.style.width = (((state.index + 1) / quiz.length) * 100) + '%';
-                    });
-                    choicesEl.appendChild(button);
-                });
+            ],
+            elements: {
+                prompt: '#quizPrompt', hint: '#quizHint', choices: '#quizChoices', feedback: '#quizFeedback',
+                count: '#quizLabel', progress: '#quizProgressBar', next: '#nextQuizBtn',
+                restart: '#restartQuizBtn', reveal: '#revealQuizBtn'
+            },
+            choiceClass: 'quiz-choice',
+            feedbackBase: 'c16-quiz-feedback',
+            summaryClass: 'tone-panel tone-panel--blue',
+            summaryText: '기준 명사를 바로 떠올리면 `N만 하다` 문장을 빠르고 자연스럽게 만들 수 있어요.',
+            summaryHint: '기준 명사를 붙여 크기를 말하는 감각을 다음 활동에서 이어 가세요.',
+            renderCount: function (element, state, length) {
+                element.innerHTML = state.complete
+                    ? '<i class="fa-solid fa-star"></i> 완료'
+                    : '<i class="fa-solid fa-pen"></i> ' + (state.index + 1) + ' / ' + length;
             }
-
-            function renderSummary() {
-                const percent = Math.round((state.score / quiz.length) * 100);
-                promptEl.textContent = '퀴즈 완료';
-                hintEl.textContent = '기준 명사를 붙여 크기를 말하는 감각이 잘 잡혔는지 확인해 보세요.';
-                labelEl.innerHTML = '<i class="fa-solid fa-star"></i> 완료';
-                choicesEl.innerHTML = ''
-                    + '<div class="tone-panel tone-panel--blue">'
-                    + '<p class="eyebrow">Result</p>'
-                    + '<h3 class="mt-0 text-3xl font-black text-slate-800">' + state.score + ' / ' + quiz.length + '</h3>'
-                    + '<p class="mt-2 mb-0 text-sm leading-7 text-slate-700">정답률 ' + percent + '%예요. 비교 기준을 바로 떠올리면 <code>N만 하다</code> 문장을 훨씬 빠르고 자연스럽게 만들 수 있습니다.</p>'
-                    + '</div>';
-                feedbackEl.className = 'hidden mt-4 rounded-[20px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold leading-6 text-slate-700';
-                nextBtn.disabled = true;
-                progressBarEl.style.width = '100%';
-            }
-
-            nextBtn.addEventListener('click', function () {
-                if (state.index === quiz.length - 1) {
-                    renderSummary();
-                    return;
-                }
-                state.index += 1;
-                renderQuestion();
-            });
-
-            restartBtn.addEventListener('click', function () {
-                state.index = 0;
-                state.score = 0;
-                renderQuestion();
-            });
-
-            renderQuestion();
         });
     </script>
     <script src="../shared/site-copyright.js"></script>
@@ -793,6 +695,5 @@
     <script src="../shared/multilang-page-data-th.js"></script>
     <script src="../shared/multilang-page-scaffold.js"></script>
     <script src="../shared/multilang-toggle.js"></script>
-    <script src="../shared/page-qr.js"></script>
 </body>
 </html>

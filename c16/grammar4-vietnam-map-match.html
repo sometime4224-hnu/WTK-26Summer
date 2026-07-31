@@ -9,7 +9,7 @@
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>16과 문법 4 보조자료 | 베트남 지도 태그 매칭</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <style>
@@ -256,6 +256,7 @@
         }
 
         .zoom-button {
+            position: relative;
             display: grid;
             place-items: center;
             width: 28px;
@@ -267,6 +268,13 @@
             cursor: pointer;
             font-size: 12px;
             font-weight: 900;
+        }
+
+        .zoom-button::before {
+            content: "";
+            position: absolute;
+            inset: -8px;
+            border-radius: 999px;
         }
 
         .zoom-button:disabled {
@@ -548,7 +556,7 @@
 
         .output-map-link[hidden],
         .output-photo-link[hidden] {
-            display: none;
+            display: none !important;
         }
 
         .tag-button.is-active,
@@ -696,6 +704,10 @@
                 <a class="photo-link output-photo-link" id="photoAction" target="_blank" rel="noopener noreferrer" aria-label="이미지 검색 결과 보기" title="이미지 검색 결과 보기" hidden><i class="fa-solid fa-image"></i></a>
                 <span class="chip is-form">N(으)로 유명해요</span>
             </div>
+            <div class="chip-row">
+                <button class="btn primary" type="button" id="checkSentenceBtn">문장 확인</button>
+                <span id="mapFeedback" role="status" aria-live="polite">대표 명사를 고른 뒤 문장 확인을 누르세요.</span>
+            </div>
         </section>
 
         <nav class="region-bar" id="regionBar" aria-label="베트남 지역 필터"></nav>
@@ -751,11 +763,13 @@
 
         <nav class="footer" aria-label="문법 이동">
             <a class="btn" href="grammar4.html"><i class="fa-solid fa-arrow-left"></i> 문법 4</a>
-            <a class="btn" href="grammar4-fame-tag-match-vietnam.html"><i class="fa-solid fa-table-cells-large"></i> 카드 버전</a>
+            <a class="btn" href="grammar4-workbook-sentence-quiz.html"><i class="fa-solid fa-pen-to-square"></i> 워크북 핵심 연습</a>
             <a class="btn primary" href="grammar4-speaking-pro.html"><i class="fa-solid fa-microphone-lines"></i> 말하기 PRO</a>
         </nav>
+        <div data-c16-state-tools></div>
     </main>
 
+    <script src="../shared/c16-grammar-state.js"></script>
     <script>
         const regions = [
             { id: 'all', label: '전체', icon: 'fa-globe-asia' },
@@ -1501,8 +1515,30 @@
             region: 'north',
             targetId: 'hanoi',
             tagId: 'oldQuarter',
-            zoomIndex: 0
+            zoomIndex: 0,
+            confirmed: false,
+            pendingFocus: ''
         };
+        const stateStore = window.C16GrammarState && window.C16GrammarState.create('grammar4-vietnam-map-match', storedState(), {
+            validate: function (candidate) {
+                const target = candidate && targets.find(function (item) { return item.id === candidate.targetId; });
+                return !!(candidate
+                    && regions.some(function (region) { return region.id === candidate.region; })
+                    && target
+                    && target.tags.includes(candidate.tagId)
+                    && Number.isInteger(candidate.zoomIndex)
+                    && candidate.zoomIndex >= 0
+                    && candidate.zoomIndex <= 4
+                    && typeof candidate.confirmed === 'boolean');
+            },
+            onReset: function (initial) {
+                Object.assign(state, initial, { pendingFocus: '[data-region="north"]' });
+                render();
+            }
+        });
+        if (stateStore) {
+            Object.assign(state, stateStore.get());
+        }
 
         const regionBar = document.getElementById('regionBar');
         const mapCanvas = document.getElementById('mapCanvas');
@@ -1526,7 +1562,23 @@
         const zoomInBtn = document.getElementById('zoomInBtn');
         const zoomResetBtn = document.getElementById('zoomResetBtn');
         const zoomLevel = document.getElementById('zoomLevel');
+        const checkSentenceBtn = document.getElementById('checkSentenceBtn');
+        const mapFeedback = document.getElementById('mapFeedback');
         const zoomSteps = [1, 1.35, 1.7, 2.15, 2.6];
+
+        function storedState() {
+            return {
+                region: state.region,
+                targetId: state.targetId,
+                tagId: state.tagId,
+                zoomIndex: state.zoomIndex,
+                confirmed: state.confirmed
+            };
+        }
+
+        function saveProgress() {
+            if (stateStore) stateStore.save(storedState());
+        }
 
         function hasBatchim(text) {
             const code = text.charCodeAt(text.length - 1);
@@ -1610,6 +1662,7 @@
         }
 
         function tagActions(target, tagId) {
+            if (!state.confirmed) return '';
             const links = [mapLink(target, tagId), photoLink(target, tagId)].filter(Boolean).join('');
             return links ? `<span class="tag-actions">${links}</span>` : '';
         }
@@ -1642,12 +1695,13 @@
 
         function setZoomIndex(index) {
             state.zoomIndex = clamp(index, 0, zoomSteps.length - 1);
+            saveProgress();
             updateMapTransform();
         }
 
         function renderRegions() {
             regionBar.innerHTML = regions.map((region) => `
-                <button class="region-button ${region.id === state.region ? 'is-active' : ''}" type="button" data-region="${region.id}">
+                <button class="region-button ${region.id === state.region ? 'is-active' : ''}" type="button" data-region="${region.id}" aria-pressed="${region.id === state.region}">
                     ${icon(region.icon)} ${region.label}
                 </button>
             `).join('');
@@ -1660,6 +1714,9 @@
                         state.targetId = list[0].id;
                         state.tagId = list[0].tags[0];
                     }
+                    state.confirmed = false;
+                    state.pendingFocus = `[data-region="${state.region}"]`;
+                    saveProgress();
                     render();
                 });
             });
@@ -1710,6 +1767,9 @@
                     state.targetId = target.id;
                     state.region = target.region;
                     state.tagId = target.tags[0];
+                    state.confirmed = false;
+                    state.pendingFocus = `[data-target="${target.id}"]`;
+                    saveProgress();
                     render();
                 });
             });
@@ -1721,7 +1781,7 @@
             const target = getTarget();
             tagGrid.innerHTML = target.tags.map((tagId) => `
                 <div class="tag-tile">
-                    <button class="tag-button ${tagId === state.tagId ? 'is-active' : ''}" type="button" data-tag="${tagId}">
+                    <button class="tag-button ${tagId === state.tagId ? 'is-active' : ''}" type="button" data-tag="${tagId}" aria-pressed="${tagId === state.tagId}">
                         <strong>${nounTags[tagId]}</strong>
                         <span>N(으)로</span>
                     </button>
@@ -1732,6 +1792,9 @@
             tagGrid.querySelectorAll('[data-tag]').forEach((button) => {
                 button.addEventListener('click', () => {
                     state.tagId = button.dataset.tag;
+                    state.confirmed = false;
+                    state.pendingFocus = `[data-tag="${state.tagId}"]`;
+                    saveProgress();
                     render();
                 });
             });
@@ -1762,6 +1825,9 @@
                     state.targetId = next.id;
                     state.region = next.region;
                     state.tagId = next.tags[0];
+                    state.confirmed = false;
+                    state.pendingFocus = `[data-target="${next.id}"]`;
+                    saveProgress();
                     render();
                 });
             });
@@ -1777,16 +1843,16 @@
             placeChip.innerHTML = `${icon(target.icon)} ${target.name}`;
             tagChip.textContent = tag;
             const mapHref = mapsUrl(target, state.tagId);
-            mapAction.hidden = !mapHref;
-            if (mapHref) {
+            mapAction.hidden = !mapHref || !state.confirmed;
+            if (mapHref && state.confirmed) {
                 mapAction.href = mapHref;
                 mapAction.setAttribute('aria-label', `${target.name} ${tag} 구글맵에서 보기`);
             } else {
                 mapAction.removeAttribute('href');
             }
             const photoHref = photosUrl(target, state.tagId);
-            photoAction.hidden = !photoHref;
-            if (photoHref) {
+            photoAction.hidden = !photoHref || !state.confirmed;
+            if (photoHref && state.confirmed) {
                 photoAction.href = photoHref;
                 photoAction.setAttribute('aria-label', `${target.name} ${tag} 이미지 검색 결과 보기`);
             } else {
@@ -1795,6 +1861,9 @@
             placeIcon.innerHTML = icon(target.icon);
             placeName.textContent = target.name;
             placeMeta.textContent = `${target.vi} · ${target.hint}`;
+            mapFeedback.textContent = state.confirmed
+                ? `확인했어요. ${buildSentence(target, state.tagId)}`
+                : '대표 명사를 고른 뒤 문장 확인을 누르세요.';
         }
 
         function render() {
@@ -1804,16 +1873,36 @@
             renderTags();
             renderNearPlaces();
             updateMapTransform();
+            if (state.pendingFocus) {
+                const selector = state.pendingFocus;
+                state.pendingFocus = '';
+                window.setTimeout(
+                    () => document.querySelector(selector)?.focus({ preventScroll: true }),
+                    0
+                );
+            }
         }
 
         zoomOutBtn.addEventListener('click', () => setZoomIndex(state.zoomIndex - 1));
         zoomInBtn.addEventListener('click', () => setZoomIndex(state.zoomIndex + 1));
         zoomResetBtn.addEventListener('click', () => setZoomIndex(0));
+        checkSentenceBtn.addEventListener('click', () => {
+            state.confirmed = true;
+            saveProgress();
+            render();
+            mapFeedback.setAttribute('tabindex', '-1');
+            mapFeedback.focus();
+        });
         window.addEventListener('resize', updateMapTransform);
+
+        if (stateStore) {
+            stateStore.mount(document.querySelector('[data-c16-state-tools]'), storedState);
+            stateStore.track(storedState);
+        }
 
         render();
     </script>
     <script src="../shared/site-copyright.js"></script>
-    <script src="../shared/page-qr.js"></script>
+    <script src="../shared/c16-support-a11y.js"></script>
 </body>
 </html>

@@ -9,7 +9,7 @@
     })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>16과 문법 2 보조자료 | 엄두 게이지</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <style>
@@ -42,6 +42,53 @@
             color: var(--ink);
             font-family: "Noto Sans KR", sans-serif;
             background: linear-gradient(180deg, var(--bg) 0%, #f8fafc 58%, #ffffff 100%);
+        }
+
+        .skip-link {
+            position: fixed;
+            top: 8px;
+            left: 8px;
+            z-index: 100;
+            transform: translateY(-150%);
+            border-radius: 8px;
+            padding: 9px 12px;
+            background: #0f172a;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .skip-link:focus {
+            transform: translateY(0);
+        }
+
+        .page-intro {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            margin: 0 0 10px;
+            padding: 0 3px;
+        }
+
+        .page-intro h1 {
+            margin: 0;
+            font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+            line-height: 1.3;
+        }
+
+        .page-intro p {
+            margin: 0;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        :focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px;
         }
 
         button,
@@ -268,7 +315,7 @@
         }
 
         .panel-head {
-            display: none;
+            display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
@@ -357,6 +404,12 @@
 
         .source-image[hidden] {
             display: none;
+        }
+
+        [data-c16-state-tools] {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
         }
 
         .scene-fallback {
@@ -582,6 +635,17 @@
 
         .level-button span {
             display: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
         }
 
         .output {
@@ -840,7 +904,9 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    <nav class="topbar">
+    <a class="skip-link" href="#umduActivity">엄두 게이지 활동으로 건너뛰기</a>
+
+    <nav class="topbar" aria-label="페이지 이동">
         <a href="../index.html"><i class="fa-solid fa-house"></i> 메인</a>
         <span>|</span>
         <a href="index.html">16과 목록</a>
@@ -848,12 +914,17 @@
         <strong>문법 2 보조자료 | 엄두 게이지</strong>
     </nav>
 
-    <main class="shell">
-        <section class="activity" aria-label="엄두 게이지 활동">
+    <main id="main-content" class="shell">
+        <header class="page-intro">
+            <h1>엄두 게이지</h1>
+            <p>상황을 보고 가장 자연스러운 표현 단계를 고르세요.</p>
+        </header>
+
+        <section id="umduActivity" class="activity" tabindex="-1" aria-label="엄두 게이지 활동">
             <aside class="deck" id="deck"></aside>
 
             <div class="workspace">
-                <section class="output" aria-live="polite">
+                <section class="output" aria-live="polite" aria-atomic="true">
                     <div class="sentence-panel">
                         <span class="result-label" id="resultLabel"></span>
                         <p class="result-sentence" id="resultSentence"></p>
@@ -873,7 +944,7 @@
                         </div>
                     </div>
                     <div class="image-stage">
-                        <img id="sourceImage" class="source-image" alt="" hidden loading="lazy" decoding="async" />
+                        <img id="sourceImage" class="source-image" alt="" loading="eager" decoding="async" />
                         <div id="sceneFallback" class="scene-fallback"></div>
                     </div>
                     <div id="levelControls" class="control-grid"></div>
@@ -899,30 +970,10 @@
             <a class="btn" href="grammar2.html"><i class="fa-solid fa-arrow-left"></i> 문법 2</a>
             <a class="btn primary" href="grammar2-speaking-pro.html"><i class="fa-solid fa-microphone-lines"></i> 말하기 PRO</a>
         </nav>
-
-        <section class="hero">
-            <div>
-                <p class="eyebrow">Grammar 2 Support</p>
-                <h1>엄두 게이지</h1>
-                <p class="lead">같은 상황이 얼마나 심한지 보고, <strong>할 수 있어요</strong>, <strong>하기 어려워요</strong>, <strong>V-(으)ㄹ 생각도 못 해요</strong>로 바꿔 말해 보세요.</p>
-            </div>
-            <div class="hero-meter" aria-label="엄두 게이지 단계">
-                <div class="meter-chip" data-level="0">
-                    <strong>0</strong>
-                    <span>할 수 있어요</span>
-                </div>
-                <div class="meter-chip" data-level="1">
-                    <strong>1</strong>
-                    <span>하기 어려워요</span>
-                </div>
-                <div class="meter-chip" data-level="2">
-                    <strong>2</strong>
-                    <span>생각도 못 해요</span>
-                </div>
-            </div>
-        </section>
+        <div data-c16-state-tools></div>
     </main>
 
+    <script src="../shared/c16-grammar-state.js"></script>
     <script>
         const cards = [
             {
@@ -1197,13 +1248,45 @@
             { label: '2단계', mode: '생각도 못 해요', icon: 'fa-ban' }
         ];
 
-        const viewStorageKey = 'c16-grammar2-umdu-gauge-view';
-
-        const state = {
+        const defaultProgress = {
             cardIndex: 0,
             level: 2,
-            viewMode: localStorage.getItem(viewStorageKey) === 'icon' ? 'icon' : 'image',
-            seen: new Set()
+            viewMode: 'image',
+            seen: []
+        };
+        const progressStore = window.C16GrammarState && typeof window.C16GrammarState.create === 'function'
+            ? window.C16GrammarState.create('grammar2-umdu-gauge', defaultProgress, {
+                validate(value) {
+                    return Boolean(value)
+                        && Number.isInteger(value.cardIndex)
+                        && value.cardIndex >= 0
+                        && value.cardIndex < cards.length
+                        && Number.isInteger(value.level)
+                        && value.level >= 0
+                        && value.level <= 2
+                        && (value.viewMode === 'image' || value.viewMode === 'icon')
+                        && Array.isArray(value.seen);
+                },
+                onReset(freshState) {
+                    state.cardIndex = Number.isInteger(freshState.cardIndex) ? freshState.cardIndex : 0;
+                    state.level = Number.isInteger(freshState.level) ? freshState.level : 2;
+                    state.viewMode = freshState.viewMode === 'icon' ? 'icon' : 'image';
+                    state.seen = new Set();
+                    render();
+                }
+            })
+            : null;
+        const restoredProgress = (progressStore ? progressStore.get() : null) || defaultProgress;
+
+        const state = {
+            cardIndex: Number.isInteger(restoredProgress.cardIndex) && restoredProgress.cardIndex >= 0 && restoredProgress.cardIndex < cards.length
+                ? restoredProgress.cardIndex
+                : 0,
+            level: Number.isInteger(restoredProgress.level) && restoredProgress.level >= 0 && restoredProgress.level <= 2
+                ? restoredProgress.level
+                : 2,
+            viewMode: restoredProgress.viewMode === 'icon' ? 'icon' : 'image',
+            seen: new Set(Array.isArray(restoredProgress.seen) ? restoredProgress.seen.filter((id) => cards.some((card) => card.id === id)) : [])
         };
 
         const deckEl = document.getElementById('deck');
@@ -1220,6 +1303,21 @@
         const buildRowEl = document.getElementById('buildRow');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
+
+        function progressSnapshot() {
+            return {
+                cardIndex: state.cardIndex,
+                level: state.level,
+                viewMode: state.viewMode,
+                seen: [...state.seen]
+            };
+        }
+
+        function saveProgress() {
+            if (progressStore) {
+                progressStore.save(progressSnapshot());
+            }
+        }
 
         function iconMarkup(name) {
             return `<i class="fa-solid ${name}" aria-hidden="true"></i>`;
@@ -1244,7 +1342,7 @@
 
         function renderDeck() {
             deckEl.innerHTML = cards.map((card, index) => `
-                <button class="deck-button ${index === state.cardIndex ? 'is-active' : ''}" type="button" data-card="${index}" aria-label="${card.category} ${card.title}" title="${card.category}: ${card.title}">
+                <button class="deck-button ${index === state.cardIndex ? 'is-active' : ''}" type="button" data-card="${index}" aria-label="${card.category} ${card.title}" aria-pressed="${index === state.cardIndex}" title="${card.category}: ${card.title}">
                     <span class="deck-icon">${iconMarkup(card.icon)}</span>
                     <span>${card.category}</span>
                 </button>
@@ -1264,6 +1362,7 @@
             sourceImageEl.onerror = null;
             sourceImageEl.hidden = true;
             sourceImageEl.removeAttribute('src');
+            sceneFallbackEl.hidden = false;
 
             if (!usesImage(card)) {
                 return;
@@ -1282,6 +1381,7 @@
                 sceneFallbackEl.hidden = false;
             };
             sourceImageEl.src = card.image;
+            sourceImageEl.hidden = false;
         }
 
         function renderScene(card) {
@@ -1308,15 +1408,21 @@
                 });
             });
 
-            sceneFallbackEl.hidden = usesImage(card);
+            const imageName = card.image ? card.image.split('/').pop() : '';
+            const imageReady = usesImage(card)
+                && Boolean(imageName)
+                && sourceImageEl.currentSrc.endsWith(imageName)
+                && sourceImageEl.complete
+                && sourceImageEl.naturalWidth > 0;
+            sceneFallbackEl.hidden = imageReady;
         }
 
         function renderControls(card) {
             levelControlsEl.innerHTML = card.levels.map((level, index) => {
                 const meta = levelMeta[index];
                 return `
-                    <button class="level-button ${index === state.level ? 'is-selected' : ''}" type="button" data-level="${index}" aria-label="${meta.label} ${meta.mode}: ${level.label}" title="${level.label}">
-                        <strong>${iconMarkup(meta.icon)} ${index}</strong>
+                    <button class="level-button ${index === state.level ? 'is-selected' : ''}" type="button" data-level="${index}" aria-label="${meta.label} ${meta.mode}: ${level.label}" aria-pressed="${index === state.level}" title="${level.label}">
+                        <strong>${iconMarkup(meta.icon)} ${meta.label} · ${meta.mode}</strong>
                     </button>
                 `;
             }).join('');
@@ -1347,6 +1453,7 @@
             renderScene(card);
             renderControls(card);
             renderOutput(card);
+            saveProgress();
         }
 
         function render() {
@@ -1358,10 +1465,11 @@
 
             renderViewToggle(card);
             renderDeck();
-            renderImage(card);
             renderScene(card);
+            renderImage(card);
             renderControls(card);
             renderOutput(card);
+            saveProgress();
         }
 
         prevBtn.addEventListener('click', () => {
@@ -1389,13 +1497,15 @@
                 const nextViewMode = button.dataset.view;
                 if (nextViewMode === 'image' && !cards[state.cardIndex].image) return;
                 state.viewMode = nextViewMode;
-                localStorage.setItem(viewStorageKey, nextViewMode);
                 render();
             });
         });
 
+        if (progressStore) {
+            progressStore.mount(document.querySelector('[data-c16-state-tools]'), progressSnapshot);
+            progressStore.track(progressSnapshot);
+        }
         render();
     </script>
-    <script src="../shared/page-qr.js"></script>
 </body>
 </html>
