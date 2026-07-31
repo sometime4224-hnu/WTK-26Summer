@@ -698,6 +698,10 @@ window.MULTILANG_PAGE_DATA = {
     "c17/grammar2.html": {
         "title": "다국어 문법 도움말",
         "grammar": "A-(으)ㄴ/V-는 척하다",
+        "anchorSelector": ".hero",
+        "collapsible": true,
+        "collapsedLabel": "문법 2 다국어 도움말 열기",
+        "expandedLabel": "문법 2 다국어 도움말 접기",
         "translations": {
             "en": {
                 "title": "English scaffold",
@@ -709,12 +713,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung khi ai do gia vo co mot trang thai hoac gia vo dang lam mot hanh dong.",
+                "title": "Hỗ trợ tiếng Việt",
+                "summary": "Dùng khi ai đó giả vờ ở trong một trạng thái hoặc giả vờ thực hiện một hành động.",
                 "points": [
-                    "Dung dang tinh tu khi gia vo co tinh chat nao do.",
-                    "Dung dang dong tu khi gia vo dang lam hanh dong.",
-                    "Thuong dien ta viec che giau su that, dien xuat hoac gia vo vi ly do nao do."
+                    "Dùng A-(으)ㄴ 척하다 với tính từ.",
+                    "Dùng V-는 척하다 với động từ.",
+                    "Mẫu này thường diễn tả việc che giấu sự thật hoặc cố ý tỏ ra như vậy vì một lý do nào đó."
                 ]
             }
         }
@@ -722,6 +726,10 @@ window.MULTILANG_PAGE_DATA = {
     "c17/grammar3.html": {
         "title": "다국어 문법 도움말",
         "grammar": "A/V-다니(요), N(이)라니(요)",
+        "anchorSelector": ".hero",
+        "collapsible": true,
+        "collapsedLabel": "문법 3 다국어 도움말 열기",
+        "expandedLabel": "문법 3 다국어 도움말 접기",
         "translations": {
             "en": {
                 "title": "English scaffold",
@@ -733,12 +741,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung de phan ung bang su ngac nhien, kho tin hoac cam xuc manh sau khi nghe thong tin.",
+                "title": "Hỗ trợ tiếng Việt",
+                "summary": "Dùng để phản ứng bằng sự ngạc nhiên, khó tin hoặc cảm xúc mạnh sau khi nghe một thông tin.",
                 "points": [
-                    "Dung mot dang voi tinh tu hoac dong tu.",
-                    "Dung dang danh tu khi thong tin la danh tu.",
-                    "Sac thai gan voi: y ban la..., that sao?, khong the tin duoc."
+                    "Dùng -다니요 với tính từ hoặc động từ.",
+                    "Dùng N(이)라니요 với danh từ.",
+                    "Sắc thái gần với: “Ý bạn là...?”, “Thật sao?” hoặc “Không thể tin được.”"
                 ]
             }
         }
@@ -746,6 +754,10 @@ window.MULTILANG_PAGE_DATA = {
     "c17/grammar4.html": {
         "title": "다국어 문법 도움말",
         "grammar": "N(이)라고 해서 다 A/V-는 것은 아니다",
+        "anchorSelector": ".hero",
+        "collapsible": true,
+        "collapsedLabel": "문법 4 다국어 도움말 열기",
+        "expandedLabel": "문법 4 다국어 도움말 접기",
         "translations": {
             "en": {
                 "title": "English scaffold",
@@ -757,12 +769,12 @@ window.MULTILANG_PAGE_DATA = {
                 ]
             },
             "vi": {
-                "title": "Ho tro tieng Viet",
-                "summary": "Dung de bac bo viec khai quat qua muc ve mot nhom hoac loai nguoi/su vat.",
+                "title": "Hỗ trợ tiếng Việt",
+                "summary": "Dùng để bác bỏ một sự khái quát hóa quá mức về một nhóm hoặc một loại người, sự vật.",
                 "points": [
-                    "Nghia la: khong phai cu la danh tu do thi tat ca deu nhu vay.",
-                    "Dung khi sua dinh kien hoac suy doan qua don gian.",
-                    "Trong tam la viec khong ap dung cho moi truong hop."
+                    "Nghĩa là: chỉ vì là N không có nghĩa là tất cả đều như vậy.",
+                    "Dùng khi sửa một định kiến hoặc một suy đoán quá đơn giản.",
+                    "Giữ từ 다 vì trọng tâm là điều đó không đúng với mọi trường hợp."
                 ]
             }
         }

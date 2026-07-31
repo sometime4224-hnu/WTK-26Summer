@@ -63,14 +63,34 @@
         return Array.from(document.querySelectorAll(`[data-lang="${lang}"]`));
     }
 
+    function normalizeBlock(el) {
+        const code = el.dataset.lang;
+        if (code) {
+            el.setAttribute("lang", code);
+        }
+        if (code === "ar") {
+            el.setAttribute("dir", "rtl");
+        }
+        el.querySelectorAll("code").forEach((term) => {
+            if (/[가-힣ㄱ-ㅎㅏ-ㅣ]/.test(term.textContent || "")) {
+                term.classList.add("ko-term");
+                term.setAttribute("lang", "ko");
+                term.setAttribute("dir", "ltr");
+            }
+        });
+    }
+
     function applyLang(lang) {
         document.querySelectorAll("[data-lang]").forEach((el) => {
+            normalizeBlock(el);
             el.classList.remove("lang-visible");
+            el.setAttribute("aria-hidden", "true");
         });
 
         const visibleBlocks = lang === NONE ? [] : getBlocks(lang);
         visibleBlocks.forEach((el) => {
             el.classList.add("lang-visible");
+            el.setAttribute("aria-hidden", "false");
         });
 
         document.querySelectorAll("[data-multilang-btn]").forEach((btn) => {

@@ -371,6 +371,85 @@
   let gameStarted = false;
   let state = createInitialState(false);
 
+  const gameStateStore = window.C17ActivityState.create("rumor-game-next", {
+    started: false,
+    won: false,
+    player: { x: state.player.x, y: state.player.y },
+    npcs: [],
+    actionLog: []
+  }, {
+    validate(value) {
+      return Boolean(value)
+        && typeof value.started === "boolean"
+        && typeof value.won === "boolean"
+        && value.player
+        && Number.isFinite(value.player.x)
+        && Number.isFinite(value.player.y)
+        && Array.isArray(value.npcs)
+        && value.npcs.every((npc) => npc && typeof npc.id === "string")
+        && Array.isArray(value.actionLog)
+        && value.actionLog.every((entry) => typeof entry === "string");
+    },
+    onReset() {
+      window.location.reload();
+    }
+  });
+
+  function checkpointState() {
+    return {
+      started: gameStarted,
+      won: state.won,
+      player: { x: Math.round(state.player.x), y: Math.round(state.player.y) },
+      npcs: state.npcs.map((npc) => ({
+        id: npc.id,
+        status: npc.status,
+        doubt: npc.doubt,
+        mood: npc.mood,
+        allyLevel: npc.allyLevel,
+        distressed: npc.distressed,
+        distressTimer: npc.distressTimer,
+        supportIndex: npc.supportIndex,
+        encourageTimer: npc.encourageTimer,
+        emotion: npc.emotion
+      })),
+      actionLog: state.actionLog.slice(0, 7)
+    };
+  }
+
+  function restoreCheckpoint(checkpoint) {
+    if (!checkpoint.started && !checkpoint.npcs.length) {
+      return;
+    }
+    state.player.x = clamp(checkpoint.player.x, 0, WORLD.width);
+    state.player.y = clamp(checkpoint.player.y, 0, WORLD.height);
+    checkpoint.npcs.forEach((savedNpc) => {
+      const npc = state.npcs.find((item) => item.id === savedNpc.id);
+      if (!npc) return;
+      npc.status = savedNpc.status === "ally" ? "ally" : "misled";
+      npc.doubt = Number.isFinite(savedNpc.doubt) ? savedNpc.doubt : npc.doubt;
+      npc.mood = typeof savedNpc.mood === "string" ? savedNpc.mood : npc.mood;
+      npc.allyLevel = clamp(Number(savedNpc.allyLevel) || 0, 0, ALLY_MAX_LEVEL);
+      npc.distressed = Boolean(savedNpc.distressed);
+      npc.distressTimer = Number(savedNpc.distressTimer) || 0;
+      npc.supportIndex = Number(savedNpc.supportIndex) || 0;
+      npc.encourageTimer = Number(savedNpc.encourageTimer) || 0;
+      npc.emotion = typeof savedNpc.emotion === "string" ? savedNpc.emotion : npc.emotion;
+    });
+    state.actionLog = checkpoint.actionLog.length ? checkpoint.actionLog.slice(0, 7) : state.actionLog;
+    state.won = Boolean(checkpoint.won);
+    state.running = false;
+    if (checkpoint.started && !checkpoint.won) {
+      refs.startButton.textContent = "이어하기";
+    }
+  }
+
+  function saveCheckpoint() {
+    gameStateStore.save(checkpointState());
+  }
+
+  restoreCheckpoint(gameStateStore.get());
+  gameStateStore.mount(document.getElementById("activityStateTools"), checkpointState);
+
   function createSlime(x, y, sourceId = "wild", seed = Math.random() * 1000) {
     const type = getSlimeType(seed);
     const typeMeta = slimeTypes[type];
@@ -479,6 +558,7 @@
     }
     gameStarted = true;
     state.running = true;
+    saveCheckpoint();
     enterImmersiveMode(options);
     showToast("소문이 퍼지기 시작했습니다. 가까운 NPC와 대화하세요.");
   }
@@ -840,6 +920,7 @@
     const emotionExpression = getRepairExpression(emotionId) ?? getRepairExpression(npc.emotionAnswer ?? "misunderstand");
     addLog(`${npc.name}: ${expression.speech} → 상태는 ${emotionExpression.label} → ${resolutionExpression.label}. 소문 ${cleared}개를 함께 정화했습니다.`);
     showToast(`${npc.name}: ${emotionExpression.label} 상태를 확인하고 ${resolutionExpression.label}했습니다.`);
+    saveCheckpoint();
     checkWin();
   }
 
@@ -855,6 +936,7 @@
     state.pulses.push({ x: npc.x, y: npc.y, r: 10, max: 92, color: "#f59e0b", life: 0.8 });
     addVisualCue(npc.x, npc.y - 82, "distress", "#f59e0b", "!", 1.25);
     addLog(`${npc.name}이 곤란해합니다. 감정을 다스려 주면 우군 효율이 올라갑니다.`);
+    saveCheckpoint();
   }
 
   function sootheAlly(npc, repairId, mode = "support") {
@@ -879,6 +961,7 @@
     addVisualCue(npc.x + 22, npc.y - 66, "spark", "#22c55e", "✦", 1.2);
     addLog(`${npc.name}: ${expression.speech} → ${mode === "encourage" ? "우군 격려" : "마음 안정"}. 우군 효율 Lv.${npc.allyLevel}, 소문 ${cleared}개 정화.`);
     showToast(`${npc.name}의 우군 효율이 Lv.${npc.allyLevel}로 올랐습니다.`);
+    saveCheckpoint();
     checkWin();
   }
 
@@ -2490,6 +2573,7 @@
       refs.finishSummary.textContent = `우군 효율 합계 ${allyPower}, 남은 소문 ${state.slimes.length}개. 함께 마음을 다스려 빌런을 몰아냈습니다.`;
       refs.finishCard.classList.remove("hidden");
       addLog("우군망이 강해졌습니다. 빌런이 더 이상 소문을 퍼뜨리지 못하고 물러났습니다.");
+      saveCheckpoint();
     }
   }
 
@@ -2503,6 +2587,7 @@
     renderLog();
     updateHud();
     resizeCanvas();
+    saveCheckpoint();
   }
 
   function setupInput() {

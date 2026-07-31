@@ -126,6 +126,23 @@
         return section;
     }
 
+    function buildDisclosure(panel, entry) {
+        const details = document.createElement("details");
+        details.className = "multilang-disclosure";
+        details.open = Boolean(entry.openByDefault);
+
+        const summary = document.createElement("summary");
+        summary.className = "multilang-disclosure__summary";
+        summary.innerHTML = `
+            <span class="multilang-disclosure__label multilang-disclosure__label--closed">${escapeHtml(entry.collapsedLabel || "다국어 도움말 열기")}</span>
+            <span class="multilang-disclosure__label multilang-disclosure__label--open">${escapeHtml(entry.expandedLabel || "다국어 도움말 접기")}</span>
+            <span class="multilang-disclosure__icon" aria-hidden="true"></span>
+        `;
+        details.appendChild(summary);
+        details.appendChild(panel);
+        return details;
+    }
+
     function findAnchor(selector) {
         if (typeof selector !== "string" || !selector.trim()) return null;
         try {
@@ -273,7 +290,8 @@
             defaultLang: "none"
         });
 
-        insertPanel(buildPanel(entry, languages), entry);
+        const panel = buildPanel(entry, languages);
+        insertPanel(entry.collapsible ? buildDisclosure(panel, entry) : panel, entry);
         hideLegacyVietnameseControls();
         watchLegacyVietnameseContent();
     }

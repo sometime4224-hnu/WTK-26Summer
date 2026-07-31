@@ -37,6 +37,7 @@
   }
 
   function init() {
+    injectC17QualityStyles();
     cleanupLegacyVietnamese();
 
     // Global footer notices are disabled by default.
@@ -46,6 +47,21 @@
     if (document.getElementById(FOOTER_ID)) return;
     injectStyle();
     injectFooter();
+  }
+
+  function injectC17QualityStyles() {
+    if (!/(?:^|\/)c17(?:\/|$)/i.test(window.location.pathname)) return;
+    if (document.querySelector('link[data-c17-quality]')) return;
+    const script = document.currentScript
+      || Array.from(document.scripts).find((item) => /site-copyright\.js(?:\?|$)/.test(item.src));
+    const href = script && script.src
+      ? new URL('../c17/quality.css', script.src).href
+      : 'quality.css';
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    link.dataset.c17Quality = 'true';
+    document.head.appendChild(link);
   }
 
   function injectStyle() {

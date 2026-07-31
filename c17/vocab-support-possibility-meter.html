@@ -334,29 +334,6 @@
             line-height: 1.55;
         }
 
-        .scenario-copy .vi-text {
-            margin-top: 6px;
-            color: #4b5563;
-            font-size: 0.92rem;
-            font-weight: 700;
-            line-height: 1.5;
-        }
-
-        .scenario-copy .vi-text::before {
-            content: "VI";
-            display: inline-flex;
-            min-height: 20px;
-            align-items: center;
-            margin-right: 7px;
-            padding: 0 6px;
-            border-radius: 999px;
-            background: color-mix(in srgb, var(--meter-color) 10%, #fff);
-            color: var(--meter-color);
-            font-size: 0.68rem;
-            font-weight: 900;
-            vertical-align: 1px;
-        }
-
         .meter {
             padding: 15px;
             border: 1px solid var(--line);
@@ -749,19 +726,6 @@
                 line-height: 1.34;
             }
 
-            .scenario-copy .vi-text {
-                margin-top: 3px;
-                font-size: 0.73rem;
-                line-height: 1.32;
-            }
-
-            .scenario-copy .vi-text::before {
-                min-height: 16px;
-                margin-right: 4px;
-                padding: 0 5px;
-                font-size: 0.58rem;
-            }
-
             .meter {
                 padding: 10px;
             }
@@ -933,9 +897,7 @@
                         </div>
                         <div class="scenario-copy">
                             <h3 id="scenario-title"></h3>
-                            <p id="scenario-title-vi" class="vi-text"></p>
                             <p id="scenario-clue"></p>
-                            <p id="scenario-clue-vi" class="vi-text"></p>
                         </div>
                     </div>
 
@@ -1047,8 +1009,6 @@
             {
                 title: "항상 일찍 오던 친구가 오늘 연락 없이 결석했어요.",
                 clue: "어제 밤에 열이 난다고 말했어요.",
-                viTitle: "Người bạn luôn đến sớm hôm nay nghỉ học mà không báo.",
-                viClue: "Tối qua bạn ấy nói là bị sốt.",
                 answer: "possible",
                 image: `${imageBasePath}/possibility-possible.webp`,
                 reason: "아팠다는 단서가 있으므로 결석은 충분히 가능한 상황입니다."
@@ -1056,8 +1016,6 @@
             {
                 title: "한국어를 전혀 모르는 사람이 통역 없이 긴 인터뷰를 했대요.",
                 clue: "그 사람은 아직 한글도 배우지 않았어요.",
-                viTitle: "Có người không biết tiếng Hàn mà nói là đã phỏng vấn dài không cần phiên dịch.",
-                viClue: "Người đó còn chưa học bảng chữ Hàn.",
                 answer: "no-reason",
                 image: `${imageBasePath}/possibility-no-reason.webp`,
                 reason: "현재 능력과 소문이 맞지 않아 가능성이 매우 낮습니다."
@@ -1065,8 +1023,6 @@
             {
                 title: "두 사람이 매일 같이 점심을 먹고 같은 팔찌를 하고 있어요.",
                 clue: "친구들이 지난주에도 둘이 데이트하는 것을 봤대요.",
-                viTitle: "Hai người ngày nào cũng ăn trưa cùng nhau và đeo vòng tay giống nhau.",
-                viClue: "Tuần trước bạn bè cũng thấy họ đi hẹn hò.",
                 answer: "certain",
                 image: `${imageBasePath}/possibility-certain.webp`,
                 reason: "반복된 행동과 목격담이 있어 확신에 가까운 판단을 할 수 있습니다."
@@ -1074,8 +1030,6 @@
             {
                 title: "오랫동안 준비한 유학 합격 소식을 들었어요.",
                 clue: "기쁘지만 너무 갑작스러워 아직 실감이 나지 않아요.",
-                viTitle: "Bạn nghe tin mình đã đậu du học sau thời gian chuẩn bị lâu.",
-                viClue: "Bạn vui, nhưng tin đến quá bất ngờ nên vẫn chưa thấy thật.",
                 answer: "hard-to-believe",
                 image: `${imageBasePath}/possibility-hard-to-believe.webp`,
                 reason: "사실을 부정한다기보다 마음으로 받아들이기 어려운 느낌입니다."
@@ -1083,8 +1037,6 @@
             {
                 title: "내일 시험이 있다는 소문이 갑자기 돌았어요.",
                 clue: "선생님은 오늘 수업 끝에 시험이 없다고 세 번 말했어요.",
-                viTitle: "Bỗng có tin đồn rằng ngày mai có bài kiểm tra.",
-                viClue: "Cuối giờ hôm nay, thầy cô nói ba lần là không có kiểm tra.",
                 answer: "no-reason",
                 image: `${imageBasePath}/possibility-no-reason.webp`,
                 reason: "권위 있는 정보가 반대 방향이므로 소문을 믿기 어렵습니다."
@@ -1092,8 +1044,6 @@
             {
                 title: "친구가 약속 시간을 잊어버렸어요.",
                 clue: "요즘 시험 기간이라 며칠째 거의 못 잤대요.",
-                viTitle: "Bạn của bạn quên giờ hẹn.",
-                viClue: "Dạo này đang mùa thi nên bạn ấy gần như không ngủ mấy ngày.",
                 answer: "possible",
                 image: `${imageBasePath}/possibility-possible.webp`,
                 reason: "피곤한 상황에서는 약속을 잊을 수도 있다고 인정할 수 있습니다."
@@ -1101,8 +1051,6 @@
             {
                 title: "회의실에 불이 켜져 있고 발표 자료가 화면에 떠 있어요.",
                 clue: "방금 안에서 발표 연습하는 소리도 들렸어요.",
-                viTitle: "Phòng họp đang bật đèn và tài liệu thuyết trình hiện trên màn hình.",
-                viClue: "Vừa rồi bạn cũng nghe tiếng luyện thuyết trình bên trong.",
                 answer: "certain",
                 image: `${imageBasePath}/possibility-certain.webp`,
                 reason: "여러 단서가 같은 방향을 가리키므로 거의 확실한 상황입니다."
@@ -1110,8 +1058,6 @@
             {
                 title: "오랜만에 만난 친구가 다음 달에 결혼한다고 했어요.",
                 clue: "너무 뜻밖이라 처음에는 농담처럼 들렸어요.",
-                viTitle: "Một người bạn lâu ngày gặp lại nói rằng tháng sau sẽ kết hôn.",
-                viClue: "Tin quá bất ngờ nên lúc đầu nghe như đùa.",
                 answer: "hard-to-believe",
                 image: `${imageBasePath}/possibility-hard-to-believe.webp`,
                 reason: "뜻밖의 사실을 듣고 놀라서 믿기 어려운 반응입니다."
@@ -1121,9 +1067,7 @@
         const scenarioListEl = document.getElementById("scenario-list");
         const scenarioImageEl = document.getElementById("scenario-image");
         const scenarioTitleEl = document.getElementById("scenario-title");
-        const scenarioTitleViEl = document.getElementById("scenario-title-vi");
         const scenarioClueEl = document.getElementById("scenario-clue");
-        const scenarioClueViEl = document.getElementById("scenario-clue-vi");
         const progressBadgeEl = document.getElementById("progress-badge");
         const rangeEl = document.getElementById("confidence-range");
         const readoutWordEl = document.getElementById("readout-word");
@@ -1201,9 +1145,7 @@
             const scenario = scenarios[currentIndex];
             scenarioImageEl.src = scenario.image;
             scenarioTitleEl.textContent = scenario.title;
-            scenarioTitleViEl.textContent = scenario.viTitle;
             scenarioClueEl.textContent = scenario.clue;
-            scenarioClueViEl.textContent = scenario.viClue;
             progressBadgeEl.textContent = `${currentIndex + 1} / ${scenarios.length}`;
             feedbackEl.innerHTML = `
                 <strong>표현을 선택하세요.</strong>
@@ -1257,6 +1199,8 @@
 
         showScenario(0);
     </script>
+    <script src="activity-state.js"></script>
+    <script src="activity-autosave.js"></script>
     <script src="../shared/site-copyright.js"></script>
     <script src="../shared/page-qr.js"></script>
 </body>

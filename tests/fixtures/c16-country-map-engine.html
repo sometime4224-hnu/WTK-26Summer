@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>C16 country map engine fixture</title>
+    <link rel="stylesheet" href="../../c16/grammar4-country-map-common.css" />
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            color: #0f172a;
+            font-family: sans-serif;
+            background: #f8fafc;
+        }
+        button, a { font: inherit; }
+        main {
+            width: min(100% - 24px, 900px);
+            margin: 0 auto;
+            padding: 12px 0 40px;
+        }
+        .panel {
+            margin-bottom: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 12px;
+            background: #fff;
+        }
+        .status-row,
+        .chip-row,
+        .region-bar,
+        .zoom-controls,
+        .tag-grid,
+        .mini-grid {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-row { justify-content: space-between; }
+        .sentence { font-size: clamp(24px, 5vw, 38px); font-weight: 900; }
+        .region-button,
+        .tag-button,
+        .mini-button,
+        .zoom-button {
+            min-height: 44px;
+            border: 1px solid #94a3b8;
+            border-radius: 10px;
+            padding: 8px 12px;
+            background: #fff;
+        }
+        [aria-pressed="true"] {
+            border-color: #2563eb;
+            background: #dbeafe;
+        }
+        .map-canvas {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #dcfce7, #dbeafe);
+        }
+        .map-layer {
+            position: absolute;
+            inset: 0;
+            transform-origin: 0 0;
+        }
+        .pin {
+            position: absolute;
+            left: var(--x);
+            top: var(--y);
+            width: 28px;
+            height: 28px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            background: #2563eb;
+            color: #fff;
+            transform: translate(-50%, -50%);
+        }
+        .pin-label {
+            position: absolute;
+            left: var(--x);
+            top: var(--y);
+            padding: 2px 5px;
+            background: #fff;
+            font-size: 11px;
+            transform: translate(14px, -50%);
+        }
+        .tag-tile {
+            display: grid;
+            grid-template-columns: minmax(140px, 1fr) auto;
+            align-items: center;
+            gap: 8px;
+        }
+        .tag-actions { display: flex; gap: 8px; }
+        .tag-actions a,
+        .chip-row a {
+            display: inline-grid;
+            place-items: center;
+            min-width: 44px;
+            min-height: 44px;
+            border: 1px solid #94a3b8;
+            border-radius: 50%;
+        }
+        .place-card { display: flex; gap: 8px; }
+        #placeName { display: block; }
+        @media (max-width: 420px) {
+            .tag-grid,
+            .mini-grid { display: grid; grid-template-columns: 1fr; }
+            .tag-tile { grid-template-columns: 1fr auto; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1 class="sr-only">국가 지도 엔진 테스트</h1>
+        <section class="panel" aria-live="polite">
+            <div class="status-row">
+                <span id="regionBadge"></span>
+                <span id="saveStatus" class="save-status" role="status"></span>
+                <button id="resetActivityBtn" class="country-map-reset" type="button">처음부터</button>
+            </div>
+            <p id="sentenceText" class="sentence"></p>
+            <div class="chip-row">
+                <span id="placeChip"></span>
+                <span id="tagChip"></span>
+                <a id="mapAction" target="_blank" rel="noopener noreferrer" hidden>지도</a>
+                <a id="photoAction" target="_blank" rel="noopener noreferrer" hidden>사진</a>
+            </div>
+        </section>
+
+        <nav id="regionBar" class="region-bar" aria-label="지역 필터"></nav>
+
+        <section class="panel">
+            <div class="zoom-controls">
+                <span id="pinCount"></span>
+                <button id="zoomOutBtn" class="zoom-button" type="button">−</button>
+                <span id="zoomLevel"></span>
+                <button id="zoomInBtn" class="zoom-button" type="button">+</button>
+                <button id="zoomResetBtn" class="zoom-button" type="button">100%</button>
+            </div>
+            <div id="mapCanvas" class="map-canvas">
+                <div id="mapLayer" class="map-layer">
+                    <div id="pinLayer"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel place-card">
+            <span id="placeIcon"></span>
+            <span>
+                <strong id="placeName" tabindex="-1"></strong>
+                <span id="placeMeta"></span>
+            </span>
+        </section>
+
+        <section class="panel">
+            <span id="tagCount"></span>
+            <div id="tagGrid" class="tag-grid"></div>
+        </section>
+
+        <section class="panel">
+            <span id="nearCount"></span>
+            <div id="nearGrid" class="mini-grid"></div>
+        </section>
+    </main>
+
+    <script src="../../c16/grammar4-country-map-state.js"></script>
+    <script src="../../c16/grammar4-country-map-engine.js"></script>
+    <script>
+        window.C16_COUNTRY_MAP_FIXTURE_KEY = 'korean3bimprove:test:c16-country-map-engine';
+        window.fixtureEngine = C16CountryMap.mount({
+            data: {
+                schemaVersion: 1,
+                countryId: 'fixture',
+                storageKey: window.C16_COUNTRY_MAP_FIXTURE_KEY,
+                zoomSteps: [1, 1.5, 2],
+                initialState: {
+                    region: 'north',
+                    targetId: 'seoul',
+                    tagId: 'palace',
+                    zoomIndex: 0
+                },
+                regions: [
+                    { id: 'all', label: '전체', icon: 'fa-globe' },
+                    { id: 'north', label: '북부', icon: 'fa-mountain' },
+                    { id: 'south', label: '남부', icon: 'fa-water' }
+                ],
+                targets: [
+                    {
+                        id: 'seoul',
+                        region: 'north',
+                        x: 32,
+                        y: 32,
+                        displayX: 58,
+                        displayY: 62,
+                        labelPlacement: 'top',
+                        icon: 'fa-city',
+                        name: '서울',
+                        nativeName: 'Seoul',
+                        hint: '수도',
+                        tagIds: ['palace', 'river']
+                    },
+                    {
+                        id: 'chuncheon',
+                        region: 'north',
+                        x: 66,
+                        y: 26,
+                        icon: 'fa-water',
+                        name: '춘천',
+                        nativeName: 'Chuncheon',
+                        hint: '호수',
+                        tagIds: ['lake']
+                    },
+                    {
+                        id: 'busan',
+                        region: 'south',
+                        x: 64,
+                        y: 74,
+                        icon: 'fa-anchor',
+                        name: '부산',
+                        nativeName: 'Busan',
+                        hint: '항구',
+                        tagIds: ['beach']
+                    }
+                ],
+                tags: {
+                    palace: {
+                        label: '경복궁',
+                        mapQuery: 'Gyeongbokgung Palace Seoul',
+                        imageQuery: 'Gyeongbokgung Palace Seoul'
+                    },
+                    river: {
+                        label: '한강',
+                        mapQuery: 'Han River Seoul',
+                        imageQuery: 'Han River Seoul'
+                    },
+                    lake: {
+                        label: '소양호',
+                        mapQuery: 'Soyang Lake Chuncheon',
+                        imageQuery: 'Soyang Lake Chuncheon'
+                    },
+                    beach: {
+                        label: '해운대',
+                        mapQuery: null,
+                        imageQuery: 'Haeundae Beach Busan'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

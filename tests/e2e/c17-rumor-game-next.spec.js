@@ -1,5 +1,12 @@
 const { test, expect } = require("@playwright/test");
 
+test.beforeEach(async ({ page }) => {
+  await page.route("https://www.googletagmanager.com/**", (route) => route.abort());
+  await page.route("https://fonts.googleapis.com/**", (route) => route.abort());
+  await page.route("https://fonts.gstatic.com/**", (route) => route.abort());
+  await page.route("https://cdnjs.cloudflare.com/**", (route) => route.abort());
+});
+
 async function expectNoHorizontalOverflow(page) {
   const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   expect(hasOverflow).toBeFalsy();
@@ -47,17 +54,17 @@ async function startGame(page) {
 }
 
 test("c17 rumor game NEXT is linked from main and vocabulary entry points", async ({ page }) => {
-  await page.goto("/");
-  const rootGameLink = page.locator('a[href="c17/rumor-game-next/index.html"]');
-  await expect(rootGameLink).toHaveCount(1);
-  await expect(rootGameLink).toContainText("소문 무마 게임 NEXT");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  const rootChapterLink = page.locator('a[href="c17/index.html"]');
+  await expect(rootChapterLink).toHaveCount(1);
+  await expect(rootChapterLink).toContainText("17");
 
-  await page.goto("/c17/index.html");
+  await page.goto("/c17/index.html", { waitUntil: "domcontentloaded" });
   const chapterGameLink = page.locator('a[href="rumor-game-next/index.html"]');
   await expect(chapterGameLink).toHaveCount(1);
   await expect(chapterGameLink).toContainText("보조 놀이");
 
-  await page.goto("/c17/vocabulary.html");
+  await page.goto("/c17/vocabulary.html", { waitUntil: "domcontentloaded" });
   const vocabGameLink = page.locator('.topbar a[href="rumor-game-next/index.html"]');
   await expect(vocabGameLink).toHaveCount(1);
   await expect(vocabGameLink).toContainText("보조놀이");
@@ -98,6 +105,18 @@ test("c17 rumor game NEXT renders and exposes vocabulary systems", async ({ page
   await expect(page.locator("#expressionOverlay")).toBeHidden();
   await expectCanvasHasScenePixels(page);
   await expectNoHorizontalOverflow(page);
+  const startedCheckpoint = await page.evaluate(() => (
+    JSON.parse(localStorage.getItem("korean3b.c17.rumor-game-next.v1"))
+  ));
+  expect(startedCheckpoint.state.started).toBe(true);
+  await page.evaluate(() => window.RUMOR_GAME_NEXT.actions.restart());
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await expect(page.locator("#startButton")).toContainText("이어하기");
+  const restartedCheckpoint = await page.evaluate(() => (
+    JSON.parse(localStorage.getItem("korean3b.c17.rumor-game-next.v1"))
+  ));
+  expect(restartedCheckpoint.state.started).toBe(true);
+  expect(restartedCheckpoint.state.won).toBe(false);
   expect(errors).toEqual([]);
 });
 

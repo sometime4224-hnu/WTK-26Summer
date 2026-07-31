@@ -14,6 +14,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="../shared/design-tokens.css" />
     <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+    <link rel="stylesheet" href="activity-state.css" />
+    <link rel="stylesheet" href="writing-cut-common.css" />
     <style>
         /* ── 교사 배너 ─────────────────────────── */
         .teacher-banner {
@@ -97,6 +99,7 @@
 
         /* 교사 모드 강조 */
         .teacher-mode .step-pill.active,
+        .teacher-mode .cut-pick.active,
         .teacher-mode .cut-pill.active {
             background: #1e3a5f !important;
             color: #ffffff !important;
@@ -104,7 +107,7 @@
         }
     </style>
 </head>
-<body class="teacher-mode">
+<body class="teacher-mode writing-cut-common">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -138,8 +141,62 @@
         </button>
     </nav>
 
-    <main class="page-shell">
-        <div id="app" class="app-root"></div>
+    <main class="page-shell writing-shell">
+        <section class="writing-hero">
+            <div>
+                <p class="writing-hero__eyebrow">Teacher Cut Writing</p>
+                <h1>서동요 컷 쓰기 · 교사용</h1>
+                <p class="writing-hero__lead">모든 컷과 단계를 자유롭게 열어 시범을 보이거나 정답을 확인할 수 있습니다.</p>
+            </div>
+            <div class="writing-hero__links">
+                <a class="writing-link" href="reading.html"><i class="fa-solid fa-book-open"></i> 지문 읽기</a>
+                <a class="writing-link writing-link--primary" href="writing-cut.html"><i class="fa-solid fa-user-graduate"></i> 학생용</a>
+            </div>
+        </section>
+
+        <section class="practice" aria-label="교사용 컷 쓰기 연습">
+            <aside class="rail" aria-label="컷 선택">
+                <h2>컷 선택</h2>
+                <p>교사용 진행 기록은 학생용과 별도로 자동 저장됩니다.</p>
+                <div id="cutRail"></div>
+            </aside>
+
+            <section class="workbench" aria-live="polite">
+                <div class="stage-head">
+                    <div class="stage-title">
+                        <p class="eyebrow" id="stageEyebrow">Step</p>
+                        <h2 id="stageTitle">연습 준비</h2>
+                    </div>
+                    <div class="progress-dots" id="progressDots" aria-label="단계 진행"></div>
+                </div>
+
+                <div class="mode-row" id="modeRow" aria-label="연습 단계"></div>
+
+                <div class="work-grid">
+                    <figure class="image-panel">
+                        <img id="cutImage" src="../assets/c17/reading-writing/images/writing-cut/c17-writing-cut-01.webp" alt="서동요 컷 1" loading="eager" decoding="async">
+                        <figcaption class="caption" id="cutCaption">1컷</figcaption>
+                    </figure>
+
+                    <div class="task-panel">
+                        <article class="answer-card">
+                            <h3 id="taskHeading">문장을 확인하세요.</h3>
+                            <p id="taskGuide">컷에 맞는 활동이 여기에 표시됩니다.</p>
+                            <div id="taskBody"></div>
+                            <div class="feedback" id="feedback"></div>
+                            <div class="answer-text" id="answerText"></div>
+                            <div class="button-row">
+                                <button class="btn" type="button" id="prevBtn"><i class="fa-solid fa-arrow-left"></i> 이전</button>
+                                <button class="btn" type="button" id="checkBtn"><i class="fa-solid fa-check"></i> 확인</button>
+                                <button class="btn" type="button" id="showAnswerBtn"><i class="fa-solid fa-eye"></i> 정답 보기</button>
+                                <button class="btn rose" type="button" id="nextBtn">다음 <i class="fa-solid fa-arrow-right"></i></button>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+        </section>
+        <div id="activityStateTools"></div>
     </main>
 
     <script>
@@ -150,6 +207,7 @@
             window.open("reading.html", "_blank");
         });
     </script>
+    <script src="activity-state.js"></script>
     <script src="writing-cut.js"></script>
     <script src="../shared/site-copyright.js"></script>
     <script src="../shared/page-qr.js"></script>

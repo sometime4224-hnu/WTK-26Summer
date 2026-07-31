@@ -3,7 +3,7 @@
 
     const ASSET_BASE = "../assets/c17/reading-writing/images/writing-cut/";
     const IS_TEACHER = Boolean(window.C17_WRITING_CUT_TEACHER);
-    const STORAGE_KEY = IS_TEACHER
+    const LEGACY_STORAGE_KEY = IS_TEACHER
         ? "korean3b.c17.writing-cut.teacher.v1"
         : "korean3b.c17.writing-cut.v1";
 
@@ -147,6 +147,18 @@
 
     window.C17_WRITING_CUTS = cuts;
 
+    const initialState = { cutIndex: 0, stageIndex: 0, done: {} };
+    const stateStore = window.C17ActivityState.create(
+        IS_TEACHER ? "writing-cut-teacher" : "writing-cut-student",
+        initialState,
+        {
+            validate: isValidState,
+            migrate: migrateLegacyState,
+            onReset: function () {
+                window.location.reload();
+            }
+        }
+    );
     const state = loadState();
     let selectedChoice = null;
     let filledBlanks = [];
@@ -171,21 +183,45 @@
         nextBtn: document.getElementById("nextBtn")
     };
 
-    function loadState() {
+    function isValidState(value) {
+        return Boolean(value)
+            && Number.isInteger(value.cutIndex)
+            && value.cutIndex >= 0
+            && value.cutIndex < cuts.length
+            && Number.isInteger(value.stageIndex)
+            && value.stageIndex >= 0
+            && value.stageIndex < stages.length
+            && Boolean(value.done)
+            && typeof value.done === "object"
+            && !Array.isArray(value.done);
+    }
+
+    function migrateLegacyState() {
         try {
-            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+            const raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+            if (!raw) {
+                return null;
+            }
+            const saved = JSON.parse(raw);
+            if (!isValidState(saved)) {
+                return null;
+            }
             return {
-                cutIndex: clamp(Number(saved.cutIndex) || 0, 0, cuts.length - 1),
-                stageIndex: clamp(Number(saved.stageIndex) || 0, 0, stages.length - 1),
-                done: saved.done && typeof saved.done === "object" ? saved.done : {}
+                cutIndex: saved.cutIndex,
+                stageIndex: saved.stageIndex,
+                done: JSON.parse(JSON.stringify(saved.done))
             };
         } catch (error) {
-            return { cutIndex: 0, stageIndex: 0, done: {} };
+            return null;
         }
     }
 
+    function loadState() {
+        return stateStore.get();
+    }
+
     function saveState() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        stateStore.save(state);
     }
 
     function clamp(value, min, max) {
@@ -472,6 +508,9 @@
         els.prevBtn.addEventListener("click", goPrev);
     }
 
+    stateStore.mount(document.getElementById("activityStateTools"), function () {
+        return state;
+    });
     bindEvents();
     render();
 })();

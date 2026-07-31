@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
     <link rel="stylesheet" href="../shared/multilang-toggle.css" />
     <link rel="stylesheet" href="../shared/page-guide.css" />
+    <link rel="stylesheet" href="activity-state.css" />
     <style>
         :root {
             --vocab-shell-width: min(1180px, calc(100vw - 32px));
@@ -302,17 +303,16 @@
             gap: 14px;
         }
         .word-card {
+            position: relative;
             min-width: 0;
             border: 0;
             padding: 0;
             background: transparent;
             color: inherit;
             text-align: initial;
-            cursor: pointer;
             perspective: 1000px;
         }
-        .word-card:focus-visible { outline: none; }
-        .word-card:focus-visible .word-card__face {
+        .word-card__flip:focus-visible ~ .word-card__inner .word-card__face {
             outline: 3px solid #bfdbfe;
             outline-offset: 3px;
         }
@@ -390,8 +390,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 34px;
-            height: 34px;
+            width: 44px;
+            height: 44px;
             border: 1px solid rgba(255, 255, 255, 0.74);
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.88);
@@ -402,6 +402,10 @@
         .card-action:hover { color: var(--accent-dark, #1d4ed8); }
         .card-action--speak { top: 10px; right: 10px; }
         .card-action--flip { right: 10px; bottom: 10px; }
+        .word-card:not(.is-flipped) .card-action--speak {
+            visibility: hidden;
+            pointer-events: none;
+        }
         .word-card__back {
             transform: rotateY(180deg);
             gap: 10px;
@@ -717,7 +721,7 @@
             .word-card__inner { min-height: 160px; }
             .word-card__front { padding: 8px; }
             .word-card__front-headword { top: 8px; left: 8px; right: 8px; padding: 6px 8px; font-size: var(--front-headword-font-size, 13px); }
-            .card-action { width: 32px; height: 32px; }
+            .card-action { width: 44px; height: 44px; }
             .card-action--speak { top: 8px; right: 8px; }
             .card-action--flip { right: 8px; bottom: 8px; }
             .word-card__back { padding: 12px; }
@@ -822,6 +826,8 @@
                 </div>
             </div>
         </section>
+
+        <div id="activityStateTools"></div>
 
         <nav class="footer-nav" aria-label="페이지 이동">
             <a class="btn" href="index.html"><i class="fa-solid fa-house"></i> 17과 목록</a>
@@ -1108,6 +1114,7 @@
     </script>
 
     <script src="../shared/vocabulary-multilang-data.js"></script>
+    <script src="activity-state.js"></script>
 
     <script>
     (function () {
@@ -1166,6 +1173,41 @@
         let cardOrder = words.map((_, index) => index);
         let quizQueue = [];
         let quizIndex = 0;
+        let quizComplete = false;
+        const stateStore = window.C17ActivityState.create("vocabulary", {
+            view: "cards",
+            category: "all",
+            search: "",
+            cardOrder: words.map((_, index) => index),
+            quizMode,
+            quizQueue: [],
+            quizIndex: 0,
+            quizComplete: false
+        }, {
+            validate: (value) => Boolean(value)
+                && ["cards", "list", "quiz"].includes(value.view)
+                && categories.some((category) => category.id === value.category)
+                && typeof value.search === "string"
+                && Array.isArray(value.cardOrder)
+                && value.cardOrder.length === words.length
+                && value.cardOrder.every((index) => Number.isInteger(index) && index >= 0 && index < words.length)
+                && availableQuizModes.includes(value.quizMode)
+                && Array.isArray(value.quizQueue)
+                && value.quizQueue.every((id) => words.some((word) => word.id === id))
+                && Number.isInteger(value.quizIndex)
+                && value.quizIndex >= 0
+                && typeof value.quizComplete === "boolean",
+            onReset: () => window.location.reload()
+        });
+        const activityState = stateStore.get();
+        currentView = activityState.view;
+        currentCategory = activityState.category;
+        searchQuery = activityState.search;
+        cardOrder = activityState.cardOrder.slice();
+        quizMode = activityState.quizMode;
+        quizQueue = activityState.quizQueue.map((id) => words.find((word) => word.id === id)).filter(Boolean);
+        quizIndex = Math.min(activityState.quizIndex, quizQueue.length);
+        quizComplete = activityState.quizComplete;
 
         const els = {
             vocabCount: document.getElementById("vocab-count"),
@@ -1200,6 +1242,18 @@
         function writeStored(key, value) {
             try { localStorage.setItem(key, value); }
             catch (error) { /* ignore */ }
+        }
+
+        function saveActivityState() {
+            activityState.view = currentView;
+            activityState.category = currentCategory;
+            activityState.search = searchQuery;
+            activityState.cardOrder = cardOrder.slice();
+            activityState.quizMode = quizMode;
+            activityState.quizQueue = quizQueue.map((word) => word.id);
+            activityState.quizIndex = quizIndex;
+            activityState.quizComplete = quizComplete;
+            stateStore.save(activityState);
         }
 
         function normalizeCategories(source) {
@@ -1343,6 +1397,10 @@
                 button.dataset.categoryId = category.id;
                 button.addEventListener("click", () => {
                     currentCategory = category.id;
+                    quizQueue = [];
+                    quizIndex = 0;
+                    quizComplete = false;
+                    saveActivityState();
                     document.querySelectorAll(".category-btn").forEach((btn) => btn.classList.remove("active"));
                     button.classList.add("active");
                     render();
@@ -1363,9 +1421,13 @@
                 button.innerHTML = `<i class="fa-solid ${meta.icon}"></i> ${escapeHtml(meta.label)}`;
                 button.addEventListener("click", () => {
                     quizMode = mode;
+                    quizQueue = [];
+                    quizIndex = 0;
+                    quizComplete = false;
                     writeStored(`${storagePrefix}-quiz-mode`, quizMode);
+                    saveActivityState();
                     updateQuizModeButtons();
-                    if (currentView === "quiz") startQuiz();
+                    if (currentView === "quiz") startQuiz(true);
                 });
                 els.quizModeSelector.appendChild(button);
             });
@@ -1406,24 +1468,20 @@
                 const palette = paletteFor(word.category);
                 const card = document.createElement("article");
                 card.className = "word-card";
-                card.tabIndex = 0;
-                card.setAttribute("role", "button");
-                card.setAttribute("aria-pressed", "false");
-                card.setAttribute("aria-label", `${word.ko} 카드 뒤집기`);
                 card.style.setProperty("--card-bg", palette.bg);
                 card.style.setProperty("--card-ink", palette.ink);
                 card.style.setProperty("--card-line", palette.line);
                 card.innerHTML = `
+                    <button class="card-action card-action--speak" type="button" data-speak="${escapeHtml(word.ko)}" data-lang-code="ko-KR" aria-label="${escapeHtml(word.ko)} 듣기" aria-hidden="true" tabindex="-1"><i class="fa-solid fa-volume-high"></i></button>
+                    <button class="card-action card-action--flip word-card__flip" type="button" aria-pressed="false" aria-label="${escapeHtml(word.ko)} 카드 뒤집기"><i class="fa-solid fa-rotate"></i></button>
                     <span class="word-card__inner">
-                        <span class="word-card__face word-card__front">
+                        <span class="word-card__face word-card__front" aria-hidden="false">
                             ${showFrontHeadword ? `<span class="word-card__front-headword">${escapeHtml(word.ko)}</span>` : ""}
                             ${imageMarkup(word, "word-card__image", word.ko)}
-                            <span class="card-action card-action--flip" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span>
                         </span>
-                        <span class="word-card__face word-card__back">
-                            <button class="card-action card-action--speak" type="button" data-speak="${escapeHtml(word.ko)}" data-lang-code="ko-KR" aria-label="${escapeHtml(word.ko)} 듣기"><i class="fa-solid fa-volume-high"></i></button>
+                        <span class="word-card__face word-card__back" aria-hidden="true">
                             <span class="word-card__back-main">${escapeHtml(word.ko)}</span>
-                            <span class="word-card__translation" dir="${escapeHtml(langDir(activeLang))}">
+                            <span class="word-card__translation" lang="${escapeHtml(activeLang)}" dir="${escapeHtml(langDir(activeLang))}">
                                 <span class="word-card__lang">${escapeHtml(answerLabel())}</span>
                                 <span class="word-card__translation-text">${escapeHtml(answerFor(word))}</span>
                             </span>
@@ -1431,25 +1489,22 @@
                         </span>
                     </span>
                 `;
-                card.addEventListener("click", (event) => {
-                    const speaker = event.target.closest("[data-speak]");
-                    if (speaker) {
-                        event.stopPropagation();
-                        speak(speaker.dataset.speak, speaker.dataset.langCode);
-                        return;
-                    }
-                    const flipped = !card.classList.contains("is-flipped");
+                const flipButton = card.querySelector(".word-card__flip");
+                const speakButton = card.querySelector("[data-speak]");
+                const frontFace = card.querySelector(".word-card__front");
+                const backFace = card.querySelector(".word-card__back");
+                function setFlipped(flipped) {
                     card.classList.toggle("is-flipped", flipped);
-                    card.setAttribute("aria-pressed", String(flipped));
+                    flipButton.setAttribute("aria-pressed", String(flipped));
+                    flipButton.setAttribute("aria-label", `${word.ko} 카드 ${flipped ? "앞면 보기" : "뒤집기"}`);
+                    frontFace.setAttribute("aria-hidden", String(flipped));
+                    backFace.setAttribute("aria-hidden", String(!flipped));
+                    speakButton.setAttribute("aria-hidden", String(!flipped));
+                    speakButton.tabIndex = flipped ? 0 : -1;
                     if (navigator.vibrate) navigator.vibrate(10);
-                });
-                card.addEventListener("keydown", (event) => {
-                    if (event.key !== "Enter" && event.key !== " ") return;
-                    event.preventDefault();
-                    const flipped = !card.classList.contains("is-flipped");
-                    card.classList.toggle("is-flipped", flipped);
-                    card.setAttribute("aria-pressed", String(flipped));
-                });
+                }
+                flipButton.addEventListener("click", () => setFlipped(!card.classList.contains("is-flipped")));
+                speakButton.addEventListener("click", () => speak(speakButton.dataset.speak, speakButton.dataset.langCode));
                 els.wordGrid.appendChild(card);
             });
         }
@@ -1476,7 +1531,7 @@
                         ${word.example ? `<div><strong>예문</strong> ${escapeHtml(word.example)}</div>` : ""}
                         <div class="translation-grid">
                             ${translationLangs.filter((lang) => word[lang]).map((lang) => `
-                                <div class="translation-cell" dir="${escapeHtml(langDir(lang))}"><strong>${escapeHtml(LANGS[lang].label)}</strong>${escapeHtml(word[lang])}</div>
+                                <div class="translation-cell" lang="${escapeHtml(lang)}" dir="${escapeHtml(langDir(lang))}"><strong>${escapeHtml(LANGS[lang].label)}</strong>${escapeHtml(word[lang])}</div>
                             `).join("")}
                         </div>
                     </div>
@@ -1493,6 +1548,7 @@
             const icon = els.shuffleBtn.querySelector("i");
             icon.classList.add("fa-spin");
             setTimeout(() => icon.classList.remove("fa-spin"), 450);
+            saveActivityState();
             render();
         }
 
@@ -1502,9 +1558,19 @@
             return filtered;
         }
 
-        function startQuiz() {
+        function startQuiz(force = false) {
+            if (quizComplete && !force) {
+                renderQuizComplete();
+                return;
+            }
+            if (!force && quizQueue.length && quizIndex < quizQueue.length) {
+                renderQuizQuestion();
+                return;
+            }
             quizQueue = quizSourceWords().sort(() => Math.random() - 0.5);
             quizIndex = 0;
+            quizComplete = false;
+            saveActivityState();
             renderQuizQuestion();
         }
 
@@ -1549,6 +1615,7 @@
                     });
                     els.quizFeedback.textContent = ok ? "정답!" : `오답 - 정답: ${correctAnswer}`;
                     els.nextQuestionBtn.hidden = false;
+                    saveActivityState();
                 });
                 els.quizOptions.appendChild(option);
             });
@@ -1556,10 +1623,17 @@
 
         function nextQuizQuestion() {
             quizIndex += 1;
+            saveActivityState();
             if (quizIndex < quizQueue.length) {
                 renderQuizQuestion();
                 return;
             }
+            quizComplete = true;
+            saveActivityState();
+            renderQuizComplete();
+        }
+
+        function renderQuizComplete() {
             els.quizProgress.textContent = `완료 / ${quizQueue.length}`;
             els.quizType.textContent = "퀴즈 완료";
             els.quizQuestion.innerHTML = '<p class="quiz-prompt">퀴즈 완료!</p>';
@@ -1570,6 +1644,7 @@
 
         function switchView(view) {
             currentView = view;
+            saveActivityState();
             els.viewButtons.forEach((button) => button.classList.toggle("active", button.dataset.view === view));
             document.querySelectorAll(".view").forEach((panel) => panel.classList.remove("active"));
             document.getElementById(`${view}-view`).classList.add("active");
@@ -1594,6 +1669,10 @@
         els.viewButtons.forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
         els.searchInput.addEventListener("input", (event) => {
             searchQuery = event.target.value.trim();
+            quizQueue = [];
+            quizIndex = 0;
+            quizComplete = false;
+            saveActivityState();
             render();
         });
         els.frontToggle.addEventListener("click", () => {
@@ -1613,7 +1692,12 @@
 
         buildCategoryFilter();
         buildQuizModeSelector();
-        switchView("cards");
+        els.searchInput.value = searchQuery;
+        stateStore.mount(document.getElementById("activityStateTools"), () => {
+            saveActivityState();
+            return activityState;
+        });
+        switchView(currentView);
     })();
     </script>
     <script src="../shared/multilang-toggle.js"></script>

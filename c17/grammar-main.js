@@ -2,13 +2,41 @@
     "use strict";
 
     const config = window.C17_GRAMMAR_PAGE;
-
     if (!config) {
         return;
     }
 
-    const page = document.getElementById("page");
-    const viToggle = document.getElementById("viToggle");
+    const pageId = (window.location.pathname.match(/grammar(\d+)\.html$/i) || [null, "page"])[1];
+    const initialState = {
+        index: 0,
+        score: 0,
+        answered: false,
+        started: false,
+        selectedChoice: null,
+        complete: false,
+        tab: "learn"
+    };
+    const stateStore = window.C17ActivityState.create("grammar" + pageId, initialState, {
+        validate: function (value) {
+            return Boolean(value)
+                && Number.isInteger(value.index)
+                && value.index >= 0
+                && value.index < config.quiz.length
+                && Number.isInteger(value.score)
+                && value.score >= 0
+                && value.score <= config.quiz.length
+                && typeof value.answered === "boolean"
+                && typeof value.started === "boolean"
+                && (value.selectedChoice === null || Number.isInteger(value.selectedChoice))
+                && typeof value.complete === "boolean"
+                && (value.tab === "learn" || value.tab === "practice");
+        },
+        onReset: function () {
+            window.location.reload();
+        }
+    });
+    const state = stateStore.get();
+
     const tabLearn = document.getElementById("tabLearn");
     const tabPractice = document.getElementById("tabPractice");
     const learnPanel = document.getElementById("learnPanel");
@@ -24,33 +52,29 @@
     const resetBtn = document.getElementById("resetBtn");
     const resultCard = document.getElementById("resultCard");
 
-    const state = {
-        index: 0,
-        score: 0,
-        answered: false,
-        started: false
-    };
-
-    function setTranslationVisible(isVisible) {
-        if (!viToggle) {
-            return;
-        }
-        page.classList.toggle("vi-on", isVisible);
-        viToggle.setAttribute("aria-pressed", String(isVisible));
-        viToggle.innerHTML = '<i class="fa-solid fa-language"></i> ' + (isVisible ? "Tiếng Việt ON" : "Tiếng Việt OFF");
+    function saveState() {
+        stateStore.save(state);
     }
 
     function showTab(name) {
         const isLearn = name === "learn";
+        state.tab = isLearn ? "learn" : "practice";
         learnPanel.hidden = !isLearn;
         practicePanel.hidden = isLearn;
         tabLearn.classList.toggle("active", isLearn);
         tabPractice.classList.toggle("active", !isLearn);
+        tabLearn.setAttribute("aria-selected", String(isLearn));
+        tabPractice.setAttribute("aria-selected", String(!isLearn));
 
-        if (!isLearn && !state.started) {
+        if (!isLearn) {
             state.started = true;
-            renderQuestion();
+            if (state.complete) {
+                renderSummary();
+            } else {
+                renderQuestion();
+            }
         }
+        saveState();
     }
 
     function setFeedback(kind, html) {
@@ -63,10 +87,29 @@
         feedbackEl.textContent = "";
     }
 
+    function paintAnswer(choiceIndex) {
+        const item = config.quiz[state.index];
+        const isCorrect = choiceIndex === item.answer;
+        Array.from(choicesEl.querySelectorAll("button")).forEach(function (button, index) {
+            button.disabled = true;
+            if (index === item.answer) {
+                button.classList.add("correct");
+            } else if (index === choiceIndex) {
+                button.classList.add("wrong");
+            } else {
+                button.classList.add("dimmed");
+            }
+        });
+        setFeedback(
+            isCorrect ? "ok" : "bad",
+            "<strong>" + (isCorrect ? "정답!" : "다시 확인!") + "</strong> " + item.feedback
+        );
+        nextBtn.disabled = false;
+        progressBar.style.width = (((state.index + 1) / config.quiz.length) * 100) + "%";
+    }
+
     function renderQuestion() {
         const item = config.quiz[state.index];
-        state.answered = false;
-
         quizTitle.textContent = config.quizTitle || "빠른 확인";
         quizCount.textContent = (state.index + 1) + " / " + config.quiz.length;
         progressBar.style.width = ((state.index / config.quiz.length) * 100) + "%";
@@ -90,6 +133,10 @@
             });
             choicesEl.appendChild(button);
         });
+
+        if (state.answered && state.selectedChoice !== null) {
+            paintAnswer(state.selectedChoice);
+        }
     }
 
     function handleChoice(choiceIndex) {
@@ -98,35 +145,18 @@
         }
 
         const item = config.quiz[state.index];
-        const buttons = Array.from(choicesEl.querySelectorAll("button"));
-        const isCorrect = choiceIndex === item.answer;
-
         state.answered = true;
-        if (isCorrect) {
+        state.selectedChoice = choiceIndex;
+        if (choiceIndex === item.answer) {
             state.score += 1;
         }
-
-        buttons.forEach(function (button, index) {
-            button.disabled = true;
-            if (index === item.answer) {
-                button.classList.add("correct");
-            } else if (index === choiceIndex) {
-                button.classList.add("wrong");
-            } else {
-                button.classList.add("dimmed");
-            }
-        });
-
-        setFeedback(
-            isCorrect ? "ok" : "bad",
-            '<strong>' + (isCorrect ? "정답!" : "다시 확인!") + "</strong> " + item.feedback
-        );
-        nextBtn.disabled = false;
-        progressBar.style.width = (((state.index + 1) / config.quiz.length) * 100) + "%";
+        paintAnswer(choiceIndex);
+        saveState();
     }
 
     function renderSummary() {
         const percent = Math.round((state.score / config.quiz.length) * 100);
+        state.complete = true;
         quizCount.textContent = "완료";
         progressBar.style.width = "100%";
         promptEl.textContent = "연습 완료";
@@ -138,12 +168,7 @@
         resultCard.innerHTML = ""
             + "<h2>" + state.score + " / " + config.quiz.length + "</h2>"
             + "<p>정답률 " + percent + "%입니다. " + (config.summary || "") + "</p>";
-    }
-
-    if (viToggle) {
-        viToggle.addEventListener("click", function () {
-            setTranslationVisible(viToggle.getAttribute("aria-pressed") !== "true");
-        });
+        saveState();
     }
 
     tabLearn.addEventListener("click", function () {
@@ -160,15 +185,26 @@
             return;
         }
         state.index += 1;
+        state.answered = false;
+        state.selectedChoice = null;
+        saveState();
         renderQuestion();
     });
 
     resetBtn.addEventListener("click", function () {
         state.index = 0;
         state.score = 0;
+        state.answered = false;
         state.started = true;
+        state.selectedChoice = null;
+        state.complete = false;
+        state.tab = "practice";
+        saveState();
         renderQuestion();
     });
 
-    setTranslationVisible(false);
+    stateStore.mount(document.getElementById("activityStateTools"), function () {
+        return state;
+    });
+    showTab(state.tab);
 })();

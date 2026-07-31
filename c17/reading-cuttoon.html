@@ -13,6 +13,8 @@
     <title>17과 읽기 컷툰 | 서동요</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <link rel="stylesheet" href="../shared/multilang-toggle.css">
+    <link rel="stylesheet" href="activity-state.css">
     <style>
         :root {
             --bg: #f7fafc;
@@ -547,6 +549,8 @@
             </div>
         </section>
 
+        <div id="activityStateTools"></div>
+
         <nav class="footer-nav" aria-label="페이지 이동">
             <a class="btn" href="reading.html"><i class="fa-solid fa-arrow-left"></i> 지문 읽기</a>
             <a class="btn primary" href="writing-cut.html">컷 쓰기 <i class="fa-solid fa-arrow-right"></i></a>
@@ -554,6 +558,7 @@
         </nav>
     </main>
 
+    <script src="activity-state.js"></script>
     <script>
         (function () {
             "use strict";
@@ -562,6 +567,13 @@
             const sheetPanels = document.querySelectorAll("[data-sheet-panel]");
             const cutLinks = document.querySelectorAll("[data-cut-link]");
             const cutCards = document.querySelectorAll("[data-cut-card]");
+            const stateStore = window.C17ActivityState.create("reading-cuttoon", { sheet: "1", cut: "1" }, {
+                validate: (value) => Boolean(value)
+                    && ["1", "2", "3"].includes(value.sheet)
+                    && /^[1-9]$/.test(value.cut),
+                onReset: () => window.location.reload()
+            });
+            const activityState = stateStore.get();
 
             function showSheet(sheet) {
                 sheetButtons.forEach((button) => {
@@ -571,12 +583,16 @@
                 sheetPanels.forEach((panel) => {
                     panel.classList.toggle("active", panel.dataset.sheetPanel === sheet);
                 });
+                activityState.sheet = sheet;
+                stateStore.save(activityState);
             }
 
             function activateCut(cut) {
                 cutLinks.forEach((link) => {
                     link.classList.toggle("active", link.dataset.cutLink === cut);
                 });
+                activityState.cut = cut;
+                stateStore.save(activityState);
             }
 
             sheetButtons.forEach((button) => {
@@ -586,6 +602,10 @@
             cutLinks.forEach((link) => {
                 link.addEventListener("click", () => activateCut(link.dataset.cutLink));
             });
+
+            showSheet(activityState.sheet);
+            activateCut(activityState.cut);
+            stateStore.mount(document.getElementById("activityStateTools"), () => activityState);
 
             if ("IntersectionObserver" in window) {
                 const observer = new IntersectionObserver((entries) => {

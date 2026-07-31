@@ -944,7 +944,13 @@
     }
 
     function readInstructionLanguage(config = pageConfig) {
-        if (!hasInstructionLanguageToggle(config)) return "ko";
+        if (!hasInstructionLanguageToggle(config)) {
+            if (shouldHideTranslationContent(config)
+                && readStorage(instructionStorageKey(), "ko") === "vi") {
+                writeStorage(instructionStorageKey(), "ko");
+            }
+            return "ko";
+        }
         const saved = readStorage(instructionStorageKey(), config.instructionLanguage.default || "ko");
         return saved === "vi" ? "vi" : "ko";
     }

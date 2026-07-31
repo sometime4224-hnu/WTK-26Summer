@@ -45,7 +45,7 @@ test("c17 grammar support quizzes use three scaffold stages and complete correct
     await expect(page.locator("h1")).toContainText(heading);
     await expect(page.locator(".stage-step")).toHaveCount(3);
     await expect(page.locator("#stageList")).toHaveCount(0);
-    await expect(page.locator("#contextGrid")).toContainText("Tiếng Việt");
+    await expect(page.locator("#contextGrid")).not.toContainText("Tiếng Việt");
 
     const structure = await page.evaluate(() => {
       const answerCounts = [0, 0, 0, 0];
@@ -53,7 +53,7 @@ test("c17 grammar support quizzes use three scaffold stages and complete correct
         return count + stage.questions.filter((question) => question.contrast).length;
       }, 0);
       const contextCount = window.C17_GRAMMAR_SUPPORT.stages.reduce((count, stage) => {
-        return count + stage.questions.filter((question) => question.contextKo && question.contextVi).length;
+        return count + stage.questions.filter((question) => question.contextKo).length;
       }, 0);
       const meaningQuestion = window.C17_GRAMMAR_SUPPORT.stages[0].questions.find((question) => {
         return question.prompt.includes("언제 써요") || question.prompt.includes("무슨 뜻");
@@ -71,7 +71,8 @@ test("c17 grammar support quizzes use three scaffold stages and complete correct
         answerCounts,
         contextCount,
         contrastCount,
-        hasVietnameseMeaningChoices: meaningQuestion.choices.every((choice) => choice.includes("(") && choice.includes(")"))
+        hasLegacyVietnamese: JSON.stringify(window.C17_GRAMMAR_SUPPORT).includes("contextVi")
+          || meaningQuestion.choices.some((choice) => /Dùng|Giả vờ|Sau đó/.test(choice))
       };
     });
 
@@ -80,7 +81,7 @@ test("c17 grammar support quizzes use three scaffold stages and complete correct
     expect(structure.answerCounts).toEqual([3, 3, 3, 3]);
     expect(structure.contextCount).toBeGreaterThanOrEqual(6);
     expect(structure.contrastCount).toBe(2);
-    expect(structure.hasVietnameseMeaningChoices).toBe(true);
+    expect(structure.hasLegacyVietnamese).toBe(false);
 
     for (let index = 0; index < 12; index += 1) {
       await expect(page.locator("#stageFocus")).not.toContainText("<code>");

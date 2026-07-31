@@ -284,48 +284,102 @@
 
         .pin {
             position: absolute;
-            left: var(--x);
-            top: var(--y);
+            left: var(--display-x);
+            top: var(--display-y);
             z-index: 5;
             display: grid;
             place-items: center;
+            width: 44px;
+            height: 44px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: #ffffff;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            transition: opacity 160ms ease;
+        }
+
+        .pin::before {
+            content: "";
+            position: absolute;
             width: 25px;
             height: 25px;
             border: 2px solid #ffffff;
             border-radius: 50% 50% 50% 8px;
             background: #2563eb;
-            color: #ffffff;
-            cursor: pointer;
             box-shadow: 0 9px 18px rgba(15, 23, 42, 0.22);
-            transform: translate(-50%, -50%) rotate(-45deg);
-            transition: transform 160ms ease, background 160ms ease, opacity 160ms ease;
+            transform: rotate(-45deg);
+            transition: transform 160ms ease, background 160ms ease;
         }
 
         .pin i {
+            position: relative;
+            z-index: 1;
             font-size: 10px;
-            transform: rotate(45deg);
         }
 
         .pin:hover,
         .pin:focus-visible {
-            transform: translate(-50%, -56%) rotate(-45deg) scale(1.08);
-            outline: none;
+            outline: 3px solid rgba(37, 99, 235, 0.42);
+            outline-offset: -5px;
+        }
+
+        .pin:hover::before,
+        .pin:focus-visible::before {
+            transform: translateY(-2px) rotate(-45deg) scale(1.08);
         }
 
         .pin.is-active {
             z-index: 8;
+        }
+
+        .pin.is-active::before {
             background: var(--green);
-            transform: translate(-50%, -58%) rotate(-45deg) scale(1.18);
+            transform: translateY(-2px) rotate(-45deg) scale(1.18);
         }
 
         .pin.is-muted {
             opacity: 0.28;
         }
 
+        .pin-leader {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+            pointer-events: none;
+        }
+
+        .pin-leader line {
+            stroke: #1d4ed8;
+            stroke-width: 1.4;
+            stroke-linecap: round;
+            stroke-dasharray: 3 3;
+            vector-effect: non-scaling-stroke;
+        }
+
+        .pin-anchor {
+            position: absolute;
+            left: var(--x);
+            top: var(--y);
+            z-index: 4;
+            width: 7px;
+            height: 7px;
+            border: 1.5px solid #ffffff;
+            border-radius: 999px;
+            background: #1d4ed8;
+            box-shadow: 0 0 0 1px rgba(29, 78, 216, 0.45);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+
         .pin-label {
             position: absolute;
-            left: calc(var(--x) + 15px);
-            top: calc(var(--y) - 10px);
+            left: calc(var(--display-x) + 15px);
+            top: calc(var(--display-y) - 10px);
             z-index: 6;
             max-width: 98px;
             border: 1px solid #bfdbfe;
@@ -337,15 +391,30 @@
             font-weight: 900;
             pointer-events: none;
             opacity: 0;
-            transform: translateY(4px);
-            transition: opacity 160ms ease, transform 160ms ease;
+            transition: opacity 160ms ease;
+        }
+
+        .pin-label.is-left {
+            right: calc(100% - var(--display-x) + 15px);
+            left: auto;
+        }
+
+        .pin-label.is-above {
+            top: calc(var(--display-y) - 15px);
+            left: var(--display-x);
+            transform: translate(-50%, -100%);
+        }
+
+        .pin-label.is-below {
+            top: calc(var(--display-y) + 15px);
+            left: var(--display-x);
+            transform: translateX(-50%);
         }
 
         .pin.is-active + .pin-label,
         .pin:hover + .pin-label,
         .pin:focus-visible + .pin-label {
             opacity: 1;
-            transform: translateY(0);
         }
 
         .side {
@@ -571,11 +640,6 @@
                 width: 100%;
             }
 
-            .pin {
-                width: 24px;
-                height: 24px;
-            }
-
             .place-card {
                 grid-template-columns: 40px 1fr;
                 padding: 10px;
@@ -629,7 +693,7 @@
                 <span class="chip" id="placeChip"></span>
                 <span class="chip" id="tagChip"></span>
                 <a class="map-link output-map-link" id="mapAction" target="_blank" rel="noopener noreferrer" aria-label="구글맵에서 보기" title="구글맵에서 보기" hidden><i class="fa-solid fa-map-location-dot"></i></a>
-                <a class="photo-link output-photo-link" id="photoAction" target="_blank" rel="noopener noreferrer" aria-label="음식 사진 보기" title="음식 사진 보기" hidden><i class="fa-solid fa-image"></i></a>
+                <a class="photo-link output-photo-link" id="photoAction" target="_blank" rel="noopener noreferrer" aria-label="이미지 검색 결과 보기" title="이미지 검색 결과 보기" hidden><i class="fa-solid fa-image"></i></a>
                 <span class="chip is-form">N(으)로 유명해요</span>
             </div>
         </section>
@@ -1297,11 +1361,9 @@
             banhCanhHaTien: 'banh canh Ha Tien restaurant'
         };
 
-        Object.assign(mapQueries, foodMapQueries);
-
-        const foodPhotoQueries = {
-            ...foodMapQueries
-        };
+        Object.entries(foodMapQueries).forEach(([tagId, query]) => {
+            if (!mapQueries[tagId]) mapQueries[tagId] = query;
+        });
 
         const targets = [
             { id: 'hanoi', region: 'north', x: 45.5, y: 17.3, icon: 'fa-city', name: '하노이', vi: 'Hà Nội', hint: '수도 · 문화', tags: ['oldQuarter', 'hoanKiem', 'waterPuppet', 'bunCha', 'eggCoffee', 'templeLiterature', 'cyclo', 'thangLongCitadel', 'stJosephCathedral', 'chaCa'] },
@@ -1323,39 +1385,39 @@
             { id: 'thanhhoa', region: 'central', x: 48.4, y: 29.0, icon: 'fa-umbrella-beach', name: '타인호아', vi: 'Thanh Hóa', hint: '해변 · 유적', tags: ['samSonBeach', 'lamKinhRelic'] },
             { id: 'vinh', region: 'central', x: 52.2, y: 33.0, icon: 'fa-water', name: '빈', vi: 'Vinh', hint: '해변 · 역사', tags: ['cuaLoBeach', 'kimLienRelic'] },
             { id: 'donghoi', region: 'central', x: 56.2, y: 37.6, icon: 'fa-umbrella-beach', name: '동허이', vi: 'Đồng Hới', hint: '해변 · 동굴', tags: ['nhatLeBeach', 'phongNhaCave', 'caveAdventure'] },
-            { id: 'quangtri', region: 'central', x: 57.4, y: 42.0, icon: 'fa-bridge', name: '꽝찌', vi: 'Quảng Trị', hint: '다리 · 터널', tags: ['hienLuongBridge', 'vinhMocTunnel', 'warRelic'] },
+            { id: 'quangtri', region: 'central', x: 57.4, y: 42.0, displayX: 60.4, displayY: 42.7, labelPlacement: 'right', icon: 'fa-bridge', name: '꽝찌', vi: 'Quảng Trị', hint: '다리 · 터널', tags: ['hienLuongBridge', 'vinhMocTunnel', 'warRelic'] },
             { id: 'danang', region: 'central', x: 67.0, y: 50.6, icon: 'fa-bridge', name: '다낭', vi: 'Đà Nẵng', hint: '해변 · 다리', tags: ['myKhe', 'dragonBridge', 'baNaHills', 'marbleMountains', 'goldenBridge', 'sonTra', 'hanRiver', 'miQuang', 'seafood'] },
-            { id: 'hoian', region: 'central', x: 64.0, y: 52.5, icon: 'fa-lightbulb', name: '호이안', vi: 'Hội An', hint: '고도 · 등불', tags: ['ancientTown', 'lanterns', 'japaneseBridge', 'tailorMade', 'caoLau', 'tanKyHouse', 'lanternMaking'] },
-            { id: 'myson', region: 'central', x: 61.5, y: 52.4, icon: 'fa-place-of-worship', name: '미선 유적', vi: 'Mỹ Sơn', hint: '참파 · 사원', tags: ['champaRuins', 'hinduTemple', 'chamCulture'] },
+            { id: 'hoian', region: 'central', x: 64.0, y: 52.5, displayX: 67.3, displayY: 54.6, labelPlacement: 'right', icon: 'fa-lightbulb', name: '호이안', vi: 'Hội An', hint: '고도 · 등불', tags: ['ancientTown', 'lanterns', 'japaneseBridge', 'tailorMade', 'caoLau', 'tanKyHouse', 'lanternMaking'] },
+            { id: 'myson', region: 'central', x: 61.5, y: 52.4, displayX: 58.8, displayY: 53.8, labelPlacement: 'left', icon: 'fa-place-of-worship', name: '미선 유적', vi: 'Mỹ Sơn', hint: '참파 · 사원', tags: ['champaRuins', 'hinduTemple', 'chamCulture'] },
             { id: 'phongnha', region: 'central', x: 53.5, y: 39.0, icon: 'fa-mountain-sun', name: '퐁냐-께방', vi: 'Phong Nha-Kẻ Bàng', hint: '동굴 · 국립공원', tags: ['sonDoong', 'phongNhaCave', 'nationalPark', 'caveAdventure', 'limestoneKarst'] },
-            { id: 'quangbinh', region: 'central', x: 56.4, y: 41.3, icon: 'fa-person-hiking', name: '꽝빈', vi: 'Quảng Bình', hint: '동굴 · 해변', tags: ['caveAdventure', 'nhatLeBeach', 'phongNhaCave'] },
-            { id: 'tamky', region: 'central', x: 62.5, y: 51.3, icon: 'fa-palette', name: '땀끼', vi: 'Tam Kỳ', hint: '벽화 · 해안', tags: ['tamThanhMural', 'beach'] },
-            { id: 'kontum', region: 'central', x: 55.4, y: 57.6, icon: 'fa-church', name: '꼰뚬', vi: 'Kon Tum', hint: '성당 · 고원', tags: ['woodenChurch', 'suspensionBridge', 'ethnicVillage'] },
+            { id: 'quangbinh', region: 'central', x: 56.4, y: 41.3, displayX: 50.5, displayY: 42.2, labelPlacement: 'left', icon: 'fa-person-hiking', name: '꽝빈', vi: 'Quảng Bình', hint: '동굴 · 해변', tags: ['caveAdventure', 'nhatLeBeach', 'phongNhaCave'] },
+            { id: 'tamky', region: 'central', x: 62.5, y: 51.3, displayX: 62.0, displayY: 47.8, labelPlacement: 'above', icon: 'fa-palette', name: '땀끼', vi: 'Tam Kỳ', hint: '벽화 · 해안', tags: ['tamThanhMural', 'beach'] },
+            { id: 'kontum', region: 'central', x: 60.0, y: 57.5, icon: 'fa-church', name: '꼰뚬', vi: 'Kon Tum', hint: '성당 · 고원', tags: ['woodenChurch', 'suspensionBridge', 'ethnicVillage'] },
             { id: 'quynhon', region: 'central', x: 73.2, y: 59.8, icon: 'fa-umbrella-beach', name: '꾸이년', vi: 'Quy Nhơn', hint: '해변 · 참탑', tags: ['quyNhonBeach', 'eoGio', 'champaRuins', 'seafood'] },
             { id: 'hcmc', region: 'south', x: 55.6, y: 80.5, icon: 'fa-building-columns', name: '호찌민시', vi: 'Thành phố Hồ Chí Minh', hint: '도시 · 역사', tags: ['benThanh', 'reunificationPalace', 'notreDame', 'warMuseum', 'nguyenHueStreet', 'landmark81'] },
             { id: 'cuchi', region: 'south', x: 52.4, y: 78.0, icon: 'fa-person-digging', name: '꾸찌', vi: 'Củ Chi', hint: '터널 · 역사', tags: ['cuChiTunnel', 'warRelic'] },
-            { id: 'mekong', region: 'south', x: 44.0, y: 86.2, icon: 'fa-person-rowing', name: '메콩 델타', vi: 'Đồng bằng sông Cửu Long', hint: '강 · 과일', tags: ['floatingMarket', 'tropicalFruit', 'boatTour', 'orchard', 'mekongCanal'] },
+            { id: 'mekong', region: 'south', x: 44.0, y: 86.2, displayX: 42.0, displayY: 88.7, labelPlacement: 'left', icon: 'fa-person-rowing', name: '메콩 델타', vi: 'Đồng bằng sông Cửu Long', hint: '강 · 과일', tags: ['floatingMarket', 'tropicalFruit', 'boatTour', 'orchard', 'mekongCanal'] },
             { id: 'cantho', region: 'south', x: 41.4, y: 87.5, icon: 'fa-store', name: '껀터', vi: 'Cần Thơ', hint: '수상시장', tags: ['caiRang', 'floatingMarket', 'tropicalFruit', 'boatTour', 'ninhKieuWharf', 'binhThuyHouse', 'ongPagoda', 'huTieu'] },
-            { id: 'mytho', region: 'south', x: 51.4, y: 84.9, icon: 'fa-person-rowing', name: '미토', vi: 'Mỹ Tho', hint: '사원 · 강', tags: ['vinhTrangPagoda', 'mekongCanal', 'boatTour'] },
+            { id: 'mytho', region: 'south', x: 51.4, y: 84.9, displayX: 55.0, displayY: 83.3, labelPlacement: 'right', icon: 'fa-person-rowing', name: '미토', vi: 'Mỹ Tho', hint: '사원 · 강', tags: ['vinhTrangPagoda', 'mekongCanal', 'boatTour'] },
             { id: 'vinhlong', region: 'south', x: 47.2, y: 86.8, icon: 'fa-seedling', name: '빈롱', vi: 'Vĩnh Long', hint: '과수원 · 도자기', tags: ['orchard', 'vinhLongPottery', 'mekongCanal'] },
             { id: 'longxuyen', region: 'south', x: 41.2, y: 83.8, icon: 'fa-water', name: '롱쑤옌', vi: 'Long Xuyên', hint: '수상마을 · 강', tags: ['floatingVillage', 'samMountain', 'boatTour'] },
-            { id: 'sadec', region: 'south', x: 45.4, y: 85.3, icon: 'fa-seedling', name: '사덱', vi: 'Sa Đéc', hint: '꽃 · 고택', tags: ['flowerVillage', 'oldHouse'] },
+            { id: 'sadec', region: 'south', x: 45.4, y: 85.3, displayX: 47.3, displayY: 83.4, labelPlacement: 'above', icon: 'fa-seedling', name: '사덱', vi: 'Sa Đéc', hint: '꽃 · 고택', tags: ['flowerVillage', 'oldHouse'] },
             { id: 'soctrang', region: 'south', x: 48.3, y: 91.2, icon: 'fa-place-of-worship', name: '속짱', vi: 'Sóc Trăng', hint: '사원 · 문화', tags: ['khmerPagoda', 'batPagoda'] },
-            { id: 'baclieu', region: 'south', x: 46.8, y: 93.3, icon: 'fa-wind', name: '박리에우', vi: 'Bạc Liêu', hint: '저택 · 풍력', tags: ['bacLieuPrinceHouse', 'windFarm'] },
-            { id: 'camau', region: 'south', x: 43.2, y: 96.2, icon: 'fa-tree', name: '까마우', vi: 'Cà Mau', hint: '곶 · 숲', tags: ['caMauCape', 'mangroveForest'] },
+            { id: 'baclieu', region: 'south', x: 45.0, y: 91.0, icon: 'fa-wind', name: '박리에우', vi: 'Bạc Liêu', hint: '저택 · 풍력', tags: ['bacLieuPrinceHouse', 'windFarm'] },
+            { id: 'camau', region: 'south', x: 36.0, y: 95.5, icon: 'fa-tree', name: '까마우', vi: 'Cà Mau', hint: '곶 · 숲', tags: ['caMauCape', 'mangroveForest'] },
             { id: 'rachgia', region: 'south', x: 34.7, y: 86.9, icon: 'fa-anchor', name: '락자', vi: 'Rạch Giá', hint: '항구 · 섬 관문', tags: ['port', 'islandGateway', 'seafood'] },
             { id: 'phuquoc', region: 'south', x: 24.5, y: 86.0, icon: 'fa-umbrella-beach', name: '푸꾸옥', vi: 'Phú Quốc', hint: '섬 · 휴양', tags: ['saoBeach', 'pepper', 'pearl', 'cableCar', 'snorkeling', 'fishSauceFactory', 'hamNinhCrab', 'nightMarket', 'anThoiIslands'] },
-            { id: 'condao', region: 'south', x: 65.6, y: 93.4, icon: 'fa-fish', name: '꼰다오', vi: 'Côn Đảo', hint: '섬 · 자연', tags: ['coralReef', 'seaTurtle', 'prisonRelic', 'snorkeling'] },
+            { id: 'condao', region: 'south', x: 52.8, y: 95.0, icon: 'fa-fish', name: '꼰다오', vi: 'Côn Đảo', hint: '섬 · 자연', tags: ['coralReef', 'seaTurtle', 'prisonRelic', 'snorkeling'] },
             { id: 'tayninh', region: 'south', x: 49.0, y: 75.9, icon: 'fa-mountain', name: '떠이닌', vi: 'Tây Ninh', hint: '산 · 사원', tags: ['baDenMountain', 'caoDaiTemple'] },
-            { id: 'bentre', region: 'south', x: 50.7, y: 84.6, icon: 'fa-leaf', name: '벤째', vi: 'Bến Tre', hint: '코코넛 · 운하', tags: ['coconut', 'mekongCanal', 'boatTour', 'orchard'] },
+            { id: 'bentre', region: 'south', x: 50.7, y: 84.6, displayX: 52.0, displayY: 87.8, labelPlacement: 'below', icon: 'fa-leaf', name: '벤째', vi: 'Bến Tre', hint: '코코넛 · 운하', tags: ['coconut', 'mekongCanal', 'boatTour', 'orchard'] },
             { id: 'nhatrang', region: 'east', x: 75.8, y: 67.6, icon: 'fa-water', name: '냐짱', vi: 'Nha Trang', hint: '해변 · 온천', tags: ['beach', 'snorkeling', 'poNagar', 'mudBath', 'seafood', 'islandTour'] },
             { id: 'camranh', region: 'east', x: 78.0, y: 69.7, icon: 'fa-ship', name: '깜라인', vi: 'Cam Ranh', hint: '만 · 해변', tags: ['camRanhBay', 'beach', 'seafood'] },
             { id: 'muine', region: 'east', x: 78.8, y: 74.5, icon: 'fa-wind', name: '무이네', vi: 'Mũi Né', hint: '모래언덕 · 바람', tags: ['redSandDunes', 'whiteSandDunes', 'kiteSurfing', 'fishingVillage'] },
             { id: 'phanthiet', region: 'east', x: 73.0, y: 74.9, icon: 'fa-fish', name: '판티엣', vi: 'Phan Thiết', hint: '소스 · 해산물', tags: ['fishSauce', 'seafood', 'champaRuins'] },
             { id: 'vungtau', region: 'east', x: 60.7, y: 83.9, icon: 'fa-anchor', name: '붕따우', vi: 'Vũng Tàu', hint: '해변 · 등대', tags: ['christStatue', 'beach', 'lighthouse', 'seafood'] },
             { id: 'phanrang', region: 'east', x: 73.8, y: 69.2, icon: 'fa-torii-gate', name: '판랑-탑참', vi: 'Phan Rang-Tháp Chàm', hint: '참 문화 · 포도', tags: ['poKlongGarai', 'vineyard', 'saltField', 'chamCulture'] },
-            { id: 'phuyen', region: 'east', x: 74.6, y: 62.8, icon: 'fa-water', name: '푸옌', vi: 'Phú Yên', hint: '해안 · 바위', tags: ['ganhDaDia', 'baiXep', 'beach', 'seafood'] },
-            { id: 'tuyhoa', region: 'east', x: 75.6, y: 62.0, icon: 'fa-umbrella-beach', name: '뚜이호아', vi: 'Tuy Hòa', hint: '해변 · 바위', tags: ['ganhDaDia', 'baiXep', 'beach'] },
+            { id: 'phuyen', region: 'east', x: 74.6, y: 62.8, displayX: 72.2, displayY: 64.0, labelPlacement: 'left', icon: 'fa-water', name: '푸옌', vi: 'Phú Yên', hint: '해안 · 바위', tags: ['ganhDaDia', 'baiXep', 'beach', 'seafood'] },
+            { id: 'tuyhoa', region: 'east', x: 75.6, y: 62.0, displayX: 77.8, displayY: 60.8, labelPlacement: 'left', icon: 'fa-umbrella-beach', name: '뚜이호아', vi: 'Tuy Hòa', hint: '해변 · 바위', tags: ['ganhDaDia', 'baiXep', 'beach'] },
             { id: 'dienbien', region: 'west', x: 18.0, y: 13.4, icon: 'fa-monument', name: '디엔비엔푸', vi: 'Điện Biên Phủ', hint: '전투 · 역사', tags: ['dienBienBattle', 'warRelic'] },
             { id: 'maichau', region: 'west', x: 39.0, y: 23.0, icon: 'fa-house-chimney', name: '마이쩌우', vi: 'Mai Châu', hint: '마을 · 논밭', tags: ['thaiVillage', 'terracedRice', 'homestay', 'trekking'] },
             { id: 'mocchau', region: 'west', x: 34.0, y: 19.6, icon: 'fa-seedling', name: '목쩌우', vi: 'Mộc Châu', hint: '차밭 · 꽃', tags: ['teaHill', 'plumFlower', 'waterfall', 'ranch'] },
@@ -1528,16 +1590,23 @@
         }
 
         function photosUrl(target, tagId) {
-            const query = foodPhotoQueries[tagId];
-            if (!query || !target.tags.includes(tagId)) return '';
-            return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(`${query}, ${target.vi}, Vietnam food`)}`;
+            if (!target.tags.includes(tagId)) return '';
+            const isFood = Object.prototype.hasOwnProperty.call(foodMapQueries, tagId);
+            const query = tagId === 'coolWeather'
+                ? 'Da Lat cool weather Vietnam'
+                : mapQueries[tagId] || nounTags[tagId];
+            if (!query) return '';
+            const contextualQuery = tagId === 'coolWeather'
+                ? query
+                : `${query}, ${target.vi}, Vietnam${isFood ? ' food' : ''}`;
+            return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(contextualQuery)}`;
         }
 
         function photoLink(target, tagId) {
             const href = photosUrl(target, tagId);
             if (!href) return '';
-            const label = `${target.name} ${nounTags[tagId]} 음식 사진 보기`;
-            return `<a class="photo-link" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${label}" title="음식 사진 보기"><i class="fa-solid fa-image"></i></a>`;
+            const label = `${target.name} ${nounTags[tagId]} 이미지 검색 결과 보기`;
+            return `<a class="photo-link" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${label}" title="이미지 검색 결과 보기"><i class="fa-solid fa-image"></i></a>`;
         }
 
         function tagActions(target, tagId) {
@@ -1598,20 +1667,46 @@
 
         function renderPins() {
             const visible = filteredTargets();
-            pinLayer.innerHTML = targets.map((target) => {
-                const isVisible = state.region === 'all' || target.region === state.region;
+            pinLayer.innerHTML = visible.map((target) => {
                 const isActive = target.id === state.targetId;
+                const displayX = target.displayX ?? target.x;
+                const displayY = target.displayY ?? target.y;
+                const isShifted = displayX !== target.x || displayY !== target.y;
+                const labelPlacement = ['left', 'above', 'below'].includes(target.labelPlacement)
+                    ? `is-${target.labelPlacement}`
+                    : '';
                 return `
-                    <button class="pin ${isActive ? 'is-active' : ''} ${isVisible ? '' : 'is-muted'}" type="button" data-target="${target.id}" style="--x:${target.x}%; --y:${target.y}%;" aria-label="${target.name}">
+                    ${isShifted ? `
+                        <svg class="pin-leader" data-leader-target="${target.id}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                            <line x1="${target.x}" y1="${target.y}" x2="${displayX}" y2="${displayY}"></line>
+                        </svg>
+                        <span class="pin-anchor" data-anchor-target="${target.id}" style="--x:${target.x}%; --y:${target.y}%;" aria-hidden="true"></span>
+                    ` : ''}
+                    <button class="pin ${isActive ? 'is-active' : ''}" type="button" data-target="${target.id}" style="--display-x:${displayX}%; --display-y:${displayY}%;" aria-pressed="${isActive}" aria-label="${target.name}">
                         ${icon(target.icon)}
                     </button>
-                    <span class="pin-label" style="--x:${target.x}%; --y:${target.y}%;">${target.name}</span>
+                    <span class="pin-label ${labelPlacement}" style="--display-x:${displayX}%; --display-y:${displayY}%;">${target.name}</span>
                 `;
             }).join('');
 
             pinLayer.querySelectorAll('[data-target]').forEach((button) => {
-                button.addEventListener('click', () => {
-                    const target = targets.find((item) => item.id === button.dataset.target);
+                button.addEventListener('click', (event) => {
+                    let selectedButton = button;
+                    if (event.detail > 0) {
+                        let nearestDistance = Number.POSITIVE_INFINITY;
+                        pinLayer.querySelectorAll('.pin').forEach((candidate) => {
+                            const rect = candidate.getBoundingClientRect();
+                            const distance = Math.hypot(
+                                event.clientX - (rect.left + rect.width / 2),
+                                event.clientY - (rect.top + rect.height / 2)
+                            );
+                            if (distance < nearestDistance) {
+                                selectedButton = candidate;
+                                nearestDistance = distance;
+                            }
+                        });
+                    }
+                    const target = targets.find((item) => item.id === selectedButton.dataset.target);
                     state.targetId = target.id;
                     state.region = target.region;
                     state.tagId = target.tags[0];
@@ -1648,6 +1743,10 @@
             const target = getTarget();
             const near = targets
                 .filter((item) => item.region === target.region && item.id !== target.id)
+                .sort((a, b) => (
+                    Math.hypot(a.x - target.x, a.y - target.y)
+                    - Math.hypot(b.x - target.x, b.y - target.y)
+                ))
                 .slice(0, 6);
 
             nearGrid.innerHTML = near.map((item) => `
@@ -1689,7 +1788,7 @@
             photoAction.hidden = !photoHref;
             if (photoHref) {
                 photoAction.href = photoHref;
-                photoAction.setAttribute('aria-label', `${target.name} ${tag} 음식 사진 보기`);
+                photoAction.setAttribute('aria-label', `${target.name} ${tag} 이미지 검색 결과 보기`);
             } else {
                 photoAction.removeAttribute('href');
             }

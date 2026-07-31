@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NB76SV96');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="몽골의 주요 도시와 지역, 명물을 지도에서 고르고 N(으)로 유명해요 문장을 만드는 한국어 학습 활동" />
+    <title>16과 문법 4 보조자료 | 몽골 명소 지도</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="grammar4-country-map.css" />
+    <link rel="stylesheet" href="grammar4-country-map-common.css" />
+    <link rel="stylesheet" href="../shared/project-topbar-compact.css" />
+</head>
+<body data-country="mongolia">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NB76SV96"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <nav class="topbar" aria-label="현재 위치">
+        <a href="../index.html"><i class="fa-solid fa-house" aria-hidden="true"></i> 메인</a>
+        <span aria-hidden="true">|</span>
+        <a href="index.html">16과 목록</a>
+        <span aria-hidden="true">|</span>
+        <strong>문법 4 보조자료 | 몽골 명소 지도</strong>
+    </nav>
+
+    <main class="shell">
+        <h1 class="sr-only">몽골 명소로 N(으)로 유명해요 문장 만들기</h1>
+
+        <section class="sentence-panel panel" aria-labelledby="taskTitle" aria-live="polite">
+            <div class="task-row">
+                <p class="eyebrow" id="taskTitle">지도 명소 문장 만들기</p>
+                <p class="task-instruction">지역 → 장소 → 명물을 눌러 문장을 완성하세요.</p>
+                <div class="activity-tools">
+                    <span class="save-status" id="saveStatus" role="status"></span>
+                    <button class="country-map-reset" id="resetActivityBtn" type="button" aria-label="이 활동을 처음부터 시작하기" title="이 활동의 저장값 지우기">
+                        <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                        <span>처음부터</span>
+                    </button>
+                </div>
+            </div>
+            <div class="status-row">
+                <span class="badge" id="regionBadge">수도권</span>
+                <span class="badge is-grammar">N(으)로 유명해요</span>
+            </div>
+            <p class="sentence" id="sentenceText"></p>
+            <div class="chip-row" aria-label="선택한 장소와 명물">
+                <span class="chip" id="placeChip"></span>
+                <span class="chip" id="tagChip"></span>
+                <a class="map-link" id="mapAction" target="_blank" rel="noopener noreferrer" hidden>
+                    <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
+                </a>
+                <a class="photo-link" id="photoAction" target="_blank" rel="noopener noreferrer" hidden>
+                    <i class="fa-solid fa-image" aria-hidden="true"></i>
+                </a>
+                <span class="chip is-form">N(으)로 유명해요</span>
+            </div>
+        </section>
+
+        <nav class="region-bar" id="regionBar" aria-label="몽골 지역 필터"></nav>
+
+        <section class="layout" aria-label="몽골 지도 기반 명물 선택">
+            <section class="map-panel panel" aria-labelledby="mapTitle">
+                <div class="panel-title">
+                    <span id="mapTitle"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> 도시·지역 핀</span>
+                    <span class="map-tools">
+                        <span id="pinCount"></span>
+                        <span class="zoom-controls" aria-label="지도 확대 조절">
+                            <button class="zoom-button" type="button" id="zoomOutBtn" aria-label="지도 축소"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+                            <span class="zoom-level" id="zoomLevel">100%</span>
+                            <button class="zoom-button" type="button" id="zoomInBtn" aria-label="지도 확대"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+                            <button class="zoom-button" type="button" id="zoomResetBtn" aria-label="지도 원위치"><i class="fa-solid fa-crosshairs" aria-hidden="true"></i></button>
+                        </span>
+                    </span>
+                </div>
+                <div class="map-canvas" id="mapCanvas">
+                    <div class="map-layer" id="mapLayer">
+                        <img class="map-image" src="../assets/c16/grammar4/images/country-maps/mongolia-region-map.webp"
+                            width="1600" height="849" alt="몽골의 도 경계와 지형이 표현된 글자 없는 지도" decoding="async" />
+                        <div id="pinLayer"></div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="side">
+                <section class="place-card panel" aria-label="선택한 장소">
+                    <span class="place-icon" id="placeIcon"></span>
+                    <span>
+                        <strong id="placeName" tabindex="-1"></strong>
+                        <span id="placeMeta"></span>
+                    </span>
+                </section>
+
+                <section class="map-panel panel" aria-labelledby="tagTitle">
+                    <div class="panel-title">
+                        <span id="tagTitle"><i class="fa-solid fa-star" aria-hidden="true"></i> 유명한 것</span>
+                        <span id="tagCount"></span>
+                    </div>
+                    <div class="tag-grid" id="tagGrid"></div>
+                </section>
+
+                <section class="map-panel mini-panel panel" aria-labelledby="nearTitle">
+                    <div class="panel-title">
+                        <span id="nearTitle"><i class="fa-solid fa-compass" aria-hidden="true"></i> 같은 지역</span>
+                        <span id="nearCount"></span>
+                    </div>
+                    <div class="mini-grid" id="nearGrid"></div>
+                </section>
+            </aside>
+        </section>
+
+        <details class="source-note">
+            <summary>지도 이미지 출처와 제작 방식</summary>
+            <p>
+                행정 경계는 Egzs의
+                <a href="https://commons.wikimedia.org/wiki/File:Blank_provincial_map_of_Mongolia.svg" target="_blank" rel="noopener noreferrer">Blank provincial map of Mongolia</a>
+                (CC0)를 기준으로 보존하고, 이미지 생성으로 만든 지형 질감을 합성했습니다. 지도 안의 글자와 핀은 웹 화면에서 별도로 제공합니다.
+            </p>
+        </details>
+
+        <nav class="footer" aria-label="문법 이동">
+            <a class="btn" href="grammar4.html"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> 문법 4</a>
+            <a class="btn" href="grammar4-korea-map-match.html"><i class="fa-solid fa-map" aria-hidden="true"></i> 한국 지도</a>
+            <a class="btn primary" href="grammar4-kazakhstan-map-match.html">카자흐스탄 지도 <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        </nav>
+    </main>
+
+    <script src="grammar4-mongolia-map-data.js"></script>
+    <script src="grammar4-country-map-state.js"></script>
+    <script src="grammar4-country-map-engine.js"></script>
+    <script>
+        window.c16CountryMapActivity = C16CountryMap.mount({
+            data: window.C16_COUNTRY_MAP_DATA
+        });
+    </script>
+</body>
+</html>

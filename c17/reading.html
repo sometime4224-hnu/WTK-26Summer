@@ -13,6 +13,8 @@
     <title>17과 읽기 | 서동요와 소문의 힘</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="../shared/project-topbar-compact.css">
+    <link rel="stylesheet" href="../shared/multilang-toggle.css">
+    <link rel="stylesheet" href="activity-state.css">
     <style>
         :root {
             --bg: #f8fafc;
@@ -503,31 +505,6 @@
             font-weight: 900;
         }
 
-        .vi-text {
-            display: none;
-        }
-
-        .show-vi .vi-text {
-            display: block;
-        }
-
-        .vi-box {
-            margin-top: 10px;
-            padding: 10px 12px;
-            border-radius: 8px;
-            background: #eef2ff;
-            color: #3730a3;
-            line-height: 1.65;
-            font-weight: 700;
-        }
-
-        .translation-toggle {
-            border: 1px solid var(--line);
-            padding: 0 12px;
-            background: #fff;
-            color: var(--indigo);
-        }
-
         .footer-nav {
             display: flex;
             justify-content: space-between;
@@ -611,9 +588,6 @@
                     <a class="btn secondary" href="reading-cuttoon.html"><i class="fa-solid fa-images"></i> 컷툰</a>
                     <a class="btn secondary" href="writing-cut.html"><i class="fa-solid fa-pen-nib"></i> 컷 쓰기</a>
                     <a class="btn secondary" href="#check"><i class="fa-solid fa-list-check"></i> 문제</a>
-                    <button id="viToggle" class="btn secondary translation-toggle" type="button" aria-pressed="false">
-                        <i class="fa-solid fa-language"></i> Tiếng Việt OFF
-                    </button>
                 </div>
             </div>
             <figure class="lesson-visual" aria-label="소문과 오해 흐름 이미지">
@@ -629,13 +603,11 @@
                 <span class="badge">준비</span>
                 <strong>여러분은 소문을 쉽게 믿는 편입니까?</strong>
                 <p>어떤 이야기를 들었을 때 바로 믿는지, 누구에게 확인하는지 먼저 생각해 보세요.</p>
-                <div class="vi-text vi-box">Bạn có dễ tin lời đồn không? Khi nghe một chuyện, bạn kiểm tra với ai?</div>
             </article>
             <article class="card">
                 <span class="badge amber">읽기 목표</span>
                 <strong>누가, 왜, 어떤 소문을 퍼뜨렸는지 찾기</strong>
                 <p>인물의 행동보다 소문이 어떤 결과를 만들었는지에 초점을 두고 읽습니다.</p>
-                <div class="vi-text vi-box">Hãy chú ý ai lan truyền lời đồn, vì sao làm vậy, và lời đồn dẫn đến kết quả gì.</div>
             </article>
         </section>
 
@@ -651,7 +623,6 @@
                 <p class="adapted-text">백제에 살던 서동은 가난했지만 영리한 청년이었습니다. 그는 신라의 선화 공주가 아름답다는 이야기를 듣고 신라로 향했습니다. 그곳에서 공주와 자신의 이름이 들어간 노래를 만들어 사람들 사이에 퍼뜨렸습니다.</p>
                 <p class="adapted-text">뜻을 모르는 아이들이 그 노래를 계속 부르자, 이야기는 궁궐 안까지 전해졌습니다. 왕은 공주에게 나쁜 소문이 생겼다고 생각했고, 결국 공주를 궁 밖으로 내보냈습니다.</p>
                 <p class="adapted-text">공주는 시골에서 한 남자를 만났습니다. 그 남자는 공주가 지낼 수 있도록 도와주었고, 두 사람은 서로 사랑하게 되어 결혼했습니다. 시간이 지나 공주는 소문을 퍼뜨린 사람이 남편 서동이었다는 사실을 알게 되었지만, 서동을 향한 마음은 달라지지 않았습니다. 훗날 서동은 공부하고 재산을 모아 백제의 왕이 되었습니다.</p>
-                <div class="vi-text vi-box">Bản đọc này được viết lại ngắn gọn theo nội dung bài đọc gốc: Seodong nghe lời đồn về công chúa, lan truyền một bài hát, lời đồn khiến công chúa rời cung, rồi hai người gặp nhau và kết hôn.</div>
             </article>
         </section>
 
@@ -786,40 +757,52 @@
                     <span>그럴 리가 없어요.</span>
                     <span>그럴 수도 있겠네요.</span>
                 </div>
-                <div class="vi-text vi-box">Trước khi truyền lời đồn, hãy hỏi nguồn tin và mức độ chắc chắn.</div>
             </article>
         </section>
 
+        <div id="activityStateTools"></div>
+
         <nav class="footer-nav" aria-label="페이지 이동">
-            <a class="btn secondary" href="listening.html"><i class="fa-solid fa-arrow-left"></i> 듣기 전체</a>
+            <a class="btn secondary" href="listening1.html"><i class="fa-solid fa-arrow-left"></i> 듣기 1</a>
             <a class="btn secondary" href="reading-cuttoon.html"><i class="fa-solid fa-images"></i> 컷툰 보기</a>
             <a class="btn" href="writing-cut.html">컷 쓰기 <i class="fa-solid fa-pen-nib"></i></a>
             <a class="btn" href="index.html">17과 목록 <i class="fa-solid fa-list"></i></a>
         </nav>
     </main>
 
+    <script src="activity-state.js"></script>
     <script>
         (function () {
             "use strict";
 
-            const page = document.getElementById("page");
-            const viToggle = document.getElementById("viToggle");
             const sequenceList = document.getElementById("sequenceList");
             const rumorNote = document.getElementById("rumorNote");
             const noteStatus = document.getElementById("noteStatus");
             const saveNoteBtn = document.getElementById("saveNoteBtn");
             const clearNoteBtn = document.getElementById("clearNoteBtn");
             const noteKey = "korean3b.c17.reading.rumor-note";
+            const initialState = { note: "", answers: [null, null, null], sequence: [] };
+            const stateStore = window.C17ActivityState.create("reading", initialState, {
+                validate: (value) => Boolean(value)
+                    && typeof value.note === "string"
+                    && Array.isArray(value.answers)
+                    && value.answers.length === 3
+                    && value.answers.every((answer) => answer === null || Number.isInteger(answer))
+                    && Array.isArray(value.sequence)
+                    && value.sequence.every((order) => Number.isInteger(order) && order >= 1 && order <= 4),
+                migrate: () => {
+                    try {
+                        const note = window.localStorage.getItem(noteKey);
+                        return note === null ? null : { note, answers: [null, null, null], sequence: [] };
+                    } catch (error) {
+                        return null;
+                    }
+                },
+                onReset: () => window.location.reload()
+            });
+            const activityState = stateStore.get();
 
-            function setViState(show) {
-                page.classList.toggle("show-vi", show);
-                viToggle.setAttribute("aria-pressed", String(show));
-                viToggle.innerHTML = show
-                    ? '<i class="fa-solid fa-language"></i> Tiếng Việt ON'
-                    : '<i class="fa-solid fa-language"></i> Tiếng Việt OFF';
-            }
-
-            function answerQuestion(question, choice) {
+            function answerQuestion(question, choice, shouldSave = true) {
                 const answer = question.dataset.answer;
                 const buttons = question.querySelectorAll("[data-choice]");
                 const feedback = question.querySelector("[data-feedback]");
@@ -833,15 +816,25 @@
 
                 feedback.textContent = isCorrect ? "정답입니다." : "정답을 다시 확인해 보세요.";
                 feedback.className = isCorrect ? "feedback good" : "feedback bad";
+                if (shouldSave) {
+                    activityState.answers[Number(question.dataset.questionIndex)] = Number(choice.dataset.choice);
+                    stateStore.save(activityState);
+                }
             }
 
             function bindQuestions() {
-                document.querySelectorAll("[data-question]").forEach((question) => {
+                document.querySelectorAll("[data-question]").forEach((question, index) => {
+                    question.dataset.questionIndex = String(index);
                     question.addEventListener("click", (event) => {
                         const choice = event.target.closest("[data-choice]");
                         if (!choice) return;
                         answerQuestion(question, choice);
                     });
+                    const savedChoice = activityState.answers[index];
+                    if (savedChoice !== null) {
+                        const choice = question.querySelector(`[data-choice="${savedChoice}"]`);
+                        if (choice) answerQuestion(question, choice, false);
+                    }
                 });
             }
 
@@ -851,21 +844,31 @@
                     if (!button) return;
                     button.classList.add("revealed");
                     button.querySelector("b").textContent = button.dataset.order;
+                    const order = Number(button.dataset.order);
+                    if (!activityState.sequence.includes(order)) {
+                        activityState.sequence.push(order);
+                        stateStore.save(activityState);
+                    }
+                });
+                activityState.sequence.forEach((order) => {
+                    const button = sequenceList.querySelector(`[data-order="${order}"]`);
+                    if (button) {
+                        button.classList.add("revealed");
+                        button.querySelector("b").textContent = String(order);
+                    }
                 });
             }
 
             function loadNote() {
-                try {
-                    rumorNote.value = window.localStorage.getItem(noteKey) || "";
-                } catch (error) {}
+                rumorNote.value = activityState.note;
             }
 
             function saveNote() {
-                try {
-                    window.localStorage.setItem(noteKey, rumorNote.value);
+                activityState.note = rumorNote.value;
+                if (stateStore.save(activityState)) {
                     noteStatus.textContent = "저장했습니다.";
                     noteStatus.className = "feedback good";
-                } catch (error) {
+                } else {
                     noteStatus.textContent = "이 브라우저에서는 저장이 제한될 수 있습니다.";
                     noteStatus.className = "feedback bad";
                 }
@@ -873,22 +876,22 @@
 
             function clearNote() {
                 rumorNote.value = "";
-                try {
-                    window.localStorage.removeItem(noteKey);
-                } catch (error) {}
+                activityState.note = "";
+                stateStore.save(activityState);
                 noteStatus.textContent = "지웠습니다.";
                 noteStatus.className = "feedback";
             }
 
-            viToggle.addEventListener("click", () => {
-                setViState(!page.classList.contains("show-vi"));
-            });
             saveNoteBtn.addEventListener("click", saveNote);
             clearNoteBtn.addEventListener("click", clearNote);
 
             bindQuestions();
             bindSequence();
             loadNote();
+            stateStore.mount(document.getElementById("activityStateTools"), () => {
+                activityState.note = rumorNote.value;
+                return activityState;
+            });
         })();
     </script>
     <script src="../shared/multilang-reading-data.js"></script>

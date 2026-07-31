@@ -18,7 +18,6 @@
         progressBar: document.getElementById("progressBar"),
         contextGrid: document.getElementById("contextGrid"),
         contextKo: document.getElementById("contextKo"),
-        contextVi: document.getElementById("contextVi"),
         prompt: document.getElementById("prompt"),
         hint: document.getElementById("hint"),
         choices: document.getElementById("choices"),
@@ -28,16 +27,46 @@
         resultCard: document.getElementById("resultCard")
     };
 
-    const state = {
+    const initialState = {
         stageIndex: 0,
         questionIndex: 0,
         unlockedStage: 0,
+        complete: false,
         selectedAnswers: config.stages.map(function (stage) {
             return stage.questions.map(function () {
                 return null;
             });
         })
     };
+    const pageNumber = (window.location.pathname.match(/grammar(\d+)-support-quiz/i) || [null, "support"])[1];
+    const stateStore = window.C17ActivityState.create("grammar" + pageNumber + "-support-quiz", initialState, {
+        validate: function (value) {
+            return Boolean(value)
+                && Number.isInteger(value.stageIndex)
+                && value.stageIndex >= 0
+                && value.stageIndex < config.stages.length
+                && Number.isInteger(value.questionIndex)
+                && value.questionIndex >= 0
+                && value.questionIndex < config.stages[value.stageIndex].questions.length
+                && Number.isInteger(value.unlockedStage)
+                && value.unlockedStage >= 0
+                && value.unlockedStage < config.stages.length
+                && typeof value.complete === "boolean"
+                && Array.isArray(value.selectedAnswers)
+                && value.selectedAnswers.length === config.stages.length
+                && value.selectedAnswers.every(function (answers, stageIndex) {
+                    return Array.isArray(answers)
+                        && answers.length === config.stages[stageIndex].questions.length
+                        && answers.every(function (answer) {
+                            return answer === null || Number.isInteger(answer);
+                        });
+                });
+        },
+        onReset: function () {
+            window.location.reload();
+        }
+    });
+    const state = stateStore.get();
 
     window.C17_GRAMMAR_SUPPORT_APP = {
         state: state,
@@ -92,6 +121,7 @@
                 state.questionIndex = getStageAnsweredCount(index) < stage.questions.length
                     ? getStageAnsweredCount(index)
                     : 0;
+                stateStore.save(state);
                 renderQuestion();
             });
             els.stageNav.appendChild(button);
@@ -121,17 +151,15 @@
     }
 
     function renderContext(question) {
-        const hasContext = Boolean(question.contextKo || question.contextVi);
+        const hasContext = Boolean(question.contextKo);
         els.contextGrid.hidden = !hasContext;
 
         if (!hasContext) {
             els.contextKo.textContent = "";
-            els.contextVi.textContent = "";
             return;
         }
 
         els.contextKo.textContent = question.contextKo || "";
-        els.contextVi.textContent = question.contextVi || "";
     }
 
     function renderChoices(question) {
@@ -216,6 +244,7 @@
 
     function chooseAnswer(choiceIndex) {
         state.selectedAnswers[state.stageIndex][state.questionIndex] = choiceIndex;
+        stateStore.save(state);
         renderQuestion();
     }
 
@@ -226,6 +255,7 @@
 
         if (!isLastQuestion) {
             state.questionIndex += 1;
+            stateStore.save(state);
             renderQuestion();
             return;
         }
@@ -234,6 +264,7 @@
             state.stageIndex += 1;
             state.unlockedStage = Math.max(state.unlockedStage, state.stageIndex);
             state.questionIndex = 0;
+            stateStore.save(state);
             renderQuestion();
             return;
         }
@@ -246,6 +277,8 @@
             return null;
         });
         state.questionIndex = 0;
+        state.complete = false;
+        stateStore.save(state);
         renderQuestion();
     }
 
@@ -253,12 +286,14 @@
         state.stageIndex = 0;
         state.questionIndex = 0;
         state.unlockedStage = 0;
+        state.complete = false;
         state.selectedAnswers = config.stages.map(function (stage) {
             return stage.questions.map(function () {
                 return null;
             });
         });
         window.C17_GRAMMAR_SUPPORT_APP.state = state;
+        stateStore.save(state);
         renderQuestion();
     }
 
@@ -266,6 +301,8 @@
         const total = getTotalQuestions();
         const score = getTotalScore();
         const percent = Math.round((score / total) * 100);
+        state.complete = true;
+        stateStore.save(state);
 
         els.quizPanel.hidden = true;
         renderStageNav();
@@ -289,5 +326,12 @@
     els.nextBtn.addEventListener("click", goNext);
     els.resetBtn.addEventListener("click", resetCurrentStage);
 
-    renderQuestion();
+    stateStore.mount(document.getElementById("activityStateTools"), function () {
+        return state;
+    });
+    if (state.complete) {
+        renderFinalResult();
+    } else {
+        renderQuestion();
+    }
 })();

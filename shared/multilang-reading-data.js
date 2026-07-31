@@ -490,6 +490,10 @@
         "c17/reading.html": {
             title: "다국어 읽기 도움말",
             subtitle: "본문 전체 번역이 아니라 읽기 목표와 활동 지시만 짧게 확인하세요.",
+            anchorSelector: ".hero",
+            collapsible: true,
+            collapsedLabel: "읽기 다국어 도움말 열기",
+            expandedLabel: "읽기 다국어 도움말 접기",
             translations: {
                 en: {
                     title: "English reading scaffold",
@@ -501,12 +505,12 @@
                     ]
                 },
                 vi: {
-                    title: "Ho tro doc tieng Viet",
-                    summary: "Hay doc bai bang cach theo doi tin don bat dau, lan ra, gay hieu lam va duoc sua lai nhu the nao.",
+                    title: "Hỗ trợ đọc tiếng Việt",
+                    summary: "Hãy đọc bài bằng cách theo dõi tin đồn bắt đầu, lan truyền, gây hiểu lầm và sau đó được làm sáng tỏ như thế nào.",
                     points: [
-                        "Tap trung vao thu tu: tin don, hieu lam, giai quyet.",
-                        "Dung ten nhan vat va thay doi canh lam diem neo.",
-                        "Ghi chu ho tro chi giup hieu yeu cau, khong thay the viec doc tieng Han."
+                        "Tập trung vào trình tự: tin đồn, hiểu lầm và cách giải quyết.",
+                        "Dùng tên nhân vật và sự thay đổi cảnh làm điểm tựa.",
+                        "Phần hỗ trợ chỉ giúp hiểu yêu cầu, không thay thế việc đọc văn bản tiếng Hàn."
                     ]
                 },
                 ar: {
@@ -550,6 +554,10 @@
         "c17/reading-cuttoon.html": {
             title: "다국어 읽기 도움말",
             subtitle: "본문 전체 번역이 아니라 읽기 목표와 활동 지시만 짧게 확인하세요.",
+            anchorSelector: ".hero",
+            collapsible: true,
+            collapsedLabel: "컷툰 다국어 도움말 열기",
+            expandedLabel: "컷툰 다국어 도움말 접기",
             translations: {
                 en: {
                     title: "English reading scaffold",
@@ -561,12 +569,12 @@
                     ]
                 },
                 vi: {
-                    title: "Ho tro doc tieng Viet",
-                    summary: "Hay doc cuttoon theo thu tu canh trong Seodongyo va ghep moi cut voi cau tieng Han.",
+                    title: "Hỗ trợ đọc tiếng Việt",
+                    summary: "Hãy đọc truyện tranh theo thứ tự các cảnh trong Seodongyo và ghép mỗi khung với câu tiếng Hàn.",
                     points: [
-                        "Dung thu tu tranh de du doan dong cau chuyen.",
-                        "Tim cho tin don lam thay doi tinh huong cua nhan vat.",
-                        "Kiem tra tung cau tieng Han voi hinh anh, khong dich ca cau chuyen."
+                        "Dùng thứ tự hình ảnh để dự đoán diễn biến câu chuyện.",
+                        "Tìm chỗ tin đồn làm thay đổi tình huống của nhân vật.",
+                        "Đối chiếu từng câu tiếng Hàn với hình ảnh, không cần dịch toàn bộ câu chuyện."
                     ]
                 },
                 ar: {
