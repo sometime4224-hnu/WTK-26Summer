@@ -47,7 +47,7 @@ test('shows immediate Korean feedback without removing the choice', async ({ pag
   await page.locator('.option-button').first().click();
   await expect(page.locator('.feedback-card')).toBeVisible();
   await expect(page.locator('.feedback-card')).toContainText('정답');
-  await expect(page.locator('.option-button')).toHaveCount(6);
+  await expect(page.locator('[data-question="c1-c16"]')).toHaveCount(4);
 });
 
 test('only submits once for a rapid double finish and retries a failed attempt once', async ({ page }) => {

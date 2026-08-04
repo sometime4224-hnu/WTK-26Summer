@@ -1,16 +1,106 @@
 const { test, expect } = require('@playwright/test');
 
+async function buildOldC13Attempt(page) {
+  await page.addInitScript(() => {
+    localStorage.clear();
+    window.HomeworkSubmitter = { submitHomework: async () => ({}) };
+  });
+  await page.goto('/review/review5-html/confirm.html');
+  await page.locator('#studentNameInput').fill('김학생');
+  await page.locator('[data-action="start"]').click();
+  await page.evaluate(() => window.__review5App.fillAnswers('confirm', true));
+  await page.locator('[data-action="finish"]').click();
+  await expect(page.locator('.result-card')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('snukorean:review5:v2:attempts:confirm')).attempts[0].submission.status)).toBe('success');
+  return page.evaluate(() => {
+    const wrapper = JSON.parse(localStorage.getItem('snukorean:review5:v2:attempts:confirm'));
+    Object.assign(wrapper.attempts[0].results[0], {
+      id: 'c1',
+      number: 1,
+      tag: '어휘 확인',
+      prompt: '다음 빈칸에 알맞은 말을 찾아 쓰세요. 우리 형은 아침마다 넥타이를 ___고 출근해요.',
+      selectedId: '1',
+      selectedText: '매다',
+      selectedLetter: 'A',
+      answerId: '1',
+      answerText: '매다',
+      correctLetter: 'A',
+      correct: true,
+      feedback: '넥타이는 목에 매는 것이므로 "매고"가 맞습니다.'
+    });
+    return JSON.stringify(wrapper);
+  });
+}
+
 test('migrates compatible versionless progress without deleting legacy data', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.clear();
-    localStorage.setItem('snukorean:review5:progress:confirm', JSON.stringify({ answers: { c1: '1' }, currentIndex: 0, choiceOrder: { c1: ['1', '2', '3', '4', '5', '6'] } }));
+    localStorage.setItem('snukorean:review5:progress:confirm', JSON.stringify({ answers: { c3: '1' }, currentIndex: 0, choiceOrder: { c3: ['1', '2', '3', '4', '5', '6'] } }));
     localStorage.setItem('snukorean:review5:attempts:confirm', JSON.stringify([]));
   });
   await page.goto('/review/review5-html/confirm.html');
   const state = await page.evaluate(() => ({ legacy: localStorage.getItem('snukorean:review5:progress:confirm'), v2: JSON.parse(localStorage.getItem('snukorean:review5:v2:progress:confirm')) }));
-  expect(state.legacy).toContain('"c1"');
+  expect(state.legacy).toContain('"c3"');
   expect(state.v2.schemaVersion).toBe(2);
-  expect(state.v2.answers.c1).toBe('1');
+  expect(state.v2.answers.c3).toBe('1');
+});
+
+test('preserves an invalid pre-change C13 v2 progress record instead of applying old c1 to c1-c16', async ({ page }) => {
+  const oldV2 = JSON.stringify({ schemaVersion: 2, answers: { c1: '1' }, choiceOrder: { c1: ['1', '2', '3', '4', '5', '6'] }, currentIndex: 0, studentName: '김학생', startedAt: 1, updatedAt: 1 });
+  await page.addInitScript((v2) => {
+    localStorage.clear();
+    localStorage.setItem('snukorean:review5:v2:progress:confirm', v2);
+  }, oldV2);
+  await page.goto('/review/review5-html/confirm.html');
+  await expect(page.locator('.recovery')).toBeVisible();
+  await expect(page.locator('[data-action="resume"]')).toHaveCount(0);
+  expect(await page.evaluate(() => localStorage.getItem('snukorean:review5:v2:progress:confirm'))).toBe(oldV2);
+  await page.locator('#studentNameInput').fill('김학생');
+  await page.locator('[data-action="start"]').click();
+  await expect(page.locator('[data-question="c1-c16"]')).toHaveCount(4);
+  expect(await page.evaluate(() => localStorage.getItem('snukorean:review5:v2:progress:confirm'))).toBe(oldV2);
+});
+
+test('preserves a legacy-only pre-change C13 progress record instead of applying old c1 to c1-c16', async ({ page }) => {
+  const oldLegacy = JSON.stringify({ answers: { c1: '1' }, currentIndex: 0, choiceOrder: { c1: ['1', '2', '3', '4', '5', '6'] } });
+  await page.addInitScript((legacy) => {
+    localStorage.clear();
+    localStorage.setItem('snukorean:review5:progress:confirm', legacy);
+  }, oldLegacy);
+  await page.goto('/review/review5-html/confirm.html');
+  await expect(page.locator('.recovery')).toBeVisible();
+  await expect(page.locator('[data-action="resume"]')).toHaveCount(0);
+  expect(await page.evaluate(() => localStorage.getItem('snukorean:review5:progress:confirm'))).toBe(oldLegacy);
+  expect(await page.evaluate(() => localStorage.getItem('snukorean:review5:v2:progress:confirm'))).toBeNull();
+  await page.locator('#studentNameInput').fill('김학생');
+  await page.locator('[data-action="start"]').click();
+  await expect(page.locator('[data-question="c1-c16"]')).toHaveCount(4);
+  expect(await page.evaluate(() => localStorage.getItem('snukorean:review5:progress:confirm'))).toBe(oldLegacy);
+});
+
+test('preserves an invalid pre-change C13 v2 attempt wrapper without restoring history', async ({ page }) => {
+  const oldV2 = await buildOldC13Attempt(page);
+  await page.evaluate((raw) => localStorage.setItem('snukorean:review5:v2:attempts:confirm', raw), oldV2);
+  const restored = await page.context().newPage();
+  await restored.goto('/review/review5-html/confirm.html');
+  await expect(restored.locator('.recovery')).toBeVisible();
+  await expect(restored.locator('.history-card')).toHaveCount(0);
+  expect(await restored.evaluate(() => localStorage.getItem('snukorean:review5:v2:attempts:confirm'))).toBe(oldV2);
+});
+
+test('preserves a legacy-only pre-change C13 attempt array without migrating history', async ({ page }) => {
+  const oldV2 = await buildOldC13Attempt(page);
+  const oldLegacy = JSON.stringify(JSON.parse(oldV2).attempts);
+  await page.evaluate((raw) => {
+    localStorage.removeItem('snukorean:review5:v2:attempts:confirm');
+    localStorage.setItem('snukorean:review5:attempts:confirm', raw);
+  }, oldLegacy);
+  const restored = await page.context().newPage();
+  await restored.goto('/review/review5-html/confirm.html');
+  await expect(restored.locator('.recovery')).toBeVisible();
+  await expect(restored.locator('.history-card')).toHaveCount(0);
+  expect(await restored.evaluate(() => localStorage.getItem('snukorean:review5:attempts:confirm'))).toBe(oldLegacy);
+  expect(await restored.evaluate(() => localStorage.getItem('snukorean:review5:v2:attempts:confirm'))).toBeNull();
 });
 
 test('confirmed reset removes migrated legacy records so reload does not resurrect work', async ({ page }) => {
@@ -18,7 +108,7 @@ test('confirmed reset removes migrated legacy records so reload does not resurre
     if (!sessionStorage.__review5LegacyResetSetup) {
       sessionStorage.__review5LegacyResetSetup = '1';
       localStorage.clear();
-      localStorage.setItem('snukorean:review5:progress:confirm', JSON.stringify({ answers: { c1: '1' }, currentIndex: 0, choiceOrder: { c1: ['1', '2', '3', '4', '5', '6'] } }));
+      localStorage.setItem('snukorean:review5:progress:confirm', JSON.stringify({ answers: { c3: '1' }, currentIndex: 0, choiceOrder: { c3: ['1', '2', '3', '4', '5', '6'] } }));
       localStorage.setItem('snukorean:review5:attempts:confirm', JSON.stringify([]));
     }
   });
@@ -165,7 +255,7 @@ test('keeps protected raw records byte-identical while fallback work survives re
   const before = await page.evaluate(() => [localStorage.getItem('snukorean:review5:v2:progress:confirm'), localStorage.getItem('snukorean:review5:v2:attempts:confirm'), localStorage.getItem('snukorean:review5:v2:recovery:progress:confirm')]);
   expect(before[0]).toBe('{손상}');
   expect(JSON.parse(before[1]).schemaVersion).toBe(7);
-  expect(JSON.parse(before[2]).answers.c1).toBeTruthy();
+  expect(JSON.parse(before[2]).answers['c1-c16']).toBeTruthy();
   await page.reload();
   await expect(page.locator('[data-action="resume"]')).toBeVisible();
   const after = await page.evaluate(() => [localStorage.getItem('snukorean:review5:v2:progress:confirm'), localStorage.getItem('snukorean:review5:v2:attempts:confirm')]);
@@ -202,7 +292,7 @@ test('keeps in-memory work and exposes recovery when storage is full', async ({ 
   await page.locator('[data-action="start"]').click();
   await page.locator('.option-button').first().click();
   await expect(page.locator('.recovery')).toContainText('저장하지 못했습니다');
-  await expect(page.locator('#recoveryText')).toContainText('c1');
+  await expect(page.locator('#recoveryText')).toContainText('c1-c16');
   expect(await page.evaluate(() => localStorage.getItem('snukorean:review5:v2:progress:confirm'))).toBe('{손상}');
 });
 
@@ -226,7 +316,7 @@ test('confirmed reset removes protected originals and returns to normal v2 savin
       sessionStorage.__review5ResetSuccessSetup = '1';
       localStorage.clear();
       localStorage.setItem('snukorean:review5:v2:progress:confirm', '{손상}');
-      localStorage.setItem('snukorean:review5:v2:recovery:progress:confirm', JSON.stringify({ schemaVersion: 2, answers: { c1: '1' }, choiceOrder: { c1: ['1', '2', '3', '4', '5', '6'] }, currentIndex: 0 }));
+      localStorage.setItem('snukorean:review5:v2:recovery:progress:confirm', JSON.stringify({ schemaVersion: 2, answers: { 'c1-c16': '1' }, choiceOrder: { 'c1-c16': ['1', '2', '3', '4'] }, currentIndex: 0 }));
     }
   });
   await page.goto('/review/review5-html/confirm.html');
