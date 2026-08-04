@@ -1,0 +1,40 @@
+:root { --ink:#29231d; --muted:#6e6358; --line:#cdbda9; --paper:#fffdf8; --accent:#a9501e; --soft:#fff1df; font-family:"Noto Sans KR","Malgun Gothic",sans-serif; color:var(--ink); background:#f5eee4; }
+* { box-sizing:border-box; }
+body { margin:0; background:linear-gradient(135deg,#f8f1e8,#eee2d2); }
+button,input,textarea { font:inherit; }
+button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible { outline:3px solid #1769aa; outline-offset:3px; }
+.writing-page { width:min(1240px,calc(100% - 32px)); margin:0 auto; padding:28px 0 48px; display:grid; grid-template-columns:minmax(240px,330px) minmax(0,1fr); gap:20px; }
+.writing-header { grid-column:1/-1; background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:20px; }
+.writing-header h1,.manuscript-head h2,.writing-help h2,.writing-help h3 { margin:4px 0 8px; }
+.writing-status,.manuscript-tip { color:var(--muted); margin:8px 0 0; line-height:1.55; }
+.back-link { color:var(--accent); font-weight:800; text-decoration:none; }
+.eyebrow { margin:0; color:var(--accent); font-weight:800; font-size:.85rem; }
+.writing-help,.manuscript-panel { min-width:0; background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:18px; }
+.writing-help { align-self:start; position:sticky; top:12px; }
+.writing-help section { border-top:1px solid #eadfd2; padding-top:10px; margin-top:10px; font-size:.93rem; line-height:1.6; }
+.writing-help p,.writing-help ol,.writing-help ul { margin:5px 0; padding-left:20px; }
+.help-sheet-head,.manuscript-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+.help-close,.help-open { display:none; }
+.notes-label,label { display:block; margin:14px 0 6px; font-weight:800; }
+#planningNotes,#studentName { width:100%; border:1px solid var(--line); border-radius:9px; padding:10px; background:#fff; }
+#planningNotes { resize:vertical; }
+.manuscript-panel { grid-column:2; }
+#characterCount { color:var(--accent); white-space:nowrap; }
+.manuscript-wrap { position:relative; overflow:auto; max-height:650px; border:2px solid #977a5b; background:#fffdfa; }
+.manuscript-grid { display:grid; grid-template-columns:repeat(20, minmax(26px,1fr)); grid-template-rows:repeat(25,32px); min-width:560px; }
+.manuscript-cell { min-width:0; min-height:32px; border-right:1px solid #c7b7a6; border-bottom:1px solid #c7b7a6; display:grid; place-items:center; font-size:18px; overflow:hidden; }
+.manuscript-cell:nth-child(20n) { border-right:0; }
+.manuscript-cell:nth-child(n+381):nth-child(-n+400) { border-bottom:3px solid var(--accent); }
+.manuscript-cell.is-active { background:#ffe3bd; box-shadow:inset 0 0 0 2px var(--accent); }
+.manuscript-input { position:absolute; inset:0; width:100%; height:100%; min-width:560px; resize:none; border:0; padding:0; color:transparent; caret-color:var(--ink); background:transparent; font-size:18px; line-height:32px; letter-spacing:0; overflow:auto; white-space:pre-wrap; }
+.manuscript-input::placeholder { color:#6e6358; padding:8px; font-size:14px; line-height:1.4; }
+.writing-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.writing-actions button { min-height:42px; border:1px solid var(--line); border-radius:9px; padding:0 13px; background:#fff; font-weight:800; cursor:pointer; }
+.writing-actions .submit-button { background:var(--accent); color:#fff; border-color:var(--accent); margin-left:auto; }
+.writing-actions .danger-button { color:#8b2525; }
+.writing-actions button:disabled { opacity:.5; cursor:not-allowed; }
+.recovery-notice { color:#8b2525; }
+.help-backdrop { display:none; }
+@media (max-width:760px) { .writing-page { width:min(100% - 16px,720px); display:block; padding-top:14px; } .writing-header,.manuscript-panel { margin-bottom:14px; } .writing-help { position:fixed; z-index:30; top:auto; left:0; right:0; bottom:0; max-height:82vh; overflow:auto; border-radius:18px 18px 0 0; transform:translateY(calc(100% + 24px)); transition:transform .18s ease; } .writing-help[aria-hidden="false"] { transform:translateY(0); } .help-open { display:block; position:fixed; z-index:20; right:16px; bottom:16px; min-height:46px; border:0; border-radius:999px; padding:0 17px; background:var(--accent); color:#fff; font-weight:800; } .help-close { display:block; border:0; background:#f2e1cf; border-radius:50%; width:36px; height:36px; font-size:24px; } .help-backdrop[hidden] { display:none; } .help-backdrop { display:block; position:fixed; z-index:29; inset:0; background:rgba(0,0,0,.45); } .manuscript-grid,.manuscript-input { min-width:520px; } }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none!important; } }
+@media print { body { background:#fff; } .writing-help,.help-open,.writing-actions,.manuscript-tip,.writing-status,.back-link,#studentName,.notes-label,label[for="studentName"] { display:none!important; } .writing-page { display:block; width:100%; } .writing-header,.manuscript-panel { border:0; box-shadow:none; padding:0; } .manuscript-input { display:none; } }

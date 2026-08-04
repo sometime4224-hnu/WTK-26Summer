@@ -218,6 +218,9 @@
             title,
             chapter: String(assignment.chapter || ""),
             totalQuestions: Number(assignment.totalQuestions) || 0,
+            submissionKind: assignment.submissionKind === "writing" ? "writing" : "quiz",
+            minCharacterCount: Number(assignment.minCharacterCount) || 0,
+            maxCharacterCount: Number(assignment.maxCharacterCount) || 0,
             anonymousModeEnabled: assignment.anonymousModeEnabled !== false,
             roster: Array.isArray(assignment.roster) ? assignment.roster : [],
             groupId: group.id || "",
@@ -378,7 +381,9 @@
                                         <article class="assignment-card" data-assignment-card="${escapeHtml(assignment.assignmentId)}">
                                             <div class="assignment-card__meta">
                                                 <span>${escapeHtml(assignment.chapter || assignment.groupTitle || "통계")}</span>
-                                                <b>${assignment.totalQuestions ? `${assignment.totalQuestions}문항` : "문항 수 미정"}</b>
+                                                <b>${assignment.submissionKind === "writing"
+                                                    ? `${assignment.minCharacterCount}~${assignment.maxCharacterCount}자`
+                                                    : assignment.totalQuestions ? `${assignment.totalQuestions}문항` : "문항 수 미정"}</b>
                                             </div>
                                             <h3>${escapeHtml(assignment.title)}</h3>
                                             <p>${escapeHtml(assignment.assignmentId)}</p>
@@ -762,6 +767,95 @@
         `;
     }
 
+    function isWritingAssignment() {
+        return getAssignment().submissionKind === "writing";
+    }
+
+    function writingRecord(record) {
+        const text = record && typeof record.responseText === "string" ? record.responseText : "";
+        const characterCount = record && Number.isInteger(record.responseCharacterCount)
+            ? record.responseCharacterCount
+            : null;
+        return { text, characterCount };
+    }
+
+    function renderWritingDashboard(filteredSubmissions, latestRows, displayContext) {
+        const assignment = getAssignment();
+        const validCount = latestRows.filter(function (row) {
+            const record = writingRecord(row);
+            return record.characterCount !== null;
+        }).length;
+        root.innerHTML = `
+            ${renderRegistryBackLink()}
+            <header class="dashboard-hero">
+                <p class="dashboard-eyebrow">Homework Dashboard</p>
+                <h1>${escapeHtml(assignment.assignmentTitle)} 제출 현황</h1>
+                <p>${escapeHtml(state.user && state.user.email ? state.user.email : "교사용 계정")}으로 로그인했습니다.</p>
+                <div class="dashboard-actions">
+                    <button id="refreshButton" class="dashboard-button primary" type="button">${state.loading ? "불러오는 중..." : "새로고침"}</button>
+                    ${renderAnonymousModeButton()}
+                    <button id="signOutButton" class="dashboard-button" type="button">로그아웃</button>
+                </div>
+            </header>
+            ${state.error ? `<div class="dashboard-alert">${escapeHtml(state.error)}</div>` : ""}
+            <section class="dashboard-summary" aria-label="쓰기 제출 요약">
+                <article class="summary-card"><span>제출 학생</span><strong>${latestRows.length}</strong></article>
+                <article class="summary-card"><span>전체 제출</span><strong>${filteredSubmissions.length}</strong></article>
+                <article class="summary-card"><span>글자 수 확인</span><strong>${validCount}</strong></article>
+            </section>
+            ${renderDateRangeFilter(filteredSubmissions)}
+            <section class="writing-submission-panel" aria-labelledby="writingSubmissionTitle">
+                <div class="panel-head"><h2 id="writingSubmissionTitle">학생별 최근 제출</h2><input id="studentSearch" type="search" value="${escapeHtml(state.search)}" placeholder="이름 검색" aria-label="이름 검색"></div>
+                ${latestRows.length ? `<div class="writing-submission-list">${latestRows.map(function (row, index) {
+                    const record = writingRecord(row);
+                    return `<article class="writing-submission" data-writing-submission="${index}">
+                        <div class="writing-submission__meta"><strong>${escapeHtml(getVisibleStudentName(row, displayContext))}</strong><span>${record.characterCount === null ? "글자 수 없음" : `${record.characterCount}자`}</span><time>${escapeHtml(formatDate(row.clientSubmittedAt || row.submittedAt))}</time></div>
+                        <p class="writing-submission__missing" ${record.text ? "hidden" : ""}>작성 내용을 확인할 수 없습니다.</p>
+                        <pre class="writing-response-text" data-writing-response="${index}"></pre>
+                        <button class="dashboard-button writing-copy-button" type="button" data-writing-copy="${index}" ${record.text ? "" : "disabled"}>글 복사</button>
+                    </article>`;
+                }).join("")}</div>` : '<p class="dashboard-empty">아직 표시할 제출 기록이 없습니다.</p>'}
+            </section>
+        `;
+        latestRows.forEach(function (row, index) {
+            const response = root.querySelector(`[data-writing-response="${index}"]`);
+            if (response) response.textContent = writingRecord(row).text;
+        });
+        document.getElementById("refreshButton").addEventListener("click", loadAndRender);
+        const anonymousToggle = document.getElementById("anonymousModeToggle");
+        if (anonymousToggle) anonymousToggle.addEventListener("click", toggleAnonymousMode);
+        wireDateRangeFilter();
+        wireAuthButtons();
+        root.querySelectorAll("[data-writing-copy]").forEach(function (button) {
+            button.addEventListener("click", async function () {
+                const record = writingRecord(latestRows[Number(button.dataset.writingCopy)]);
+                try {
+                    await navigator.clipboard.writeText(record.text);
+                    button.textContent = "복사했습니다";
+                } catch (error) {
+                    const response = root.querySelector(`[data-writing-response="${button.dataset.writingCopy}"]`);
+                    if (!response) return;
+                    let copied = false;
+                    const selection = window.getSelection();
+                    try {
+                        const range = document.createRange();
+                        range.selectNodeContents(response);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                        copied = document.execCommand("copy") === true;
+                    } catch (fallbackError) {
+                        copied = false;
+                    } finally {
+                        selection.removeAllRanges();
+                    }
+                    button.textContent = copied ? "복사했습니다" : "복사하지 못했습니다. 다시 시도하세요.";
+                }
+            });
+        });
+        const search = document.getElementById("studentSearch");
+        if (search) search.addEventListener("input", function () { state.search = search.value; renderDashboard(); });
+    }
+
     function renderSignedOut() {
         if (isRegistryMode() && (!selectedRegistryAssignment || unknownRegistryAssignment)) {
             renderRegistryHub();
@@ -862,6 +956,12 @@
 
         const filteredSubmissions = getDateFilteredSubmissions();
         const latestRows = buildLatestByStudent(filteredSubmissions);
+        if (isWritingAssignment()) {
+            const displayContext = buildDisplayContext(latestRows);
+            const rows = getFilteredRows(latestRows, displayContext);
+            renderWritingDashboard(filteredSubmissions, rows, displayContext);
+            return;
+        }
         const allRows = buildRosterRows(latestRows);
         const displayContext = buildDisplayContext(allRows);
         const rows = getFilteredRows(allRows, displayContext);

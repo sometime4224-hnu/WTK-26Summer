@@ -1,927 +1,229 @@
 (function () {
+  "use strict";
+
   var DATA = window.REVIEW5_DATA;
-  var FEEDBACK_I18N = window.REVIEW5_FEEDBACK_I18N || {};
-  var STORAGE_PREFIX = "snukorean:review5";
-  var runtime = {
-    layout: loadText("layout") || "phone",
-    sectionUi: {},
-    speakingQuestionId: "",
-    audioElement: null
-  };
+  var PREFIX = "snukorean:review5";
+  var VERSION = 2;
+  var memory = { progress: {}, attempts: {}, notices: {}, layout: "auto", ui: {}, storageFailed: false, protection: {} };
 
   document.addEventListener("DOMContentLoaded", function () {
-    applyLayout(runtime.layout);
+    memory.layout = safeGet(PREFIX + ":v2:layout") || "auto";
+    if (document.body.dataset.section) initializeSection(document.body.dataset.section);
+    applyLayout();
+    window.addEventListener("resize", function () { if (memory.layout === "auto") applyLayout(); });
     document.getElementById("app").addEventListener("click", onClick);
-    window.addEventListener("beforeunload", stopAudio);
+    document.getElementById("app").addEventListener("input", onInput);
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") flush(); });
+    exposeTestHelpers();
     render();
   });
 
   function onClick(event) {
-    var target = event.target.closest("[data-action]");
-    if (!target) {
-      return;
-    }
-
-    var action = target.getAttribute("data-action");
-    var sectionId = target.getAttribute("data-section") || document.body.dataset.section;
-    var ui = sectionId ? getUi(sectionId) : null;
-
-    if (action === "set-layout") {
-      runtime.layout = target.getAttribute("data-layout");
-      saveText("layout", runtime.layout);
-      applyLayout(runtime.layout);
-      render();
-      return;
-    }
-
-    if (action === "start" || action === "restart") {
-      if (sectionId) {
-        stopAudio();
-        clearProgress(sectionId);
-        setProgress(sectionId, createProgress(sectionId));
-        ui.view = "quiz";
-        ui.activeAttemptId = "";
-        ui.modalAttemptId = "";
-        ui.filter = "incorrect";
-        render();
-      }
-      return;
-    }
-
-    if (action === "resume") {
-      if (sectionId) {
-        stopAudio();
-        ui.view = "quiz";
-        ui.activeAttemptId = "";
-        ui.modalAttemptId = "";
-        render();
-      }
-      return;
-    }
-
-    if (action === "select-choice") {
-      updateChoice(sectionId, target.getAttribute("data-question"), target.getAttribute("data-choice"));
-      return;
-    }
-
-    if (action === "prev-question") {
-      moveQuestion(sectionId, -1);
-      return;
-    }
-
-    if (action === "next-question") {
-      moveQuestion(sectionId, 1);
-      return;
-    }
-
-    if (action === "jump-question") {
-      jumpQuestion(sectionId, Number(target.getAttribute("data-index")));
-      return;
-    }
-
-    if (action === "finish-section") {
-      finishSection(sectionId);
-      return;
-    }
-
-    if (action === "play-audio") {
-      toggleAudio(sectionId, target.getAttribute("data-question"));
-      return;
-    }
-
-    if (action === "view-attempt") {
-      ui.modalAttemptId = target.getAttribute("data-attempt");
-      render();
-      return;
-    }
-
-    if (action === "close-modal") {
-      if (ui) {
-        ui.modalAttemptId = "";
-      }
-      render();
-      return;
-    }
-
-    if (action === "show-result") {
-      if (ui) {
-        ui.activeAttemptId = target.getAttribute("data-attempt");
-        ui.view = "result";
-      }
-      render();
-      return;
-    }
-
-    if (action === "back-to-start") {
-      if (ui) {
-        stopAudio();
-        ui.view = "start";
-        ui.activeAttemptId = "";
-      }
-      render();
-      return;
-    }
-
-    if (action === "set-filter") {
-      if (ui) {
-        ui.filter = target.getAttribute("data-filter");
-      }
-      render();
-    }
+    var button = event.target.closest("[data-action]");
+    if (!button) return;
+    var action = button.dataset.action;
+    var sectionId = button.dataset.section || document.body.dataset.section;
+    if (action === "layout") { memory.layout = button.dataset.layout; safeSet(PREFIX + ":v2:layout", memory.layout); applyLayout(); render(); return; }
+    if (action === "start" || action === "new-attempt") { start(sectionId); return; }
+    if (action === "resume") { ui(sectionId).view = "quiz"; render(); return; }
+    if (action === "choice") { choose(sectionId, button.dataset.question, button.dataset.choice); return; }
+    if (action === "next" || action === "previous") { navigate(sectionId, action === "next" ? 1 : -1); return; }
+    if (action === "jump") { jump(sectionId, Number(button.dataset.index)); return; }
+    if (action === "finish") { finish(sectionId); return; }
+    if (action === "retry-submit") { retrySubmit(sectionId, button.dataset.attempt); return; }
+    if (action === "result") { ui(sectionId).view = "result"; ui(sectionId).attemptId = button.dataset.attempt; render(); return; }
+    if (action === "home") { ui(sectionId).view = "start"; render(); return; }
+    if (action === "reset-request") { ui(sectionId).resetConfirm = true; render(); return; }
+    if (action === "reset-confirm") { resetSection(sectionId); return; }
+    if (action === "reset-cancel") { ui(sectionId).resetConfirm = false; render(); return; }
+    if (action === "copy-recovery") { copyRecovery(sectionId); return; }
+    if (action === "download-recovery") { downloadRecovery(sectionId); return; }
+    if (action === "play-audio") { playAudio(sectionId, button.dataset.question); }
   }
 
-  function render() {
-    if (document.body.dataset.role === "hub") {
-      renderHub();
-      return;
-    }
-    renderSection(document.body.dataset.section);
+  function onInput(event) {
+    if (event.target.id !== "studentNameInput") return;
+    var sectionId = document.body.dataset.section;
+    var progress = memory.progress[sectionId];
+    if (progress) { progress.studentName = String(event.target.value || "").trim().slice(0, 40); progress.updatedAt = Date.now(); saveProgress(sectionId); }
+    else safeSet(PREFIX + ":v2:studentName", String(event.target.value || "").trim().slice(0, 40));
+    ui(sectionId).status = "";
   }
 
-  function renderHub() {
-    var cards = DATA.order.map(function (sectionId) {
-      var section = DATA.sections[sectionId];
-      var progress = getProgress(sectionId);
-      var attempts = getAttempts(sectionId);
-      var latest = attempts[0];
-      var answered = progress ? Object.keys(progress.answers).length : 0;
-      var progressLabel = answered ? answered + "/" + section.questions.length : "새로 시작";
-      var latestLabel = latest ? latest.score + "/" + latest.total : "기록 없음";
-      var description = section.hero;
-      return (
-        '<article class="section-card">' +
-        '<div class="section-row">' +
-        '<div>' +
-        '<div class="eyebrow">REVIEW 5</div>' +
-        '<h2 class="section-title">' + escapeHtml(section.title) + "</h2>" +
-        '<p class="section-copy">' + escapeHtml(description) + "</p>" +
-        "</div>" +
-        "</div>" +
-        '<div class="section-meta">' +
-        '<span class="chip"><strong>진행</strong>' + escapeHtml(progressLabel) + "</span>" +
-        '<span class="chip"><strong>최근</strong>' + escapeHtml(latestLabel) + "</span>" +
-        '<span class="chip"><strong>기록</strong>' + String(attempts.length) + "</span>" +
-        "</div>" +
-        '<div class="section-actions">' +
-        '<a class="primary-button" href="' + escapeHtml(section.href) + '">열기</a>' +
-        "</div>" +
-        "</article>"
-      );
-    }).join("");
-
-    document.getElementById("app").innerHTML =
-      '<main class="app-shell">' +
-      renderTopbar("../index.html") +
-      '<section class="hero-card surface">' +
-      '<div class="eyebrow">복습 5</div>' +
-      '<h1 class="hero-title">하위 단원별 퀴즈</h1>' +
-      '<p class="hero-copy">스마트폰 폭이 기본이고, 오른쪽 위 토글로 태블릿 폭으로 바로 전환됩니다. 각 단원은 자동 저장되며 결과와 과거 기록을 다시 열어볼 수 있습니다.</p>' +
-      '<div class="stats-grid">' +
-      '<div class="stats-card"><span class="stat-label">단원</span><span class="stat-value">4</span></div>' +
-      '<div class="stats-card"><span class="stat-label">저장</span><span class="stat-value">Auto</span></div>' +
-      "</div>" +
-      "</section>" +
-      '<section class="section-grid">' + cards + "</section>" +
-      "</main>";
+  function isQuiz(section) { return Boolean(section && section.homework && section.homework.submissionKind === "quiz" && section.homework.assignmentId && Array.isArray(section.questions)); }
+  function initializeSection(sectionId) {
+    if (!isQuiz(DATA.sections[sectionId])) return;
+    if (memory.progress.hasOwnProperty(sectionId)) return;
+    memory.progress[sectionId] = null;
+    memory.attempts[sectionId] = [];
+    memory.protection[sectionId] = { progress: null, attempts: null };
+    var pKey = v2Key("progress", sectionId), aKey = v2Key("attempts", sectionId);
+    var v2Progress = readRecord(pKey, "progress", sectionId);
+    var v2Attempts = readRecord(aKey, "attempts", sectionId);
+    if (v2Progress.valid) memory.progress[sectionId] = v2Progress.value;
+    else if (v2Progress.issue) { memory.protection[sectionId].progress = v2Progress.raw; loadFallback(sectionId, "progress"); }
+    if (v2Attempts.valid) memory.attempts[sectionId] = v2Attempts.value;
+    else if (v2Attempts.issue) { memory.protection[sectionId].attempts = v2Attempts.raw; loadFallback(sectionId, "attempts"); }
+    if (v2Progress.issue || v2Attempts.issue || memory.storageFailed) notice(sectionId, "저장된 기록을 안전하게 읽지 못했습니다. 현재 작업은 계속할 수 있습니다.");
+    if (!v2Progress.exists) migrateLegacy(sectionId, "progress");
+    if (!v2Attempts.exists) migrateLegacy(sectionId, "attempts");
   }
 
-  function renderSection(sectionId) {
-    var section = DATA.sections[sectionId];
-    var ui = getUi(sectionId);
-    var progress = getProgress(sectionId);
-    if (ui.view === "quiz" && !progress) {
-      ui.view = "start";
-    }
-
-    if (ui.view === "result") {
-      renderResult(section);
-      return;
-    }
-
-    if (ui.view === "quiz" && progress) {
-      renderQuiz(section, progress);
-      return;
-    }
-
-    renderStart(section, progress);
-  }
-
-  function renderStart(section, progress) {
-    var sectionId = section.id;
-    var ui = getUi(sectionId);
-    var attempts = getAttempts(sectionId);
-    var latest = attempts[0];
-    var answered = progress ? Object.keys(progress.answers).length : 0;
-    var stats = latest
-      ? '<div class="stats-grid">' +
-        '<div class="stats-card"><span class="stat-label">최근 점수</span><span class="stat-value">' + latest.score + "/" + latest.total + "</span></div>" +
-        '<div class="stats-card"><span class="stat-label">응시 기록</span><span class="stat-value">' + attempts.length + "</span></div>" +
-        "</div>"
-      : '<div class="empty-card">아직 기록이 없습니다. 첫 응시가 자동으로 저장됩니다.</div>';
-
-    var progressAction = answered
-      ? '<button class="primary-button" data-action="resume" data-section="' + sectionId + '">이어 풀기</button>'
-      : '<button class="primary-button" data-action="start" data-section="' + sectionId + '">시작</button>';
-
-    var resetAction = answered
-      ? '<button class="secondary-button" data-action="restart" data-section="' + sectionId + '">새 시도</button>'
-      : "";
-
-    var historyHtml = attempts.length
-      ? attempts.map(function (attempt) {
-          return (
-            '<article class="history-card">' +
-            '<div class="history-head">' +
-            '<div>' +
-            '<div class="history-score">' + attempt.score + "/" + attempt.total + "</div>" +
-            '<div class="history-date">' + escapeHtml(formatDate(attempt.finishedAt)) + "</div>" +
-            "</div>" +
-            '<span class="chip"><strong>오답</strong>' + String(attempt.total - attempt.score) + "</span>" +
-            "</div>" +
-            '<div class="history-actions">' +
-            '<button class="secondary-button" data-action="show-result" data-section="' + sectionId + '" data-attempt="' + attempt.id + '">결과</button>' +
-            '<button class="secondary-button" data-action="view-attempt" data-section="' + sectionId + '" data-attempt="' + attempt.id + '">복기</button>' +
-            "</div>" +
-            "</article>"
-          );
-        }).join("")
-      : "";
-
-    document.getElementById("app").innerHTML =
-      '<main class="app-shell">' +
-      renderTopbar("index.html") +
-      '<section class="hero-card surface">' +
-      '<div class="eyebrow">REVIEW 5</div>' +
-      '<h1 class="hero-title">' + escapeHtml(section.title) + "</h1>" +
-      '<p class="hero-copy">' + escapeHtml(section.hero) + "</p>" +
-      '<div class="section-meta">' +
-      '<span class="chip"><strong>문항</strong>' + escapeHtml(section.countLabel) + "</span>" +
-      '<span class="chip"><strong>진행</strong>' + (answered ? answered + "/" + section.questions.length : "0/" + section.questions.length) + "</span>" +
-      "</div>" +
-      '<div class="section-actions">' + progressAction + resetAction + "</div>" +
-      "</section>" +
-      stats +
-      '<div class="divider-title"><h2>기록</h2></div>' +
-      (historyHtml ? '<section class="history-list">' + historyHtml + "</section>" : "") +
-      "</main>" +
-      renderAttemptModal(section, ui.modalAttemptId);
-  }
-
-  function renderQuiz(section, progress) {
-    var sectionId = section.id;
-    var ui = getUi(sectionId);
-    var index = clamp(progress.currentIndex, 0, section.questions.length - 1);
-    if (index !== progress.currentIndex) {
-      progress.currentIndex = index;
-      setProgress(sectionId, progress);
-    }
-    var question = section.questions[index];
-    var selected = progress.answers[question.id] || "";
-    var answeredCount = Object.keys(progress.answers).length;
-    var isLast = index === section.questions.length - 1;
-    var percent = Math.round(((index + 1) / section.questions.length) * 100);
-    var feedback = selected ? renderFeedback(question, selected) : "";
-    var optionClass = question.imageChoices ? " option-grid--media" : (isWideChoices(question) ? " option-grid--wide" : "");
-    var shakeClass = ui.shakeQuestionId === question.id ? " is-shake" : "";
-
-    document.getElementById("app").innerHTML =
-      '<main class="app-shell">' +
-      renderTopbar("index.html") +
-      '<section class="progress-card surface">' +
-      '<div class="progress-bar"><div class="progress-fill" style="width:' + percent + '%"></div></div>' +
-      '<div class="progress-meta"><span>' + escapeHtml(section.title) + '</span><span>' + (index + 1) + " / " + section.questions.length + "</span></div>" +
-      '<div class="dot-strip">' + renderDots(section, progress) + "</div>" +
-      "</section>" +
-      '<section class="question-card' + shakeClass + '">' +
-      '<div class="eyebrow">' + escapeHtml(question.tag) + "</div>" +
-      '<div class="question-number">' + String(index + 1).padStart(2, "0") + "</div>" +
-      (question.audio ? renderAudio(question) : "") +
-      '<p class="question-prompt">' + escapeHtml(question.prompt) + "</p>" +
-      renderContext(question.context) +
-      '<div class="option-grid' + optionClass + '">' + renderOptions(question, selected, progress.choiceOrder && progress.choiceOrder[question.id]) + "</div>" +
-      feedback +
-      "</section>" +
-      '<nav class="nav-bar">' +
-      '<button class="nav-button" data-action="prev-question" data-section="' + sectionId + '"' + (index === 0 ? " disabled" : "") + ' aria-label="이전">' + icon("left") + "</button>" +
-      '<div class="nav-center"></div>' +
-      (
-        isLast
-          ? '<button class="nav-button is-primary' + (selected ? " is-pulse" : "") + '" data-action="finish-section" data-section="' + sectionId + '" aria-label="완료">' + icon("check") + "</button>"
-          : '<button class="nav-button is-primary' + (selected ? " is-pulse" : "") + '" data-action="next-question" data-section="' + sectionId + '" aria-label="다음">' + icon("right") + "</button>"
-      ) +
-      "</nav>" +
-      '<div class="divider-title"><h3>진행</h3><span class="chip"><strong>완료</strong>' + answeredCount + "</span></div>" +
-      "</main>";
-  }
-
-  function renderResult(section) {
-    var sectionId = section.id;
-    var ui = getUi(sectionId);
-    var attempt = findAttempt(sectionId, ui.activeAttemptId) || getAttempts(sectionId)[0];
-    if (!attempt) {
-      ui.view = "start";
-      render();
-      return;
-    }
-    ui.activeAttemptId = attempt.id;
-
-    var incorrectCount = attempt.total - attempt.score;
-    var ratio = attempt.total ? Math.round((attempt.score / attempt.total) * 100) : 0;
-    var ringDegree = Math.round((ratio / 100) * 360);
-    var filter = ui.filter || "incorrect";
-    var items = attempt.results.filter(function (item) {
-      return filter === "all" ? true : !item.correct;
-    });
-    if (!items.length) {
-      items = attempt.results;
-    }
-
-    document.getElementById("app").innerHTML =
-      '<main class="app-shell">' +
-      renderTopbar("index.html") +
-      '<section class="result-card surface">' +
-      '<div class="eyebrow">RESULT</div>' +
-      '<h1 class="result-title">' + escapeHtml(section.title) + "</h1>" +
-      '<div class="score-wrap">' +
-      '<div class="score-ring" style="--ring-degree:' + ringDegree + 'deg"><div class="score-value">' + ratio + "%</div></div>" +
-      '<div class="score-copy">' +
-      '<p class="muted-copy">' + escapeHtml(formatDate(attempt.finishedAt)) + "</p>" +
-      '<p class="question-prompt">' + attempt.score + " / " + attempt.total + "</p>" +
-      '<div class="section-meta">' +
-      '<span class="chip"><strong>정답</strong>' + attempt.score + "</span>" +
-      '<span class="chip"><strong>오답</strong>' + incorrectCount + "</span>" +
-      '<span class="chip"><strong>응시</strong>' + getAttempts(sectionId).length + "</span>" +
-      "</div>" +
-      "</div>" +
-      "</div>" +
-      '<div class="result-actions">' +
-      '<button class="secondary-button" data-action="set-filter" data-section="' + sectionId + '" data-filter="incorrect">오답만</button>' +
-      '<button class="secondary-button" data-action="set-filter" data-section="' + sectionId + '" data-filter="all">전체 보기</button>' +
-      '<button class="secondary-button" data-action="back-to-start" data-section="' + sectionId + '">처음 화면</button>' +
-      '<button class="primary-button" data-action="restart" data-section="' + sectionId + '">다시 풀기</button>' +
-      "</div>" +
-      (section.nextHref ? '<div class="section-actions" style="margin-top:12px;"><a class="text-button" href="' + escapeHtml(section.nextHref) + '">다음 단원</a></div>' : "") +
-      "</section>" +
-      '<section class="review-list">' + renderReviewItems(attempt, items) + "</section>" +
-      "</main>";
-  }
-
-  function renderAttemptModal(section, attemptId) {
-    if (!attemptId) {
-      return "";
-    }
-    var attempt = findAttempt(section.id, attemptId);
-    if (!attempt) {
-      return "";
-    }
-    return (
-      '<div class="modal">' +
-      '<div class="modal-panel surface">' +
-      '<div class="modal-close"><button class="ghost-icon" data-action="close-modal" data-section="' + section.id + '" aria-label="닫기">' + icon("close") + '</button></div>' +
-      '<div class="eyebrow">기록 복기</div>' +
-      '<h2 class="section-title">' + escapeHtml(section.title) + "</h2>" +
-      '<p class="muted-copy">' + escapeHtml(formatDate(attempt.finishedAt)) + " · " + attempt.score + "/" + attempt.total + "</p>" +
-      '<section class="review-list">' + renderReviewItems(attempt, attempt.results) + "</section>" +
-      "</div>" +
-      "</div>"
-    );
-  }
-
-  function renderReviewItems(attempt, results) {
-    return results.map(function (item) {
-      var contextHtml = renderContext(item.context, true);
-      var feedback = normalizeStoredFeedback(item.id, item.feedback);
-      var transcriptHtml = item.audio && item.audio.transcript
-        ? '<div class="review-context"><div class="transcript-box">' + item.audio.transcript.map(function (part) {
-            return "<div><strong>" + escapeHtml(part.speaker || "지문") + ":</strong> " + escapeHtml(part.text) + "</div>";
-          }).join("") + "</div></div>"
-        : "";
-      return (
-        '<article class="review-item ' + (item.correct ? "correct" : "wrong") + '">' +
-        '<div class="review-head">' +
-        '<span class="status-pill ' + (item.correct ? "correct" : "wrong") + '">' + (item.correct ? "정답" : "오답") + "</span>" +
-        '<span class="review-sub">' + escapeHtml(item.tag) + "</span>" +
-        "</div>" +
-        '<p class="review-prompt"><strong>' + escapeHtml(item.number) + ".</strong> " + escapeHtml(item.prompt) + "</p>" +
-        contextHtml +
-        transcriptHtml +
-        '<p class="review-answer"><strong>내 답</strong> ' + escapeHtml(item.selectedText || "미응답") + "</p>" +
-        '<p class="review-answer"><strong>정답</strong> ' + escapeHtml(item.answerText) + "</p>" +
-        renderBilingualFeedback(feedback) +
-        "</article>"
-      );
-    }).join("");
-  }
-
-  function renderFeedback(question, selectedId) {
-    var correct = selectedId === question.answer;
-    var feedback = getFeedbackEntry(question.id, question.feedback);
-    return (
-      '<div class="feedback-card ' + (correct ? "correct" : "wrong") + '">' +
-      '<div class="feedback-top">' +
-      '<span class="status-pill ' + (correct ? "correct" : "wrong") + '">' + (correct ? "정답" : "오답") + "</span>" +
-      '<span class="review-sub">정답 · ' + escapeHtml(choiceText(question, question.answer)) + "</span>" +
-      "</div>" +
-      '<p class="feedback-answer"><strong>내 답</strong> ' + escapeHtml(choiceText(question, selectedId)) + "</p>" +
-      renderBilingualFeedback(feedback) +
-      "</div>"
-    );
-  }
-
-  function renderOptions(question, selectedId, choiceOrder) {
-    var orderedChoices = getOrderedChoices(question, choiceOrder);
-    return orderedChoices.map(function (choice, displayIndex) {
-      var className = "option-button" + (choice.image ? " option-button--image" : "");
-      if (selectedId) {
-        if (choice.id === selectedId && choice.id === question.answer) {
-          className += " is-correct";
-        } else if (choice.id === selectedId) {
-          className += " is-wrong";
-        } else if (choice.id === question.answer) {
-          className += " is-correct";
-        }
-      } else if (choice.id === selectedId) {
-        className += " is-selected";
-      }
-
-      return (
-        '<button class="' + className + '" data-action="select-choice" data-question="' + question.id + '" data-choice="' + choice.id + '" data-section="' + document.body.dataset.section + '">' +
-        '<span class="option-index">' + (displayIndex + 1) + "</span>" +
-        (choice.image
-          ? '<span class="option-image-wrap"><img class="option-image" src="' + escapeHtml(choice.image) + '" alt="' + escapeHtml(choice.text) + '"></span><span class="sr-only">' + escapeHtml(choice.text) + "</span>"
-          : '<span class="option-text">' + escapeHtml(choice.text) + "</span>") +
-        "</button>"
-      );
-    }).join("");
-  }
-
-  function renderContext(context, compact) {
-    if (!context || !context.length) {
-      return "";
-    }
-    return (
-      '<div class="context-stack">' +
-      context.map(function (block) {
-        var type = block.type === "passage" ? " passage" : "";
-        return '<div class="context-block' + type + '">' + escapeHtml(block.text).replace(/\n/g, "<br>") + "</div>";
-      }).join("") +
-      "</div>"
-    );
-  }
-
-  function renderAudio(question) {
-    var isPlaying = runtime.speakingQuestionId === question.id;
-    return (
-      '<div class="audio-panel' + (isPlaying ? " is-playing" : "") + '">' +
-      '<button class="audio-button" data-action="play-audio" data-question="' + question.id + '" data-section="' + document.body.dataset.section + '" aria-label="재생">' + icon(isPlaying ? "stop" : "play") + "</button>" +
-      '<div class="audio-copy">' +
-      '<div class="audio-title">' + escapeHtml(question.audio.label) + "</div>" +
-      '<div class="audio-sub">탭해서 듣기</div>' +
-      '<div class="audio-wave"><span></span><span></span><span></span><span></span></div>' +
-      "</div>" +
-      "</div>"
-    );
-  }
-
-  function renderDots(section, progress) {
-    return section.questions.map(function (question, index) {
-      var classes = "dot-button";
-      if (progress.answers[question.id]) {
-        classes += " is-answered";
-      }
-      if (index === progress.currentIndex) {
-        classes += " is-current";
-      }
-      return '<button class="' + classes + '" data-action="jump-question" data-section="' + section.id + '" data-index="' + index + '" aria-label="' + (index + 1) + '"></button>';
-    }).join("");
-  }
-
-  function renderTopbar(backHref) {
-    return (
-      '<header class="topbar">' +
-      '<div class="topbar-group">' +
-      (backHref ? '<a class="ghost-icon" href="' + escapeHtml(backHref) + '" aria-label="뒤로">' + icon("home") + "</a>" : '<div class="ghost-icon" aria-hidden="true">' + icon("home") + "</div>") +
-      "</div>" +
-      '<div class="topbar-group">' + renderDeviceToggle() + "</div>" +
-      "</header>"
-    );
-  }
-
-  function renderDeviceToggle() {
-    return (
-      '<div class="device-toggle" role="group" aria-label="화면 전환">' +
-      '<button class="device-button' + (runtime.layout === "phone" ? " is-active" : "") + '" data-action="set-layout" data-layout="phone" aria-label="스마트폰">' + icon("phone") + "</button>" +
-      '<button class="device-button' + (runtime.layout === "tablet" ? " is-active" : "") + '" data-action="set-layout" data-layout="tablet" aria-label="태블릿">' + icon("tablet") + "</button>" +
-      "</div>"
-    );
-  }
-
-  function updateChoice(sectionId, questionId, choiceId) {
-    var progress = getProgress(sectionId);
-    if (!progress) {
-      progress = createProgress(sectionId);
-    }
-    progress.answers[questionId] = choiceId;
-    progress.updatedAt = Date.now();
-    setProgress(sectionId, progress);
-    render();
-  }
-
-  function moveQuestion(sectionId, delta) {
-    var progress = getProgress(sectionId);
-    if (!progress) {
-      return;
-    }
-    stopAudio();
-    progress.currentIndex = clamp(progress.currentIndex + delta, 0, DATA.sections[sectionId].questions.length - 1);
-    progress.updatedAt = Date.now();
-    setProgress(sectionId, progress);
-    render();
-  }
-
-  function jumpQuestion(sectionId, index) {
-    var progress = getProgress(sectionId);
-    if (!progress) {
-      return;
-    }
-    stopAudio();
-    progress.currentIndex = clamp(index, 0, DATA.sections[sectionId].questions.length - 1);
-    progress.updatedAt = Date.now();
-    setProgress(sectionId, progress);
-    render();
-  }
-
-  function finishSection(sectionId) {
-    var section = DATA.sections[sectionId];
-    var progress = getProgress(sectionId);
-    var ui = getUi(sectionId);
-    if (!progress) {
-      return;
-    }
-    var firstMissing = section.questions.findIndex(function (question) {
-      return !progress.answers[question.id];
-    });
-    if (firstMissing !== -1) {
-      progress.currentIndex = firstMissing;
-      progress.updatedAt = Date.now();
-      setProgress(sectionId, progress);
-      ui.shakeQuestionId = section.questions[firstMissing].id;
-      render();
-      setTimeout(function () {
-        ui.shakeQuestionId = "";
-        render();
-      }, 260);
-      return;
-    }
-
-    stopAudio();
-    var attempt = buildAttempt(section, progress.answers);
-    saveAttempt(sectionId, attempt);
-    clearProgress(sectionId);
-    ui.view = "result";
-    ui.activeAttemptId = attempt.id;
-    ui.filter = "incorrect";
-    render();
-  }
-
-  function toggleAudio(sectionId, questionId) {
-    var question = findQuestion(sectionId, questionId);
-    var src = getAudioSrc(question);
-    if (!question || !question.audio || !src) {
-      return;
-    }
-
-    if (runtime.speakingQuestionId === questionId && runtime.audioElement && !runtime.audioElement.paused) {
-      stopAudio();
-      render();
-      return;
-    }
-
-    stopAudio();
-    runtime.audioElement = new Audio(src);
-    runtime.speakingQuestionId = questionId;
-    runtime.audioElement.onended = function () {
-      stopAudio();
-      render();
-    };
-    runtime.audioElement.onerror = function () {
-      stopAudio();
-      render();
-    };
-    render();
-    runtime.audioElement.play().catch(function () {
-      runtime.speakingQuestionId = "";
-      runtime.audioElement = null;
-      render();
-    });
-  }
-
-  function stopAudio() {
-    if (runtime.audioElement) {
-      runtime.audioElement.pause();
-      runtime.audioElement.currentTime = 0;
-      runtime.audioElement.onended = null;
-      runtime.audioElement.onerror = null;
-      runtime.audioElement = null;
-    }
-    runtime.speakingQuestionId = "";
-  }
-
-  function buildAttempt(section, answers) {
-    var results = section.questions.map(function (question, index) {
-      var selectedId = answers[question.id] || "";
-      return {
-        id: question.id,
-        number: index + 1,
-        tag: question.tag,
-        prompt: question.prompt,
-        context: question.context || [],
-        audio: question.audio || null,
-        selectedId: selectedId,
-        selectedText: choiceText(question, selectedId),
-        answerId: question.answer,
-        answerText: choiceText(question, question.answer),
-        correct: selectedId === question.answer,
-        feedback: getFeedbackEntry(question.id, question.feedback)
-      };
-    });
-    var score = results.filter(function (item) {
-      return item.correct;
-    }).length;
-    return {
-      id: "attempt-" + Date.now() + "-" + Math.random().toString(16).slice(2, 8),
-      finishedAt: Date.now(),
-      score: score,
-      total: results.length,
-      results: results
-    };
-  }
-
-  function createProgress(sectionId) {
-    var section = DATA.sections[sectionId];
-    return {
-      answers: {},
-      choiceOrder: createChoiceOrderMap(section),
-      currentIndex: 0,
-      startedAt: Date.now(),
-      updatedAt: Date.now()
-    };
-  }
-
-  function findQuestion(sectionId, questionId) {
-    return DATA.sections[sectionId].questions.find(function (question) {
-      return question.id === questionId;
-    });
-  }
-
-  function findAttempt(sectionId, attemptId) {
-    return getAttempts(sectionId).find(function (attempt) {
-      return attempt.id === attemptId;
-    });
-  }
-
-  function getUi(sectionId) {
-    if (!runtime.sectionUi[sectionId]) {
-      runtime.sectionUi[sectionId] = {
-        view: "start",
-        activeAttemptId: "",
-        modalAttemptId: "",
-        filter: "incorrect",
-        shakeQuestionId: ""
-      };
-    }
-    return runtime.sectionUi[sectionId];
-  }
-
-  function getProgress(sectionId) {
-    var progress = loadJson(storageKey("progress", sectionId));
-    if (!progress) {
-      return null;
-    }
-    return normalizeProgress(sectionId, progress);
-  }
-
-  function setProgress(sectionId, value) {
-    saveJson(storageKey("progress", sectionId), value);
-  }
-
-  function clearProgress(sectionId) {
-    localStorage.removeItem(storageKey("progress", sectionId));
-  }
-
-  function getAttempts(sectionId) {
-    return loadJson(storageKey("attempts", sectionId)) || [];
-  }
-
-  function saveAttempt(sectionId, attempt) {
-    var attempts = getAttempts(sectionId);
-    attempts.unshift(attempt);
-    saveJson(storageKey("attempts", sectionId), attempts.slice(0, 12));
-  }
-
-  function storageKey(type, id) {
-    return STORAGE_PREFIX + ":" + type + ":" + id;
-  }
-
-  function loadJson(key) {
+  function readRecord(key, type, sectionId) {
+    var raw = safeGet(key);
+    if (raw === null) return { exists: false, valid: false, raw: raw };
     try {
-      var raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : null;
-    } catch (error) {
-      return null;
-    }
+      var parsed = JSON.parse(raw);
+      if (!parsed || parsed.schemaVersion !== VERSION) return { exists: true, valid: false, issue: true, raw: raw };
+      if (type === "progress" && !validV2Progress(parsed, sectionId)) return { exists: true, valid: false, issue: true, raw: raw };
+      if (type === "attempts" && !validV2Attempts(parsed, sectionId)) return { exists: true, valid: false, issue: true, raw: raw };
+      return { exists: true, valid: true, value: type === "attempts" ? parsed.attempts : parsed, raw: raw };
+    } catch (_) { return { exists: true, valid: false, issue: true, raw: raw }; }
+  }
+  function loadFallback(sectionId, type) {
+    var fallback = readRecord(fallbackKey(type, sectionId), type, sectionId);
+    if (fallback.valid) {
+      if (type === "progress") memory.progress[sectionId] = fallback.value;
+      else memory.attempts[sectionId] = fallback.value;
+    } else if (fallback.exists) notice(sectionId, "복구용 저장 기록도 안전하게 읽지 못했습니다. 현재 작업은 화면에 유지됩니다.");
   }
 
-  function saveJson(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
-  }
-
-  function loadText(key) {
+  function migrateLegacy(sectionId, type) {
+    var legacyKey = PREFIX + ":" + type + ":" + sectionId;
+    var raw = safeGet(legacyKey);
+    if (raw === null) return;
     try {
-      return localStorage.getItem(STORAGE_PREFIX + ":" + key);
-    } catch (error) {
-      return "";
-    }
-  }
-
-  function saveText(key, value) {
-    localStorage.setItem(STORAGE_PREFIX + ":" + key, value);
-  }
-
-  function applyLayout(layout) {
-    document.documentElement.setAttribute("data-layout", layout);
-  }
-
-  function choiceText(question, choiceId) {
-    var choice = question.choices.find(function (item) {
-      return item.id === String(choiceId);
-    });
-    return choice ? choice.text : "";
-  }
-
-  function getOrderedChoices(question, choiceOrder) {
-    if (!choiceOrder || !choiceOrder.length) {
-      return question.choices.slice();
-    }
-    return choiceOrder.map(function (choiceId) {
-      return question.choices.find(function (choice) {
-        return choice.id === String(choiceId);
-      });
-    }).filter(Boolean);
-  }
-
-  function getFeedbackEntry(questionId, fallbackText) {
-    var entry = FEEDBACK_I18N[questionId] || {};
-    return {
-      ko: entry.ko || fallbackText || "",
-      vi: entry.vi || ""
-    };
-  }
-
-  function normalizeStoredFeedback(questionId, feedback) {
-    if (feedback && typeof feedback === "object" && (feedback.ko || feedback.vi)) {
-      return feedback;
-    }
-    return getFeedbackEntry(questionId, typeof feedback === "string" ? feedback : "");
-  }
-
-  function normalizeProgress(sectionId, progress) {
-    var changed = false;
-    var section = DATA.sections[sectionId];
-    if (!progress.answers || typeof progress.answers !== "object") {
-      progress.answers = {};
-      changed = true;
-    }
-    if (!progress.choiceOrder || typeof progress.choiceOrder !== "object") {
-      progress.choiceOrder = createChoiceOrderMap(section);
-      changed = true;
-    }
-
-    section.questions.forEach(function (question) {
-      var saved = progress.choiceOrder[question.id];
-      if (!Array.isArray(saved) || saved.length !== question.choices.length || !sameChoiceSet(saved, question.choices)) {
-        progress.choiceOrder[question.id] = shuffleArray(question.choices.map(function (choice) {
-          return choice.id;
-        }));
-        changed = true;
+      var parsed = JSON.parse(raw), value;
+      if (type === "progress") {
+        if (!validLegacyProgress(parsed, sectionId)) { notice(sectionId, "이전 저장 기록의 형식을 확인할 수 없어 그대로 보관했습니다."); return; }
+        value = normalizeProgress(sectionId, parsed);
+        value.schemaVersion = VERSION;
+        if (safeSet(v2Key(type, sectionId), JSON.stringify(value))) memory.progress[sectionId] = value;
+      } else {
+        if (!Array.isArray(parsed) || !parsed.every(function (attempt) { return normalizeLegacyAttempt(attempt, sectionId); })) { notice(sectionId, "이전 응시 기록의 형식을 확인할 수 없어 그대로 보관했습니다."); return; }
+        value = parsed.map(function (attempt) { return normalizeLegacyAttempt(attempt, sectionId); });
+        if (safeSet(v2Key(type, sectionId), JSON.stringify({ schemaVersion: VERSION, attempts: value }))) memory.attempts[sectionId] = value;
       }
-    });
-
-    if (changed) {
-      saveJson(storageKey("progress", sectionId), progress);
-    }
-    return progress;
+    } catch (_) { notice(sectionId, "이전 저장 기록이 손상되어 그대로 보관했습니다."); }
   }
 
-  function createChoiceOrderMap(section) {
-    var map = {};
-    section.questions.forEach(function (question) {
-      map[question.id] = shuffleArray(question.choices.map(function (choice) {
-        return choice.id;
-      }));
-    });
-    return map;
+  function validV2Progress(value, sectionId) { var section = DATA.sections[sectionId]; return Boolean(isQuiz(section) && value && validV2Answers(value.answers, sectionId) && value.choiceOrder && isPlainObject(value.choiceOrder) && section.questions.every(function (question) { return validOrder(value.choiceOrder[question.id], question); }) && Number.isFinite(value.currentIndex) && Math.floor(value.currentIndex) === value.currentIndex && value.currentIndex >= 0 && value.currentIndex < section.questions.length && typeof value.studentName === "string" && value.studentName.length <= 40 && Number.isFinite(value.startedAt) && Number.isFinite(value.updatedAt)); }
+  function validLegacyProgress(value, sectionId) { return value && validV2Answers(value.answers, sectionId); }
+  function validAnswers(answers, sectionId) {
+    var section = DATA.sections[sectionId];
+    return Object.keys(answers).every(function (id) { return section.questions.some(function (q) { return q.id === id && q.choices.some(function (c) { return c.id === String(answers[id]); }); }); });
   }
-
-  function sameChoiceSet(savedOrder, choices) {
-    var expected = choices.map(function (choice) {
-      return String(choice.id);
-    }).sort();
-    var actual = savedOrder.map(function (choiceId) {
-      return String(choiceId);
-    }).sort();
-    return expected.length === actual.length && expected.every(function (value, index) {
-      return value === actual[index];
-    });
-  }
-
-  function shuffleArray(items) {
-    var copy = items.slice();
-    for (var index = copy.length - 1; index > 0; index -= 1) {
-      var swapIndex = Math.floor(Math.random() * (index + 1));
-      var temp = copy[index];
-      copy[index] = copy[swapIndex];
-      copy[swapIndex] = temp;
-    }
+  function isPlainObject(value) { return Boolean(value && typeof value === "object" && !Array.isArray(value) && Object.getPrototypeOf(value) === Object.prototype); }
+  function validV2Answers(answers, sectionId) { return isPlainObject(answers) && Object.keys(answers).every(function (id) { return typeof answers[id] === "string" && DATA.sections[sectionId].questions.some(function (question) { return question.id === id && question.choices.some(function (choice) { return choice.id === answers[id]; }); }); }); }
+  function normalizeProgress(sectionId, value) {
+    var section = DATA.sections[sectionId], copy = Object.assign({}, value);
+    copy.answers = Object.assign({}, value.answers || {});
+    copy.choiceOrder = value.choiceOrder && typeof value.choiceOrder === "object" ? value.choiceOrder : choiceOrders(section);
+    section.questions.forEach(function (q) { if (!validOrder(copy.choiceOrder[q.id], q)) copy.choiceOrder[q.id] = q.choices.map(function (c) { return c.id; }); });
+    copy.currentIndex = Math.max(0, Math.min(Number(copy.currentIndex) || 0, section.questions.length - 1));
+    copy.studentName = String(copy.studentName || safeGet(PREFIX + ":v2:studentName") || "").slice(0, 40);
+    copy.startedAt = Number(copy.startedAt) || Date.now(); copy.updatedAt = Number(copy.updatedAt) || Date.now(); copy.schemaVersion = VERSION;
     return copy;
   }
+  function validOrder(order, question) { return Array.isArray(order) && order.length === question.choices.length && order.slice().sort().join("|") === question.choices.map(function (c) { return c.id; }).sort().join("|"); }
+  function validV2Attempts(wrapper, sectionId) { return wrapper && Array.isArray(wrapper.attempts) && wrapper.attempts.every(function (attempt) { return validV2Attempt(attempt, sectionId); }); }
+  function validV2Attempt(attempt, sectionId) { var section = DATA.sections[sectionId]; if (!attempt || typeof attempt !== "object" || attempt.schemaVersion !== VERSION || typeof attempt.id !== "string" || !/^attempt-\d{1,16}-[a-z0-9]{6}$/.test(attempt.id) || typeof attempt.studentName !== "string" || attempt.studentName.length > 40 || !validTimestamp(attempt.finishedAt) || !Number.isInteger(attempt.score) || !Number.isInteger(attempt.total) || attempt.total !== section.questions.length || attempt.score < 0 || attempt.score > attempt.total || !Array.isArray(attempt.results) || attempt.results.length !== section.questions.length || !attempt.submission || typeof attempt.submission !== "object" || ["submitting", "success", "failed"].indexOf(attempt.submission.status) === -1) return false; var score = 0; for (var index = 0; index < section.questions.length; index += 1) { if (!validV2Result(attempt.results[index], section.questions[index], index)) return false; if (attempt.results[index].correct) score += 1; } return score === attempt.score; }
+  function validV2Result(result, question, index) { var letterPattern = new RegExp("^[A-" + letter(question.choices.length - 1) + "]$"); return Boolean(result && typeof result === "object" && result.id === question.id && result.number === index + 1 && result.tag === question.tag && result.prompt === question.prompt && typeof result.selectedId === "string" && question.choices.some(function (choice) { return choice.id === result.selectedId; }) && result.selectedText === choiceText(question, result.selectedId) && letterPattern.test(result.selectedLetter) && result.answerId === question.answer && result.answerText === choiceText(question, question.answer) && letterPattern.test(result.correctLetter) && typeof result.correct === "boolean" && result.correct === (result.selectedId === question.answer) && result.feedback === (question.feedback || "")); }
 
-  function renderBilingualFeedback(feedback) {
-    var ko = feedback && feedback.ko ? feedback.ko : "";
-    var vi = feedback && feedback.vi ? feedback.vi : "";
-    return (
-      '<div class="review-feedback-grid">' +
-      (ko ? '<div class="feedback-block"><div class="feedback-label">쉬운 한국어</div><p class="review-feedback">' + escapeHtml(ko) + "</p></div>" : "") +
-      (vi ? '<div class="feedback-block"><div class="feedback-label">Tiếng Việt</div><p class="review-feedback">' + escapeHtml(vi) + "</p></div>" : "") +
-      "</div>"
-    );
+  function render() { if (document.body.dataset.role === "hub") { document.body.dataset.view = "hub"; renderHub(); } else renderSection(document.body.dataset.section); }
+  function renderHub() {
+    var cards = DATA.order.map(function (id) {
+      var s = DATA.sections[id], quiz = isQuiz(s), progress = quiz ? getProgress(id) : null, attempts = quiz ? getAttempts(id) : [];
+      return '<article class="section-card"><p class="eyebrow">복습 5</p><h2>' + esc(s.title) + '</h2><p>' + esc(s.hero) + '</p><p class="chip">' + (quiz ? esc(s.countLabel) : "긴 글 쓰기") + '</p><a class="primary-button" href="' + esc(s.href) + '">' + (progress ? "이어 하기" : "열기") + '</a>' + (attempts.length ? '<span class="history-mini">최근 ' + attempts[0].score + '/' + attempts[0].total + '</span>' : '') + '</article>';
+    }).join("");
+    app('<main class="app-shell"><header class="topbar"><a href="../index.html" aria-label="복습 목록">⌂</a>' + layoutControls() + '</header><section class="hero-card"><p class="eyebrow">복습 5</p><h1>복습 5 과제</h1><p>원하는 과제를 열고, 이름을 입력한 뒤 바로 시작하세요.</p></section><section class="section-grid">' + cards + '</section></main>');
   }
+  function renderSection(sectionId) {
+    var section = DATA.sections[sectionId]; if (!isQuiz(section)) { location.href = "index.html"; return; }
+    initializeSection(sectionId); var state = ui(sectionId), progress = getProgress(sectionId); document.body.dataset.view = state.view;
+    if (state.view === "result") { renderResult(section); return; }
+    if (state.view === "quiz" && progress) { renderQuiz(section, progress); return; }
+    renderStart(section, progress);
+  }
+  function renderStart(section, progress) {
+    var id = section.id, attempts = getAttempts(id), name = progress ? progress.studentName : safeGet(PREFIX + ":v2:studentName") || "";
+    var action = progress ? "resume" : "start", label = progress ? "이어서 풀기" : "퀴즈 시작";
+    app('<main class="app-shell"><header class="topbar"><a href="index.html" aria-label="복습 5">⌂</a>' + layoutControls() + '</header><section class="hero-card"><p class="eyebrow">복습 5</p><h1>' + esc(section.title) + '</h1><p>' + esc(section.hero) + '</p><label class="student-name-field" for="studentNameInput">학생 이름 <b>필수</b><input id="studentNameInput" maxlength="40" autocomplete="name" value="' + esc(name) + '" placeholder="이름을 입력하세요" aria-describedby="nameStatus"></label><p id="nameStatus" class="status" aria-live="polite">' + esc(ui(id).status || "이름을 입력한 뒤 시작하세요.") + '</p><button class="primary-button" data-action="' + action + '" data-section="' + id + '">' + label + '</button></section>' + recoveryPanel(id) + resetControl(id) + history(section, attempts) + '</main>');
+  }
+  function renderQuiz(section, progress) {
+    var index = progress.currentIndex, question = section.questions[index], selected = progress.answers[question.id] || "", answered = Object.keys(progress.answers).length;
+    var choices = orderChoices(question, progress.choiceOrder[question.id]).map(function (choice, ix) {
+      var state = selected ? (choice.id === question.answer ? " correct" : choice.id === selected ? " wrong" : "") : "";
+      return '<button class="option-button' + state + '" data-action="choice" data-section="' + section.id + '" data-question="' + question.id + '" data-choice="' + choice.id + '" aria-pressed="' + (choice.id === selected) + '"><span>' + letter(ix) + '</span> ' + (choice.image ? '<img src="' + esc(choice.image) + '" alt="' + esc(choice.text) + '">' : esc(choice.text)) + '</button>';
+    }).join("");
+    var audio = question.audio ? '<button class="secondary-button" data-action="play-audio" data-section="' + section.id + '" data-question="' + question.id + '">▶ ' + esc(question.audio.label) + '</button>' : "";
+    var feedback = selected ? '<div class="feedback-card ' + (selected === question.answer ? "correct" : "wrong") + '" role="status"><strong>' + (selected === question.answer ? "정답입니다." : "다시 확인하세요.") + '</strong><p>정답: ' + esc(choiceText(question, question.answer)) + '</p><p>' + esc(question.feedback || "") + '</p></div>' : "";
+    var nav = index === section.questions.length - 1 ? '<button class="primary-button" data-action="finish" data-section="' + section.id + '">완료하고 제출</button>' : '<button class="primary-button" data-action="next" data-section="' + section.id + '">다음</button>';
+    app('<main class="app-shell"><header class="topbar"><a href="index.html" aria-label="복습 5">⌂</a>' + layoutControls() + '</header><section class="quiz-header"><p class="eyebrow">' + esc(section.title) + '</p><p>' + (index + 1) + ' / ' + section.questions.length + ' · 답한 문항 ' + answered + '</p></section><section class="question-card"><h1><span class="sr-only">문항 </span>' + (index + 1) + '</h1>' + audio + '<p class="question-prompt">' + esc(question.prompt) + '</p>' + context(question.context) + '<div class="option-grid">' + choices + '</div>' + feedback + '</section><nav class="quiz-nav"><button class="secondary-button" data-action="previous" data-section="' + section.id + '"' + (index === 0 ? " disabled" : "") + '>이전</button>' + nav + '</nav>' + recoveryPanel(section.id) + '</main>');
+  }
+  function renderResult(section) {
+    var attempt = findAttempt(section.id, ui(section.id).attemptId) || getAttempts(section.id)[0]; if (!attempt) { ui(section.id).view = "start"; render(); return; }
+    var wrong = attempt.results.filter(function (r) { return !r.correct; });
+    var submit = attempt.submission || {}, status = submit.status === "success" ? "온라인 제출이 완료되었습니다." : submit.status === "failed" ? "온라인 제출에 실패했습니다. 다시 제출해 주세요." : submit.status === "submitting" ? "온라인으로 제출하고 있습니다." : "제출을 준비하고 있습니다.";
+    var review = (wrong.length ? wrong : attempt.results).map(function (r) { return '<article class="review-item ' + (r.correct ? "correct" : "wrong") + '"><p><strong>' + r.number + '. ' + esc(r.prompt) + '</strong></p><p>내 답: ' + esc(r.selectedText || "미응답") + '</p><p>정답: ' + esc(r.answerText) + '</p><p>' + esc(r.feedback || "") + '</p></article>'; }).join("");
+    app('<main class="app-shell"><header class="topbar"><a href="index.html" aria-label="복습 5">⌂</a>' + layoutControls() + '</header><section class="result-card"><p class="eyebrow">결과</p><h1>' + attempt.score + ' / ' + attempt.total + '</h1><p>' + esc(formatDate(attempt.finishedAt)) + '</p><p class="status homework-status--result ' + esc(submit.status || "pending") + '" role="status">' + esc(status) + '</p>' + (submit.status === "failed" ? '<button class="primary-button" data-action="retry-submit" data-section="' + section.id + '" data-attempt="' + attempt.id + '">다시 제출</button>' : '') + '<button class="secondary-button" data-action="new-attempt" data-section="' + section.id + '">새 시도 시작</button><button class="secondary-button" data-action="home" data-section="' + section.id + '">기록으로 돌아가기</button></section><section class="review-list"><h2>' + (wrong.length ? "오답 확인" : "문항 확인") + '</h2>' + review + '</section>' + recoveryPanel(section.id) + '</main>');
+  }
+  function history(section, attempts) { return '<section class="history-list"><h2>응시 기록</h2>' + (attempts.length ? attempts.map(function (a) { return '<article class="history-card"><strong>' + a.score + '/' + a.total + '</strong><span>' + esc(formatDate(a.finishedAt)) + '</span><button class="secondary-button" data-action="result" data-section="' + section.id + '" data-attempt="' + a.id + '">결과 보기</button></article>'; }).join("") : '<p>아직 응시 기록이 없습니다.</p>') + '</section>'; }
+  function recoveryPanel(id) { var n = memory.notices[id]; if (!n) return ""; var confirmed = ui(id).resetConfirm; return '<section class="recovery" role="alert"><p>' + esc(n) + '</p><p class="status" aria-live="polite">' + esc(ui(id).copyStatus || "") + '</p><textarea id="recoveryText" readonly aria-label="복구 기록">' + esc(recoveryData(id)) + '</textarea><div><button class="secondary-button" data-action="copy-recovery" data-section="' + id + '">기록 복사</button><button class="secondary-button" data-action="download-recovery" data-section="' + id + '">기록 내려받기</button>' + (confirmed ? '<button class="secondary-button" data-action="reset-confirm" data-section="' + id + '">정말 이 과제만 초기화</button><button class="secondary-button" data-action="reset-cancel" data-section="' + id + '">취소</button>' : '<button class="text-button" data-action="reset-request" data-section="' + id + '">이 과제 초기화</button>') + '</div></section>'; }
+  function resetControl(id) { if (memory.notices[id]) return ""; return ui(id).resetConfirm ? '<section class="recovery"><p>이 과제의 현재 저장 기록과 응시 기록만 초기화할까요?</p><button class="secondary-button" data-action="reset-confirm" data-section="' + id + '">정말 이 과제만 초기화</button><button class="secondary-button" data-action="reset-cancel" data-section="' + id + '">취소</button></section>' : '<p class="reset-control"><button class="text-button" data-action="reset-request" data-section="' + id + '">이 과제 저장 기록 초기화</button></p>'; }
+  function layoutControls() { return '<div class="layout-controls" role="group" aria-label="화면 전환"><button data-action="layout" data-layout="auto" aria-pressed="' + (memory.layout === "auto") + '">자동</button><button data-action="layout" data-layout="phone" aria-label="스마트폰" aria-pressed="' + (memory.layout === "phone") + '">스마트폰</button><button data-action="layout" data-layout="tablet" aria-label="태블릿" aria-pressed="' + (memory.layout === "tablet") + '">태블릿</button></div>'; }
 
-  function isWideChoices(question) {
-    return question.choices.every(function (choice) {
-      return choice.text.length < 22;
-    });
+  function start(id) { if (!studentName(id)) { ui(id).status = "이름을 먼저 입력해야 시작할 수 있습니다."; render(); return; } var p = createProgress(id); p.studentName = studentName(id); memory.progress[id] = p; saveProgress(id); ui(id).finishing = false; ui(id).view = "quiz"; render(); }
+  function choose(id, qid, cid) { var p = getProgress(id); if (!p) return; p.answers[qid] = cid; p.updatedAt = Date.now(); saveProgress(id); render(); }
+  function navigate(id, delta) { var p = getProgress(id); if (!p) return; p.currentIndex = Math.max(0, Math.min(p.currentIndex + delta, DATA.sections[id].questions.length - 1)); p.updatedAt = Date.now(); saveProgress(id); render(); }
+  function jump(id, index) { var p = getProgress(id); if (!p) return; p.currentIndex = Math.max(0, Math.min(index, DATA.sections[id].questions.length - 1)); p.updatedAt = Date.now(); saveProgress(id); render(); }
+  function finish(id) {
+    var section = DATA.sections[id], p = getProgress(id); if (!p || ui(id).finishing) return;
+    if (!studentName(id)) { ui(id).status = "이름을 먼저 입력해야 제출할 수 있습니다."; ui(id).view = "start"; render(); return; }
+    var missing = section.questions.findIndex(function (q) { return !p.answers[q.id]; });
+    if (missing >= 0) { p.currentIndex = missing; p.updatedAt = Date.now(); saveProgress(id); ui(id).status = "모든 문항에 답한 뒤 제출하세요."; render(); return; }
+    ui(id).finishing = true; var attempt = buildAttempt(section, p); attempt.submission = { status: "submitting", requested: true, attempts: 1 }; memory.attempts[id].unshift(attempt); saveAttempts(id); memory.progress[id] = null; removeKey(writeKey("progress", id)); ui(id).view = "result"; ui(id).attemptId = attempt.id; render(); submitAttempt(id, attempt);
   }
+  function retrySubmit(id, attemptId) { var attempt = findAttempt(id, attemptId); if (!attempt || attempt.submission.status === "submitting") return; attempt.submission = { status: "submitting", requested: true, attempts: (attempt.submission.attempts || 0) + 1 }; saveAttempts(id); render(); submitAttempt(id, attempt); }
+  function submitAttempt(id, attempt) { var section = DATA.sections[id]; Promise.resolve().then(function () { if (!window.HomeworkSubmitter || typeof window.HomeworkSubmitter.submitHomework !== "function") throw new Error("제출 모듈을 찾을 수 없습니다."); return window.HomeworkSubmitter.submitHomework(payload(section, attempt)); }).then(function () { attempt.submission.status = "success"; attempt.submission.submittedAt = Date.now(); saveAttempts(id); render(); }, function () { attempt.submission.status = "failed"; saveAttempts(id); notice(id, "온라인 제출에 실패했습니다. 이 기기의 결과는 저장되었습니다. 다시 제출하거나 기록을 보관하세요."); render(); }); }
+  function buildAttempt(section, progress) { var results = section.questions.map(function (q, i) { var selected = progress.answers[q.id] || ""; return { id: q.id, number: i + 1, tag: q.tag, prompt: q.prompt, selectedId: selected, selectedText: choiceText(q, selected), selectedLetter: choiceLetter(q, selected, progress.choiceOrder[q.id]), answerId: q.answer, answerText: choiceText(q, q.answer), correctLetter: choiceLetter(q, q.answer, progress.choiceOrder[q.id]), correct: selected === q.answer, feedback: q.feedback || "" }; }); var score = results.filter(function (r) { return r.correct; }).length; return { id: "attempt-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8), schemaVersion: VERSION, finishedAt: Date.now(), studentName: progress.studentName, score: score, total: results.length, results: results }; }
+  function payload(section, attempt) { var qr = attempt.results.map(function (r) { return { number: r.number, area: r.tag || section.title, prompt: r.prompt, studentAnswer: r.selectedText, selectedLetter: r.selectedLetter, correctAnswer: r.answerText, correctLetter: r.correctLetter, isCorrect: r.correct }; }); return { assignmentId: section.homework.assignmentId, assignmentTitle: section.homework.title, chapter: "review5", sectionId: section.id, sectionTitle: section.title, studentName: attempt.studentName || studentName(section.id), score: attempt.score, total: attempt.total, percent: Math.round(attempt.score / attempt.total * 100), completed: true, answered: attempt.total, correctQuestions: qr.filter(function (x) { return x.isCorrect; }).map(function (x) { return x.number; }), wrongQuestions: qr.filter(function (x) { return !x.isCorrect; }).map(function (x) { return x.number; }), questionResults: qr, clientSubmittedAt: new Date().toISOString(), signatureHash: hash(section.homework.assignmentId + ":" + attempt.id + ":" + attempt.results.map(function (r) { return r.id + ":" + r.selectedId; }).join("|")) }; }
 
-  function getAudioSrc(question) {
-    if (!question || !question.audio) {
-      return "";
-    }
-    if (question.audio.file) {
-      return question.audio.file;
-    }
-    return "assets/audio/" + question.id + ".mp3";
-  }
-
-  function formatDate(timestamp) {
-    return new Intl.DateTimeFormat("ko-KR", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    }).format(new Date(timestamp));
-  }
-
-  function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-  }
-
-  function escapeHtml(value) {
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  }
-
-  function icon(type) {
-    var common = 'viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
-    if (type === "home") {
-      return '<svg ' + common + '><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.8V21h14V9.8"/><path d="M9.5 21v-6h5v6"/></svg>';
-    }
-    if (type === "phone") {
-      return '<svg ' + common + '><rect x="7" y="2.8" width="10" height="18.4" rx="2.2"/><path d="M11 18h2"/></svg>';
-    }
-    if (type === "tablet") {
-      return '<svg ' + common + '><rect x="4.5" y="3.2" width="15" height="17.6" rx="2.2"/><path d="M11 17.7h2"/></svg>';
-    }
-    if (type === "left") {
-      return '<svg ' + common + '><path d="M15 18 9 12l6-6"/></svg>';
-    }
-    if (type === "right") {
-      return '<svg ' + common + '><path d="m9 18 6-6-6-6"/></svg>';
-    }
-    if (type === "check") {
-      return '<svg ' + common + '><path d="M5 12.5 9.2 17 19 7"/></svg>';
-    }
-    if (type === "play") {
-      return '<svg ' + common + '><path d="m9 7 8 5-8 5Z" fill="currentColor" stroke="none"/></svg>';
-    }
-    if (type === "stop") {
-      return '<svg ' + common + '><rect x="8" y="8" width="8" height="8" rx="1.2" fill="currentColor" stroke="none"/></svg>';
-    }
-    return '<svg ' + common + '><path d="M6 6 18 18"/><path d="M18 6 6 18"/></svg>';
-  }
-})();
+  function createProgress(id) { var s = DATA.sections[id]; return { schemaVersion: VERSION, answers: {}, choiceOrder: choiceOrders(s), currentIndex: 0, startedAt: Date.now(), updatedAt: Date.now(), studentName: safeGet(PREFIX + ":v2:studentName") || "" }; }
+  function choiceOrders(section) { var o = {}; section.questions.forEach(function (q) { o[q.id] = q.choices.map(function (c) { return c.id; }); }); return o; }
+  function getProgress(id) { initializeSection(id); return memory.progress[id]; }
+  function getAttempts(id) { initializeSection(id); return memory.attempts[id] || []; }
+  function saveProgress(id) { if (!safeSet(writeKey("progress", id), JSON.stringify(memory.progress[id]))) notice(id, "기기에 저장하지 못했습니다. 현재 작업은 화면에 유지됩니다."); }
+  function saveAttempts(id) { if (!safeSet(writeKey("attempts", id), JSON.stringify({ schemaVersion: VERSION, attempts: memory.attempts[id] }))) notice(id, "기기에 저장하지 못했습니다. 현재 결과는 화면에 유지됩니다."); }
+  function findAttempt(id, aid) { return getAttempts(id).find(function (a) { return a.id === aid; }); }
+  function studentName(id) { return String((getProgress(id) && getProgress(id).studentName) || safeGet(PREFIX + ":v2:studentName") || "").trim(); }
+  function ui(id) { if (!memory.ui[id]) memory.ui[id] = { view: "start", attemptId: "", status: "", resetConfirm: false }; return memory.ui[id]; }
+  function v2Key(type, id) { return PREFIX + ":v2:" + type + ":" + id; }
+  function fallbackKey(type, id) { return PREFIX + ":v2:recovery:" + type + ":" + id; }
+  function writeKey(type, id) { return memory.protection[id] && memory.protection[id][type] !== null ? fallbackKey(type, id) : v2Key(type, id); }
+  function readStorage(key) { try { return { ok: true, value: localStorage.getItem(key) }; } catch (_) { memory.storageFailed = true; return { ok: false, value: null }; } }
+  function safeGet(key) { return readStorage(key).value; }
+  function safeSet(key, value) { try { localStorage.setItem(key, value); return true; } catch (_) { memory.storageFailed = true; return false; } }
+  function removeKey(key) { try { localStorage.removeItem(key); return true; } catch (_) { memory.storageFailed = true; return false; } }
+  function notice(id, text) { memory.notices[id] = text; }
+  function flush() { var id = document.body.dataset.section; if (id && memory.progress[id]) saveProgress(id); if (id && memory.attempts[id]) saveAttempts(id); }
+  function resetSection(id) { var keys = [v2Key("progress", id), v2Key("attempts", id), fallbackKey("progress", id), fallbackKey("attempts", id), PREFIX + ":progress:" + id, PREFIX + ":attempts:" + id], snapshots = keys.map(function (key) { var read = readStorage(key); return { key: key, raw: read.value, ok: read.ok }; }), removed = [], failed = snapshots.some(function (entry) { return !entry.ok; }); snapshots.forEach(function (entry) { if (failed || entry.raw === null) return; if (removeKey(entry.key)) removed.push(entry); else failed = true; }); if (failed) { removed.forEach(function (entry) { safeSet(entry.key, entry.raw); }); notice(id, "초기화하지 못했습니다. 현재 작업과 저장 기록을 그대로 유지합니다."); ui(id).resetConfirm = false; render(); return; } memory.progress[id] = null; memory.attempts[id] = []; memory.protection[id] = { progress: null, attempts: null }; delete memory.notices[id]; ui(id).resetConfirm = false; ui(id).view = "start"; render(); }
+  function recoveryData(id) { return JSON.stringify({ sectionId: id, progress: memory.progress[id], attempts: memory.attempts[id], protectedOriginal: memory.protection[id], notice: memory.notices[id], savedAt: new Date().toISOString() }, null, 2); }
+  function copyRecovery(id) { var text = recoveryData(id), area = document.getElementById("recoveryText"); function fallback() { var node = area || document.createElement("textarea"); if (!area) { node.value = text; document.body.appendChild(node); } node.focus(); node.select(); var ok = false; try { ok = document.execCommand("copy"); } catch (_) {} if (!area) node.remove(); ui(id).copyStatus = ok ? "기록을 복사했습니다." : "복사하지 못했습니다. 아래 기록을 선택해 복사하거나 내려받으세요."; render(); } if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { ui(id).copyStatus = "기록을 복사했습니다."; render(); }, fallback); else fallback(); }
+  function downloadRecovery(id) { try { var blob = new Blob([recoveryData(id)], { type: "application/json" }), link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "review5-" + id + "-recovery.json"; link.click(); setTimeout(function () { URL.revokeObjectURL(link.href); }, 0); ui(id).copyStatus = "복구 기록을 내려받기 시작했습니다."; } catch (_) { ui(id).copyStatus = "내려받기를 시작하지 못했습니다. 아래 기록을 복사하세요."; } render(); }
+  function applyLayout() { var wide = window.innerWidth >= 900, effective = memory.layout === "auto" ? (wide ? "desktop" : "phone") : memory.layout; document.documentElement.dataset.layout = effective; document.documentElement.dataset.layoutPreference = memory.layout; }
+  function orderChoices(q, ids) { return (ids || []).map(function (id) { return q.choices.find(function (c) { return c.id === String(id); }); }).filter(Boolean); }
+  function choiceText(q, id) { var c = q.choices.find(function (x) { return x.id === String(id); }); return c ? c.text : ""; }
+  function choiceLetter(q, id, order) { var i = (order || []).indexOf(String(id)); return i < 0 ? "" : letter(i); }
+  function letter(i) { return String.fromCharCode(65 + i); }
+  function context(items) { return items && items.length ? '<div class="context">' + items.map(function (i) { return '<p>' + esc(i.text).replace(/\n/g, "<br>") + '</p>'; }).join("") + '</div>' : ""; }
+  function playAudio(id, qid) { var q = DATA.sections[id].questions.find(function (x) { return x.id === qid; }); if (q && q.audio) { var audio = new Audio(q.audio.file || ("assets/audio/" + qid + ".mp3")); audio.play().catch(function () {}); } }
+  function normalizeLegacyAttempt(attempt, sectionId) { var section = DATA.sections[sectionId]; if (!attempt || typeof attempt !== "object" || !Array.isArray(attempt.results) || attempt.results.length !== section.questions.length) return null; var results = []; for (var index = 0; index < section.questions.length; index += 1) { var source = attempt.results[index], question = section.questions[index], canonicalOrder = question.choices.map(function (choice) { return choice.id; }); if (!source || typeof source !== "object" || source.id !== question.id || !question.choices.some(function (choice) { return choice.id === String(source.selectedId); })) return null; var selectedId = String(source.selectedId); results.push({ id: question.id, number: index + 1, tag: question.tag, prompt: question.prompt, selectedId: selectedId, selectedText: choiceText(question, selectedId), selectedLetter: choiceLetter(question, selectedId, canonicalOrder), answerId: question.answer, answerText: choiceText(question, question.answer), correctLetter: choiceLetter(question, question.answer, canonicalOrder), correct: selectedId === question.answer, feedback: question.feedback || "" }); } var score = results.filter(function (result) { return result.correct; }).length, finishedAt = validTimestamp(attempt.finishedAt) ? attempt.finishedAt : Date.now(), safeId = /^attempt-\d{1,16}-[a-z0-9]{6}$/.test(attempt.id || "") ? attempt.id : "attempt-" + finishedAt + "-000000"; return { id: safeId, schemaVersion: VERSION, finishedAt: finishedAt, studentName: typeof attempt.studentName === "string" ? attempt.studentName.slice(0, 40) : "", score: score, total: section.questions.length, results: results, submission: { status: "failed", attempts: 0 } }; }
+  function validTimestamp(value) { return Number.isFinite(value) && Math.abs(value) <= 8640000000000000 && Number.isFinite(new Date(value).getTime()); }
+  function formatDate(value) { return new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)); }
+  function hash(source) { var h = 2166136261; for (var i = 0; i < source.length; i++) { h ^= source.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
+  function esc(v) { return String(v || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;"); }
+  function app(html) { document.getElementById("app").innerHTML = html; }
+  function exposeTestHelpers() { window.__review5App = { fillAnswers: function (id, correct) { initializeSection(id); var p = memory.progress[id] || createProgress(id); p.studentName = p.studentName || "테스트학생"; DATA.sections[id].questions.forEach(function (q) { p.answers[q.id] = correct === false ? q.choices.find(function (c) { return c.id !== q.answer; }).id : q.answer; }); p.currentIndex = DATA.sections[id].questions.length - 1; memory.progress[id] = p; saveProgress(id); if (document.body.dataset.section === id) render(); }, getState: function (id) { return { progress: memory.progress[id], attempts: memory.attempts[id], notice: memory.notices[id] }; }, reset: resetSection, storageKeys: function (id) { return { progress: v2Key("progress", id), attempts: v2Key("attempts", id) }; } }; }
+}());

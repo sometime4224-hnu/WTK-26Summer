@@ -51,6 +51,9 @@ async function installDashboardMock(page) {
           questionResults: []
         }
       ],
+      'review5-long-writing-v1': [
+        { id: 'writing-1', assignmentId: 'review5-long-writing-v1', studentName: '김학생', responseText: '<img src=x onerror=alert(1)> 고향 글', responseCharacterCount: 400, clientSubmittedAt: '2026-06-30T01:00:00.000Z' }
+      ],
       'vocab-grammar-mock-round1-v1': [
         {
           id: 'round1-sub-1',
@@ -233,10 +236,10 @@ test.describe('homework dashboard', () => {
     await page.goto('/teacher-dashboard/index.html', { waitUntil: 'load' });
 
     await expect(page.locator('h1')).toHaveText('제출 통계');
-    await expect(page.locator('[data-assignment-card]')).toHaveCount(11);
+    await expect(page.locator('[data-assignment-card]')).toHaveCount(16);
     await expect(page.locator('[data-assignment-card="c12-review-quiz-v1"]')).toContainText('12과 어휘·문법 복습');
     await expect(page.locator('[data-assignment-card="review4-reading-writing-v1"]')).toContainText('복습 4 읽기와 쓰기');
-    await expect(page.locator('[data-assignment-anonymous-link]')).toHaveCount(11);
+    await expect(page.locator('[data-assignment-anonymous-link]')).toHaveCount(16);
     await expect(page.locator('[data-assignment-anonymous-link="c12-review-quiz-v1"]')).toHaveText('익명 현황');
     await expect(page.locator('[data-assignment-anonymous-link="vocab-grammar-mock-round1-v1"]')).toHaveText('익명 현황');
 
@@ -315,6 +318,33 @@ test.describe('homework dashboard', () => {
 
     await expect(page.locator('h1')).toHaveText('제출 통계');
     await expect(page.locator('.dashboard-alert')).toContainText('등록되지 않은 통계 항목입니다');
-    await expect(page.locator('[data-assignment-card]')).toHaveCount(11);
+    await expect(page.locator('[data-assignment-card]')).toHaveCount(16);
+  });
+
+  test('shows writing text safely without quiz statistics', async ({ page }) => {
+    await blockExternalRequests(page);
+    await installDashboardMock(page);
+    await page.goto('/teacher-dashboard/index.html?assignment=review5-long-writing-v1', { waitUntil: 'load' });
+    await page.locator('#signInButton').click();
+    await expect(page.locator('.writing-submission')).toContainText('김학생');
+    await expect(page.locator('.writing-submission')).toContainText('400자');
+    await expect(page.locator('.writing-response-text')).toHaveText('<img src=x onerror=alert(1)> 고향 글');
+    await expect(page.locator('.writing-response-text img')).toHaveCount(0);
+    await expect(page.locator('.score-bars, .weak-panel')).toHaveCount(0);
+
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText() { return Promise.reject(new Error('clipboard blocked')); } } });
+      document.execCommand = () => true;
+    });
+    await page.locator('.writing-copy-button').click();
+    await expect(page.locator('.writing-copy-button')).toHaveText('복사했습니다');
+    await expect(page.locator('.writing-response-text')).toHaveText('<img src=x onerror=alert(1)> 고향 글');
+    await expect(page.locator('.writing-response-text img')).toHaveCount(0);
+
+    await page.evaluate(() => { document.execCommand = () => false; });
+    await page.locator('.writing-copy-button').click();
+    await expect(page.locator('.writing-copy-button')).toHaveText('복사하지 못했습니다. 다시 시도하세요.');
+    await expect(page.locator('.writing-response-text')).toHaveText('<img src=x onerror=alert(1)> 고향 글');
+    await expect(page.locator('.writing-response-text img')).toHaveCount(0);
   });
 });

@@ -15,12 +15,10 @@ service cloud.firestore {
     function isTeacher() {
       return request.auth != null
         && request.auth.token.email_verified == true
-        && request.auth.token.email in [
-          "YOUR_TEACHER_EMAIL@example.com"
-        ];
+        && request.auth.token.email in ["YOUR_TEACHER_EMAIL@example.com"];
     }
 
-    function isValidSubmission(assignmentId) {
+    function hasCommonFields(assignmentId) {
       return request.auth != null
         && request.resource.data.assignmentId == assignmentId
         && request.resource.data.anonymousUid == request.auth.uid
@@ -28,6 +26,55 @@ service cloud.firestore {
         && request.resource.data.studentName.size() >= 1
         && request.resource.data.studentName.size() <= 40
         && request.resource.data.completed == true
+        && request.resource.data.clientSubmittedAt is string
+        && request.resource.data.submittedAt is timestamp
+        && request.resource.data.signatureHash is string
+        && request.resource.data.signatureHash.size() >= 1
+        && request.resource.data.signatureHash.size() <= 160;
+    }
+
+    function isValidSubmission(assignmentId) {
+      return hasCommonFields(assignmentId)
+        && (isWritingSubmission(assignmentId) || isQuizSubmission(assignmentId));
+    }
+
+    // Writing has a deliberately separate, exact schema. The client submitter only
+    // adds anonymousUid and submittedAt to this allowlist.
+    function isWritingSubmission(assignmentId) {
+      return assignmentId == "review5-long-writing-v1"
+        && request.resource.data.keys().hasAll([
+          "assignmentId", "assignmentTitle", "chapter", "sectionId", "sectionTitle",
+          "submissionKind", "studentName", "responseText", "responseCharacterCount",
+          "minCharacterCount", "maxCharacterCount", "completed", "clientSubmittedAt",
+          "signatureHash", "anonymousUid", "submittedAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "assignmentId", "assignmentTitle", "chapter", "sectionId", "sectionTitle",
+          "submissionKind", "studentName", "responseText", "responseCharacterCount",
+          "minCharacterCount", "maxCharacterCount", "completed", "clientSubmittedAt",
+          "signatureHash", "anonymousUid", "submittedAt"
+        ])
+        && request.resource.data.assignmentTitle == "복습 5 장문 쓰기"
+        && request.resource.data.chapter == "review5"
+        && request.resource.data.sectionId == "longWriting"
+        && request.resource.data.sectionTitle == "장문 쓰기"
+        && request.resource.data.submissionKind == "writing"
+        && request.resource.data.responseText is string
+        && request.resource.data.responseCharacterCount is int
+        && request.resource.data.minCharacterCount == 400
+        && request.resource.data.maxCharacterCount == 500
+        && request.resource.data.responseCharacterCount >= 400
+        && request.resource.data.responseCharacterCount <= 500
+        && request.resource.data.responseText.replace("\r", "").replace("\n", "").size() >= 400
+        && request.resource.data.responseText.replace("\r", "").replace("\n", "").size() <= 500
+        && request.resource.data.responseText.replace("\r", "").replace("\n", "").size()
+          == request.resource.data.responseCharacterCount;
+    }
+
+    // Existing quiz submissions omit submissionKind, so absence continues to mean quiz.
+    function isQuizSubmission(assignmentId) {
+      return (!request.resource.data.keys().hasAll(["submissionKind"])
+          || request.resource.data.submissionKind == "quiz")
         && request.resource.data.score is int
         && request.resource.data.percent is int
         && request.resource.data.percent >= 0
@@ -35,13 +82,10 @@ service cloud.firestore {
         && request.resource.data.correctQuestions is list
         && request.resource.data.wrongQuestions is list
         && request.resource.data.questionResults is list
-        && request.resource.data.clientSubmittedAt is string
-        && request.resource.data.submittedAt is timestamp
-        && (
-          isC12ReviewSubmission(assignmentId)
+        && (isC12ReviewSubmission(assignmentId)
           || isVocabGrammarMockSubmission(assignmentId)
           || isReview4Submission(assignmentId)
-        );
+          || isReview5QuizSubmission(assignmentId));
     }
 
     function isC12ReviewSubmission(assignmentId) {
@@ -49,67 +93,67 @@ service cloud.firestore {
         && request.resource.data.chapter == "12"
         && request.resource.data.total == 24
         && request.resource.data.answered == 24
-        && request.resource.data.score >= 0
-        && request.resource.data.score <= 24
+        && request.resource.data.score >= 0 && request.resource.data.score <= 24
         && request.resource.data.questionResults.size() == 24;
     }
 
-    function isReview4Assignment(assignmentId) {
-      return assignmentId == "review4-reading-writing-v1";
-    }
-
-    function review4SectionId(assignmentId) {
-      return "readingWriting";
-    }
-
-    function review4Total(assignmentId) {
-      return 15;
-    }
-
     function isReview4Submission(assignmentId) {
-      return isReview4Assignment(assignmentId)
+      return assignmentId == "review4-reading-writing-v1"
         && request.resource.data.chapter == "review4"
-        && request.resource.data.sectionId == review4SectionId(assignmentId)
+        && request.resource.data.sectionId == "readingWriting"
         && request.resource.data.sectionTitle is string
-        && request.resource.data.total == review4Total(assignmentId)
-        && request.resource.data.answered == review4Total(assignmentId)
-        && request.resource.data.score >= 0
-        && request.resource.data.score <= review4Total(assignmentId)
-        && request.resource.data.questionResults.size() == review4Total(assignmentId);
+        && request.resource.data.total == 15 && request.resource.data.answered == 15
+        && request.resource.data.score >= 0 && request.resource.data.score <= 15
+        && request.resource.data.questionResults.size() == 15;
+    }
+
+    function review5QuizTotal(assignmentId) {
+      return assignmentId == "review5-confirm-v1" ? 19
+        : assignmentId == "review5-evaluate-v1" ? 17
+        : assignmentId == "review5-listening-v1" ? 16
+        : assignmentId == "review5-reading-writing-v1" ? 15 : -1;
+    }
+
+    function review5QuizSection(assignmentId) {
+      return assignmentId == "review5-confirm-v1" ? "confirm"
+        : assignmentId == "review5-evaluate-v1" ? "evaluate"
+        : assignmentId == "review5-listening-v1" ? "listening"
+        : assignmentId == "review5-reading-writing-v1" ? "readingWriting" : "";
+    }
+
+    function isReview5QuizSubmission(assignmentId) {
+      return assignmentId in ["review5-confirm-v1", "review5-evaluate-v1", "review5-listening-v1", "review5-reading-writing-v1"]
+        && request.resource.data.chapter == "review5"
+        && request.resource.data.sectionId == review5QuizSection(assignmentId)
+        && request.resource.data.sectionTitle is string
+        && request.resource.data.total == review5QuizTotal(assignmentId)
+        && request.resource.data.answered == review5QuizTotal(assignmentId)
+        && request.resource.data.score >= 0 && request.resource.data.score <= review5QuizTotal(assignmentId)
+        && request.resource.data.questionResults.size() == review5QuizTotal(assignmentId);
     }
 
     function isVocabGrammarMockAssignment(assignmentId) {
       return assignmentId in [
-        "vocab-grammar-mock-round1-v1",
-        "vocab-grammar-mock-round2-v1",
-        "vocab-grammar-mock-round1-ibt-v1",
-        "vocab-grammar-mock-round2-ibt-v1",
-        "vocab-grammar-mock-round3-ibt-v1",
-        "vocab-grammar-mock-round4-ibt-v1",
-        "vocab-grammar-mock-round3-v1",
-        "vocab-grammar-mock-round4-v1",
-        "vocab-grammar-mock-marathon30-v1"
+        "vocab-grammar-mock-round1-v1", "vocab-grammar-mock-round2-v1",
+        "vocab-grammar-mock-round1-ibt-v1", "vocab-grammar-mock-round2-ibt-v1",
+        "vocab-grammar-mock-round3-ibt-v1", "vocab-grammar-mock-round4-ibt-v1",
+        "vocab-grammar-mock-round3-v1", "vocab-grammar-mock-round4-v1",
+        "vocab-grammar-mock-marathon30-ibt-v1"
       ];
     }
 
     function vocabGrammarMockTotal(assignmentId) {
-      return assignmentId == "vocab-grammar-mock-round1-v1"
-        || assignmentId == "vocab-grammar-mock-round1-ibt-v1"
-        ? 26
-        : assignmentId == "vocab-grammar-mock-marathon30-v1"
-          ? 30
-          : 25;
+      return assignmentId == "vocab-grammar-mock-round1-v1" || assignmentId == "vocab-grammar-mock-round1-ibt-v1" ? 26
+        : assignmentId == "vocab-grammar-mock-marathon30-ibt-v1" ? 30 : 25;
     }
 
     function isVocabGrammarMockSubmission(assignmentId) {
       return isVocabGrammarMockAssignment(assignmentId)
         && request.resource.data.chapter == "midterm-3b"
-        && request.resource.data.roundId is string
-        && request.resource.data.roundLabel is string
+        && request.resource.data.roundId is string && request.resource.data.roundLabel is string
         && request.resource.data.total == vocabGrammarMockTotal(assignmentId)
         && request.resource.data.answered == vocabGrammarMockTotal(assignmentId)
-        && request.resource.data.score >= 0
-        && request.resource.data.score <= vocabGrammarMockTotal(assignmentId)
+        && request.resource.data.score >= 0 && request.resource.data.score <= vocabGrammarMockTotal(assignmentId)
         && request.resource.data.questionResults.size() == vocabGrammarMockTotal(assignmentId);
     }
   }

@@ -32,6 +32,17 @@
                 ]
             },
             {
+                id: "review5",
+                title: "복습 5",
+                assignments: [
+                    { assignmentId: "review5-confirm-v1", title: "복습 5 확인하기", chapter: "review5", sectionId: "confirm", submissionKind: "quiz", totalQuestions: 19, activityHref: "review/review5-html/confirm.html" },
+                    { assignmentId: "review5-evaluate-v1", title: "복습 5 평가하기", chapter: "review5", sectionId: "evaluate", submissionKind: "quiz", totalQuestions: 17, activityHref: "review/review5-html/evaluate.html" },
+                    { assignmentId: "review5-listening-v1", title: "복습 5 듣기", chapter: "review5", sectionId: "listening", submissionKind: "quiz", totalQuestions: 16, activityHref: "review/review5-html/listening.html" },
+                    { assignmentId: "review5-reading-writing-v1", title: "복습 5 읽기와 쓰기", chapter: "review5", sectionId: "readingWriting", submissionKind: "quiz", totalQuestions: 15, activityHref: "review/review5-html/reading-writing.html" },
+                    { assignmentId: "review5-long-writing-v1", title: "복습 5 장문 쓰기", chapter: "review5", sectionId: "longWriting", submissionKind: "writing", minCharacterCount: 400, maxCharacterCount: 500, activityHref: "review/review5-html/long-writing.html" }
+                ]
+            },
+            {
                 id: "midterm-vocab-grammar",
                 title: "중간 모의고사",
                 assignments: [

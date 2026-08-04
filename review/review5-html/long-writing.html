@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>복습 5 장문 쓰기</title>
+  <link rel="stylesheet" href="assets/long-writing.css?v=review5-v2">
+</head>
+<body>
+  <main class="writing-page">
+    <header class="writing-header">
+      <a href="index.html" class="back-link">← 복습 5</a>
+      <p class="eyebrow">복습 5 · 장문 쓰기</p>
+      <h1>내 고향의 과거와 현재</h1>
+      <p id="writingStatus" class="writing-status" role="status" aria-live="polite">이름과 글을 준비해 보세요.</p>
+    </header>
+
+    <button id="helpOpenButton" class="help-open" type="button" aria-haspopup="dialog" aria-controls="writingHelp">도움</button>
+    <div id="helpBackdrop" class="help-backdrop" hidden></div>
+    <aside id="writingHelp" class="writing-help" aria-labelledby="helpTitle" aria-hidden="false">
+      <div class="help-sheet-head"><h2 id="helpTitle">쓰기 도움</h2><button id="helpCloseButton" class="help-close" type="button" aria-label="도움 닫기">×</button></div>
+      <section><h3>무엇을 쓸까요?</h3><p>고향의 옛 모습, 지금 달라진 점과 장점, 앞으로 바라는 변화와 그 이유를 써 보세요.</p></section>
+      <section><h3>3부분으로 정리하기</h3><ol><li>과거: 예전의 거리·사람·생활</li><li>현재: 달라진 모습과 좋은 점</li><li>미래: 바라는 변화와 이유</li></ol></section>
+      <section><h3>표현 힌트</h3><p>예전에는, 지금은, ~아/어지다, ~게 되다, ~기 때문에, ~았으면/었으면 좋겠다</p></section>
+      <label class="notes-label" for="planningNotes">계획 메모 (내 기기에만 저장)</label>
+      <textarea id="planningNotes" rows="7" placeholder="핵심 단어와 순서를 메모하세요."></textarea>
+      <section class="self-check"><h3>마지막 확인</h3><ul><li>과거·현재·미래가 모두 있나요?</li><li>이유와 장점을 썼나요?</li><li>400~500자 안인가요?</li></ul></section>
+    </aside>
+
+    <section class="manuscript-panel" aria-labelledby="manuscriptTitle">
+      <div class="manuscript-head"><div><p class="eyebrow">원고지 20 × 25</p><h2 id="manuscriptTitle">최종 글</h2></div><strong id="characterCount" aria-live="polite">0 / 400~500자</strong></div>
+      <label for="studentName">이름</label>
+      <input id="studentName" maxlength="40" autocomplete="name" placeholder="이름을 입력하세요">
+      <label for="manuscriptInput">원고지에 쓸 글</label>
+      <div id="manuscriptWrap" class="manuscript-wrap">
+        <div id="manuscriptGrid" class="manuscript-grid" aria-hidden="true"></div>
+        <textarea id="manuscriptInput" class="manuscript-input" spellcheck="false" aria-describedby="characterCount writingStatus" placeholder="여기에 최종 글을 입력하세요. 줄바꿈은 다음 줄 첫 칸으로 이동합니다."></textarea>
+      </div>
+      <p class="manuscript-tip">공백과 문장 부호도 한 칸입니다. 줄바꿈은 글자 수에 넣지 않습니다.</p>
+      <div class="writing-actions">
+        <button id="copyTextButton" type="button">최종 글 복사</button>
+        <button id="downloadTextButton" type="button">.txt 내려받기</button>
+        <button id="printTextButton" type="button">인쇄</button>
+        <button id="resetWritingButton" type="button" class="danger-button">이 페이지 초기화</button>
+        <button id="submitWritingButton" type="button" class="submit-button" disabled>온라인 제출</button>
+      </div>
+      <p id="recoveryNotice" class="recovery-notice" hidden>이전 저장 내용을 읽을 수 없습니다. 원본은 초기화 전까지 보존됩니다. <button id="copyRecoveryButton" type="button">원본 복사</button> <button id="downloadRecoveryButton" type="button">원본 내려받기</button></p>
+      <p id="saveFailureRecovery" class="recovery-notice" hidden>이 기기에 현재 작업을 저장하지 못했습니다. 계획 메모와 최종 글을 바로 보관하세요. <button id="copyCurrentRecoveryButton" type="button">현재 작업 복사</button> <button id="downloadCurrentRecoveryButton" type="button">현재 작업 내려받기</button></p>
+    </section>
+  </main>
+  <script src="../../shared/homework-firebase-config.js"></script>
+  <script src="../../shared/homework-submitter.js"></script>
+  <script src="assets/data.js?v=review5-v2"></script>
+  <script src="assets/long-writing.js?v=review5-v2"></script>
+</body>
+</html>
