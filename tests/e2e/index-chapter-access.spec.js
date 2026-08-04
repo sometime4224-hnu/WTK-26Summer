@@ -12,3 +12,16 @@ test('메인 허브에서 16과는 활성화되어 단원 페이지로 이동한
   await chapter16.click();
   await expect(page).toHaveURL(/\/c16\/index\.html$/);
 });
+
+test('메인 허브에서 17과는 활성화되어 단원 페이지로 이동한다', async ({ page }) => {
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+
+  const chapter17 = page.locator('a.chapter-card[data-chapter="c17"]');
+  await expect(chapter17).toHaveCount(1);
+  await expect(chapter17).not.toHaveClass(/disabled/);
+  await expect(chapter17).not.toHaveAttribute('aria-disabled', 'true');
+  await expect(chapter17.locator('.status-badge')).toHaveCount(0);
+
+  await chapter17.click();
+  await expect(page).toHaveURL(/\/c17\/index\.html$/);
+});
