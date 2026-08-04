@@ -27,7 +27,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "assets" / "audio"
 SOURCE_TRACK = Path(
-    r"D:\My project 모음\00.my_app_project\서울대 한국어 웹 보조 교재 제작\교과서 소스\음원 모음\2B\00_트랙_전체\WB\Track12.mp3"
+    r"D:\My project 모음\00.my_app_project\서울대 한국어 웹 보조 교재 제작\교과서 소스\음원 모음\3B\00_트랙_전체\WB\Seoul Univ_3B_Work Book_Trk_12.mp3"
 )
 
 
@@ -39,23 +39,27 @@ class Clip:
     shared_with: str | None = None
 
 
+# The 3B waveform has approximately six-second answer gaps after items 1-12,
+# then the common 13-14 and 15-16 dialogues.  These boundaries retain 0.5 s of
+# silence on each safe side of every item.  The short numbered cues after the
+# common dialogues are outside the shared dialogue clips.
 CLIPS = (
-    Clip("l1", 0.000, 23.800),
-    Clip("l2", 28.700, 43.600),
-    Clip("l3", 48.600, 65.300),
-    Clip("l4", 67.300, 75.800),
-    Clip("l5", 77.800, 98.400),
-    Clip("l6", 103.400, 124.500),
-    Clip("l7", 126.500, 146.900),
-    Clip("l8", 151.900, 175.600),
-    Clip("l9", 177.600, 201.600),
-    Clip("l10", 206.600, 244.800),
-    Clip("l11", 249.700, 294.500),
-    Clip("l12", 299.600, 335.700),
-    Clip("l13", 340.700, 395.600, shared_with="l14"),
-    Clip("l14", 340.700, 395.600, shared_with="l13"),
-    Clip("l15", 400.600, 445.400, shared_with="l16"),
-    Clip("l16", 400.600, 445.400, shared_with="l15"),
+    Clip("l1", 0.000, 27.096),
+    Clip("l2", 32.117, 58.345),
+    Clip("l3", 63.379, 83.489),
+    Clip("l4", 88.541, 101.156),
+    Clip("l5", 106.190, 119.907),
+    Clip("l6", 124.928, 159.258),
+    Clip("l7", 164.282, 188.721),
+    Clip("l8", 193.747, 216.290),
+    Clip("l9", 221.334, 260.480),
+    Clip("l10", 265.497, 300.248),
+    Clip("l11", 305.273, 354.075),
+    Clip("l12", 359.122, 404.849),
+    Clip("l13", 409.899, 468.639, shared_with="l14"),
+    Clip("l14", 409.899, 468.639, shared_with="l13"),
+    Clip("l15", 484.262, 540.770, shared_with="l16"),
+    Clip("l16", 484.262, 540.770, shared_with="l15"),
 )
 
 DURATION_RE = re.compile(r"Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)")
