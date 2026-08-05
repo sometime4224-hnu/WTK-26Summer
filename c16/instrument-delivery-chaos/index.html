@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#fff4d8">
+    <title>생각도 못 한 악기 배달</title>
+    <link rel="stylesheet" href="delivery-infinite-boost-v2.css">
+    <script src="delivery-infinite-boost-v2.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#startGame">게임 시작으로 건너뛰기</a>
+
+    <header class="topbar">
+        <a class="home-link" href="../index.html" aria-label="16과로 돌아가기">
+            <span aria-hidden="true">←</span>
+            <span>16과</span>
+        </a>
+        <div class="topbar__title" aria-label="생각도 못 한 악기 배달">
+            <span aria-hidden="true">📦</span>
+            악기 특송
+        </div>
+        <div class="topbar__actions">
+            <button class="icon-button" id="soundToggle" type="button" aria-pressed="false" aria-label="소리 끄기">
+                <span id="soundIcon" aria-hidden="true">♫</span>
+            </button>
+            <button class="icon-button" id="pauseButton" type="button" aria-label="게임 일시정지" hidden>
+                <span aria-hidden="true">Ⅱ</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="app">
+        <section class="game" id="gameRoot" data-game-state="menu" aria-label="생각도 못 한 악기 배달 게임">
+            <div class="hud" aria-label="게임 현황">
+                <div class="hud__item">
+                    <span id="stageName">스테이지</span>
+                    <strong><span id="roundValue">0</span>/5</strong>
+                </div>
+                <div class="hud__item">
+                    <span>거리</span>
+                    <strong><span id="distanceValue">0</span>/<span id="targetDistanceValue">800</span>m</strong>
+                </div>
+                <div class="hud__item">
+                    <span>점수</span>
+                    <strong id="scoreValue">0</strong>
+                </div>
+                <div class="hud__item hud__item--best">
+                    <span>최고</span>
+                    <strong id="bestValue">0</strong>
+                </div>
+            </div>
+
+            <div class="stage" id="stage">
+                <canvas id="gameCanvas" role="img" aria-label="커다란 악기를 날려 보내는 만화풍 물리 게임 화면"></canvas>
+                <div class="paper-noise" aria-hidden="true"></div>
+
+                <section class="screen screen--menu" id="menuScreen" aria-labelledby="gameTitle">
+                    <div class="menu-card">
+                        <p class="eyebrow">C16 PHYSICS RELAY</p>
+                        <h1 id="gameTitle">생각도 못 한<br><span>악기 배달</span></h1>
+                        <p class="menu-pitch">악기가 너무 큽니다.<br><strong>목표를 박살 낸 뒤, 멈출 때까지 무한 가속 폭발을 이어 가세요.</strong></p>
+                        <div class="rule-strip" aria-label="게임 방법">
+                            <span><b>1</b> 힘 모아 발사</span>
+                            <span><b>2</b> 목표 돌파</span>
+                            <span><b>3</b> ∞ 가속 연쇄</span>
+                        </div>
+                        <button class="primary-button" id="startGame" type="button">
+                            <span aria-hidden="true">🚚</span>
+                            <span id="startGameLabel">던지기 시작</span>
+                        </button>
+                        <p class="best-line">최고 <strong id="menuBestScore">0</strong>점 · 최장 <strong id="menuBestDistance">0</strong>m</p>
+                    </div>
+                </section>
+
+                <section class="screen screen--pause" id="pauseScreen" aria-labelledby="pauseTitle" hidden>
+                    <div class="paper-card">
+                        <p class="eyebrow">배송 잠시 멈춤</p>
+                        <h2 id="pauseTitle">악기도 쉬는 중</h2>
+                        <button class="primary-button" id="resumeGame" type="button">다시 던지기</button>
+                        <button class="text-button" id="quitGame" type="button">오늘 배송 포기</button>
+                    </div>
+                </section>
+
+                <section class="screen screen--final" id="finalScreen" aria-labelledby="finalTitle" hidden>
+                    <div class="paper-card final-card">
+                        <p class="result-kicker">5스테이지 완주 보고서</p>
+                        <strong class="final-score" id="finalScore">0</strong>
+                        <span class="final-score__unit">점</span>
+                        <h2 id="finalTitle">악기 던지기로 유명한 밴드</h2>
+                        <p class="result-detail">목표 돌파 <span id="finalGoals">0</span>/5 · 최장 <span id="finalDistance">0</span>m · 총 <span id="finalDestroyed">0</span>개 파괴</p>
+                        <p class="new-record" id="newRecord" hidden>새로운 대형 사고 기록!</p>
+                        <div class="final-actions">
+                            <button class="primary-button" id="playAgain" type="button">한 판 더</button>
+                            <a class="secondary-button" href="../index.html">16과로 돌아가기</a>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="relay-strip" id="relayStrip" aria-hidden="true" hidden></div>
+
+                <div class="strength-ribbon" id="strengthRibbon" role="note" hidden>
+                    <span id="strengthOwner">피아노 동작 · 치다</span>
+                    <strong id="strengthName">건반 치기 충격파</strong>
+                    <small id="strengthDetail">건반을 칠 때마다 앞 장애물까지 도미노로 와장창!</small>
+                </div>
+
+                <div class="relay-toast" id="relayToast" role="status" hidden>
+                    <span class="relay-toast__kicker" id="relayKicker">스테이지 1 통과!</span>
+                    <strong id="relayTitle">피아노 49m</strong>
+                    <span id="relayDetail">1개 파괴 · +720점</span>
+                    <b id="relayNext">다음 스테이지: 드럼</b>
+                </div>
+
+                <div class="aim-panel" id="aimPanel" hidden>
+                    <div class="angle-chip"><span>각도</span><strong id="angleValue">45°</strong></div>
+                    <div class="power-meter" aria-label="던지는 힘">
+                        <span id="powerFill"></span>
+                    </div>
+                    <strong class="power-label" id="powerLabel">힘 25%</strong>
+                </div>
+
+                <div class="speech-bubble" id="speechBubble" role="status" hidden>
+                    <span id="speechText">피아노가 자동차만 해요!</span>
+                </div>
+
+                <div class="impact-label" id="impactLabel" aria-hidden="true"></div>
+            </div>
+
+            <div class="action-dock" id="actionDock" hidden>
+                <button class="action-button" id="actionButton" type="button">
+                    <span class="action-button__icon" id="actionIcon" aria-hidden="true">●</span>
+                    <strong id="actionLabel">꾹 눌러 힘 모으기</strong>
+                </button>
+                <p id="actionHint">누르고 있다가 놓기 · <kbd>SPACE</kbd></p>
+                <button class="end-run-button" id="endRunButton" type="button" hidden>이 기록으로 다음 스테이지 →</button>
+            </div>
+
+            <footer class="game-footer">
+                <button class="footer-button" id="effectsToggle" type="button" aria-pressed="false">효과 줄이기</button>
+                <button class="footer-button" id="resetRecord" type="button">기록 초기화</button>
+                <span class="save-status" id="saveStatus" role="status">기록 자동 저장</span>
+            </footer>
+        </section>
+    </main>
+
+    <dialog class="reset-dialog" id="resetDialog" aria-labelledby="resetTitle">
+        <form method="dialog">
+            <h2 id="resetTitle">이 게임의 배송 기록을 지울까요?</h2>
+            <p>최고 점수, 최장 거리, 진행 중인 배달과 설정만 초기화됩니다.</p>
+            <div class="dialog-actions">
+                <button class="secondary-button" value="cancel">취소</button>
+                <button class="danger-button" id="confirmReset" value="confirm">기록 지우기</button>
+            </div>
+        </form>
+    </dialog>
+
+    <p class="visually-hidden" id="liveRegion" aria-live="polite"></p>
+    <noscript>이 게임을 실행하려면 브라우저에서 JavaScript를 켜 주세요.</noscript>
+</body>
+</html>

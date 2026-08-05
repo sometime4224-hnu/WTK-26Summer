@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#090b21">
+    <title>C16 카오스 오케스트라</title>
+    <link rel="stylesheet" href="classics-orchestra.css">
+    <script src="classics-arcade.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#startGame">게임 시작으로 건너뛰기</a>
+
+    <header class="topbar">
+        <a class="home-link" href="../index.html" aria-label="16과로 돌아가기">
+            <span aria-hidden="true">←</span>
+            <span>16과</span>
+        </a>
+        <div class="topbar__title" aria-label="C16 카오스 오케스트라">
+            <span class="live-dot" aria-hidden="true"></span>
+            CHAOS ORCHESTRA
+        </div>
+        <div class="topbar__actions">
+            <button class="icon-button" id="soundToggle" type="button" aria-pressed="false" aria-label="소리 끄기">
+                <span id="soundIcon" aria-hidden="true">♫</span>
+            </button>
+            <button class="icon-button" id="pauseButton" type="button" aria-label="게임 일시정지" hidden>
+                <span aria-hidden="true">Ⅱ</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="app" id="mainContent">
+        <section class="game" id="gameRoot" data-game-state="menu" aria-label="카오스 오케스트라 게임">
+            <div class="hud" aria-label="게임 현황">
+                <div class="hud__item hud__item--time">
+                    <span class="hud__label">TIME</span>
+                    <strong id="timeValue">60.0</strong>
+                </div>
+                <div class="hud__item hud__item--score">
+                    <span class="hud__label">SCORE</span>
+                    <strong id="scoreValue">0</strong>
+                </div>
+                <div class="hud__item hud__item--combo">
+                    <span class="hud__label">COMBO</span>
+                    <strong><span id="comboValue">0</span><small>×</small></strong>
+                </div>
+                <div class="mood" id="moodBadge">
+                    <span class="mood__spark" aria-hidden="true">✦</span>
+                    <span id="moodValue">마음이 편안해지다</span>
+                </div>
+            </div>
+
+            <div class="stage" id="stage">
+                <canvas id="gameCanvas" role="img" aria-label="기타, 피아노, 바이올린, 드럼의 네 레인으로 노트가 내려오는 리듬 게임 화면"></canvas>
+
+                <div class="track-ribbon" id="trackRibbon" aria-label="현재 곡: 베토벤 환희의 송가, 분당 100박">
+                    <span class="track-ribbon__disc" aria-hidden="true">♪</span>
+                    <span class="track-ribbon__copy">
+                        <small>PUBLIC DOMAIN CLASSIC</small>
+                        <strong id="trackTitle">베토벤 · 환희의 송가</strong>
+                    </span>
+                    <span class="track-ribbon__tempo" id="trackTempo" aria-hidden="true">♩=100</span>
+                    <progress id="trackProgress" max="60000" value="0" aria-label="곡 진행률"></progress>
+                </div>
+
+                <div class="stage-band" aria-hidden="true">
+                    <div class="stage-band__side stage-band__side--left">
+                        <div class="performer performer--guitar" data-performer-lane="0" data-instrument="기타">
+                            <span class="performer__spotlight"></span>
+                            <svg class="performer__art" viewBox="0 0 170 210">
+                                <ellipse class="performer__shadow" cx="85" cy="197" rx="55" ry="9"/>
+                                <g class="performer__body">
+                                    <path class="performer__leg" d="M70 147 59 193M98 147l18 46"/>
+                                    <path class="performer__shoe" d="M43 195h24M108 195h25"/>
+                                    <path class="performer__jacket performer__jacket--warm" d="M57 87q28-18 56 0l-7 67H64Z"/>
+                                    <circle class="performer__skin" cx="85" cy="59" r="27"/>
+                                    <path class="performer__hair" d="M57 59q2-33 30-34 30 4 28 34l-14-16-13 8-14-9-17 20Z"/>
+                                    <path class="performer__face" d="M73 61h3m18 0h3M78 72q7 7 15 0"/>
+                                </g>
+                                <g class="guitar">
+                                    <path class="guitar__neck" d="m98 112 47-43 7 7-45 49Z"/>
+                                    <path class="guitar__head" d="m143 67 10-10 10 11-10 10Z"/>
+                                    <path class="guitar__body" d="M65 109q-23 4-18 25 4 12 18 9 4 21 24 16 20-4 15-27-4-18-23-14-4-11-16-9Z"/>
+                                    <circle class="guitar__hole" cx="81" cy="132" r="8"/>
+                                    <path class="guitar__strings" d="m57 141 82-65m-78 69 82-65"/>
+                                </g>
+                                <path class="performer__arm performer__arm--support" d="M102 94q18 4 28 1"/>
+                                <path class="performer__arm motion-arm" d="M62 97q17 19 27 37"/>
+                                <circle class="performer__hand motion-hand" cx="88" cy="134" r="6"/>
+                            </svg>
+                            <span class="performer__name"><b>기타</b><small>줄을 튕겨요</small></span>
+                            <span class="performer__verb">튕기다!</span>
+                        </div>
+
+                        <div class="performer performer--piano" data-performer-lane="1" data-instrument="피아노">
+                            <span class="performer__spotlight"></span>
+                            <svg class="performer__art" viewBox="0 0 170 210">
+                                <ellipse class="performer__shadow" cx="85" cy="197" rx="63" ry="9"/>
+                                <g class="performer__body">
+                                    <path class="performer__leg" d="M70 150 62 192M98 150l12 42"/>
+                                    <path class="performer__shoe" d="M48 195h23M102 195h23"/>
+                                    <path class="performer__jacket performer__jacket--gold" d="M56 91q29-18 59 1l-9 65H63Z"/>
+                                    <circle class="performer__skin" cx="85" cy="61" r="27"/>
+                                    <path class="performer__hair" d="M58 59q2-31 27-34 27 0 31 28l-11-7-6 12-19-13-21 19Z"/>
+                                    <path class="performer__face" d="M73 63h3m18 0h3M78 74q7 6 15 0"/>
+                                </g>
+                                <g class="keyboard">
+                                    <path class="keyboard__case" d="M24 126h124l-8 47H32Z"/>
+                                    <path class="keyboard__white" d="M34 132h104v27H34Z"/>
+                                    <path class="keyboard__lines" d="M49 132v27m15-27v27m15-27v27m15-27v27m15-27v27m15-27v27"/>
+                                    <path class="keyboard__black" d="M45 132v14m23-14v14m15-14v14m26-14v14m15-14v14"/>
+                                    <path class="keyboard__stand" d="m47 171-12 24m88-24 12 24"/>
+                                </g>
+                                <g class="piano-hands motion-hands">
+                                    <path class="performer__arm" d="M62 99q-2 25 12 38M108 99q4 25-12 38"/>
+                                    <circle class="performer__hand" cx="74" cy="139" r="7"/>
+                                    <circle class="performer__hand" cx="96" cy="139" r="7"/>
+                                </g>
+                            </svg>
+                            <span class="performer__name"><b>피아노</b><small>건반을 눌러요</small></span>
+                            <span class="performer__verb">누르다!</span>
+                        </div>
+                    </div>
+
+                    <div class="stage-band__side stage-band__side--right">
+                        <div class="performer performer--violin" data-performer-lane="2" data-instrument="바이올린">
+                            <span class="performer__spotlight"></span>
+                            <svg class="performer__art" viewBox="0 0 170 210">
+                                <ellipse class="performer__shadow" cx="85" cy="197" rx="55" ry="9"/>
+                                <g class="performer__body">
+                                    <path class="performer__leg" d="M70 148 60 193M99 148l14 45"/>
+                                    <path class="performer__shoe" d="M45 195h23M105 195h24"/>
+                                    <path class="performer__jacket performer__jacket--cool" d="M56 88q29-18 59 1l-9 67H63Z"/>
+                                    <circle class="performer__skin" cx="85" cy="58" r="27"/>
+                                    <path class="performer__hair" d="M57 58q5-32 30-34 28 4 29 33l-14-11-10 10-18-12-17 18Z"/>
+                                    <path class="performer__face" d="M73 61h3m18 0h3M78 71q7 7 15 0"/>
+                                </g>
+                                <g class="violin">
+                                    <path class="violin__neck" d="m85 98 32-31 6 6-30 34Z"/>
+                                    <path class="violin__body" d="M75 103q-15 4-8 17-9 17 7 24 12 5 17-8 13-5 8-18-4-12-17-8-1-6-7-7Z"/>
+                                    <path class="violin__strings" d="m75 138 43-67"/>
+                                    <path class="violin__detail" d="M75 119q9-7 18 1M76 131q8 6 16-1"/>
+                                </g>
+                                <path class="performer__arm performer__arm--support" d="M62 97q9 25 21 28"/>
+                                <g class="motion-bow">
+                                    <path class="performer__arm" d="M107 96q14 15 21 30"/>
+                                    <path class="violin__bow" d="m49 151 90-70"/>
+                                    <circle class="performer__hand" cx="126" cy="124" r="6"/>
+                                </g>
+                            </svg>
+                            <span class="performer__name"><b>바이올린</b><small>활로 켜요</small></span>
+                            <span class="performer__verb">켜다!</span>
+                        </div>
+
+                        <div class="performer performer--drums" data-performer-lane="3" data-instrument="드럼">
+                            <span class="performer__spotlight"></span>
+                            <svg class="performer__art" viewBox="0 0 170 210">
+                                <ellipse class="performer__shadow" cx="85" cy="197" rx="67" ry="9"/>
+                                <g class="performer__body">
+                                    <path class="performer__jacket performer__jacket--violet" d="M56 93q29-19 59 0l-8 57H63Z"/>
+                                    <circle class="performer__skin" cx="85" cy="61" r="27"/>
+                                    <path class="performer__hair" d="M57 61q0-32 28-36 26 1 31 29l-14-8-9 11-18-12-18 20Z"/>
+                                    <path class="performer__face" d="M73 63h3m18 0h3M78 74q7 7 15 0"/>
+                                </g>
+                                <g class="drum-kit">
+                                    <path class="drum-kit__stand" d="M85 119v70M48 127l-18 63m92-63 18 63"/>
+                                    <ellipse class="drum-kit__cymbal" cx="38" cy="125" rx="28" ry="7"/>
+                                    <ellipse class="drum-kit__cymbal" cx="132" cy="125" rx="28" ry="7"/>
+                                    <circle class="drum-kit__kick" cx="85" cy="163" r="35"/>
+                                    <circle class="drum-kit__ring" cx="85" cy="163" r="21"/>
+                                    <ellipse class="drum-kit__tom" cx="58" cy="142" rx="23" ry="17"/>
+                                    <ellipse class="drum-kit__tom" cx="112" cy="142" rx="23" ry="17"/>
+                                </g>
+                                <g class="motion-stick motion-stick--left">
+                                    <path class="performer__arm" d="M62 101 52 128"/>
+                                    <path class="drum-kit__stick" d="m52 128-23-44"/>
+                                    <circle class="performer__hand" cx="52" cy="126" r="6"/>
+                                </g>
+                                <g class="motion-stick motion-stick--right">
+                                    <path class="performer__arm" d="m108 101 10 27"/>
+                                    <path class="drum-kit__stick" d="m118 128 24-44"/>
+                                    <circle class="performer__hand" cx="118" cy="126" r="6"/>
+                                </g>
+                            </svg>
+                            <span class="performer__name"><b>드럼</b><small>스틱으로 쳐요</small></span>
+                            <span class="performer__verb">치다!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stage-vignette" aria-hidden="true"></div>
+                <div class="hit-flash" id="hitFlash" aria-hidden="true"></div>
+
+                <section class="screen screen--menu" id="menuScreen" aria-labelledby="gameTitle">
+                    <div class="menu-copy">
+                        <p class="eyebrow"><span aria-hidden="true">✦</span> C16 ARCADE <span aria-hidden="true">✦</span></p>
+                        <h1 id="gameTitle"><span>카오스</span> 오케스트라</h1>
+                        <p class="menu-pitch"><strong id="menuSongTitle">베토벤의 「환희의 송가」</strong><br>노트가 박자선에 닿을 때 4버튼으로 연주하세요.</p>
+
+                        <div class="song-picker">
+                            <label for="songSelect">연주할 클래식 <span>6곡</span></label>
+                            <select id="songSelect" aria-describedby="songDetails">
+                                <option value="ode-to-joy">베토벤 · 환희의 송가</option>
+                                <option value="fur-elise">베토벤 · 엘리제를 위하여</option>
+                                <option value="eine-kleine">모차르트 · 아이네 클라이네 나흐트무지크</option>
+                                <option value="turkish-march">모차르트 · 터키 행진곡</option>
+                                <option value="bach-prelude">바흐 · 프렐류드 C장조</option>
+                                <option value="symphony-five">베토벤 · 운명 교향곡</option>
+                            </select>
+                            <small id="songDetails"><span id="menuSongWork">교향곡 9번 4악장 주제</span> · 게임 편곡 ♩=<span id="menuTempo">100</span></small>
+                        </div>
+
+                        <div class="lane-preview" aria-label="네 개의 연주 레인">
+                            <span data-lane="0"><b>기타</b><small>튕기다</small></span>
+                            <span data-lane="1"><b>피아노</b><small>누르다</small></span>
+                            <span data-lane="2"><b>바이올린</b><small>켜다</small></span>
+                            <span data-lane="3"><b>드럼</b><small>치다</small></span>
+                        </div>
+
+                        <button class="primary-button" id="startGame" type="button">
+                            <span aria-hidden="true">▶</span>
+                            무대 난입
+                        </button>
+                        <p class="control-hint"><kbd>D</kbd><kbd>F</kbd><kbd>J</kbd><kbd>K</kbd> 또는 아래 네 버튼</p>
+                        <p class="best-line">BEST <strong id="menuBestScore">0</strong> <span aria-hidden="true">·</span> 최고 콤보 <strong id="menuBestCombo">0</strong></p>
+                    </div>
+                </section>
+
+                <section class="screen screen--countdown" id="countdownScreen" aria-live="assertive" hidden>
+                    <p id="countdownLabel">READY</p>
+                </section>
+
+                <section class="screen screen--pause" id="pauseScreen" aria-labelledby="pauseTitle" hidden>
+                    <div class="pause-card">
+                        <p class="eyebrow">잠깐 숨 고르기</p>
+                        <h2 id="pauseTitle">PAUSED</h2>
+                        <button class="primary-button" id="resumeGame" type="button">다시 연주</button>
+                        <button class="text-button" id="quitGame" type="button">무대에서 내려오기</button>
+                    </div>
+                </section>
+
+                <section class="screen screen--result" id="resultScreen" aria-labelledby="resultTitle" hidden>
+                    <div class="result-card">
+                        <p class="result-kicker">FINAL SCORE</p>
+                        <p class="result-song" id="resultSong">베토벤 · 환희의 송가</p>
+                        <strong class="result-score" id="finalScore">0</strong>
+                        <h2 id="resultTitle">생각도 못 한 데뷔</h2>
+                        <p class="result-detail"><span id="resultPerfect">0</span> PERFECT <span aria-hidden="true">·</span> <span id="resultCombo">0</span> MAX COMBO</p>
+                        <p class="new-record" id="newRecord" hidden>NEW RECORD!</p>
+                        <div class="result-actions">
+                            <button class="primary-button" id="playAgain" type="button">한 판 더</button>
+                            <a class="secondary-button" href="../index.html">16과로 돌아가기</a>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="power-banner" id="powerBanner" aria-live="polite" hidden>
+                    <span class="power-banner__tag">FEVER</span>
+                    <strong id="powerName">사람 키만 하다</strong>
+                    <span id="powerEffect">노트 거대화</span>
+                </div>
+
+                <div class="judgement" id="judgement" aria-hidden="true"></div>
+            </div>
+
+            <div class="touch-controls" id="touchControls" aria-label="연주 버튼">
+                <button class="lane-button" type="button" data-lane="0" aria-label="기타 줄을 튕기다, D 키">
+                    <span class="lane-button__key">D</span>
+                    <strong>기타</strong>
+                    <small>튕기다</small>
+                </button>
+                <button class="lane-button" type="button" data-lane="1" aria-label="피아노 건반을 누르다, F 키">
+                    <span class="lane-button__key">F</span>
+                    <strong>피아노</strong>
+                    <small>누르다</small>
+                </button>
+                <button class="lane-button" type="button" data-lane="2" aria-label="바이올린을 켜다, J 키">
+                    <span class="lane-button__key">J</span>
+                    <strong>바이올린</strong>
+                    <small>켜다</small>
+                </button>
+                <button class="lane-button" type="button" data-lane="3" aria-label="드럼을 치다, K 키">
+                    <span class="lane-button__key">K</span>
+                    <strong>드럼</strong>
+                    <small>치다</small>
+                </button>
+            </div>
+
+            <footer class="game-footer">
+                <span class="track-credit">
+                    <span class="track-credit__full" id="trackCreditTitle">♪ 베토벤 「환희의 송가」 ·</span>
+                    <a id="scoreSource" href="https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=528" target="_blank" rel="noopener" aria-label="환희의 송가 퍼블릭 도메인 악보 출처 열기">PD 악보</a>
+                    <span class="track-credit__full">· 브라우저 합성</span>
+                </span>
+                <button class="footer-button" id="effectsToggle" type="button" aria-pressed="false">효과 줄이기</button>
+                <button class="footer-button" id="resetRecord" type="button">기록 초기화</button>
+                <span class="save-status" id="saveStatus" role="status">기록 자동 저장</span>
+            </footer>
+        </section>
+    </main>
+
+    <dialog class="reset-dialog" id="resetDialog" aria-labelledby="resetTitle">
+        <form method="dialog">
+            <h2 id="resetTitle">이 게임의 기록을 지울까요?</h2>
+            <p>최고 점수, 최고 콤보와 설정만 초기화됩니다.</p>
+            <div class="dialog-actions">
+                <button class="secondary-button" value="cancel">취소</button>
+                <button class="danger-button" id="confirmReset" value="confirm">기록 지우기</button>
+            </div>
+        </form>
+    </dialog>
+
+    <p class="visually-hidden" id="liveRegion" aria-live="polite"></p>
+    <noscript>이 게임을 실행하려면 브라우저에서 JavaScript를 켜 주세요.</noscript>
+</body>
+</html>
