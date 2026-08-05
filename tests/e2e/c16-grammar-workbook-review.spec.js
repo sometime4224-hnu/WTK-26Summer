@@ -7,7 +7,8 @@ const routes = [
     main: '/c16/grammar1.html',
     previous: '',
     next: 'grammar2-workbook-review.html',
-    title: 'N만 하다'
+    title: 'N만 하다',
+    count: 18
   },
   {
     path: '/c16/grammar2-workbook-review.html',
@@ -15,7 +16,8 @@ const routes = [
     main: '/c16/grammar2.html',
     previous: 'grammar1-workbook-review.html',
     next: 'grammar3-workbook-review.html',
-    title: 'V-(으)ㄹ 생각도 못 하다'
+    title: 'V-(으)ㄹ 생각도 못 하다',
+    count: 20
   },
   {
     path: '/c16/grammar3-workbook-review.html',
@@ -23,7 +25,8 @@ const routes = [
     main: '/c16/grammar3.html',
     previous: 'grammar2-workbook-review.html',
     next: 'grammar4-workbook-sentence-quiz.html',
-    title: 'V-(으)ㄹ 만하다'
+    title: 'V-(으)ㄹ 만하다',
+    count: 18
   },
   {
     path: '/c16/grammar4-workbook-sentence-quiz.html',
@@ -31,7 +34,8 @@ const routes = [
     main: '/c16/grammar4.html',
     previous: 'grammar3-workbook-review.html',
     next: '',
-    title: '유명하다'
+    title: '유명하다',
+    count: 20
   }
 ];
 
@@ -58,7 +62,7 @@ async function advanceToIndex(page, config, targetIndex) {
   }
 }
 
-test('four Chapter 16 workbook reviews have six configured items and keep the first response visible on phones', async ({ page }) => {
+test('four Chapter 16 workbook reviews expose the expanded item sets and keep the first response visible on phones', async ({ page }) => {
   const failures = [];
   page.on('pageerror', (error) => failures.push(`pageerror: ${error.message}`));
   page.on('console', (message) => {
@@ -75,10 +79,10 @@ test('four Chapter 16 workbook reviews have six configured items and keep the fi
       const key = await clearCurrentReview(page);
       const config = await reviewConfig(page);
       expect(config.pageId).toBe(route.pageId);
-      expect(config.items).toHaveLength(6);
+      expect(config.items).toHaveLength(route.count);
       expect(key).toBe(storageKey(route.pageId));
       await expect(page.locator('h1')).toContainText(route.title);
-      await expect(page.locator('[data-review-progress-label]')).toHaveText('1 / 6');
+      await expect(page.locator('[data-review-progress-label]')).toHaveText(`1 / ${route.count}`);
       await expect(page.locator('#answerInput')).toBeVisible();
       await expect(page.locator('#primaryAction')).toHaveText('답 확인');
 
@@ -240,6 +244,75 @@ test('core grammar and cue content are enough across all four reviews', async ({
     }, example.answer);
     expect(accepted, `${example.id} should accept its core expression`).toBe(true);
   }
+});
+
+test('expanded reviews cover every workbook exercise section and accept every model answer', async ({ page }) => {
+  const expectedSections = {
+    'grammar1-workbook-review': ['워크북 연습 1', '워크북 연습 2', '워크북 연습 3'],
+    'grammar2-workbook-review': ['워크북 연습 1', '워크북 연습 2', '워크북 연습 3', '워크북 연습 4'],
+    'grammar3-workbook-review': ['워크북 연습 1', '워크북 연습 2', '워크북 연습 3', '워크북 연습 4'],
+    'grammar4-workbook-sentence-quiz': ['워크북 연습 1', '워크북 연습 2', '워크북 연습 3', '워크북 연습 4']
+  };
+
+  for (const route of routes) {
+    await page.goto(route.path, { waitUntil: 'domcontentloaded' });
+    await clearCurrentReview(page);
+    const config = await reviewConfig(page);
+    const sections = config.items.map((item) => item.section);
+    for (const section of expectedSections[route.pageId]) {
+      expect(sections.some((label) => label.startsWith(section)), `${route.pageId} should include ${section}`).toBe(true);
+    }
+
+    for (let index = 0; index < config.items.length; index += 1) {
+      const result = await page.evaluate((answer) => {
+        const hook = window.__c16WorkbookReview;
+        const id = hook.config.items[hook.currentState().currentIndex].id;
+        const state = hook.answerCurrent(answer);
+        return { id, accepted: state.correct[id] };
+      }, config.items[index].answer);
+      expect(result.accepted, `${route.pageId} ${result.id} should accept its model answer`).toBe(true);
+      await page.locator('#primaryAction').click();
+    }
+    await expect(page.locator('[data-review-summary]')).toBeVisible();
+  }
+});
+
+test('a completed six-item review migrates forward and resumes at the first added workbook item', async ({ page }) => {
+  const target = routes[0];
+  const key = storageKey(target.pageId);
+  const previousIds = Array.from({ length: 6 }, (_, index) => `g1-${index + 1}`);
+  const mapFrom = (factory) => Object.fromEntries(previousIds.map((id, index) => [id, factory(id, index)]));
+  const legacyPayload = {
+    version: 1,
+    page: target.pageId,
+    updatedAt: '2026-08-03T00:00:00.000Z',
+    state: {
+      currentIndex: 5,
+      responses: mapFrom((_id, index) => `saved-${index + 1}`),
+      attempts: mapFrom(() => 1),
+      checked: mapFrom(() => true),
+      correct: mapFrom(() => true),
+      revealed: mapFrom(() => false),
+      hints: mapFrom(() => 0),
+      completed: true
+    }
+  };
+
+  await page.goto(target.path, { waitUntil: 'domcontentloaded' });
+  await page.addInitScript(({ reviewKey, payload }) => {
+    localStorage.setItem(reviewKey, JSON.stringify(payload));
+  }, { reviewKey: key, payload: legacyPayload });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('.c16-state-tools')).not.toContainText('읽을 수 없습니다');
+  await expect(page.locator('[data-review-progress-label]')).toHaveText(`7 / ${target.count}`);
+  const migrated = await page.evaluate(() => window.__c16WorkbookReview.currentState());
+  expect(migrated).toMatchObject({
+    currentIndex: 6,
+    completed: false,
+    correct: { 'g1-1': true, 'g1-6': true, 'g1-7': false },
+    responses: { 'g1-1': 'saved-1', 'g1-6': 'saved-6', 'g1-7': '' }
+  });
 });
 
 test('Grammar 2 item 1 accepts the source-derived 비싸서 variant as well as the existing answer', async ({ page }) => {
@@ -490,7 +563,8 @@ test('partial text, a completed review, and its independent/revealed counts rest
 
   await page.goto('/c16/grammar3-workbook-review.html', { waitUntil: 'domcontentloaded' });
   await clearCurrentReview(page);
-  for (let index = 0; index < 6; index += 1) {
+  const grammar3Config = await reviewConfig(page);
+  for (let index = 0; index < grammar3Config.items.length; index += 1) {
     const answer = await page.evaluate(() => {
       const hook = window.__c16WorkbookReview;
       const state = hook.currentState();
@@ -501,7 +575,7 @@ test('partial text, a completed review, and its independent/revealed counts rest
     await page.locator('#primaryAction').click();
   }
   await expect(page.locator('[data-review-summary]')).toBeVisible();
-  await expect(page.locator('[data-review-summary-text]')).toContainText('스스로 맞힌 문항 6개');
+  await expect(page.locator('[data-review-summary-text]')).toContainText(`스스로 맞힌 문항 ${grammar3Config.items.length}개`);
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.locator('[data-review-summary]')).toBeVisible();
   expect(await page.evaluate(() => window.__c16WorkbookReview.currentState().completed)).toBe(true);
@@ -550,7 +624,7 @@ test('hub and grammar main pages expose each workbook review while review pages 
     const link = page.locator(`a[href="${href}"]`).first();
     await expect(link).toBeVisible();
     await expect(link).toContainText('워크북 복습');
-    await expect(link).toContainText('6문항 대화 복습');
+    await expect(link).toContainText(`${route.count}문항 종합 복습`);
     await expect(link).toHaveClass(/lesson-link--main/);
   }
 

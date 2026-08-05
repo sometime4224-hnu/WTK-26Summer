@@ -161,45 +161,44 @@ test('C16 문법 메인 1~4는 재시도/정답 확인 뒤에만 다음으로 �
   expect(failures).toEqual([]);
 });
 
-test('문법 4 워크북 퀴즈는 유형 선택, 주관식 검증, 로/으로 자동 처리를 제공한다', async ({ page }) => {
+test('문법 4 워크북 복습은 특징형과 명사형 문장을 검증하고 로/으로을 구별한다', async ({ page }) => {
   await page.goto('/c16/grammar4-workbook-sentence-quiz.html', { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => localStorage.removeItem('korean3b.c16.grammar.grammar4-workbook-sentence-quiz'));
   await page.reload({ waitUntil: 'domcontentloaded' });
 
   await expect(page.locator('h1')).toContainText('유명하다');
-  await expect(page.locator('[data-type="feature"]')).toBeVisible();
-  await page.locator('[data-type="noun"]').click();
-  await expect(page.locator('#feedback')).toContainText('다시 선택');
-  await page.locator('[data-type="feature"]').click();
   await expect(page.locator('#answerInput')).toBeVisible();
-  await page.locator('#answerInput').fill('쇼핑이 편리');
-  await page.locator('#checkBtn').click();
-  await expect(page.locator('#feedback')).toContainText('조금 달라요');
-  await expect(page.locator('#nextBtn')).toBeDisabled();
-  await page.locator('#answerInput').fill('쇼핑이 편리하기로');
-  await page.locator('#checkBtn').click();
-  await expect(page.locator('#feedback')).toContainText('동대문시장은 쇼핑이 편리하기로 유명해요.');
-  await expect(page.locator('#nextBtn')).toBeEnabled();
+  await page.locator('#answerInput').fill('옷이 싸요');
+  await page.locator('#primaryAction').click();
+  await expect(page.locator('#reviewFeedback')).toContainText('목표 표현');
+  await page.locator('#answerInput').fill('옷이 싸기로 유명해요');
+  await page.locator('#primaryAction').click();
+  await expect(page.locator('#reviewFeedback')).toContainText('맞아요');
 
-  // Move to the two noun questions with answer reveal, then verify the automatic particle.
-  for (let index = 0; index < 2; index += 1) {
-    await page.locator('#nextBtn').click();
-    await page.locator('[data-type="feature"]').click();
-    await page.locator('#revealBtn').click();
+  // Resolve the remaining feature prompts and move to the first noun prompt.
+  for (let index = 0; index < 4; index += 1) {
+    await page.locator('#primaryAction').click();
+    if (index < 3) {
+      const answer = await page.evaluate(() => {
+        const hook = window.__c16WorkbookReview;
+        return hook.config.items[hook.currentState().currentIndex].answer;
+      });
+      await page.locator('#answerInput').fill(answer);
+      await page.locator('#primaryAction').click();
+    }
   }
-  await page.locator('#nextBtn').click();
-  await expect(page.locator('[data-type="noun"]')).toBeVisible();
-  await page.locator('[data-type="noun"]').click();
-  await expect(page.locator('#inputNote')).toContainText('자동');
-  await page.locator('#answerInput').fill('오징어로');
-  await page.locator('#checkBtn').click();
-  await expect(page.locator('#feedback')).toContainText('울릉도는 오징어로 유명해요.');
-  await expect(page.locator('#answerInput')).toHaveValue('오징어');
-  await page.locator('#nextBtn').click();
-  await page.locator('[data-type="noun"]').click();
-  await page.locator('#answerInput').fill('전주비빔밥');
-  await page.locator('#checkBtn').click();
-  await expect(page.locator('#feedback')).toContainText('전주는 전주비빔밥으로 유명해요.');
+  await expect(page.locator('[data-review-progress-label]')).toHaveText('5 / 20');
+  await page.locator('#answerInput').fill('울릉도는 오징어으로 유명해요');
+  await page.locator('#primaryAction').click();
+  await expect(page.locator('#reviewFeedback')).toContainText('목표 표현');
+  await page.locator('#answerInput').fill('울릉도는 오징어로 유명해요');
+  await page.locator('#primaryAction').click();
+  await expect(page.locator('#reviewFeedback')).toContainText('맞아요');
+
+  await page.locator('#primaryAction').click();
+  await page.locator('#answerInput').fill('전주는 비빔밥으로 유명해요');
+  await page.locator('#primaryAction').click();
+  await expect(page.locator('#reviewFeedback')).toContainText('맞아요');
 });
 
 test('문법 4 워크북 퀴즈는 손상된 기록을 덮어쓰지 않고 복구 선택지를 보여 준다', async ({ page }) => {
@@ -739,7 +738,7 @@ test('핵심 C16 문법 동선은 320/390 및 200% 확대 환경에서 목표와
     { path: '/c16/grammar2.html', action: '#choices button' },
     { path: '/c16/grammar3.html', action: '#choices button' },
     { path: '/c16/grammar4.html', action: '#choices button' },
-    { path: '/c16/grammar4-workbook-sentence-quiz.html', action: '[data-type]' },
+    { path: '/c16/grammar4-workbook-sentence-quiz.html', action: '#answerInput' },
     { path: '/c16/grammar1-size-match.html', action: '#choiceList .choice-card' },
     { path: '/c16/grammar2-card-builder-pro.html', action: '[data-reason]' },
     { path: '/c16/grammar3-worth-gauge.html', action: '[data-activity]' },

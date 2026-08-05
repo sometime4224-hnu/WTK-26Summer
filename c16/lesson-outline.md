@@ -1,7 +1,8 @@
 # 16과 소스 정리
 
-- 기준 PDF: `C:\Users\somet\Desktop\00.my_app_project\snukorean\3B\students_book_3B_split_by_lesson\16_lesson_16.pdf`
-- 확인 페이지: 16과 분할 PDF의 `문법과 표현 1`·`문법과 표현 2` 페이지
+- 학생용 교재 기준 PDF: `../../snukorean/3B/students_book_3B_split_by_lesson/16_lesson_16.pdf`
+- 워크북 기준 PDF: `../../snukorean/3B/서울대 한국어 workbook 3B 칼라.pdf`
+- 워크북 확인 범위: PDF 144–151쪽의 문법 1–4 연습, PDF 152–153쪽의 문형 연습
 - 단원 제목: 가야금이 사람 키만 해요
 
 ## 개요
