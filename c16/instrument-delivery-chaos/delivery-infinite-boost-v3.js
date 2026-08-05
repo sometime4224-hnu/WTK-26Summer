@@ -602,6 +602,7 @@
         power: .25,
         powerDirection: 1,
         cameraX: 0,
+        viewScale: 1,
         session: null,
         stageInfo: STAGES[0],
         instrument: INSTRUMENTS[0],
@@ -1198,6 +1199,7 @@
         runtime.power = .25;
         runtime.powerDirection = 1;
         runtime.cameraX = 0;
+        runtime.viewScale = 1;
         runtime.projectile = null;
         runtime.specialAvailable = false;
         runtime.aftershockCharges = 0;
@@ -1554,7 +1556,7 @@
         }
         projectile.specialFlash = Math.max(projectile.specialFlash, type.id === "absurd" ? 1.15 : .7);
         spawnParticles(projectile.x, projectile.y, type.color, type.id === "absurd" ? 30 : (type.id === "strong" ? 20 : 13), type.id === "absurd" ? 430 : 270);
-        showImpact(endlessCombo > 0 ? `가속 폭발 ×${endlessCombo}!!` : type.impact, (helper.x - runtime.cameraX) / runtime.width * 100, helper.y / runtime.height * 100);
+        showImpact(endlessCombo > 0 ? `가속 폭발 ×${endlessCombo}!!` : type.impact, worldToScreenX(helper.x) / runtime.width * 100, helper.y / runtime.height * 100);
         showSpeech(helperMessage, endlessCombo > 0 ? 2100 : (type.id === "absurd" ? 2500 : 1800));
         playSound(type.id === "light" ? "button" : "special");
         updateActionButton();
@@ -1690,7 +1692,7 @@
             projectile.angularVelocity += (Math.random() - .5) * 8;
             spawnParticles(obstacle.x, obstacle.y, obstacle.color, 13, 230);
             const word = strengthWord || (obstacle.shape === "triangle" ? "뾰족!" : IMPACT_WORDS[Math.floor(Math.random() * IMPACT_WORDS.length)]);
-            showImpact(word, (obstacle.x - runtime.cameraX) / runtime.width * 100, obstacle.y / runtime.height * 100);
+            showImpact(word, worldToScreenX(obstacle.x) / runtime.width * 100, obstacle.y / runtime.height * 100);
             playSound("impact");
             if (runtime.currentDestroyed === 2 || runtime.currentDestroyed === 5) {
                 showSpeech(COMEDY_LINES[runtime.currentDestroyed % COMEDY_LINES.length], 1700);
@@ -1898,7 +1900,10 @@
         }
 
         runtime.currentDistance = Math.max(0, Math.round((projectile.maxX - LAUNCH_X) / DISTANCE_SCALE));
-        const targetCamera = Math.max(0, projectile.x - runtime.width * .34);
+        const speedViewRatio = updateWorldView(projectile, dt);
+        const speedViewProfile = getSpeedViewProfile();
+        const desiredProjectileX = runtime.width * (.32 - speedViewRatio * .10);
+        const targetCamera = Math.max(0, projectile.x - desiredProjectileX);
         const actionInProgress = projectile.actionPulse > 0
             || projectile.pianoSmashTimer > 0
             || projectile.rocketTimer > 0
@@ -1906,7 +1911,16 @@
             || projectile.drumTimer > 0
             || projectile.specialTimer > 0
             || projectile.absurdTimer > 0;
-        runtime.cameraX += (targetCamera - runtime.cameraX) * Math.min(1, dt * (actionInProgress ? 14 : 4.8));
+        const cameraFollow = (actionInProgress ? 14 : 5.2) + speedViewRatio * 24;
+        runtime.cameraX += (targetCamera - runtime.cameraX) * Math.min(1, dt * cameraFollow);
+        const anchor = worldViewAnchorX();
+        // Long instruments can extend far past their physics radius while rotating.
+        // Every viewport keeps an immediate right-side safety margin for sudden boosts.
+        const maxScreenX = runtime.width * speedViewProfile.rightLimit;
+        const maxLogicalX = anchor + (maxScreenX - anchor) / runtime.viewScale;
+        if (projectile.x - runtime.cameraX > maxLogicalX) {
+            runtime.cameraX = Math.max(0, projectile.x - maxLogicalX);
+        }
         updateHud();
 
         const speed = Math.hypot(projectile.vx, projectile.vy);
@@ -2064,6 +2078,8 @@
         saveRecord("진행 중인 배달을 정리함");
         runtime.session = null;
         runtime.projectile = null;
+        runtime.cameraX = 0;
+        runtime.viewScale = 1;
         runtime.currentDistance = 0;
         runtime.currentScore = 0;
         updateRecordDisplay();
@@ -2085,6 +2101,8 @@
         record = createDefaultRecord();
         runtime.session = null;
         runtime.projectile = null;
+        runtime.cameraX = 0;
+        runtime.viewScale = 1;
         applySettings();
         updateRecordDisplay();
         updateHud();
@@ -2113,6 +2131,59 @@
         if (runtime.projectile && runtime.state !== "flying") {
             runtime.projectile.y = groundAt(runtime.projectile.x) - runtime.projectile.radius;
         }
+    }
+
+    function getSpeedViewProfile() {
+        if (runtime.width <= 480 && runtime.height > runtime.width) {
+            return { mode: "portrait", maxZoomOut: .22, rightLimit: .68 };
+        }
+        if (runtime.height <= 520 && runtime.width > runtime.height) {
+            return { mode: "landscape", maxZoomOut: .16, rightLimit: .76 };
+        }
+        if (runtime.width <= 1024) {
+            return { mode: "tablet", maxZoomOut: .14, rightLimit: .76 };
+        }
+        return { mode: "desktop", maxZoomOut: .10, rightLimit: .80 };
+    }
+
+    function worldViewAnchorX() {
+        return runtime.width * .28;
+    }
+
+    function worldViewLeft() {
+        const anchor = worldViewAnchorX();
+        return anchor - anchor / Math.max(.76, runtime.viewScale);
+    }
+
+    function worldViewRight() {
+        const anchor = worldViewAnchorX();
+        return anchor + (runtime.width - anchor) / Math.max(.76, runtime.viewScale);
+    }
+
+    function worldViewBottom() {
+        return runtime.groundY + (runtime.height - runtime.groundY) / Math.max(.76, runtime.viewScale) + 12;
+    }
+
+    function worldToScreenX(worldX) {
+        const anchor = worldViewAnchorX();
+        const logicalX = worldX - runtime.cameraX;
+        return anchor + (logicalX - anchor) * runtime.viewScale;
+    }
+
+    function applyWorldViewTransform() {
+        const anchor = worldViewAnchorX();
+        ctx.translate(anchor, runtime.groundY);
+        ctx.scale(runtime.viewScale, runtime.viewScale);
+        ctx.translate(-anchor, -runtime.groundY);
+    }
+
+    function updateWorldView(projectile, dt) {
+        const forwardSpeed = Math.max(0, projectile?.vx || 0);
+        const speedRatio = Math.max(0, Math.min(1, (forwardSpeed - 1200) / 4200));
+        const targetScale = 1 - speedRatio * getSpeedViewProfile().maxZoomOut;
+        runtime.viewScale += (targetScale - runtime.viewScale) * Math.min(1, dt * 5.5);
+        if (Math.abs(runtime.viewScale - 1) < .002) runtime.viewScale = 1;
+        return speedRatio;
     }
 
     function roundedRect(context, x, y, width, height, radius) {
@@ -2256,17 +2327,20 @@
     }
 
     function drawGround() {
-        const start = Math.max(0, runtime.cameraX - 40);
-        const end = runtime.cameraX + runtime.width + 50;
+        const visibleLeft = worldViewLeft();
+        const visibleRight = worldViewRight();
+        const start = Math.max(0, runtime.cameraX + visibleLeft - 40);
+        const end = runtime.cameraX + visibleRight + 50;
+        const bottom = worldViewBottom();
         const step = 14;
         ctx.beginPath();
-        ctx.moveTo(start - runtime.cameraX, runtime.height + 10);
+        ctx.moveTo(start - runtime.cameraX, bottom);
         for (let x = start; x <= end; x += step) {
             ctx.lineTo(x - runtime.cameraX, groundAt(x));
         }
-        ctx.lineTo(end - runtime.cameraX, runtime.height + 10);
+        ctx.lineTo(end - runtime.cameraX, bottom);
         ctx.closePath();
-        ctx.fillStyle = surfaceAt(start + runtime.width / 2).color;
+        ctx.fillStyle = surfaceAt(runtime.cameraX + (visibleLeft + visibleRight) / 2).color;
         ctx.fill();
 
         for (const surface of runtime.surfaces) {
@@ -2274,11 +2348,11 @@
             const from = Math.max(start, surface.from);
             const to = Math.min(end, surface.to);
             ctx.beginPath();
-            ctx.moveTo(from - runtime.cameraX, runtime.height + 10);
+            ctx.moveTo(from - runtime.cameraX, bottom);
             for (let x = from; x <= to + step; x += step) {
                 ctx.lineTo(Math.min(x, to) - runtime.cameraX, groundAt(Math.min(x, to)));
             }
-            ctx.lineTo(to - runtime.cameraX, runtime.height + 10);
+            ctx.lineTo(to - runtime.cameraX, bottom);
             ctx.closePath();
             ctx.fillStyle = surface.color;
             ctx.fill();
@@ -2327,7 +2401,7 @@
         for (const surface of runtime.surfaces) {
             const center = (surface.from + surface.to) / 2;
             const sx = center - runtime.cameraX;
-            if (sx < -100 || sx > runtime.width + 100) continue;
+            if (sx < visibleLeft - 100 || sx > visibleRight + 100) continue;
             const textWidth = ctx.measureText(surface.name).width + 20;
             ctx.fillStyle = "rgba(255,250,240,.92)";
             ctx.strokeStyle = "#17213b";
@@ -2342,7 +2416,7 @@
 
     function drawShape(obstacle) {
         const x = obstacle.x - runtime.cameraX;
-        if (x < -obstacle.radius * 2 || x > runtime.width + obstacle.radius * 2) return;
+        if (x < worldViewLeft() - obstacle.radius * 2 || x > worldViewRight() + obstacle.radius * 2) return;
         if (obstacle.destroyed) return;
         ctx.save();
         ctx.translate(x, obstacle.y);
@@ -2387,7 +2461,7 @@
     function drawHelper(helper, time) {
         if (helper.used) return;
         const x = helper.x - runtime.cameraX;
-        if (x < -helper.radius * 2.4 || x > runtime.width + helper.radius * 2.4) return;
+        if (x < worldViewLeft() - helper.radius * 2.4 || x > worldViewRight() + helper.radius * 2.4) return;
         const y = helper.y + (record.settings.reducedEffects ? 0 : Math.sin(time * .004 + helper.bob) * 6);
         const scale = helper.radius / HELPER_TYPES[helper.type].radius;
         ctx.save();
@@ -2515,7 +2589,7 @@
         for (const [progress, label] of landmarks) {
             const worldX = LAUNCH_X + (worldEnd - LAUNCH_X) * progress;
             const x = worldX - runtime.cameraX;
-            if (x < -170 || x > runtime.width + 170) continue;
+            if (x < worldViewLeft() - 170 || x > worldViewRight() + 170) continue;
             const ground = groundAt(worldX);
             const percent = Math.round(progress * 100);
             ctx.save();
@@ -2541,13 +2615,13 @@
 
     function drawEndlessMarkers() {
         const worldEnd = getStageWorldEnd();
-        if (runtime.cameraX + runtime.width < worldEnd - 100) return;
+        if (runtime.cameraX + worldViewRight() < worldEnd - 100) return;
         const firstIndex = Math.max(0, Math.floor((runtime.cameraX - worldEnd) / ENDLESS_CHUNK_LENGTH) - 1);
-        const lastIndex = firstIndex + Math.ceil(runtime.width / ENDLESS_CHUNK_LENGTH) + 3;
+        const lastIndex = firstIndex + Math.ceil((worldViewRight() - worldViewLeft()) / ENDLESS_CHUNK_LENGTH) + 3;
         for (let index = firstIndex; index <= lastIndex; index += 1) {
             const worldX = worldEnd + 540 + index * ENDLESS_CHUNK_LENGTH;
             const x = worldX - runtime.cameraX;
-            if (x < -150 || x > runtime.width + 150) continue;
+            if (x < worldViewLeft() - 150 || x > worldViewRight() + 150) continue;
             const ground = groundAt(worldX);
             const label = ENDLESS_SIGNS[(index + (runtime.session?.roundIndex || 0)) % ENDLESS_SIGNS.length];
             ctx.save();
@@ -2601,7 +2675,7 @@
         if (!runtime.session) return;
         const worldX = 310;
         const x = worldX - runtime.cameraX;
-        if (x < -180 || x > runtime.width + 180) return;
+        if (x < worldViewLeft() - 180 || x > worldViewRight() + 180) return;
         const ground = groundAt(worldX);
         ctx.save();
         ctx.strokeStyle = "#17213b";
@@ -2627,7 +2701,7 @@
 
     function drawLauncher() {
         const x = 105 - runtime.cameraX;
-        if (x < -180) return;
+        if (x < worldViewLeft() - 180) return;
         const ground = groundAt(105);
         ctx.save();
         ctx.strokeStyle = "#17213b";
@@ -2672,7 +2746,7 @@
     function drawVenue() {
         const worldEnd = getStageWorldEnd();
         const x = worldEnd - runtime.cameraX;
-        if (x < -260 || x > runtime.width + 300) return;
+        if (x < worldViewLeft() - 260 || x > worldViewRight() + 300) return;
         const ground = groundAt(worldEnd);
         ctx.save();
         const beacon = ctx.createLinearGradient(x, ground - 310, x, ground);
@@ -2750,7 +2824,7 @@
             const x = x0 + Math.cos(radians) * speed * t + .5 * runtime.stageInfo.wind * t * t - runtime.cameraX;
             const y = y0 - Math.sin(radians) * speed * runtime.instrument.verticalMultiplier * t
                 + .5 * runtime.stageInfo.gravity * runtime.instrument.gravityMultiplier * t * t;
-            if (y > runtime.height || x > runtime.width + 10) break;
+            if (y > runtime.height || x > worldViewRight() + 10) break;
             ctx.globalAlpha = 1 - i / 17;
             ctx.fillStyle = i % 2 ? "#fff" : "#ff7043";
             ctx.strokeStyle = "#17213b";
@@ -2928,7 +3002,7 @@
     function drawParticles() {
         for (const particle of runtime.particles) {
             const x = particle.x - runtime.cameraX;
-            if (x < -20 || x > runtime.width + 20) continue;
+            if (x < worldViewLeft() - 20 || x > worldViewRight() + 20) continue;
             ctx.globalAlpha = Math.min(1, particle.life / .28);
             ctx.fillStyle = particle.color;
             ctx.strokeStyle = "#17213b";
@@ -3080,6 +3154,8 @@
     function drawScene(time) {
         ctx.clearRect(0, 0, runtime.width, runtime.height);
         drawBackground(time);
+        ctx.save();
+        applyWorldViewTransform();
         drawGround();
         drawLandmarks();
         drawEndlessMarkers();
@@ -3130,6 +3206,7 @@
             );
         }
         drawParticles();
+        ctx.restore();
         drawBreakthroughOverlay();
     }
 
@@ -3315,6 +3392,12 @@
                 checkpointIndex: runtime.checkpointIndex,
                 surfacePattern: runtime.surfaces.map((surface) => surface.id),
                 flightSeconds: runtime.flightSeconds,
+                viewportWidth: runtime.width,
+                viewportHeight: runtime.height,
+                viewScale: runtime.viewScale,
+                viewMode: getSpeedViewProfile().mode,
+                viewRightLimit: getSpeedViewProfile().rightLimit,
+                projectileScreenX: runtime.projectile ? worldToScreenX(runtime.projectile.x) : null,
                 goalReached: runtime.goalReached,
                 endlessDistance: Math.max(0, runtime.currentDistance - (runtime.stageInfo.goalDistance || 800)),
                 endlessCombo: runtime.endlessCombo,

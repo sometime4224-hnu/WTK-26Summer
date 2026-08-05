@@ -297,6 +297,38 @@ test('가벼운·강력한·말도 안 되는 도움 효과가 실제 추진력�
   expect(errors).toEqual([]);
 });
 
+for (const view of [
+  { name: '휴대폰 세로', width: 390, height: 844, mode: 'portrait', maxScale: .96, rightLimit: .685 },
+  { name: '휴대폰 가로', width: 844, height: 390, mode: 'landscape', maxScale: .97, rightLimit: .765 },
+  { name: '태블릿', width: 1024, height: 768, mode: 'tablet', maxScale: .975, rightLimit: .765 },
+  { name: '데스크톱', width: 1440, height: 900, mode: 'desktop', maxScale: .98, rightLimit: .805 }
+]) {
+  test(`${view.name} 화면에서는 초고속 악기도 줌 아웃과 선행 카메라 안에 남는다`, async ({ page }) => {
+    const errors = collectErrors(page);
+    await page.setViewportSize({ width: view.width, height: view.height });
+    await page.goto(GAME_URL, { waitUntil: 'domcontentloaded' });
+
+    const state = await page.evaluate(() => {
+      const game = window.C16InstrumentDelivery;
+      game.startWithOrder(['trumpet', 'piano', 'guitar', 'drum', 'violin']);
+      game.quickLaunch(.9, 40);
+      game.useSpecial();
+      game.triggerHelper('strong');
+      game.triggerHelper('absurd');
+      game.advanceFlight(.8);
+      return game.getState();
+    });
+
+    expect(state.state).toBe('flying');
+    expect(state.projectileSpeed).toBeGreaterThan(2000);
+    expect(state.viewMode).toBe(view.mode);
+    expect(state.viewScale).toBeLessThan(view.maxScale);
+    expect(state.projectileScreenX).toBeGreaterThanOrEqual(0);
+    expect(state.projectileScreenX).toBeLessThanOrEqual(state.viewportWidth * view.rightLimit);
+    expect(errors).toEqual([]);
+  });
+}
+
 test('보통 발사로 첫 응원 풍선에 자연스럽게 닿는다', async ({ page }) => {
   const errors = collectErrors(page);
   await page.goto(GAME_URL, { waitUntil: 'domcontentloaded' });
