@@ -126,17 +126,17 @@ test('키보드 탐색에서 시작 버튼의 초점이 선명하게 보인다',
   expect(focusStyle.outlineWidth).toBeGreaterThanOrEqual(3);
 });
 
-test('퍼블릭 도메인 클래식 6곡을 고르고 선택한 곡을 기억한다', async ({ page }) => {
+test('퍼블릭 도메인 클래식 6곡을 고르고 신규 5곡은 완곡 악보로 연주한다', async ({ page }) => {
   const errors = collectErrors(page);
   await page.goto(GAME_URL, { waitUntil: 'domcontentloaded' });
 
   const songs = [
     { id: 'ode-to-joy', title: '환희의 송가', composer: 'L. v. 베토벤', bpm: 100, sourceId: '528' },
-    { id: 'fur-elise', title: '엘리제를 위하여', composer: 'L. v. 베토벤', bpm: 92, sourceId: '931' },
-    { id: 'eine-kleine', title: '아이네 클라이네 나흐트무지크', composer: 'W. A. 모차르트', bpm: 132, sourceId: '900' },
-    { id: 'turkish-march', title: '터키 행진곡', composer: 'W. A. 모차르트', bpm: 116, sourceId: '108' },
-    { id: 'bach-prelude', title: '프렐류드 C장조', composer: 'J. S. 바흐', bpm: 90, sourceId: '2206' },
-    { id: 'symphony-five', title: '운명 교향곡', composer: 'L. v. 베토벤', bpm: 108, sourceId: '941' }
+    { id: 'fur-elise', title: '엘리제를 위하여', composer: 'L. v. 베토벤', bpm: 72, sourceId: '931' },
+    { id: 'eine-kleine', title: '아이네 클라이네 나흐트무지크', composer: 'W. A. 모차르트', bpm: 144, sourceId: '900' },
+    { id: 'turkish-march', title: '터키 행진곡', composer: 'W. A. 모차르트', bpm: 60, sourceId: '108' },
+    { id: 'bach-prelude', title: '프렐류드 C장조', composer: 'J. S. 바흐', bpm: 60, sourceId: '5' },
+    { id: 'symphony-five', title: '운명 교향곡', composer: 'L. v. 베토벤', bpm: 192, sourceId: '941' }
   ];
 
   await expect(page.locator('#songSelect option')).toHaveCount(6);
@@ -155,6 +155,19 @@ test('퍼블릭 도메인 클래식 6곡을 고르고 선택한 곡을 기억한
     expect(state.song.bpm).toBe(song.bpm);
     expect(state.song.chartSteps).toBeGreaterThan(150);
     expect(state.song.chartNotes).toBeGreaterThan(20);
+    if (song.id !== 'ode-to-joy') {
+      expect(state.song.fullScore).toBe(true);
+      expect(state.song.looped).toBe(false);
+      expect(state.song.sourceKind).toBe('embedded-public-domain-midi');
+      expect(state.song.sourceSha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(state.song.durationMs).toBeGreaterThan(120_000);
+      expect(state.song.sourceNoteCount).toBeGreaterThan(500);
+      expect(state.song.midiTrackCount).toBeGreaterThanOrEqual(3);
+      expect(state.song.scoreAudit.totalBars).toBeGreaterThan(30);
+      expect(state.song.scoreAudit.uniqueBars / state.song.scoreAudit.totalBars).toBeGreaterThan(0.45);
+      expect(state.song.scoreAudit.openingPhraseOccurrences).toBeLessThan(state.song.scoreAudit.totalBars / 8);
+      await expect(page.locator('#menuEdition')).toContainText('완곡');
+    }
   }
 
   await page.locator('#songSelect').selectOption('turkish-march');

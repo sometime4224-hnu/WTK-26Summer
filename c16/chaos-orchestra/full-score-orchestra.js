@@ -1,15 +1,15 @@
-/* C16 Chaos Orchestra classical library runtime */
+/* C16 Chaos Orchestra full-score classical runtime */
 (() => {
     'use strict';
 
     const STORAGE_KEY = 'korean3b:c16:chaos-orchestra';
     const SCHEMA_VERSION = 1;
-    const GAME_DURATION = 60_000;
     const TARGET_NOTE_TRAVEL = 2_400;
     const COUNTDOWN_STEP = 680;
     const COUNTDOWN_LABELS = ['3', '2', '1', 'GO!'];
     const MISS_WINDOW = 220;
     const REDUCED_MOTION_QUERY = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const MIDI_LIBRARY = window.C16ClassicalMidiLibrary;
 
     const LANES = [
         { instrument: '기타', action: '튕기다', key: 'D', color: '#ff6b79', frequency: 329.63 },
@@ -60,54 +60,183 @@
         { notes: [55, 59, 62], bass: 43 }
     ]);
 
-    // The following motifs preserve the recognizable opening pitches and rhythms of
-    // their public-domain scores. Each one is repeated as a compact 60-second game cut.
-    const FUR_ELISE_THEME = Object.freeze([
-        [76, 1], [75, 1], [76, 1], [75, 1], [76, 1], [71, 1], [74, 1], [72, 1], [69, 3],
-        [60, 1], [64, 1], [69, 1], [71, 3], [64, 1], [68, 1], [71, 1], [72, 3], [64, 1],
-        [76, 1], [75, 1], [76, 1], [75, 1], [76, 1], [71, 1], [74, 1], [72, 1], [69, 3],
-        [60, 1], [64, 1], [69, 1], [71, 3], [64, 1], [72, 1], [71, 1], [69, 4]
-    ]);
-    const EINE_KLEINE_THEME = Object.freeze([
-        [79, 3], [74, 1], [79, 3], [74, 1], [79, 1], [74, 1], [79, 1], [83, 1], [86, 4],
-        [84, 3], [81, 1], [84, 3], [81, 1], [84, 1], [81, 1], [78, 1], [81, 1], [74, 4]
-    ]);
-    const TURKISH_MARCH_THEME = Object.freeze([
-        [71, 1], [69, 1], [68, 1], [69, 1], [72, 4],
-        [74, 1], [72, 1], [71, 1], [72, 1], [76, 4],
-        [77, 1], [76, 1], [75, 1], [76, 1],
-        [83, 1], [81, 1], [80, 1], [81, 1],
-        [83, 1], [81, 1], [80, 1], [81, 1], [84, 4]
-    ]);
-    const BACH_PRELUDE_THEME = Object.freeze([
-        ...[60, 64, 67, 72, 76, 67, 72, 76, 60, 64, 67, 72, 76, 67, 72, 76].map((note) => [note, 1]),
-        ...[60, 62, 69, 74, 77, 69, 74, 77, 60, 62, 69, 74, 77, 69, 74, 77].map((note) => [note, 1]),
-        ...[59, 62, 67, 74, 77, 67, 74, 77, 59, 62, 67, 74, 77, 67, 74, 77].map((note) => [note, 1]),
-        ...[60, 64, 67, 72, 76, 67, 72, 76, 60, 64, 67, 72, 76, 67, 72, 76].map((note) => [note, 1])
-    ]);
-    const FIFTH_SYMPHONY_THEME = Object.freeze([
-        [null, 1], [67, 1], [67, 1], [67, 1], [63, 5],
-        [65, 1], [65, 1], [65, 1], [62, 9],
-        [67, 1], [67, 1], [67, 1], [63, 5],
-        [75, 1], [75, 1], [75, 1], [72, 5]
-    ]);
+    function decodeBase64(value) {
+        const binary = window.atob(value);
+        return Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    }
+
+    function readUint16(bytes, offset) {
+        return (bytes[offset] << 8) | bytes[offset + 1];
+    }
+
+    function readUint32(bytes, offset) {
+        return (((bytes[offset] << 24) >>> 0)
+            | (bytes[offset + 1] << 16)
+            | (bytes[offset + 2] << 8)
+            | bytes[offset + 3]) >>> 0;
+    }
+
+    function readVariableLength(bytes, cursor) {
+        let value = 0;
+        let byte = 0;
+        do {
+            if (cursor.offset >= bytes.length) throw new Error('잘못된 MIDI 가변 길이 값입니다.');
+            byte = bytes[cursor.offset];
+            cursor.offset += 1;
+            value = (value << 7) | (byte & 0x7f);
+        } while (byte & 0x80);
+        return value;
+    }
+
+    function midiChunkName(bytes, offset) {
+        return String.fromCharCode(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]);
+    }
+
+    function parseMidiScore(encoded) {
+        const bytes = decodeBase64(encoded);
+        if (midiChunkName(bytes, 0) !== 'MThd') throw new Error('MIDI 헤더가 없습니다.');
+
+        const headerLength = readUint32(bytes, 4);
+        const trackCount = readUint16(bytes, 10);
+        const division = readUint16(bytes, 12);
+        if (division & 0x8000) throw new Error('SMPTE MIDI 시간 형식은 지원하지 않습니다.');
+
+        const notes = [];
+        const tempos = [];
+        let fileOffset = 8 + headerLength;
+        let scoreEndTick = 0;
+
+        for (let trackIndex = 0; trackIndex < trackCount; trackIndex += 1) {
+            if (midiChunkName(bytes, fileOffset) !== 'MTrk') throw new Error('MIDI 트랙이 손상되었습니다.');
+            const trackLength = readUint32(bytes, fileOffset + 4);
+            const trackEnd = fileOffset + 8 + trackLength;
+            const cursor = { offset: fileOffset + 8 };
+            const programs = Array(16).fill(0);
+            const activeNotes = new Map();
+            let tick = 0;
+            let runningStatus = 0;
+
+            const closeNote = (channel, pitch, endTick) => {
+                const key = `${channel}:${pitch}`;
+                const stack = activeNotes.get(key);
+                if (!stack?.length) return;
+                const started = stack.shift();
+                if (!stack.length) activeNotes.delete(key);
+                notes.push({
+                    track: trackIndex,
+                    channel,
+                    program: started.program,
+                    pitch,
+                    velocity: started.velocity,
+                    startTick: started.tick,
+                    durationTicks: Math.max(1, endTick - started.tick)
+                });
+            };
+
+            while (cursor.offset < trackEnd) {
+                tick += readVariableLength(bytes, cursor);
+                scoreEndTick = Math.max(scoreEndTick, tick);
+                let status = bytes[cursor.offset];
+                if (status < 0x80) {
+                    if (!runningStatus) throw new Error('MIDI 러닝 스테이터스가 손상되었습니다.');
+                    status = runningStatus;
+                } else {
+                    cursor.offset += 1;
+                    if (status < 0xf0) runningStatus = status;
+                }
+
+                if (status === 0xff) {
+                    const type = bytes[cursor.offset];
+                    cursor.offset += 1;
+                    const length = readVariableLength(bytes, cursor);
+                    if (type === 0x51 && length === 3) {
+                        tempos.push({
+                            tick,
+                            microseconds: (bytes[cursor.offset] << 16)
+                                | (bytes[cursor.offset + 1] << 8)
+                                | bytes[cursor.offset + 2]
+                        });
+                    }
+                    cursor.offset += length;
+                    if (type === 0x2f) break;
+                    continue;
+                }
+
+                if (status === 0xf0 || status === 0xf7) {
+                    cursor.offset += readVariableLength(bytes, cursor);
+                    continue;
+                }
+
+                const type = status & 0xf0;
+                const channel = status & 0x0f;
+                const first = bytes[cursor.offset];
+                cursor.offset += 1;
+                if (type === 0xc0) {
+                    programs[channel] = first;
+                    continue;
+                }
+                if (type === 0xd0) continue;
+                const second = bytes[cursor.offset];
+                cursor.offset += 1;
+
+                if (type === 0x90 && second > 0) {
+                    const key = `${channel}:${first}`;
+                    const stack = activeNotes.get(key) ?? [];
+                    stack.push({ tick, velocity: second, program: programs[channel] });
+                    activeNotes.set(key, stack);
+                } else if (type === 0x80 || (type === 0x90 && second === 0)) {
+                    closeNote(channel, first, tick);
+                }
+            }
+
+            for (const [key, stack] of activeNotes) {
+                const [channel, pitch] = key.split(':').map(Number);
+                while (stack.length) closeNote(channel, pitch, tick);
+            }
+            fileOffset = trackEnd;
+        }
+
+        const sortedTempos = tempos.length ? [...tempos] : [{ tick: 0, microseconds: 500_000 }];
+        sortedTempos.sort((left, right) => left.tick - right.tick);
+        if (sortedTempos[0].tick !== 0) sortedTempos.unshift({ tick: 0, microseconds: 500_000 });
+        const tempoMap = sortedTempos.filter((tempo, index) => (
+            index === sortedTempos.length - 1 || tempo.tick !== sortedTempos[index + 1].tick
+        ));
+
+        function tickToMilliseconds(targetTick) {
+            let elapsedMilliseconds = 0;
+            let previousTick = 0;
+            let microseconds = 500_000;
+            for (const tempo of tempoMap) {
+                if (tempo.tick > targetTick) break;
+                elapsedMilliseconds += ((tempo.tick - previousTick) * microseconds) / (division * 1_000);
+                previousTick = tempo.tick;
+                microseconds = tempo.microseconds;
+            }
+            return elapsedMilliseconds + ((targetTick - previousTick) * microseconds) / (division * 1_000);
+        }
+
+        const timedNotes = notes.map((note) => {
+            const startMs = tickToMilliseconds(note.startTick);
+            const endMs = tickToMilliseconds(note.startTick + note.durationTicks);
+            return Object.freeze({ ...note, startMs, durationMs: Math.max(1, endMs - startMs) });
+        });
+        const durationMs = Math.max(
+            tickToMilliseconds(scoreEndTick),
+            ...timedNotes.map((note) => note.startMs + note.durationMs)
+        );
+
+        return Object.freeze({
+            division,
+            trackCount,
+            tempos: Object.freeze(tempoMap.map((tempo) => Object.freeze({ ...tempo }))),
+            notes: Object.freeze(timedNotes),
+            durationMs
+        });
+    }
 
     function arrangementDuration(arrangement) {
         return arrangement.reduce((total, [, duration]) => total + duration, 0);
-    }
-
-    function fitArrangement(motif, targetSteps) {
-        const arrangement = [];
-        let cursor = 0;
-        while (cursor < targetSteps) {
-            for (const [note, duration] of motif) {
-                if (cursor >= targetSteps) break;
-                const clippedDuration = Math.min(duration, targetSteps - cursor);
-                arrangement.push(Object.freeze([note, clippedDuration]));
-                cursor += clippedDuration;
-            }
-        }
-        return Object.freeze(arrangement);
     }
 
     function buildStepEvents(arrangement, stepCount, chartEvery = 1) {
@@ -132,20 +261,167 @@
     function createSong(config) {
         const stepMs = 60_000 / (config.bpm * config.stepsPerBeat);
         const introSteps = Math.max(4, Math.round(TARGET_NOTE_TRAVEL / stepMs));
-        const arrangementSteps = Math.max(1, Math.floor(GAME_DURATION / stepMs) - introSteps);
-        const arrangement = config.loop === false
-            ? Object.freeze([...config.motif])
-            : fitArrangement(config.motif, arrangementSteps);
+        const arrangement = Object.freeze([...config.motif]);
+        const arrangementSteps = arrangementDuration(arrangement);
         const stepEvents = buildStepEvents(arrangement, arrangementSteps, config.chartEvery ?? 1);
         return Object.freeze({
             ...config,
-            duration: GAME_DURATION,
+            duration: Math.round((introSteps + arrangementSteps) * stepMs),
             stepMs,
             introSteps,
             arrangementSteps,
             arrangement,
             stepEvents,
-            chartNotes: stepEvents.filter((event) => event?.playable).length
+            chartNotes: stepEvents.filter((event) => event?.playable).length,
+            fullScore: false,
+            looped: false,
+            sourceKind: 'manual-score-sequence',
+            sourceNoteCount: arrangement.filter(([note]) => note !== null).length,
+            introNotes: Object.freeze([...config.chords[0].notes])
+        });
+    }
+
+    function selectMidiVoices(events, maxVoices = 8) {
+        const byPitch = new Map();
+        for (const event of events) {
+            const current = byPitch.get(event.note);
+            if (!current || event.velocity > current.velocity || event.duration > current.duration) {
+                byPitch.set(event.note, event);
+            }
+        }
+        const unique = [...byPitch.values()].sort((left, right) => left.note - right.note);
+        if (unique.length <= maxVoices) return Object.freeze(unique.map((event) => Object.freeze(event)));
+
+        const selected = new Map();
+        selected.set(unique[0].note, unique[0]);
+        selected.set(unique.at(-1).note, unique.at(-1));
+        const byImportance = [...unique].sort((left, right) => (
+            (right.velocity * Math.min(right.duration, 8)) - (left.velocity * Math.min(left.duration, 8))
+        ));
+        for (const event of byImportance) {
+            selected.set(event.note, event);
+            if (selected.size >= maxVoices) break;
+        }
+        return Object.freeze([...selected.values()]
+            .sort((left, right) => left.note - right.note)
+            .map((event) => Object.freeze(event)));
+    }
+
+    function buildMidiAudioEvents(score, stepMs) {
+        const scoreSteps = Math.max(1, Math.ceil(score.durationMs / stepMs));
+        const grouped = Array.from({ length: scoreSteps }, () => []);
+        for (const note of score.notes) {
+            if (note.channel === 9) continue;
+            const step = Math.max(0, Math.min(scoreSteps - 1, Math.round(note.startMs / stepMs)));
+            grouped[step].push({
+                note: note.pitch,
+                duration: Math.max(1, Math.round(note.durationMs / stepMs)),
+                velocity: note.velocity,
+                program: note.program,
+                track: note.track
+            });
+        }
+        return Object.freeze(grouped.map((events) => (
+            events.length ? selectMidiVoices(events) : null
+        )));
+    }
+
+    function buildMidiChartEvents(score, stepMs, scoreSteps, melodyTracks, chartEvery = 2) {
+        const selectedTracks = new Set(melodyTracks);
+        const melodyByStep = new Map();
+        for (const note of score.notes) {
+            if (!selectedTracks.has(note.track) || note.channel === 9) continue;
+            const step = Math.max(0, Math.min(scoreSteps - 1, Math.round(note.startMs / stepMs)));
+            const candidate = {
+                note: note.pitch,
+                duration: Math.max(1, Math.round(note.durationMs / stepMs))
+            };
+            const current = melodyByStep.get(step);
+            if (!current || candidate.note > current.note) melodyByStep.set(step, candidate);
+        }
+
+        const stepEvents = Array.from({ length: scoreSteps }, () => null);
+        let melodyIndex = 0;
+        for (const [step, event] of [...melodyByStep].sort((left, right) => left[0] - right[0])) {
+            stepEvents[step] = Object.freeze({
+                ...event,
+                playable: melodyIndex % chartEvery === 0
+            });
+            melodyIndex += 1;
+        }
+        return Object.freeze(stepEvents);
+    }
+
+    function auditMidiBars(audioEvents, barSteps) {
+        const totalBars = Math.ceil(audioEvents.length / barSteps);
+        const fingerprints = [];
+        for (let bar = 0; bar < totalBars; bar += 1) {
+            const parts = [];
+            const firstStep = bar * barSteps;
+            for (let offset = 0; offset < barSteps; offset += 1) {
+                const events = audioEvents[firstStep + offset];
+                if (!events) continue;
+                parts.push(`${offset}:${events.map((event) => event.note).join('.')}`);
+            }
+            fingerprints.push(parts.join(','));
+        }
+
+        const phraseLength = Math.min(2, fingerprints.length);
+        const openingPhrase = fingerprints.slice(0, phraseLength).join('|');
+        let openingPhraseOccurrences = 0;
+        for (let index = 0; index <= fingerprints.length - phraseLength; index += 1) {
+            if (fingerprints.slice(index, index + phraseLength).join('|') === openingPhrase) {
+                openingPhraseOccurrences += 1;
+            }
+        }
+        return Object.freeze({
+            totalBars,
+            uniqueBars: new Set(fingerprints).size,
+            openingPhraseOccurrences
+        });
+    }
+
+    function createMidiSong(config) {
+        const source = MIDI_LIBRARY?.songs?.[config.id];
+        if (!source?.data) throw new Error(`${config.title}의 공개 MIDI 악보를 불러오지 못했습니다.`);
+        const score = parseMidiScore(source.data);
+        const firstTempo = score.tempos[0]?.microseconds ?? 500_000;
+        const bpm = Math.round(60_000_000 / firstTempo);
+        const stepsPerBeat = config.stepsPerBeat ?? 4;
+        const stepMs = firstTempo / (stepsPerBeat * 1_000);
+        const introSteps = Math.max(4, Math.round(TARGET_NOTE_TRAVEL / stepMs));
+        const audioEvents = buildMidiAudioEvents(score, stepMs);
+        const arrangementSteps = audioEvents.length;
+        const stepEvents = buildMidiChartEvents(
+            score,
+            stepMs,
+            arrangementSteps,
+            config.melodyTracks,
+            config.chartEvery
+        );
+        const firstScoreChord = audioEvents.find(Boolean)?.slice(0, 4).map((event) => event.note) ?? [60, 64, 67];
+        return Object.freeze({
+            ...config,
+            bpm,
+            stepsPerBeat,
+            stepMs,
+            introSteps,
+            duration: Math.round(introSteps * stepMs + score.durationMs),
+            arrangementSteps,
+            arrangement: Object.freeze([Object.freeze([null, arrangementSteps])]),
+            stepEvents,
+            audioEvents,
+            chartNotes: stepEvents.filter((event) => event?.playable).length,
+            sourceUrl: source.pageUrl,
+            sourceKind: 'embedded-public-domain-midi',
+            sourceSha256: source.sha256,
+            sourceNoteCount: score.notes.length,
+            midiTrackCount: score.trackCount,
+            scoreDuration: Math.round(score.durationMs),
+            scoreAudit: auditMidiBars(audioEvents, config.barSteps),
+            introNotes: Object.freeze(firstScoreChord),
+            fullScore: true,
+            looped: false
         });
     }
 
@@ -167,105 +443,60 @@
             voice: 'orchestra',
             sourceUrl: 'https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=528'
         }),
-        createSong({
+        createMidiSong({
             id: 'fur-elise',
             title: '엘리제를 위하여',
             composer: 'L. v. 베토벤',
             composerLabel: '베토벤',
-            work: '바가텔 WoO 59 주제',
-            bpm: 92,
+            work: '바가텔 WoO 59 전곡',
             stepsPerBeat: 4,
             barSteps: 12,
-            motif: FUR_ELISE_THEME,
             chartEvery: 2,
-            chords: Object.freeze([
-                { notes: [57, 60, 64], bass: 45 },
-                { notes: [52, 56, 59], bass: 40 },
-                { notes: [57, 60, 64], bass: 45 },
-                { notes: [52, 57, 60], bass: 40 }
-            ]),
-            voice: 'piano',
-            sourceUrl: 'https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=931'
+            melodyTracks: Object.freeze([1])
         }),
-        createSong({
+        createMidiSong({
             id: 'eine-kleine',
             title: '아이네 클라이네 나흐트무지크',
             composer: 'W. A. 모차르트',
             composerLabel: '모차르트',
-            work: '현악 세레나데 K. 525 1악장 주제',
-            bpm: 132,
-            stepsPerBeat: 2,
-            barSteps: 8,
-            motif: EINE_KLEINE_THEME,
-            chartEvery: 1,
-            chords: Object.freeze([
-                { notes: [55, 59, 62], bass: 43 },
-                { notes: [50, 54, 57], bass: 38 },
-                { notes: [48, 52, 55], bass: 36 },
-                { notes: [50, 54, 57], bass: 38 }
-            ]),
-            voice: 'strings',
-            sourceUrl: 'https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=900'
+            work: '현악 세레나데 K. 525 1악장 전곡',
+            stepsPerBeat: 4,
+            barSteps: 16,
+            chartEvery: 3,
+            melodyTracks: Object.freeze([1])
         }),
-        createSong({
+        createMidiSong({
             id: 'turkish-march',
             title: '터키 행진곡',
             composer: 'W. A. 모차르트',
             composerLabel: '모차르트',
-            work: '피아노 소나타 K. 331 3악장 주제',
-            bpm: 116,
+            work: '피아노 소나타 K. 331 3악장 전곡',
             stepsPerBeat: 4,
-            barSteps: 16,
-            motif: TURKISH_MARCH_THEME,
+            barSteps: 8,
             chartEvery: 2,
-            chords: Object.freeze([
-                { notes: [57, 60, 64], bass: 45 },
-                { notes: [52, 56, 59], bass: 40 },
-                { notes: [57, 60, 64], bass: 45 },
-                { notes: [52, 56, 64], bass: 40 }
-            ]),
-            voice: 'bright',
-            sourceUrl: 'https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=108'
+            melodyTracks: Object.freeze([1])
         }),
-        createSong({
+        createMidiSong({
             id: 'bach-prelude',
             title: '프렐류드 C장조',
             composer: 'J. S. 바흐',
             composerLabel: '바흐',
-            work: '평균율 클라비어곡집 1권 BWV 846',
-            bpm: 90,
+            work: '평균율 클라비어곡집 1권 BWV 846 전곡',
             stepsPerBeat: 4,
-            barSteps: 8,
-            motif: BACH_PRELUDE_THEME,
+            barSteps: 16,
             chartEvery: 2,
-            chords: Object.freeze([
-                { notes: [48, 52, 55], bass: 36 },
-                { notes: [48, 50, 57], bass: 36 },
-                { notes: [47, 50, 55], bass: 35 },
-                { notes: [48, 52, 55], bass: 36 }
-            ]),
-            voice: 'baroque',
-            sourceUrl: 'https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2206'
+            melodyTracks: Object.freeze([2])
         }),
-        createSong({
+        createMidiSong({
             id: 'symphony-five',
             title: '운명 교향곡',
             composer: 'L. v. 베토벤',
             composerLabel: '베토벤',
-            work: '교향곡 5번 1악장 주제',
-            bpm: 108,
-            stepsPerBeat: 2,
+            work: '교향곡 5번 1악장 전곡',
+            stepsPerBeat: 4,
             barSteps: 8,
-            motif: FIFTH_SYMPHONY_THEME,
-            chartEvery: 1,
-            chords: Object.freeze([
-                { notes: [48, 51, 55], bass: 36 },
-                { notes: [41, 44, 48], bass: 29 },
-                { notes: [43, 47, 50], bass: 31 },
-                { notes: [48, 51, 55], bass: 36 }
-            ]),
-            voice: 'dramatic',
-            sourceUrl: 'https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=941'
+            chartEvery: 3,
+            melodyTracks: Object.freeze([8])
         })
     ]);
     const SONGS_BY_ID = new Map(SONG_LIBRARY.map((song) => [song.id, song]));
@@ -357,6 +588,7 @@
         songSelect: document.getElementById('songSelect'),
         menuSongTitle: document.getElementById('menuSongTitle'),
         menuSongWork: document.getElementById('menuSongWork'),
+        menuEdition: document.getElementById('menuEdition'),
         menuTempo: document.getElementById('menuTempo'),
         trackRibbon: document.getElementById('trackRibbon'),
         trackTitle: document.getElementById('trackTitle'),
@@ -407,7 +639,7 @@
     let powerCursor = 0;
     let lastPowerCombo = 0;
     let lastMood = '';
-    let lastAnnouncedSecond = 60;
+    let lastAnnouncedSecond = Math.ceil(SONG.duration / 1_000);
     let canvasWidth = 0;
     let canvasHeight = 0;
     let canvasDpr = 1;
@@ -524,10 +756,46 @@
             if (isGo) this.tone(990, 0.3, 'sine', 0.1, 0.04);
         }
 
+        playMidiScoreStep(step) {
+            const events = SONG.audioEvents[step];
+            const stepInBar = step % SONG.barSteps;
+            if (stepInBar % SONG.stepsPerBeat === 0) {
+                const downbeat = stepInBar === 0;
+                this.noise(downbeat ? 0.045 : 0.022, downbeat ? 0.012 : 0.0045, 0, downbeat ? 1_100 : 5_200);
+                if (downbeat) this.tone(96, 0.12, 'sine', 0.022, 0, 48);
+            }
+            if (!events?.length) return;
+
+            const polyphonyScale = 1 / Math.max(1, Math.sqrt(events.length / 2));
+            for (const event of events) {
+                let oscillatorType = 'triangle';
+                let colorGain = 0;
+                if (event.program >= 40 && event.program <= 47) {
+                    oscillatorType = 'sawtooth';
+                    colorGain = 0.008;
+                } else if (event.program >= 68 && event.program <= 79) {
+                    oscillatorType = 'sine';
+                    colorGain = 0.006;
+                } else if (event.program >= 24 && event.program <= 31) {
+                    oscillatorType = 'triangle';
+                    colorGain = 0.005;
+                }
+
+                const frequency = noteFrequency(event.note);
+                const duration = Math.max(0.07, Math.min(3.6, event.duration * (SONG.stepMs / 1_000) * 0.9));
+                const velocityGain = 0.014 + (event.velocity / 127) * 0.034;
+                const gain = velocityGain * polyphonyScale;
+                this.tone(frequency, duration, oscillatorType, gain);
+                if (colorGain > 0 && events.length <= 5) {
+                    this.tone(frequency * 1.002, duration * 0.92, 'triangle', colorGain * polyphonyScale, 0.006);
+                }
+            }
+        }
+
         playSongStep(index) {
             if (index < SONG.introSteps) {
                 if (index === 0) {
-                    SONG.chords[0].notes.forEach((note, chordTone) => {
+                    SONG.introNotes.forEach((note, chordTone) => {
                         this.tone(noteFrequency(note), Math.min(2.28, noteTravelTime / 1_000), chordTone === 1 ? 'triangle' : 'sine', 0.017, chordTone * 0.012);
                     });
                 }
@@ -542,6 +810,10 @@
             }
 
             const arrangementStep = index - SONG.introSteps;
+            if (SONG.sourceKind === 'embedded-public-domain-midi') {
+                this.playMidiScoreStep(arrangementStep);
+                return;
+            }
             const stepInBar = arrangementStep % SONG.barSteps;
             const barIndex = Math.floor(arrangementStep / SONG.barSteps);
             const chord = SONG.chords[barIndex % SONG.chords.length];
@@ -741,16 +1013,26 @@
         els.menuBestCombo.textContent = record.bestCombo.toLocaleString('ko-KR');
     }
 
+    function formatTrackLength(milliseconds) {
+        const totalSeconds = Math.max(0, Math.round(milliseconds / 1_000));
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = String(totalSeconds % 60).padStart(2, '0');
+        return `${minutes}:${seconds}`;
+    }
+
     function renderSong() {
         const menuTitle = `${SONG.composerLabel}의 「${SONG.title}」`;
         els.songSelect.value = SONG.id;
         els.menuSongTitle.textContent = menuTitle;
         els.menuSongWork.textContent = SONG.work;
+        els.menuEdition.textContent = SONG.fullScore
+            ? `완곡 ${formatTrackLength(SONG.scoreDuration)}`
+            : `${formatTrackLength(SONG.duration)} 게임 편곡`;
         els.menuTempo.textContent = String(SONG.bpm);
         els.trackTitle.textContent = `${SONG.composerLabel} · ${SONG.title}`;
         els.trackTempo.textContent = `♩=${SONG.bpm}`;
-        els.trackRibbon.setAttribute('aria-label', `현재 곡: ${SONG.composerLabel} ${SONG.title}, 분당 ${SONG.bpm}박`);
-        els.trackProgress.max = GAME_DURATION;
+        els.trackRibbon.setAttribute('aria-label', `현재 곡: ${SONG.composerLabel} ${SONG.title}, ${formatTrackLength(SONG.duration)}, 분당 ${SONG.bpm}박`);
+        els.trackProgress.max = SONG.duration;
         els.trackCreditTitle.textContent = `♪ ${SONG.composerLabel} 「${SONG.title}」 ·`;
         els.scoreSource.href = SONG.sourceUrl;
         els.scoreSource.setAttribute('aria-label', `${SONG.title} 퍼블릭 도메인 악보 출처 열기`);
@@ -792,7 +1074,7 @@
     }
 
     function canvasLabelForState(state) {
-        if (state === 'running') return `리듬 게임 진행 중. 점수 ${score}, 콤보 ${combo}, 남은 시간 ${Math.ceil((GAME_DURATION - elapsed) / 1000)}초`;
+        if (state === 'running') return `리듬 게임 진행 중. 점수 ${score}, 콤보 ${combo}, 남은 시간 ${Math.ceil((SONG.duration - elapsed) / 1000)}초`;
         if (state === 'paused') return '리듬 게임이 일시정지되었습니다.';
         if (state === 'result') return `게임 종료. 최종 점수 ${score}, 최고 콤보 ${maxCombo}`;
         return '기타, 피아노, 바이올린, 드럼의 네 레인으로 노트가 내려오는 리듬 게임 화면';
@@ -823,7 +1105,7 @@
         powerCursor = 0;
         lastPowerCombo = 0;
         lastMood = '';
-        lastAnnouncedSecond = 60;
+        lastAnnouncedSecond = Math.ceil(SONG.duration / 1_000);
         backgroundBeatGlow = 0;
         els.trackProgress.value = 0;
         els.trackRibbon.classList.remove('is-beat');
@@ -905,7 +1187,7 @@
     function finishRun(forced = false) {
         if (!['running', 'countdown'].includes(gameState)) return;
         if (gameState === 'countdown' && forced) {
-            elapsed = GAME_DURATION;
+            elapsed = SONG.duration;
         }
         const priorBest = record.bestScore;
         const isNewRecord = score > priorBest;
@@ -949,7 +1231,7 @@
 
     function scheduleNotes(currentTime) {
         const scheduleUntil = currentTime + noteTravelTime + 180;
-        while (nextTargetTime <= Math.min(scheduleUntil, GAME_DURATION + MISS_WINDOW)) {
+        while (nextTargetTime <= Math.min(scheduleUntil, SONG.duration + MISS_WINDOW)) {
             createPatternNotes(nextTargetTime, sequenceStep);
             nextTargetTime += stepDurationAt(nextTargetTime);
             sequenceStep += 1;
@@ -980,7 +1262,7 @@
         elapsed = Math.max(0, now - runStartedAt - pausedTotal);
         scheduleNotes(elapsed);
 
-        while (nextBeatTime <= elapsed && nextBeatTime < GAME_DURATION) {
+        while (nextBeatTime <= elapsed && nextBeatTime < SONG.duration) {
             audio.playSongStep(beatIndex);
             backgroundBeatGlow = beatIndex % 2 === 0 ? 0.78 : 0.34;
             if (beatIndex % SONG.stepsPerBeat === 0) {
@@ -1016,14 +1298,14 @@
 
         updateEffects(deltaMs);
         renderHud();
-        const remainingSeconds = Math.max(0, Math.ceil((GAME_DURATION - elapsed) / 1_000));
+        const remainingSeconds = Math.max(0, Math.ceil((SONG.duration - elapsed) / 1_000));
         if (remainingSeconds !== lastAnnouncedSecond && [30, 10, 5].includes(remainingSeconds)) {
             lastAnnouncedSecond = remainingSeconds;
             announce(`${remainingSeconds}초 남았습니다.`);
         }
 
-        if (elapsed >= GAME_DURATION) {
-            elapsed = GAME_DURATION;
+        if (elapsed >= SONG.duration) {
+            elapsed = SONG.duration;
             renderHud();
             finishRun();
         }
@@ -1146,11 +1428,18 @@
     }
 
     function renderHud() {
-        const remaining = Math.max(0, GAME_DURATION - elapsed);
-        els.timeValue.textContent = (remaining / 1_000).toFixed(1);
+        const remaining = Math.max(0, SONG.duration - elapsed);
+        const remainingSeconds = remaining / 1_000;
+        if (remainingSeconds >= 60) {
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = String(Math.floor(remainingSeconds % 60)).padStart(2, '0');
+            els.timeValue.textContent = `${minutes}:${seconds}`;
+        } else {
+            els.timeValue.textContent = remainingSeconds.toFixed(1);
+        }
         els.scoreValue.textContent = score.toLocaleString('ko-KR');
         els.comboValue.textContent = combo.toLocaleString('ko-KR');
-        els.trackProgress.value = Math.min(GAME_DURATION, Math.max(0, elapsed));
+        els.trackProgress.value = Math.min(SONG.duration, Math.max(0, elapsed));
         updateMood();
     }
 
@@ -1858,9 +2147,18 @@
                 stepsPerBeat: SONG.stepsPerBeat,
                 step: beatIndex,
                 chartSteps: SONG.stepEvents.length,
-                arrangementSteps: arrangementDuration(SONG.arrangement),
+                arrangementSteps: SONG.arrangementSteps,
                 chartNotes: SONG.chartNotes,
-                sourceUrl: SONG.sourceUrl
+                durationMs: SONG.duration,
+                scoreDurationMs: SONG.scoreDuration ?? SONG.duration,
+                sourceUrl: SONG.sourceUrl,
+                sourceKind: SONG.sourceKind,
+                sourceSha256: SONG.sourceSha256 ?? null,
+                sourceNoteCount: SONG.sourceNoteCount,
+                midiTrackCount: SONG.midiTrackCount ?? null,
+                fullScore: SONG.fullScore,
+                looped: SONG.looped,
+                scoreAudit: SONG.scoreAudit ?? null
             },
             librarySize: SONG_LIBRARY.length,
             storageHealthy,
