@@ -11,7 +11,7 @@
     const DISTANCE_SCALE = 18;
     const MAP_STRETCH = DISTANCE_SCALE / 12;
     const CHECKPOINTS = [.25, .5, .75];
-    const ENDLESS_CHUNK_LENGTH = 1650;
+    const ENDLESS_CHUNK_LENGTH = 2200;
     const ENDLESS_LOOKAHEAD = 7200;
     const ENDLESS_GRACE_SECONDS = 5.8;
     const ENDLESS_SURFACES = ["smooth", "soft", "bumpy", "normal", "rough"];
@@ -629,6 +629,8 @@
         endlessCrashes: 0,
         endlessChunkIndex: 0,
         endlessGeneratedUntil: 0,
+        endlessGeneratedHelpers: 0,
+        endlessGeneratedObstacles: 0,
         lastAccelerationAt: 0,
         breakthroughFlash: 0,
         lastImpactAt: 0,
@@ -643,7 +645,8 @@
         transitionTimer: 0,
         audioContext: null,
         lastFrame: performance.now(),
-        worldSeed: 1
+        worldSeed: 1,
+        debugWorldSeed: null
     };
 
     function shuffledInstrumentIds() {
@@ -1058,49 +1061,44 @@
         const worldEnd = getStageWorldEnd();
         if (runtime.endlessGeneratedUntil < worldEnd) runtime.endlessGeneratedUntil = worldEnd + 180;
         const targetX = projectileX + Math.max(ENDLESS_LOOKAHEAD, runtime.width * 10);
-        const patterns = [
-            ["light", "strong"],
-            ["strong", "light"],
-            ["light", "absurd"],
-            ["strong", "strong"],
-            ["absurd", "light"]
-        ];
+        const helperPattern = ["light", "strong", null, "light", "absurd", "strong", null, "light"];
 
         while (runtime.endlessGeneratedUntil < targetX) {
             const chunkIndex = runtime.endlessChunkIndex;
             const random = mulberry32(runtime.worldSeed + 19001 + chunkIndex * 104729);
             const chunkStart = runtime.endlessGeneratedUntil;
             const chunkLength = ENDLESS_CHUNK_LENGTH + (random() - .5) * 220;
-            const pattern = patterns[(chunkIndex + (runtime.session?.roundIndex || 0)) % patterns.length];
-            const helperPositions = [.23, .68];
+            const stageOffset = runtime.session?.roundIndex || 0;
+            const typeId = helperPattern[(chunkIndex + stageOffset) % helperPattern.length];
 
-            helperPositions.forEach((ratio, helperIndex) => {
-                const typeId = pattern[helperIndex];
+            if (typeId) {
+                const ratio = [.27, .48, .71][(chunkIndex + stageOffset) % 3];
                 const x = chunkStart + chunkLength * ratio;
-                const lane = (chunkIndex * 2 + helperIndex + (runtime.session?.roundIndex || 0)) % 4;
+                const lane = (chunkIndex + stageOffset) % 4;
                 const height = [108, 150, 205, 132][lane] + (random() - .5) * 20;
-                runtime.helpers.push(createEndlessHelper(typeId, x, height, chunkIndex * 2 + helperIndex));
-            });
+                runtime.helpers.push(createEndlessHelper(typeId, x, height, chunkIndex));
+                runtime.endlessGeneratedHelpers += 1;
+            }
 
-            [.43, .86].forEach((ratio, obstacleIndex) => {
-                const shape = SHAPES[Math.floor(random() * SHAPES.length)];
-                const radius = (27 + random() * 25) * (runtime.stageInfo.obstacleScale || 1);
-                const x = chunkStart + chunkLength * ratio;
-                const airborne = random() < Math.max(.2, runtime.stageInfo.airChance || .2);
-                runtime.obstacles.push({
-                    id: `${runtime.stageInfo.id}-endless-obstacle-${chunkIndex}-${obstacleIndex}`,
-                    shape: shape.id,
-                    name: shape.name,
-                    color: shape.color,
-                    x,
-                    y: groundAt(x) - radius - (airborne ? 65 + random() * 100 : 0),
-                    radius,
-                    rotation: random() * Math.PI,
-                    destroyed: false,
-                    wobble: random() * Math.PI * 2,
-                    endless: true
-                });
+            const obstacleRatio = [.41, .62, .83][(chunkIndex + stageOffset) % 3];
+            const shape = SHAPES[Math.floor(random() * SHAPES.length)];
+            const radius = (27 + random() * 25) * (runtime.stageInfo.obstacleScale || 1);
+            const x = chunkStart + chunkLength * obstacleRatio;
+            const airborne = random() < Math.max(.2, runtime.stageInfo.airChance || .2);
+            runtime.obstacles.push({
+                id: `${runtime.stageInfo.id}-endless-obstacle-${chunkIndex}`,
+                shape: shape.id,
+                name: shape.name,
+                color: shape.color,
+                x,
+                y: groundAt(x) - radius - (airborne ? 65 + random() * 100 : 0),
+                radius,
+                rotation: random() * Math.PI,
+                destroyed: false,
+                wobble: random() * Math.PI * 2,
+                endless: true
             });
+            runtime.endlessGeneratedObstacles += 1;
 
             runtime.endlessChunkIndex += 1;
             runtime.endlessGeneratedUntil = chunkStart + chunkLength;
@@ -1137,6 +1135,8 @@
         runtime.endlessCrashes = 0;
         runtime.endlessChunkIndex = 0;
         runtime.endlessGeneratedUntil = getStageWorldEnd() + 180;
+        runtime.endlessGeneratedHelpers = 0;
+        runtime.endlessGeneratedObstacles = 0;
         runtime.breakthroughFlash = 1.6;
         runtime.currentScore += 1600 + (runtime.session?.roundIndex || 0) * 400;
         runtime.aftershockCharges = 3;
@@ -1165,8 +1165,9 @@
         saveRecord(message);
     }
 
-    function startSession(customOrder = null) {
+    function startSession(customOrder = null, debugWorldSeed = null) {
         playSound("button");
+        runtime.debugWorldSeed = Number.isFinite(debugWorldSeed) ? Math.round(debugWorldSeed) : null;
         if (customOrder) {
             runtime.session = createSession(customOrder);
         } else if (record.activeRun) {
@@ -1218,13 +1219,17 @@
         runtime.endlessCrashes = 0;
         runtime.endlessChunkIndex = 0;
         runtime.endlessGeneratedUntil = 0;
+        runtime.endlessGeneratedHelpers = 0;
+        runtime.endlessGeneratedObstacles = 0;
         runtime.lastAccelerationAt = 0;
         runtime.breakthroughFlash = 0;
         runtime.helperHits = { light: 0, strong: 0, absurd: 0 };
         runtime.specialUsedAt = -1;
         runtime.actionImpactLockUntil = 0;
         runtime.actionSpeechLockUntil = 0;
-        runtime.worldSeed = Date.now() % 2147483647 + session.roundIndex * 997;
+        runtime.worldSeed = runtime.debugWorldSeed === null
+            ? Date.now() % 2147483647 + session.roundIndex * 997
+            : runtime.debugWorldSeed + session.roundIndex * 997;
         runtime.helpers = createHelpers(runtime.worldSeed + 77, runtime.stageInfo);
         runtime.obstacles = createObstacles(runtime.worldSeed, runtime.stageInfo).filter((obstacle) => (
             !runtime.helpers.some((helper) => Math.abs(obstacle.x - helper.x) < obstacle.radius + helper.radius + 72)
@@ -3405,6 +3410,8 @@
                 endlessCrashes: runtime.endlessCrashes,
                 endlessChunkIndex: runtime.endlessChunkIndex,
                 endlessGeneratedUntil: runtime.endlessGeneratedUntil,
+                endlessGeneratedHelpers: runtime.endlessGeneratedHelpers,
+                endlessGeneratedObstacles: runtime.endlessGeneratedObstacles,
                 accelerationGraceRemaining: runtime.goalReached
                     ? Math.max(0, ENDLESS_GRACE_SECONDS - (runtime.flightSeconds - runtime.lastAccelerationAt))
                     : 0,
@@ -3433,6 +3440,8 @@
                 bowActive: Boolean(runtime.instrument.id === "violin" && runtime.projectile?.specialTimer > 0),
                 blowActive: Boolean(runtime.instrument.id === "trumpet" && runtime.projectile?.rocketTimer > 0),
                 helperHits: { ...runtime.helperHits },
+                finiteHelperCount: runtime.helpers.filter((helper) => !helper.endless).length,
+                endlessHelperCount: runtime.helpers.filter((helper) => helper.endless && !helper.used).length,
                 helpersRemaining: runtime.helpers.filter((helper) => !helper.used).map((helper) => helper.type),
                 projectileSpeed: runtime.projectile ? Math.round(Math.hypot(runtime.projectile.vx, runtime.projectile.vy)) : 0,
                 projectileVx: runtime.projectile ? Math.round(runtime.projectile.vx) : 0,
@@ -3444,7 +3453,7 @@
             };
         },
         start: () => startSession(),
-        startWithOrder: (order) => startSession(Array.isArray(order) ? order : null),
+        startWithOrder: (order, debugWorldSeed) => startSession(Array.isArray(order) ? order : null, debugWorldSeed),
         quickLaunch,
         useSpecial,
         useAftershock,

@@ -364,6 +364,7 @@ test('서로 다른 이름과 물리 규칙을 가진 다섯 스테이지가 차
       name: stage.stageName,
       total: stage.totalStages,
       physics: `${stage.stageGravity}/${stage.stageWind}/${stage.obstacleCount}`,
+      helperCount: stage.finiteHelperCount,
       helpers: [...new Set(stage.helpersRemaining)].sort(),
       goal: stage.goalDistance,
       worldEnd: stage.worldEnd,
@@ -384,6 +385,7 @@ test('서로 다른 이름과 물리 규칙을 가진 다섯 스테이지가 차
   expect(seen.map((stage) => stage.name)).toEqual(expectedNames);
   expect(seen.every((stage) => stage.total === 5)).toBe(true);
   expect(new Set(seen.map((stage) => stage.physics)).size).toBe(5);
+  expect(seen.map((stage) => stage.helperCount)).toEqual([10, 11, 11, 12, 12]);
   expect(seen.every((stage) => stage.helpers.join(',') === 'absurd,light,strong')).toBe(true);
   expect(seen.map((stage) => stage.goal)).toEqual([800, 950, 1100, 1300, 1550]);
   expect(seen.map((stage) => stage.timeLimit)).toEqual([19, 21, 22, 24, 26]);
@@ -401,16 +403,35 @@ test('모든 악기가 목표를 돌파한 뒤 무한 가속을 이어 가고 �
   for (let shift = 0; shift < instruments.length; shift += 1) {
     const order = instruments.map((_, index) => instruments[(index + shift) % instruments.length]);
     await page.goto(GAME_URL, { waitUntil: 'domcontentloaded' });
-    await page.evaluate((ids) => window.C16InstrumentDelivery.startWithOrder(ids), order);
+    await page.evaluate(({ ids, seed }) => window.C16InstrumentDelivery.startWithOrder(ids, seed), {
+      ids: order,
+      seed: 1693 + shift * 10000
+    });
 
     for (let stageIndex = 0; stageIndex < 5; stageIndex += 1) {
       const state = await page.evaluate(() => {
         const game = window.C16InstrumentDelivery;
         game.quickLaunch(.65, 45);
         game.useSpecial();
-        game.advanceFlight(18);
+        for (let step = 0; step < 36; step += 1) {
+          const before = game.getState();
+          if (before.goalReached && before.state === 'flying' && step % 4 === 0) {
+            const type = ['light', 'strong', 'absurd'][Math.floor(step / 4) % 3];
+            if (!game.triggerHelper(type)) game.triggerObstacle();
+          }
+          game.advanceFlight(.5);
+        }
+        const finalState = game.getState();
+        if (finalState.goalReached && finalState.state === 'flying') game.triggerObstacle();
         return game.getState();
       });
+      expect(state.goalReached, JSON.stringify({
+        shift,
+        stageIndex,
+        instrument: order[stageIndex],
+        distance: state.distance,
+        helperHits: state.helperHits
+      })).toBe(true);
       if (shift === 0 && stageIndex === 0) {
         await expect(page.locator('#targetDistanceValue')).toHaveText('∞');
         await expect(page.getByRole('button', { name: '이 기록으로 다음 스테이지 →' })).toBeVisible();
@@ -424,6 +445,9 @@ test('모든 악기가 목표를 돌파한 뒤 무한 가속을 이어 가고 �
         reachedGoal: state.goalReached,
         endlessDistance: state.endlessDistance,
         endlessCombo: state.endlessCombo,
+        endlessChunkIndex: state.endlessChunkIndex,
+        endlessGeneratedHelpers: state.endlessGeneratedHelpers,
+        endlessGeneratedObstacles: state.endlessGeneratedObstacles,
         checkpointIndex: state.checkpointIndex,
         helperCount: Object.values(state.helperHits).reduce((sum, count) => sum + count, 0)
       });
@@ -441,6 +465,8 @@ test('모든 악기가 목표를 돌파한 뒤 무한 가속을 이어 가고 �
   expect(results.every((result) => result.distance >= result.goal)).toBe(true);
   expect(results.every((result) => result.endlessDistance > 0)).toBe(true);
   expect(results.every((result) => result.endlessCombo > 0)).toBe(true);
+  expect(results.every((result) => result.endlessGeneratedHelpers <= Math.ceil(result.endlessChunkIndex * .75))).toBe(true);
+  expect(results.every((result) => result.endlessGeneratedObstacles <= result.endlessChunkIndex)).toBe(true);
   expect(results.every((result) => result.checkpointIndex === 3)).toBe(true);
   expect(results.every((result) => result.helperCount > 0)).toBe(true);
   expect(new Set(results.map((result) => result.instrument))).toEqual(new Set(instruments));
