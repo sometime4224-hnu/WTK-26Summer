@@ -1,4 +1,4 @@
-/* C16 Chaos Orchestra full-score classical runtime */
+/* C16 Chaos Orchestra music-first classical runtime */
 (() => {
     'use strict';
 
@@ -858,24 +858,6 @@
             }
         }
 
-        playLane(laneIndex, rating) {
-            const lane = LANES[laneIndex];
-            const ratingGain = rating === 'PERFECT' ? 1 : rating === 'GREAT' ? 0.82 : 0.68;
-            if (laneIndex === 0) {
-                this.tone(lane.frequency, 0.19, 'triangle', 0.105 * ratingGain, 0, lane.frequency * 0.72);
-                this.tone(lane.frequency * 2, 0.1, 'sine', 0.042 * ratingGain, 0.01);
-            } else if (laneIndex === 1) {
-                this.tone(lane.frequency, 0.3, 'sine', 0.11 * ratingGain);
-                this.tone(lane.frequency * 2, 0.2, 'triangle', 0.05 * ratingGain, 0.012);
-            } else if (laneIndex === 2) {
-                this.tone(lane.frequency, 0.36, 'sawtooth', 0.052 * ratingGain, 0, lane.frequency * 1.015);
-                this.tone(lane.frequency * 0.5, 0.32, 'triangle', 0.055 * ratingGain, 0.01);
-            } else {
-                this.tone(150, 0.13, 'sine', 0.11 * ratingGain, 0, 58);
-                this.noise(0.12, 0.075 * ratingGain, 0, 500);
-            }
-        }
-
         playMiss() {
             this.tone(150, 0.14, 'sawtooth', 0.04, 0, 72);
         }
@@ -1367,7 +1349,7 @@
         score += Math.round(base * comboMultiplier * powerMultiplier * crowdMultiplier);
 
         createHitBurst(note, rating);
-        audio.playLane(note.lane, rating);
+        // Keep input feedback visual so fixed key sounds never mask the score.
         if (!automated) showJudgement(rating);
         else if (combo % 4 === 0) showJudgement('AUTO');
 
@@ -2137,6 +2119,9 @@
             combo,
             maxCombo,
             notes: notes.filter((note) => !note.hit && !note.missed).length,
+            activeTargets: notes
+                .filter((note) => !note.hit && !note.missed)
+                .map((note) => ({ lane: note.lane, targetTime: note.targetTime })),
             activePower: activePower?.id ?? null,
             song: {
                 id: SONG.id,
@@ -2161,6 +2146,7 @@
                 scoreAudit: SONG.scoreAudit ?? null
             },
             librarySize: SONG_LIBRARY.length,
+            inputAudioMode: 'visual-only',
             storageHealthy,
             storageHadRecord,
             animationFrame: rafId

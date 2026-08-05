@@ -218,6 +218,40 @@ test('네 악기 연주자가 입력에 반응하고 연주동사 활자를 보�
   expect(errors).toEqual([]);
 });
 
+test('입력 판정은 음악 위에 별도의 타건음을 추가하지 않는다', async ({ page }) => {
+  await page.addInitScript(() => {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const originalCreateOscillator = AudioContextClass.prototype.createOscillator;
+    window.__c16OscillatorCount = 0;
+    AudioContextClass.prototype.createOscillator = function trackedCreateOscillator() {
+      window.__c16OscillatorCount += 1;
+      return originalCreateOscillator.call(this);
+    };
+  });
+
+  await page.goto(GAME_URL, { waitUntil: 'domcontentloaded' });
+  await page.locator('#songSelect').selectOption('fur-elise');
+  expect((await page.evaluate(() => window.C16ChaosOrchestra.getState())).inputAudioMode).toBe('visual-only');
+  await startGame(page);
+
+  let observedHit = null;
+  await expect.poll(async () => {
+    const result = await page.evaluate(() => {
+      const state = window.C16ChaosOrchestra.getState();
+      const target = state.activeTargets.find((note) => Math.abs(note.targetTime - state.elapsed) <= 180);
+      if (!target) return null;
+      const before = window.__c16OscillatorCount;
+      const hit = window.C16ChaosOrchestra.hitLane(target.lane);
+      return { hit, addedOscillators: window.__c16OscillatorCount - before };
+    });
+    if (result) observedHit = result;
+    return result?.hit ?? false;
+  }, { timeout: 8_000 }).toBe(true);
+
+  expect(observedHit.addedOscillators).toBe(0);
+});
+
 test('정상 기록은 첫 로드에서 덮어쓰지 않고 그대로 복원한다', async ({ page }) => {
   const seededRecord = {
     schemaVersion: 1,
