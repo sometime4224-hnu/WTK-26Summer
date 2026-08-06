@@ -54,6 +54,71 @@ test("meaning map gives each target word one clear visual rule", async ({ page }
   await expect(page.getByText("실제 사실 ≠ 내가 이해한 내용", { exact: true })).toBeVisible();
 });
 
+test("meaning cards switch independently between the original and opposite situations", async ({ page }) => {
+  await page.goto("/c17/vocab-support-meaning-map.html", { waitUntil: "domcontentloaded" });
+
+  const byChance = page.locator("#by-chance");
+  const honestly = page.locator("#honestly");
+  const disappointed = page.locator("#disappointed");
+  const misunderstand = page.locator("#misunderstand");
+
+  await byChance.getByRole("button", { name: "우연히 카드에서 반대 상황 보기" }).click();
+  await expect(byChance.getByRole("heading", { level: 2 })).toHaveText("일부러");
+  await expect(byChance.getByText("목적 있음 + 의도해서 행동함", { exact: true })).toBeVisible();
+  await expect(byChance.locator("img")).toHaveAttribute("src", /intentionally\.svg/);
+  await expect(byChance.getByText("미리 정한 목적이 있어서 의도적으로 행동합니다.", { exact: true })).toBeVisible();
+  await expect(byChance.getByRole("button", { name: "일부러 카드에서 원래 말 보기" })).toHaveAttribute("aria-pressed", "true");
+  await expect(honestly.getByRole("heading", { level: 2 })).toHaveText("솔직히");
+
+  const honestlyToggle = honestly.getByRole("button", { name: "솔직히 카드에서 반대 상황 보기" });
+  await honestlyToggle.focus();
+  await honestlyToggle.press("Enter");
+  await expect(honestly.getByRole("heading", { level: 2 })).toHaveText("솔직하지 않게");
+  await expect(honestly.locator("img")).toHaveAttribute("src", /not-honestly\.svg/);
+
+  await disappointed.getByRole("button", { name: "실망하다 카드에서 반대 상황 보기" }).click();
+  await expect(disappointed.getByRole("heading", { level: 2 })).toHaveText("만족하다");
+  await expect(disappointed.locator("img")).toHaveAttribute("src", /satisfied\.svg/);
+
+  await misunderstand.getByRole("button", { name: "오해하다 카드에서 반대 상황 보기" }).click();
+  await expect(misunderstand.getByRole("heading", { level: 2 })).toHaveText("제대로 이해하다");
+  await expect(misunderstand.locator("img")).toHaveAttribute("src", /understand-correctly\.svg/);
+
+  await byChance.getByRole("button", { name: "일부러 카드에서 원래 말 보기" }).click();
+  await expect(byChance.getByRole("heading", { level: 2 })).toHaveText("우연히");
+  await expect(byChance.getByRole("button", { name: "우연히 카드에서 반대 상황 보기" })).toHaveAttribute("aria-pressed", "false");
+});
+
+test("meaning card sides survive reload and the page-scoped reset restores the originals", async ({ page }) => {
+  await page.goto("/c17/vocab-support-meaning-map.html", { waitUntil: "domcontentloaded" });
+
+  await page.locator("#by-chance [data-meaning-toggle]").click();
+  await page.locator("#disappointed [data-meaning-toggle]").click();
+  await page.reload({ waitUntil: "domcontentloaded" });
+
+  await expect(page.locator("#by-chance").getByRole("heading", { level: 2 })).toHaveText("일부러");
+  await expect(page.locator("#honestly").getByRole("heading", { level: 2 })).toHaveText("솔직히");
+  await expect(page.locator("#disappointed").getByRole("heading", { level: 2 })).toHaveText("만족하다");
+  await expect(page.locator("#misunderstand").getByRole("heading", { level: 2 })).toHaveText("오해하다");
+
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("korean3b.c17.vocab-support-meaning-map.v1")));
+  expect(saved.schemaVersion).toBe(1);
+  expect(saved.state.sides).toEqual({
+    "by-chance": "opposite",
+    honestly: "base",
+    disappointed: "opposite",
+    misunderstand: "base"
+  });
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.locator(".meaning-state-tools summary").click();
+  await page.getByRole("button", { name: "이 페이지 기록 초기화" }).click();
+  for (const word of ["우연히", "솔직히", "실망하다", "오해하다"]) {
+    await expect(page.getByRole("heading", { level: 2, name: word, exact: true })).toBeVisible();
+  }
+  expect(await page.evaluate(() => localStorage.getItem("korean3b.c17.vocab-support-meaning-map.v1"))).toBeNull();
+});
+
 for (const viewport of [
   { width: 320, height: 844 },
   { width: 390, height: 844 },
@@ -68,6 +133,12 @@ for (const viewport of [
       const onPageError = (error) => pageErrors.push(error.message);
       page.on("pageerror", onPageError);
       await page.goto(`/c17/${filename}`, { waitUntil: "domcontentloaded" });
+      if (filename === "vocab-support-meaning-map.html") {
+        const toggles = page.locator("[data-meaning-toggle]");
+        for (let index = 0; index < await toggles.count(); index += 1) {
+          await toggles.nth(index).click();
+        }
+      }
       await page.waitForFunction(() => Array.from(document.images).every((image) => image.complete));
 
       const audit = await page.evaluate(() => {

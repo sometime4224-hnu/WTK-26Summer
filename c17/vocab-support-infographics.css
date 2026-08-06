@@ -267,6 +267,58 @@ img { display: block; max-width: 100%; }
 
 .meaning-card__head { padding: 19px 20px 8px; }
 
+.meaning-card__title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.meaning-card__toggle {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid #b9cff6;
+    border-radius: 999px;
+    background: #f6f9ff;
+    color: #1d4ed8;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 900;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.meaning-card__toggle:hover {
+    border-color: #7aa7ec;
+    background: #eaf2ff;
+}
+
+.meaning-card__toggle:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+}
+
+.meaning-card__toggle[aria-pressed="true"] {
+    border-color: #c4b5fd;
+    background: #f3e8ff;
+    color: #6d28d9;
+}
+
+.meaning-card__toggle-icon {
+    font-size: 1.05rem;
+    line-height: 1;
+    transition: transform 180ms ease;
+}
+
+.meaning-card__toggle[aria-pressed="true"] .meaning-card__toggle-icon {
+    transform: rotate(180deg);
+}
+
 .meaning-card__equation {
     display: inline-flex;
     margin: 8px 0 0;
@@ -281,14 +333,26 @@ img { display: block; max-width: 100%; }
 .meaning-card:nth-child(2) .meaning-card__equation { background: var(--teal-soft); color: var(--teal); }
 .meaning-card:nth-child(3) .meaning-card__equation { background: #fff7df; color: #a16207; }
 .meaning-card:nth-child(4) .meaning-card__equation { background: var(--rose-soft); color: var(--rose); }
+.meaning-card.is-opposite .meaning-card__equation { background: #f3e8ff; color: #6d28d9; }
 
 .meaning-card figure { margin: 0; padding: 10px 14px 0; }
 
+.meaning-card__visual {
+    overflow: hidden;
+    border-radius: 17px;
+    perspective: 900px;
+}
+
 .meaning-card figure img {
     width: 100%;
+    height: auto;
     border: 1px solid #e2e8f0;
     border-radius: 17px;
     background: var(--paper);
+}
+
+.meaning-card.is-changing .meaning-card__visual {
+    animation: meaning-card-reveal 280ms ease-out;
 }
 
 .meaning-card figcaption {
@@ -299,6 +363,47 @@ img { display: block; max-width: 100%; }
 }
 
 .meaning-card .example { margin: 8px 19px 20px; }
+
+.meaning-card__status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    border: 0;
+    white-space: nowrap;
+}
+
+.meaning-state-tools {
+    margin-top: 18px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.78);
+}
+
+.meaning-state-tools summary {
+    padding: 11px 14px;
+    color: #526178;
+    font-size: 0.84rem;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.meaning-state-tools summary:focus-visible {
+    border-radius: 14px;
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
+}
+
+.meaning-state-tools .c17-state-tools { margin: 0 12px 12px; }
+
+@keyframes meaning-card-reveal {
+    from { opacity: 0.35; transform: rotateY(12deg) scale(0.985); }
+    to { opacity: 1; transform: rotateY(0) scale(1); }
+}
 
 .support-footer {
     display: flex;
@@ -347,6 +452,8 @@ img { display: block; max-width: 100%; }
     .compare-card { padding: 16px; }
     .section-heading { margin-top: 27px; }
     .meaning-card__head { padding: 16px 16px 7px; }
+    .meaning-card__title-row { align-items: center; gap: 8px; }
+    .meaning-card__toggle { padding-inline: 10px; font-size: 0.77rem; }
     .meaning-card figure { padding: 8px 9px 0; }
     .meaning-card .example { margin: 7px 14px 16px; }
     .support-footer { align-items: stretch; flex-direction: column; }
@@ -357,6 +464,13 @@ img { display: block; max-width: 100%; }
     .support-topbar a { padding-inline: 8px; font-size: 0.8rem; }
     .support-shell { width: min(100% - 16px, 1120px); }
     .support-hero h1 { font-size: 1.62rem; }
+    .meaning-card__toggle { max-width: 128px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .meaning-card__toggle-icon { transition: none; }
+    .meaning-card.is-changing .meaning-card__visual { animation: none; }
 }
 
 @media print {
