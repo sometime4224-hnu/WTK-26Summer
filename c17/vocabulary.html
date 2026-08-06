@@ -61,12 +61,20 @@
             border-bottom: 1px solid var(--line, #dbe4f0);
             backdrop-filter: blur(12px);
         }
-        .topbar a {
+        .topbar a,
+        .topbar button {
             color: var(--accent-dark, #1d4ed8);
             font-size: 13px;
             font-weight: 900;
             text-decoration: none;
         }
+        .topbar button {
+            border: 0;
+            padding: 0;
+            background: transparent;
+            cursor: not-allowed;
+        }
+        .topbar button:disabled { color: #64748b; opacity: 0.72; }
         .topbar__divider { color: #cbd5e1; font-weight: 900; }
 
         .shell { width: var(--vocab-shell-width); margin: var(--vocab-shell-margin); }
@@ -748,7 +756,7 @@
         <span class="topbar__divider">|</span>
         <a href="vocab-support-picture-quiz.html">그림퀴즈</a>
         <span class="topbar__divider">|</span>
-        <a href="rumor-game-next/index.html">보조놀이</a>
+        <button type="button" disabled aria-label="보조놀이 현재 비활성화됨">보조놀이 · 비활성</button>
     </nav>
 
     <main class="shell">

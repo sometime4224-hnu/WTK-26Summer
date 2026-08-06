@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>소문 마을 NEXT</title>
+    <title>소문 무마 게임 NEXT | 17과</title>
     <link rel="stylesheet" href="../../shared/project-topbar-compact.css" />
     <link rel="stylesheet" href="../activity-state.css" />
     <link rel="stylesheet" href="../quality.css" />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260806-c17-rumor-final6" />
   </head>
   <body>
     <nav class="top-nav" aria-label="상단 이동">
@@ -22,10 +22,11 @@
     </nav>
 
     <main class="prototype-shell">
-      <section class="game-stage" aria-label="소문 마을 NEXT 프로토타입">
-        <canvas id="gameCanvas" width="960" height="640" aria-label="소문을 무마하는 마을 게임 화면"></canvas>
+      <section class="game-stage" aria-label="소문 무마 게임 NEXT">
+        <p id="gameInstructions" class="sr-only">방향키나 WASD로 이동합니다. 가까운 사람이나 소문 앞에서 Space, Enter 또는 E를 눌러 대화하거나 무마합니다.</p>
+        <canvas id="gameCanvas" width="960" height="640" role="application" tabindex="-1" aria-label="소문을 무마하는 마을 게임 화면" aria-describedby="gameInstructions"></canvas>
 
-        <section id="titleScreen" class="title-screen" aria-label="소문 마을 NEXT 시작 화면">
+        <section id="titleScreen" class="title-screen" aria-label="소문 무마 게임 NEXT 시작 화면">
           <div class="title-screen__scene" aria-hidden="true">
             <span class="title-screen__hero"></span>
             <span class="title-screen__villain"></span>
@@ -43,15 +44,16 @@
         </section>
 
         <div class="hud">
-          <div class="hud__cluster hud__cluster--mission">
+          <div class="hud__cluster hud__cluster--mission" aria-live="polite" aria-atomic="true">
             <span class="hud__label">현재 상황</span>
             <strong id="missionTitle">빌런이 오해를 퍼뜨렸습니다</strong>
             <p id="missionDetail">NPC와 대화해서 가능성을 판단하고 오해를 풀어 주세요.</p>
           </div>
           <div class="hud__cluster hud__cluster--stats">
-            <span>확산도 <b id="spreadText">0</b></span>
+            <span id="spreadStatus" role="progressbar" aria-label="소문 확산도" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">확산도 <b id="spreadText">0</b></span>
             <span>아군 <b id="allyText">0</b>/<b id="allyTotalText">0</b></span>
             <span>소문 <b id="slimeText">0</b></span>
+            <a class="hud__exit" href="../vocabulary.html">나가기</a>
           </div>
         </div>
 
@@ -60,25 +62,34 @@
         </div>
 
         <section class="victory-card" aria-label="승리 조건">
-          <span class="panel-label">Clear Goals</span>
+          <span class="panel-label">완료 조건</span>
           <ul id="victoryList" class="victory-list"></ul>
         </section>
 
-        <button id="expressionToggle" class="expression-toggle" type="button" aria-expanded="false" aria-controls="expressionOverlay">표현집</button>
+        <button id="expressionToggle" class="expression-toggle" type="button" aria-expanded="false" aria-controls="expressionOverlay">표현·기록</button>
 
-        <section id="expressionOverlay" class="expression-overlay hidden" aria-label="인게임 표현집">
+        <section id="expressionOverlay" class="expression-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="expressionOverlayTitle">
           <div class="expression-overlay__header">
-            <span class="panel-label">Vocabulary</span>
+            <span class="panel-label">학습 도움</span>
             <button id="expressionClose" type="button">닫기</button>
           </div>
-          <h2>지금 쓰는 표현</h2>
+          <h2 id="expressionOverlayTitle">지금 쓰는 표현</h2>
+          <section class="expression-overlay__spread" aria-label="소문 확산 상태">
+            <strong>소문 확산</strong>
+            <div class="spread-meter" aria-hidden="true">
+              <span id="spreadFill"></span>
+            </div>
+            <p id="spreadHint" class="panel-copy">소문 슬라임은 시간이 지나면 늘어납니다.</p>
+          </section>
           <ul id="expressionOverlayList" class="expression-overlay__list"></ul>
+          <h2 class="expression-overlay__subheading">최근 무마 기록</h2>
+          <ol id="actionLog" class="action-log"></ol>
         </section>
 
         <div id="prompt" class="prompt hidden"></div>
         <div id="toast" class="toast hidden" aria-live="polite"></div>
 
-        <section id="dialogue" class="dialogue hidden" aria-live="polite">
+        <section id="dialogue" class="dialogue hidden" role="dialog" aria-modal="true" aria-labelledby="speakerName" aria-describedby="dialogueText dialogueClue">
           <div class="dialogue__header">
             <span id="speakerName" class="dialogue__speaker">민지</span>
             <span id="dialogueStep" class="dialogue__step">가능성 판단</span>
@@ -89,48 +100,31 @@
           <div id="dialogueOptions" class="dialogue__options"></div>
         </section>
 
-        <section id="finishCard" class="finish-card hidden" aria-live="polite">
-          <span class="finish-card__tag">Rumor Cleared</span>
-          <h1>마을의 오해가 풀렸습니다</h1>
+        <section id="finishCard" class="finish-card hidden" role="dialog" aria-modal="true" aria-labelledby="finishTitle" aria-describedby="finishSummary">
+          <span class="finish-card__tag">소문 무마 완료</span>
+          <h1 id="finishTitle">마을의 오해가 풀렸습니다</h1>
           <p>가능성 표현과 감정 표현을 사용해 소문 확산을 막았습니다.</p>
           <p id="finishSummary" class="finish-summary">정리 중입니다.</p>
-          <button id="restartButton" type="button">다시 시작</button>
+          <div class="finish-card__actions">
+            <button id="restartButton" type="button">다시 시작</button>
+            <a href="../vocabulary.html">어휘로 돌아가기</a>
+          </div>
         </section>
 
         <div class="mobile-controls" aria-label="모바일 조작">
-          <div id="joystick" class="joystick" aria-label="이동 조이스틱">
-            <span id="joystickKnob" class="joystick__knob"></span>
+          <div class="mobile-dpad" role="group" aria-label="이동 방향">
+            <button class="mobile-dpad__up" type="button" data-action="move" data-dir="up" aria-label="위로 이동">↑</button>
+            <button class="mobile-dpad__left" type="button" data-action="move" data-dir="left" aria-label="왼쪽으로 이동">←</button>
+            <button class="mobile-dpad__right" type="button" data-action="move" data-dir="right" aria-label="오른쪽으로 이동">→</button>
+            <button class="mobile-dpad__down" type="button" data-action="move" data-dir="down" aria-label="아래로 이동">↓</button>
           </div>
-          <button class="mobile-action" type="button" data-action="interact">확인</button>
+          <button id="mobileAction" class="mobile-action" type="button" data-action="interact">확인</button>
         </div>
       </section>
-
-      <aside class="side-panel">
-        <section class="panel-block">
-          <span class="panel-label">Rumor System</span>
-          <h2>소문 확산</h2>
-          <div class="spread-meter" aria-label="소문 확산도">
-            <span id="spreadFill"></span>
-          </div>
-          <p id="spreadHint" class="panel-copy">소문 슬라임은 시간이 지나면 늘어납니다.</p>
-        </section>
-
-        <section class="panel-block">
-          <span class="panel-label">Vocabulary</span>
-          <h2>오늘 쓰는 표현</h2>
-          <ul id="expressionList" class="expression-list"></ul>
-        </section>
-
-        <section class="panel-block">
-          <span class="panel-label">Town Log</span>
-          <h2>무마 기록</h2>
-          <ol id="actionLog" class="action-log"></ol>
-        </section>
-      </aside>
     </main>
 
     <script src="../activity-state.js"></script>
-    <script src="./game.js"></script>
-      <script src="../../shared/page-qr.js"></script>
-</body>
+    <script src="./game.js?v=20260806-c17-rumor-final6"></script>
+    <script src="../../shared/page-qr.js"></script>
+  </body>
 </html>

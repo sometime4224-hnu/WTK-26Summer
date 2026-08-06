@@ -12,6 +12,7 @@
     startButton: document.getElementById("startButton"),
     missionTitle: document.getElementById("missionTitle"),
     missionDetail: document.getElementById("missionDetail"),
+    spreadStatus: document.getElementById("spreadStatus"),
     spreadText: document.getElementById("spreadText"),
     allyText: document.getElementById("allyText"),
     allyTotalText: document.getElementById("allyTotalText"),
@@ -23,7 +24,6 @@
     expressionOverlay: document.getElementById("expressionOverlay"),
     expressionOverlayList: document.getElementById("expressionOverlayList"),
     expressionClose: document.getElementById("expressionClose"),
-    expressionList: document.getElementById("expressionList"),
     actionLog: document.getElementById("actionLog"),
     prompt: document.getElementById("prompt"),
     toast: document.getElementById("toast"),
@@ -37,8 +37,7 @@
     finishCard: document.getElementById("finishCard"),
     finishSummary: document.getElementById("finishSummary"),
     restartButton: document.getElementById("restartButton"),
-    joystick: document.getElementById("joystick"),
-    joystickKnob: document.getElementById("joystickKnob")
+    mobileAction: document.getElementById("mobileAction")
   };
 
   const WORLD = { width: 1660, height: 1060 };
@@ -50,6 +49,9 @@
   const MAX_SLIMES = 34;
   const ALLY_MAX_LEVEL = 3;
   const ENCOURAGE_COOLDOWN = 6;
+  const CHECKPOINT_VERSION = 2;
+  const AUTOSAVE_INTERVAL = 1.5;
+  const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
   const slimeTypes = {
     normal: {
@@ -307,7 +309,6 @@
   ];
 
   const keys = new Set();
-  const virtualStick = { active: false, pointerId: null, dx: 0, dy: 0 };
   const viewport = { width: 960, height: 640, dpr: 1 };
   const miniViewport = { width: 168, height: 126, dpr: 1 };
 
@@ -369,17 +370,26 @@
   }
 
   let gameStarted = false;
+  let progressStarted = false;
   let state = createInitialState(false);
+  let autosaveElapsed = 0;
+  let lastRenderedLog = "";
+  let lastVictoryMarkup = "";
 
   const gameStateStore = window.C17ActivityState.create("rumor-game-next", {
+    checkpointVersion: CHECKPOINT_VERSION,
     started: false,
     won: false,
+    time: 0,
     player: { x: state.player.x, y: state.player.y },
+    villain: null,
     npcs: [],
+    slimes: [],
+    activeDialogue: null,
     actionLog: []
   }, {
     validate(value) {
-      return Boolean(value)
+      const baseValid = Boolean(value)
         && typeof value.started === "boolean"
         && typeof value.won === "boolean"
         && value.player
@@ -389,6 +399,27 @@
         && value.npcs.every((npc) => npc && typeof npc.id === "string")
         && Array.isArray(value.actionLog)
         && value.actionLog.every((entry) => typeof entry === "string");
+      if (!baseValid || value.checkpointVersion == null) {
+        return baseValid;
+      }
+      return value.checkpointVersion === CHECKPOINT_VERSION
+        && Number.isFinite(value.time)
+        && value.villain
+        && Number.isFinite(value.villain.x)
+        && Number.isFinite(value.villain.y)
+        && typeof value.villain.mode === "string"
+        && Array.isArray(value.slimes)
+        && value.slimes.length <= MAX_SLIMES
+        && value.slimes.every((slime) => slime
+          && typeof slime.id === "string"
+          && Number.isFinite(slime.x)
+          && Number.isFinite(slime.y)
+          && Number.isFinite(slime.vx)
+          && Number.isFinite(slime.vy)
+          && typeof slime.type === "string"
+          && Number.isFinite(slime.hp))
+        && (value.activeDialogue == null
+          || (typeof value.activeDialogue.npcId === "string" && typeof value.activeDialogue.step === "string"));
     },
     onReset() {
       window.location.reload();
@@ -397,9 +428,24 @@
 
   function checkpointState() {
     return {
-      started: gameStarted,
+      checkpointVersion: CHECKPOINT_VERSION,
+      started: progressStarted,
       won: state.won,
+      time: Number(state.time.toFixed(2)),
       player: { x: Math.round(state.player.x), y: Math.round(state.player.y) },
+      villain: {
+        x: Math.round(state.villain.x),
+        y: Math.round(state.villain.y),
+        targetId: state.villain.targetId,
+        mode: state.villain.mode,
+        whisperTimer: state.villain.whisperTimer,
+        moteTimer: state.villain.moteTimer,
+        cooldown: state.villain.cooldown,
+        face: state.villain.face,
+        wave: state.villain.wave,
+        mood: state.villain.mood,
+        moodTimer: state.villain.moodTimer
+      },
       npcs: state.npcs.map((npc) => ({
         id: npc.id,
         status: npc.status,
@@ -409,9 +455,36 @@
         distressed: npc.distressed,
         distressTimer: npc.distressTimer,
         supportIndex: npc.supportIndex,
+        supportNeedId: npc.supportNeed?.id ?? null,
+        cleanTimer: npc.cleanTimer,
         encourageTimer: npc.encourageTimer,
         emotion: npc.emotion
       })),
+      slimes: state.slimes.slice(0, MAX_SLIMES).map((slime) => ({
+        id: slime.id,
+        x: Math.round(slime.x),
+        y: Math.round(slime.y),
+        vx: Number(slime.vx.toFixed(2)),
+        vy: Number(slime.vy.toFixed(2)),
+        r: slime.r,
+        wobble: slime.wobble,
+        bornTimer: slime.bornTimer,
+        age: slime.age,
+        sourceId: slime.sourceId,
+        word: slime.word,
+        type: slime.type,
+        hp: slime.hp,
+        maxHp: slime.maxHp
+      })),
+      activeDialogue: state.activeDialogue ? {
+        npcId: state.activeDialogue.npcId,
+        step: state.activeDialogue.step,
+        selectedPossibility: state.activeDialogue.selectedPossibility ?? null,
+        missCount: state.activeDialogue.missCount ?? 0,
+        hint: state.activeDialogue.hint ?? "",
+        feedback: state.activeDialogue.feedback ?? "",
+        clueAlert: Boolean(state.activeDialogue.clueAlert)
+      } : null,
       actionLog: state.actionLog.slice(0, 7)
     };
   }
@@ -420,8 +493,15 @@
     if (!checkpoint.started && !checkpoint.npcs.length) {
       return;
     }
+    progressStarted = Boolean(checkpoint.started);
     state.player.x = clamp(checkpoint.player.x, 0, WORLD.width);
     state.player.y = clamp(checkpoint.player.y, 0, WORLD.height);
+    const isCurrentCheckpoint = checkpoint.checkpointVersion === CHECKPOINT_VERSION;
+    if (isCurrentCheckpoint) {
+      state.time = Math.max(0, checkpoint.time);
+      state.villain = restoreVillain(checkpoint.villain);
+      state.slimes = checkpoint.slimes.map(restoreSlime).filter(Boolean).slice(0, MAX_SLIMES);
+    }
     checkpoint.npcs.forEach((savedNpc) => {
       const npc = state.npcs.find((item) => item.id === savedNpc.id);
       if (!npc) return;
@@ -432,18 +512,82 @@
       npc.distressed = Boolean(savedNpc.distressed);
       npc.distressTimer = Number(savedNpc.distressTimer) || 0;
       npc.supportIndex = Number(savedNpc.supportIndex) || 0;
+      npc.supportNeed = isCurrentCheckpoint
+        ? supportScenarios.find((scenario) => scenario.id === savedNpc.supportNeedId) ?? null
+        : null;
+      npc.cleanTimer = Number.isFinite(savedNpc.cleanTimer) ? savedNpc.cleanTimer : npc.cleanTimer;
       npc.encourageTimer = Number(savedNpc.encourageTimer) || 0;
       npc.emotion = typeof savedNpc.emotion === "string" ? savedNpc.emotion : npc.emotion;
     });
+    if (isCurrentCheckpoint && checkpoint.activeDialogue) {
+      const savedDialogue = checkpoint.activeDialogue;
+      const validStep = ["possibility", "support", "encourage", "result"].includes(savedDialogue.step);
+      const validNpc = state.npcs.some((npc) => npc.id === savedDialogue.npcId);
+      if (validStep && validNpc) {
+        state.activeDialogue = {
+          npcId: savedDialogue.npcId,
+          step: savedDialogue.step,
+          selectedPossibility: savedDialogue.selectedPossibility ?? null,
+          missCount: Math.max(0, Number(savedDialogue.missCount) || 0),
+          hint: typeof savedDialogue.hint === "string" ? savedDialogue.hint : "",
+          feedback: typeof savedDialogue.feedback === "string" ? savedDialogue.feedback : "",
+          clueAlert: Boolean(savedDialogue.clueAlert)
+        };
+      }
+    }
     state.actionLog = checkpoint.actionLog.length ? checkpoint.actionLog.slice(0, 7) : state.actionLog;
     state.won = Boolean(checkpoint.won);
     state.running = false;
-    if (checkpoint.started && !checkpoint.won) {
-      refs.startButton.textContent = "이어하기";
+    if (checkpoint.started) {
+      refs.startButton.textContent = checkpoint.won ? "완료 결과 보기" : "이어하기";
     }
   }
 
+  function restoreVillain(savedVillain) {
+    const fallback = { ...state.villain };
+    const allowedModes = ["seeking", "whisper", "cooldown", "idle", "retreat"];
+    return {
+      ...fallback,
+      x: clamp(savedVillain.x, 40, WORLD.width - 40),
+      y: clamp(savedVillain.y, 64, WORLD.height - 44),
+      targetId: typeof savedVillain.targetId === "string" ? savedVillain.targetId : null,
+      mode: allowedModes.includes(savedVillain.mode) ? savedVillain.mode : "seeking",
+      whisperTimer: Math.max(0, Number(savedVillain.whisperTimer) || 0),
+      moteTimer: Math.max(0, Number(savedVillain.moteTimer) || 0),
+      cooldown: Math.max(0, Number(savedVillain.cooldown) || 0),
+      face: savedVillain.face === -1 ? -1 : 1,
+      wave: Number(savedVillain.wave) || 0,
+      mood: typeof savedVillain.mood === "string" ? savedVillain.mood : fallback.mood,
+      moodTimer: Math.max(0, Number(savedVillain.moodTimer) || 0)
+    };
+  }
+
+  function restoreSlime(savedSlime) {
+    if (!slimeTypes[savedSlime.type]) {
+      return null;
+    }
+    const typeMeta = slimeTypes[savedSlime.type];
+    const maxHp = Math.max(1, Math.min(typeMeta.hp, Number(savedSlime.maxHp) || typeMeta.hp));
+    return {
+      id: savedSlime.id,
+      x: clamp(savedSlime.x, 34, WORLD.width - 34),
+      y: clamp(savedSlime.y, 58, WORLD.height - 34),
+      vx: clamp(savedSlime.vx, -100, 100),
+      vy: clamp(savedSlime.vy, -100, 100),
+      r: clamp(Number(savedSlime.r) || 18, 12, 32),
+      wobble: Number(savedSlime.wobble) || 0,
+      bornTimer: Math.max(0, Number(savedSlime.bornTimer) || 0),
+      age: Math.max(0, Number(savedSlime.age) || 0),
+      sourceId: typeof savedSlime.sourceId === "string" ? savedSlime.sourceId : "wild",
+      word: rumorWords.includes(savedSlime.word) ? savedSlime.word : rumorWords[0],
+      type: savedSlime.type,
+      hp: clamp(Number(savedSlime.hp) || 1, 1, maxHp),
+      maxHp
+    };
+  }
+
   function saveCheckpoint() {
+    autosaveElapsed = 0;
     gameStateStore.save(checkpointState());
   }
 
@@ -496,7 +640,20 @@
   }
 
   function worldToScreen(point) {
-    return { x: point.x - state.camera.x, y: point.y - state.camera.y };
+    const offset = getWorldOffset();
+    return { x: point.x - state.camera.x + offset.x, y: point.y - state.camera.y + offset.y };
+  }
+
+  function getWorldOffset() {
+    return {
+      x: Math.max(0, (viewport.width - WORLD.width) / 2),
+      y: Math.max(0, (viewport.height - WORLD.height) / 2)
+    };
+  }
+
+  function applyWorldTransform() {
+    const offset = getWorldOffset();
+    ctx.translate(offset.x - state.camera.x, offset.y - state.camera.y);
   }
 
   function addLog(text) {
@@ -538,9 +695,10 @@
     }
   }
 
-  async function enterImmersiveMode({ fullscreen = true } = {}) {
+  async function enterImmersiveMode({ fullscreen = false } = {}) {
     document.body.classList.add("game-active");
     refs.titleScreen.classList.add("hidden");
+    setGameplayControlsAvailable(true);
     window.requestAnimationFrame(resizeCanvas);
     if (!fullscreen || document.fullscreenElement || !refs.gameStage.requestFullscreen) {
       return;
@@ -557,19 +715,32 @@
       return;
     }
     gameStarted = true;
-    state.running = true;
-    saveCheckpoint();
+    progressStarted = true;
     enterImmersiveMode(options);
-    showToast("소문이 퍼지기 시작했습니다. 가까운 NPC와 대화하세요.");
+    if (state.won) {
+      state.running = false;
+      showFinishCard({ focus: true });
+    } else {
+      state.running = true;
+      if (state.activeDialogue) {
+        renderDialogue(true);
+      } else {
+        showToast("소문이 퍼지기 시작했습니다. 가까운 NPC와 대화하세요.");
+        window.requestAnimationFrame(() => canvas.focus({ preventScroll: true }));
+      }
+    }
+    saveCheckpoint();
   }
 
-  function resetJoystick() {
-    virtualStick.active = false;
-    virtualStick.pointerId = null;
-    virtualStick.dx = 0;
-    virtualStick.dy = 0;
-    if (refs.joystickKnob) {
-      refs.joystickKnob.style.transform = "translate(-50%, -50%)";
+  function setGameplayControlsAvailable(available) {
+    canvas.tabIndex = available ? 0 : -1;
+    canvas.setAttribute("aria-hidden", String(!available));
+    for (const element of [refs.expressionToggle, document.querySelector(".hud__exit"), document.querySelector(".mobile-controls")]) {
+      if (!element) continue;
+      element.inert = !available;
+    }
+    for (const layer of refs.gameStage.querySelectorAll(".hud, .mini-map-card, .victory-card, .prompt, .toast")) {
+      layer.setAttribute("aria-hidden", String(!available));
     }
   }
 
@@ -620,27 +791,38 @@
     return 4;
   }
 
-  function getPossibilityOptions(answerId) {
+  function placeAnswerAt(optionIds, answerId, targetIndex) {
+    const ordered = optionIds.filter((id) => id !== answerId);
+    ordered.splice(clamp(targetIndex, 0, optionIds.length - 1), 0, answerId);
+    return ordered;
+  }
+
+  function getPossibilityOptions(answerId, npcId) {
     const optionPlan = {
       "no-reason": ["no-reason", "possible", "hard-to-believe", "certain"],
       "hard-to-believe": ["hard-to-believe", "certain", "no-reason", "possible"],
       possible: ["possible", "no-reason", "hard-to-believe", "certain"],
       certain: ["certain", "hard-to-believe", "possible", "no-reason"]
     };
-    return (optionPlan[answerId] ?? possibilityExpressions.map((item) => item.id))
-      .slice(0, getDialogueOptionLimit())
+    const limit = getDialogueOptionLimit();
+    const npcIndex = Math.max(0, state.npcs.findIndex((npc) => npc.id === npcId));
+    const selectedIds = (optionPlan[answerId] ?? possibilityExpressions.map((item) => item.id)).slice(0, limit);
+    return placeAnswerAt(selectedIds, answerId, npcIndex % limit)
       .map(getExpression)
       .filter(Boolean);
   }
 
-  function getSupportOptions(answerId) {
+  function getSupportOptions(answerId, npcId, scenarioId) {
     const optionPlan = {
       disappointed: ["disappointed", "argue", "misunderstand"],
       argue: ["argue", "disappointed", "misunderstand"],
       misunderstand: ["misunderstand", "argue", "disappointed"]
     };
-    return (optionPlan[answerId] ?? stateExpressionIds)
-      .slice(0, Math.min(3, getDialogueOptionLimit()))
+    const limit = Math.min(3, getDialogueOptionLimit());
+    const npcIndex = Math.max(0, state.npcs.findIndex((npc) => npc.id === npcId));
+    const scenarioIndex = Math.max(0, supportScenarios.findIndex((scenario) => scenario.id === scenarioId));
+    const selectedIds = (optionPlan[answerId] ?? stateExpressionIds).slice(0, limit);
+    return placeAnswerAt(selectedIds, answerId, (npcIndex + scenarioIndex + 1) % limit)
       .map(getRepairExpression)
       .filter(Boolean);
   }
@@ -715,7 +897,8 @@
   }
 
   function spawnParticles(x, y, color, count) {
-    for (let i = 0; i < count; i += 1) {
+    const particleCount = prefersReducedMotion ? Math.min(count, 4) : count;
+    for (let i = 0; i < particleCount; i += 1) {
       const angle = Math.random() * Math.PI * 2;
       const speed = 46 + Math.random() * 110;
       state.particles.push({
@@ -766,7 +949,8 @@
           npcId: npc.id,
           step: "support"
         };
-        renderDialogue();
+        renderDialogue(true);
+        saveCheckpoint();
         return;
       }
       if (canEncourageAlly(npc)) {
@@ -779,7 +963,8 @@
         };
         setNpcMood(npc, "listening", 1.3);
         addVisualCue(npc.x, npc.y - 76, "encourage", "#0f766e", "Lv?", 1.05);
-        renderDialogue();
+        renderDialogue(true);
+        saveCheckpoint();
         return;
       }
       if (npc.allyLevel < ALLY_MAX_LEVEL && (npc.encourageTimer ?? 0) > 0) {
@@ -801,12 +986,18 @@
     };
     setNpcMood(npc, "listening", 1.6);
     addVisualCue(npc.x, npc.y - 70, "listen", "#7c3aed", "?", 0.9);
-    renderDialogue();
+    renderDialogue(true);
+    saveCheckpoint();
   }
 
-  function closeDialogue() {
+  function closeDialogue({ focusCanvas = true } = {}) {
     state.activeDialogue = null;
     refs.dialogue.classList.add("hidden");
+    refs.gameStage.classList.remove("is-dialogue-open");
+    saveCheckpoint();
+    if (focusCanvas && gameStarted && !state.won) {
+      window.requestAnimationFrame(() => canvas.focus({ preventScroll: true }));
+    }
   }
 
   function handleOption(kind, id) {
@@ -820,19 +1011,24 @@
       return;
     }
 
+    if (kind === "continue") {
+      closeDialogue();
+      return;
+    }
+
     if (kind === "possibility") {
       if (id === npc.answer) {
         const expression = getExpression(id);
         dialogue.selectedPossibility = id;
+        dialogue.step = "result";
         dialogue.hint = "";
         dialogue.feedback = `좋아요. ${npc.possibilityReason} 그래서 "${expression.speech}"가 자연스럽습니다.`;
         dialogue.clueAlert = false;
         setNpcMood(npc, "understanding", 1.3);
         addVisualCue(npc.x, npc.y - 70, "correct", "#0f766e", "✓", 1.1);
         state.pulses.push({ x: npc.x, y: npc.y, r: 10, max: 74, color: "#0f766e", life: 0.65 });
-        showToast(`${expression.speech}: 단서를 보고 자연스럽게 대답했습니다.`);
         resolveNpc(npc, id);
-        closeDialogue();
+        renderDialogue(true);
       } else {
         const correct = getExpression(npc.answer).speech;
         dialogue.missCount = (dialogue.missCount ?? 0) + 1;
@@ -851,6 +1047,7 @@
         }
         showToast("조금 어색했어요. 단서를 보고 다시 말해 보세요.");
         renderDialogue();
+        saveCheckpoint();
       }
       return;
     }
@@ -869,6 +1066,7 @@
         addLog(`${npc.name}: 아직 마음이 흔들립니다. 힌트는 ${correct}.`);
         showToast("아직 맞는 감정 표현을 찾지 못했습니다.");
         renderDialogue();
+        saveCheckpoint();
         return;
       }
       closeDialogue();
@@ -889,6 +1087,7 @@
         addVisualCue(npc.x, npc.y - 76, "confused", "#f59e0b", "?", 1.05);
         showToast("격려 표현이 아직 어색해요. 다시 골라 보세요.");
         renderDialogue();
+        saveCheckpoint();
         return;
       }
       closeDialogue();
@@ -919,7 +1118,6 @@
     addVisualCue(npc.x + 20, npc.y - 70, "spark", "#22c55e", "✦", 1.25);
     const emotionExpression = getRepairExpression(emotionId) ?? getRepairExpression(npc.emotionAnswer ?? "misunderstand");
     addLog(`${npc.name}: ${expression.speech} → 상태는 ${emotionExpression.label} → ${resolutionExpression.label}. 소문 ${cleared}개를 함께 정화했습니다.`);
-    showToast(`${npc.name}: ${emotionExpression.label} 상태를 확인하고 ${resolutionExpression.label}했습니다.`);
     saveCheckpoint();
     checkWin();
   }
@@ -997,6 +1195,9 @@
         showToast(result.count > 1 ? "출처를 확인해서 주변 소문까지 줄였습니다." : "소문 슬라임을 직접 확인해서 줄였습니다.");
       }
       checkWin();
+      if (!state.won) {
+        saveCheckpoint();
+      }
       return;
     }
 
@@ -1022,6 +1223,7 @@
     addVisualCue(state.villain.x, state.villain.y - 72, "blocked", "#ef4444", "×", 1.25);
     addLog("주인공이 빌런의 속삭임을 막았습니다. 새 소문이 생기지 않았습니다.");
     showToast("속삭임을 막았습니다.");
+    saveCheckpoint();
   }
 
   function update(dt) {
@@ -1030,6 +1232,18 @@
     }
 
     state.time += dt;
+    state.toast.timer = Math.max(0, state.toast.timer - dt);
+    autosaveElapsed += dt;
+    const learningOverlayOpen = Boolean(state.activeDialogue)
+      || (refs.expressionOverlay && !refs.expressionOverlay.classList.contains("hidden"));
+    if (learningOverlayOpen) {
+      updateVisualFeedback(dt);
+      updateHud();
+      if (autosaveElapsed >= AUTOSAVE_INTERVAL) {
+        saveCheckpoint();
+      }
+      return;
+    }
     updatePlayer(dt);
     updateVillain(dt);
     updateNpcs(dt);
@@ -1040,6 +1254,9 @@
     updateVisualFeedback(dt);
     updateCamera();
     updateHud();
+    if (autosaveElapsed >= AUTOSAVE_INTERVAL) {
+      saveCheckpoint();
+    }
   }
 
   function updatePlayer(dt) {
@@ -1052,8 +1269,6 @@
     if (keys.has("arrowright") || keys.has("d")) dx += 1;
     if (keys.has("arrowup") || keys.has("w")) dy -= 1;
     if (keys.has("arrowdown") || keys.has("s")) dy += 1;
-    dx += virtualStick.dx;
-    dy += virtualStick.dy;
     if (dx || dy) {
       const length = Math.hypot(dx, dy);
       dx /= length;
@@ -1105,6 +1320,7 @@
         villain.mode = "cooldown";
         villain.cooldown = 0.9;
         villain.targetId = null;
+        saveCheckpoint();
       }
       return;
     }
@@ -1231,6 +1447,9 @@
               });
             }
             checkWin();
+            if (!state.won) {
+              saveCheckpoint();
+            }
           }
         }
         continue;
@@ -1368,9 +1587,24 @@
     if (!refs.victoryList) {
       return;
     }
-    refs.victoryList.innerHTML = getVictoryGoals()
+    const markup = getVictoryGoals()
       .map((goal) => `<li class="${goal.done ? "is-done" : ""}" data-goal="${goal.id}">${escapeHtml(goal.label)}</li>`)
       .join("");
+    if (markup === lastVictoryMarkup) {
+      return;
+    }
+    lastVictoryMarkup = markup;
+    refs.victoryList.innerHTML = markup;
+  }
+
+  function setTextIfChanged(element, value) {
+    if (!element) {
+      return;
+    }
+    const nextText = String(value);
+    if (element.textContent !== nextText) {
+      element.textContent = nextText;
+    }
   }
 
   function updateHud() {
@@ -1378,45 +1612,66 @@
     const distressed = state.npcs.filter((npc) => npc.distressed).length;
     const allyPower = getAllyPower();
     const spread = getSpreadScore();
-    refs.spreadText.textContent = String(spread);
-    refs.allyText.textContent = String(allies);
-    refs.allyTotalText.textContent = String(state.npcs.length);
-    refs.slimeText.textContent = String(state.slimes.length);
-    refs.spreadFill.style.width = `${spread}%`;
-    refs.spreadHint.textContent = distressed
+    setTextIfChanged(refs.spreadText, spread);
+    if (refs.spreadStatus?.getAttribute("aria-valuenow") !== String(spread)) {
+      refs.spreadStatus?.setAttribute("aria-valuenow", String(spread));
+    }
+    setTextIfChanged(refs.allyText, allies);
+    setTextIfChanged(refs.allyTotalText, state.npcs.length);
+    setTextIfChanged(refs.slimeText, state.slimes.length);
+    const spreadWidth = `${spread}%`;
+    if (refs.spreadFill.style.width !== spreadWidth) {
+      refs.spreadFill.style.width = spreadWidth;
+    }
+    setTextIfChanged(refs.spreadHint, distressed
       ? "곤란해하는 우군과 대화하면 정화 효율이 올라갑니다."
       : allies
       ? `우군 효율 합계 ${allyPower}. 우군과 다시 대화해 격려 훈련을 할 수 있습니다.`
-      : "NPC의 오해를 풀면 소문 증식을 함께 막아 줍니다.";
+      : "NPC의 오해를 풀면 소문 증식을 함께 막아 줍니다.");
 
     const prompt = getPrompt();
-    refs.prompt.textContent = prompt;
+    setTextIfChanged(refs.prompt, prompt);
     refs.prompt.classList.toggle("hidden", !prompt || Boolean(state.activeDialogue) || state.won);
-
-    refs.toast.textContent = state.toast.text;
-    refs.toast.classList.toggle("hidden", !state.toast.text || state.toast.timer <= 0);
-    if (state.toast.timer > 0) {
-      state.toast.timer -= 1 / 60;
+    if (refs.mobileAction) {
+      const mobileLabel = prompt.includes("속삭임")
+        ? "막기"
+        : prompt.includes("대화") || prompt.includes("마음") || prompt.includes("격려")
+        ? "대화"
+        : prompt.includes("무마")
+        ? "무마"
+        : "확인";
+      setTextIfChanged(refs.mobileAction, mobileLabel);
+      const mobileLabelDetail = prompt || "가까운 대상 확인";
+      if (refs.mobileAction.getAttribute("aria-label") !== mobileLabelDetail) {
+        refs.mobileAction.setAttribute("aria-label", mobileLabelDetail);
+      }
     }
+
+    setTextIfChanged(refs.toast, state.toast.text);
+    refs.toast.classList.toggle("hidden", !state.toast.text || state.toast.timer <= 0);
 
     renderVictoryGoals();
 
     const remaining = state.npcs.filter((npc) => npc.status !== "ally");
+    let missionTitle = "빌런이 오해를 퍼뜨렸습니다";
+    let missionDetail = "NPC와 대화해서 가능성을 판단하고 오해를 풀어 주세요.";
     if (state.won) {
-      refs.missionTitle.textContent = "모든 오해가 풀렸습니다";
-      refs.missionDetail.textContent = "소문은 확인과 대화로 줄어듭니다.";
+      missionTitle = "모든 오해가 풀렸습니다";
+      missionDetail = "소문은 확인과 대화로 줄어듭니다.";
     } else if (distressed) {
       const target = state.npcs.find((npc) => npc.distressed);
-      refs.missionTitle.textContent = `${target.name}의 마음 다스리기`;
-      refs.missionDetail.textContent = "머리 위 ! 표시가 뜬 우군과 대화해서 효율을 올리세요.";
+      missionTitle = `${target.name}의 마음 다스리기`;
+      missionDetail = "머리 위 ! 표시가 뜬 우군과 대화해서 효율을 올리세요.";
     } else if (allies === state.npcs.length) {
-      refs.missionTitle.textContent = "우군망을 키워 빌런 몰아내기";
-      refs.missionDetail.textContent = `우군 효율 합계 ${allyPower}. 가까운 우군을 격려해 Lv.${ALLY_MAX_LEVEL}까지 올리세요.`;
+      missionTitle = "우군망을 키워 빌런 몰아내기";
+      missionDetail = `우군 효율 합계 ${allyPower}. 가까운 우군을 격려해 Lv.${ALLY_MAX_LEVEL}까지 올리세요.`;
     } else if (remaining.length) {
       const target = remaining.sort((a, b) => b.doubt - a.doubt)[0];
-      refs.missionTitle.textContent = `${target.name}의 오해를 풀기`;
-      refs.missionDetail.textContent = `${target.emotion} 상태입니다. 단서를 보고 가능성 표현을 고르세요.`;
+      missionTitle = `${target.name}의 오해를 풀기`;
+      missionDetail = `${target.emotion} 상태입니다. 단서를 보고 가능성 표현을 고르세요.`;
     }
+    setTextIfChanged(refs.missionTitle, missionTitle);
+    setTextIfChanged(refs.missionDetail, missionDetail);
   }
 
   function getPrompt() {
@@ -1452,7 +1707,7 @@
     return button;
   }
 
-  function renderDialogue() {
+  function renderDialogue(focusFirst = false) {
     const dialogue = state.activeDialogue;
     if (!dialogue) {
       closeDialogue();
@@ -1465,6 +1720,7 @@
     }
 
     refs.dialogue.classList.remove("hidden");
+    refs.gameStage.classList.add("is-dialogue-open");
     refs.speakerName.textContent = npc.name;
     refs.dialogueOptions.innerHTML = "";
     refs.dialogueClue.classList.toggle("dialogue__clue--alert", Boolean(dialogue.clueAlert));
@@ -1475,9 +1731,29 @@
       refs.dialogueStep.textContent = "가능성 판단";
       refs.dialogueText.textContent = `${npc.name}: "${npc.rumor}"`;
       refs.dialogueClue.textContent = dialogue.hint || `단서: ${npc.clue} 소문을 믿을 수 있는 정도에 맞는 가능성 표현을 고르세요.`;
-      for (const expression of getPossibilityOptions(npc.answer)) {
+      for (const expression of getPossibilityOptions(npc.answer, npc.id)) {
         refs.dialogueOptions.appendChild(createOptionButton("expression", expression, () => handleOption("possibility", expression.id)));
       }
+      focusFirstDialogueOption(focusFirst);
+      return;
+    }
+
+    if (dialogue.step === "result") {
+      const expression = getExpression(dialogue.selectedPossibility ?? npc.answer);
+      const emotionExpression = getRepairExpression(npc.emotionAnswer);
+      const resolutionExpression = getRepairExpression(npc.resolutionAnswer ?? "solve");
+      refs.dialogueStep.textContent = "확인 완료";
+      refs.dialogueText.textContent = `${npc.name}: "${npc.repairText}"`;
+      refs.dialogueClue.textContent = `가능성 표현 “${expression.speech}”: ${npc.possibilityReason}`;
+      refs.dialogueFeedback.textContent = `상태 표현 “${emotionExpression.speech}”: ${npc.emotionReason} 해결 표현 “${resolutionExpression.speech}”: ${npc.resolutionReason}`;
+      refs.dialogueFeedback.classList.remove("hidden");
+      const continueButton = document.createElement("button");
+      continueButton.type = "button";
+      continueButton.dataset.dialogueContinue = "true";
+      continueButton.innerHTML = "<strong>계속하기</strong><small>확인한 표현으로 다음 오해를 풀어 보세요.</small>";
+      continueButton.addEventListener("click", () => handleOption("continue", ""));
+      refs.dialogueOptions.appendChild(continueButton);
+      focusFirstDialogueOption(focusFirst);
       return;
     }
 
@@ -1486,9 +1762,10 @@
       refs.dialogueStep.textContent = "상태 확인";
       refs.dialogueText.textContent = `${npc.name}: "${supportNeed.line}"`;
       refs.dialogueClue.textContent = dialogue.hint || `상황: ${supportNeed.clue} 지금 상태를 가장 정확히 짚는 표현만 고르세요.`;
-      for (const expression of getSupportOptions(supportNeed.answer)) {
+      for (const expression of getSupportOptions(supportNeed.answer, npc.id, supportNeed.id)) {
         refs.dialogueOptions.appendChild(createOptionButton("repair", expression, () => handleOption("support", expression.id)));
       }
+      focusFirstDialogueOption(focusFirst);
       return;
     }
 
@@ -1497,11 +1774,19 @@
       refs.dialogueStep.textContent = "우군 훈련";
       refs.dialogueText.textContent = `${npc.name}: "${supportNeed.line}"`;
       refs.dialogueClue.textContent = dialogue.hint || `훈련 단서: ${supportNeed.clue} 상태 확인에 깔끔하게 맞는 표현만 고르세요.`;
-      for (const expression of getSupportOptions(supportNeed.answer)) {
+      for (const expression of getSupportOptions(supportNeed.answer, npc.id, supportNeed.id)) {
         refs.dialogueOptions.appendChild(createOptionButton("repair", expression, () => handleOption("encourage", expression.id)));
       }
+      focusFirstDialogueOption(focusFirst);
       return;
     }
+  }
+
+  function focusFirstDialogueOption(shouldFocus) {
+    if (!shouldFocus) {
+      return;
+    }
+    window.requestAnimationFrame(() => refs.dialogueOptions.querySelector("button")?.focus({ preventScroll: true }));
   }
 
   function getAllExpressions() {
@@ -1523,7 +1808,6 @@
   }
 
   function renderExpressions() {
-    renderExpressionList(refs.expressionList);
     renderExpressionList(refs.expressionOverlayList);
   }
 
@@ -1533,16 +1817,25 @@
     }
     const shouldOpen = forceOpen ?? refs.expressionOverlay.classList.contains("hidden");
     refs.expressionOverlay.classList.toggle("hidden", !shouldOpen);
+    refs.gameStage.classList.toggle("is-overlay-open", shouldOpen);
     refs.expressionToggle.setAttribute("aria-expanded", String(shouldOpen));
     if (shouldOpen) {
       renderExpressionList(refs.expressionOverlayList);
+      window.requestAnimationFrame(() => refs.expressionClose.focus({ preventScroll: true }));
+    } else if (gameStarted) {
+      window.requestAnimationFrame(() => refs.expressionToggle.focus({ preventScroll: true }));
     }
   }
 
   function renderLog() {
-    refs.actionLog.innerHTML = state.actionLog
+    const markup = state.actionLog
       .map((item) => `<li>${escapeHtml(item)}</li>`)
       .join("");
+    if (markup === lastRenderedLog) {
+      return;
+    }
+    lastRenderedLog = markup;
+    refs.actionLog.innerHTML = markup;
   }
 
   function escapeHtml(value) {
@@ -1555,7 +1848,8 @@
 
   function draw() {
     ctx.setTransform(viewport.dpr, 0, 0, viewport.dpr, 0, 0);
-    ctx.clearRect(0, 0, viewport.width, viewport.height);
+    ctx.fillStyle = "#d9ead2";
+    ctx.fillRect(0, 0, viewport.width, viewport.height);
     drawWorld();
     drawPulses();
     drawVillainTargetPreview();
@@ -1573,7 +1867,7 @@
 
   function drawWorld() {
     ctx.save();
-    ctx.translate(-state.camera.x, -state.camera.y);
+    applyWorldTransform();
     ctx.fillStyle = "#d9ead2";
     ctx.fillRect(0, 0, WORLD.width, WORLD.height);
     drawGrassTexture();
@@ -1779,7 +2073,7 @@
 
   function drawPulses() {
     ctx.save();
-    ctx.translate(-state.camera.x, -state.camera.y);
+    applyWorldTransform();
     for (const pulse of state.pulses) {
       ctx.globalAlpha = clamp(pulse.life, 0, 1);
       ctx.strokeStyle = pulse.color;
@@ -1803,7 +2097,7 @@
     const warningAlpha = state.villain.mode === "whisper" ? 0.42 : 0.28;
 
     ctx.save();
-    ctx.translate(-state.camera.x, -state.camera.y);
+    applyWorldTransform();
     ctx.fillStyle = `rgba(139, 92, 246, ${warningAlpha * 0.55})`;
     ctx.beginPath();
     ctx.ellipse(target.x, target.y + 24, 56 + pulse, 18 + Math.sin(phase + 1) * 3, 0, 0, Math.PI * 2);
@@ -1834,7 +2128,7 @@
 
   function drawSlimes() {
     ctx.save();
-    ctx.translate(-state.camera.x, -state.camera.y);
+    applyWorldTransform();
     for (const slime of state.slimes) {
       const typeMeta = slimeTypes[slime.type] ?? slimeTypes.normal;
       const wobble = Math.sin(slime.wobble) * 3;
@@ -1928,7 +2222,7 @@
 
   function drawNpcs() {
     ctx.save();
-    ctx.translate(-state.camera.x, -state.camera.y);
+    applyWorldTransform();
     for (const npc of state.npcs) {
       const isAlly = npc.status === "ally";
       ctx.fillStyle = npc.distressed ? "rgba(245, 158, 11, 0.2)" : isAlly ? "rgba(15, 118, 110, 0.14)" : "rgba(139, 92, 246, 0.16)";
@@ -2062,7 +2356,7 @@
     }
     const villain = state.villain;
     ctx.save();
-    ctx.translate(-state.camera.x, -state.camera.y);
+    applyWorldTransform();
     ctx.strokeStyle = "rgba(139, 92, 246, 0.35)";
     ctx.lineWidth = 4;
     ctx.setLineDash([6, 12]);
@@ -2078,7 +2372,7 @@
 
   function drawRumorMotes() {
     ctx.save();
-    ctx.translate(-state.camera.x, -state.camera.y);
+    applyWorldTransform();
     for (const mote of state.rumorMotes) {
       const t = clamp(mote.t, 0, 1);
       const eased = t * t * (3 - 2 * t);
@@ -2400,7 +2694,7 @@
 
   function drawParticles() {
     ctx.save();
-    ctx.translate(-state.camera.x, -state.camera.y);
+    applyWorldTransform();
     for (const particle of state.particles) {
       ctx.globalAlpha = clamp(particle.life / particle.maxLife, 0, 1);
       ctx.fillStyle = particle.color;
@@ -2414,7 +2708,7 @@
 
   function drawVisualCues() {
     ctx.save();
-    ctx.translate(-state.camera.x, -state.camera.y);
+    applyWorldTransform();
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     for (const cue of state.visualCues) {
@@ -2570,29 +2864,90 @@
       state.won = true;
       state.running = false;
       state.villain.mode = "retreat";
-      refs.finishSummary.textContent = `우군 효율 합계 ${allyPower}, 남은 소문 ${state.slimes.length}개. 함께 마음을 다스려 빌런을 몰아냈습니다.`;
-      refs.finishCard.classList.remove("hidden");
       addLog("우군망이 강해졌습니다. 빌런이 더 이상 소문을 퍼뜨리지 못하고 물러났습니다.");
+      showFinishCard({ focus: true });
       saveCheckpoint();
+    }
+  }
+
+  function showFinishCard({ focus = false } = {}) {
+    const allyPower = getAllyPower();
+    refs.finishSummary.textContent = `우군 효율 합계 ${allyPower}, 남은 소문 ${state.slimes.length}개. 함께 마음을 다스려 빌런을 몰아냈습니다.`;
+    refs.finishCard.classList.remove("hidden");
+    refs.gameStage.classList.add("is-finished");
+    if (focus) {
+      window.requestAnimationFrame(() => refs.restartButton.focus({ preventScroll: true }));
     }
   }
 
   function restart() {
     state = createInitialState(gameStarted);
     keys.clear();
-    resetJoystick();
+    autosaveElapsed = 0;
     refs.finishCard.classList.add("hidden");
     refs.dialogue.classList.add("hidden");
+    refs.gameStage.classList.remove("is-dialogue-open", "is-finished");
     toggleExpressionOverlay(false);
+    lastRenderedLog = "";
+    lastVictoryMarkup = "";
     renderLog();
     updateHud();
     resizeCanvas();
     saveCheckpoint();
+    window.requestAnimationFrame(() => canvas.focus({ preventScroll: true }));
+  }
+
+  function getOpenModal() {
+    return [refs.finishCard, refs.dialogue, refs.expressionOverlay]
+      .find((element) => element && !element.classList.contains("hidden")) ?? null;
+  }
+
+  function trapModalFocus(event, modal) {
+    const focusable = [...modal.querySelectorAll("a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])")]
+      .filter((element) => element.getClientRects().length > 0 && element.getAttribute("aria-hidden") !== "true");
+    if (!focusable.length) {
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const active = document.activeElement;
+    if (!modal.contains(active)) {
+      (event.shiftKey ? last : first).focus({ preventScroll: true });
+      event.preventDefault();
+      return;
+    }
+    if (event.shiftKey && active === first) {
+      last.focus({ preventScroll: true });
+      event.preventDefault();
+    } else if (!event.shiftKey && active === last) {
+      first.focus({ preventScroll: true });
+      event.preventDefault();
+    }
   }
 
   function setupInput() {
     window.addEventListener("keydown", (event) => {
       const key = event.key.toLowerCase();
+      const openModal = getOpenModal();
+      if (key === "tab" && openModal) {
+        trapModalFocus(event, openModal);
+        return;
+      }
+      if (key === "escape") {
+        if (refs.expressionOverlay && !refs.expressionOverlay.classList.contains("hidden")) {
+          toggleExpressionOverlay(false);
+          event.preventDefault();
+          return;
+        }
+        if (state.activeDialogue) {
+          closeDialogue();
+          event.preventDefault();
+          return;
+        }
+      }
+      if (event.target instanceof Element && event.target.closest("button, a, input, select, textarea, summary, [contenteditable='true']")) {
+        return;
+      }
       if (!gameStarted && (key === " " || key === "enter")) {
         startGame();
         event.preventDefault();
@@ -2606,16 +2961,6 @@
         interact();
         event.preventDefault();
       }
-      if (key === "escape") {
-        if (refs.expressionOverlay && !refs.expressionOverlay.classList.contains("hidden")) {
-          toggleExpressionOverlay(false);
-          event.preventDefault();
-          return;
-        }
-        if (state.activeDialogue) {
-          closeDialogue();
-        }
-      }
     });
     window.addEventListener("keyup", (event) => {
       keys.delete(event.key.toLowerCase());
@@ -2625,74 +2970,38 @@
       const dir = button.dataset.dir;
       const keyMap = { up: "arrowup", down: "arrowdown", left: "arrowleft", right: "arrowright" };
       const mapped = keyMap[dir];
-      button.addEventListener("pointerdown", () => keys.add(mapped));
-      button.addEventListener("pointerup", () => keys.delete(mapped));
-      button.addEventListener("pointerleave", () => keys.delete(mapped));
+      const stopMoving = () => keys.delete(mapped);
+      button.addEventListener("pointerdown", (event) => {
+        if (!gameStarted || state.activeDialogue || state.won) return;
+        keys.add(mapped);
+        button.setPointerCapture?.(event.pointerId);
+        event.preventDefault();
+      });
+      button.addEventListener("pointerup", stopMoving);
+      button.addEventListener("pointercancel", stopMoving);
+      button.addEventListener("lostpointercapture", stopMoving);
+      button.addEventListener("pointerleave", stopMoving);
+      button.addEventListener("blur", stopMoving);
       button.addEventListener("click", () => {
+        if (!gameStarted || state.activeDialogue || state.won) return;
         keys.add(mapped);
         window.setTimeout(() => keys.delete(mapped), 140);
       });
     });
-    document.querySelector("[data-action='interact']").addEventListener("click", interact);
+    document.querySelector("[data-action='interact']")?.addEventListener("click", interact);
     refs.restartButton.addEventListener("click", restart);
     refs.startButton.addEventListener("click", () => startGame());
     refs.expressionToggle?.addEventListener("click", () => toggleExpressionOverlay());
     refs.expressionClose?.addEventListener("click", () => toggleExpressionOverlay(false));
     window.addEventListener("resize", resizeCanvas);
     document.addEventListener("fullscreenchange", () => window.requestAnimationFrame(resizeCanvas));
-    setupJoystick();
-  }
-
-  function setupJoystick() {
-    if (!refs.joystick || !refs.joystickKnob) {
-      return;
-    }
-
-    const updateStick = (event) => {
-      const rect = refs.joystick.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const max = rect.width * 0.33;
-      const rawX = event.clientX - centerX;
-      const rawY = event.clientY - centerY;
-      const distance = Math.hypot(rawX, rawY);
-      const limited = distance > max ? max / distance : 1;
-      const x = rawX * limited;
-      const y = rawY * limited;
-      virtualStick.dx = clamp(x / max, -1, 1);
-      virtualStick.dy = clamp(y / max, -1, 1);
-      refs.joystickKnob.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
-    };
-
-    refs.joystick.addEventListener("pointerdown", (event) => {
-      if (!gameStarted) {
-        return;
+    window.addEventListener("blur", () => keys.clear());
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        keys.clear();
       }
-      virtualStick.active = true;
-      virtualStick.pointerId = event.pointerId;
-      refs.joystick.setPointerCapture(event.pointerId);
-      updateStick(event);
-      event.preventDefault();
     });
-
-    refs.joystick.addEventListener("pointermove", (event) => {
-      if (!virtualStick.active || virtualStick.pointerId !== event.pointerId) {
-        return;
-      }
-      updateStick(event);
-      event.preventDefault();
-    });
-
-    const releaseStick = (event) => {
-      if (virtualStick.pointerId !== null && virtualStick.pointerId !== event.pointerId) {
-        return;
-      }
-      resetJoystick();
-    };
-
-    refs.joystick.addEventListener("pointerup", releaseStick);
-    refs.joystick.addEventListener("pointercancel", releaseStick);
-    refs.joystick.addEventListener("lostpointercapture", resetJoystick);
+    canvas.addEventListener("pointerdown", () => canvas.focus({ preventScroll: true }));
   }
 
   let lastTime = performance.now();
@@ -2708,6 +3017,7 @@
   function init() {
     resizeCanvas();
     document.body.classList.remove("game-active");
+    setGameplayControlsAvailable(false);
     refs.allyTotalText.textContent = String(state.npcs.length);
     renderExpressions();
     renderLog();
