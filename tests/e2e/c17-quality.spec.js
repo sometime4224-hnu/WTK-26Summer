@@ -24,10 +24,12 @@ const C17_PAGES = [
   "writing-cut-teacher.html",
   "vocabulary.html",
   "vocab-support-adverb-tone.html",
+  "vocab-support-meaning-map.html",
   "vocab-support-misunderstanding-sequence.html",
   "vocab-support-picture-quiz.html",
   "vocab-support-possibility-meter.html",
   "vocab-support-rumor-flow.html",
+  "vocab-support-rumor-contrast.html",
   "vocab-support-rumor-scene.html",
   "rumor-game-next/index.html"
 ];
@@ -77,7 +79,7 @@ test("all c17 static local links and assets resolve", () => {
   expect(fs.readFileSync(path.join(repoRoot, "c17", "grammar2-speaking-pro.html"), "utf8")).toContain("처음부터 다시");
 });
 
-test("all 27 c17 pages load without page errors, duplicate IDs, or horizontal overflow", async ({ page }) => {
+test("all 29 c17 pages load without page errors, duplicate IDs, or horizontal overflow", async ({ page }) => {
   await blockExternalRequests(page);
   await page.setViewportSize({ width: 320, height: 844 });
 
