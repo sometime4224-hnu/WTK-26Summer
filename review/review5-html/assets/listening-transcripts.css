@@ -97,24 +97,41 @@ audio { min-height: 48px; }
 }
 
 .transcript-line {
-  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   min-height: 54px;
+  align-items: start;
   padding: 13px 14px;
   color: var(--ink);
-  text-align: left;
   line-height: 1.6;
   border: 1px solid transparent;
   border-radius: 12px;
   background: transparent;
+}
+
+.transcript-text { min-width: 0; }
+
+.transcript-phrase {
+  display: inline;
+  max-width: 100%;
+  margin: 0;
+  padding: 3px 4px;
+  color: inherit;
+  text-align: left;
+  line-height: inherit;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
   cursor: pointer;
 }
 
-.transcript-line:hover { background: #fff6e6; }
+.transcript-phrase:hover { background: #fff0cf; }
 
-.transcript-line.is-current {
-  border-color: #c67925;
-  background: var(--accent-soft);
-  box-shadow: inset 4px 0 0 var(--accent);
+.transcript-phrase.is-current {
+  color: #211507;
+  border-color: #a94f0d;
+  background: #ffd66d;
+  box-shadow: 0 0 0 2px rgba(184, 93, 20, .18);
 }
 
 .speaker { display: inline-block; min-width: 2.2em; margin-right: 8px; color: var(--accent); font-weight: 800; }

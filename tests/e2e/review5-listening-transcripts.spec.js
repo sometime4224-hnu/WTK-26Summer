@@ -21,6 +21,47 @@ test('lists the 14 canonical listening units and links from the listening quiz o
   expect(units.flatMap((unit) => unit.questionIds)).toEqual(['l1', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9', 'l10', 'l11', 'l12', 'l13', 'l14', 'l15', 'l16']);
 });
 
+test('keeps all 198 analyzed phrases aligned with the approved transcript text', async ({ page }) => {
+  await page.goto(PAGE);
+  const contract = await page.evaluate(() => {
+    const data = window.REVIEW5_DATA.sections.listening.questions;
+    const alignment = window.REVIEW5_TRANSCRIPT_ALIGNMENT;
+    const sourceUnits = [
+      ...data.slice(0, 12).map((question) => [question.id, question]),
+      ['l13-14', data[12]],
+      ['l15-16', data[14]]
+    ];
+    const errors = [];
+    let phraseCount = 0;
+    for (const [unitId, question] of sourceUnits) {
+      const unit = alignment.units[unitId];
+      if (!unit) {
+        errors.push(`${unitId}: 정렬 없음`);
+        continue;
+      }
+      if (unit.lines.length !== question.audio.transcript.length) errors.push(`${unitId}: 줄 수 불일치`);
+      unit.lines.forEach((phrases, lineIndex) => {
+        phraseCount += phrases.length;
+        const expected = question.audio.transcript[lineIndex]?.text;
+        if (phrases.map((phrase) => phrase[0]).join(' ') !== expected) errors.push(`${unitId}:${lineIndex}: 지문 불일치`);
+        phrases.forEach((phrase, phraseIndex) => {
+          if (!(typeof phrase[0] === 'string' && phrase[0].length && Number.isFinite(phrase[1]) && Number.isFinite(phrase[2]) && phrase[2] > phrase[1])) {
+            errors.push(`${unitId}:${lineIndex}:${phraseIndex}: 잘못된 구`);
+          }
+        });
+      });
+    }
+    return { version: alignment.version, method: alignment.method, unitCount: Object.keys(alignment.units).length, phraseCount, errors };
+  });
+  expect(contract).toEqual({
+    version: 1,
+    method: 'faster-whisper-word-timestamps-refined-with-silero-vad',
+    unitCount: 14,
+    phraseCount: 198,
+    errors: []
+  });
+});
+
 test('reuses the listening questions for a saved quick quiz with immediate feedback', async ({ page }) => {
   await page.goto(PAGE);
   await expect(page.getByRole('heading', { name: '간이 문제 풀기' })).toBeVisible();
@@ -43,7 +84,7 @@ test('reuses the listening questions for a saved quick quiz with immediate feedb
   await expect(page.locator('.practice-question').nth(1)).toContainText('들은 내용과 맞는 것을 고르십시오.');
 });
 
-test('uses inspected utterance cues, highlights current speech, and seeks from transcript buttons', async ({ page }) => {
+test('uses analyzed phrase cues, highlights the current phrase, and seeks from phrase buttons', async ({ page }) => {
   await page.goto(PAGE);
   const units = await page.evaluate(() => window.__review5TranscriptApp.getUnits());
   for (const unit of units) {
@@ -55,7 +96,8 @@ test('uses inspected utterance cues, highlights current speech, and seeks from t
       const cues = app.getCues(unit.id, duration);
       return { duration, cues, active: cues.map((cue) => app.getActiveIndex(unit.id, (cue.start + cue.end) / 2, duration)), before: app.getActiveIndex(unit.id, 0, duration), after: app.getActiveIndex(unit.id, cues.at(-1).end + .01, duration) };
     }, unit);
-    expect(verification.cues).toHaveLength(unit.transcriptLength);
+    expect(verification.cues).toHaveLength(unit.phraseCount);
+    expect(verification.cues.length).toBeGreaterThan(unit.transcriptLength);
     expect(verification.cues[0].start).toBeGreaterThan(0);
     expect(verification.cues.at(-1).end).toBeLessThan(verification.duration);
     for (let index = 0; index < verification.cues.length; index += 1) {
@@ -73,7 +115,7 @@ test('uses inspected utterance cues, highlights current speech, and seeks from t
     audio.currentTime = 0;
     audio.dispatchEvent(new Event('timeupdate'));
   });
-  await expect(page.locator('.transcript-line.is-current')).toHaveCount(0);
+  await expect(page.locator('.transcript-phrase.is-current')).toHaveCount(0);
   const l1Cues = await page.evaluate(() => {
     const duration = document.querySelector('#transcriptAudio').duration;
     return window.__review5TranscriptApp.getCues('l1', duration);
@@ -83,20 +125,20 @@ test('uses inspected utterance cues, highlights current speech, and seeks from t
     audio.currentTime = (cue.start + cue.end) / 2;
     audio.dispatchEvent(new Event('timeupdate'));
   }, l1Cues[0]);
-  await expect(page.locator('.transcript-line.is-current')).toHaveCount(1);
-  await expect(page.locator('.transcript-line.is-current')).toHaveAttribute('aria-current', 'true');
-  await page.locator('.transcript-line').nth(1).focus();
-  await page.locator('.transcript-line').nth(1).press('Enter');
-  await expect.poll(() => page.locator('.transcript-line.is-current').evaluate((node) => node.getAttribute('data-cue-index'))).toBe('1');
+  await expect(page.locator('.transcript-phrase.is-current')).toHaveCount(1);
+  await expect(page.locator('.transcript-phrase.is-current')).toHaveAttribute('aria-current', 'true');
+  await page.locator('.transcript-phrase').nth(1).focus();
+  await page.locator('.transcript-phrase').nth(1).press('Enter');
+  await expect.poll(() => page.locator('.transcript-phrase.is-current').evaluate((node) => node.getAttribute('data-cue-index'))).toBe('1');
   await page.evaluate(() => {
     const audio = document.querySelector('#transcriptAudio');
     audio.currentTime = audio.duration;
     audio.dispatchEvent(new Event('ended'));
   });
-  await expect(page.locator('.transcript-line.is-current')).toHaveCount(0);
+  await expect(page.locator('.transcript-phrase.is-current')).toHaveCount(0);
 });
 
-test('l1 leaves the numbered instruction unhighlighted and maps inspected dialogue spans', async ({ page }) => {
+test('precise l1 and l7 boundaries leave instructions silent and replace the old late cues', async ({ page }) => {
   await page.goto(PAGE);
   await expect.poll(() => page.locator('#transcriptAudio').evaluate((audio) => audio.readyState >= 1 && audio.duration)).toBeTruthy();
   await page.evaluate(() => {
@@ -104,20 +146,46 @@ test('l1 leaves the numbered instruction unhighlighted and maps inspected dialog
     audio.currentTime = 5;
     audio.dispatchEvent(new Event('timeupdate'));
   });
-  await expect(page.locator('.transcript-line.is-current')).toHaveCount(0);
+  await expect(page.locator('.transcript-phrase.is-current')).toHaveCount(0);
   const cues = await page.evaluate(() => window.__review5TranscriptApp.getCues('l1', document.querySelector('#transcriptAudio').duration));
+  expect(cues[0].start).toBeGreaterThan(8.2);
+  expect(cues[0].start).toBeLessThan(9.2);
   await page.evaluate((cue) => {
     const audio = document.querySelector('#transcriptAudio');
     audio.currentTime = (cue.start + cue.end) / 2;
     audio.dispatchEvent(new Event('timeupdate'));
   }, cues[0]);
-  await expect(page.locator('.transcript-line.is-current')).toHaveAttribute('data-cue-index', '0');
+  await expect(page.locator('.transcript-phrase.is-current')).toHaveAttribute('data-cue-index', '0');
+  await expect(page.locator('.transcript-phrase.is-current')).toContainText('여보, 저기 옷장에서 까만');
   await page.evaluate((cue) => {
     const audio = document.querySelector('#transcriptAudio');
     audio.currentTime = (cue.start + cue.end) / 2;
     audio.dispatchEvent(new Event('timeupdate'));
   }, cues[2]);
-  await expect(page.locator('.transcript-line.is-current')).toHaveAttribute('data-cue-index', '2');
+  await expect(page.locator('.transcript-phrase.is-current')).toHaveAttribute('data-cue-index', '2');
+
+  await page.selectOption('#trackSelect', 'l7');
+  await expect.poll(() => page.locator('#transcriptAudio').evaluate((audio) => audio.readyState >= 1 && audio.duration)).toBeTruthy();
+  const l7Cues = await page.evaluate(() => window.__review5TranscriptApp.getCues('l7', document.querySelector('#transcriptAudio').duration));
+  expect(l7Cues[0].start).toBeGreaterThan(1.1);
+  expect(l7Cues[0].start).toBeLessThan(1.6);
+});
+
+test('clears phrase emphasis during a real pause between analyzed phrases', async ({ page }) => {
+  await page.goto(PAGE);
+  await expect.poll(() => page.locator('#transcriptAudio').evaluate((audio) => audio.readyState >= 1 && audio.duration)).toBeTruthy();
+  const gapTime = await page.evaluate(() => {
+    const audio = document.querySelector('#transcriptAudio');
+    const cues = window.__review5TranscriptApp.getCues('l1', audio.duration);
+    const gapIndex = cues.findIndex((cue, index) => index && cue.start - cues[index - 1].end > .3);
+    return (cues[gapIndex - 1].end + cues[gapIndex].start) / 2;
+  });
+  await page.evaluate((time) => {
+    const audio = document.querySelector('#transcriptAudio');
+    audio.currentTime = time;
+    audio.dispatchEvent(new Event('timeupdate'));
+  }, gapTime);
+  await expect(page.locator('.transcript-phrase.is-current')).toHaveCount(0);
 });
 
 test('loads metadata for every canonical audio asset without browser errors', async ({ page }) => {

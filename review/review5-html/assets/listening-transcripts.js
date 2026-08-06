@@ -2,34 +2,10 @@
   "use strict";
 
   var DATA = window.REVIEW5_DATA;
+  var ALIGNMENT = window.REVIEW5_TRANSCRIPT_ALIGNMENT;
   var STORAGE_KEY = "snukorean:review5:listening-transcripts:v2:state";
   var LEGACY_STORAGE_KEY = "snukorean:review5:listening-transcripts:v1:state";
   var VERSION = 2;
-  /*
-   * Inspected speech spans in seconds. These were placed from each MP3's
-   * silencedetect boundaries (−35 dB) and the utterance order in the approved
-   * transcript. Intro/question prompts and trailing material are deliberately
-   * not cued. The values use the encoded clips' nominal durations; a very small
-   * duration scale below absorbs container/decoder variance without moving the
-   * relative boundaries.
-   */
-  var INSPECTED_CUES = {
-    l1: [[12.03, 13.85], [14.90, 16.48], [17.53, 23.06], [24.12, 26.58]],
-    l2: [[12.23, 25.69]],
-    l3: [[12.50, 15.95], [16.72, 19.56]],
-    l4: [[1.98, 4.45], [5.15, 12.08]],
-    l5: [[1.79, 4.43], [4.98, 13.17]],
-    l6: [[9.05, 13.58], [14.64, 19.83], [20.55, 22.95], [24.01, 28.65]],
-    l7: [[6.82, 9.46], [10.32, 17.49], [18.56, 21.78]],
-    l8: [[7.58, 9.22], [9.83, 12.16], [13.24, 15.79], [16.32, 18.88]],
-    l9: [[14.95, 17.39], [17.91, 19.42], [20.48, 22.84], [23.93, 26.21], [26.85, 28.45], [29.49, 30.01], [30.62, 36.52]],
-    l10: [[16.25, 21.69], [22.22, 34.20]],
-    l11: [[12.06, 23.39], [24.43, 48.25]],
-    l12: [[13.04, 27.38], [28.11, 45.18]],
-    "l13-14": [[25.70, 30.54], [31.35, 36.31], [37.44, 45.24], [46.34, 48.51], [49.40, 51.50], [52.62, 55.63]],
-    "l15-16": [[16.91, 34.41], [35.45, 47.05], [48.06, 55.97]]
-  };
-  var NOMINAL_DURATIONS = { l1: 27.12, l2: 26.23, l3: 20.11, l4: 12.62, l5: 13.71, l6: 34.32, l7: 24.45, l8: 22.54, l9: 39.16, l10: 34.74, l11: 48.80, l12: 45.74, "l13-14": 58.75, "l15-16": 56.50 };
   var units = buildUnits();
   var selectedUnit = units[0];
   var state = defaultState();
@@ -43,6 +19,7 @@
   var status;
   var currentCues = [];
   var suppressSave = false;
+  var syncFrame = 0;
 
   document.addEventListener("DOMContentLoaded", init);
 
@@ -75,7 +52,8 @@
 
   function unit(question, label, id, questions) {
     if (!question || !question.audio) return null;
-    return { id: id || question.id, label: label, audio: question.audio.file, trackLabel: question.audio.label, transcript: question.audio.transcript, questions: questions || [question] };
+    var unitId = id || question.id;
+    return { id: unitId, label: label, audio: question.audio.file, trackLabel: question.audio.label, transcript: question.audio.transcript, questions: questions || [question], alignment: ALIGNMENT && ALIGNMENT.units && ALIGNMENT.units[unitId] };
   }
 
   function defaultState() { return { schemaVersion: VERSION, unitId: units[0] ? units[0].id : "l1", position: 0, playbackRate: 1, answers: {}, updatedAt: Date.now() }; }
@@ -98,11 +76,13 @@
     });
     audio.addEventListener("loadedmetadata", onMetadata);
     audio.addEventListener("timeupdate", onTimeChange);
-    audio.addEventListener("seeking", updateCurrentLine);
-    audio.addEventListener("ended", function () { updateCurrentLine(); saveState(true); });
-    audio.addEventListener("pause", function () { if (!suppressSave) saveState(true); });
+    audio.addEventListener("seeking", updateCurrentPhrase);
+    audio.addEventListener("play", startPhraseSync);
+    audio.addEventListener("playing", startPhraseSync);
+    audio.addEventListener("ended", function () { stopPhraseSync(); updateCurrentPhrase(); saveState(true); });
+    audio.addEventListener("pause", function () { stopPhraseSync(); updateCurrentPhrase(); if (!suppressSave) saveState(true); });
     audio.addEventListener("ratechange", function () { state.playbackRate = validRate(audio.playbackRate) ? audio.playbackRate : 1; saveState(true); });
-    audio.addEventListener("error", function () { status.textContent = "음원을 불러오지 못했습니다."; updateCurrentLine(); });
+    audio.addEventListener("error", function () { status.textContent = "음원을 불러오지 못했습니다."; updateCurrentPhrase(); });
     lines.addEventListener("click", function (event) {
       var button = event.target.closest("button[data-cue-index]");
       if (!button) return;
@@ -113,7 +93,7 @@
       if (!button) return;
       choosePracticeAnswer(button.dataset.questionId, button.dataset.choiceId);
     });
-    window.addEventListener("pagehide", function () { saveState(true); });
+    window.addEventListener("pagehide", function () { stopPhraseSync(); saveState(true); });
     document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") saveState(true); });
     document.getElementById("recoveryNotice").addEventListener("click", onRecoveryAction);
   }
@@ -140,26 +120,37 @@
       try { audio.currentTime = position; } catch (_) {}
     }
     renderLines();
-    updateCurrentLine();
+    updateCurrentPhrase();
     saveState(true);
   }
 
   function onTimeChange() {
-    updateCurrentLine();
+    updateCurrentPhrase();
     if (Math.abs((Number(audio.currentTime) || 0) - lastSavedPosition) >= 1) saveState(false);
   }
 
   function cueBoundaries(unit, duration) {
-    var spans = unit && INSPECTED_CUES[unit.id];
-    var nominal = unit && NOMINAL_DURATIONS[unit.id];
-    if (!spans || !nominal || spans.length !== unit.transcript.length) return [];
-    var scale = Number.isFinite(duration) && duration > 0 ? duration / nominal : 1;
-    return spans.map(function (span, index) { return { index: index, start: span[0] * scale, end: span[1] * scale }; });
+    var alignment = unit && unit.alignment;
+    if (!alignment || !Number.isFinite(alignment.duration) || alignment.duration <= 0 || !Array.isArray(alignment.lines) || alignment.lines.length !== unit.transcript.length) return [];
+    var scale = Number.isFinite(duration) && duration > 0 ? duration / alignment.duration : 1;
+    var cues = [];
+    alignment.lines.forEach(function (phrases, lineIndex) {
+      if (!Array.isArray(phrases)) return;
+      phrases.forEach(function (phrase, phraseIndex) {
+        if (!Array.isArray(phrase) || typeof phrase[0] !== "string" || !Number.isFinite(phrase[1]) || !Number.isFinite(phrase[2]) || phrase[2] <= phrase[1]) return;
+        cues.push({ index: cues.length, lineIndex: lineIndex, phraseIndex: phraseIndex, text: phrase[0], start: phrase[1] * scale, end: phrase[2] * scale });
+      });
+    });
+    return cues;
   }
 
   function renderLines() {
-    lines.innerHTML = selectedUnit.transcript.map(function (line, index) {
-      return '<li><button type="button" class="transcript-line" data-cue-index="' + index + '"><span class="speaker">' + escapeHtml(line.speaker || "") + '</span><span>' + escapeHtml(line.text) + '</span></button></li>';
+    lines.innerHTML = selectedUnit.transcript.map(function (line, lineIndex) {
+      var cues = currentCues.filter(function (cue) { return cue.lineIndex === lineIndex; });
+      var text = cues.length ? cues.map(function (cue) {
+        return '<button type="button" class="transcript-phrase" data-cue-index="' + cue.index + '" aria-label="' + escapeHtml(cue.text) + '부터 듣기">' + escapeHtml(cue.text) + '</button>';
+      }).join('<span class="phrase-space" aria-hidden="true"> </span>') : '<span>' + escapeHtml(line.text) + '</span>';
+      return '<li class="transcript-line"><span class="speaker">' + escapeHtml(line.speaker || "") + '</span><span class="transcript-text">' + text + '</span></li>';
     }).join("");
   }
 
@@ -193,14 +184,30 @@
 
   function letter(index) { return String.fromCharCode(65 + index); }
 
-  function updateCurrentLine() {
+  function updateCurrentPhrase() {
     var index = activeCueIndex(Number(audio.currentTime) || 0, currentCues, Number(audio.duration));
-    Array.prototype.forEach.call(lines.querySelectorAll(".transcript-line"), function (button, buttonIndex) {
-      var current = buttonIndex === index;
+    Array.prototype.forEach.call(lines.querySelectorAll(".transcript-phrase"), function (button) {
+      var current = Number(button.dataset.cueIndex) === index;
       button.classList.toggle("is-current", current);
       if (current) button.setAttribute("aria-current", "true");
       else button.removeAttribute("aria-current");
     });
+  }
+
+  function startPhraseSync() {
+    if (syncFrame) return;
+    function tick() {
+      updateCurrentPhrase();
+      if (!audio.paused && !audio.ended) syncFrame = window.requestAnimationFrame(tick);
+      else syncFrame = 0;
+    }
+    syncFrame = window.requestAnimationFrame(tick);
+  }
+
+  function stopPhraseSync() {
+    if (!syncFrame) return;
+    window.cancelAnimationFrame(syncFrame);
+    syncFrame = 0;
   }
 
   function activeCueIndex(time, cues, duration) {
@@ -215,7 +222,7 @@
     var cue = currentCues[index];
     if (!cue) return;
     try { audio.currentTime = cue.start; } catch (_) { return; }
-    updateCurrentLine();
+    updateCurrentPhrase();
     saveState(true);
     var play = audio.play();
     if (play && typeof play.catch === "function") play.catch(function () {});
@@ -368,8 +375,8 @@
   function exposeTestHelpers() {
     window.__review5TranscriptApp = Object.freeze({
       getState: function () { return JSON.parse(JSON.stringify(state)); },
-      getUnits: function () { return units.map(function (unit) { return { id: unit.id, label: unit.label, audio: unit.audio, transcriptLength: unit.transcript.length, questionIds: unit.questions.map(function (question) { return question.id; }) }; }); },
-      getCues: function (unitId, duration) { var unit = units.find(function (item) { return item.id === unitId; }) || selectedUnit; return cueBoundaries(unit, duration).map(function (cue) { return { index: cue.index, start: cue.start, end: cue.end }; }); },
+      getUnits: function () { return units.map(function (unit) { return { id: unit.id, label: unit.label, audio: unit.audio, transcriptLength: unit.transcript.length, phraseCount: cueBoundaries(unit, 0).length, questionIds: unit.questions.map(function (question) { return question.id; }) }; }); },
+      getCues: function (unitId, duration) { var unit = units.find(function (item) { return item.id === unitId; }) || selectedUnit; return cueBoundaries(unit, duration).map(function (cue) { return { index: cue.index, lineIndex: cue.lineIndex, phraseIndex: cue.phraseIndex, text: cue.text, start: cue.start, end: cue.end }; }); },
       getActiveIndex: function (unitId, time, duration) { var unit = units.find(function (item) { return item.id === unitId; }) || selectedUnit; return activeCueIndex(time, cueBoundaries(unit, duration), duration); },
       storageKey: STORAGE_KEY,
       legacyStorageKey: LEGACY_STORAGE_KEY
