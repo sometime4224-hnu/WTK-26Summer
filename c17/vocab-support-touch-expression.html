@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f6f8fc" />
+    <title>17과 어휘 보조 활동 | 눌러서 표현 바꾸기</title>
+    <link rel="stylesheet" href="../shared/design-tokens.css" />
+    <link rel="stylesheet" href="activity-state.css" />
+    <link rel="stylesheet" href="vocab-support-touch-expression.css" />
+</head>
+<body>
+    <nav class="touch-topbar" aria-label="17과 이동">
+        <div class="touch-topbar__links">
+            <a href="../index.html">메인</a>
+            <a href="index.html">17과</a>
+            <a href="vocabulary.html">어휘</a>
+            <a class="touch-topbar__related" href="vocab-support-rumor-scene.html">장면 도식</a>
+        </div>
+        <strong class="touch-topbar__current">어휘 터치 활동</strong>
+    </nav>
+
+    <main class="touch-shell">
+        <header class="touch-hero">
+            <p class="touch-hero__eyebrow">17과 어휘 보조 활동</p>
+            <h1>눌러서 표현을 바꿔요</h1>
+            <p>장면 속 대상 하나를 누르고 문장이 어떻게 달라지는지 보세요.</p>
+        </header>
+
+        <section class="live-panel" id="livePanel" aria-labelledby="livePanelTitle">
+            <div class="live-panel__head">
+                <p id="livePanelTitle">지금 만든 표현</p>
+                <span id="progressText">0/8 살펴봄</span>
+            </div>
+            <p class="live-sentence" id="liveSentence" role="status" aria-live="polite" aria-atomic="true">
+                장면 속 대상을 눌러 보세요.
+            </p>
+            <div class="grammar-strip" aria-label="선택한 표현의 문장 구조">
+                <span id="subjectChip">주어 · 아직 없음</span>
+                <span id="particleChip">조사 · —</span>
+            </div>
+            <p class="live-explanation" id="liveExplanation">누른 대상이 문장의 주인공이나 핵심 표현이 됩니다.</p>
+        </section>
+
+        <section class="activity-block" aria-labelledby="rumorTitle">
+            <header class="activity-block__head">
+                <div>
+                    <p class="step-label">1 · 소문 표현</p>
+                    <h2 id="rumorTitle">무엇을 누르느냐에 따라 표현이 달라져요</h2>
+                </div>
+                <div class="actor-readout" aria-label="현재 장면의 사람">
+                    <span>사람</span>
+                    <strong id="actorLabel">?</strong>
+                </div>
+            </header>
+
+            <div class="rumor-touch-grid" id="rumorTouchGrid" aria-label="소문 표현을 바꾸는 네 대상">
+                <button class="touch-target" type="button" data-expression="rumor-appear" aria-pressed="false">
+                    <span class="visit-mark" aria-hidden="true">✓</span>
+                    <svg viewBox="0 0 180 112" aria-hidden="true">
+                        <circle cx="26" cy="70" r="15" class="svg-head" />
+                        <rect x="12" y="87" width="28" height="20" rx="9" class="svg-body svg-body--state" />
+                        <circle cx="154" cy="70" r="15" class="svg-head" />
+                        <rect x="140" y="87" width="28" height="20" rx="9" class="svg-body svg-body--state" />
+                        <path d="M50 15h77c14 0 24 10 24 23v18c0 13-10 23-24 23H96L77 94l4-15H50c-14 0-24-10-24-23V38c0-13 10-23 24-23Z" class="svg-rumor" />
+                        <text x="89" y="58" text-anchor="middle" class="svg-symbol">?</text>
+                    </svg>
+                    <strong>소문</strong>
+                    <span>새로 알려짐</span>
+                </button>
+
+                <button class="touch-target" type="button" data-expression="rumor-start" aria-pressed="false">
+                    <span class="visit-mark" aria-hidden="true">✓</span>
+                    <svg viewBox="0 0 180 112" aria-hidden="true">
+                        <circle cx="55" cy="42" r="23" class="svg-head" />
+                        <rect x="31" y="68" width="48" height="40" rx="17" class="svg-body svg-body--action" />
+                        <path d="M82 31 104 20M85 45l27 2M76 17 89 3" class="svg-action-rays" />
+                        <path d="M104 57h43" class="svg-action-arrow" />
+                        <circle cx="155" cy="57" r="14" class="svg-listener" />
+                    </svg>
+                    <strong>수진</strong>
+                    <span>처음 말함</span>
+                </button>
+
+                <button class="touch-target" type="button" data-expression="rumor-spread" aria-pressed="false">
+                    <span class="visit-mark" aria-hidden="true">✓</span>
+                    <svg viewBox="0 0 180 112" aria-hidden="true">
+                        <g class="svg-chain">
+                            <circle cx="22" cy="51" r="13" /><circle cx="68" cy="51" r="13" />
+                            <circle cx="114" cy="51" r="13" /><circle cx="160" cy="51" r="13" />
+                            <path d="M37 51h15M83 51h15M129 51h15" />
+                        </g>
+                        <path d="M25 75c38 24 92 24 130 0" class="svg-state-wave" />
+                    </svg>
+                    <strong>사람 사이</strong>
+                    <span>자연스럽게 이어짐</span>
+                </button>
+
+                <button class="touch-target" type="button" data-expression="rumor-scatter" aria-pressed="false">
+                    <span class="visit-mark" aria-hidden="true">✓</span>
+                    <svg viewBox="0 0 180 112" aria-hidden="true">
+                        <circle cx="66" cy="56" r="19" class="svg-head" />
+                        <rect x="47" y="77" width="38" height="30" rx="14" class="svg-body svg-body--action" />
+                        <g class="svg-broadcast">
+                            <path d="M88 47 134 24" /><path d="M91 58h53" /><path d="M88 69 134 91" />
+                            <circle cx="151" cy="18" r="11" /><circle cx="160" cy="58" r="11" /><circle cx="151" cy="96" r="11" />
+                        </g>
+                    </svg>
+                    <strong>여러 방향</strong>
+                    <span>적극적으로 보냄</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="activity-block" aria-labelledby="situationTitle">
+            <header class="activity-block__head activity-block__head--simple">
+                <div>
+                    <p class="step-label">2 · 상황 표현</p>
+                    <h2 id="situationTitle">SVG 장면을 누르면 핵심 표현이 문장에 들어가요</h2>
+                </div>
+            </header>
+
+            <div class="situation-grid" aria-label="네 상황 표현">
+                <button class="situation-target" type="button" data-expression="by-chance" aria-pressed="false">
+                    <span class="visit-mark" aria-hidden="true">✓</span>
+                    <img src="../assets/c17/vocabulary/infographics/by-chance-20260806.svg" width="800" height="520"
+                        alt="약속하지 않은 두 사람이 뜻밖에 만나는 우연히 도식" />
+                    <span class="situation-target__text"><strong>우연히</strong><small>계획 없이 뜻밖에</small></span>
+                </button>
+                <button class="situation-target" type="button" data-expression="honestly" aria-pressed="false">
+                    <span class="visit-mark" aria-hidden="true">✓</span>
+                    <img src="../assets/c17/vocabulary/infographics/honestly.svg" width="800" height="520"
+                        alt="속마음과 말한 내용이 같은 솔직히 도식" />
+                    <span class="situation-target__text"><strong>솔직히</strong><small>숨기지 않고 그대로</small></span>
+                </button>
+                <button class="situation-target" type="button" data-expression="disappointed" aria-pressed="false">
+                    <span class="visit-mark" aria-hidden="true">✓</span>
+                    <img src="../assets/c17/vocabulary/infographics/disappointed-20260806.svg" width="800" height="520"
+                        alt="기대와 실제 결과가 달라 마음이 상하는 실망하다 도식" />
+                    <span class="situation-target__text"><strong>실망하다</strong><small>기대와 달라 마음이 상함</small></span>
+                </button>
+                <button class="situation-target" type="button" data-expression="misunderstand" aria-pressed="false">
+                    <span class="visit-mark" aria-hidden="true">✓</span>
+                    <img src="../assets/c17/vocabulary/infographics/misunderstand.svg" width="800" height="520"
+                        alt="실제 사실과 다르게 이해하는 오해하다 도식" />
+                    <span class="situation-target__text"><strong>오해하다</strong><small>실제 뜻과 다르게 이해함</small></span>
+                </button>
+            </div>
+        </section>
+
+        <section class="completion-panel" aria-label="활동 진행 상태">
+            <p id="completionMessage" role="status" aria-live="polite">8개 대상을 모두 눌러 표현을 바꿔 보세요.</p>
+            <button id="resetActivity" type="button">처음부터 다시</button>
+        </section>
+
+        <details class="state-details">
+            <summary>학습 기록 관리</summary>
+            <div id="activityStateTools"></div>
+        </details>
+
+        <footer class="touch-footer">
+            <a href="vocab-support-rumor-scene.html">← 소문 장면 도식</a>
+            <a href="vocabulary.html">어휘 카드로 돌아가기 →</a>
+        </footer>
+    </main>
+
+    <script src="activity-state.js"></script>
+    <script src="vocab-support-touch-expression.js"></script>
+</body>
+</html>
