@@ -4,6 +4,10 @@ const { test, expect } = require('@playwright/test');
 
 const countries = [
   {
+    country: 'korea',
+    path: '/c16/grammar4-korea-map-match.html'
+  },
+  {
     country: 'vietnam',
     path: '/c16/grammar4-vietnam-map-match.html'
   },

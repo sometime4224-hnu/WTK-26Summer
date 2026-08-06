@@ -1662,7 +1662,6 @@
         }
 
         function tagActions(target, tagId) {
-            if (!state.confirmed) return '';
             const links = [mapLink(target, tagId), photoLink(target, tagId)].filter(Boolean).join('');
             return links ? `<span class="tag-actions">${links}</span>` : '';
         }
@@ -1843,16 +1842,16 @@
             placeChip.innerHTML = `${icon(target.icon)} ${target.name}`;
             tagChip.textContent = tag;
             const mapHref = mapsUrl(target, state.tagId);
-            mapAction.hidden = !mapHref || !state.confirmed;
-            if (mapHref && state.confirmed) {
+            mapAction.hidden = !mapHref;
+            if (mapHref) {
                 mapAction.href = mapHref;
                 mapAction.setAttribute('aria-label', `${target.name} ${tag} 구글맵에서 보기`);
             } else {
                 mapAction.removeAttribute('href');
             }
             const photoHref = photosUrl(target, state.tagId);
-            photoAction.hidden = !photoHref || !state.confirmed;
-            if (photoHref && state.confirmed) {
+            photoAction.hidden = !photoHref;
+            if (photoHref) {
                 photoAction.href = photoHref;
                 photoAction.setAttribute('aria-label', `${target.name} ${tag} 이미지 검색 결과 보기`);
             } else {

@@ -267,10 +267,110 @@ test('문법 1~4 말하기 화면은 문법별 제목과 입력 대체 응답을
   }
 });
 
-test('한국 문화 지도는 선택 지역의 핀만 DOM에 두고 확인 뒤 외부 탐색을 연다', async ({ page }) => {
+test('한국 문화 지도는 모든 대표 태그의 지도·이미지 탐색을 바로 제공하고 확인 흐름을 유지한다', async ({ page }) => {
   await page.goto('/c16/grammar4-korea-map-match.html', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#pinLayer .pin')).toHaveCount(3);
-  await expect(page.locator('#mapAction')).toBeHidden();
+  await expect(page.locator('#mapAction')).toBeVisible();
+  await expect(page.locator('#photoAction')).toBeVisible();
+  await expect(page.locator('#tagGrid .tag-actions')).toHaveCount(6);
+
+  const audit = await page.evaluate(() => {
+    const hasSecureBlankTarget = (link) => {
+      if (!link || link.target !== '_blank') return false;
+      const rel = new Set((link.rel || '').split(/\s+/).filter(Boolean));
+      return rel.has('noopener') && rel.has('noreferrer');
+    };
+    const pairs = [];
+    const domLinkIssues = [];
+
+    for (const target of targets) {
+      state.region = target.region;
+      state.targetId = target.id;
+      state.tagId = target.tags[0];
+      state.confirmed = false;
+      render();
+
+      if (mapAction.hidden || photoAction.hidden) {
+        domLinkIssues.push(`${target.id}: output links`);
+      }
+
+      for (const tagId of target.tags) {
+        const mapHref = mapsUrl(target, tagId);
+        const imageHref = photosUrl(target, tagId);
+        const mapUrl = mapHref ? new URL(mapHref) : null;
+        const imageUrl = imageHref ? new URL(imageHref) : null;
+        const tile = document.querySelector(
+          `[data-tag="${CSS.escape(tagId)}"]`
+        )?.closest('.tag-tile');
+        const mapLinkElement = tile?.querySelector('a.map-link');
+        const imageLinkElement = tile?.querySelector('a.photo-link');
+
+        pairs.push({
+          targetId: target.id,
+          tagId,
+          mapHost: mapUrl?.hostname || '',
+          mapPath: mapUrl?.pathname || '',
+          mapApi: mapUrl?.searchParams.get('api') || '',
+          mapQuery: mapUrl?.searchParams.get('query') || '',
+          imageHost: imageUrl?.hostname || '',
+          imageMode: imageUrl?.searchParams.get('tbm') || '',
+          imageQuery: imageUrl?.searchParams.get('q') || ''
+        });
+
+        if (
+          !mapLinkElement
+          || mapLinkElement.href !== mapHref
+          || !hasSecureBlankTarget(mapLinkElement)
+        ) {
+          domLinkIssues.push(`${target.id}/${tagId}: map link`);
+        }
+        if (
+          !imageLinkElement
+          || imageLinkElement.href !== imageHref
+          || !hasSecureBlankTarget(imageLinkElement)
+        ) {
+          domLinkIssues.push(`${target.id}/${tagId}: image link`);
+        }
+      }
+    }
+
+    const seoul = targets.find((target) => target.id === 'seoul');
+    const jeju = targets.find((target) => target.id === 'jeju');
+    return {
+      pairCount: pairs.length,
+      invalidMaps: pairs.filter((item) => (
+        item.mapHost !== 'www.google.com'
+        || item.mapPath !== '/maps/search/'
+        || item.mapApi !== '1'
+        || !item.mapQuery
+      )),
+      invalidImages: pairs.filter((item) => (
+        item.imageHost !== 'www.google.com'
+        || item.imageMode !== 'isch'
+        || !item.imageQuery
+      )),
+      domLinkIssues,
+      preciseQueries: {
+        towerMap: new URL(mapsUrl(seoul, 'nSeoulTower')).searchParams.get('query'),
+        towerImage: new URL(photosUrl(seoul, 'nSeoulTower')).searchParams.get('q'),
+        tangerineMap: new URL(mapsUrl(jeju, 'tangerine')).searchParams.get('query'),
+        tangerineImage: new URL(photosUrl(jeju, 'tangerine')).searchParams.get('q')
+      }
+    };
+  });
+
+  expect(audit.pairCount).toBe(78);
+  expect(audit.invalidMaps).toEqual([]);
+  expect(audit.invalidImages).toEqual([]);
+  expect(audit.domLinkIssues).toEqual([]);
+  expect(audit.preciseQueries).toEqual({
+    towerMap: 'N서울타워 서울',
+    towerImage: 'N서울타워 서울 대한민국',
+    tangerineMap: '제주 감귤체험농장',
+    tangerineImage: '제주 감귤 과수원 대한민국'
+  });
+
+  await page.locator('[data-region="capital"]').click();
   await page.locator('[data-region="gangwon"]').click();
   await expect(page.locator('[data-region="gangwon"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#pinLayer .pin')).toHaveCount(2);
@@ -281,15 +381,18 @@ test('한국 문화 지도는 선택 지역의 핀만 DOM에 두고 확인 뒤 �
   await page.locator('#checkSentenceBtn').click();
   await expect(page.locator('#mapFeedback')).toContainText('확인했어요');
   await expect(page.locator('#mapAction')).toBeVisible();
+  await expect(page.locator('#photoAction')).toBeVisible();
 });
 
-test('비교용 베트남 지도도 확인 전에는 탐색 링크를 숨기고 선택 상태를 복원한다', async ({ page }) => {
+test('베트남 지도는 확인 전에도 탐색 링크를 제공하고 선택 상태를 복원한다', async ({ page }) => {
   await page.goto('/c16/grammar4-vietnam-map-match.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#mapAction')).toBeHidden();
-  await expect(page.locator('#tagGrid .tag-actions')).toHaveCount(0);
+  await expect(page.locator('#mapAction')).toBeVisible();
+  await expect(page.locator('#photoAction')).toBeVisible();
+  await expect(page.locator('#tagGrid .tag-actions')).not.toHaveCount(0);
   await page.locator('[data-region="central"]').click();
   await expect(page.locator('[data-region="central"]')).toBeFocused();
-  await expect(page.locator('#mapAction')).toBeHidden();
+  await expect(page.locator('#mapAction')).toBeVisible();
+  await expect(page.locator('#photoAction')).toBeVisible();
   await page.locator('#checkSentenceBtn').click();
   await expect(page.locator('#mapFeedback')).toContainText('확인했어요');
   await expect(page.locator('#mapAction')).toBeVisible();
@@ -743,6 +846,7 @@ test('핵심 C16 문법 동선은 320/390 및 200% 확대 환경에서 목표와
     { path: '/c16/grammar2-card-builder-pro.html', action: '[data-reason]' },
     { path: '/c16/grammar3-worth-gauge.html', action: '[data-activity]' },
     { path: '/c16/grammar4-korea-map-match.html', action: '[data-region]' },
+    { path: '/c16/grammar4-vietnam-map-match.html', action: '[data-region]' },
     { path: '/c16/grammar4-speaking-pro.html', action: '#recordBtn' }
   ];
 

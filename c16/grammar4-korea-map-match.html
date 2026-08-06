@@ -491,7 +491,7 @@
             gap: 4px;
         }
 
-        .tag-actions .past-link,
+        .tag-actions .map-link,
         .tag-actions .photo-link {
             width: 26px;
             height: 26px;
@@ -499,7 +499,7 @@
         }
 
         .photo-link,
-        .past-link {
+        .map-link {
             display: inline-grid;
             place-items: center;
             width: 30px;
@@ -519,15 +519,15 @@
             box-shadow: 0 6px 14px rgba(67, 56, 202, 0.12);
         }
 
-        .past-link:hover,
-        .past-link:focus-visible {
+        .map-link:hover,
+        .map-link:focus-visible {
             border-color: #fb923c;
             background: #ffedd5;
             color: #9a3412;
         }
 
         .photo-link[hidden],
-        .past-link[hidden] {
+        .map-link[hidden] {
             display: none !important;
         }
 
@@ -688,8 +688,8 @@
             <div class="chip-row">
                 <span class="chip" id="placeChip"></span>
                 <span class="chip" id="tagChip"></span>
-                <a class="past-link" id="mapAction" target="_blank" rel="noopener noreferrer" aria-label="구글맵에서 보기" title="구글맵에서 보기"><i class="fa-solid fa-map-location-dot"></i></a>
-                <a class="photo-link" id="photoAction" target="_blank" rel="noopener noreferrer" aria-label="사진 보기" title="사진 보기" hidden><i class="fa-solid fa-image"></i></a>
+                <a class="map-link" id="mapAction" target="_blank" rel="noopener noreferrer" aria-label="구글맵에서 보기" title="구글맵에서 보기" hidden><i class="fa-solid fa-map-location-dot"></i></a>
+                <a class="photo-link" id="photoAction" target="_blank" rel="noopener noreferrer" aria-label="이미지 검색 결과 보기" title="이미지 검색 결과 보기" hidden><i class="fa-solid fa-image"></i></a>
                 <span class="chip is-form">N(으)로 유명해요</span>
             </div>
             <div class="chip-row">
@@ -878,6 +878,42 @@
             'dwaejiGukbap', 'aguJjim', 'blackPork', 'tangerine'
         ]);
 
+        const mapQueryOverrides = {
+            nSeoulTower: 'N서울타워 서울',
+            hanRiver: '한강공원 서울',
+            tteokbokki: '서울 떡볶이 맛집',
+            jajangmyeon: '인천 차이나타운 짜장면 맛집',
+            chickenStreet: '수원 통닭거리',
+            dakgalbi: '춘천 닭갈비 맛집',
+            makguksu: '춘천 막국수 맛집',
+            chodangTofu: '강릉 초당순두부 맛집',
+            jikji: '청주고인쇄박물관 직지',
+            sungsimdang: '성심당 본점 대전',
+            bibimbap: '전주비빔밥 맛집',
+            kongnamulGukbap: '전주 콩나물국밥 맛집',
+            tteokgalbi: '광주 떡갈비거리',
+            hongeo: '목포 홍어거리',
+            gatbawi: '목포 갓바위',
+            makchang: '대구 막창골목',
+            flatDumpling: '대구 납작만두 맛집',
+            posco: '포스코 포항제철소',
+            gwamegi: '포항 과메기문화관',
+            eonyangBulgogi: '울산 언양불고기특구',
+            dwaejiGukbap: '부산 돼지국밥 맛집',
+            jinhaeCherry: '진해군항제 여좌천 로망스다리 창원',
+            aguJjim: '창원 마산 아귀찜거리',
+            blackPork: '제주 흑돼지거리',
+            tangerine: '제주 감귤체험농장'
+        };
+
+        const imageQueryOverrides = {
+            nSeoulTower: 'N서울타워 서울 대한민국',
+            jikji: '직지심체요절 청주 대한민국',
+            posco: '포항제철소 포스코 대한민국',
+            jinhaeCherry: '진해군항제 벚꽃 창원 대한민국',
+            tangerine: '제주 감귤 과수원 대한민국'
+        };
+
         const targetTags = {
             seoul: ['gyeongbokgung', 'nSeoulTower', 'hanRiver', 'bukchon', 'gwangjangMarket', 'tteokbokki'],
             incheon: ['incheonAirport', 'chinatown', 'wolmido', 'songdo', 'jajangmyeon'],
@@ -1020,29 +1056,36 @@
         }
 
         function mapsUrl(target, tagId) {
-            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${nounTags[tagId]} ${target.ko}`)}`;
+            if (!target.tags.includes(tagId) || !nounTags[tagId]) return '';
+            const query = mapQueryOverrides[tagId]
+                || `${nounTags[tagId]} ${target.ko} 대한민국${foodTags.has(tagId) ? ' 맛집' : ''}`;
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
         }
 
         function photosUrl(target, tagId) {
-            if (!foodTags.has(tagId)) return '';
-            return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(`${nounTags[tagId]} ${target.ko} 사진`)}`;
+            if (!target.tags.includes(tagId) || !nounTags[tagId]) return '';
+            const query = imageQueryOverrides[tagId]
+                || `${nounTags[tagId]} ${target.ko} 대한민국${foodTags.has(tagId) ? ' 음식' : ''}`;
+            return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(query)}`;
         }
 
         function mapLink(target, tagId) {
+            const href = mapsUrl(target, tagId);
+            if (!href) return '';
             const label = `${target.name} ${nounTags[tagId]} 구글맵에서 보기`;
-            return `<a class="past-link" href="${mapsUrl(target, tagId)}" target="_blank" rel="noopener noreferrer" aria-label="${label}" title="구글맵에서 보기"><i class="fa-solid fa-map-location-dot"></i></a>`;
+            return `<a class="map-link" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${label}" title="구글맵에서 보기"><i class="fa-solid fa-map-location-dot"></i></a>`;
         }
 
         function photoLink(target, tagId) {
             const href = photosUrl(target, tagId);
             if (!href) return '';
-            const label = `${target.name} ${nounTags[tagId]} 사진 보기`;
-            return `<a class="photo-link" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${label}" title="사진 보기"><i class="fa-solid fa-image"></i></a>`;
+            const label = `${target.name} ${nounTags[tagId]} 이미지 검색 결과 보기`;
+            return `<a class="photo-link" href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${label}" title="이미지 검색 결과 보기"><i class="fa-solid fa-image"></i></a>`;
         }
 
         function tagActions(target, tagId) {
-            if (!state.confirmed) return '';
-            return `<span class="tag-actions">${mapLink(target, tagId)}${photoLink(target, tagId)}</span>`;
+            const links = [mapLink(target, tagId), photoLink(target, tagId)].filter(Boolean).join('');
+            return links ? `<span class="tag-actions">${links}</span>` : '';
         }
 
         function updateZoomControls() {
@@ -1189,18 +1232,19 @@
             regionBadge.textContent = regionLabel(target.region);
             placeChip.innerHTML = `${icon(target.icon)} ${target.name}`;
             tagChip.textContent = tag;
-            mapAction.hidden = !state.confirmed;
-            if (state.confirmed) {
-                mapAction.href = mapsUrl(target, state.tagId);
+            const mapHref = mapsUrl(target, state.tagId);
+            mapAction.hidden = !mapHref;
+            if (mapHref) {
+                mapAction.href = mapHref;
                 mapAction.setAttribute('aria-label', `${target.name} ${tag} 구글맵에서 보기`);
             } else {
                 mapAction.removeAttribute('href');
             }
             const photoHref = photosUrl(target, state.tagId);
-            photoAction.hidden = !photoHref || !state.confirmed;
-            if (photoHref && state.confirmed) {
+            photoAction.hidden = !photoHref;
+            if (photoHref) {
                 photoAction.href = photoHref;
-                photoAction.setAttribute('aria-label', `${target.name} ${tag} 사진 보기`);
+                photoAction.setAttribute('aria-label', `${target.name} ${tag} 이미지 검색 결과 보기`);
             } else {
                 photoAction.removeAttribute('href');
             }
