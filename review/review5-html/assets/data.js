@@ -115,6 +115,7 @@
       listening: {
         id: "listening",
         href: "listening.html",
+        transcriptHref: "listening-transcripts.html",
         nextHref: "reading-writing.html",
         title: "듣기",
         hero: "복습5 듣기 지문을 재생하고 선택하는 단계",
